@@ -6,7 +6,7 @@
 
 ### Build
 
-#### Trivy Build
+#### Kaniko Build
 
 - Stage: Build
 - Primary Task to extend: Kaniko
@@ -21,13 +21,36 @@
 
 ### Promote
 
+- Stage: Promote
+- Primary task to extend: promote
+- Variable list
+  - CI_REGISTRY_IMAGE
+  - CI_REGISTRY_USER
+  - CI_REGISTRY_PASSWORD
+  - CI_COMMIT_SHORT_SHA
+  - CI_COMMIT_TAG
+  - IMAGE
+- Description: 
+
 ### Scan
 
+- Stage: Scan
+- Primary Task to extend: 
+- Variable list
+  - $CI_REGISTRY_IMAGE : 
+  - $CI_REGISTRY_USER : 
+  - $CI_REGISTRY_PASSWORD :
+  - $IMAGE: 
+  - $CI_COMMIT_SHORT_SHA: 
+- Description: 
 
-## Expected Variables
 
-The [Big Bang](https://repo1.dsop.io/platform-one/private/big-bang) project has the following variables configured
+## Pre-Defined Variables
 
-| Variable Name     | Purpose                       | Last updated      |
-|--------------     | --------                      | ------------      |
-| DOCKER_AUTH       | Authenticate to Registry1     | 10/14/2020        |
+The [Big Bang](https://repo1.dsop.io/platform-one/private/big-bang) project has the following variables configured. 
+
+| Variable Name         | Purpose                               | Last updated      |
+|--------------         | --------                              | ------------      |
+| DOCKER_AUTH           | Authenticate to Registry1             | 10/14/2020        |
+
+The Gitlab CI/CD auto injected variables [reference](https://docs.gitlab.com/ee/ci/variables/predefined_variables.html).
