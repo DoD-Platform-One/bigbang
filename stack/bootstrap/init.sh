@@ -22,29 +22,31 @@ need() {
   command -v "$1" >/dev/null 2>&1 || fatal "'$1' required on \$PATH but not found"
 }
 
-deploy_gotk() {
-  info "Installing gotk components"
-  # Apply gotk components
-  kustomize build stack/base/gotk-system/toolkit | kubectl apply -f -
+deploy_flux() {
+  info "Installing flux components"
+  # Apply flux components
+  kustomize build stack/base/flux-system/toolkit | kubectl apply -f -
 
-  info "Waiting for gotk components to initialize"
-  kubectl wait --for=condition=available --timeout=60s --all deployments -n gotk-system
+  info "Waiting for flux components to initialize"
+  kubectl wait --for=condition=available --timeout=60s --all deployments -n flux-system
 
   info "Registering required HelmRepositories"
   # apply helmrepositories
-  kustomize build stack/base/gotk-system/chart-repositories | kubectl apply -f -
+  kustomize build stack/base/flux-system/chart-repositories | kubectl apply -f -
 }
 
 deploy_umbrella() {
   info "Bootstrapping from the current repo"
 
   # apply the repository with the current branch
-  branch=$(git rev-parse --abbrev-ref HEAD)
+  export branch=$(git rev-parse --abbrev-ref HEAD)
+  export repo=$(git config --get remote.origin.url)
+  export env="dev"
 
-  cat stack/bootstrap/bootstrap.yaml | sed -e 's/$BRANCH/'$branch'/g' | kubectl apply -f -
+  envsubst < stack/bootstrap/bootstrap.yaml | kubectl apply -f -
 }
 
 {
-#  deploy_gotk
+  deploy_flux
   deploy_umbrella
 }

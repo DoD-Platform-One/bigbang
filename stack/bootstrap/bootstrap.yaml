@@ -3,12 +3,12 @@ apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
   name: this
-  namespace: gotk-system
+  namespace: flux-system
 spec:
   interval: 1m
   ref:
-    branch: $BRANCH
-  url: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git
+    branch: $branch
+  url: $repo
   ignore: |
     # exclude all
     /*
@@ -20,10 +20,10 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
   name: bigbang-umbrella
-  namespace: gotk-system
+  namespace: flux-system
 spec:
   interval: 1m
-  path: './stack/base'
+  path: './stack/env/$env'
   sourceRef:
     kind: GitRepository
     name: this

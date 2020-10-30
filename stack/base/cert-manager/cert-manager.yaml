@@ -14,8 +14,16 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jetstack
-        namespace: gotk-system
+        namespace: flux-system
       interval: 5m
+
+  valuesFrom:
+    - kind: ConfigMap
+      name: env-values
+      optional: true
+    - kind: Secret
+      name: env-values
+      optional: true
 
   values:
     installCRDs: true
