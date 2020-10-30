@@ -1,0 +1,31 @@
+resources:
+  - gotk-system/
+  - istio/
+  - observability/
+  - cert-manager/
+  - gatekeeper/
+
+patches:
+    # Add common parameters to all HelmReleases
+  - target:
+      kind: HelmRelease
+      group: helm.toolkit.fluxcd.io
+    patch: |
+      apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      metadata:
+        name: common
+      spec:
+        test:
+          enable: false
+        install:
+          remediation:
+            retries: 5
+        upgrade:
+          remediation:
+            retries: 3
+            remediateLastFailure: true
+          cleanupOnFail: true
+        rollback:
+          timeout: 1m
+          cleanupOnFail: true
