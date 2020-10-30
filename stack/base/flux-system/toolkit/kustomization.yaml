@@ -1,2 +1,5 @@
+commonLabels:
+  owner: p1
+
 resources:
   - all.yaml

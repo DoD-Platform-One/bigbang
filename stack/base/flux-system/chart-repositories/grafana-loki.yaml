@@ -1,9 +1,9 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: rancher-latest
-  namespace: gotk-system
+  name: grafana-loki
+  namespace: flux-system
 spec:
   interval: 24h
-  url: https://releases.rancher.com/server-charts/latest
+  url: https://grafana.github.io/loki/charts
   timeout: 3m

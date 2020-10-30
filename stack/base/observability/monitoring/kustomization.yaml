@@ -1,2 +1,7 @@
 resources:
   - kube-prometheus-stack.yaml
+
+  # Virtual Services
+  - alertmanager-vs.yaml
+  - grafana-vs.yaml
+  - prometheus-vs.yaml

@@ -13,7 +13,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
-        namespace: gotk-system
+        namespace: flux-system
       interval: 5m
 
   valuesFrom:
@@ -37,10 +37,6 @@ spec:
       image:
         repository: grafana/grafana
         tag: 7.2.2
-      admin:
-        existingSecret: grafana-admin-creds
-        userKey: user
-        passwordKey: password
 
     prometheus:
       enabled: true

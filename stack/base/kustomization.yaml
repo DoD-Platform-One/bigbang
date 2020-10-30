@@ -1,9 +1,9 @@
 resources:
-  - gotk-system/
-  - istio/
-  - observability/
-  - cert-manager/
-  - gatekeeper/
+  - flux-system
+  - istio
+  - observability
+  - cert-manager
+  - gatekeeper
 
 patches:
     # Add common parameters to all HelmReleases
@@ -29,3 +29,16 @@ patches:
         rollback:
           timeout: 1m
           cleanupOnFail: true
+
+configMapGenerator:
+  - name: globals
+    namespace: flux-system
+
+vars:
+  - name: hostname
+    objref: { kind: ConfigMap, name: globals, apiVersion: v1 }
+    fieldref:
+      fieldpath: data.hostname
+
+configurations:
+  - config.yaml
