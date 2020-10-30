@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: rancher-latest
+  namespace: gotk-system
+spec:
+  interval: 24h
+  url: https://releases.rancher.com/server-charts/latest
+  timeout: 3m

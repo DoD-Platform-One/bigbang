@@ -1,0 +1,16 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: this
+  namespace: gotk-system
+spec:
+  interval: 1m
+  ref:
+    branch: $BRANCH
+  url: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git
+  ignore: |
+    # exclude all
+    /*
+    # include deploy dirs
+    !/stack/

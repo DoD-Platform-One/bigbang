@@ -1,0 +1,8 @@
+resources:
+  - banzaicloud.yaml
+  - gitlab.yaml
+  - grafana-loki.yaml
+  - jetstack.yaml
+  - podinfo.yaml
+  - prometheus-community.yaml
+  - rancher-latest.yaml

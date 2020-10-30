@@ -1,0 +1,52 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring
+  namespace: observability
+spec:
+  interval: 2m
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: 10.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: gotk-system
+      interval: 5m
+
+  valuesFrom:
+    - kind: ConfigMap
+      name: env-values
+      optional: true
+    - kind: Secret
+      name: env-values
+      optional: true
+
+  values:
+    fullnameOverride: monitoring
+
+    prometheusOperator:
+      enabled: true
+      manageCrds: true
+      createCustomResource: true
+
+    grafana:
+      enabled: true
+      image:
+        repository: grafana/grafana
+        tag: 7.2.2
+      admin:
+        existingSecret: grafana-admin-creds
+        userKey: user
+        passwordKey: password
+
+    prometheus:
+      enabled: true
+      prometheusSpec:
+        # service port naming conventions
+        portName: http-web
+
+    alertmanager:
+      enabled: true

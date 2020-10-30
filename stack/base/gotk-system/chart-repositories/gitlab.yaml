@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: gitlab
+  namespace: gotk-system
+spec:
+  interval: 24h
+  url: https://charts.gitlab.io/
+  timeout: 3m

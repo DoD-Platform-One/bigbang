@@ -1,0 +1,3 @@
+resources:
+  - istio-operator/
+  - istio-system/
