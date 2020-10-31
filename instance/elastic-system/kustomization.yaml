@@ -1,0 +1,4 @@
+namespace: elastic-system
+
+resources:
+- ../../base/logging/eck-operator

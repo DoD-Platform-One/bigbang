@@ -1,0 +1,6 @@
+namespace: monitoring
+
+resources:
+- alertmanager-vs.yaml
+- grafana-vs.yaml
+- prometheus-vs.yaml

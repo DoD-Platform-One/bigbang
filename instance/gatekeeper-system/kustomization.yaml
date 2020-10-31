@@ -1,0 +1,4 @@
+namespace: gatekeeper-system
+
+resources:
+  - ../../base/gatekeeper

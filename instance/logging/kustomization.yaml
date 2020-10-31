@@ -1,0 +1,6 @@
+namespace: logging
+
+resources:
+- ../../base/logging/efk
+
+- ingress
