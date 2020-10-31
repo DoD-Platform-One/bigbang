@@ -4,6 +4,8 @@ Work in progress umbrella package
 
 ## Usage
 
+### As a consumer
+
 ```bash
 # Get base
 kpt get https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git/base base
@@ -16,6 +18,14 @@ git add . && git commit -m "initial commit" && git push
 
 # Apply the bootstrapping resources (flux kustomizations)
 # NOTE: Shell script is provided for documentation purposes as well as minor convenience (such as an envsubst for current branch)
+bootstrap/init.sh
+```
+
+### For development or getting started
+
+```bash
+# Assumes valid kubeconfig is configured
+# WARNING: This will deploy (a lot of) resources to the cluster configured with kubectl
 bootstrap/init.sh
 ```
 
