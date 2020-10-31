@@ -1,0 +1,17 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: this
+  namespace: flux-system
+spec:
+  interval: 1m
+  ref:
+    branch: $branch
+  url: $repo
+  ignore: |
+    # exclude all
+    /*
+    # include deploy dirs
+    !/base/
+    !/instance/

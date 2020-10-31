@@ -1,0 +1,8 @@
+resources:
+  - all-in-one.yaml
+
+#images:
+#  # TODO: This image doesnt't work yet
+#  - name: docker.elastic.co/eck/eck-operator:1.2.1
+#    newName: registry1.dsop.io/ironbank/elastic/eck-operator/eck-operator
+#    newTag: 1.2.1

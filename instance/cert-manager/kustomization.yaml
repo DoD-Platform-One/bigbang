@@ -1,0 +1,7 @@
+namespace: cert-manager
+
+resources:
+  - ../../base/cert-manager
+
+patchesStrategicMerge:
+  - helmrelease.yaml

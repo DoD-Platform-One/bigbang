@@ -1,0 +1,6 @@
+namespace: istio-system
+
+resources:
+- ../../base/istio/istio-system
+
+- gateway.yaml

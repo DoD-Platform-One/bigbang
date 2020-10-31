@@ -1,0 +1,18 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bigbang-eck-operator
+spec:
+  path: './instance/elastic-system'
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bigbang-logging
+spec:
+  path: './instance/logging'
+  dependsOn:
+    - name: bigbang-istio-system
+      namespace: flux-system

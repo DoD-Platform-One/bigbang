@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bigbang-istio-operator
+spec:
+  path: './instance/istio-operator'
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: bigbang-istio-system
+spec:
+  path: './instance/istio-system'
+  dependsOn:
+    - name: bigbang-istio-operator
+      namespace: flux-system
+  healthChecks:
+    - kind: Deployment
+      apiVersion: apps/v1
+      name: istiod
+      namespace: istio-system

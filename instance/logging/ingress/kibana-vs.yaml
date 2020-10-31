@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kibana
+spec:
+  hosts:
+  - "kibana.hostname" # {"$kpt-set":"kibana-hostname"}
+  gateways:
+  - main.istio-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        port:
+          number: 5601
+        host: kibana-kb-http

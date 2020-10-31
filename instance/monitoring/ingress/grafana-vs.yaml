@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: grafana
+spec:
+  hosts:
+  - "grafana.hostname" # {"$kpt-set":"grafana-hostname"}
+  gateways:
+  - main.istio-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        port:
+          number: 80
+        host: monitoring-grafana
