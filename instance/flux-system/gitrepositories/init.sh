@@ -39,8 +39,10 @@ deploy_umbrella() {
   export repo=$(git config --get remote.origin.url)
   export env="dev"
 
-  kustomize build bootstrap/gitrepositories | envsubst | kubectl apply -f -
-  kustomize build instance/flux-system | kubectl apply -f -
+  curdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+  kustomize build "${curdir}" | envsubst | kubectl apply -f -
+  kustomize build "${curdir}/.." | kubectl apply -f -
 }
 
 {
