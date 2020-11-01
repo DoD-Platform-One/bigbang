@@ -5,11 +5,9 @@ metadata:
   namespace: flux-system
 spec:
   ignore: |
-    # exclude all
-    /*
-    # include deploy dirs
-    !/base/
-    !/instance/
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
   interval: 1m
   ref:
     branch: $branch

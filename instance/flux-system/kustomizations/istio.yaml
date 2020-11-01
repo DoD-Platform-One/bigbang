@@ -3,7 +3,7 @@ kind: Kustomization
 metadata:
   name: bigbang-istio-operator
 spec:
-  path: './instance/istio-operator'
+  path: './instance/istio-operator' # {"$kpt-set":"env-istio-operator"}
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
@@ -18,4 +18,4 @@ spec:
     namespace: istio-system
     apiVersion: apps/v1
     kind: Deployment
-  path: './instance/istio-system'
+  path: './instance/istio-system' # {"$kpt-set":"env-istio-system"}

@@ -3,4 +3,4 @@ kind: Kustomization
 metadata:
   name: bigbang-gatekeeper
 spec:
-  path: './instance/gatekeeper-system'
+  path: './instance/gatekeeper-system' # {"$kpt-set":"env-gatekeeper-system"}

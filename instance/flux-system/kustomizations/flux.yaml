@@ -3,4 +3,4 @@ kind: Kustomization
 metadata:
   name: bigbang-flux
 spec:
-  path: './instance/flux-system'
+  path: './instance/flux-system' # {"$kpt-set":"env-flux-system"}
