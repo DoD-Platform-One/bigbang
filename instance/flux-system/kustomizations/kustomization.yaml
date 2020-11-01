@@ -1,26 +1,24 @@
 namespace: flux-system
-
 resources:
-  - istio.yaml
-  - flux.yaml
-  - cert-manager.yaml
-  - logging.yaml
-  - monitoring.yaml
-  - gatekeeper.yaml
-
+- istio.yaml
+- flux.yaml
+- cert-manager.yaml
+- logging.yaml
+- monitoring.yaml
+- gatekeeper.yaml
 patches:
-  - target:
-      kind: Kustomization
-      group: kustomize.toolkit.fluxcd.io
-    patch: |
-      apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
-      kind: Kustomization
-      metadata:
-        name: bigbang-apps
-      spec:
-        interval: 2m
-        sourceRef:
-          kind: GitRepository
-          name: this
-        prune: true
-        timeout: 2m
+- target:
+    kind: Kustomization
+    group: kustomize.toolkit.fluxcd.io
+  patch: |-
+    apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+    kind: Kustomization
+    metadata:
+      name: bigbang-apps
+    spec:
+      interval: 2m
+      sourceRef:
+        kind: GitRepository
+        name: this
+      prune: true
+      timeout: 2m

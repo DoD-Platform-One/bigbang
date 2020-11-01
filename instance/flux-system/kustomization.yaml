@@ -1,7 +1,5 @@
 namespace: flux-system
-
 resources:
-  - ../../base/flux
-
-  # Bootstrapping components
-  - kustomizations
+- ../../base/flux
+# Bootstrapping components
+- kustomizations

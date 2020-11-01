@@ -1,29 +1,28 @@
----
 # GitOps Toolkit revision latest
 # Components: source-controller,kustomize-controller,helm-controller,notification-controller
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: flux-system
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: allow-scraping
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: allow-scraping
-  namespace: flux-system
 spec:
   ingress:
-  - from:
+  - ports:
+    - protocol: TCP
+      port: 8080
+    from:
     - namespaceSelector: {}
-    ports:
-    - port: 8080
-      protocol: TCP
   podSelector: {}
   policyTypes:
   - Ingress
@@ -31,11 +30,11 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: allow-webhooks
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: allow-webhooks
-  namespace: flux-system
 spec:
   ingress:
   - from:
@@ -49,11 +48,11 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: deny-ingress
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: deny-ingress
-  namespace: flux-system
 spec:
   ingress:
   - from:
@@ -65,47 +64,47 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  name: crd-controller-flux-system
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: crd-controller-flux-system
-  namespace: flux-system
 rules:
-- apiGroups:
+- resources:
+  - '*'
+  apiGroups:
   - source.toolkit.fluxcd.io
-  resources:
-  - '*'
   verbs:
   - '*'
-- apiGroups:
+- resources:
+  - '*'
+  apiGroups:
   - kustomize.toolkit.fluxcd.io
-  resources:
-  - '*'
   verbs:
   - '*'
-- apiGroups:
+- resources:
+  - '*'
+  apiGroups:
   - helm.toolkit.fluxcd.io
-  resources:
-  - '*'
   verbs:
   - '*'
-- apiGroups:
+- resources:
+  - '*'
+  apiGroups:
   - notification.toolkit.fluxcd.io
-  resources:
-  - '*'
   verbs:
   - '*'
-- apiGroups:
-  - ""
-  resources:
+- resources:
   - configmaps
   - configmaps/status
+  apiGroups:
+  - ""
   verbs:
   - '*'
-- apiGroups:
-  - ""
-  resources:
+- resources:
   - events
+  apiGroups:
+  - ""
   verbs:
   - create
   - patch
@@ -113,46 +112,46 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
+  name: crd-controller-flux-system
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: crd-controller-flux-system
-  namespace: flux-system
 roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
   name: crd-controller-flux-system
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
 subjects:
-- kind: ServiceAccount
-  name: default
+- name: default
   namespace: flux-system
+  kind: ServiceAccount
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  name: cluster-reconciler-flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: cluster-reconciler-flux-system
 roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
   name: cluster-admin
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
 subjects:
-- kind: ServiceAccount
-  name: default
+- name: default
   namespace: flux-system
+  kind: ServiceAccount
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: buckets.source.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: buckets.source.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: source.toolkit.fluxcd.io
   names:
@@ -162,135 +161,155 @@ spec:
     singular: bucket
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .spec.url
-      name: URL
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: URL
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+      jsonPath: .spec.url
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: Bucket is the Schema for the buckets API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
-            description: BucketSpec defines the desired state of an S3 compatible bucket
+            type: object
+            description: BucketSpec defines the desired state of an S3 compatible
+              bucket
             properties:
+              secretRef:
+                type: object
+                description: The name of the secret containing authentication credentials
+                  for the Bucket.
+                properties:
+                  name:
+                    type: string
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
               bucketName:
+                type: string
                 description: The bucket name.
-                type: string
               endpoint:
+                type: string
                 description: The bucket endpoint address.
-                type: string
               ignore:
-                description: Ignore overrides the set of excluded patterns in the .sourceignore format (which is the same as .gitignore). If not provided, a default will be used, consult the documentation for your version to find out what those are.
                 type: string
+                description: Ignore overrides the set of excluded patterns in the
+                  .sourceignore format (which is the same as .gitignore). If not provided,
+                  a default will be used, consult the documentation for your version
+                  to find out what those are.
               insecure:
-                description: Insecure allows connecting to a non-TLS S3 HTTP endpoint.
                 type: boolean
+                description: Insecure allows connecting to a non-TLS S3 HTTP endpoint.
               interval:
-                description: The interval at which to check for bucket updates.
                 type: string
+                description: The interval at which to check for bucket updates.
               provider:
+                type: string
                 description: The S3 compatible storage provider name, default ('generic').
                 enum:
                 - generic
                 - aws
-                type: string
               region:
+                type: string
                 description: The bucket region.
-                type: string
-              secretRef:
-                description: The name of the secret containing authentication credentials for the Bucket.
-                properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                    type: string
-                type: object
               timeout:
-                description: The timeout for download operations, defaults to 20s.
                 type: string
+                description: The timeout for download operations, defaults to 20s.
             required:
             - bucketName
             - endpoint
             - interval
-            type: object
           status:
+            type: object
             description: BucketStatus defines the observed state of a bucket
             properties:
               artifact:
-                description: Artifact represents the output of the last successful Bucket sync.
+                type: object
+                description: Artifact represents the output of the last successful
+                  Bucket sync.
                 properties:
-                  checksum:
-                    description: Checksum is the SHA1 checksum of the artifact.
-                    type: string
-                  lastUpdateTime:
-                    description: LastUpdateTime is the timestamp corresponding to the last update of this artifact.
-                    format: date-time
-                    type: string
-                  path:
-                    description: Path is the relative file path of this artifact.
-                    type: string
                   revision:
-                    description: Revision is a human readable identifier traceable in the origin source system. It can be a Git commit SHA, Git tag, a Helm index timestamp, a Helm chart version, etc.
                     type: string
+                    description: Revision is a human readable identifier traceable
+                      in the origin source system. It can be a Git commit SHA, Git
+                      tag, a Helm index timestamp, a Helm chart version, etc.
+                  checksum:
+                    type: string
+                    description: Checksum is the SHA1 checksum of the artifact.
+                  lastUpdateTime:
+                    type: string
+                    description: LastUpdateTime is the timestamp corresponding to
+                      the last update of this artifact.
+                    format: date-time
+                  path:
+                    type: string
+                    description: Path is the relative file path of this artifact.
                   url:
-                    description: URL is the HTTP address of this artifact.
                     type: string
+                    description: URL is the HTTP address of this artifact.
                 required:
                 - path
                 - url
-                type: object
               conditions:
+                type: array
                 description: Conditions holds the conditions for the Bucket.
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last observed generation.
                 format: int64
-                type: integer
               url:
-                description: URL is the download link for the artifact output of the last Bucket sync.
                 type: string
-            type: object
-        type: object
+                description: URL is the download link for the artifact output of the
+                  last Bucket sync.
     served: true
     storage: true
     subresources:
@@ -305,13 +324,13 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: gitrepositories.source.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: gitrepositories.source.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: source.toolkit.fluxcd.io
   names:
@@ -321,154 +340,183 @@ spec:
     singular: gitrepository
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .spec.url
-      name: URL
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: URL
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+      jsonPath: .spec.url
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: GitRepository is the Schema for the gitrepositories API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: GitRepositorySpec defines the desired state of a Git repository.
             properties:
-              ignore:
-                description: Ignore overrides the set of excluded patterns in the .sourceignore format (which is the same as .gitignore). If not provided, a default will be used, consult the documentation for your version to find out what those are.
-                type: string
-              interval:
-                description: The interval at which to check for repository updates.
-                type: string
-              ref:
-                description: The Git reference to checkout and monitor for changes, defaults to master branch.
-                properties:
-                  branch:
-                    description: The Git branch to checkout, defaults to master.
-                    type: string
-                  commit:
-                    description: The Git commit SHA to checkout, if specified Tag filters will be ignored.
-                    type: string
-                  semver:
-                    description: The Git tag semver expression, takes precedence over Tag.
-                    type: string
-                  tag:
-                    description: The Git tag to checkout, takes precedence over Branch.
-                    type: string
-                type: object
               secretRef:
-                description: The secret name containing the Git credentials. For HTTPS repositories the secret must contain username and password fields. For SSH repositories the secret must contain identity, identity.pub and known_hosts fields.
+                type: object
+                description: The secret name containing the Git credentials. For HTTPS
+                  repositories the secret must contain username and password fields.
+                  For SSH repositories the secret must contain identity, identity.pub
+                  and known_hosts fields.
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                type: object
-              timeout:
-                description: The timeout for remote Git operations like cloning, defaults to 20s.
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+              ignore:
                 type: string
+                description: Ignore overrides the set of excluded patterns in the
+                  .sourceignore format (which is the same as .gitignore). If not provided,
+                  a default will be used, consult the documentation for your version
+                  to find out what those are.
+              interval:
+                type: string
+                description: The interval at which to check for repository updates.
+              ref:
+                type: object
+                description: The Git reference to checkout and monitor for changes,
+                  defaults to master branch.
+                properties:
+                  branch:
+                    type: string
+                    description: The Git branch to checkout, defaults to master.
+                  commit:
+                    type: string
+                    description: The Git commit SHA to checkout, if specified Tag
+                      filters will be ignored.
+                  semver:
+                    type: string
+                    description: The Git tag semver expression, takes precedence over
+                      Tag.
+                  tag:
+                    type: string
+                    description: The Git tag to checkout, takes precedence over Branch.
+              timeout:
+                type: string
+                description: The timeout for remote Git operations like cloning, defaults
+                  to 20s.
               url:
+                type: string
                 description: The repository URL, can be a HTTP/S or SSH address.
                 pattern: ^(http|https|ssh)://
-                type: string
               verify:
-                description: Verify OpenPGP signature for the Git commit HEAD points to.
+                type: object
+                description: Verify OpenPGP signature for the Git commit HEAD points
+                  to.
                 properties:
-                  mode:
-                    description: Mode describes what git object should be verified, currently ('head').
-                    enum:
-                    - head
-                    type: string
                   secretRef:
-                    description: The secret name containing the public keys of all trusted Git authors.
+                    type: object
+                    description: The secret name containing the public keys of all
+                      trusted Git authors.
                     properties:
                       name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                         type: string
-                    type: object
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                  mode:
+                    type: string
+                    description: Mode describes what git object should be verified,
+                      currently ('head').
+                    enum:
+                    - head
                 required:
                 - mode
-                type: object
             required:
             - interval
             - url
-            type: object
           status:
+            type: object
             description: GitRepositoryStatus defines the observed state of a Git repository.
             properties:
               artifact:
-                description: Artifact represents the output of the last successful repository sync.
+                type: object
+                description: Artifact represents the output of the last successful
+                  repository sync.
                 properties:
-                  checksum:
-                    description: Checksum is the SHA1 checksum of the artifact.
-                    type: string
-                  lastUpdateTime:
-                    description: LastUpdateTime is the timestamp corresponding to the last update of this artifact.
-                    format: date-time
-                    type: string
-                  path:
-                    description: Path is the relative file path of this artifact.
-                    type: string
                   revision:
-                    description: Revision is a human readable identifier traceable in the origin source system. It can be a Git commit SHA, Git tag, a Helm index timestamp, a Helm chart version, etc.
                     type: string
+                    description: Revision is a human readable identifier traceable
+                      in the origin source system. It can be a Git commit SHA, Git
+                      tag, a Helm index timestamp, a Helm chart version, etc.
+                  checksum:
+                    type: string
+                    description: Checksum is the SHA1 checksum of the artifact.
+                  lastUpdateTime:
+                    type: string
+                    description: LastUpdateTime is the timestamp corresponding to
+                      the last update of this artifact.
+                    format: date-time
+                  path:
+                    type: string
+                    description: Path is the relative file path of this artifact.
                   url:
-                    description: URL is the HTTP address of this artifact.
                     type: string
+                    description: URL is the HTTP address of this artifact.
                 required:
                 - path
                 - url
-                type: object
               conditions:
+                type: array
                 description: Conditions holds the conditions for the GitRepository.
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last observed generation.
                 format: int64
-                type: integer
               url:
-                description: URL is the download link for the artifact output of the last repository sync.
                 type: string
-            type: object
-        type: object
+                description: URL is the download link for the artifact output of the
+                  last repository sync.
     served: true
     storage: true
     subresources:
@@ -483,13 +531,13 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: helmcharts.source.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: helmcharts.source.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: source.toolkit.fluxcd.io
   names:
@@ -499,142 +547,159 @@ spec:
     singular: helmchart
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .spec.chart
-      name: Chart
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: Chart
       type: string
-    - jsonPath: .spec.version
-      name: Version
+      jsonPath: .spec.chart
+    - name: Version
       type: string
-    - jsonPath: .spec.sourceRef.kind
-      name: Source Kind
+      jsonPath: .spec.version
+    - name: Source Kind
       type: string
-    - jsonPath: .spec.sourceRef.name
-      name: Source Name
+      jsonPath: .spec.sourceRef.kind
+    - name: Source Name
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+      jsonPath: .spec.sourceRef.name
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: HelmChart is the Schema for the helmcharts API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: HelmChartSpec defines the desired state of a Helm chart.
             properties:
               chart:
-                description: The name or path the Helm chart is available at in the SourceRef.
                 type: string
+                description: The name or path the Helm chart is available at in the
+                  SourceRef.
               interval:
-                description: The interval at which to check the Source for updates.
                 type: string
+                description: The interval at which to check the Source for updates.
               sourceRef:
+                type: object
                 description: The reference to the Source the chart is available at.
                 properties:
-                  apiVersion:
-                    description: APIVersion of the referent.
+                  name:
                     type: string
+                    description: Name of the referent.
+                  apiVersion:
+                    type: string
+                    description: APIVersion of the referent.
                   kind:
-                    description: Kind of the referent, valid values are ('HelmRepository', 'GitRepository', 'Bucket').
+                    type: string
+                    description: Kind of the referent, valid values are ('HelmRepository',
+                      'GitRepository', 'Bucket').
                     enum:
                     - HelmRepository
                     - GitRepository
                     - Bucket
-                    type: string
-                  name:
-                    description: Name of the referent.
-                    type: string
                 required:
                 - kind
                 - name
-                type: object
               valuesFile:
-                description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Ignored when omitted.
                 type: string
+                description: Alternative values file to use as the default chart values,
+                  expected to be a relative path in the SourceRef. Ignored when omitted.
               version:
-                description: The chart version semver expression, ignored for charts from GitRepository and Bucket sources. Defaults to latest when omitted.
                 type: string
+                description: The chart version semver expression, ignored for charts
+                  from GitRepository and Bucket sources. Defaults to latest when omitted.
             required:
             - chart
             - interval
             - sourceRef
-            type: object
           status:
+            type: object
             description: HelmChartStatus defines the observed state of the HelmChart.
             properties:
               artifact:
-                description: Artifact represents the output of the last successful chart sync.
+                type: object
+                description: Artifact represents the output of the last successful
+                  chart sync.
                 properties:
-                  checksum:
-                    description: Checksum is the SHA1 checksum of the artifact.
-                    type: string
-                  lastUpdateTime:
-                    description: LastUpdateTime is the timestamp corresponding to the last update of this artifact.
-                    format: date-time
-                    type: string
-                  path:
-                    description: Path is the relative file path of this artifact.
-                    type: string
                   revision:
-                    description: Revision is a human readable identifier traceable in the origin source system. It can be a Git commit SHA, Git tag, a Helm index timestamp, a Helm chart version, etc.
                     type: string
+                    description: Revision is a human readable identifier traceable
+                      in the origin source system. It can be a Git commit SHA, Git
+                      tag, a Helm index timestamp, a Helm chart version, etc.
+                  checksum:
+                    type: string
+                    description: Checksum is the SHA1 checksum of the artifact.
+                  lastUpdateTime:
+                    type: string
+                    description: LastUpdateTime is the timestamp corresponding to
+                      the last update of this artifact.
+                    format: date-time
+                  path:
+                    type: string
+                    description: Path is the relative file path of this artifact.
                   url:
-                    description: URL is the HTTP address of this artifact.
                     type: string
+                    description: URL is the HTTP address of this artifact.
                 required:
                 - path
                 - url
-                type: object
               conditions:
+                type: array
                 description: Conditions holds the conditions for the HelmChart.
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last observed generation.
                 format: int64
-                type: integer
               url:
-                description: URL is the download link for the last chart pulled.
                 type: string
-            type: object
-        type: object
+                description: URL is the download link for the last chart pulled.
     served: true
     storage: true
     subresources:
@@ -649,13 +714,13 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: helmrepositories.source.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: helmrepositories.source.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: source.toolkit.fluxcd.io
   names:
@@ -665,116 +730,134 @@ spec:
     singular: helmrepository
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .spec.url
-      name: URL
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: URL
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+      jsonPath: .spec.url
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: HelmRepository is the Schema for the helmrepositories API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: HelmRepositorySpec defines the reference to a Helm repository.
             properties:
-              interval:
-                description: The interval at which to check the upstream for updates.
-                type: string
               secretRef:
-                description: The name of the secret containing authentication credentials for the Helm repository. For HTTP/S basic auth the secret must contain username and password fields. For TLS the secret must contain a certFile and keyFile, and/or caCert fields.
+                type: object
+                description: The name of the secret containing authentication credentials
+                  for the Helm repository. For HTTP/S basic auth the secret must contain
+                  username and password fields. For TLS the secret must contain a
+                  certFile and keyFile, and/or caCert fields.
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                type: object
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+              interval:
+                type: string
+                description: The interval at which to check the upstream for updates.
               timeout:
+                type: string
                 description: The timeout of index downloading, defaults to 60s.
-                type: string
               url:
-                description: The Helm repository URL, a valid URL contains at least a protocol and host.
                 type: string
+                description: The Helm repository URL, a valid URL contains at least
+                  a protocol and host.
             required:
             - interval
             - url
-            type: object
           status:
+            type: object
             description: HelmRepositoryStatus defines the observed state of the HelmRepository.
             properties:
               artifact:
-                description: Artifact represents the output of the last successful repository sync.
+                type: object
+                description: Artifact represents the output of the last successful
+                  repository sync.
                 properties:
-                  checksum:
-                    description: Checksum is the SHA1 checksum of the artifact.
-                    type: string
-                  lastUpdateTime:
-                    description: LastUpdateTime is the timestamp corresponding to the last update of this artifact.
-                    format: date-time
-                    type: string
-                  path:
-                    description: Path is the relative file path of this artifact.
-                    type: string
                   revision:
-                    description: Revision is a human readable identifier traceable in the origin source system. It can be a Git commit SHA, Git tag, a Helm index timestamp, a Helm chart version, etc.
                     type: string
+                    description: Revision is a human readable identifier traceable
+                      in the origin source system. It can be a Git commit SHA, Git
+                      tag, a Helm index timestamp, a Helm chart version, etc.
+                  checksum:
+                    type: string
+                    description: Checksum is the SHA1 checksum of the artifact.
+                  lastUpdateTime:
+                    type: string
+                    description: LastUpdateTime is the timestamp corresponding to
+                      the last update of this artifact.
+                    format: date-time
+                  path:
+                    type: string
+                    description: Path is the relative file path of this artifact.
                   url:
-                    description: URL is the HTTP address of this artifact.
                     type: string
+                    description: URL is the HTTP address of this artifact.
                 required:
                 - path
                 - url
-                type: object
               conditions:
+                type: array
                 description: Conditions holds the conditions for the HelmRepository.
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last observed generation.
                 format: int64
-                type: integer
               url:
-                description: URL is the download link for the last index fetched.
                 type: string
-            type: object
-        type: object
+                description: URL is the download link for the last index fetched.
     served: true
     storage: true
     subresources:
@@ -789,31 +872,31 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  name: source-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: source-controller
-  namespace: flux-system
 spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
+  type: ClusterIP
   selector:
     app: source-controller
-  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: source-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: source-controller
-  namespace: flux-system
 spec:
   replicas: 1
   selector:
@@ -821,41 +904,36 @@ spec:
       app: source-controller
   template:
     metadata:
+      labels:
+        app: source-controller
       annotations:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
-      labels:
-        app: source-controller
     spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/os: linux
       containers:
-      - args:
+      - name: manager
+        image: ghcr.io/fluxcd/source-controller:v0.2.1
+        args:
         - --events-addr=http://notification-controller/
         - --watch-all-namespaces=true
         - --log-level=info
         - --log-json
         - --enable-leader-election
         - --storage-path=/data
+        ports:
+        - name: http
+          containerPort: 9090
+        - name: http-prom
+          containerPort: 8080
         env:
         - name: RUNTIME_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/source-controller:v0.2.1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-        name: manager
-        ports:
-        - containerPort: 9090
-          name: http
-        - containerPort: 8080
-          name: http-prom
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
         resources:
           limits:
             cpu: 1000m
@@ -863,34 +941,39 @@ spec:
           requests:
             cpu: 50m
             memory: 64Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: tmp
+          mountPath: /tmp
+        livenessProbe:
+          httpGet:
+            port: http
+            path: /
+        readinessProbe:
+          httpGet:
+            port: http
+            path: /
+        imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
-        volumeMounts:
-        - mountPath: /data
-          name: data
-        - mountPath: /tmp
-          name: tmp
-      nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/os: linux
-      terminationGracePeriodSeconds: 10
       volumes:
-      - emptyDir: {}
-        name: data
-      - emptyDir: {}
-        name: tmp
+      - name: data
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: kustomizations.kustomize.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: kustomizations.kustomize.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: kustomize.toolkit.fluxcd.io
   names:
@@ -902,236 +985,275 @@ spec:
     singular: kustomization
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: Kustomization is the Schema for the kustomizations API.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: KustomizationSpec defines the desired state of a kustomization.
             properties:
-              decryption:
-                description: Decrypt Kubernetes secrets before applying them on the cluster.
-                properties:
-                  provider:
-                    description: Provider is the name of the decryption engine.
-                    enum:
-                    - sops
-                    type: string
-                  secretRef:
-                    description: The secret name containing the private OpenPGP keys used for decryption.
-                    properties:
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                        type: string
-                    type: object
-                required:
-                - provider
-                type: object
-              dependsOn:
-                description: DependsOn may contain a dependency.CrossNamespaceDependencyReference slice with references to Kustomization resources that must be ready before this Kustomization can be reconciled.
-                items:
-                  description: CrossNamespaceDependencyReference holds the reference to a dependency.
-                  properties:
-                    name:
-                      description: Name holds the name reference of a dependency.
-                      type: string
-                    namespace:
-                      description: Namespace holds the namespace reference of a dependency.
-                      type: string
-                  required:
-                  - name
-                  type: object
-                type: array
-              healthChecks:
-                description: A list of resources to be included in the health assessment.
-                items:
-                  description: CrossNamespaceObjectReference contains enough information to let you locate the typed referenced object at cluster level
-                  properties:
-                    apiVersion:
-                      description: API version of the referent, defaults to 'apps/v1'
-                      type: string
-                    kind:
-                      description: Kind of the referent
-                      type: string
-                    name:
-                      description: Name of the referent
-                      type: string
-                    namespace:
-                      description: Namespace of the referent
-                      type: string
-                  required:
-                  - kind
-                  - name
-                  type: object
-                type: array
-              interval:
-                description: The interval at which to reconcile the kustomization.
-                type: string
-              kubeConfig:
-                description: The KubeConfig for reconciling the Kustomization on a remote cluster.
-                properties:
-                  secretRef:
-                    description: SecretRef holds the name to a secret that contains a 'value' key with the kubeconfig file as the value. It must be in the same namespace as the Kustomization. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling the Kustomization.
-                    properties:
-                      name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                        type: string
-                    type: object
-                type: object
-              path:
-                description: Path to the directory containing the kustomization file.
-                pattern: ^\./
-                type: string
-              prune:
-                description: Prune enables garbage collection.
-                type: boolean
               serviceAccount:
-                description: The Kubernetes service account used for applying the kustomization.
+                type: object
+                description: The Kubernetes service account used for applying the
+                  kustomization.
                 properties:
                   name:
+                    type: string
                     description: Name is the name of the service account being referenced.
-                    type: string
                   namespace:
-                    description: Namespace is the namespace of the service account being referenced.
                     type: string
+                    description: Namespace is the namespace of the service account
+                      being referenced.
                 required:
                 - name
                 - namespace
+              decryption:
                 type: object
-              sourceRef:
-                description: Reference of the source where the kustomization file is.
+                description: Decrypt Kubernetes secrets before applying them on the
+                  cluster.
                 properties:
-                  apiVersion:
-                    description: API version of the referent
+                  secretRef:
+                    type: object
+                    description: The secret name containing the private OpenPGP keys
+                      used for decryption.
+                    properties:
+                      name:
+                        type: string
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                  provider:
                     type: string
+                    description: Provider is the name of the decryption engine.
+                    enum:
+                    - sops
+                required:
+                - provider
+              dependsOn:
+                type: array
+                description: DependsOn may contain a dependency.CrossNamespaceDependencyReference
+                  slice with references to Kustomization resources that must be ready
+                  before this Kustomization can be reconciled.
+                items:
+                  type: object
+                  description: CrossNamespaceDependencyReference holds the reference
+                    to a dependency.
+                  properties:
+                    name:
+                      type: string
+                      description: Name holds the name reference of a dependency.
+                    namespace:
+                      type: string
+                      description: Namespace holds the namespace reference of a dependency.
+                  required:
+                  - name
+              healthChecks:
+                type: array
+                description: A list of resources to be included in the health assessment.
+                items:
+                  type: object
+                  description: CrossNamespaceObjectReference contains enough information
+                    to let you locate the typed referenced object at cluster level
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the referent
+                    namespace:
+                      type: string
+                      description: Namespace of the referent
+                    apiVersion:
+                      type: string
+                      description: API version of the referent, defaults to 'apps/v1'
+                    kind:
+                      type: string
+                      description: Kind of the referent
+                  required:
+                  - kind
+                  - name
+              interval:
+                type: string
+                description: The interval at which to reconcile the kustomization.
+              kubeConfig:
+                type: object
+                description: The KubeConfig for reconciling the Kustomization on a
+                  remote cluster.
+                properties:
+                  secretRef:
+                    type: object
+                    description: SecretRef holds the name to a secret that contains
+                      a 'value' key with the kubeconfig file as the value. It must
+                      be in the same namespace as the Kustomization. It is recommended
+                      that the kubeconfig is self-contained, and the secret is regularly
+                      updated if credentials such as a cloud-access-token expire.
+                      Cloud specific `cmd-path` auth helpers will not function without
+                      adding binaries and credentials to the Pod that is responsible
+                      for reconciling the Kustomization.
+                    properties:
+                      name:
+                        type: string
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+              path:
+                type: string
+                description: Path to the directory containing the kustomization file.
+                pattern: ^\./
+              prune:
+                type: boolean
+                description: Prune enables garbage collection.
+              sourceRef:
+                type: object
+                description: Reference of the source where the kustomization file
+                  is.
+                properties:
+                  name:
+                    type: string
+                    description: Name of the referent
+                  namespace:
+                    type: string
+                    description: Namespace of the referent, defaults to the Kustomization
+                      namespace
+                  apiVersion:
+                    type: string
+                    description: API version of the referent
                   kind:
+                    type: string
                     description: Kind of the referent
                     enum:
                     - GitRepository
                     - Bucket
-                    type: string
-                  name:
-                    description: Name of the referent
-                    type: string
-                  namespace:
-                    description: Namespace of the referent, defaults to the Kustomization namespace
-                    type: string
                 required:
                 - kind
                 - name
-                type: object
               suspend:
-                description: This flag tells the controller to suspend subsequent kustomize executions, it does not apply to already started executions. Defaults to false.
                 type: boolean
+                description: This flag tells the controller to suspend subsequent
+                  kustomize executions, it does not apply to already started executions.
+                  Defaults to false.
               targetNamespace:
-                description: TargetNamespace sets or overrides the namespace in the kustomization.yaml file.
+                type: string
+                description: TargetNamespace sets or overrides the namespace in the
+                  kustomization.yaml file.
                 maxLength: 63
                 minLength: 1
-                type: string
               timeout:
-                description: Timeout for validation, apply and health checking operations. Defaults to 'Interval' duration.
                 type: string
+                description: Timeout for validation, apply and health checking operations.
+                  Defaults to 'Interval' duration.
               validation:
-                description: Validate the Kubernetes objects before applying them on the cluster. The validation strategy can be 'client' (local dry-run) or 'server' (APIServer dry-run).
+                type: string
+                description: Validate the Kubernetes objects before applying them
+                  on the cluster. The validation strategy can be 'client' (local dry-run)
+                  or 'server' (APIServer dry-run).
                 enum:
                 - client
                 - server
-                type: string
             required:
             - interval
             - path
             - prune
             - sourceRef
-            type: object
           status:
+            type: object
             description: KustomizationStatus defines the observed state of a kustomization.
             properties:
               conditions:
+                type: array
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               lastAppliedRevision:
-                description: The last successfully applied revision. The revision format for Git sources is <branch|tag>/<commit-sha>.
                 type: string
+                description: The last successfully applied revision. The revision
+                  format for Git sources is <branch|tag>/<commit-sha>.
               lastAttemptedRevision:
-                description: LastAttemptedRevision is the revision of the last reconciliation attempt.
                 type: string
+                description: LastAttemptedRevision is the revision of the last reconciliation
+                  attempt.
               lastHandledReconcileAt:
-                description: LastHandledReconcileAt holds the value of the most recent reconcile request value, so a change can be detected.
                 type: string
+                description: LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change can be detected.
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last reconciled generation.
                 format: int64
-                type: integer
               snapshot:
+                type: object
                 description: The last successfully applied revision metadata.
                 properties:
                   checksum:
-                    description: The manifests sha1 checksum.
                     type: string
+                    description: The manifests sha1 checksum.
                   entries:
+                    type: array
                     description: A list of Kubernetes kinds grouped by namespace.
                     items:
-                      description: Snapshot holds the metadata of namespaced Kubernetes objects
+                      type: object
+                      description: Snapshot holds the metadata of namespaced Kubernetes
+                        objects
                       properties:
+                        namespace:
+                          type: string
+                          description: The namespace of this entry.
                         kinds:
+                          type: object
                           additionalProperties:
                             type: string
                           description: The list of Kubernetes kinds.
-                          type: object
-                        namespace:
-                          description: The namespace of this entry.
-                          type: string
                       required:
                       - kinds
-                      type: object
-                    type: array
                 required:
                 - checksum
                 - entries
-                type: object
-            type: object
-        type: object
     served: true
     storage: true
     subresources:
@@ -1146,12 +1268,12 @@ status:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: kustomize-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: kustomize-controller
-  namespace: flux-system
 spec:
   replicas: 1
   selector:
@@ -1159,41 +1281,36 @@ spec:
       app: kustomize-controller
   template:
     metadata:
+      labels:
+        app: kustomize-controller
       annotations:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
-      labels:
-        app: kustomize-controller
     spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/os: linux
       containers:
-      - args:
+      - name: manager
+        image: ghcr.io/fluxcd/kustomize-controller:v0.2.0
+        args:
         - --events-addr=http://notification-controller/
         - --watch-all-namespaces=true
         - --log-level=info
         - --log-json
         - --enable-leader-election
+        ports:
+        - name: http-prom
+          containerPort: 8080
+        - name: healthz
+          protocol: TCP
+          containerPort: 9440
         env:
         - name: RUNTIME_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/kustomize-controller:v0.2.0
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: healthz
-        name: manager
-        ports:
-        - containerPort: 8080
-          name: http-prom
-        - containerPort: 9440
-          name: healthz
-          protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: healthz
         resources:
           limits:
             cpu: 1000m
@@ -1201,30 +1318,35 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+        volumeMounts:
+        - name: temp
+          mountPath: /tmp
+        livenessProbe:
+          httpGet:
+            port: healthz
+            path: /healthz
+        readinessProbe:
+          httpGet:
+            port: healthz
+            path: /readyz
+        imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
-        volumeMounts:
-        - mountPath: /tmp
-          name: temp
-      nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/os: linux
-      terminationGracePeriodSeconds: 10
       volumes:
-      - emptyDir: {}
-        name: temp
+      - name: temp
+        emptyDir: {}
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: helmreleases.helm.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: helmreleases.helm.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: helm.toolkit.fluxcd.io
   names:
@@ -1236,360 +1358,480 @@ spec:
     singular: helmrelease
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+  - name: v2beta1
+    additionalPrinterColumns:
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v2beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: HelmRelease is the Schema for the helmreleases API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: HelmReleaseSpec defines the desired state of a Helm release.
             properties:
               chart:
-                description: Chart defines the template of the v1beta1.HelmChart that should be created for this HelmRelease.
+                type: object
+                description: Chart defines the template of the v1beta1.HelmChart that
+                  should be created for this HelmRelease.
                 properties:
                   spec:
-                    description: Spec holds the template for the v1beta1.HelmChartSpec for this HelmRelease.
+                    type: object
+                    description: Spec holds the template for the v1beta1.HelmChartSpec
+                      for this HelmRelease.
                     properties:
                       chart:
-                        description: The name or path the Helm chart is available at in the SourceRef.
                         type: string
+                        description: The name or path the Helm chart is available
+                          at in the SourceRef.
                       interval:
-                        description: Interval at which to check the v1beta1.Source for updates. Defaults to 'HelmReleaseSpec.Interval'.
                         type: string
+                        description: Interval at which to check the v1beta1.Source
+                          for updates. Defaults to 'HelmReleaseSpec.Interval'.
                       sourceRef:
-                        description: The name and namespace of the v1beta1.Source the chart is available at.
+                        type: object
+                        description: The name and namespace of the v1beta1.Source
+                          the chart is available at.
                         properties:
-                          apiVersion:
-                            description: APIVersion of the referent.
+                          name:
                             type: string
+                            description: Name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                          namespace:
+                            type: string
+                            description: Namespace of the referent.
+                            maxLength: 63
+                            minLength: 1
+                          apiVersion:
+                            type: string
+                            description: APIVersion of the referent.
                           kind:
+                            type: string
                             description: Kind of the referent.
                             enum:
                             - HelmRepository
                             - GitRepository
                             - Bucket
-                            type: string
-                          name:
-                            description: Name of the referent.
-                            maxLength: 253
-                            minLength: 1
-                            type: string
-                          namespace:
-                            description: Namespace of the referent.
-                            maxLength: 63
-                            minLength: 1
-                            type: string
                         required:
                         - name
-                        type: object
                       valuesFile:
-                        description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Ignored when omitted.
                         type: string
+                        description: Alternative values file to use as the default
+                          chart values, expected to be a relative path in the SourceRef.
+                          Ignored when omitted.
                       version:
-                        description: Version semver expression, ignored for charts from v1beta1.GitRepository and v1beta1.Bucket sources. Defaults to latest when omitted.
                         type: string
+                        description: Version semver expression, ignored for charts
+                          from v1beta1.GitRepository and v1beta1.Bucket sources. Defaults
+                          to latest when omitted.
                     required:
                     - chart
                     - sourceRef
-                    type: object
                 required:
                 - spec
-                type: object
               dependsOn:
-                description: DependsOn may contain a dependency.CrossNamespaceDependencyReference slice with references to HelmRelease resources that must be ready before this HelmRelease can be reconciled.
+                type: array
+                description: DependsOn may contain a dependency.CrossNamespaceDependencyReference
+                  slice with references to HelmRelease resources that must be ready
+                  before this HelmRelease can be reconciled.
                 items:
-                  description: CrossNamespaceDependencyReference holds the reference to a dependency.
+                  type: object
+                  description: CrossNamespaceDependencyReference holds the reference
+                    to a dependency.
                   properties:
                     name:
+                      type: string
                       description: Name holds the name reference of a dependency.
-                      type: string
                     namespace:
-                      description: Namespace holds the namespace reference of a dependency.
                       type: string
+                      description: Namespace holds the namespace reference of a dependency.
                   required:
                   - name
-                  type: object
-                type: array
               install:
-                description: Install holds the configuration for Helm install actions for this HelmRelease.
+                type: object
+                description: Install holds the configuration for Helm install actions
+                  for this HelmRelease.
                 properties:
                   disableHooks:
-                    description: DisableHooks prevents hooks from running during the Helm install action.
                     type: boolean
+                    description: DisableHooks prevents hooks from running during the
+                      Helm install action.
                   disableOpenAPIValidation:
-                    description: DisableOpenAPIValidation prevents the Helm install action from validating rendered templates against the Kubernetes OpenAPI Schema.
                     type: boolean
+                    description: DisableOpenAPIValidation prevents the Helm install
+                      action from validating rendered templates against the Kubernetes
+                      OpenAPI Schema.
                   disableWait:
-                    description: DisableWait disables the waiting for resources to be ready after a Helm install has been performed.
                     type: boolean
+                    description: DisableWait disables the waiting for resources to
+                      be ready after a Helm install has been performed.
                   remediation:
-                    description: Remediation holds the remediation configuration for when the Helm install action for the HelmRelease fails. The default is to not perform any action.
+                    type: object
+                    description: Remediation holds the remediation configuration for
+                      when the Helm install action for the HelmRelease fails. The
+                      default is to not perform any action.
                     properties:
                       ignoreTestFailures:
-                        description: IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an install action but fail. Defaults to 'Test.IgnoreFailures'.
                         type: boolean
+                        description: IgnoreTestFailures tells the controller to skip
+                          remediation when the Helm tests are run after an install
+                          action but fail. Defaults to 'Test.IgnoreFailures'.
                       remediateLastFailure:
-                        description: RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false'.
                         type: boolean
+                        description: RemediateLastFailure tells the controller to
+                          remediate the last failure, when no retries remain. Defaults
+                          to 'false'.
                       retries:
-                        description: Retries is the number of retries that should be attempted on failures before bailing. Remediation, using an uninstall, is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.
                         type: integer
-                    type: object
+                        description: Retries is the number of retries that should
+                          be attempted on failures before bailing. Remediation, using
+                          an uninstall, is performed between each attempt. Defaults
+                          to '0', a negative integer equals to unlimited retries.
                   replace:
-                    description: Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.
                     type: boolean
+                    description: Replace tells the Helm install action to re-use the
+                      'ReleaseName', but only if that name is a deleted release which
+                      remains in the history.
                   skipCRDs:
-                    description: SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present.
                     type: boolean
+                    description: SkipCRDs tells the Helm install action to not install
+                      any CRDs. By default, CRDs are installed if not already present.
                   timeout:
-                    description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
-                type: object
+                    description: Timeout is the time to wait for any individual Kubernetes
+                      operation (like Jobs for hooks) during the performance of a
+                      Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.
               interval:
-                description: Interval at which to reconcile the Helm release.
                 type: string
+                description: Interval at which to reconcile the Helm release.
               kubeConfig:
-                description: KubeConfig for reconciling the HelmRelease on a remote cluster.
+                type: object
+                description: KubeConfig for reconciling the HelmRelease on a remote
+                  cluster.
                 properties:
                   secretRef:
-                    description: SecretRef holds the name to a secret that contains a 'value' key with the kubeconfig file as the value. It must be in the same namespace as the HelmRelease. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling the HelmRelease.
+                    type: object
+                    description: SecretRef holds the name to a secret that contains
+                      a 'value' key with the kubeconfig file as the value. It must
+                      be in the same namespace as the HelmRelease. It is recommended
+                      that the kubeconfig is self-contained, and the secret is regularly
+                      updated if credentials such as a cloud-access-token expire.
+                      Cloud specific `cmd-path` auth helpers will not function without
+                      adding binaries and credentials to the Pod that is responsible
+                      for reconciling the HelmRelease.
                     properties:
                       name:
-                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                         type: string
-                    type: object
-                type: object
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
               maxHistory:
-                description: MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.
                 type: integer
+                description: MaxHistory is the number of revisions saved by Helm for
+                  this HelmRelease. Use '0' for an unlimited number of revisions;
+                  defaults to '10'.
               releaseName:
-                description: ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.
+                type: string
+                description: ReleaseName used for the Helm release. Defaults to a
+                  composition of '[TargetNamespace-]Name'.
                 maxLength: 53
                 minLength: 1
-                type: string
               rollback:
-                description: Rollback holds the configuration for Helm rollback actions for this HelmRelease.
+                type: object
+                description: Rollback holds the configuration for Helm rollback actions
+                  for this HelmRelease.
                 properties:
                   cleanupOnFail:
-                    description: CleanupOnFail allows deletion of new resources created during the Helm rollback action when it fails.
                     type: boolean
+                    description: CleanupOnFail allows deletion of new resources created
+                      during the Helm rollback action when it fails.
                   disableHooks:
-                    description: DisableHooks prevents hooks from running during the Helm rollback action.
                     type: boolean
+                    description: DisableHooks prevents hooks from running during the
+                      Helm rollback action.
                   disableWait:
-                    description: DisableWait disables the waiting for resources to be ready after a Helm rollback has been performed.
                     type: boolean
+                    description: DisableWait disables the waiting for resources to
+                      be ready after a Helm rollback has been performed.
                   force:
-                    description: Force forces resource updates through a replacement strategy.
                     type: boolean
+                    description: Force forces resource updates through a replacement
+                      strategy.
                   recreate:
-                    description: Recreate performs pod restarts for the resource if applicable.
                     type: boolean
+                    description: Recreate performs pod restarts for the resource if
+                      applicable.
                   timeout:
-                    description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
-                type: object
+                    description: Timeout is the time to wait for any individual Kubernetes
+                      operation (like Jobs for hooks) during the performance of a
+                      Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.
               suspend:
-                description: Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.
                 type: boolean
+                description: Suspend tells the controller to suspend reconciliation
+                  for this HelmRelease, it does not apply to already started reconciliations.
+                  Defaults to false.
               targetNamespace:
-                description: TargetNamespace to target when performing operations for the HelmRelease. Defaults to the namespace of the HelmRelease.
+                type: string
+                description: TargetNamespace to target when performing operations
+                  for the HelmRelease. Defaults to the namespace of the HelmRelease.
                 maxLength: 63
                 minLength: 1
-                type: string
               test:
-                description: Test holds the configuration for Helm test actions for this HelmRelease.
+                type: object
+                description: Test holds the configuration for Helm test actions for
+                  this HelmRelease.
                 properties:
                   enable:
-                    description: Enable enables Helm test actions for this HelmRelease after an Helm install or upgrade action has been performed.
                     type: boolean
+                    description: Enable enables Helm test actions for this HelmRelease
+                      after an Helm install or upgrade action has been performed.
                   ignoreFailures:
-                    description: IgnoreFailures tells the controller to skip remediation when the Helm tests are run but fail. Can be overwritten for tests run after install or upgrade actions in 'Install.IgnoreTestFailures' and 'Upgrade.IgnoreTestFailures'.
                     type: boolean
+                    description: IgnoreFailures tells the controller to skip remediation
+                      when the Helm tests are run but fail. Can be overwritten for
+                      tests run after install or upgrade actions in 'Install.IgnoreTestFailures'
+                      and 'Upgrade.IgnoreTestFailures'.
                   timeout:
-                    description: Timeout is the time to wait for any individual Kubernetes operation during the performance of a Helm test action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
-                type: object
+                    description: Timeout is the time to wait for any individual Kubernetes
+                      operation during the performance of a Helm test action. Defaults
+                      to 'HelmReleaseSpec.Timeout'.
               timeout:
-                description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm action. Defaults to '5m0s'.
                 type: string
+                description: Timeout is the time to wait for any individual Kubernetes
+                  operation (like Jobs for hooks) during the performance of a Helm
+                  action. Defaults to '5m0s'.
               uninstall:
-                description: Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.
+                type: object
+                description: Uninstall holds the configuration for Helm uninstall
+                  actions for this HelmRelease.
                 properties:
                   disableHooks:
-                    description: DisableHooks prevents hooks from running during the Helm rollback action.
                     type: boolean
+                    description: DisableHooks prevents hooks from running during the
+                      Helm rollback action.
                   keepHistory:
-                    description: KeepHistory tells Helm to remove all associated resources and mark the release as deleted, but retain the release history.
                     type: boolean
+                    description: KeepHistory tells Helm to remove all associated resources
+                      and mark the release as deleted, but retain the release history.
                   timeout:
-                    description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
-                type: object
+                    description: Timeout is the time to wait for any individual Kubernetes
+                      operation (like Jobs for hooks) during the performance of a
+                      Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.
               upgrade:
-                description: Upgrade holds the configuration for Helm upgrade actions for this HelmRelease.
+                type: object
+                description: Upgrade holds the configuration for Helm upgrade actions
+                  for this HelmRelease.
                 properties:
                   cleanupOnFail:
-                    description: CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.
                     type: boolean
+                    description: CleanupOnFail allows deletion of new resources created
+                      during the Helm upgrade action when it fails.
                   disableHooks:
-                    description: DisableHooks prevents hooks from running during the Helm upgrade action.
                     type: boolean
+                    description: DisableHooks prevents hooks from running during the
+                      Helm upgrade action.
                   disableOpenAPIValidation:
-                    description: DisableOpenAPIValidation prevents the Helm upgrade action from validating rendered templates against the Kubernetes OpenAPI Schema.
                     type: boolean
+                    description: DisableOpenAPIValidation prevents the Helm upgrade
+                      action from validating rendered templates against the Kubernetes
+                      OpenAPI Schema.
                   disableWait:
-                    description: DisableWait disables the waiting for resources to be ready after a Helm upgrade has been performed.
                     type: boolean
+                    description: DisableWait disables the waiting for resources to
+                      be ready after a Helm upgrade has been performed.
                   force:
-                    description: Force forces resource updates through a replacement strategy.
                     type: boolean
+                    description: Force forces resource updates through a replacement
+                      strategy.
                   preserveValues:
-                    description: PreserveValues will make Helm reuse the last release's values and merge in overrides from 'Values'. Setting this flag makes the HelmRelease non-declarative.
                     type: boolean
+                    description: PreserveValues will make Helm reuse the last release's
+                      values and merge in overrides from 'Values'. Setting this flag
+                      makes the HelmRelease non-declarative.
                   remediation:
-                    description: Remediation holds the remediation configuration for when the Helm upgrade action for the HelmRelease fails. The default is to not perform any action.
+                    type: object
+                    description: Remediation holds the remediation configuration for
+                      when the Helm upgrade action for the HelmRelease fails. The
+                      default is to not perform any action.
                     properties:
-                      ignoreTestFailures:
-                        description: IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an upgrade action but fail. Defaults to 'Test.IgnoreFailures'.
-                        type: boolean
-                      remediateLastFailure:
-                        description: RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false' unless 'Retries' is greater than 0.
-                        type: boolean
-                      retries:
-                        description: Retries is the number of retries that should be attempted on failures before bailing. Remediation, using 'Strategy', is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.
-                        type: integer
                       strategy:
-                        description: Strategy to use for failure remediation. Defaults to 'rollback'.
+                        type: string
+                        description: Strategy to use for failure remediation. Defaults
+                          to 'rollback'.
                         enum:
                         - rollback
                         - uninstall
-                        type: string
-                    type: object
+                      ignoreTestFailures:
+                        type: boolean
+                        description: IgnoreTestFailures tells the controller to skip
+                          remediation when the Helm tests are run after an upgrade
+                          action but fail. Defaults to 'Test.IgnoreFailures'.
+                      remediateLastFailure:
+                        type: boolean
+                        description: RemediateLastFailure tells the controller to
+                          remediate the last failure, when no retries remain. Defaults
+                          to 'false' unless 'Retries' is greater than 0.
+                      retries:
+                        type: integer
+                        description: Retries is the number of retries that should
+                          be attempted on failures before bailing. Remediation, using
+                          'Strategy', is performed between each attempt. Defaults
+                          to '0', a negative integer equals to unlimited retries.
                   timeout:
-                    description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.
                     type: string
-                type: object
+                    description: Timeout is the time to wait for any individual Kubernetes
+                      operation (like Jobs for hooks) during the performance of a
+                      Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.
               values:
                 description: Values holds the values for this Helm release.
                 x-kubernetes-preserve-unknown-fields: true
               valuesFrom:
-                description: ValuesFrom holds references to resources containing Helm values for this HelmRelease, and information about how they should be merged.
+                type: array
+                description: ValuesFrom holds references to resources containing Helm
+                  values for this HelmRelease, and information about how they should
+                  be merged.
                 items:
-                  description: ValuesReference contains a reference to a resource containing Helm values, and optionally the key they can be found at.
+                  type: object
+                  description: ValuesReference contains a reference to a resource
+                    containing Helm values, and optionally the key they can be found
+                    at.
                   properties:
+                    name:
+                      type: string
+                      description: Name of the values referent. Should reside in the
+                        same namespace as the referring resource.
+                      maxLength: 253
+                      minLength: 1
                     kind:
-                      description: Kind of the values referent, valid values are ('Secret', 'ConfigMap').
+                      type: string
+                      description: Kind of the values referent, valid values are ('Secret',
+                        'ConfigMap').
                       enum:
                       - Secret
                       - ConfigMap
-                      type: string
-                    name:
-                      description: Name of the values referent. Should reside in the same namespace as the referring resource.
-                      maxLength: 253
-                      minLength: 1
-                      type: string
                     optional:
-                      description: Optional marks this ValuesReference as optional. When set, a not found error for the values reference is ignored, but any ValuesKey, TargetPath or transient error will still result in a reconciliation failure.
                       type: boolean
+                      description: Optional marks this ValuesReference as optional.
+                        When set, a not found error for the values reference is ignored,
+                        but any ValuesKey, TargetPath or transient error will still
+                        result in a reconciliation failure.
                     targetPath:
-                      description: TargetPath is the YAML dot notation path the value should be merged at. When set, the ValuesKey is expected to be a single flat value. Defaults to 'None', which results in the values getting merged at the root.
                       type: string
+                      description: TargetPath is the YAML dot notation path the value
+                        should be merged at. When set, the ValuesKey is expected to
+                        be a single flat value. Defaults to 'None', which results
+                        in the values getting merged at the root.
                     valuesKey:
-                      description: ValuesKey is the data key where the values.yaml or a specific value can be found at. Defaults to 'values.yaml'.
                       type: string
+                      description: ValuesKey is the data key where the values.yaml
+                        or a specific value can be found at. Defaults to 'values.yaml'.
                   required:
                   - kind
                   - name
-                  type: object
-                type: array
             required:
             - chart
             - interval
-            type: object
           status:
+            type: object
             description: HelmReleaseStatus defines the observed state of a HelmRelease.
             properties:
               conditions:
+                type: array
                 description: Conditions holds the conditions for the HelmRelease.
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               failures:
-                description: Failures is the reconciliation failure count against the latest desired state. It is reset after a successful reconciliation.
-                format: int64
                 type: integer
+                description: Failures is the reconciliation failure count against
+                  the latest desired state. It is reset after a successful reconciliation.
+                format: int64
               helmChart:
-                description: HelmChart is the namespaced name of the HelmChart resource created by the controller for the HelmRelease.
                 type: string
+                description: HelmChart is the namespaced name of the HelmChart resource
+                  created by the controller for the HelmRelease.
               installFailures:
-                description: InstallFailures is the install failure count against the latest desired state. It is reset after a successful reconciliation.
+                type: integer
+                description: InstallFailures is the install failure count against
+                  the latest desired state. It is reset after a successful reconciliation.
                 format: int64
-                type: integer
               lastAppliedRevision:
-                description: LastAppliedRevision is the revision of the last successfully applied source.
                 type: string
+                description: LastAppliedRevision is the revision of the last successfully
+                  applied source.
               lastAttemptedRevision:
-                description: LastAttemptedRevision is the revision of the last reconciliation attempt.
                 type: string
+                description: LastAttemptedRevision is the revision of the last reconciliation
+                  attempt.
               lastAttemptedValuesChecksum:
-                description: LastAttemptedValuesChecksum is the SHA1 checksum of the values of the last reconciliation attempt.
                 type: string
+                description: LastAttemptedValuesChecksum is the SHA1 checksum of the
+                  values of the last reconciliation attempt.
               lastHandledReconcileAt:
-                description: LastHandledReconcileAt holds the value of the most recent reconcile request value, so a change can be detected.
                 type: string
+                description: LastHandledReconcileAt holds the value of the most recent
+                  reconcile request value, so a change can be detected.
               lastReleaseRevision:
-                description: LastReleaseRevision is the revision of the last successful Helm release.
                 type: integer
+                description: LastReleaseRevision is the revision of the last successful
+                  Helm release.
               observedGeneration:
+                type: integer
                 description: ObservedGeneration is the last observed generation.
                 format: int64
-                type: integer
               upgradeFailures:
-                description: UpgradeFailures is the upgrade failure count against the latest desired state. It is reset after a successful reconciliation.
-                format: int64
                 type: integer
-            type: object
-        type: object
+                description: UpgradeFailures is the upgrade failure count against
+                  the latest desired state. It is reset after a successful reconciliation.
+                format: int64
     served: true
     storage: true
     subresources:
@@ -1604,12 +1846,12 @@ status:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: helm-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: helm-controller
-  namespace: flux-system
 spec:
   replicas: 1
   selector:
@@ -1617,34 +1859,33 @@ spec:
       app: helm-controller
   template:
     metadata:
+      labels:
+        app: helm-controller
       annotations:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
-      labels:
-        app: helm-controller
     spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/os: linux
       containers:
-      - args:
+      - name: manager
+        image: ghcr.io/fluxcd/helm-controller:v0.2.0
+        args:
         - --events-addr=http://notification-controller/
         - --watch-all-namespaces=true
         - --log-level=info
         - --log-json
         - --enable-leader-election
+        ports:
+        - name: http-prom
+          containerPort: 8080
         env:
         - name: RUNTIME_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/helm-controller:v0.2.0
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: http-prom
-        name: manager
-        ports:
-        - containerPort: 8080
-          name: http-prom
         resources:
           limits:
             cpu: 1000m
@@ -1652,30 +1893,31 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+        volumeMounts:
+        - name: temp
+          mountPath: /tmp
+        livenessProbe:
+          httpGet:
+            port: http-prom
+            path: /metrics
+        imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
-        volumeMounts:
-        - mountPath: /tmp
-          name: temp
-      nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/os: linux
-      terminationGracePeriodSeconds: 10
       volumes:
-      - emptyDir: {}
-        name: temp
+      - name: temp
+        emptyDir: {}
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: alerts.notification.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: alerts.notification.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: notification.toolkit.fluxcd.io
   names:
@@ -1685,48 +1927,70 @@ spec:
     singular: alert
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: Alert is the Schema for the alerts API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
-            description: AlertSpec defines an alerting rule for events involving a list of objects
+            type: object
+            description: AlertSpec defines an alerting rule for events involving a
+              list of objects
             properties:
               eventSeverity:
+                type: string
                 default: info
-                description: Filter events based on severity, defaults to ('info'). If set to 'info' no events will be filtered.
+                description: Filter events based on severity, defaults to ('info').
+                  If set to 'info' no events will be filtered.
                 enum:
                 - info
                 - error
-                type: string
               eventSources:
+                type: array
                 description: Filter events based on the involved objects
                 items:
-                  description: CrossNamespaceObjectReference contains enough information to let you locate the typed referenced object at cluster level
+                  type: object
+                  description: CrossNamespaceObjectReference contains enough information
+                    to let you locate the typed referenced object at cluster level
                   properties:
-                    apiVersion:
-                      description: API version of the referent
+                    name:
                       type: string
+                      description: Name of the referent
+                      maxLength: 53
+                      minLength: 1
+                    namespace:
+                      type: string
+                      description: Namespace of the referent
+                      maxLength: 53
+                      minLength: 1
+                    apiVersion:
+                      type: string
+                      description: API version of the referent
                     kind:
+                      type: string
                       description: Kind of the referent
                       enum:
                       - Bucket
@@ -1735,65 +1999,57 @@ spec:
                       - HelmRelease
                       - HelmChart
                       - HelmRepository
-                      type: string
-                    name:
-                      description: Name of the referent
-                      maxLength: 53
-                      minLength: 1
-                      type: string
-                    namespace:
-                      description: Namespace of the referent
-                      maxLength: 53
-                      minLength: 1
-                      type: string
                   required:
                   - name
-                  type: object
-                type: array
               providerRef:
+                type: object
                 description: Send events using this provider
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                type: object
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
               suspend:
-                description: This flag tells the controller to suspend subsequent events dispatching. Defaults to false.
                 type: boolean
+                description: This flag tells the controller to suspend subsequent
+                  events dispatching. Defaults to false.
             required:
             - eventSources
             - providerRef
-            type: object
           status:
+            type: object
             description: AlertStatus defines the observed state of Alert
             properties:
               conditions:
+                type: array
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
-            type: object
-        type: object
     served: true
     storage: true
     subresources:
@@ -1808,13 +2064,13 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: providers.notification.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: providers.notification.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: notification.toolkit.fluxcd.io
   names:
@@ -1824,51 +2080,40 @@ spec:
     singular: provider
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: Provider is the Schema for the providers API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: ProviderSpec defines the desired state of Provider
             properties:
-              address:
-                description: HTTP/S webhook address of this provider
-                pattern: ^(http|https)://
-                type: string
-              channel:
-                description: Alert channel for this provider
-                type: string
-              proxy:
-                description: HTTP/S address of the proxy
-                pattern: ^(http|https)://
-                type: string
-              secretRef:
-                description: Secret reference containing the provider webhook URL
-                properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
-                    type: string
-                type: object
               type:
+                type: string
                 description: Type of provider
                 enum:
                 - slack
@@ -1878,43 +2123,64 @@ spec:
                 - generic
                 - github
                 - gitlab
+              secretRef:
+                type: object
+                description: Secret reference containing the provider webhook URL
+                properties:
+                  name:
+                    type: string
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+              address:
                 type: string
+                description: HTTP/S webhook address of this provider
+                pattern: ^(http|https)://
+              channel:
+                type: string
+                description: Alert channel for this provider
+              proxy:
+                type: string
+                description: HTTP/S address of the proxy
+                pattern: ^(http|https)://
               username:
-                description: Bot username for this provider
                 type: string
+                description: Bot username for this provider
             required:
             - type
-            type: object
           status:
+            type: object
             description: ProviderStatus defines the observed state of Provider
             properties:
               conditions:
+                type: array
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
-            type: object
-        type: object
     served: true
     storage: true
     subresources:
@@ -1929,13 +2195,13 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  annotations:
-    controller-gen.kubebuilder.io/version: v0.3.0
-  creationTimestamp: null
+  name: receivers.notification.toolkit.fluxcd.io
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
-  name: receivers.notification.toolkit.fluxcd.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
 spec:
   group: notification.toolkit.fluxcd.io
   names:
@@ -1945,46 +2211,71 @@ spec:
     singular: receiver
   scope: Namespaced
   versions:
-  - additionalPrinterColumns:
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+  - name: v1beta1
+    additionalPrinterColumns:
+    - name: Ready
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].message
-      name: Status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - name: Status
       type: string
-    - jsonPath: .metadata.creationTimestamp
-      name: Age
+      jsonPath: .status.conditions[?(@.type=="Ready")].message
+    - name: Age
       type: date
-    name: v1beta1
+      jsonPath: .metadata.creationTimestamp
     schema:
       openAPIV3Schema:
+        type: object
         description: Receiver is the Schema for the receivers API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           metadata:
             type: object
           spec:
+            type: object
             description: ReceiverSpec defines the desired state of Receiver
             properties:
-              events:
-                description: A list of events to handle, e.g. 'push' for GitHub or 'Push Hook' for GitLab.
-                items:
-                  type: string
-                type: array
+              type:
+                type: string
+                description: Type of webhook sender, used to determine the validation
+                  procedure and payload deserialization.
+                enum:
+                - generic
+                - github
+                - gitlab
+                - bitbucket
+                - harbor
               resources:
+                type: array
                 description: A list of resources to be notified about changes.
                 items:
-                  description: CrossNamespaceObjectReference contains enough information to let you locate the typed referenced object at cluster level
+                  type: object
+                  description: CrossNamespaceObjectReference contains enough information
+                    to let you locate the typed referenced object at cluster level
                   properties:
-                    apiVersion:
-                      description: API version of the referent
+                    name:
                       type: string
+                      description: Name of the referent
+                      maxLength: 53
+                      minLength: 1
+                    namespace:
+                      type: string
+                      description: Namespace of the referent
+                      maxLength: 53
+                      minLength: 1
+                    apiVersion:
+                      type: string
+                      description: API version of the referent
                     kind:
+                      type: string
                       description: Kind of the referent
                       enum:
                       - Bucket
@@ -1993,77 +2284,67 @@ spec:
                       - HelmRelease
                       - HelmChart
                       - HelmRepository
-                      type: string
-                    name:
-                      description: Name of the referent
-                      maxLength: 53
-                      minLength: 1
-                      type: string
-                    namespace:
-                      description: Namespace of the referent
-                      maxLength: 53
-                      minLength: 1
-                      type: string
                   required:
                   - name
-                  type: object
-                type: array
               secretRef:
-                description: Secret reference containing the token used to validate the payload authenticity
+                type: object
+                description: Secret reference containing the token used to validate
+                  the payload authenticity
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                     type: string
-                type: object
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+              events:
+                type: array
+                description: A list of events to handle, e.g. 'push' for GitHub or
+                  'Push Hook' for GitLab.
+                items:
+                  type: string
               suspend:
-                description: This flag tells the controller to suspend subsequent events handling. Defaults to false.
                 type: boolean
-              type:
-                description: Type of webhook sender, used to determine the validation procedure and payload deserialization.
-                enum:
-                - generic
-                - github
-                - gitlab
-                - bitbucket
-                - harbor
-                type: string
+                description: This flag tells the controller to suspend subsequent
+                  events handling. Defaults to false.
             required:
             - resources
             - type
-            type: object
           status:
+            type: object
             description: ReceiverStatus defines the observed state of Receiver
             properties:
               conditions:
+                type: array
                 items:
-                  description: Condition contains condition information of a toolkit resource.
+                  type: object
+                  description: Condition contains condition information of a toolkit
+                    resource.
                   properties:
-                    lastTransitionTime:
-                      description: LastTransitionTime is the timestamp corresponding to the last status change of this condition.
-                      format: date-time
-                      type: string
-                    message:
-                      description: Message is a human readable description of the details of the last transition, complementing reason.
-                      type: string
-                    reason:
-                      description: Reason is a brief machine readable explanation for the condition's last transition.
-                      type: string
-                    status:
-                      description: Status of the condition, one of ('True', 'False', 'Unknown').
-                      type: string
                     type:
-                      description: Type of the condition.
                       type: string
+                      description: Type of the condition.
+                    status:
+                      type: string
+                      description: Status of the condition, one of ('True', 'False',
+                        'Unknown').
+                    lastTransitionTime:
+                      type: string
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                    message:
+                      type: string
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                    reason:
+                      type: string
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
                   required:
                   - status
                   - type
-                  type: object
-                type: array
               url:
-                description: Generated webhook URL in the format of '/hook/sha256sum(token+name+namespace)'.
                 type: string
-            type: object
-        type: object
+                description: Generated webhook URL in the format of '/hook/sha256sum(token+name+namespace)'.
     served: true
     storage: true
     subresources:
@@ -2078,50 +2359,50 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  name: notification-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: notification-controller
-  namespace: flux-system
 spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http
+  type: ClusterIP
   selector:
     app: notification-controller
-  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: webhook-receiver
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: webhook-receiver
-  namespace: flux-system
 spec:
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: http-webhook
+  type: ClusterIP
   selector:
     app: notification-controller
-  type: ClusterIP
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: http-webhook
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: notification-controller
+  namespace: flux-system
   labels:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/version: latest
     control-plane: controller
-  name: notification-controller
-  namespace: flux-system
 spec:
   replicas: 1
   selector:
@@ -2129,37 +2410,36 @@ spec:
       app: notification-controller
   template:
     metadata:
+      labels:
+        app: notification-controller
       annotations:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
-      labels:
-        app: notification-controller
     spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/os: linux
       containers:
-      - args:
+      - name: manager
+        image: ghcr.io/fluxcd/notification-controller:v0.2.0
+        args:
         - --watch-all-namespaces=true
         - --log-level=info
         - --log-json
         - --enable-leader-election
+        ports:
+        - name: http
+          containerPort: 9090
+        - name: http-webhook
+          containerPort: 9292
+        - name: http-prom
+          containerPort: 8080
         env:
         - name: RUNTIME_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/notification-controller:v0.2.0
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /metrics
-            port: http-prom
-        name: manager
-        ports:
-        - containerPort: 9090
-          name: http
-        - containerPort: 9292
-          name: http-webhook
-        - containerPort: 8080
-          name: http-prom
         resources:
           limits:
             cpu: 1000m
@@ -2167,17 +2447,17 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
+        volumeMounts:
+        - name: temp
+          mountPath: /tmp
+        livenessProbe:
+          httpGet:
+            port: http-prom
+            path: /metrics
+        imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
-        volumeMounts:
-        - mountPath: /tmp
-          name: temp
-      nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/os: linux
-      terminationGracePeriodSeconds: 10
       volumes:
-      - emptyDir: {}
-        name: temp
----
+      - name: temp
+        emptyDir: {}

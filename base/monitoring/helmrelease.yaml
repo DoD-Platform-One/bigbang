@@ -1,62 +1,54 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: monitoring
   namespace: monitoring
 spec:
-  interval: 2m
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 10.1.2
+      interval: 5m
       sourceRef:
-        kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
-      interval: 5m
-
-  valuesFrom:
-    - kind: ConfigMap
-      name: env-values
-      optional: true
-    - kind: Secret
-      name: env-values
-      optional: true
-
+        kind: HelmRepository
+      version: 10.1.2
+  interval: 2m
   values:
+    alertmanager:
+      alertmanagerSpec:
+        image:
+          repository: registry1.dsop.io/ironbank/opensource/prometheus/alertmanager
+          tag: v0.21.0
+      enabled: true
     fullnameOverride: monitoring
-
     global:
       imagePullSecrets:
-        - name: private-registry
-
-    prometheusOperator:
+      - name: private-registry
+    grafana:
+      image:
+        repository: registry1.dsop.io/ironbank/opensource/grafana/grafana
+        tag: 7.1.3-1
       enabled: true
-      manageCrds: true
-      createCustomResource: true
+    prometheus:
+      enabled: true
+      prometheusSpec:
+        # service port naming conventions
+        portName: http-web
+    prometheusOperator:
       image:
         repository: registry1.dsop.io/ironbank/opensource/coreos/prometheus-operator
         tag: v0.42.1
       configmapReloadImage:
         repository: registry1.dsop.io/ironbank/opensource/jimmidyson/configmap-reload
         tag: v0.4.0
-
-    grafana:
+      createCustomResource: true
       enabled: true
-      image:
-        repository: registry1.dsop.io/ironbank/opensource/grafana/grafana
-        tag: 7.1.3-1
-
-    prometheus:
-      enabled: true
-      prometheusSpec:
-        # service port naming conventions
-        portName: http-web
-
-    alertmanager:
-      enabled: true
-      alertmanagerSpec:
-        image:
-          repository: registry1.dsop.io/ironbank/opensource/prometheus/alertmanager
-          tag: v0.21.0
+      manageCrds: true
+  valuesFrom:
+  - name: env-values
+    kind: ConfigMap
+    optional: true
+  - name: env-values
+    kind: Secret
+    optional: true
