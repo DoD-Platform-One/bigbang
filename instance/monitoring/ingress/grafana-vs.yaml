@@ -3,10 +3,10 @@ kind: VirtualService
 metadata:
   name: grafana
 spec:
-  hosts:
-  - "grafana.hostname" # {"$kpt-set":"grafana-hostname"}
   gateways:
   - main.istio-system.svc.cluster.local
+  hosts:
+  - "grafana.hostname" # {"$kpt-set":"grafana-hostname"}
   http:
   - route:
     - destination:

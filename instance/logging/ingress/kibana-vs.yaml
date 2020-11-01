@@ -3,10 +3,10 @@ kind: VirtualService
 metadata:
   name: kibana
 spec:
-  hosts:
-  - "kibana.hostname" # {"$kpt-set":"kibana-hostname"}
   gateways:
   - main.istio-system.svc.cluster.local
+  hosts:
+  - "kibana.hostname" # {"$kpt-set":"kibana-hostname"}
   http:
   - route:
     - destination:

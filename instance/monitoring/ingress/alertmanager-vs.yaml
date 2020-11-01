@@ -3,10 +3,10 @@ kind: VirtualService
 metadata:
   name: alert-manager
 spec:
-  hosts:
-  - "alerts.hostname" # {"$kpt-set":"alertmanager-hostname"}
   gateways:
   - main.istio-system.svc.cluster.local
+  hosts:
+  - "alerts.hostname" # {"$kpt-set":"alertmanager-hostname"}
   http:
   - route:
     - destination:

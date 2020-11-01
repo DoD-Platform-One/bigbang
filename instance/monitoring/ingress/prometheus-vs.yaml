@@ -3,10 +3,10 @@ kind: VirtualService
 metadata:
   name: prometheus
 spec:
-  hosts:
-  - "prometheus.hostname" # {"$kpt-set":"prometheus-hostname"}
   gateways:
   - main.istio-system.svc.cluster.local
+  hosts:
+  - "prometheus.hostname" # {"$kpt-set":"prometheus-hostname"}
   http:
   - route:
     - destination:

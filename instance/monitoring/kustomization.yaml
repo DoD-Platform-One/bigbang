@@ -1,10 +1,7 @@
 namespace: monitoring
-
 resources:
 - ../../base/monitoring
-
 # Environment specific values
 - ingress
-
 patchesStrategicMerge:
-  - helmrelease.yaml
+- helmrelease.yaml
