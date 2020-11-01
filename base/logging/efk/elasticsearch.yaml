@@ -3,79 +3,80 @@ kind: Elasticsearch
 metadata:
   name: elasticsearch
 spec:
-  version: 7.9.2
   image: registry1.dsop.io/ironbank/elastic/elasticsearch/elasticsearch:7.9.2
   nodeSets:
-    - name: master
-      count: 1
-      config:
-        node.master: true
-        node.data: false
-        node.ingest: false
-        node.store.allow_mmap: true
-        index.store.type: mmapfs
-        node.ml: false
-        xpack.ml.enabled: false
-        xpack.security.authc.token.enabled: true
-      podTemplate:
-        metadata:
-          annotations:
-            traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-            traffic.sidecar.istio.io/excludeInboundPorts: "9300"
-            fluentbit.io/exclude-istio-proxy: "true"
-            prometheus.istio.io/merge-metrics: "false"
-#        spec:
-#          automountServiceAccountToken: true
-#          containers:
-#            - name: elasticsearch
-#              env:
-#                - name: ES_JAVA_OPTS
-#                  value: "-Xms1g -Xmx1g"
-#              resources:
-#                requests:
-#                  memory: 2Gi
-#                  cpu: 0.5
-#                limits:
-#                  memory: 3Gi
-#                  cpu: 2
-    - name: data
-      count: 1
-      config:
-        node.master: false
-        node.data: true
-        node.ingest: true
-        node.store.allow_mmap: true
-        index.store.type: mmapfs
-        node.ml: false
-        xpack.ml.enabled: false
-        xpack.security.authc.token.enabled: true
-      podTemplate:
-        metadata:
-          annotations:
-            traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-            traffic.sidecar.istio.io/excludeInboundPorts: "9300"
-            fluentbit.io/exclude-istio-proxy: "true"
-            prometheus.istio.io/merge-metrics: "false"
-        spec:
-          automountServiceAccountToken: true
-#          containers:
-#            - name: elasticsearch
-#              env:
-#                - name: ES_JAVA_OPTS
-#                  value: "-Xms1g -Xmx1g"
-#              resources:
-#                requests:
-#                  memory: 2Gi
-#                  cpu: 0.5
-#                limits:
-#                  memory: 3Gi
-#                  cpu: 2
-      volumeClaimTemplates:
-        - metadata:
-            name: elasticsearch-data
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 10Gi
+  - name: master
+    config:
+      index.store.type: mmapfs
+      node.data: false
+      node.ingest: false
+      node.master: true
+      node.ml: false
+      node.store.allow_mmap: true
+      xpack.ml.enabled: false
+      xpack.security.authc.token.enabled: true
+    count: 1
+    podTemplate:
+      metadata:
+        annotations:
+          fluentbit.io/exclude-istio-proxy: "true"
+          prometheus.istio.io/merge-metrics: "false"
+          #        spec:
+          #          automountServiceAccountToken: true
+          #          containers:
+          #            - name: elasticsearch
+          #              env:
+          #                - name: ES_JAVA_OPTS
+          #                  value: "-Xms1g -Xmx1g"
+          #              resources:
+          #                requests:
+          #                  memory: 2Gi
+          #                  cpu: 0.5
+          #                limits:
+          #                  memory: 3Gi
+          #                  cpu: 2
+
+          traffic.sidecar.istio.io/excludeInboundPorts: "9300"
+          traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
+  - name: data
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        resources:
+          requests:
+            storage: 10Gi
+        accessModes:
+        - ReadWriteOnce
+    config:
+      index.store.type: mmapfs
+      node.data: true
+      node.ingest: true
+      node.master: false
+      node.ml: false
+      node.store.allow_mmap: true
+      xpack.ml.enabled: false
+      xpack.security.authc.token.enabled: true
+    count: 1
+    podTemplate:
+      metadata:
+        annotations:
+          fluentbit.io/exclude-istio-proxy: "true"
+          prometheus.istio.io/merge-metrics: "false"
+          traffic.sidecar.istio.io/excludeInboundPorts: "9300"
+          traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
+      spec:
+        automountServiceAccountToken: true
+        #          containers:
+        #            - name: elasticsearch
+        #              env:
+        #                - name: ES_JAVA_OPTS
+        #                  value: "-Xms1g -Xmx1g"
+        #              resources:
+        #                requests:
+        #                  memory: 2Gi
+        #                  cpu: 0.5
+        #                limits:
+        #                  memory: 3Gi
+        #                  cpu: 2
+  version: 7.9.2

@@ -1,34 +1,30 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: cert-manager
 spec:
-  interval: 2m
-
   chart:
     spec:
       chart: cert-manager
-      version: v1.0.3
+      interval: 5m
       sourceRef:
-        kind: HelmRepository
         name: jetstack
         namespace: flux-system
-      interval: 5m
-
-  valuesFrom:
-    - kind: ConfigMap
-      name: env-values
-      optional: true
-    - kind: Secret
-      name: env-values
-      optional: true
-
+        kind: HelmRepository
+      version: v1.0.3
+  interval: 2m
   values:
     installCRDs: true
     prometheus:
       servicemonitor:
-        enabled: false
         labels:
           release: monitoring
+        enabled: false
+  valuesFrom:
+  - name: env-values
+    kind: ConfigMap
+    optional: true
+  - name: env-values
+    kind: Secret
+    optional: true

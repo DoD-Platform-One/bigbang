@@ -5,5 +5,5 @@ metadata:
   namespace: flux-system
 spec:
   interval: 24h
-  url: https://releases.rancher.com/server-charts/latest
   timeout: 3m
+  url: https://releases.rancher.com/server-charts/latest

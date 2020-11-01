@@ -1,5 +1,5 @@
 resources:
-  - all-in-one.yaml
+- all-in-one.yaml
 
 #images:
 #  # TODO: This image doesnt't work yet

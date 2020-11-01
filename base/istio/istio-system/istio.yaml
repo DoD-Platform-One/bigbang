@@ -4,41 +4,36 @@ metadata:
   name: istiocontrolplane
   namespace: istio-system
 spec:
-  profile: default
-  hub: registry1.dsop.io/ironbank/opensource/istio
-  tag: 1.7.3
-  meshConfig:
-    accessLogFile: /dev/stdout
   addonComponents:
     kiali:
       enabled: true
-
     tracing:
       enabled: true
-
+  hub: registry1.dsop.io/ironbank/opensource/istio
+  meshConfig:
+    accessLogFile: /dev/stdout
+  profile: default
+  tag: 1.7.3
   values:
     global:
       imagePullSecrets:
-        - private-registry
-
-
-    sidecarInjectorWebhook:
-      rewriteAppHTTPProbe: true
-      neverInjectSelector:
-        - matchExpressions:
-            - key: app.kubernetes.io/component
-              operator: In
-              values: [fluentd-configcheck]
-
+      - private-registry
     kiali:
-      hub: registry1.dsop.io/ironbank/opensource/kiali
       image: kiali
-      tag: v1.23.0
       dashboard:
         auth:
           strategy: anonymous
+      hub: registry1.dsop.io/ironbank/opensource/kiali
+      tag: v1.23.0
+    sidecarInjectorWebhook:
+      neverInjectSelector:
+      - matchExpressions:
+        - key: app.kubernetes.io/component
+          operator: In
+          values: [fluentd-configcheck]
+      rewriteAppHTTPProbe: true
     tracing:
       jaeger:
-        hub: registry1.dsop.io/ironbank/opensource/jaegertracing
         image: all-in-one
+        hub: registry1.dsop.io/ironbank/opensource/jaegertracing
         tag: 1.19.2

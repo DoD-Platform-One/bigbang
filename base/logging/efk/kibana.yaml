@@ -3,7 +3,6 @@ kind: Kibana
 metadata:
   name: kibana
 spec:
-  version: 7.8.1
   count: 1
   elasticsearchRef:
     name: elasticsearch
@@ -17,3 +16,4 @@ spec:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       automountServiceAccountToken: true
+  version: 7.8.1
