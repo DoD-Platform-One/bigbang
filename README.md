@@ -8,10 +8,10 @@ Work in progress umbrella package
 
 ```bash
 # Get base
-kpt get https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git/base base
+kpt pkg get https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git/base base
 
 # Get instance
-kpt get https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git/instance bigbang
+kpt pkg get https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git/instance bigbang
 
 # Commit and push to a repo cluster has access to
 git add . && git commit -m "initial commit" && git push
