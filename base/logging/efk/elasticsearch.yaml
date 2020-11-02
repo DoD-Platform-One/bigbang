@@ -1,7 +1,7 @@
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
-  name: elasticsearch
+  name: bigbang
 spec:
   image: registry1.dsop.io/ironbank/elastic/elasticsearch/elasticsearch:7.9.2
   nodeSets:
@@ -36,8 +36,11 @@ spec:
           #                  memory: 3Gi
           #                  cpu: 2
 
+          sidecar.istio.io/rewriteAppHTTPProbers: "true"
           traffic.sidecar.istio.io/excludeInboundPorts: "9300"
           traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
+      spec:
+        automountServiceAccountToken: true
   - name: data
     volumeClaimTemplates:
     - metadata:
@@ -63,6 +66,7 @@ spec:
         annotations:
           fluentbit.io/exclude-istio-proxy: "true"
           prometheus.istio.io/merge-metrics: "false"
+          sidecar.istio.io/rewriteAppHTTPProbers: "true"
           traffic.sidecar.istio.io/excludeInboundPorts: "9300"
           traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
       spec:

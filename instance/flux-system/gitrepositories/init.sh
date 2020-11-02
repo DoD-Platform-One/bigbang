@@ -31,18 +31,30 @@ deploy_flux() {
   kubectl wait --for=condition=available --timeout=60s --all deployments -n flux-system
 }
 
-deploy_umbrella() {
-  info "Bootstrapping from the current repo"
-
-  # apply the repository with the current branch
+deploy_this_repo() {
   export branch=$(git rev-parse --abbrev-ref HEAD)
   export repo=$(git config --get remote.origin.url)
   export env="dev"
 
-  curdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  info "Deploying the current repo: ${branch} targetting the branch: ${repo}"
 
   kustomize build "${curdir}" | envsubst | kubectl apply -f -
-  kustomize build "${curdir}/.." | kubectl apply -f -
+}
+
+bootstrap() {
+  curdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+  deploy_this_repo
+
+  case "$1" in
+  "dev")
+    kustomize build base/flux/chart-repositories | kubectl apply -f -
+    info "Stopping at empty flux"
+    ;;
+  *)
+    info "Bootstrapping from the current repo"
+    kustomize build "${curdir}/.." | kubectl apply -f -
+  esac
 }
 
 {
@@ -52,5 +64,6 @@ deploy_umbrella() {
   need "git"
 
   deploy_flux
-  deploy_umbrella
+  
+  bootstrap "$1"
 }

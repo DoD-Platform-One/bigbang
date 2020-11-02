@@ -1,3 +1,4 @@
+namespace: istio-system
 resources:
 - namespace.yaml
 - istio.yaml

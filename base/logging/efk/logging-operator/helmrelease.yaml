@@ -1,0 +1,20 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: logging-operator
+spec:
+  chart:
+    spec:
+      chart: logging-operator
+      interval: 5m
+      sourceRef:
+        name: banzaicloud
+        namespace: flux-system
+        kind: HelmRepository
+      version: 3.7.0
+  interval: 2m
+  values:
+    createCustomResource: false
+    monitoring:
+      serviceMonitor:
+        enabled: true

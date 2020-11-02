@@ -12,7 +12,7 @@ spec:
         name: prometheus-community
         namespace: flux-system
         kind: HelmRepository
-      version: 10.1.2
+      version: 10.3.4
   interval: 2m
   values:
     alertmanager:

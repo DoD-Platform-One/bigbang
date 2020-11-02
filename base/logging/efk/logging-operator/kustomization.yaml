@@ -1,0 +1,5 @@
+resources:
+- helmrelease.yaml
+# system wide pipeline
+- es-clusteroutput.yaml
+- logging.yaml
