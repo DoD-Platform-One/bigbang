@@ -2,7 +2,10 @@ namespace: monitoring
 resources:
 - ../../base/monitoring
 - networkpolicy.yaml
-# Environment specific values
+# Application monitoring
+- ../../base/istio/monitoring
+- ../../base/flux/monitoring
+# VirtualServices added and configured per environment with setters
 - ingress
 patchesStrategicMerge:
 - helmrelease.yaml

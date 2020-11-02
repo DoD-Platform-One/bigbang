@@ -3,3 +3,4 @@ resources:
 - ../../base/istio/istio-system
 - networkpolicy.yaml
 - gateway.yaml
+- ingress

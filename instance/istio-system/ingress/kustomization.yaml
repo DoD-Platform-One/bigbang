@@ -1,2 +1,3 @@
 resources:
-- kibana-vs.yaml
+- jaeger-vs.yaml
+- kiali-vs.yaml

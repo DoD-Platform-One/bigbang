@@ -9,3 +9,6 @@ spec:
     apiVersion: helm.toolkit.fluxcd.io/v2beta1
     kind: HelmRelease
   path: './instance/cert-manager' # {"$kpt-set":"env-cert-manager"}
+  dependsOn:
+    - name: bigbang-monitoring
+      namespace: flux-system
