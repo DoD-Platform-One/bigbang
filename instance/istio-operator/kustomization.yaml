@@ -1,3 +1,4 @@
 namespace: istio-operator
 resources:
 - ../../base/istio/istio-operator
+- networkpolicy.yaml

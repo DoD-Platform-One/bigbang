@@ -1,6 +1,7 @@
 namespace: monitoring
 resources:
 - ../../base/monitoring
+- networkpolicy.yaml
 # Environment specific values
 - ingress
 patchesStrategicMerge:

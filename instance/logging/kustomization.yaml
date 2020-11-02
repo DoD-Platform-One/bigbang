@@ -1,4 +1,5 @@
 namespace: logging
 resources:
 - ../../base/logging/efk
+- networkpolicy.yaml
 - ingress

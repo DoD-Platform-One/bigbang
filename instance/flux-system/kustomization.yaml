@@ -1,5 +1,6 @@
 namespace: flux-system
 resources:
 - ../../base/flux
+- networkpolicy.yaml
 # Bootstrapping components
 - kustomizations
