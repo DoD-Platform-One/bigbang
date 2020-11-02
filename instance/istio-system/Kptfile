@@ -33,3 +33,11 @@ openAPI:
           values:
           - marker: ${hostname}
             ref: '#/definitions/io.k8s.cli.setters.hostname'
+    io.k8s.cli.substitutions.kiali-hostname:
+      x-k8s-cli:
+        substitution:
+          name: kiali-hostname
+          pattern: kiali.${hostname}
+          values:
+          - marker: ${hostname}
+            ref: '#/definitions/io.k8s.cli.setters.hostname'

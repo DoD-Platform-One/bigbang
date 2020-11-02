@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kiali
+spec:
+  hosts:
+  - "kiali.hostname" # {"$kpt-set":"kiali-hostname"}
+  gateways:
+  - main.istio-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        port:
+          number: 20001
+        host: kiali.istio-system.svc.cluster.local

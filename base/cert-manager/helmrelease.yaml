@@ -17,10 +17,11 @@ spec:
   values:
     installCRDs: true
     prometheus:
+      enabled: true
       servicemonitor:
         labels:
           release: monitoring
-        enabled: false
+        enabled: true
   valuesFrom:
   - name: env-values
     kind: ConfigMap
