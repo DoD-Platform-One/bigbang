@@ -13,8 +13,8 @@ spec:
       number: 80
     hosts:
     - '*'
-    # tls:
-    #   httpsRedirect: true
+    tls:
+      httpsRedirect: true
   - port:
       name: https
       protocol: HTTPS
