@@ -1,11 +1,11 @@
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
-  name: kibana
+  name: bigbang
 spec:
   count: 1
   elasticsearchRef:
-    name: elasticsearch
+    name: bigbang
   http:
     tls:
       selfSignedCertificate:
@@ -16,4 +16,4 @@ spec:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       automountServiceAccountToken: true
-  version: 7.8.1
+  version: 7.9.2

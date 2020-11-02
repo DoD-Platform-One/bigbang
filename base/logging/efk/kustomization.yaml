@@ -2,3 +2,5 @@ resources:
 - namespace.yaml
 - elasticsearch.yaml
 - kibana.yaml
+# Logging operator (declarative logging pipelines)
+- logging-operator
