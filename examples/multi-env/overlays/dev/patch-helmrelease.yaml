@@ -1,0 +1,8 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: bigbang
+spec:
+  # Bump up refresh interval for dev
+  interval: 1m0s

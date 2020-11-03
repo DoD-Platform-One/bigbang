@@ -1,0 +1,17 @@
+namespace: flux-system
+
+resources:
+  - ../../base
+
+configMapGenerator:
+  - name: bigbang-values
+    behavior: merge
+    files:
+      - values.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+patchesStrategicMerge:
+  - patch-gitrepository.yaml
+  - patch-helmrelease.yaml

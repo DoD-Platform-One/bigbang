@@ -4,39 +4,24 @@ Work in progress umbrella package
 
 ## Usage
 
-```
-# As a helm chart
-helm install bigbang chart/ -n flux-system
+The following examples expect a cluster with fluxv2 preinstalled.  This can be done by [installing the flux cli](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli) and running `flux install`.  (TODO: Convert to IB images).
 
-# If you don't like helm
-helm template bigbang chart/ -n flux-system | kubectl apply -f -
-```
+### Quickstart
 
-You can also point a `HelmRelease` to this repository as so:
+A bare mininmum, simple quickstart is provided under `./examples/simple`:
 
-```yaml
----
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: umbrella
-  namespace: flux-system
-spec:
-  url: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella.git
----
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
-metadata:
-  name: bigbang
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      chart: chart/
-      sourceRef:
-        kind: GitRepository
-        name: umbrella
-        namespace: flux-system
+```bash
+kubectl apply -f examples/simple
 ```
 
-The `umbrella` helm chart is configurable through a variety of means, please see [TODO]() for more info.
+### Multi Environment
+
+Most production deployments follow a traditional Dev, Acceptance, Staging, Test (DAST) workflow.  This example demonstrates __one way__ of achieving multiple deployments with differing configurations.
+
+```bash
+# Apply dev
+kustomize build examples/multi-env/overlays/dev | kubectl apply -f -
+
+# Apply prod
+kustomize build examples/multi-env/overlays/prod | kubectl apply -f -
+```

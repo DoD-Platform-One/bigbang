@@ -1,0 +1,14 @@
+namespace: flux-system
+
+resources:
+  - gitrepository.yaml
+  - helmrelease.yaml
+
+configMapGenerator:
+  - name: bigbang-values
+    behavior: create
+    files:
+      - values.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
