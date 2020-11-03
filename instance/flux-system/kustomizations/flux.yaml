@@ -1,6 +1,0 @@
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
-kind: Kustomization
-metadata:
-  name: bigbang-flux
-spec:
-  path: './instance/flux-system' # {"$kpt-set":"env-flux-system"}

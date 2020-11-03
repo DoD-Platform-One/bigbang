@@ -1,6 +1,0 @@
-resources:
-- operator.yaml
-images:
-- name: docker.io/istio/operator:1.7.4-distroless
-  newName: registry1.dsop.io/ironbank/opensource/istio/operator
-  newTag: 1.7.3

@@ -1,0 +1,8 @@
+{{- if .Values.istio.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    namespace: istio-system
+{{- end }}

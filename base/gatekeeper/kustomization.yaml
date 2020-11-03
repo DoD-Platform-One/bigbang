@@ -1,7 +1,0 @@
-resources:
-- namespace.yaml
-- gatekeeper.yaml
-images:
-- name: openpolicyagent/gatekeeper:v3.1.1
-  newName: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
-  newTag: v3.1.1

@@ -1,6 +1,0 @@
-namespace: istio-system
-resources:
-- ../../base/istio/istio-system
-- networkpolicy.yaml
-- gateway.yaml
-- ingress

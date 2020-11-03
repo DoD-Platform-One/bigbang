@@ -1,0 +1,45 @@
+global:
+  hostname: bigbang.dev
+
+  # Toggle sourcing from external repos
+  offline: false
+
+  # Flux reconciliation parameters
+  interval: 2m
+  install:
+    retries: 3
+  upgrade:
+    retries: 3
+  rollback:
+    timeout: 2m
+    cleanupOnFail: true
+
+istio:
+  enabled: true
+  git:
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git
+    branch: charts
+
+certmanager:
+  enabled: true
+  git:
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/cert-manager.git
+    branch: release-v1.0.x
+
+gatekeeper:
+  enabled: true
+  git:
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git
+    branch: chart
+
+logging:
+  enabled: true
+  git:
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/logging.git
+    branch: release-v0.2.x
+
+monitoring:
+  enabled: true
+  git:
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
+    branch: release-v0.2.x

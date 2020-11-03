@@ -1,0 +1,48 @@
+{{- if .Values.istio.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ .Release.Name }}-istio-operator
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetNamespace: istio-operator
+  chart:
+    spec:
+      chart: charts/operator
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: {{ .Release.Name }}-istio
+        namespace: flux-system
+
+  interval: {{ .Values.interval | default .Values.global.interval }}
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: {{ .Values.global.install.retries }}
+  upgrade:
+    remediation:
+      retries: {{ .Values.global.upgrade.retries }}
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: {{ .Values.global.rollback.timeout }}
+    cleanupOnFail: {{ .Values.global.rollback.cleanupOnFail }}
+
+  values:
+    hub: registry1.dsop.io/ironbank/opensource/istio
+    tag: 1.7.3
+
+  valuesFrom:
+    - name: env-values
+      kind: ConfigMap
+      optional: true
+    - name: env-values
+      kind: Secret
+      optional: true
+
+  dependsOn:
+    - name: {{ .Release.Name }}-gatekeeper
+      namespace: {{ .Release.Namespace }}
+{{- end }}

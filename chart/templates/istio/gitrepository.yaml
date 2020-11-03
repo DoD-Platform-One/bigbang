@@ -1,0 +1,17 @@
+{{- if or (not .Values.global.offline) .Values.istio.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: {{ .Release.Name }}-istio
+  namespace: {{ .Release.Namespace }}
+spec:
+  ignore: |
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
+    /**/*.sh
+  interval: {{ .Values.global.interval }}
+  ref:
+    branch: {{ .Values.istio.git.branch }}
+  url: {{ .Values.istio.git.repo }}
+{{- end }}

@@ -1,0 +1,17 @@
+{{- if or (not .Values.global.offline) .Values.certmanager.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: {{ .Release.Name }}-certmanager
+  namespace: {{ .Release.Namespace }}
+spec:
+  ignore: |
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
+    /**/*.sh
+  interval: {{ .Values.global.interval }}
+  ref:
+    branch: {{ .Values.certmanager.git.branch }}
+  url: {{ .Values.certmanager.git.repo }}
+{{- end }}

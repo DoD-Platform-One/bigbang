@@ -1,9 +1,0 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: HelmRepository
-metadata:
-  name: rancher-latest
-  namespace: flux-system
-spec:
-  interval: 24h
-  timeout: 3m
-  url: https://releases.rancher.com/server-charts/latest
