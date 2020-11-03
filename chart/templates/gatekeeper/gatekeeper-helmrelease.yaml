@@ -34,6 +34,7 @@ spec:
     image:
       repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
       release: v3.1.2
+    disableValidatingWebhook: true
 
   valuesFrom:
     - name: env-values
@@ -42,4 +43,7 @@ spec:
     - name: env-values
       kind: Secret
       optional: true
+  dependsOn:
+  - name: {{ .Release.Name }}-cert-manager
+    namespace: {{ .Release.Namespace }}
 {{- end }}

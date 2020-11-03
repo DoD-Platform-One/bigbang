@@ -37,7 +37,4 @@ spec:
     - name: env-values
       kind: Secret
       optional: true
-  dependsOn:
-    - name: {{ .Release.Name }}-gatekeeper
-      namespace: {{ .Release.Namespace }}
 {{- end }}
