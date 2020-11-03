@@ -1,4 +1,0 @@
-namespace: gatekeeper-system
-resources:
-- ../../base/gatekeeper
-- networkpolicy.yaml

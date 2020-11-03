@@ -1,0 +1,39 @@
+{{- if .Values.logging.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ .Release.Name }}-logging-operator
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetNamespace: logging
+  chart:
+    spec:
+      chart: charts/logging-operator
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: {{ .Release.Name }}-logging
+        namespace: flux-system
+
+  interval: {{ .Values.interval | default .Values.global.interval }}
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: {{ .Values.global.install.retries }}
+  upgrade:
+    remediation:
+      retries: {{ .Values.global.upgrade.retries }}
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: {{ .Values.global.rollback.timeout }}
+    cleanupOnFail: {{ .Values.global.rollback.cleanupOnFail }}
+
+  values:
+    createCustomResource: false
+
+  dependsOn:
+    - name: {{ .Release.Name }}-gatekeeper
+      namespace: {{ .Release.Namespace }}
+{{- end }}

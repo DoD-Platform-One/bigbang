@@ -1,0 +1,45 @@
+{{- if .Values.gatekeeper.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ .Release.Name }}-gatekeeper
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetNamespace: gatekeeper-system
+  chart:
+    spec:
+      chart: charts/gatekeeper
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: {{ .Release.Name }}-gatekeeper
+        namespace: flux-system
+
+  interval: {{ .Values.interval | default .Values.global.interval }}
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: {{ .Values.global.install.retries }}
+  upgrade:
+    remediation:
+      retries: {{ .Values.global.upgrade.retries }}
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: {{ .Values.global.rollback.timeout }}
+    cleanupOnFail: {{ .Values.global.rollback.cleanupOnFail }}
+
+  values:
+    image:
+      repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
+      release: v3.1.2
+
+  valuesFrom:
+    - name: env-values
+      kind: ConfigMap
+      optional: true
+    - name: env-values
+      kind: Secret
+      optional: true
+{{- end }}

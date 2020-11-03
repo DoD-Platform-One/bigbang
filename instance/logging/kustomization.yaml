@@ -1,6 +1,0 @@
-namespace: logging
-resources:
-- ../../base/logging/efk
-- networkpolicy.yaml
-# VirtualServices added and configured per environment with setters
-- ingress
