@@ -18,7 +18,7 @@ istio:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git
-    branch: charts
+    branch: chart-release
 
 certmanager:
   enabled: true
@@ -30,7 +30,7 @@ gatekeeper:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git
-    branch: chart
+    branch: chart-release
 
 logging:
   enabled: true
