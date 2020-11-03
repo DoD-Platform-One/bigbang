@@ -1,0 +1,8 @@
+{{- if .Values.twistlock.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: twistlock
+  labels:
+    namespace: twistlock
+{{- end }}

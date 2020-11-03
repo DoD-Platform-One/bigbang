@@ -1,0 +1,17 @@
+{{- if or (not .Values.global.offline) .Values.twistlock.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: {{ .Release.Name }}-twistlock
+  namespace: {{ .Release.Namespace }}
+spec:
+  ignore: |
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
+    /**/*.sh
+  interval: {{ .Values.global.interval }}
+  ref:
+    branch: {{ .Values.twistlock.git.branch }}
+  url: {{ .Values.twistlock.git.repo }}
+{{- end }}
