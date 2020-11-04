@@ -44,6 +44,6 @@ spec:
       kind: Secret
       optional: true
   dependsOn:
-  - name: {{ .Release.Name }}-cert-manager
+  - name: {{ .Release.Name }}-certmanager
     namespace: {{ .Release.Namespace }}
 {{- end }}
