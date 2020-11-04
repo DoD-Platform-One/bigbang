@@ -75,7 +75,10 @@ spec:
     kind: Secret
     optional: true
 
+  # TODO: DRY this up
+  {{- if .Values.gatekeeper.enabled }}
   dependsOn:
     - name: {{ .Release.Name }}-gatekeeper
       namespace: {{ .Release.Namespace }}
+  {{- end }}
 {{- end }}

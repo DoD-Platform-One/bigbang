@@ -42,8 +42,11 @@ spec:
     hostname: {{ .Values.global.hostname }}
 
   dependsOn:
-    - name: {{ .Release.Name }}-gatekeeper
-      namespace: {{ .Release.Namespace }}
     - name: {{ .Release.Name }}-istio-operator
       namespace: {{ .Release.Namespace }}
+
+    {{- if .Values.gatekeeper.enabled }}
+    - name: {{ .Release.Name }}-gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
 {{- end }}

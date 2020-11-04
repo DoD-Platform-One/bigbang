@@ -41,13 +41,20 @@ spec:
   values:
     hostname: {{ .Values.global.hostname }}
 
+  {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:
-    - name: {{ .Release.Name }}-gatekeeper
-      namespace: {{ .Release.Namespace }}
-    - name: {{ .Release.Name }}-istio
-      namespace: {{ .Release.Namespace }}
     - name: {{ .Release.Name }}-eck-operator
       namespace: {{ .Release.Namespace }}
     - name: {{ .Release.Name }}-logging-operator
       namespace: {{ .Release.Namespace }}
+
+    {{- if  .Values.gatekeeper.enabled }}
+    - name: {{ .Release.Name }}-gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if .Values.istio.enabled }}
+    - name: {{ .Release.Name }}-istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
 {{- end }}

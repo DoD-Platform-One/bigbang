@@ -38,7 +38,9 @@ spec:
       kind: Secret
       optional: true
 
+  {{- if .Values.gatekeeper.enabled }}
   dependsOn:
     - name: {{ .Release.Name }}-gatekeeper
       namespace: {{ .Release.Namespace }}
+  {{- end }}
 {{- end }}

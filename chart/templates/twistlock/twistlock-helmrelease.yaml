@@ -42,11 +42,18 @@ spec:
     hostname: {{ .Values.global.hostname }}
     prometheus:
       servicemonitor:
-        enabled: true
+        enabled: {{ .Values.monitoring.enabled }}
 
+  # TODO: DRY this up
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
+    {{- if .Values.gatekeeper.enabled }}
     - name: {{ .Release.Name }}-gatekeeper
       namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
     - name: {{ .Release.Name }}-istio
       namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
 {{- end }}
