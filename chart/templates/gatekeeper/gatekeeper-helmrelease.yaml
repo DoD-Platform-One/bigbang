@@ -43,7 +43,10 @@ spec:
     - name: env-values
       kind: Secret
       optional: true
+
+  {{- if .Values.certmanager.enabled }}
   dependsOn:
   - name: {{ .Release.Name }}-certmanager
     namespace: {{ .Release.Namespace }}
+  {{- end }}
 {{- end }}

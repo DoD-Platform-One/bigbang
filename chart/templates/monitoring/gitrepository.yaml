@@ -1,4 +1,4 @@
-{{- if or (not .Values.global.offline) .Values.monitoring.enabled }}
+{{- if and (not .Values.global.offline) .Values.monitoring.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:

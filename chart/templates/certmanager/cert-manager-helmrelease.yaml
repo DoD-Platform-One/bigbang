@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: {{ .Release.Name }}-cert-manager
+  name: {{ .Release.Name }}-certmanager
   namespace: {{ .Release.Namespace }}
 spec:
   targetNamespace: cert-manager
