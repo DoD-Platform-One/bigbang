@@ -1,0 +1,84 @@
+stages:
+  - package tests
+
+package tests:
+  stage: package tests
+  tags:
+    - bigbang
+    - privileged
+    - public
+  image: registry.access.redhat.com/ubi8/ubi:8.2
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+
+  before_script:
+    # Downloading Tools needed for cluster creation
+    - echo "Installing wget npm git and docker-ce-cli"
+    - yum -y install wget npm git gettext > /dev/null && wget https://download.docker.com/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo > /dev/null && yum -y install docker-ce-cli > /dev/null && yum -y clean all > /dev/null
+    - wget -q "https://get.helm.sh/helm-v3.4.0-linux-amd64.tar.gz" && tar xzf helm-v3.4.0-linux-amd64.tar.gz -C /usr/local/bin/ --strip-components 1 && chmod +x /usr/local/bin/helm
+    - curl -s https://toolkit.fluxcd.io/install.sh | bash
+    - wget -q -O /usr/local/bin/argocd "https://github.com/argoproj/argo-cd/releases/download/v1.7.8/argocd-linux-amd64" && chmod +x /usr/local/bin/argocd
+    - wget -q -O /usr/local/bin/mkcert "https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64" && chmod +x /usr/local/bin/mkcert
+    - wget -q -O /usr/local/bin/k3d "https://github.com/rancher/k3d/releases/download/v3.1.5/k3d-linux-amd64" && chmod +x /usr/local/bin/k3d
+    - wget -q -O /usr/local/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v1.19.3/bin/linux/amd64/kubectl" && chmod +x /usr/local/bin/kubectl
+    - wget -q "https://github.com/open-policy-agent/conftest/releases/download/v0.21.0/conftest_0.21.0_Linux_x86_64.tar.gz" && tar xzf conftest_0.21.0_Linux_x86_64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/conftest
+    # Starting dnsmasq for cluster dns resolution
+    - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:latest
+    - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+
+    # Inject image pull secrets into k3d
+    - env
+    - envsubst < tests/registries.yaml.template > tests/registries.yaml
+    - cat tests/registries.yaml
+    - docker login registry1.dsop.io  -p ${REGISTRY1_PASSWORD} -u ${REGISTRY1_USER}
+    - docker pull registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper:v3.1.2
+    
+    # Standup cluster
+    - k3d cluster create umbrella --volume ${PWD}/tests/registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
+    - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
+    - kubectl get nodes
+    - k3d node list
+    # Install Flux
+    - which flux
+    - flux install --timeout 3m0s
+    - while ! (kubectl get ns,pods,hr,gitrepositories -A); do sleep 3; done
+    # Install Big Bang
+    - helm upgrade -i bigbang chart -n flux-system 
+    # Wait for healthy
+    - sleep 5
+    - kubectl get ns,pods,hr,gitrepositories -A
+    - kubectl wait --for=condition=Ready --timeout 30s helmrelease -n flux-system bigbang-certmanager
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-gatekeeper
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-istio-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-istio
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-eck-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-logging-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-efk
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-twistlock
+    # Install cypress
+#    - npm install cypress
+    # Clean up previous cluster
+    # Create cluster and wait for deployments and pods
+    # - k3d cluster create mycluster --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --agents 1 --servers 1
+    # - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
+    # - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+    # - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+    # # Deploy ArgoCD and wait for deployments and pods
+    # - kubectl apply -k ./ArgoCD/
+    # - |
+    #   kubectl patch secret -n argocd argocd-secret -p '{"stringData": { "admin.password": "$2y$12$3EySSrfvhLp7V1833J4fS.kvPNvdxmiofuhHV8spDr98J.EJ/FgJW"}}'
+    # - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+    # - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+
+  script:
+    # Place kubernetes package test here
+    - echo "Package tests go here"
+    - kubectl get hr -A
+
+  after_script:
+    # Delete Cluster
+    - k3d cluster delete umbrella
