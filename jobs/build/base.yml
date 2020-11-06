@@ -1,7 +1,7 @@
 ###########################################################################
 # Base template for container builds and sets the default container tag.  #
 # See docker.yml or kaniko.yml for specific builder implementations.      #
-########################################################################### 
+###########################################################################
 .container build:
   stage: build
   variables:
@@ -9,6 +9,11 @@
     # IMAGE: REGISTRY[:PORT]/USER/REPO[:TAG]
     # Duplicate these variables out so that they cna be overridden at the job level
     IMAGE: $CI_REGISTRY_IMAGE
+    # The registry1 user has a $ in it.  This causes problems in GitLab
+    # The workaround is to reassign it (https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27436#note_33922439)
+    REGISTRY1: "registry1.dsop.io"
+    REGISTRY1_USER_: $REGISTRY1_USER
+    REGISTRY1_PASSWORD_: $REGISTRY1_PASSWORD
 
 # ------------------------------------------------------------------------------------
 # Kaniko
@@ -22,6 +27,8 @@
     entrypoint: [""]
   script:
     - echo "Building ${IMAGE}:${CI_COMMIT_SHORT_SHA} using ${DOCKERFILE_DIR}/${DOCKERFILE_NAME}"
-    - echo "$DOCKER_AUTH" > /kaniko/.docker/config.json
-
+    - echo "{\"auths\":{" > /kaniko/.docker/config.json
+    - echo "\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}," >> /kaniko/.docker/config.json
+    - echo "\"$REGISTRY1\":{\"username\":\"$REGISTRY1_USER_\",\"password\":\"$REGISTRY1_PASSWORD_\"}" >> /kaniko/.docker/config.json
+    - echo "}}" >> /kaniko/.docker/config.json
     - /kaniko/executor --context ${DOCKERFILE_DIR} --dockerfile ${DOCKERFILE_NAME} --destination ${IMAGE}:${CI_COMMIT_SHORT_SHA}

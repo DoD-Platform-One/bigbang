@@ -3,7 +3,7 @@
 
 .trivy scan:
   extends: .container scan
-  image: 
+  image:
     name: aquasec/trivy:0.9.0
     entrypoint: [""]
   variables:
