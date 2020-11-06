@@ -5,4 +5,16 @@ metadata:
   name: logging
   labels:
     istio-injection: enabled
+
+---
+  {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: logging
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+{{- end }}
 {{- end }}

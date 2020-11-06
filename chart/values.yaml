@@ -1,17 +1,25 @@
-global:
-  hostname: bigbang.dev
+hostname: bigbang.dev
 
-  # Toggle sourcing from external repos
-  offline: false
+# Toggle sourcing from external repos
+# TODO: All this does right now is toggle GitRepositories, it is _not_ fully functional
+offline: false
 
-  # Flux reconciliation parameters
+# Registry credentials to use from pulling images from private registry, will create an appropriate imagePullSecret in all relevant namespaces
+registryCredentials:
+  registry: registry1.dsop.io
+  username: ""
+  password: ""
+  email: ""
+
+# Flux reconciliation parameters
+flux:
   interval: 2m
   install:
     retries: 3
   upgrade:
     retries: 3
   rollback:
-    timeout: 2m
+    timeout: 5m
     cleanupOnFail: true
 
 istio:
@@ -19,33 +27,39 @@ istio:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git
     branch: chart-release
-
+  values: {}
 certmanager:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/cert-manager.git
     branch: release-v1.0.x
+  values: {}
+  
 
 gatekeeper:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git
     branch: chart-release
+  values: {}
 
 logging:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/logging.git
     branch: release-v0.2.x
+  values: {}
 
 monitoring:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
     branch: release-v0.2.x
+  values: {}
 
 twistlock:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/security-tools/twistlock.git
     branch: chart-release
+  values: {}

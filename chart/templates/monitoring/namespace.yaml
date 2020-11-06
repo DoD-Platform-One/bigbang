@@ -3,4 +3,16 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: monitoring
+
+---
+{{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: monitoring
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+{{- end }}
 {{- end }}

@@ -1,4 +1,4 @@
-namespace: flux-system
+namespace: bigbang
 
 resources:
   - ../../base
@@ -7,7 +7,4 @@ configMapGenerator:
   - name: bigbang-values
     behavior: merge
     files:
-      - values.yaml
-
-generatorOptions:
-  disableNameSuffixHash: true
+      - values.yaml=values/bigbang.yaml

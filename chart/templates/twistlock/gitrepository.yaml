@@ -1,8 +1,8 @@
-{{- if and (not .Values.global.offline) .Values.twistlock.enabled }}
+{{- if and (not .Values.offline) .Values.twistlock.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: {{ .Release.Name }}-twistlock
+  name: twistlock
   namespace: {{ .Release.Namespace }}
 spec:
   ignore: |
@@ -10,7 +10,7 @@ spec:
     /**/*.md
     /**/*.txt
     /**/*.sh
-  interval: {{ .Values.global.interval }}
+  interval: {{ .Values.flux.interval }}
   ref:
     branch: {{ .Values.twistlock.git.branch }}
   url: {{ .Values.twistlock.git.repo }}

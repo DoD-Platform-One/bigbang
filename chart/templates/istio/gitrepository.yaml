@@ -1,8 +1,8 @@
-{{- if and (not .Values.global.offline) .Values.istio.enabled }}
+{{- if and (not .Values.offline) .Values.istio.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: {{ .Release.Name }}-istio
+  name: istio
   namespace: {{ .Release.Namespace }}
 spec:
   ignore: |
@@ -10,7 +10,7 @@ spec:
     /**/*.md
     /**/*.txt
     /**/*.sh
-  interval: {{ .Values.global.interval }}
+  interval: {{ .Values.flux.interval }}
   ref:
     branch: {{ .Values.istio.git.branch }}
   url: {{ .Values.istio.git.repo }}

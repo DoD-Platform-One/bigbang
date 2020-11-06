@@ -1,9 +1,0 @@
----
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: umbrella
-#spec:
-#  # Patch to a development branch
-#  ref:
-#    branch: hel

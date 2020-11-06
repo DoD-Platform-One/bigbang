@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: {{ .Release.Name }}-certmanager
+  name: certmanager
   namespace: {{ .Release.Namespace }}
 spec:
   targetNamespace: cert-manager
@@ -12,30 +12,36 @@ spec:
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: {{ .Release.Name }}-certmanager
-        namespace: flux-system
+        name: certmanager
+        namespace: {{ .Release.Namespace }}
 
-  interval: {{ .Values.interval | default .Values.global.interval }}
+  {{- with .Values.flux }}
+  interval: {{ .interval }}
   test:
     enable: false
   install:
     remediation:
-      retries: {{ .Values.global.install.retries }}
+      retries: {{ .install.retries }}
   upgrade:
     remediation:
-      retries: {{ .Values.global.upgrade.retries }}
+      retries: {{ .upgrade.retries }}
       remediateLastFailure: true
     cleanupOnFail: true
   rollback:
-    timeout: {{ .Values.global.rollback.timeout }}
-    cleanupOnFail: {{ .Values.global.rollback.cleanupOnFail }}
+    timeout: {{ .rollback.timeout }}
+    cleanupOnFail: {{ .rollback.cleanupOnFail }}
+  {{- end }}
+
+  values:
+    global:
+      logLevel: 2
+
+      {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+      imagePullSecrets: [ name: private-registry ]
+      {{- end }}
 
   valuesFrom:
-    - name: env-values
-      kind: ConfigMap
-      optional: true
-    - name: env-values
-      kind: Secret
-      optional: true
-
+  - name: values
+    kind: Secret
+    valuesKey: "certmanager.yaml"
 {{- end }}

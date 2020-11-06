@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -8,13 +9,13 @@ spec:
       chart: chart
       sourceRef:
         kind: GitRepository
-        name: umbrella
-        namespace: flux-system
+        name: bigbang
+        namespace: bigbang
   interval: 5m0s
   valuesFrom:
-    - kind: ConfigMap
-      name: bigbang-values
+    - name: bigbang-values
+      kind: ConfigMap
       optional: true
-    - kind: Secret
-      name: bigbang-values
+    - name: bigbang-values
+      kind: Secret
       optional: true

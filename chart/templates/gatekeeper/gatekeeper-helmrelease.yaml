@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: {{ .Release.Name }}-gatekeeper
+  name: gatekeeper
   namespace: {{ .Release.Namespace }}
 spec:
   targetNamespace: gatekeeper-system
@@ -12,41 +12,44 @@ spec:
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: {{ .Release.Name }}-gatekeeper
-        namespace: flux-system
+        name: gatekeeper
+        namespace: {{ .Release.Namespace }}
 
-  interval: {{ .Values.interval | default .Values.global.interval }}
+  {{- with .Values.flux }}
+  interval: {{ .interval }}
   test:
     enable: false
   install:
     remediation:
-      retries: {{ .Values.global.install.retries }}
+      retries: {{ .install.retries }}
   upgrade:
     remediation:
-      retries: {{ .Values.global.upgrade.retries }}
+      retries: {{ .upgrade.retries }}
       remediateLastFailure: true
     cleanupOnFail: true
   rollback:
-    timeout: {{ .Values.global.rollback.timeout }}
-    cleanupOnFail: {{ .Values.global.rollback.cleanupOnFail }}
+    timeout: {{ .rollback.timeout }}
+    cleanupOnFail: {{ .rollback.cleanupOnFail }}
+  {{- end }}
+
+  valuesFrom:
+    - name: values
+      kind: Secret
+      valuesKey: "gatekeeper.yaml"
 
   values:
     image:
       repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
       release: v3.1.2
     disableValidatingWebhook: true
-
-  valuesFrom:
-    - name: env-values
-      kind: ConfigMap
-      optional: true
-    - name: env-values
-      kind: Secret
-      optional: true
+    createNamespace: false
+    {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+    imagePullSecrets: [ private-registry ]
+    {{- end }}
 
   {{- if .Values.certmanager.enabled }}
   dependsOn:
-  - name: {{ .Release.Name }}-certmanager
+  - name: certmanager
     namespace: {{ .Release.Namespace }}
   {{- end }}
 {{- end }}

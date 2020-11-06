@@ -1,0 +1,18 @@
+namespace: bigbang
+
+resources:
+  - ../../base
+
+  # Environment specific values
+  - source-secrets.yaml
+
+patchesStrategicMerge:
+  - patch-bigbang.yaml
+  - |-
+    apiVersion: source.toolkit.fluxcd.io/v1beta1
+    kind: GitRepository
+    metadata:
+      name: bigbang
+    spec:
+      ref:
+        branch: valuesfrom
