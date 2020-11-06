@@ -1,8 +1,8 @@
-{{- if and (not .Values.global.offline) .Values.monitoring.enabled }}
+{{- if and (not .Values.offline) .Values.monitoring.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: {{ .Release.Name }}-monitoring
+  name: monitoring
   namespace: {{ .Release.Namespace }}
 spec:
   ignore: |
@@ -10,7 +10,7 @@ spec:
     /**/*.md
     /**/*.txt
     /**/*.sh
-  interval: {{ .Values.global.interval }}
+  interval: {{ .Values.flux.interval }}
   ref:
     branch: {{ .Values.monitoring.git.branch }}
   url: {{ .Values.monitoring.git.repo }}

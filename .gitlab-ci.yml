@@ -7,7 +7,7 @@ package tests:
     - bigbang
     - privileged
     - public
-  image: registry.access.redhat.com/ubi8/ubi:8.2
+  image: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:b0b45793
   services:
     - docker:dind
   variables:
@@ -16,47 +16,39 @@ package tests:
     DOCKER_TLS_CERTDIR: ""
 
   before_script:
-    # Downloading Tools needed for cluster creation
-    - echo "Installing wget npm git and docker-ce-cli"
-    - yum -y install wget npm git gettext > /dev/null && wget https://download.docker.com/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo > /dev/null && yum -y install docker-ce-cli > /dev/null && yum -y clean all > /dev/null
-    - wget -q "https://get.helm.sh/helm-v3.4.0-linux-amd64.tar.gz" && tar xzf helm-v3.4.0-linux-amd64.tar.gz -C /usr/local/bin/ --strip-components 1 && chmod +x /usr/local/bin/helm
-    - curl -s https://toolkit.fluxcd.io/install.sh | bash
-    - wget -q -O /usr/local/bin/k3d "https://github.com/rancher/k3d/releases/download/v3.1.5/k3d-linux-amd64" && chmod +x /usr/local/bin/k3d
-    - wget -q -O /usr/local/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v1.19.3/bin/linux/amd64/kubectl" && chmod +x /usr/local/bin/kubectl
     # Starting dnsmasq for cluster dns resolution
-    - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:latest
+    - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:release-1.0.7
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
-    # Inject image pull secrets into k3d
-    - export DOLLAR=$
-    - env
-    - envsubst < tests/registries.yaml.template > tests/registries.yaml
-    - cat tests/registries.yaml
-    - docker login registry1.dsop.io  -p ${REGISTRY1_PASSWORD} -u 'robot$bigbang'
-    - docker pull registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper:v3.1.2
-    
     # Standup cluster
-    - k3d cluster create umbrella --volume ${PWD}/tests/registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
+    - k3d cluster create umbrella  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl get nodes
     - k3d node list
+
     # Install Flux
     - which flux
+    - flux --version
     - flux install --timeout 3m0s
-    - kubectl get namespaces,pods,helmrelease,gitrepositories -A 
+    - kubectl get namespaces,pods,helmrelease,gitrepositories -A
+
     # Install Big Bang
-    - helm upgrade -i bigbang chart -n flux-system 
+    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+
     # Wait for healthy
     - sleep 5
-    - kubectl get namespaces,pods,helmrelease,gitrepositories -A
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-certmanager
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-gatekeeper
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-istio-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-istio
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-eck-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-logging-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-efk
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n flux-system bigbang-twistlock
+    - kubectl get namespaces,pods,helmrelease,kustomizations,gitrepositories -A
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang certmanager
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang logging-operator
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang efk
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
+
+    # Show all deployed resources
+    - kubectl get all -A
 
     # Install cypress
 #    - npm install cypress

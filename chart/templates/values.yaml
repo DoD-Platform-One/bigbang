@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: values
+  namespace:  {{ .Release.Namespace }}
+type: generic
+stringData:
+  istio.yaml: |
+{{ toYaml .Values.istio.values | indent 4  }}
+  certmanager.yaml: |
+{{ toYaml .Values.certmanager.values | indent 4 }}
+  gatekeeper.yaml: |
+{{ toYaml .Values.gatekeeper.values | indent 4 }}
+  logging.yaml: |
+{{ toYaml .Values.logging.values | indent 4 }}
+  monitoring.yaml: |
+{{ toYaml .Values.monitoring.values | indent 4 }}
+  twistlock.yaml: |
+{{ toYaml .Values.twistlock.values | indent 4}} 
+data:

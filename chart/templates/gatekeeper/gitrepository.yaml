@@ -1,8 +1,8 @@
-{{- if and (not .Values.global.offline) .Values.gatekeeper.enabled }}
+{{- if and (not .Values.offline) .Values.gatekeeper.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: {{ .Release.Name }}-gatekeeper
+  name: gatekeeper
   namespace: {{ .Release.Namespace }}
 spec:
   ignore: |
@@ -10,7 +10,7 @@ spec:
     /**/*.md
     /**/*.txt
     /**/*.sh
-  interval: {{ .Values.global.interval }}
+  interval: {{ .Values.flux.interval }}
   ref:
     branch: {{ .Values.gatekeeper.git.branch }}
   url: {{ .Values.gatekeeper.git.repo }}
