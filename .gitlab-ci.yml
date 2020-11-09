@@ -43,8 +43,8 @@ package tests:
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang logging-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang efk
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
 
     # Show all deployed resources
