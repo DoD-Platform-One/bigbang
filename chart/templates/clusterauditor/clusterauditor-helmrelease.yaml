@@ -1,20 +1,19 @@
-{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.gatekeeper.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: gatekeeper
+  name: cluster-auditor
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: gatekeeper-system
+  targetNamespace: cluster-auditor
   chart:
     spec:
-      chart: charts/gatekeeper
+      chart: charts/application
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: gatekeeper
+        name: cluster-auditor
         namespace: {{ .Release.Namespace }}
-
   {{- with .Values.flux }}
   interval: {{ .interval }}
   test:
@@ -32,12 +31,8 @@ spec:
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
 
-  valuesFrom:
-    - name: values
-      kind: Secret
-      valuesKey: "gatekeeper.yaml"
-
   values:
+    #conversion from umbrella values to package values
     image:
       repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
       release: v3.1.2
@@ -46,10 +41,17 @@ spec:
     {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
     imagePullSecrets: [ private-registry ]
     {{- end }}
-
+  valuesFrom:
+  - name: values
+    kind: Secret
+    valuesKey: "clusterauditor.yaml"
   {{- if .Values.certmanager.enabled }}
   dependsOn:
-  - name: certmanager
+  - name: gatekeeper
     namespace: {{ .Release.Namespace }}
+  - name: eck-operator
+    namespace: {{ .Release.Namespace }}
+  - name: cluster-auditor-policies
+    namespace: {{ .Release.Namespace}}
   {{- end }}
 {{- end }}

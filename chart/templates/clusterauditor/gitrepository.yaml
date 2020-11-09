@@ -1,8 +1,8 @@
-{{- if and (not .Values.offline) (or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (not .Values.offline) .Values.clusterAuditor.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: gatekeeper
+  name: cluster-auditor
   namespace: {{ .Release.Namespace }}
 spec:
   ignore: |
@@ -12,6 +12,6 @@ spec:
     /**/*.sh
   interval: {{ .Values.flux.interval }}
   ref:
-    branch: {{ .Values.gatekeeper.git.branch }}
-  url: {{ .Values.gatekeeper.git.repo }}
+    branch: {{ .Values.clusterAuditor.git.branch }}
+  url: {{ .Values.clusterAuditor.git.repo }}
 {{- end }}

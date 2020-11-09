@@ -34,6 +34,14 @@ certmanager:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/cert-manager.git
     branch: release-v1.0.x
   values: {}
+
+clusterAuditor:
+  enabled: true
+  git: 
+    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/cluster-auditor.git
+    branch: chart-release
+  values: {}
+
   
 
 gatekeeper:

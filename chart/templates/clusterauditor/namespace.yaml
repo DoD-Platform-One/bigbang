@@ -1,13 +1,10 @@
-{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.gatekeeper.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    admission.gatekeeper.sh/ignore: no-self-managing
-    app: {{ .Release.Name }}-gatekeeper
-    control-plane: controller-manager
-    gatekeeper.sh/system: "yes"
-  name: gatekeeper-system
+    app: {{ .Release.Name }}-cluster-auditor
+  name: cluster-auditor
 
 ---
 {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
@@ -15,7 +12,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: private-registry
-  namespace: gatekeeper-system
+  namespace: cluster-auditor
 type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}
