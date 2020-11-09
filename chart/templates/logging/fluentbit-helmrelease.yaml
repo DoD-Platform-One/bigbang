@@ -2,13 +2,13 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: efk
+  name: fluent-bit
   namespace: {{ .Release.Namespace }}
 spec:
   targetNamespace: logging
   chart:
     spec:
-      chart: charts/logging
+      chart: charts/fluent-bit
       interval: 5m
       sourceRef:
         kind: GitRepository
@@ -32,19 +32,15 @@ spec:
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
 
-  valuesFrom:
-    - name: values
-      kind: Secret
-      valuesKey: "logging.yaml"
-
   values:
-    hostname: {{ .Values.hostname }}
+    elasticsearch:
+      host: "logging-ek-es-http"
+      password:
+        secret: "logging-ek-es-elastic-user"
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:
-    - name: eck-operator
-      namespace: {{ .Release.Namespace }}
-    - name: logging-operator
+    - name: ek
       namespace: {{ .Release.Namespace }}
 
     {{- if  .Values.gatekeeper.enabled }}
@@ -55,5 +51,5 @@ spec:
     {{- if .Values.istio.enabled }}
     - name: istio
       namespace: {{ .Release.Namespace }}
-    {{- end }}
-{{- end }}
+  {{- end }}
+  {{- end }}

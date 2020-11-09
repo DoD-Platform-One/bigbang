@@ -2,9 +2,17 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: eck-operator
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: logging
+  {{- if .Values.istio.enabled }}
   labels:
     istio-injection: enabled
+  {{- end}}
 
 ---
   {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
