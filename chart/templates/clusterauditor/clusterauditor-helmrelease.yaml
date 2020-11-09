@@ -1,4 +1,4 @@
-{{- if .Values.gatekeeper.enabled }}
+{{- if .Values.clusterAuditor.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -30,14 +30,8 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
   values:
     #conversion from umbrella values to package values
-    image:
-      repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
-      release: v3.1.2
-    disableValidatingWebhook: true
-    createNamespace: false
     {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
     imagePullSecrets: [ private-registry ]
     {{- end }}
@@ -45,13 +39,9 @@ spec:
   - name: values
     kind: Secret
     valuesKey: "clusterauditor.yaml"
-  {{- if .Values.certmanager.enabled }}
   dependsOn:
-  - name: gatekeeper
-    namespace: {{ .Release.Namespace }}
   - name: eck-operator
     namespace: {{ .Release.Namespace }}
   - name: cluster-auditor-policies
     namespace: {{ .Release.Namespace}}
-  {{- end }}
 {{- end }}

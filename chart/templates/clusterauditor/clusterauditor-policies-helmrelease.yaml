@@ -5,6 +5,7 @@ metadata:
   name: cluster-auditor-policies
   namespace: {{ .Release.Namespace }}
 spec:
+  targetNamespace: cluster-auditor
   chart:
     spec:
       chart: charts/policies
@@ -37,8 +38,6 @@ spec:
   {{- if .Values.certmanager.enabled }}
   dependsOn:
   - name: gatekeeper
-    namespace: {{ .Release.Namespace }}
-  - name: eck-operator
     namespace: {{ .Release.Namespace }}
   {{- end }}
 {{- end }}
