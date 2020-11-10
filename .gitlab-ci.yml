@@ -38,7 +38,6 @@ package tests:
     # Wait for healthy
     - sleep 5
     - kubectl get namespaces,pods,helmrelease,kustomizations,gitrepositories -A
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang certmanager
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio

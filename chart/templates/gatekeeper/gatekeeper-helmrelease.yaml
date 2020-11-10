@@ -46,10 +46,4 @@ spec:
     {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
     imagePullSecrets: [ private-registry ]
     {{- end }}
-
-  {{- if .Values.certmanager.enabled }}
-  dependsOn:
-  - name: certmanager
-    namespace: {{ .Release.Namespace }}
-  {{- end }}
 {{- end }}
