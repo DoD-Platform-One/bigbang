@@ -7,8 +7,6 @@ type: generic
 stringData:
   istio.yaml: |
 {{ toYaml .Values.istio.values | indent 4  }}
-  certmanager.yaml: |
-{{ toYaml .Values.certmanager.values | indent 4 }}
   gatekeeper.yaml: |
 {{ toYaml .Values.gatekeeper.values | indent 4 }}
   logging.yaml: |

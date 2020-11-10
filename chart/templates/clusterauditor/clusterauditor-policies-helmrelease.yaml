@@ -35,7 +35,7 @@ spec:
   - name: values
     kind: Secret
     valuesKey: "clusterauditor.yaml"
-  {{- if .Values.certmanager.enabled }}
+  {{- if .Values.gatekeeper.enabled }}
   dependsOn:
   - name: gatekeeper
     namespace: {{ .Release.Namespace }}
