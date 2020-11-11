@@ -19,3 +19,8 @@ kubectl apply -f examples/simple
 While simple to use, Big Bang also allows full flexibility in configuring individual packages, using encrypted secrets, and deploying to multiple environments with the same configuration base.  
 
 See the [readme](./examples/complete/README.md) for more information.
+
+
+### Developers
+
+Developers can use the [Developer Setup](./examples/development/README.md) to faciliate a local setup for developing improvements to Big Bang.
