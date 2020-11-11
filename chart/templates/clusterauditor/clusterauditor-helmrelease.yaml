@@ -5,7 +5,7 @@ metadata:
   name: cluster-auditor
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: cluster-auditor
+  targetNamespace: logging
   chart:
     spec:
       chart: charts/application
@@ -40,7 +40,7 @@ spec:
     kind: Secret
     valuesKey: "clusterauditor.yaml"
   dependsOn:
-  - name: eck-operator
+  - name: ek
     namespace: {{ .Release.Namespace }}
   - name: cluster-auditor-policies
     namespace: {{ .Release.Namespace}}

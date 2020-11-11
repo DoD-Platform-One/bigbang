@@ -34,6 +34,7 @@ package tests:
 
     # Install Big Bang
     - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
 
     # Wait for healthy
     - sleep 5
@@ -45,8 +46,9 @@ package tests:
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
-    - kubectl wait --for=condition=Ready --timeout 900s helmrelease -n bigbang cluster-auditor
-    
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
+    - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
+
     # Show all deployed resources
     - kubectl get all -A
 
@@ -68,6 +70,8 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package tests go here"
+    - curl -v https://kiali.bigbang.dev
+    - curl -v https://kibana.bigbang.dev
     - kubectl get helmrelease -A
 
   after_script:

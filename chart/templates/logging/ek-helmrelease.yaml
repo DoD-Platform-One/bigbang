@@ -1,4 +1,4 @@
-{{- if .Values.logging.enabled }}
+{{- if or .Values.logging.enabled .Values.clusterAuditor.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -39,6 +39,22 @@ spec:
 
   values:
     hostname: {{ .Values.hostname }}
+
+    kibana:
+      version: 7.9.2
+
+      {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+      imagePullSecrets:
+        - name: private-registry
+      {{- end }}
+
+    elasticsearch:
+      version: 7.9.2
+
+      {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+      imagePullSecrets:
+        - name: private-registry
+      {{- end }}
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:

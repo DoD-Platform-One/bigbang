@@ -22,11 +22,35 @@ spec:
             count: 1
             persistence:
               size: 5Gi
+            resources:
+              limits:
+                cpu: 1
+                memory: 1Gi
           data:
             count: 1
             persistence:
               size: 5Gi
+            resources:
+              limits:
+                cpu: 1
+                memory: 1Gi
 
-    # Disable packages from deploying (for example while you're testing)
+    istio:
+      # Directly modify chart values for dev workloads
+      values:
+        kiali:
+          dashboard:
+            auth:
+              strategy: "anonymous"     # Turn off authentication for kiali dashboard
+
+    gatekeeper:
+      # Directly modify chart values for dev workloads
+      values:
+        replicas: 1
+
     twistlock:
-      enabled: false
+      # Directly modify chart values for dev workloads
+      values:
+        console:
+          persistence:
+            size: 5Gi
