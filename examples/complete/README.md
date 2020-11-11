@@ -42,7 +42,7 @@ To set up your local development environment, follow the steps below:
 k3d cluster create --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer
 
 # Deploy the latest fluxv2 with iron bank images
-kubectl apply -f https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2/-/raw/master/flux-system.yaml
+flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2 --timeout 3m0s
 
 # Apply a local version of the umbrella chart
 # NOTE: This is the alternative to deploying a HelmRelease and having flux manage it, we use a local copy to avoid having to commit every change
