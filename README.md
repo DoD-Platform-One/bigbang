@@ -23,4 +23,4 @@ See the [readme](./examples/complete/README.md) for more information.
 
 ### Developers
 
-Developers can use the [Developer Setup](./examples/development/README.md) to faciliate a local setup for developing improvements to Big Bang.
+Developers can use the [Developer Setup](./examples/complete/README.md#development-workflow) to faciliate a local setup for developing improvements to Big Bang.
