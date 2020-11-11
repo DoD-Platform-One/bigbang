@@ -5,6 +5,8 @@ metadata:
   namespace:  {{ .Release.Namespace }}
 type: generic
 stringData:
+  values.yaml: |
+{{ toYaml .Values | indent 4}}
   istio.yaml: |
 {{ toYaml .Values.istio.values | indent 4  }}
   gatekeeper.yaml: |
