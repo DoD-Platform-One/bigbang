@@ -12,6 +12,12 @@ spec:
     /**/*.sh
   interval: {{ .Values.flux.interval }}
   ref:
+{{- if .Values.logging.git.commit }}
+    commit: {{ .Values.logging.git.commit }}
+{{- else if .Values.logging.git.tag }}
+    tag: {{ .Values.logging.git.tag }}
+{{- else }}
     branch: {{ .Values.logging.git.branch }}
+{{- end }}
   url: {{ .Values.logging.git.repo }}
 {{- end }}
