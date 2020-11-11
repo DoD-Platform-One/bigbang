@@ -71,8 +71,7 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package tests go here"
-    - curl -v https://kiali.bigbang.dev
-    - curl -v https://kibana.bigbang.dev
+    - bash ./tests/virtualservices.sh
     - kubectl get helmrelease -A
 
   after_script:
