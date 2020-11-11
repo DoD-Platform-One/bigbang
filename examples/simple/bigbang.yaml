@@ -8,7 +8,7 @@ spec:
   interval: 1m0s
   url: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella
   ref:
-    branch: valuesfrom
+    branch: master
 
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
