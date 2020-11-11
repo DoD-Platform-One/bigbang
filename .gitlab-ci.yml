@@ -29,7 +29,7 @@ package tests:
     # Install Flux
     - which flux
     - flux --version
-    - flux install --timeout 3m0s
+    - flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2 --timeout 3m0s
     - kubectl get namespaces,pods,helmrelease,gitrepositories -A
 
     # Install Big Bang
@@ -48,6 +48,7 @@ package tests:
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
     - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
+    
 
     # Show all deployed resources
     - kubectl get all -A
