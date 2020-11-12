@@ -80,7 +80,4 @@ package tests:
 
   after_script:
     # Delete Cluster
-    - kubectl get helmrelease,gitrepositories -A
-    - kubectl describe helmrelease -n bigbang monitoring
-    - kubectl describe all -n monitoring
     - k3d cluster delete umbrella
