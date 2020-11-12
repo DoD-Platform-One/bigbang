@@ -29,7 +29,7 @@ package tests:
     # Install Flux
     - which flux
     - flux --version
-    - flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2 --timeout 3m0s
+    - flux install
     - kubectl get namespaces,pods,helmrelease,gitrepositories -A
 
     # Install Big Bang
@@ -42,6 +42,7 @@ package tests:
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
+    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang monitoring
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
     - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
@@ -73,7 +74,13 @@ package tests:
     - echo "Package tests go here"
     - bash ./tests/virtualservices.sh
     - kubectl get helmrelease -A
+    - echo "Showing images not from ironbank:"
+    # Ignore rancher images since those are from k3d
+    - kubectl get pods -A -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c | grep -v "registry1" | grep -v "rancher"
 
   after_script:
     # Delete Cluster
+    - kubectl get helmrelease,gitrepositories -A
+    - kubectl describe helmrelease -n bigbang monitoring
+    - kubectl describe all -n monitoring
     - k3d cluster delete umbrella

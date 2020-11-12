@@ -43,24 +43,7 @@ spec:
       imagePullSecrets:
         - name: private-registry
     hostname: {{ .Values.hostname }}
-    kubePrometheusStack:
-      alertmanager:
-        alertmanagerSpec:
-          image:
-            repository: registry1.dsop.io/ironbank/opensource/prometheus/alertmanager
-            tag: v0.21.0
-        enabled: true
-
-    kubePrometheusStack:
-      grafana:
-        image:
-          pullSecrets:
-          - private-registry
-
-      prometheusOperator:
-        createCustomResource: true
-        manageCrds: true
-
+    
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
