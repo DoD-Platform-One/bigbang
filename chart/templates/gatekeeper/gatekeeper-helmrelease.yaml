@@ -43,7 +43,6 @@ spec:
       release: v3.1.2
     disableValidatingWebhook: true
     createNamespace: false
-    {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
-    imagePullSecrets: [ private-registry ]
-    {{- end }}
+    imagePullSecrets:
+      - name: private-registry
 {{- end }}

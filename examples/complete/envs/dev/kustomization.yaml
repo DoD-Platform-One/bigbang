@@ -8,11 +8,3 @@ resources:
 
 patchesStrategicMerge:
   - patch-bigbang.yaml
-  - |-
-    apiVersion: source.toolkit.fluxcd.io/v1beta1
-    kind: GitRepository
-    metadata:
-      name: bigbang
-    spec:
-      ref:
-        branch: valuesfrom

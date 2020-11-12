@@ -14,6 +14,10 @@ spec:
       rollback:
         cleanupOnFail: false
 
+    # clusterAuditor:
+
+#    monitoring:
+
     logging:
       # Directly modify chart values for dev workloads
       values:

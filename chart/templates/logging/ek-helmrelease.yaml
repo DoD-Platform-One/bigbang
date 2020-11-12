@@ -43,18 +43,14 @@ spec:
     kibana:
       version: 7.9.2
 
-      {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
       imagePullSecrets:
         - name: private-registry
-      {{- end }}
 
     elasticsearch:
       version: 7.9.2
 
-      {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
       imagePullSecrets:
         - name: private-registry
-      {{- end }}
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:

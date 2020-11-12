@@ -37,9 +37,8 @@ spec:
     tag: 1.7.3
     createNamespace: false
 
-    {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
-    imagePullSecrets: [ private-registry ]
-    {{- end }}
+    imagePullSecrets:
+      - name: private-registry
 
   {{- if .Values.gatekeeper.enabled }}
   dependsOn:
