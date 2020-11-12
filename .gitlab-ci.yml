@@ -1,8 +1,53 @@
-stages:
-  - package tests
+.deploy_k3d: &deploy_k3d
+  # Starting dnsmasq for cluster dns resolution
+  - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:release-1.0.7
+  - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
-package tests:
-  stage: package tests
+  # Standup cluster
+  - k3d cluster create ${K3D_CLUSTER_NAME}  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
+  - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
+  - kubectl get nodes
+  - k3d node list
+
+.deploy_flux: &deploy_flux
+  # Install Flux
+  - which flux
+  - flux --version
+  - flux install 
+  - kubectl get namespaces,pods,helmrelease,gitrepositories -A
+
+.wait_for_healthy: &wait_for_healthy
+  # Wait for healthy
+  ## TODO: make this dynamicly include the helmreleases being created instead of hardcoding 
+  - sleep 5
+  - kubectl get namespaces,pods,helmrelease,kustomizations,gitrepositories -A
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang monitoring
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
+  - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
+
+.do_some_quick_tests: &do_some_quick_tests
+  # Place kubernetes package test here
+  - echo "Package tests go here"
+  - bash ./tests/virtualservices.sh
+  - kubectl get helmrelease -A
+
+.check_non_ironbank_images: &check_non_ironbank_images
+  - echo "Showing images not from ironbank:"
+  # Ignore rancher images since those are from k3d
+  - kubectl get pods -A -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c | grep -v "registry1" | grep -v "rancher"
+
+
+stages:
+  - fast feedback
+
+.k3d:
   tags:
     - bigbang
     - privileged
@@ -14,70 +59,46 @@ package tests:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
-
   before_script:
-    # Starting dnsmasq for cluster dns resolution
-    - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:release-1.0.7
-    - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+    - *deploy_k3d 
+    - *deploy_flux
+  after_script:
+    - *check_non_ironbank_images
+    # Delete Cluster
+    - k3d cluster delete ${K3D_CLUSTER_NAME}
 
-    # Standup cluster
-    - k3d cluster create umbrella  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
-    - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
-    - kubectl get nodes
-    - k3d node list
-
-    # Install Flux
-    - which flux
-    - flux --version
-    - flux install
-    - kubectl get namespaces,pods,helmrelease,gitrepositories -A
-
-    # Install Big Bang
+fresh install:
+  stage: fast feedback
+  extends: .k3d
+  variables:
+    K3D_CLUSTER_NAME: fresh-install
+  script:
+    - echo "Install Big Bang From Current Branch"
+    # Install Big Bang From Current Branch
     - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
     - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+    - *wait_for_healthy
+    - *do_some_quick_tests
 
-    # Wait for healthy
-    - sleep 5
-    - kubectl get namespaces,pods,helmrelease,kustomizations,gitrepositories -A
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang monitoring
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
-    - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
-    - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
-    
-
-    # Show all deployed resources
-    - kubectl get all -A
-
-    # Install cypress
-#    - npm install cypress
-    # Clean up previous cluster
-    # Create cluster and wait for deployments and pods
-    # - k3d cluster create mycluster --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --agents 1 --servers 1
-    # - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
-    # - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
-    # - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    # # Deploy ArgoCD and wait for deployments and pods
-    # - kubectl apply -k ./ArgoCD/
-    # - |
-    #   kubectl patch secret -n argocd argocd-secret -p '{"stringData": { "admin.password": "$2y$12$3EySSrfvhLp7V1833J4fS.kvPNvdxmiofuhHV8spDr98J.EJ/FgJW"}}'
-    # - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
-    # - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-
+upgrade from master:
+  stage: fast feedback
+  extends: .k3d
+  variables:
+    K3D_CLUSTER_NAME: upgrade-from-master
   script:
-    # Place kubernetes package test here
-    - echo "Package tests go here"
-    - bash ./tests/virtualservices.sh
-    - kubectl get helmrelease -A
-    - echo "Showing images not from ironbank:"
-    # Ignore rancher images since those are from k3d
-    - kubectl get pods -A -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c | grep -v "registry1" | grep -v "rancher"
+    - echo "Install Big Bang From Master"
+    - git fetch
+    - git checkout ${CI_DEFAULT_BRANCH}
+    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+    - *wait_for_healthy
+    - *do_some_quick_tests
 
-  after_script:
-    # Delete Cluster
-    - k3d cluster delete umbrella
+    - echo "Upgrade Big Bang to Current Branch"
+    - git checkout ${CI_COMMIT_BRANCH}
+    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+    - *wait_for_healthy
+    - *do_some_quick_tests
+  only:
+    - merge_requests
