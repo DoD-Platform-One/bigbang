@@ -11,13 +11,7 @@ spec:
     /**/*.txt
     /**/*.sh
   interval: {{ .Values.flux.interval }}
-  ref:
-{{- if .Values.gatekeeper.git.commit }}
-    commit: {{ .Values.gatekeeper.git.commit }}
-{{- else if .Values.gatekeeper.git.tag }}
-    tag: {{ .Values.gatekeeper.git.tag }}
-{{- else }}
-    branch: {{ .Values.gatekeeper.git.branch }}
-{{- end }}
   url: {{ .Values.gatekeeper.git.repo }}
+  ref:
+    {{- include "validRef" .Values.gatekeeper.git | nindent 4 }}
 {{- end }}
