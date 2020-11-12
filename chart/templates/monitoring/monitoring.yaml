@@ -38,6 +38,8 @@ spec:
       valuesKey: "monitoring.yaml"
 
   values:
+    hostname: {{ .Values.hostname }}
+
     global:
       imagePullSecrets:
         - name: private-registry
