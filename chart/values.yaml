@@ -62,7 +62,7 @@ monitoring:
   enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
-    branch: master
+    branch: release-v0.2.x
     # commit: ""
     # tag: ""
   values: {}
