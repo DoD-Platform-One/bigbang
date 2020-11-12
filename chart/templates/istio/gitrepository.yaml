@@ -11,13 +11,7 @@ spec:
     /**/*.txt
     /**/*.sh
   interval: {{ .Values.flux.interval }}
-  ref:
-{{- if .Values.istio.git.commit }}
-    commit: {{ .Values.istio.git.commit }}
-{{- else if .Values.istio.git.tag }}
-    tag: {{ .Values.istio.git.tag }}
-{{- else }}
-    branch: {{ .Values.istio.git.branch }}
-{{- end }}
   url: {{ .Values.istio.git.repo }}
+  ref:
+    {{- include "validRef" .Values.istio.git | nindent 4 }}
 {{- end }}

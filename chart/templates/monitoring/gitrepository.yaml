@@ -11,13 +11,7 @@ spec:
     /**/*.txt
     /**/*.sh
   interval: {{ .Values.flux.interval }}
-  ref:
-{{- if .Values.monitoring.git.commit }}
-    commit: {{ .Values.monitoring.git.commit }}
-{{- else if .Values.monitoring.git.tag }}
-    tag: {{ .Values.monitoring.git.tag }}
-{{- else }}
-    branch: {{ .Values.monitoring.git.branch }}
-{{- end }}
   url: {{ .Values.monitoring.git.repo }}
+  ref:
+    {{- include "validRef" .Values.monitoring.git | nindent 4 }}
 {{- end }}

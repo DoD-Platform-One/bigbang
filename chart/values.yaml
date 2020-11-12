@@ -27,8 +27,8 @@ istio:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git
     branch: chart-release
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}
 
 clusterAuditor:
@@ -36,8 +36,8 @@ clusterAuditor:
   git: 
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/cluster-auditor.git
     branch: chart-release
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}
 
 gatekeeper:
@@ -45,8 +45,8 @@ gatekeeper:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git
     branch: chart-release
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}
 
 logging:
@@ -54,8 +54,8 @@ logging:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/logging.git
     branch: release-v0.2.x
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}
 
 monitoring:
@@ -63,8 +63,8 @@ monitoring:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
     branch: release-v0.2.x
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}
 
 twistlock:
@@ -72,6 +72,6 @@ twistlock:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/security-tools/twistlock.git
     branch: chart-release
-    # commit: ""
-    # tag: ""
+#    commit: ""
+#    tag: ""
   values: {}

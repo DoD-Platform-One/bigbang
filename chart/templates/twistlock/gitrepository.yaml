@@ -11,13 +11,7 @@ spec:
     /**/*.txt
     /**/*.sh
   interval: {{ .Values.flux.interval }}
-  ref:
-{{- if .Values.twistlock.git.commit }}
-    commit: {{ .Values.twistlock.git.commit }}
-{{- else if .Values.twistlock.git.tag }}
-    tag: {{ .Values.twistlock.git.tag }}
-{{- else }}
-    branch: {{ .Values.twistlock.git.branch }}
-{{- end }}
   url: {{ .Values.twistlock.git.repo }}
+  ref:
+    {{- include "validRef" .Values.twistlock.git | nindent 4 }}
 {{- end }}
