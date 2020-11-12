@@ -14,6 +14,7 @@ spec:
         kind: GitRepository
         name: cluster-auditor
         namespace: {{ .Release.Namespace }}
+
   {{- with .Values.flux }}
   interval: {{ .interval }}
   test:
@@ -30,15 +31,16 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
+
+  valuesFrom:
+    - name: values
+      kind: Secret
+      valuesKey: "clusterauditor.yaml"
+
   values:
     #conversion from umbrella values to package values
-    {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
     imagePullSecrets: [ private-registry ]
-    {{- end }}
-  valuesFrom:
-  - name: values
-    kind: Secret
-    valuesKey: "clusterauditor.yaml"
+
   dependsOn:
   - name: ek
     namespace: {{ .Release.Namespace }}

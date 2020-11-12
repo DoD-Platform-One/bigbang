@@ -31,10 +31,12 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
+
   valuesFrom:
   - name: values
     kind: Secret
     valuesKey: "clusterauditor.yaml"
+
   {{- if .Values.gatekeeper.enabled }}
   dependsOn:
   - name: gatekeeper

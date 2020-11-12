@@ -36,12 +36,12 @@ spec:
     - name: values
       kind: Secret
       valuesKey: "istio.yaml"
+
   values:
     hostname: {{ .Values.hostname }}
 
-    {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
-    imagePullSecrets: [ private-registry ]
-    {{- end }}
+    imagePullSecrets:
+      - private-registry
 
   dependsOn:
     - name: istio-operator
