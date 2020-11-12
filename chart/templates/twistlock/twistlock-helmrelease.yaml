@@ -38,7 +38,8 @@ spec:
     valuesKey: "twistlock.yaml"
 
   values:
-    hostname: {{ .Values.hostname }}
+    console:
+      hostname: {{ .Values.hostname }}
     prometheus:
       servicemonitor:
         enabled: {{ .Values.monitoring.enabled }}
