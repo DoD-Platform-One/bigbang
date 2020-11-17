@@ -7,7 +7,7 @@ configuration validation:
   stage: configuration validation
 
   image: 
-    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:e048b39c
+    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:4d3bab1b
 
   script:
     # Place configuration validation tests here
@@ -25,7 +25,7 @@ package tests:
     - privileged
 
   image: 
-    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:e048b39c
+    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:4d3bab1b
   services:
     - docker:dind
   variables:
