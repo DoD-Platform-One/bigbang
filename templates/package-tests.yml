@@ -7,7 +7,7 @@ configuration validation:
   stage: configuration validation
 
   image: 
-    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:4d3bab1b
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
 
   script:
     # Place configuration validation tests here
@@ -25,7 +25,7 @@ package tests:
     - privileged
 
   image: 
-    name: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:4d3bab1b
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
   services:
     - docker:dind
   variables:
@@ -35,7 +35,7 @@ package tests:
 
   before_script:
     # Starting dnsmasq for cluster dns resolution
-    - docker run -d -p 53:53/udp -p 53:53 janeczku/go-dnsmasq:release-1.0.7
+    - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:release-1.0.7
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
     # Create cluster and wait for deployments and pods
