@@ -53,7 +53,7 @@ package tests:
     - echo "Package tests"
     - kubectl get ingress --all-namespaces
     - kubectl get all -A
-#    - cypress run --spec tests/cypress/
+    - cypress verify
 
   after_script:
     # Delete Cluster
