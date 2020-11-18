@@ -75,3 +75,11 @@ twistlock:
 #    commit: ""
 #    tag: ""
   values: {}
+
+addons:
+  argocd:
+    enabled: false
+    git:
+      repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd.git
+      branch: chart-release
+    values: {}

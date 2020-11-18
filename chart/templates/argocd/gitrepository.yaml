@@ -1,0 +1,17 @@
+{{- if .Values.addons.argocd.enabled  }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: argocd
+  namespace: {{ .Release.Namespace }}
+spec:
+  ignore: |
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
+    /**/*.sh
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.argocd.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.argocd.git | nindent 4 }}
+{{- end }}

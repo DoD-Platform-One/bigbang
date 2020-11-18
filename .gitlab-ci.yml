@@ -30,6 +30,8 @@
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
+  # Enable this after we merge in
+  # - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang argocd
   - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
 .do_some_quick_tests: &do_some_quick_tests
@@ -75,7 +77,7 @@ fresh install:
   script:
     - echo "Install Big Bang From Current Branch"
     # Install Big Bang From Current Branch
-    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD} --set addons.argocd.enabled=true
     - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
     - *wait_for_healthy
     - *do_some_quick_tests
