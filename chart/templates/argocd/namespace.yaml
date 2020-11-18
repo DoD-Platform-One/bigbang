@@ -1,0 +1,20 @@
+{{- if .Values.addons.argocd.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app: {{ .Release.Name }}-argocd
+  name: argocd
+
+---
+{{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: argocd
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+{{- end }}
+{{- end }}

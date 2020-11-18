@@ -7,6 +7,8 @@ type: generic
 stringData:
   values.yaml: |
 {{ toYaml .Values | indent 4}}
+  argocd.yaml: |
+{{ toYaml .Values.addons.argocd.values | indent 4 }}
   istio.yaml: |
 {{ toYaml .Values.istio.values | indent 4  }}
   gatekeeper.yaml: |
