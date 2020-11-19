@@ -37,6 +37,9 @@ elif [[ $1 == *"../"* ]]
 then
     echo "Please use the absolute path for the app."
     exit 1
+elif [ ! -d $1 ]; then
+    echo "Please specify the app path as first argument. If you have, verify the path exists."
+    exit 1
 fi
 
 conftest $1
