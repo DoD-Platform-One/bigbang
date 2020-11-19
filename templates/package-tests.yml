@@ -8,13 +8,25 @@ configuration validation:
 
   image: 
     name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+  variables:
+    PIPELINE_REPO: https://repo1.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+    PIPELINE_REPO_DESTINATION: "../pipeline-repo"
+    GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
+
+  before_script:
+    - git clone ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
 
   script:
     # Place configuration validation tests here
-    - echo "Directory Structure of repository"
+    - echo "Directory structure of repository:"
     - tree .
-    - echo "Configuration validation tests go here"
-    - helm conftest chart --policy policy
+    - echo "Generic configuration validation tests:"
+    - helm conftest chart --policy ${GENERIC_POLICY_PATH}
+    - >
+      if [ -d "policy" ]; then
+        echo "App specific configuration validation tests:"
+        helm conftest chart --policy policy
+      fi
 
 
 package tests:
