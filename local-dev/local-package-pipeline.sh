@@ -1,10 +1,11 @@
 #!/bin/bash
 # Runs the conftest stage of the package pipeline
 conftest() {( set -e
+    git clone https://repo1.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates.git pipeline-templates-dev
     echo "Directory structure of repository:"
     tree $1
     echo "Generic configuration validation tests:"
-    helm conftest $1/chart --policy ../policies
+    helm conftest $1/chart --policy pipeline-templates-dev/policies
     if [ -d "$1/policy" ]; then
         echo "App specific configuration validation tests:"
         helm conftest chart --policy $1/policy
@@ -45,6 +46,7 @@ fi
 conftest $1
 exit_status=$?
 if [ ${exit_status} -eq 0 ]; then
+    rm -rf pipeline-templates-dev
     echo "Conftest succeeded."
     packagetest $1
     exit_status=$?
@@ -58,6 +60,7 @@ if [ ${exit_status} -eq 0 ]; then
         echo "Pipeline failed (1/2 stages passed)."
     fi
 else
+    rm -rf pipeline-templates-dev
     echo "Conftest failed."
     echo "Pipeline failed (0/2 stages passed)."
 fi
