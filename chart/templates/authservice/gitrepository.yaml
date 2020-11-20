@@ -1,0 +1,17 @@
+{{- if and .Values.istio.enabled .Values.addons.authservice.enabled  }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: authservice
+  namespace: {{ .Release.Namespace }}
+spec:
+  ignore: |
+    # exclude file extensions
+    /**/*.md
+    /**/*.txt
+    /**/*.sh
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.authservice.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.authservice.git | nindent 4 }}
+{{- end }}

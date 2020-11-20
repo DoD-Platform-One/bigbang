@@ -83,3 +83,10 @@ addons:
       repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd.git
       branch: chart-release
     values: {}
+
+  authservice:
+    enabled: false
+    git:
+      repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice.git
+      branch: master
+    values: {}
