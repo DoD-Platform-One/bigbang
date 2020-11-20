@@ -12,7 +12,7 @@ RUN set -eux; \
                 xfsprogs \
                 xz \
                 pigz \
-                git curl bash npm \
+                git curl bash npm tree \
         ; \
         if zfs="$(apk info --no-cache --quiet zfs)" && [ -n "$zfs" ]; then \
                 apk add --no-cache zfs; \
