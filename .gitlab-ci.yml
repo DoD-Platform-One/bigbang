@@ -1,26 +1,46 @@
-.deploy_k3d: &deploy_k3d
-  # Starting dnsmasq for cluster dns resolution
-  - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:release-1.0.7
-  - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+# Define global rules for when pipelines run
+workflow:
+  rules:
+    # Skip pipeline when commit message starts with "wip"
+    - if: '$CI_COMMIT_MESSAGE =~ /^wip/'
+      when: never
+    # Skip pipeline for branches that start with "docs"
+    - if: '$CI_COMMIT_BRANCH =~ /^docs/'
+      when: never
+    - when: always
 
-  # Standup cluster
-  - k3d cluster create ${K3D_CLUSTER_NAME}  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
-  - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
-  - kubectl get nodes
-  - k3d node list
+include:
+  - project: 'platform-one/big-bang/pipeline-templates/umbrella-templates'
+    file: '/global.gitlab-ci.yml'
 
-.deploy_flux: &deploy_flux
-  # Install Flux
-  - which flux
+stages:
+  - smoke tests
+  - network up
+  - cluster up
+  - bigbang up
+  - test
+  - bigbang down
+  - cluster down
+  - network down
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Smoke Tests
+#
+.bigbang:
+  image: registry.dsop.io/platform-one/private/big-bang/pipeline-templates/k3d-builder:b0b45793
+
+.deploy_bigbang: &deploy_bigbang
+  # Deploy flux and wait for it to be ready
   - flux --version
-  - flux install 
-  - kubectl get namespaces,pods,helmrelease,gitrepositories -A
+  - flux install
+  - kubectl get namespaces,pods,gitrepositories,helmrelease -A
 
-.wait_for_healthy: &wait_for_healthy
-  # Wait for healthy
-  ## TODO: make this dynamicly include the helmreleases being created instead of hardcoding 
-  - sleep 5
-  - kubectl get namespaces,pods,helmrelease,kustomizations,gitrepositories -A
+  # Deploy BigBang
+  - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
+  - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+
+  # Wait for components to be ready
+  # NOTE: Wait for each package individually so they show up nicely in ci logs
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang gatekeeper
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio-operator
   - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang istio
@@ -34,73 +54,199 @@
   # - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang argocd
   - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
-.do_some_quick_tests: &do_some_quick_tests
-  # Place kubernetes package test here
-  - echo "Package tests go here"
-  - bash ./tests/virtualservices.sh
-  - kubectl get helmrelease -A
-
-.check_non_ironbank_images: &check_non_ironbank_images
+  # Quick check for non iron bank images
   - echo "Showing images not from ironbank:"
   # Ignore rancher images since those are from k3d
   - kubectl get pods -A -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c | grep -v "registry1" | grep -v "rancher"
 
+  # Basic smoke test BigBang
+#  - echo "Package tests go here"
+#  - bash ./tests/virtualservices.sh
+#  - kubectl get helmrelease -A
 
-stages:
-  - fast feedback
-
-.k3d:
-  tags:
-    - bigbang
-    - privileged
-    - public
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
-  services:
-    - docker:dind
+clean install:
+  stage: smoke tests
+#  extends:
+#    - .k3d
+  rules:
+    # Skip on merge requests (it is ran as part of the non MR pipeline)
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
   variables:
-    DOCKER_HOST: tcp://localhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - *deploy_k3d 
-    - *deploy_flux
-  after_script:
-    - *check_non_ironbank_images
-    # Delete Cluster
-    - k3d cluster delete ${K3D_CLUSTER_NAME}
-
-fresh install:
-  stage: fast feedback
-  extends: .k3d
-  variables:
-    K3D_CLUSTER_NAME: fresh-install
+    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+  image: alpine:latest
   script:
-    - echo "Install Big Bang From Current Branch"
-    # Install Big Bang From Current Branch
-    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD} --set addons.argocd.enabled=true
-    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
-    - *wait_for_healthy
-    - *do_some_quick_tests
+#    - *deploy_bigbang
+    - echo "temp"
 
-upgrade from master:
-  stage: fast feedback
-  extends: .k3d
+upgrade:
+  stage: smoke tests
+  extends:
+    - .k3d
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
-    K3D_CLUSTER_NAME: upgrade-from-master
+    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   script:
-    - echo "Install Big Bang From Master"
-    - git fetch
-    - git checkout ${CI_DEFAULT_BRANCH}
-    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
-    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
-    - *wait_for_healthy
-    - *do_some_quick_tests
+    - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
+    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - *deploy_bigbang
 
-    - echo "Upgrade Big Bang to Current Branch"
+    - echo "Upgrade Big Bang from ${CI_COMMIT_BRANCH}"
     - git checkout ${CI_COMMIT_BRANCH}
-    - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD}
-    - kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
-    - *wait_for_healthy
-    - *do_some_quick_tests
-  only:
-    - merge_requests
+    - *deploy_bigbang
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Infrastructure: Management Jobs
+#
+# .pre job for pulling pipeline contents from umbrella-templates project
+# TODO: Currently all jobs connected via "needs" must explicitly need this job, should evaluate turning this into a global cache
+fetch umbrella templates:
+  extends:
+    - .fetch
+    - .infra create
+  stage: .pre
+
+# Abstract for job manually triggering infrastructure builds
+.infra fork:
+  stage: network up
+  needs:
+    - fetch umbrella templates
+  rules:
+    # Skip when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
+    # Only run on merge requests when manually activated
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+      allow_failure: false
+
+# Abstract for jobs responsible for creating infrastructure
+.infra create:
+  rules:
+    # Skip when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
+    # Only run on merge requests
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# Abstract for jobs responsible for cleaning up infrastructure
+.infra cleanup:
+  rules:
+    # Skip when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
+    # Always run on merge requests
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      allow_failure: true
+      when: always
+#-----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Infrastructure: Networking
+#
+aws/network up:
+  extends:
+    - .infra fork
+    - .network up
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    auto_stop_in: 1 hour
+
+aws/network down:
+  extends:
+    - .infra cleanup
+    - .network down
+  stage: network down
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    action: stop
+#-----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Infrastructure: RKE2
+#
+# Create RKE2 cluster on AWS
+aws/rke2/cluster up:
+  stage: cluster up
+  extends:
+    - .infra create
+    - .rke2 up
+  needs:
+    - job: fetch umbrella templates
+      artifacts: true
+    - job: aws/network up
+
+# Install BigBang on RKE2 cluster on AWS
+aws/rke2/bigbang up:
+  stage: bigbang up
+  extends:
+    - .infra create
+    - .bigbang
+  needs:
+    - job: fetch umbrella templates
+      artifacts: true
+    - job: aws/rke2/cluster up
+      artifacts: true
+  before_script:
+    - mkdir -p ~/.kube
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
+
+    # Deploy a default storage class for aws
+    - kubectl apply -f ${CI_PROJECT_DIR}/umbrella-templates/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
+  script:
+    - *deploy_bigbang
+  after_script:
+    - kubectl get all -A
+
+# Run tests on BigBang on RKE2 cluster on AWS
+aws/rke2/bigbang test:
+  stage: test
+  extends:
+    - .infra create
+    - .bigbang
+  needs:
+    - job: fetch umbrella templates
+      artifacts: true
+    - job: aws/rke2/cluster up
+      artifacts: true
+    - job: aws/rke2/bigbang up
+  script:
+    - echo "tests go here"
+
+# Uninstall BigBang on RKE2 cluster on AWS
+aws/rke2/bigbang down:
+  stage: bigbang down
+  extends:
+    - .infra cleanup
+    - .bigbang
+  needs:
+    - job: fetch umbrella templates
+      artifacts: true
+    - job: aws/rke2/cluster up
+      artifacts: true
+    - job: aws/rke2/bigbang test
+  before_script:
+    - mkdir -p ~/.kube
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
+  script:
+    - helm un -n bigbang bigbang
+
+    # TODO: Smarter wait
+    - sleep 180
+  after_script:
+    - kubectl get all -A
+
+# Destroy RKE2 cluster on AWS
+aws/rke2/cluster down:
+  stage: cluster down
+  extends:
+    - .infra cleanup
+    - .rke2 down
+  needs:
+    - job: fetch umbrella templates
+      artifacts: true
+    - job: aws/rke2/bigbang down
+#-----------------------------------------------------------------------------------------------------------------------
