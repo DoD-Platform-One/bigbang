@@ -7,3 +7,7 @@ docker run --priviliged -d --name local-dev registry.dsop.io/platform-one/big-ba
 docker exec local-dev k3d cluster create package-pipeline --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
 docker exec local-dev kubectl get all -A
 ```
+### For cypress tests:
+```
+docker exec local-dev cy-run.sh
+```
