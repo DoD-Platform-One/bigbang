@@ -30,6 +30,9 @@ packagetest() {( set -e
     cypress verify
 )}
 
+start_time="$(date -u +%s)"
+
+# Verify app path was passed
 if [ -z $1 ]
 then
     echo "Please specify the app path as first argument."
@@ -43,8 +46,11 @@ elif [ ! -d $1 ]; then
     exit 1
 fi
 
+# Run the conftest
 conftest $1
 exit_status=$?
+
+# Conditionally run the packagetest
 if [ ${exit_status} -eq 0 ]; then
     rm -rf pipeline-templates-dev
     echo "Conftest succeeded."
@@ -64,3 +70,7 @@ else
     echo "Conftest failed."
     echo "Pipeline failed (0/2 stages passed)."
 fi
+
+end_time="$(date -u +%s)"
+elapsed_seconds="$(($end_time-$start_time))"
+echo "Pipeline run finished in $elapsed_seconds seconds."

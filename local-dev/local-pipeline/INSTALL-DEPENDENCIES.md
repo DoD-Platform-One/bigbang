@@ -1,6 +1,6 @@
 ## tree
 
-Linux: may be preinstalled, if not... `sudo apt-get install tree` or `yum install tree -y` for most distros
+Linux: may be preinstalled, if not... `sudo apt-get install tree` or `yum install tree -y` or `apk add tree` for most distros
 
 macOS: `brew install tree` without `brew` you can try this [reference](https://gist.github.com/fscm/9eee2784f101f21515d66321180aef0f)
 
