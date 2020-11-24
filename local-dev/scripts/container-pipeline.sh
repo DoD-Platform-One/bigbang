@@ -1,5 +1,6 @@
 #!/bin/bash
 start_time="$(date -u +%s)"
+executionpath=`dirname $0`
 
 # Verify app path was passed
 if [ -z $1 ]
@@ -24,7 +25,7 @@ else
 fi
 
 # Copy the specified app into the container and run the pipeline
-cp executor.sh $1
+cp $executionpath/executor.sh $1
 docker cp $1 k3d-builder-local:/app
 docker exec -it -w /app k3d-builder-local ./executor.sh /app
 
