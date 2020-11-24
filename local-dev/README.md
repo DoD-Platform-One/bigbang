@@ -11,7 +11,7 @@ The preferred method is the Container-Pipeline since it is easier to get started
 Container-Pipeline:
 - Pipeline is run entirely in a Docker container, no need to install additional tools besides Docker
 - Execution can be slower due to Docker-in-Docker and other complexities
-- Scripts ocated under `local-docker-pipeline` directory
+- Scripts located under `local-docker-pipeline` directory
 
 Local-Pipeline:
 - Pipeline is run entirely on local dev machine, requires additional tools (see the `INSTALL-DEPENDENCIES.md` file)
