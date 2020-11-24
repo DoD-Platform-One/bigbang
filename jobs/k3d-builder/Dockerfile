@@ -68,22 +68,6 @@ RUN npm install cypress && \
     ln -s /node_modules/cypress/bin/cypress /usr/local/bin/cypress && \
     cypress verify
 
-# Install ClusterAPI
-ENV CLUSTERAPI_VERSION='0.3.10'
-ADD https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERAPI_VERSION}/clusterctl-linux-amd64 /usr/local/bin/clusterctl
-RUN chmod +x /usr/local/bin/clusterctl
-
-# Install Cluster AWS ADM
-ENV CLUSTERAWSADM_VERSION='0.6.3'
-ADD https://github.com/kubernetes-sigs/cluster-api-provider-aws/releases/download/v${CLUSTERAWSADM_VERSION}/clusterawsadm-linux-amd64 /usr/local/bin/clusterawsadm
-RUN chmod +x /usr/local/bin/clusterawsadm
-
-# Install AWS Cli
-ADD "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" ./awscliv2.zip
-RUN unzip -q awscliv2.zip && \
-    ./aws/install -b /usr/local/bin && \
-    rm -rf aws awscliv2.zip
-
 # Install tree for directory structure
 RUN yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/tree-1.7.0-15.el8.x86_64.rpm
 
