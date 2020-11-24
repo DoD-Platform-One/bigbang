@@ -20,7 +20,7 @@ if [ "$(docker ps -aq -f status=exited -f name=k3d-builder-local)" ]
 then
     docker start k3d-builder-local
 else
-    docker run -d --privileged -p 53:53/udp -p 53:53 --name k3d-builder-local registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder-local:0.0.1
+    docker run -d --privileged --name k3d-builder-local registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder-local:0.0.1
 fi
 
 # Copy the specified app into the container and run the pipeline
