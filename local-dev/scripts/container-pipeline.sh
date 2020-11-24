@@ -1,5 +1,6 @@
 #!/bin/bash
 start_time="$(date -u +%s)"
+executionpath=`dirname $0`
 
 # Verify app path was passed
 if [ -z $1 ]
@@ -24,8 +25,8 @@ else
 fi
 
 # Copy the specified app into the container and run the pipeline
-cp executor.sh $1
 docker cp $1 k3d-builder-local:/app
+docker cp $executionpath/executor.sh k3d-builder-local:/app/
 docker exec -it -w /app k3d-builder-local ./executor.sh /app
 
 # Check if cypress had any artifacts and copy those out to ./cypress-results
@@ -35,7 +36,6 @@ docker exec k3d-builder-local [ -d "/app/tests/cypress/videos" ] && mkdir -p ./c
 # Clean up the app from the container, stop container, remove the script from app directory
 docker exec -it k3d-builder-local rm -rf /app
 docker stop k3d-builder-local
-rm $1/executor.sh
 
 end_time="$(date -u +%s)"
 elapsed_seconds="$(($end_time-$start_time))"
