@@ -44,16 +44,16 @@ stages:
 
   # Wait for components to be ready
   # NOTE: Wait for each package individually so they show up nicely in ci logs
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang gatekeeper
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang istio-operator
+  - kubectl wait --for=condition=Ready --timeout 180s helmrelease -n bigbang gatekeeper
+  - kubectl wait --for=condition=Ready --timeout 180s helmrelease -n bigbang istio-operator
   - kubectl wait --for=condition=Ready --timeout 240s helmrelease -n bigbang istio
-  - kubectl wait --for=condition=Ready --timeout 500s helmrelease -n bigbang monitoring
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang eck-operator
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
-  - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
+  - kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang monitoring
+  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang eck-operator
+  - kubectl wait --for=condition=Ready --timeout 420s helmrelease -n bigbang ek
+  - kubectl wait --for=condition=Ready --timeout 360s helmrelease -n bigbang fluent-bit
+  - kubectl wait --for=condition=Ready --timeout 360s helmrelease -n bigbang twistlock
+  - kubectl wait --for=condition=Ready --timeout 360s helmrelease -n bigbang cluster-auditor
+  - kubectl wait --for=condition=Ready --timeout 60s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
   # Wait for addons (only if they exist since they might not yet for upgrades)
   # TODO: This is kinda messy
@@ -205,6 +205,12 @@ aws/rke2/bigbang up:
     - *deploy_bigbang
   after_script:
     - kubectl get all -A
+    - kubectl get vs -A
+    - kubectl describe gateway main -n istio-system
+    - kubectl get gateway main -n istio-system
+    - kubectl get gateway main -n istio-system -o yaml
+    - kubectl get service -n istio-system
+    - kubectl get service istio-ingressgateway -n istio-system -o yaml
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
