@@ -218,6 +218,9 @@ aws/rke2/bigbang test:
     - job: aws/rke2/cluster up
       artifacts: true
     - job: aws/rke2/bigbang up
+  before_script:
+    - mkdir -p ~/.kube
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
   script:
     - kubectl get all -A
     - kubectl get vs -A
