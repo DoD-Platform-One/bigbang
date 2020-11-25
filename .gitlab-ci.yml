@@ -220,6 +220,7 @@ aws/rke2/bigbang test:
     - job: aws/rke2/bigbang up
   script:
     - kubectl get all -A
+    - kubectl get vs -A
     - kubectl describe gateway main -n istio-system
     - kubectl get gateway main -n istio-system
     - kubectl get gateway main -n istio-system -o yaml
