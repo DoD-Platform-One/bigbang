@@ -7,8 +7,8 @@ Work in progress umbrella package
 Per the Charter, all Big Bang packages will leverage container images from [IronBank](https://ironbank.dsop.io/).  In order to pull these images, ImagePullSecrets must be provided to BigBang.  For developers to obtain access 
 to the images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dsop.io)
 
-1) Register for a free Ironbank account [Here](????)
-2) Log into the [Iron Bank Registry](https://registry1.dsop.io) and follow the directions [Here]() for obtaining your API keys.
+1) Register for a free Ironbank account [Here](https://sso-info.il2.dsop.io/new_account.html)
+2) Log into the [Iron Bank Registry](https://registry1.dsop.io), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
 3) When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token
 
 ## Usage
