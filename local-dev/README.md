@@ -10,6 +10,7 @@ The preferred method is the Container-Pipeline since it is easier to get started
 
 Container-Pipeline:
 - Pipeline is run entirely in a Docker container, no need to install additional tools besides Docker
+- Docker must have at least 4GB of RAM
 - Execution can be slower due to Docker-in-Docker and other complexities
 - Scripts located under `local-docker-pipeline` directory
 
