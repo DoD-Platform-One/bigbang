@@ -43,6 +43,7 @@ packagetest() {( set -e
     helm install pipeline-local $1/chart -n pipeline-local --create-namespace -f $1/tests/test-values.yml
     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+    istioctl install -y > /dev/null
     echo "Package tests"
     kubectl get ingress --all-namespaces
     kubectl get all -A
