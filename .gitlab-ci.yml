@@ -222,7 +222,7 @@ aws/rke2/bigbang test:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
   script:
-    - sleep 300
+    - sleep 240
     - kubectl get all -A
     - kubectl get vs -A
     - kubectl describe gateway main -n istio-system
