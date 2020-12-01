@@ -2,11 +2,46 @@
 
 set -e
 
-# Wait for components to be ready
-for package in $(kubectl get --no-headers helmrelease -n bigbang | awk '{print $1}');
-do 
-  echo "Waiting on package $package" 
-  kubectl wait --for=condition=Ready --timeout 500s helmrelease -n bigbang $package;
+## This is an array to instantiate the order of wait conditions
+ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor"
+
+
+## This the actual deployed helmrelease objects in the cluster
+DEPLOYED_HELMRELEASES=$(kubectl get hr --no-headers -n bigbang | awk '{ print $1}')
+
+## Function to test an array contains an element
+## Args:
+## $1: array to search
+## $2: element to search for
+function array_contains() {
+    local array="$1[@]"
+    local seeking=$2
+    local in=1
+    for element in ${!array}; do
+        if [[ $element == "$seeking" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
+
+## Function to wait on helmrelease
+## Args:
+## $1: package name
+function wait_on() {
+  echo "Waiting on package $1"
+  kubectl wait --for=condition=Ready --timeout 5s helmrelease -n bigbang $1;
+}
+
+for package in $ORDERED_HELMRELEASES;
+do
+  array_contains DEPLOYED_HELMRELEASES "$package" && wait_on "$package" || echo "Expected package: $package, but not found in release. Update the array in this script if this package is no longer needed"
+done
+
+for package in $DEPLOYED_HELMRELEASES;
+do
+  array_contains ORDERED_HELMRELEASES "$package" && echo "" || wait_on "$package"
 done
 
 echo "Waiting on Secrets Kustomization"
