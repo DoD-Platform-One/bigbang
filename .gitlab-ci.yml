@@ -264,4 +264,5 @@ release:
   # - tags
   script:
   - echo "Hello!  I'm in ${CI_COMMIT_TAG}"
-  - ./hack/bundle-images.sh --images "images-${CI_COMMIT_TAG}.tar.gz"
+  - ./hack/bundle-images.sh --images images-${CI_COMMIT_TAG}.tar.gz
+  - ls -lah 
