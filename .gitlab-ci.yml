@@ -258,6 +258,14 @@ aws/rke2/cluster down:
 
 
 release:
+  services:
+    - docker:dind
+  variables:
+    # dind stuff
+    DOCKER_HOST: tcp://localhost:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+
   stage: release
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
   # only:
