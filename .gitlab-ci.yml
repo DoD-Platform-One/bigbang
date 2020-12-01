@@ -31,7 +31,10 @@ stages:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
 
 .deploy_bigbang: &deploy_bigbang
-  - for script in /scripts/*.sh; do $script; done
+  - for script in /scripts/*.sh 
+    do 
+      bash $script
+    done
 
 .test_bigbang: &test_bigbang
   - for test in /tests/bash/*.sh; do $test; done 
