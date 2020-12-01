@@ -2,3 +2,4 @@
 certs/
 
 .DS_Store
+*.tar.gz

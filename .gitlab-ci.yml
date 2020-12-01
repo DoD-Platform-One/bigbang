@@ -14,7 +14,7 @@ include:
     file: '/global.gitlab-ci.yml'
 
 stages:
-  - smoke tests
+  # - smoke tests
   - network up
   - cluster up
   - bigbang up
