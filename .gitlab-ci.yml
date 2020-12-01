@@ -14,7 +14,7 @@ include:
     file: '/global.gitlab-ci.yml'
 
 stages:
-  # - smoke tests
+  - smoke tests
   - network up
   - cluster up
   - bigbang up
@@ -78,7 +78,7 @@ clean install:
     # Skip on merge requests (it is ran as part of the non MR pipeline)
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
       when: never
-    - when: always
+    - when: never
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   script:
