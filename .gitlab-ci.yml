@@ -22,7 +22,7 @@ stages:
   - bigbang down
   - cluster down
   - network down
-
+  - release
 #-----------------------------------------------------------------------------------------------------------------------
 # Smoke Tests
 #
@@ -255,3 +255,12 @@ aws/rke2/cluster down:
       artifacts: true
     - job: aws/rke2/bigbang down
 #-----------------------------------------------------------------------------------------------------------------------
+
+
+release:
+  stage: release
+  only:
+  - tags
+  script:
+  - echo "Hello!  I'm in ${CI_COMMIT_TAG}"
+  - ./hack/bundle-images.sh --images images-${CI_COMMIT_TAG}.tar.gz
