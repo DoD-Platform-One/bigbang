@@ -18,8 +18,8 @@ packagetest() {( set -e
     while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-
-    # Place kubernetes package test here
+    echo "Istio install"
+    istioctl install -y > /dev/null
     echo "Package install"
     helm install devtest $1/chart -n devtest --create-namespace -f $1/tests/test-values.yml
     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
