@@ -259,8 +259,9 @@ aws/rke2/cluster down:
 
 release:
   stage: release
-  only:
-  - tags
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+  # only:
+  # - tags
   script:
   - echo "Hello!  I'm in ${CI_COMMIT_TAG}"
   - ./hack/bundle-images.sh --images images-${CI_COMMIT_TAG}.tar.gz
