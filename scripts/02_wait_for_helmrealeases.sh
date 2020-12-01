@@ -46,7 +46,9 @@ for package in $DEPLOYED_HELMRELEASES;
 do
   if array_contains ORDERED_HELMRELEASES "$package";
   then echo ""
-  else wait_on "$package"
+  else 
+    echo "Found package: $package, but not found in this script array. Update the array in this script if this package is always needed"
+    wait_on "$package"
   fi
 done
 
