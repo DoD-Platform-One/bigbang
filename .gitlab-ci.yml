@@ -11,7 +11,6 @@ workflow:
 
 include:
   - project: 'platform-one/big-bang/pipeline-templates/umbrella-templates'
-    ref: 'BB-694-1'
     file: '/global.gitlab-ci.yml'    
 
 stages:
