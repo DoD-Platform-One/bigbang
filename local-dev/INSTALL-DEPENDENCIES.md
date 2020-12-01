@@ -6,6 +6,10 @@ macOS: `brew install tree` without `brew` you can try this [reference](https://g
 
 Windows: ?
 
+## istioctl
+
+https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/#install-hahahugoshortcode-s2-hbhb
+
 ## helm
 
 https://helm.sh/docs/intro/install/
