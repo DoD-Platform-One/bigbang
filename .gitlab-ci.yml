@@ -276,6 +276,6 @@ release:
   script:
   - echo "Hello!  I'm in ${CI_COMMIT_TAG}"
   - env
-  - docker login -u 'robot$bigbang' -p ${REGISTRY1_PASSWORD}
+  - docker login -u 'robot\$bigbang' -p ${REGISTRY1_PASSWORD}
   - ./hack/bundle-images.sh --images images-${CI_COMMIT_TAG}.tar.gz
   - ls -lah 
