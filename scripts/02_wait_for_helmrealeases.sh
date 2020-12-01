@@ -31,17 +31,23 @@ function array_contains() {
 ## $1: package name
 function wait_on() {
   echo "Waiting on package $1"
-  kubectl wait --for=condition=Ready --timeout 5s helmrelease -n bigbang $1;
+  kubectl wait --for=condition=Ready --timeout 500s helmrelease -n bigbang $1;
 }
 
 for package in $ORDERED_HELMRELEASES;
 do
-  array_contains DEPLOYED_HELMRELEASES "$package" && wait_on "$package" || echo "Expected package: $package, but not found in release. Update the array in this script if this package is no longer needed"
+  if array_contains DEPLOYED_HELMRELEASES "$package";
+  then wait_on "$package"
+  else echo "Expected package: $package, but not found in release. Update the array in this script if this package is no longer needed"
+  fi
 done
 
 for package in $DEPLOYED_HELMRELEASES;
 do
-  array_contains ORDERED_HELMRELEASES "$package" && echo "" || wait_on "$package"
+  if array_contains ORDERED_HELMRELEASES "$package";
+  then echo ""
+  else wait_on "$package"
+  fi
 done
 
 echo "Waiting on Secrets Kustomization"
