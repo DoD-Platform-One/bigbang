@@ -3,11 +3,12 @@
 set -e
 
 # Deploy flux and wait for it to be ready
+echo "Installing Flux"
 flux --version
 flux install
-kubectl get namespaces,pods,gitrepositories,helmrelease -A
 
 # Deploy BigBang
+echo "Installing BigBang"
 helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD} --set addons.argocd.enabled=true --set addons.authservice.enabled=true
 
 # Apply secrets kustomization pointing to current branch
