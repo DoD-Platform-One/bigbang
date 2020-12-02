@@ -45,7 +45,7 @@ clean install:
       when: never
     - when: always
   variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
     - *deploy_bigbang
     - *test_bigbang
@@ -60,7 +60,7 @@ upgrade:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
