@@ -11,7 +11,7 @@ workflow:
 
 include:
   - project: 'platform-one/big-bang/pipeline-templates/umbrella-templates'
-    file: '/global.gitlab-ci.yml'
+    file: '/global.gitlab-ci.yml'    
 
 stages:
   - smoke tests
@@ -30,45 +30,10 @@ stages:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
 
 .deploy_bigbang: &deploy_bigbang
-  # Deploy flux and wait for it to be ready
-  - flux --version
-  - flux install
-  - kubectl get namespaces,pods,gitrepositories,helmrelease -A
+  - for script in ./scripts/*.sh; do chmod +x $script && $script; done
 
-  # Deploy BigBang
-  - helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='robot$bigbang' --set registryCredentials.password=${REGISTRY1_PASSWORD} --set addons.argocd.enabled=true --set addons.authservice.enabled=true
-
-  # Apply secrets kustomization pointing to current branch
-  - echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
-  - cat examples/complete/envs/dev/source-secrets.yaml | sed 's|master|'$CI_COMMIT_REF_NAME'|g' | kubectl apply -f -
-
-  # Wait for components to be ready
-  # NOTE: Wait for each package individually so they show up nicely in ci logs
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang gatekeeper
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang istio-operator
-  - kubectl wait --for=condition=Ready --timeout 240s helmrelease -n bigbang istio
-  - kubectl wait --for=condition=Ready --timeout 500s helmrelease -n bigbang monitoring
-  - kubectl wait --for=condition=Ready --timeout 120s helmrelease -n bigbang eck-operator
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang ek
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang fluent-bit
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang twistlock
-  - kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang cluster-auditor
-  - kubectl wait --for=condition=Ready --timeout 30s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
-
-  # Wait for addons (only if they exist since they might not yet for upgrades)
-  # TODO: This is kinda messy
-  - kubectl get helmrelease -n bigbang argocd && kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang argocd
-  - kubectl get helmrelease -n bigbang authservice && kubectl wait --for=condition=Ready --timeout 300s helmrelease -n bigbang authservice
-
-  # Quick check for non iron bank images
-  - echo "Showing images not from ironbank:"
-  # Ignore rancher images since those are from k3d
-  - kubectl get pods -A -o jsonpath="{..image}" | tr -s '[[:space:]]' '\n' | sort | uniq -c | grep -v "registry1" | grep -v "rancher"
-
-  # Basic smoke test BigBang
-#  - echo "Package tests go here"
-#  - bash ./tests/virtualservices.sh
-#  - kubectl get helmrelease -A
+.test_bigbang: &test_bigbang
+  - for test in ./tests/bash/*.sh; do chmod +x $test && $test; done 
 
 clean install:
   stage: smoke tests
@@ -80,9 +45,13 @@ clean install:
       when: never
     - when: always
   variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
     - *deploy_bigbang
+    - *test_bigbang
+  after_script:
+    - kubectl get all -A
+    - kubectl get helmrelease -A
 
 upgrade:
   stage: smoke tests
@@ -91,15 +60,17 @@ upgrade:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
     - *deploy_bigbang
+    - *test_bigbang
 
     - echo "Upgrade Big Bang from ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
     - *deploy_bigbang
+    - *test_bigbang
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -218,8 +189,18 @@ aws/rke2/bigbang test:
     - job: aws/rke2/cluster up
       artifacts: true
     - job: aws/rke2/bigbang up
+  before_script:
+    - mkdir -p ~/.kube
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
   script:
-    - echo "tests go here"
+    - sleep 240
+    - kubectl get all -A
+    - kubectl get vs -A
+    - kubectl describe gateway main -n istio-system
+    - kubectl get gateway main -n istio-system
+    - kubectl get gateway main -n istio-system -o yaml
+    - kubectl get service -n istio-system
+    - kubectl get service istio-ingressgateway -n istio-system -o yaml
 
 # Uninstall BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang down:
