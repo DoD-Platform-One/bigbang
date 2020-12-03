@@ -5,13 +5,13 @@ workflow:
     - if: '$CI_COMMIT_MESSAGE =~ /^wip/'
       when: never
     # Skip pipeline for branches that start with "docs"
-    - if: '$CI_COMMIT_BRANCH =~ /^docs/'
+    - if: '$CI_COMMIT_REF_NAME =~ /^docs/'
       when: never
     - when: always
 
 include:
   - project: 'platform-one/big-bang/pipeline-templates/umbrella-templates'
-    file: '/global.gitlab-ci.yml'    
+    file: '/global.gitlab-ci.yml'
 
 stages:
   - smoke tests
@@ -28,6 +28,9 @@ stages:
 #
 .bigbang:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+  after_script:
+    - kubectl get all -A
+    - kubectl get helmrelease -A
 
 .deploy_bigbang: &deploy_bigbang
   - for script in ./scripts/*.sh; do chmod +x $script && $script; done
@@ -174,8 +177,6 @@ aws/rke2/bigbang up:
     - kubectl apply -f ${CI_PROJECT_DIR}/umbrella-templates/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
   script:
     - *deploy_bigbang
-  after_script:
-    - kubectl get all -A
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
@@ -219,11 +220,8 @@ aws/rke2/bigbang down:
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
   script:
     - helm un -n bigbang bigbang
-
     # TODO: Smarter wait
     - sleep 180
-  after_script:
-    - kubectl get all -A
 
 # Destroy RKE2 cluster on AWS
 aws/rke2/cluster down:
