@@ -33,7 +33,7 @@ stages:
     - kubectl get helmrelease -A
 
 .deploy_bigbang: &deploy_bigbang
-  - for script in ./scripts/*.sh; do chmod +x $script && $script; done
+  - for script in ./scripts/deploy/*.sh; do chmod +x $script && $script; done
 
 .test_bigbang: &test_bigbang
   - for test in ./tests/bash/*.sh; do chmod +x $test && $test; done 
@@ -194,14 +194,11 @@ aws/rke2/bigbang test:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
   script:
-    - sleep 240
-    - kubectl get all -A
-    - kubectl get vs -A
-    - kubectl describe gateway main -n istio-system
-    - kubectl get gateway main -n istio-system
-    - kubectl get gateway main -n istio-system -o yaml
-    - kubectl get service -n istio-system
-    - kubectl get service istio-ingressgateway -n istio-system -o yaml
+    ## Move this yum install to the dockerfile for the builder
+    ## putting it here now for a quick way to install dig
+    - yum install bind-utils -y
+    - chmod +x scripts/hosts.sh && ./scripts/hosts.sh
+    - *test_bigbang
 
 # Uninstall BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang down:
