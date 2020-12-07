@@ -46,12 +46,6 @@ spec:
           dashboard:
             auth:
               strategy: "anonymous"   
-        ingressGateway:
-          serviceAnnotations:
-            # Ensure mission apps have internal load balancer only
-            service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-            # Enable cross zone load balancing
-            service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
 
     gatekeeper:
       # Directly modify chart values for dev workloads
