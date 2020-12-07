@@ -29,7 +29,6 @@ While simple to use, Big Bang also allows full flexibility in configuring indivi
 
 See the [readme](./examples/complete/README.md) for more information.
 
+### Contributing
 
-### Developers
-
-Developers can use the [Developer Setup](./examples/complete/README.md#development-workflow) to faciliate a local setup for developing improvements to Big Bang.
+Please see our [contributing guide](./CONTRIBUTING.md) if you are interested in contributing to Big Bang.
