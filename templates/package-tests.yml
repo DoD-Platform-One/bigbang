@@ -65,6 +65,7 @@ package tests:
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
     - kubectl get ingress --all-namespaces
+    - kubectl get vs -A
     - kubectl get all -A
     - if [ -f tests/cypress.json ]; then cypress run --config-file tests/cypress.json; fi
 
