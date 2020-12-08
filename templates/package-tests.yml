@@ -60,13 +60,13 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package install"
-    - helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml
+    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace; fi
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
     - kubectl get ingress --all-namespaces
     - kubectl get all -A
-    - cypress verify
+    - if [ -f tests/cypress.json ]; then cypress run --config-file tests/cypress.json; fi
 
   after_script:
     # Delete Cluster
