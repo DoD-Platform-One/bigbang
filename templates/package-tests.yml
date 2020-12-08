@@ -55,7 +55,7 @@ package tests:
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    - if [[ "${CI_PROJECT_NAME}" != *istio* ]]; then istioctl install -y; fi 
+    - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
 
   script:
     # Place kubernetes package test here
