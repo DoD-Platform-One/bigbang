@@ -55,13 +55,12 @@ clean install:
   after_script:
     - kubectl get all -A
     - kubectl get helmrelease -A
-
 upgrade:
   stage: smoke tests
   extends:
     - .k3d
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TITLE !~ /^Breaking Change/'
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
