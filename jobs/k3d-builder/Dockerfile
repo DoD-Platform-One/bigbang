@@ -18,7 +18,7 @@ gpgcheck=0\n'\
 
 RUN curl https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 
-RUN yum -y install npm git xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib docker-ce-cli unzip
+RUN yum -y install npm git xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib docker-ce-cli unzip jq
 
 # Install Conftest
 ENV CONFTEST_VERSION='0.21.0'
