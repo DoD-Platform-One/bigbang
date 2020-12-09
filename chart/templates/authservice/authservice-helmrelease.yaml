@@ -40,7 +40,6 @@ spec:
     imagePullSecrets:
       - name: private-registry
 
-    defaultConfig: false
     filterLabel: keycloak
 
   dependsOn:

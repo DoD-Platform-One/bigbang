@@ -42,8 +42,7 @@ spec:
     global:
       imagePullSecrets:
         - name: private-registry
-    hostname: {{ .Values.hostname }}
-    
+
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
