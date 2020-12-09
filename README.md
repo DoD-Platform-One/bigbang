@@ -105,9 +105,9 @@ the package pipeline template.
 
 ```bash
 include:
-  - project: 'platform-one/private/big-bang/pipeline-templates'
+  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
     ref: master
-    file: '/templates/package-tests.yaml'
+    file: '/templates/package-tests.yml'
 ```
 ### Using the CI pipline infrastrcuture to test packages locally
 
