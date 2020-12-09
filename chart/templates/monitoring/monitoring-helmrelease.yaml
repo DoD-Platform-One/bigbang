@@ -38,7 +38,8 @@ spec:
 
   values:
     hostname: {{ .Values.hostname }}
-
+    istio:
+      enabled: {{ .Values.istio.enabled }}
     global:
       imagePullSecrets:
         - name: private-registry

@@ -4,6 +4,7 @@ set -ex
 # Deploy flux and wait for it to be ready
 echo "Installing Flux"
 flux --version
+flux check --pre
 flux install
 
 # Deploy BigBang using dev sized scaling
