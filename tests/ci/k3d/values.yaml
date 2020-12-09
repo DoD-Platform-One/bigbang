@@ -1,0 +1,65 @@
+hostname: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+logging:
+  enabled: true
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+      data:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 2Gi
+
+istio:
+  enabled: true
+  values:
+    kiali:
+      dashboard:
+        auth:
+          strategy: "anonymous"
+
+clusterAuditor:
+  enabled: true
+
+monitoring:
+  enabled: true
+  values:
+    prometheusOperator:
+      admissionWebhooks:
+        # Disable admission webhook creation for CI to speed things up
+        enabled: false
+
+gatekeeper:
+  enabled: true
+  values:
+    replicas: 1
+
+twistlock:
+  enabled: true
+  values:
+    console:
+      persistence:
+        size: 5Gi
+
+# Explicitly enable all addons for CI
+addons:
+  argocd:
+    enabled: true
+  authservice:
+    enabled: true
