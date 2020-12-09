@@ -24,8 +24,42 @@ stages:
   - network down
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Pre Stage Jobs
+#
+
+pre vars:
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  stage: .pre
+  artifacts:
+    reports:
+      dotenv: variables.env
+  script:
+  # obtain MR and master versions
+  - CHART_MR_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
+  - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+  - CHART_MA_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
+  - git fetch && git checkout ${CI_COMMIT_REF_NAME}
+  - echo "CHART_MR_VERSION=$CHART_MR_VERSION" >> variables.env
+  - echo "CHART_MA_VERSION=$CHART_MA_VERSION" >> variables.env
+  # obtain semver differences (subtract master version from mr verison)
+  - chmod +x ./scripts/semver_diff.sh
+  - CHART_VERSION_DIFF=$(./scripts/semver_diff.sh $CHART_MR_VERSION $CHART_MA_VERSION)
+  - IFS=. DIFF_ARR=(${CHART_VERSION_DIFF##*-})
+  - echo "CHART_VERSION_DIFF=$CHART_VERSION_DIFF" >> variables.env
+  # detect breaking change (first two version sections in semver diff)
+  - CHART_BREAKING_CHANGE="false"
+  - if (( ${DIFF_ARR[0]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi
+  - if (( ${DIFF_ARR[1]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi
+  # store variables
+  - echo "CHART_BREAKING_CHANGE=$CHART_BREAKING_CHANGE" >> variables.env
+  - cat variables.env
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Smoke Tests
 #
+
 .bigbang:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
   after_script:
@@ -55,8 +89,12 @@ clean install:
   after_script:
     - kubectl get all -A
     - kubectl get helmrelease -A
+
 upgrade:
   stage: smoke tests
+  needs:
+    - job: pre vars
+      artifacts: true  
   extends:
     - .k3d
   rules:
@@ -64,11 +102,11 @@ upgrade:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
+    - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
     - *deploy_bigbang
     - *test_bigbang
-
     - echo "Upgrade Big Bang from ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
     - git reset --hard && git clean -fd
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
