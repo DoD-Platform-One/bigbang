@@ -56,7 +56,7 @@ package tests:
       echo "mirrors:" >> ~/.k3d/p1-registries.yaml
       echo "  'registry1.dsop.io':" >> ~/.k3d/p1-registries.yaml
       echo "    endpoint:" >> ~/.k3d/p1-registries.yaml
-      echo "      - 'https://registry1.dsop.io' >> ~/.k3d/p1-registries.yaml
+      echo "      - 'https://registry1.dsop.io'" >> ~/.k3d/p1-registries.yaml
       echo "" >> ~/.k3d/p1-registries.yaml
       echo "configs:" >> ~/.k3d/p1-registries.yaml
       echo "  'registry1.dsop.io':" >> ~/.k3d/p1-registries.yaml
