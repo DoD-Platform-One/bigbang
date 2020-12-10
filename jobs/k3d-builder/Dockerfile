@@ -54,7 +54,7 @@ ADD https://github.com/FiloSottile/mkcert/releases/download/v${MKCERT_VERSION}/m
 RUN chmod +x /usr/local/bin/mkcert
 
 # Install K3d
-ENV K3D_VERSION='3.1.5'
+ENV K3D_VERSION='3.4.0'
 ADD https://github.com/rancher/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
 RUN chmod +x /usr/local/bin/k3d
 
