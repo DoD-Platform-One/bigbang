@@ -60,7 +60,7 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package install"
-    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace; fi
+    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace --set registryCredentials.username="${REGISTRY1_USER}" --set registryCredentials.password="${REGISTRY1_PASSWORD}" -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace --set registryCredentials.username="${REGISTRY1_USER}" --set registryCredentials.password="${REGISTRY1_PASSWORD}"; fi
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
