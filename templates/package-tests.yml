@@ -51,7 +51,20 @@ package tests:
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
     # Create cluster and wait for deployments and pods
-    - k3d cluster create ${CI_PROJECT_NAME} --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
+    - mkdir ~/.k3d/
+    - |
+      echo "mirrors:" >> ~/.k3d/p1-registries.yaml
+      echo "  'registry1.dsop.io':" >> ~/.k3d/p1-registries.yaml
+      echo "    endpoint:" >> ~/.k3d/p1-registries.yaml
+      echo "      - 'https://registry1.dsop.io' >> ~/.k3d/p1-registries.yaml
+      echo "" >> ~/.k3d/p1-registries.yaml
+      echo "configs:" >> ~/.k3d/p1-registries.yaml
+      echo "  'registry1.dsop.io':" >> ~/.k3d/p1-registries.yaml
+      echo "    auth:" >> ~/.k3d/p1-registries.yaml
+      echo "      username: ${REGISTRY1_USER}" >> ~/.k3d/p1-registries.yaml
+      echo "      password: '${REGISTRY1_PASSWORD}'" >> ~/.k3d/p1-registries.yaml
+    - cat ~/.k3d/p1-registries.yaml
+    - k3d cluster create ${CI_PROJECT_NAME} -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
@@ -60,7 +73,7 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package install"
-    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace --set registryCredentials.username=${REGISTRY1_USER} --set registryCredentials.password=${REGISTRY1_PASSWORD} -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace --set registryCredentials.username=${REGISTRY1_USER} --set registryCredentials.password=${REGISTRY1_PASSWORD}; fi
+    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace; fi
     - sleep 100
     - kubectl get all -n ${CI_PROJECT_NAME}
     - kubectl describe pod -n ${CI_PROJECT_NAME}
