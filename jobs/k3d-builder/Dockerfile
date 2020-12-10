@@ -75,3 +75,7 @@ RUN yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/t
 RUN rm -rf /etc/yum.repos.d/docker-ce.repo && \
     rm -rf /etc/yum.repos.d/CentOS.repo && \
     yum clean all
+    
+VOLUME /var/lib/docker
+
+ENTRYPOINT [""]
