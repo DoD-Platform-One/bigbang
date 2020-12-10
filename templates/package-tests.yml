@@ -7,7 +7,7 @@ configuration validation:
   stage: configuration validation
 
   image: 
-    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.3
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:b391183d
   variables:
     PIPELINE_REPO: https://repo1.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates.git
     PIPELINE_REPO_DESTINATION: "../pipeline-repo"
@@ -37,8 +37,7 @@ package tests:
     - privileged
 
   image: 
-    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.3
-    entrypoint: [""]
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:b391183d
   services:
     - docker:dind
   variables:
