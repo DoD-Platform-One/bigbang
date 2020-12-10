@@ -1,3 +1,5 @@
+# Appendix C - Big Bang Development
+
 ## So you want to develop on Big Bang Umbrella?
 
 Included here is a setup that will allow you to checkout and begin development using your workstation and a minimal EC2 instance in AWS.
@@ -14,7 +16,7 @@ Included here is a setup that will allow you to checkout and begin development u
 
 This section will cover the creation of an environment manually. This is a good place to start because it creates an understanding of everything that the automated method does for you.
 
-Step 1: Create an Ubuntu 20.04 xlarge EC2 instance with the following attributes:  
+Step 1: Create an Ubuntu 20.04 xlarge EC2 instance with the following attributes:
         (see addendum for using Amazon Linux2 - but it really does not matter)
 
 + 50 Gigs of disk space
@@ -22,7 +24,7 @@ Step 1: Create an Ubuntu 20.04 xlarge EC2 instance with the following attributes
 + A security group that allows all TCP traffic from your IP address.
 + The following in the User Data
 
-```
+```bash
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
 
@@ -39,7 +41,7 @@ Step 2: SSH into your new EC2 instance and configure it with the following:
 
 + Install Docker CE
 
-```
+```bash
 #Remove any old Docker items
 sudo apt remove docker docker-engine docker.io containerd runc
 
@@ -47,7 +49,7 @@ sudo apt remove docker docker-engine docker.io containerd runc
 sudo apt update
 sudo apt install apt-transport-https ca-certificates curl     gnupg-agent software-properties-common
 
-#Add the Docker repository, we are installing from Docker and not the 
+#Add the Docker repository, we are installing from Docker and not the
 #Ubuntu APT repo.
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
@@ -63,13 +65,13 @@ sudo apt install docker-ce docker-ce-cli containerd.io
 #to run docker commands
 sudo usermod -aG docker $USER
 
-** It is important at this point that you log out and back in to 
+** It is important at this point that you log out and back in to
 ** have the user group changes take effect.
 ```
 
 + Install K3D on the EC2 instance
 
-```
+```bash
 wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 
 k3d //to check the install
@@ -77,17 +79,17 @@ k3d //to check the install
 
 + We can now spin up our dev cluster on the EC2 instance using K3D
 
-```
+```bash
 k3d cluster create -s 1 -a 3  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=<your-public-ec2-ip>"  -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
 + Optionally you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
 
-```
-# create the directory for the k3s registry config.  
+```bash
+# create the directory for the k3s registry config.
 mkdir ~/.k3d/
 
-# create the config file. Use your registry1 credentials. Copy your user name and token secret from your Harbor profile.  
+# create the config file. Use your registry1 credentials. Copy your user name and token secret from your Harbor profile.
 
 cat << EOF > ~/.k3d/p1-registries.yaml
 configs:
@@ -102,38 +104,38 @@ k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/ranc
 
 Here is a break down of what we are doing with this command.
 
-(-s 1) Creating 1 master/server
+`-s 1` Creating 1 master/server
 
-(-a 3) Creating 3 agent nodes
+`-a 3` Creating 3 agent nodes
 
-(--k3s-server-arg "--disable=traefik") Disable the default Traefik Ingress
+`--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
 
-(--k3s-server-arg "--disable=metrics-server") Disable default metrics
+`--k3s-server-arg "--disable=metrics-server"` Disable default metrics
 
-(--k3s-server-arg "--tls-san=<your public ec2 ip>") This adds the public IP to the kubeapi certificate so that you can access it remotely.
+`--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
 
-(-p 80:80@loadbalancer) Exposes the cluster on the host on port 80
+`-p 80:80@loadbalancer` Exposes the cluster on the host on port 80
 
-(-p 443:443@loadbalancer) Exposes the cluster on the host on port 443
+`-p 443:443@loadbalancer` Exposes the cluster on the host on port 443
 
-optional:  
-(-v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml) volume mount image pull secret config for k3d cluster  
-(--api-port 0.0.0.0:38787) Chooses a port for the API server instead of being assigned a random one. You can set this to any port number that you want.
+optional:
+`-v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster
+`--api-port 0.0.0.0:38787` Chooses a port for the API server instead of being assigned a random one. You can set this to any port number that you want.
 
 + Once your cluster is up, you can bring over the kubeconfig from the EC2 instance to your workstation.
 
-```
+```bash
 cat ~/.kube/config
 ```
 
 + Move to your workstation and install Big Bang Umbrella on the cluster
 
-```
+```bash
 # Test to see if you can connect to your cluster
 
 kubectl get nodes
 
-# From the base of the project 
+# From the base of the project
 
 flux install
 
@@ -143,7 +145,7 @@ kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
 
 # Helm install BigBang umbrella
 
-# Method 1 - go for it. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)  
+# Method 1 - go for it. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)
 
 yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' | helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f -
 
@@ -152,14 +154,14 @@ yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' | helm upgrade 
 yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' > my-values.yaml
 
 # Modify my-values.yaml
-# Install using your new values. You could also modify the values in place. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)  
+# Install using your new values. You could also modify the values in place. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)
 
 helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f my-values.yaml
 ```
 
 + You can now modify your local /etc/hosts files (Or whatever the Windows people call it these days)
 
-```
+```bash
 160.1.38.137     kibana.bigbang.dev
 160.1.38.137     kiali.bigbang.dev
 160.1.38.137    prometheus.bigbang.dev
@@ -168,22 +170,24 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCreden
 
 + You can watch your install take place with
 
-```
+```bash
 watch kubectl get po,gitrepository,kustomizations,helmreleases -A
 ```
 
 As of this time, Twistlock is the last thing to be installed. Once you see Twistlock sync and everything else is up and healty you are fully installed.
 
 ### Addendum for Amazon Linux 2
+
 Here are the configuration steps if you want to use a Fedora based instance. All other steps are similar to Ubuntu.
-```
+
+```bash
 # update system
 sudo yum update -y
 # install and start docker
 sudo yum install docker -y
 sudo usermod -aG docker $USER
-sudo systemctl enable docker.service 
-sudo systemctl start docker.service 
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
 # fix docker config for ulimit nofile.
 # this is a bug in the AMI that will eventually be fixed
 sudo sed -i 's/^OPTIONS=.*/OPTIONS=\"--default-ulimit nofile=65535:65535\"/' /etc/sysconfig/docker
