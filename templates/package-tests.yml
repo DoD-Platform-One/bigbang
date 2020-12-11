@@ -4,6 +4,10 @@ stages:
 
 configuration validation:
   stage: configuration validation
+  tags:
+    - bigbang
+    - public
+    - privileged
 
   image: 
     name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
