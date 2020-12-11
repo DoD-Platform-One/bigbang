@@ -14,7 +14,7 @@ Table of Contents
 
 - Admin tools
   - [Docker](https://docs.docker.com/engine/install/)
-  - [Flux CLI](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli):     `curl -s https://toolkit.fluxcd.io/install.sh | sudo bash`
+  - [Flux CLI](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli):     `brew install fluxcd/tap/flux`
   - [Git](https://git-scm.com/download/)
   - [Helm](https://helm.sh/docs/intro/install/)
   - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
