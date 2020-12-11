@@ -60,7 +60,7 @@ package tests:
     - kubectl get all -A
     - kubectl create namespace ${CI_PROJECT_NAME}
     - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
-    - kubectl get secret private-registry -o yaml
+    - kubectl get secret -n ${CI_PROJECT_NAME} private-registry -o yaml
     - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
 
   script:
