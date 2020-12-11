@@ -118,11 +118,14 @@ upgrade:
 
 package:
   stage: package
+  image: docker:20.10.0
   extends: .k3d
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 #    - if: '$CI_COMMIT_TAG'
 #    - when: never
+  services:
+    - registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
   dependencies:
     - clean install
   before_script: []
