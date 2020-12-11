@@ -8,7 +8,7 @@ spec:
   targetNamespace: istio-system
   chart:
     spec:
-      chart: chart
+      chart: {{ .Values.addons.authservice.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository

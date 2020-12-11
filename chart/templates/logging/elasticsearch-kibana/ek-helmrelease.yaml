@@ -1,18 +1,18 @@
-{{- if .Values.istio.enabled }}
+{{- if or .Values.logging.enabled .Values.clusterAuditor.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: istio
+  name: ek
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: istio-system
+  targetNamespace: logging
   chart:
     spec:
-      chart: charts/controlplane
+      chart: {{ .Values.logging.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: istio
+        name: elasticsearch-kibana
         namespace: {{ .Release.Namespace }}
 
   {{- with .Values.flux }}
@@ -35,19 +35,35 @@ spec:
   valuesFrom:
     - name: values
       kind: Secret
-      valuesKey: "istio.yaml"
+      valuesKey: "logging.yaml"
+
   values:
     hostname: {{ .Values.hostname }}
 
-    imagePullSecrets:
-      - private-registry
+    kibana:
+      version: 7.9.2
 
+      imagePullSecrets:
+        - name: private-registry
+
+    elasticsearch:
+      version: 7.9.2
+
+      imagePullSecrets:
+        - name: private-registry
+
+  {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:
-    - name: istio-operator
+    - name: eck-operator
       namespace: {{ .Release.Namespace }}
 
-    {{- if .Values.gatekeeper.enabled }}
+    {{- if  .Values.gatekeeper.enabled }}
     - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if .Values.istio.enabled }}
+    - name: istio
       namespace: {{ .Release.Namespace }}
     {{- end }}
 {{- end }}

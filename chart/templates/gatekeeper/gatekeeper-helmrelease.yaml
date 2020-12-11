@@ -8,7 +8,7 @@ spec:
   targetNamespace: gatekeeper-system
   chart:
     spec:
-      chart: charts/gatekeeper
+      chart: {{ .Values.gatekeeper.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository

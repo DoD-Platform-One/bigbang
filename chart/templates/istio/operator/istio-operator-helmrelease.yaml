@@ -1,18 +1,18 @@
-{{- if .Values.clusterAuditor.enabled }}
+{{- if .Values.istio.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: cluster-auditor-policies
+  name: istio-operator
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: cluster-auditor
+  targetNamespace: istio-operator
   chart:
     spec:
-      chart: charts/policies
+      chart: {{ .Values.istiooperator.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: cluster-auditor
+        name: istio-operator
         namespace: {{ .Release.Namespace }}
 
   {{- with .Values.flux }}
@@ -33,13 +33,22 @@ spec:
   {{- end }}
 
   valuesFrom:
-  - name: values
-    kind: Secret
-    valuesKey: "clusterauditor.yaml"
+    - name: values
+      kind: Secret
+      valuesKey: "istiooperator.yaml"
+
+  values:
+    hub: registry1.dsop.io/ironbank/opensource/istio
+    tag: 1.7.3
+    createNamespace: false
+
+    imagePullSecrets:
+      - name: private-registry
 
   {{- if .Values.gatekeeper.enabled }}
   dependsOn:
-  - name: gatekeeper
-    namespace: {{ .Release.Namespace }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
   {{- end }}
+
 {{- end }}

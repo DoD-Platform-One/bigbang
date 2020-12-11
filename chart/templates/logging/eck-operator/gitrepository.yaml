@@ -2,16 +2,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: logging
+  name: eck-operator
   namespace: {{ .Release.Namespace }}
 spec:
-  ignore: |
-    # exclude file extensions
-    /**/*.md
-    /**/*.txt
-    /**/*.sh
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.logging.git.repo }}
+  url: {{ .Values.eckoperator.git.repo }}
   ref:
-    {{- include "validRef" .Values.logging.git | nindent 4 }}
+    {{- include "validRef" .Values.eckoperator.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
 {{- end }}

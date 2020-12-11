@@ -1,0 +1,13 @@
+{{- if and (not .Values.offline) (or .Values.logging.enabled .Values.clusterAuditor.enabled) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: elasticsearch-kibana
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.logging.git.repo }}
+  ref:
+    {{- include "validRef" .Values.logging.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+{{- end }}

@@ -8,7 +8,7 @@ spec:
   targetNamespace: argocd
   chart:
     spec:
-      chart: chart
+      chart: {{ .Values.addons.argocd.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
