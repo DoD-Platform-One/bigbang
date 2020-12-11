@@ -67,6 +67,7 @@ package tests:
             password: ${REGISTRY1_PASSWORD}
       EOF
     - cat /tmp/p1-registries.yaml
+    - k3d cluster list
     - k3d cluster create ${CI_PROJECT_NAME} --agents 2 --servers 1 -v /tmp/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --trace --verbose
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
