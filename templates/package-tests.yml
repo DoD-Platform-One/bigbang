@@ -2,7 +2,6 @@ stages:
   - configuration validation
   - package tests
 
-
 configuration validation:
   stage: configuration validation
 
@@ -27,7 +26,6 @@ configuration validation:
         echo "App specific configuration validation tests:"
         helm conftest chart --policy policy
       fi
-
 
 package tests:
   stage: package tests
@@ -55,7 +53,8 @@ package tests:
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    - kubectl create namespace ${CI_PROJECT_NAME}; kubectl create secret -n ${CI_PROJECT_NAME} docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+    - kubectl create namespace ${CI_PROJECT_NAME}
+    - kubectl create secret -n ${CI_PROJECT_NAME} docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
     - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
 
   script:
