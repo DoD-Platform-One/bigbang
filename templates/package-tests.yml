@@ -24,6 +24,7 @@ configuration validation:
     - echo "Directory structure of repository:"
     - tree .
     - echo "Generic configuration validation tests:"
+    - helm dependency update chart
     - helm conftest chart --policy ${GENERIC_POLICY_PATH}
     - >
       if [ -d "policy" ]; then
