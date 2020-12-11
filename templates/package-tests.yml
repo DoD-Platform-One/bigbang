@@ -71,7 +71,7 @@ package tests:
     - kubectl get ingress --all-namespaces
     - kubectl get vs -A
     - kubectl get all -A
-    - if [ -f tests/cypress.json ]; then cypress run; fi
+    - if [ -f tests/cypress.json ]; then cd tests && cypress run; fi
 
   after_script:
     # Delete Cluster
