@@ -125,7 +125,7 @@ upgrade:
 
 package:
   stage: package
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/packager:0.0.1
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/packager:0.0.2
   extends: .k3d
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
