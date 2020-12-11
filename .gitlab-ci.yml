@@ -149,6 +149,8 @@ upgrade:
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/myawesomerelease/${PACKAGE_VERSION}"
   before_script:
     - apk add curl
   script:
