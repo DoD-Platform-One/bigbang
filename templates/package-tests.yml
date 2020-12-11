@@ -82,6 +82,7 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package install"
+    - helm dependency update chart
     # Check for test values file
     - |
       if [ -f "tests/test-values.yml" ]; then 
