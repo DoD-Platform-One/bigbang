@@ -27,7 +27,7 @@ logging:
             memory: 2Gi
 
 istio:
-  enabled: false
+  enabled: true
   values:
     kiali:
       dashboard:
@@ -46,7 +46,7 @@ monitoring:
 #        enabled: false
 
 gatekeeper:
-  enabled: true
+  enabled: false
   values:
     replicas: 1
 
