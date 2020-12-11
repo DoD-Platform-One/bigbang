@@ -84,8 +84,10 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
+    - yum install -y jq
     - *deploy_bigbang
-    - *test_bigbang
+#    - *test_bigbang
+    - docker exec -it k3d-${CLUSTER_NAME}-server-0 crictl images -o json | tail -n +2 | jq -r '.images[].repoTags[0] | select(. != null)'
   after_script:
     - kubectl get all -A
     - kubectl get helmrelease -A

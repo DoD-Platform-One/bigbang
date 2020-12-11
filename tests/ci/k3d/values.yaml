@@ -6,7 +6,7 @@ flux:
     cleanupOnFail: false
 
 logging:
-  enabled: true
+  enabled: false
   values:
     elasticsearch:
       master:
@@ -35,10 +35,10 @@ istio:
           strategy: "anonymous"
 
 clusterAuditor:
-  enabled: true
+  enabled: false
 
 monitoring:
-  enabled: true
+  enabled: false
 #  values:
 #    prometheusOperator:
 #      admissionWebhooks:
@@ -46,12 +46,12 @@ monitoring:
 #        enabled: false
 
 gatekeeper:
-  enabled: true
+  enabled: false
   values:
     replicas: 1
 
 twistlock:
-  enabled: true
+  enabled: false
   values:
     console:
       persistence:
@@ -60,6 +60,6 @@ twistlock:
 # Explicitly enable all addons for CI
 addons:
   argocd:
-    enabled: true
+    enabled: false
   authservice:
-    enabled: true
+    enabled: false
