@@ -72,7 +72,8 @@ package tests:
     #    kubectl apply -f tests/main-test-gateway.yaml 
     #  fi
     - istioctl install -y
-    - kubectl apply -f tests/wildcard-cert.yaml
+    - openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+    - kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
     - kubectl apply -f tests/main-test-gateway.yaml
 
   script:
