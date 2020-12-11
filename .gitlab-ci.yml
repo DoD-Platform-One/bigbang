@@ -26,7 +26,7 @@ stages:
   - release
 
 variables:
-  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/bigbang/0.0.1"
+  RELEASE_BUCKET: umbrella-bigbang-releases
   IMAGE_LIST: images.txt
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
@@ -153,15 +153,17 @@ package:
     - aws s3 sync release/ s3://umbrella-bigbang-releases/umbrella/0.0.1
   after_script: []
 
-#release:
-#  stage: release
-#  image: registry.gitlab.com/gitlab-org/release-cli:latest
-#  script:
-#    - |
-#      release-cli create --name "Release Test" --tag-name 0.0.1 \
-#        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}\"}" \
-#        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}\"}" \
-#        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${REPOS_PKG}\"}"
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  variables:
+    RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}-1.amazonaws.com/umbrella/${VERSION}
+  script:
+    - |
+      release-cli create --name "Release Test" --tag-name 0.0.1 \
+        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
 
 #-----------------------------------------------------------------------------------------------------------------------
 
