@@ -76,6 +76,7 @@ package tests:
       if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
         echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}')" >> /etc/hosts;
       fi
+    - curl https://argocd.bigbang.dev
     - if [ -f tests/cypress.json ]; then cd tests && cypress run; fi
 
   after_script:
