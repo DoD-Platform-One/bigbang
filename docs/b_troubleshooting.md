@@ -16,7 +16,7 @@ Big Bang is configured to retry failed package installations and upgrades.  Befo
 ## Iron Bank authentication
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 | Despite entering correct credentials, get `anauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dsop.io`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
 
 ## Flux install
@@ -32,7 +32,7 @@ kubectl get events -n flux-system
 ```
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 | Install script timed and pods are still pulling the image | Slow connection to docker registry | Adjust `--timeout` value in `flux install` to wait longer |
 | Pod status is `ImagePullBackOff` or `ErrImagePull` | Bad registry, version, or credentials | Fix the `--registry`, `--version`, or `--image-pull secret` options or use the `hack/flux-install.sh` script for pulling from Iron Bank |
 
@@ -49,7 +49,7 @@ kubectl get events --field-selector involvedObject.kind=GitRepository -A
 ```
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 | `unable to clone ... error: authentication required` | Pull credentials for Git invalid or not provided | Add credentials to a `Secret` and reference it in `GitRepository.spec.secretRef.name`.  If possible, encrypt the secret and include it in the Kustomization deployment for your environment.
 | `auth secret error: Secret ... not found` | `GitRepository` is trying to use credentials but cannot find the `Secret` | Make sure the secret exists and is in the same namespace as the `GitRepository` resource.   If possible, encrypt the secret and include it in the Kustomization deployment for your environment.
 | `unable to clone ... error: repository not found` | Invalid Git url | Fix url for Git repository and redeploy |
@@ -58,7 +58,7 @@ kubectl get events --field-selector involvedObject.kind=GitRepository -A
 ## ConfigMap or Secrets
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 |`ConfigMap` or `Secret` does not exist| GitRepository or Kustomization failed.  Namespace was incorrect. | Use [GitRepository](#git-repository) and [Kustomization](#kustomization) sections to troubleshoot.  Use `kubectl get secrets,configmaps -A` to verify resource was not in the wrong Namespace. |
 
 ## Helm Release
@@ -74,7 +74,7 @@ kubectl get events --field-selector involvedObject.kind=HelmRelease -A
 ```
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 | `Reconcilliation in Progress` | This is normal and indicates flux is currently applying updates | Wait |
 | `dependency ... is not ready` | This is normal and indicates flux is currently waiting on another resource to complete | Wait |
 | `Error: YAML parse error on ...` | Syntax error in helm chart | Use `helm template` to narrow down the problem.  Fix it and commit to Git |
@@ -94,7 +94,7 @@ kubectl get events --field-selector involvedObject.kind=Kustomization -A
 ```
 
 | Symptom | Cause | Resolution |
-|--|--|--|--|
+|--|--|--|
 | `kustomization path not found` | `spec.path` in Kustomization resource in is incorrect | Fix `spec.path` and redeploy |
 | `Source not found` | `spec.sourceRef` in Kustomization resource is incorrect | Fix `spec.sourceRef` to point to repository resource and redeploy |
 | `decryption secret error: Secret ... not found` | SOPS private key secret is missing or misconfigured | Check `decryption` settings in the Kustomization resource to make sure `secretRef` is pointing to the correct secret.  Make sure the `Secret` holding the private key is deployed in the cluster. |
