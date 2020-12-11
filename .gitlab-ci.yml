@@ -131,6 +131,8 @@ package:
     DOCKER_TLS_CERTDIR: ""
   dependencies:
     - clean install
+  before_script:
+    - apk add bash
   script:
     - docker login registry1.dsop.io -u 'robot$bigbang' -p ${REGISTRY1_PASSWORD}
     - ./scripts/package_images.sh --image-list images.txt --images images.tar.gz
