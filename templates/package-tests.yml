@@ -67,7 +67,7 @@ package tests:
       fi
     # Check for wildcard-cert and gateway if found apply them
     - |
-      if [ -f tests/wildcard-cert.yaml ] $$ [ -f tests/main-test-gateway.yaml ]; then 
+      if [ -f "tests/wildcard-cert.yaml" ] $$ [ -f "tests/main-test-gateway.yaml" ]; then 
         kubectl apply -f tests/wildcard-cert.yaml
         kubectl apply -f tests/main-test-gateway.yaml 
       fi
@@ -77,7 +77,7 @@ package tests:
     - echo "Package install"
     # Check for test values file
     - |
-      if [ -f tests/test-values.yml ]; then 
+      if [ -f "tests/test-values.yml" ]; then 
         helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml 
       else 
         helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
@@ -97,7 +97,7 @@ package tests:
       fi
     - curl https://argocd.bigbang.dev
     - |
-      if [ -f tests/cypress.json ]; then
+      if [ -f "tests/cypress.json" ]; then
         cd tests && cypress run
       fi
 
