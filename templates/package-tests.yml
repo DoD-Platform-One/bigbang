@@ -2,9 +2,12 @@ stages:
   - configuration validation
   - package tests
 
-
 configuration validation:
   stage: configuration validation
+  tags:
+    - bigbang
+    - public
+    - privileged
 
   image: 
     name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
@@ -21,13 +24,13 @@ configuration validation:
     - echo "Directory structure of repository:"
     - tree .
     - echo "Generic configuration validation tests:"
+    - helm dependency update chart
     - helm conftest chart --policy ${GENERIC_POLICY_PATH}
     - >
       if [ -d "policy" ]; then
         echo "App specific configuration validation tests:"
         helm conftest chart --policy policy
       fi
-
 
 package tests:
   stage: package tests
@@ -44,6 +47,12 @@ package tests:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+  
+  artifacts:
+    paths:
+      - tests/cypress/screenshots
+      - tests/cypress/videos
+    expire_in: 3 days
 
   artifacts:
     paths:
@@ -57,23 +66,49 @@ package tests:
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
     # Create cluster and wait for deployments and pods
-    - k3d cluster create ${CI_PROJECT_NAME} --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents 1 --servers 1
+    - k3d cluster create ${CI_PROJECT_NAME} --agents 1 --servers 1 --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
+    # Need namespace and secret for registry1 images
+    - kubectl create namespace ${CI_PROJECT_NAME}
+    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+    # Check for istio in package name if not there install istio
+    - |
+      if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
+        istioctl install -y
+      fi
+    # Check for gateway if found generate throw away wildcard-cert secret and apply gateway
+    - |
+      if [ -f "tests/main-test-gateway.yaml" ]; then 
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"  
+        kubectl apply -f tests/main-test-gateway.yaml 
+      fi
 
   script:
     # Place kubernetes package test here
     - echo "Package install"
-    - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace; fi
+    - helm dependency update chart
+    # Check for test values file
+    - |
+      if [ -f "tests/test-values.yml" ]; then 
+        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml 
+      else 
+        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
+      fi
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
-    - kubectl get ingress --all-namespaces
-    - kubectl get vs -A
-    - kubectl get all -A
-    - if [ -f tests/cypress.json ]; then cypress run --config-file tests/cypress.json; fi
+    # If istio-ingressgateway has a loadBalancer IP and ${CI_PROJECT_NAME} namespace has a virtualService hostname add value to /etc/hosts
+    - |
+      if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
+        echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}')" >> /etc/hosts
+      fi
+    - |
+      if [ -f "tests/cypress.json" ]; then
+        cd tests && cypress run
+      fi
 
   after_script:
     # Delete Cluster
