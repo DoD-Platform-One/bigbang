@@ -118,7 +118,7 @@ upgrade:
 
 package:
   stage: package
-  image: docker:20.10.0
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/packager:0.0.1
   extends: .k3d
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
@@ -130,13 +130,19 @@ package:
     - clean install
   before_script: []
   script:
+    # Package images
     - docker login registry1.dsop.io -u 'robot$bigbang' -p ${REGISTRY1_PASSWORD}
-    - ./scripts/package_images.sh --image-list images.txt --images images.tar.gz
+    - ./scripts/package/images.sh --image-list images.txt --images images.tar.gz
+
+    # Package dependent repos
+    - ./scripts/package/gits.sh
+    - tar -czvf gits.tar.gz repos/
   after_script: []
   artifacts:
     paths:
       - images.txt
       - images.tar.gz
+      - gits.tar.gz
     expire_in: 7 days
 
 #-----------------------------------------------------------------------------------------------------------------------
