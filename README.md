@@ -13,21 +13,11 @@ to the images, follow the guides below.  These steps should NOT be used for prod
 
 ## Usage
 
-The following examples expect a cluster with fluxv2 preinstalled.  This can be done by [installing the flux cli](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli) and running `flux install`.  (TODO: Convert to IB images).
+The following examples expect a cluster with fluxv2 preinstalled.  This can be done by [installing the flux cli](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli) and running `flux install`.  This will install flux from the internet.  If you wish to install the Iron Bank approved images, run `hack/flux-install.sh` to install flux from the [Iron Bank Registry](https://registry1.dsop.io).
 
-### Simple Quickstart
+### Quickstart
 
-A bare mininmum, simple quickstart is provided under `./examples/simple`:
-
-```bash
-kubectl apply -f examples/simple
-```
-
-### Complete Example
-
-While simple to use, Big Bang also allows full flexibility in configuring individual packages, using encrypted secrets, and deploying to multiple environments with the same configuration base.  
-
-See the [readme](./examples/complete/README.md) for more information.
+A quickstart BigBang environment template is provided [here](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang).  See the README.md to get started.
 
 ### Contributing
 

@@ -6,7 +6,7 @@ Thanks for taking the time to contribute to BigBang!
 
 Big Bang is designed in such a way as to be as easily deployed locally as it is in production.  In fact, most contributions begin locally.
 
-Follow the steps below to get a complete local instantiation of Big Bang up locally using [k3d]().
+Follow the steps below to get a complete local instantiation of Big Bang up locally using [k3d](https://k3d.io/).
 
 ### Local Development Quickstart
 
@@ -19,24 +19,36 @@ k3d cluster create --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disa
 
 #### Deploying Big Bang
 
-Several examples are provided under the `./examples` folder that run through various implementations of BigBang.
+The [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang) should be copied locally to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang/README.md) and in the [Big Bang docs](./docs) for configuration.
 
 ```bash
-# Deploy the latest fluxv2 with iron bank images
-flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2 --timeout 3m0s
+# Deploy official, hardened fluxv2 from Iron Bank
+# Alternatives:
+# - Install non-hardened image: `flux install`
+# - Install unofficial images from Big Bang repo: `flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2`
+hack/flux-install.sh
+
+# Apply the development sops secret
+# Modify sops-create.sh if you use your own SOPS secret
+hack/sops-create.sh
+
+# The above command creates the 'bigbang' namespace. If you skip it, create your own
+kubectl create namespace bigbang
+
+# Apply the necessary dev secrets (e.g. pull secrets, certs)
+# The .yaml files used for this are from the Big Bang environment template
+sops -d bigbang/base/secrets.enc.yaml | kubectl apply -n bigbang -f -
+sops -d bigbang/dev/secrets.enc.yaml | kubectl apply -n bigbang -f -
 
 # Apply a local version of the umbrella chart
 # NOTE: This is the alternative to deploying a HelmRelease and having flux manage it, we use a local copy to avoid having to commit every change
 # NOTE: Use yq to parse the kustomize values patch and pipe it to the helm values
-yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' | helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
-
-# Apply the necessary dev secrets
-# NOTE: You should do this immediately after the previous helm command in case there are any secrets that the helm charts require to boot
+# The .yaml files used for yq are from the Big Bang environment template
 # NOTE: Flux will take care of the reconcilitation and retry loops for us, it is normal to see resources fail to deploy a few times on boot
-kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+yq m bigbang/prod/configmap.yaml bigbang/base/configmap.yaml | helm helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
 
 # After making changes to the umbrella chart or values, you can update the chart idempotently
-yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' | helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
+yq m bigbang/prod/configmap.yaml bigbang/base/configmap.yaml | helm helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
 
 # A convenience development script is provided to force fluxv2 to reconcile all helmreleases within the cluster
 hack/sync.sh
@@ -52,7 +64,7 @@ All routable endpoints BigBang deploys will use the TLD of `bigbang.dev` by defa
 
 #### Secrets & Certificates
 
-A __development only__ gpg key is provided at `bigbang-dev.asc` that is used to encrypt and decrypt the "secret" information in `envs/dev/secrets`.
+A __development only__ gpg key is provided at `hack/bigbang-dev.asc` that is used to encrypt and decrypt the "secret" information in `hack/secrets`.
 
 We cannot stress enough, __do not use this key to encrypt real secret data__.  It is a shared key meant to demonstrate the workflow of secrets management within Big Bang.
 
@@ -61,10 +73,10 @@ We cannot stress enough, __do not use this key to encrypt real secret data__.  I
 gpg --import bigbang-dev.asc
 
 # Decrypt the Big Bang Development Wildcard Cert
-sops -d envs/dev/secrets/ingress-cert.yaml
+sops -d hack/secrets/ingress-cert.yaml
 
 # Encrypt the Big Bang Development Wildcard Cert
-sops -e envs/dev/secrets/ingress-cert.yaml
+sops -e hack/ingress-cert.yaml
 ```
 
 ## Merge requests process
@@ -83,7 +95,7 @@ This stage is ran on every commit, and is a requirement for merging.
 
 #### Smoke Testing
 
-For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`]() that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
+For fast feedback testing, an ephemeral in cluster pipeline is created using [k3d](https://k3d.io/) that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
 
 This stage verifies several easy to check assumptions such as:
 
