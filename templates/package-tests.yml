@@ -53,35 +53,18 @@ package tests:
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
     # Create cluster and wait for deployments and pods
-    - |
-      cat <<EOF > /tmp/p1-registries.yaml
-      mirrors:
-        registry1.dsop.io:
-          endpoint:
-          - https://registry1.dsop.io
-      configs:
-        registry1.dsop.io:
-          auth:
-            username: 'robot$bigbang'
-            password: ${REGISTRY1_PASSWORD}
-      EOF
     - k3d cluster create ${CI_PROJECT_NAME} --agents 1 --servers 1 -v /tmp/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait
     - while ! (kubectl get node | grep "agent" > /dev/null); do sleep 3; done
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    #- kubectl get all -A
-    #- kubectl create namespace ${CI_PROJECT_NAME}
-    #- kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-    #- kubectl get secret -n ${CI_PROJECT_NAME} private-registry -o yaml
+    - kubectl create namespace ${CI_PROJECT_NAME}
+    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
     - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
 
   script:
     # Place kubernetes package test here
     - echo "Package install"
     - if [ -f tests/test-values.yml ]; then helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml; else helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace; fi
-    - sleep 100
-    - kubectl get all -n ${CI_PROJECT_NAME}
-    - kubectl describe pod -n ${CI_PROJECT_NAME}
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
