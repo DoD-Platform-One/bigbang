@@ -145,24 +145,23 @@ package:
     - ./scripts/package/gits.sh
     - tar -czf $REPOS_PKG repos/
 
-    # Publish packages
-    - |
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_LIST} ${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}
-    - |
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_PKG} ${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}
-    - |
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${REPOS_PKG} ${PACKAGE_REGISTRY_URL}/${REPOS_PKG}
+    # Prep release
+    - mkdir -p release
+    - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+
+    # Publish packages to s3 release
+    - aws s3 sync release/ s3://umbrella-bigbang-releases/umbrella/0.0.1
   after_script: []
 
-release:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  script:
-    - |
-      release-cli create --name "Release Test" --tag-name 0.0.1 \
-        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}\"}" \
-        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}\"}" \
-        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${REPOS_PKG}\"}"
+#release:
+#  stage: release
+#  image: registry.gitlab.com/gitlab-org/release-cli:latest
+#  script:
+#    - |
+#      release-cli create --name "Release Test" --tag-name 0.0.1 \
+#        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}\"}" \
+#        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}\"}" \
+#        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${REPOS_PKG}\"}"
 
 #-----------------------------------------------------------------------------------------------------------------------
 
