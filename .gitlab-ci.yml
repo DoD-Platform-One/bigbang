@@ -123,6 +123,10 @@ package:
 #    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
 #    - if: '$CI_COMMIT_TAG'
 #    - when: never
+  tags:
+    - bigbang
+    - privileged
+    - public
   services:
     - docker:20.10.0-dind
   variables:
@@ -138,6 +142,7 @@ package:
     - ./scripts/package_images.sh --image-list images.txt --images images.tar.gz
   artifacts:
     paths:
+      - images.txt
       - images.tar.gz
     expire_in: 7 days
 
