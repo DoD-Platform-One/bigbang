@@ -9,12 +9,18 @@ stringData:
 {{ toYaml .Values | indent 4}}
   argocd.yaml: |
 {{ toYaml .Values.addons.argocd.values | indent 4 }}
+  istiooperator.yaml: |
+{{ toYaml .Values.istiooperator.values | indent 4  }}
   authservice.yaml: |
 {{ toYaml .Values.addons.authservice.values | indent 4 }}
   istio.yaml: |
 {{ toYaml .Values.istio.values | indent 4  }}
   gatekeeper.yaml: |
 {{ toYaml .Values.gatekeeper.values | indent 4 }}
+  fluentbit.yaml: |
+{{ toYaml .Values.fluentbit.values | indent 4 }}
+  eckoperator.yaml: |
+{{ toYaml .Values.eckoperator.values | indent 4 }}
   logging.yaml: |
 {{ toYaml .Values.logging.values | indent 4 }}
   monitoring.yaml: |

@@ -8,7 +8,7 @@ spec:
   targetNamespace: logging
   chart:
     spec:
-      chart: charts/application
+      chart: {{ .Values.clusterAuditor.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
@@ -44,6 +44,6 @@ spec:
   dependsOn:
   - name: ek
     namespace: {{ .Release.Namespace }}
-  - name: cluster-auditor-policies
+  - name: gatekeeper
     namespace: {{ .Release.Namespace}}
 {{- end }}

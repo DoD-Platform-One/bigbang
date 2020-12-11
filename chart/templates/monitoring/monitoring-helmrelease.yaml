@@ -8,12 +8,13 @@ spec:
   targetNamespace: monitoring
   chart:
     spec:
-      chart: chart
+      chart: {{ .Values.monitoring.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
         name: monitoring
         namespace: {{ .Release.Namespace }}
+
   {{- with .Values.flux }}
   interval: {{ .interval }}
   test:
@@ -43,6 +44,17 @@ spec:
     global:
       imagePullSecrets:
         - name: private-registry
+    grafana:
+      image:
+        pullSecrets:
+        - private-registry
+    prometheus-node-exporter:
+      serviceAccount:
+        imagePullSecrets:
+        - name: private-registry
+    kube-state-metrics:
+      imagePullSecrets:
+      - name: private-registry
 
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}

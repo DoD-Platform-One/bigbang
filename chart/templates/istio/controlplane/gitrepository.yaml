@@ -2,16 +2,12 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: istio
+  name: istio-controlplane
   namespace: {{ .Release.Namespace }}
 spec:
-  ignore: |
-    # exclude file extensions
-    /**/*.md
-    /**/*.txt
-    /**/*.sh
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.istio.git.repo }}
   ref:
     {{- include "validRef" .Values.istio.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
 {{- end }}

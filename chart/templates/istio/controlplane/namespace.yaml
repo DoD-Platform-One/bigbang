@@ -1,21 +1,11 @@
 {{- if .Values.istio.enabled }}
----
 apiVersion: v1
 kind: Namespace
 metadata:
   name: istio-system
 
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: istio-operator
-  labels:
-    istio-operator-managed: Reconcile
-    istio-injection: disabled
-
----
 {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -24,16 +14,5 @@ metadata:
 type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: istio-operator
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-
 {{- end }}
 {{- end }}

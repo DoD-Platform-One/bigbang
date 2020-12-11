@@ -39,11 +39,11 @@ clusterAuditor:
 
 monitoring:
   enabled: true
-  values:
-    prometheusOperator:
-      admissionWebhooks:
-        # Disable admission webhook creation for CI to speed things up
-        enabled: false
+#  values:
+#    prometheusOperator:
+#      admissionWebhooks:
+#        # Disable admission webhook creation for CI to speed things up
+#        enabled: false
 
 gatekeeper:
   enabled: true

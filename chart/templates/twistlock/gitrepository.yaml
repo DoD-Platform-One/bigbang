@@ -5,13 +5,9 @@ metadata:
   name: twistlock
   namespace: {{ .Release.Namespace }}
 spec:
-  ignore: |
-    # exclude file extensions
-    /**/*.md
-    /**/*.txt
-    /**/*.sh
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.twistlock.git.repo }}
   ref:
     {{- include "validRef" .Values.twistlock.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
 {{- end }}

@@ -1,9 +1,4 @@
 {{- if or .Values.logging.enabled .Values.clusterAuditor.enabled }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: eck-operator
-
 ---
 apiVersion: v1
 kind: Namespace

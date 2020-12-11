@@ -8,7 +8,7 @@ spec:
   targetNamespace: twistlock
   chart:
     spec:
-      chart: chart
+      chart: {{ .Values.twistlock.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository

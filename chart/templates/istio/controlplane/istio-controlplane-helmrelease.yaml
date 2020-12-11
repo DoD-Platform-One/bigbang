@@ -2,17 +2,17 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: istio-operator
+  name: istio
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: istio-operator
+  targetNamespace: istio-system
   chart:
     spec:
-      chart: charts/operator
+      chart: {{ .Values.istio.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: istio
+        name: istio-controlplane
         namespace: {{ .Release.Namespace }}
 
   {{- with .Values.flux }}
@@ -32,18 +32,22 @@ spec:
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
 
+  valuesFrom:
+    - name: values
+      kind: Secret
+      valuesKey: "istio.yaml"
   values:
-    hub: registry1.dsop.io/ironbank/opensource/istio
-    tag: 1.7.3
-    createNamespace: false
+    hostname: {{ .Values.hostname }}
 
     imagePullSecrets:
-      - name: private-registry
+      - private-registry
 
-  {{- if .Values.gatekeeper.enabled }}
   dependsOn:
+    - name: istio-operator
+      namespace: {{ .Release.Namespace }}
+
+    {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
-  {{- end }}
-
+    {{- end }}
 {{- end }}

@@ -1,0 +1,13 @@
+{{- if and (not .Values.offline) (or .Values.logging.enabled .Values.clusterAuditor.enabled) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: fluentbit
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.fluentbit.git.repo }}
+  ref:
+    {{- include "validRef" .Values.fluentbit.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+{{- end }}

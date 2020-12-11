@@ -1,13 +1,13 @@
-{{- if and (not .Values.offline) .Values.monitoring.enabled }}
+{{- if and (not .Values.offline) .Values.istio.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: monitoring
+  name: istio-operator
   namespace: {{ .Release.Namespace }}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.monitoring.git.repo }}
+  url: {{ .Values.istiooperator.git.repo }}
   ref:
-    {{- include "validRef" .Values.monitoring.git | nindent 4 }}
+    {{- include "validRef" .Values.istiooperator.git | nindent 4 }}
   {{ include "gitIgnore" . }}
 {{- end }}
