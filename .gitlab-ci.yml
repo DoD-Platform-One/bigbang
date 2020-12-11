@@ -146,9 +146,12 @@ package:
     - tar -czf $REPOS_PKG repos/
 
     # Publish packages
-    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_LIST} ${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}
-    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_PKG} ${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}
-    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${REPOS_PKG} ${PACKAGE_REGISTRY_URL}/${REPOS_PKG}
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_LIST} ${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_PKG} ${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${REPOS_PKG} ${PACKAGE_REGISTRY_URL}/${REPOS_PKG}
   after_script: []
 
 release:
