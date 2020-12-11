@@ -49,6 +49,7 @@ package tests:
     DOCKER_TLS_CERTDIR: ""
   
   artifacts:
+    when: always
     paths:
       - tests/cypress/screenshots
       - tests/cypress/videos
