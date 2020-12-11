@@ -25,6 +25,12 @@ stages:
   - package
   - release
 
+variables:
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/bigbang/0.0.1"
+  IMAGE_LIST: images.txt
+  IMAGE_PKG: images.tar.gz
+  REPOS_PKG: repositories.tar.gz
+
 #-----------------------------------------------------------------------------------------------------------------------
 # Pre Stage Jobs
 #
@@ -74,25 +80,25 @@ pre vars:
 .test_bigbang: &test_bigbang
   - for test in ./tests/bash/*.sh; do chmod +x $test && $test; done 
 
-#clean install:
-#  stage: smoke tests
-#  extends:
-#    - .k3d
-#  rules:
-#    # Skip on merge requests (it is ran as part of the non MR pipeline)
-#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#      when: never
-#    - when: always
-#  variables:
-#    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
-#  script:
-#    - *deploy_bigbang
-##    - *test_bigbang
-#    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
-#  artifacts:
-#    paths:
-#      - images.txt
-#    expire_in: 7 days
+clean install:
+  stage: smoke tests
+  extends:
+    - .k3d
+  rules:
+    # Skip on merge requests (it is ran as part of the non MR pipeline)
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: always
+  variables:
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
+  script:
+    - *deploy_bigbang
+#    - *test_bigbang
+    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+  artifacts:
+    paths:
+      - images.txt
+    expire_in: 7 days
 
 upgrade:
   stage: smoke tests
@@ -117,48 +123,43 @@ upgrade:
     - *deploy_bigbang
     - *test_bigbang
 
-#package:
-#  stage: package
-#  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/packager:0.0.1
-#  extends: .k3d
-##  rules:
-##    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-##    - if: '$CI_COMMIT_TAG'
-##    - when: never
-#  services:
-#    - registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
-#  dependencies:
-#    - clean install
-#  before_script: []
-#  script:
-#    # Package images
-#    - docker login registry1.dsop.io -u 'robot$bigbang' -p ${REGISTRY1_PASSWORD}
-#    - ./scripts/package/images.sh --image-list images.txt --images images.tar.gz
-#
-#    # Package dependent repos
-#    - ./scripts/package/gits.sh
-#    - tar -czf repositories.tar.gz repos/
-#  after_script: []
-#  artifacts:
-#    paths:
-#      - images.txt
-#      - images.tar.gz
-#      - gits.tar.gz
-#    expire_in: 7 days
+package:
+  stage: package
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/packager:0.0.1
+  extends: .k3d
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+#    - if: '$CI_COMMIT_TAG'
+#    - when: never
+  services:
+    - registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
+  dependencies:
+    - clean install
+  before_script: []
+  script:
+    # Package images
+    - docker login registry1.dsop.io -u 'robot$bigbang' -p ${REGISTRY1_PASSWORD}
+    - ./scripts/package/images.sh --image-list $IMAGE_LIST --images $IMAGE_PKG
+
+    # Package dependent repos
+    - ./scripts/package/gits.sh
+    - tar -czf $REPOS_PKG repos/
+
+    # Publish packages
+    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_LIST} ${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}
+    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${IMAGE_PKG} ${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}
+    - curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file ${REPOS_PKG} ${PACKAGE_REGISTRY_URL}/${REPOS_PKG}
+  after_script: []
 
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  variables:
-    PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/myawesomerelease/${PACKAGE_VERSION}"
-  before_script:
-    - apk add curl
   script:
-    - touch afile
     - |
-      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file afile ${PACKAGE_REGISTRY_URL}/afile
-#  release:
-#    tag_name: "
+      release-cli create --name "Release Test" --tag-name 0.0.1 \
+        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_LIST}\"}" \
+        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${IMAGE_PKG}\"}" \
+        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${REPOS_PKG}\"}"
 
 #-----------------------------------------------------------------------------------------------------------------------
 
