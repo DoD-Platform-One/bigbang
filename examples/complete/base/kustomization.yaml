@@ -1,9 +1,0 @@
-namespace: bigbang
-
-commonLabels:
-  owner: bigbang
-
-resources:
-  - namespace.yaml
-  - gitrepository.yaml
-  - helmrelease.yaml

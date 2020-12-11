@@ -1,8 +1,0 @@
----
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: bigbang
-spec:
-  interval: 1m0s
-  url: https://repo1.dsop.io/platform-one/big-bang/umbrella.git
