@@ -54,12 +54,6 @@ package tests:
       - tests/cypress/videos
     expire_in: 3 days
 
-  artifacts:
-    paths:
-      - tests/cypress/screenshots
-      - tests/cypress/videos
-    expire_in: 3 days
-
   before_script:
     # Starting dnsmasq for cluster dns resolution
     - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:release-1.0.7
