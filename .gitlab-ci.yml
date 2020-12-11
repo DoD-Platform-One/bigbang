@@ -86,9 +86,6 @@ clean install:
   script:
     - *deploy_bigbang
     - *test_bigbang
-  after_script:
-    - kubectl get all -A
-    - kubectl get helmrelease -A
 
 upgrade:
   stage: smoke tests
