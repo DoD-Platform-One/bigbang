@@ -61,46 +61,36 @@ package tests:
     - kubectl create namespace ${CI_PROJECT_NAME}
     - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
     # Check for istio in package name if not there install istio
-    #- |
-    #  if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
-    #    istioctl install -y
-    #  fi
-    # Check for wildcard-cert and gateway if found apply them
-    #- |
-    #  if [ -f "tests/wildcard-cert.yaml" ] $$ [ -f "tests/main-test-gateway.yaml" ]; then 
-    #    kubectl apply -f tests/wildcard-cert.yaml
-    #    kubectl apply -f tests/main-test-gateway.yaml 
-    #  fi
-    - istioctl install -y
-    - openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-    - kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
-    - kubectl apply -f tests/main-test-gateway.yaml
+    - |
+      if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
+        istioctl install -y
+      fi
+    # Check for gateway if found generate throw away wildcard-cert secret and apply gateway
+    - |
+      if [ -f "tests/main-test-gateway.yaml" ]; then 
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"  
+        kubectl apply -f tests/main-test-gateway.yaml 
+      fi
 
   script:
     # Place kubernetes package test here
     - echo "Package install"
     # Check for test values file
-    #- |
-    #  if [ -f "tests/test-values.yml" ]; then 
-    #    helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml 
-    #  else 
-    #    helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
-    #  fi
-    - helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
+    - |
+      if [ -f "tests/test-values.yml" ]; then 
+        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml 
+      else 
+        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
+      fi
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
-    # Debug output
-    - kubectl get ingress --all-namespaces
-    - kubectl get vs -A
-    - kubectl get gw -A
-    - kubectl get all -A
     # If istio-ingressgateway has a loadBalancer IP and ${CI_PROJECT_NAME} namespace has a virtualService hostname add value to /etc/hosts
     - |
       if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
         echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}')" >> /etc/hosts
       fi
-    - curl https://argocd.bigbang.dev
     - |
       if [ -f "tests/cypress.json" ]; then
         cd tests && cypress run
