@@ -46,6 +46,12 @@ package tests:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+  
+  artifacts:
+    paths:
+      - tests/cypress/screenshots
+      - tests/cypress/videos
+    expire_in: 3 days
 
   before_script:
     # Starting dnsmasq for cluster dns resolution
