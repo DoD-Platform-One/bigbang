@@ -60,6 +60,7 @@ package tests:
     - kubectl create namespace ${CI_PROJECT_NAME}
     - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
     - if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then istioctl install -y; fi 
+    - if [ -f tests/wildcard-cert.yaml ] $$ [ -f tests/main-test-gateway.yaml ]; then kubectl apply -f tests/wildcard-cert.yaml; kubectl apply -f tests/main-test-gateway.yaml; fi
 
   script:
     # Place kubernetes package test here
