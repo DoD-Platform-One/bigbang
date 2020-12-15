@@ -109,6 +109,17 @@ include:
     ref: master
     file: '/templates/package-tests.yml'
 ```
+
+If the package has an operator dependency (i.e. elasticsearch-kibana must have the eck-operator deployed first), add 
+additional lines to specify the repo for the dependency. The ${DEPENDENCY_REPO_BRANCH} variable is optional, if not 
+specified the default main/master branch will be used.
+
+```bash
+variables:
+  DEPENDENCY_REPO: "https://repo1.dsop.io/platform-one/big-bang/apps/core/eck-operator.git"
+  DEPENDENCY_REPO_BRANCH: master
+```
+
 ### Using the CI pipline infrastrcuture to test packages locally
 
 This repo also contains the infrastructure and scripts needed to execute the above described stages in a local environment.

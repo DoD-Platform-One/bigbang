@@ -80,6 +80,25 @@ package tests:
         kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"  
         kubectl apply -f tests/main-test-gateway.yaml 
       fi
+    - |
+      if [ ! -z ${DEPENDENCY_REPO} ]; then
+        if [ ! -z ${DEPENDENCY_REPO_BRANCH} ]; then
+          git clone -b ${DEPENDENCY_REPO_BRANCH} ${DEPENDENCY_REPO} dependency-repo
+        else
+          git clone ${DEPENDENCY_REPO} dependency-repo
+        fi
+        helm dependency update dependency-repo/chart
+        kubectl create namespace ${CI_PROJECT_NAME}-dependency
+        kubectl create -n ${CI_PROJECT_NAME}-dependency secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+        if [ -f dependency-repo/tests/test-values.yml ]; then
+          helm install --wait --timeout 600s ${CI_PROJECT_NAME}-dependency dependency-repo/chart -n ${CI_PROJECT_NAME}-dependency --create-namespace -f dependency-repo/tests/test-values.yml
+        else
+          helm install --wait --timeout 600s ${CI_PROJECT_NAME}-dependency dependency-repo/chart -n ${CI_PROJECT_NAME}-dependency --create-namespace
+        fi
+      fi
+    - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+    - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+    - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
   script:
     # Place kubernetes package test here
@@ -88,10 +107,11 @@ package tests:
     # Check for test values file
     - |
       if [ -f "tests/test-values.yml" ]; then 
-        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml 
+        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml
       else 
-        helm install ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
+        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
       fi
+    - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     - echo "Package tests"
