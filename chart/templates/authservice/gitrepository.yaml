@@ -5,13 +5,10 @@ metadata:
   name: authservice
   namespace: {{ .Release.Namespace }}
 spec:
-  ignore: |
-    # exclude file extensions
-    /**/*.md
-    /**/*.txt
-    /**/*.sh
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.addons.authservice.git.repo }}
   ref:
     {{- include "validRef" .Values.addons.authservice.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" .Values.git | nindent 2 }}
 {{- end }}
