@@ -5,7 +5,21 @@ set -ex
 echo "Installing Flux"
 flux --version
 flux check --pre
-flux install
+
+# Install flux in the cluster
+kubectl create ns flux-system || true
+
+kubectl create secret docker-registry ironbank -n flux-system \
+   --docker-server=registry1.dsop.io \
+   --docker-username='robot$bigbang' \
+   --docker-password=${REGISTRY1_PASSWORD} \
+   --docker-email=bigbang@bigbang.dev || true
+kubectl apply -f ./scripts/deploy/flux.yaml
+
+# Wait for flux
+kubectl wait --for=condition=available --timeout 300s -n "flux-system" "deployment/helm-controller"
+kubectl wait --for=condition=available --timeout 300s -n "flux-system" "deployment/source-controller"
+flux check
 
 # Deploy BigBang using dev sized scaling
 echo "Installing BigBang"

@@ -15,7 +15,6 @@ spec:
   test:
     enable: false
   install:
-    createNamespace: true
     remediation:
       retries: 5
   upgrade:
