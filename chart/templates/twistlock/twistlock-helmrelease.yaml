@@ -43,7 +43,8 @@ spec:
     prometheus:
       servicemonitor:
         enabled: {{ .Values.monitoring.enabled }}
-
+    istio:
+      enabled: {{ .Values.istio.enabled }}
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:

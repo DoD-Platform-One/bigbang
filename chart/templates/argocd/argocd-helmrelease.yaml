@@ -40,6 +40,10 @@ spec:
     createNamespace: false
     imagePullSecrets:
       - name: private-registry
+    server:
+      config:
+        url: https://argocd.{{ .Values.hostname }}
+
   {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
