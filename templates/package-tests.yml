@@ -42,7 +42,7 @@ package tests:
   image: 
     name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
   services:
-    - docker:dind
+    - registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
   variables:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
