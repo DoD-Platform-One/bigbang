@@ -141,7 +141,7 @@ flux install
 
 kubectl create ns bigbang
 
-kubectl apply -f examples/complete/envs/dev/source-secrets.yaml
+kubectl apply -f tests/ci/shared-secrets.yaml
 
 # Helm install BigBang umbrella
 
