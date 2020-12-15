@@ -11,6 +11,26 @@ registryCredentials:
   password: ""
   email: ""
 
+# Global git values
+# Order of precedence is:
+#   1. existingSecret
+#   2. http credentials (username/password)
+#   3. ssh credentials (privateKey/publicKey/knownHosts)
+git:
+  # Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+  existingSecret: ""
+
+  # Chart created secrets with user defined values
+  credentials:
+    # HTTP git credentials, both username and password must be provided
+    username: ""
+    password: ""
+
+    # SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+    privateKey: ""
+    publicKey: ""
+    knownHosts: ""
+
 # Flux reconciliation parameters
 flux:
   interval: 2m
@@ -34,6 +54,7 @@ istio:
   values: {}
 
 istiooperator:
+  enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
@@ -77,6 +98,7 @@ logging:
   values: {}
 
 eckoperator:
+  enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
@@ -84,6 +106,7 @@ eckoperator:
   values: {}
 
 fluentbit:
+  enabled: true
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"

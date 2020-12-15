@@ -24,6 +24,20 @@ branch: {{ .branch | quote }}
 {{- end -}}
 
 {{/*
+Build the appropriate git credentials secret for private git repositories
+*/}}
+{{- define "gitCreds" -}}
+{{- if .existingSecret -}}
+secretRef:
+  name: {{ .existingSecret }}
+{{- else if coalesce .credentials.username .credentials.password .credentials.privateKey .credentials.publicKey .credentials.knownHosts "" -}}
+{{- /* Input validation happens in git-credentials.yaml template */ -}}
+secretRef:
+  name: git-credentials
+{{- end -}}
+{{- end -}}
+
+{{/*
 Build common set of file extensions to include/exclude
 */}}
 {{- define "gitIgnore" -}}
