@@ -44,7 +44,7 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
 
 ## Upgrade
 
-All changes to the Big Bang cluster should be made through Git.  After changes are pushed, Big Bang will automatically reconcile the difference with the cluster. 
+All changes to the Big Bang cluster should be made through Git.  After changes are pushed, Big Bang will automatically reconcile the difference with the cluster.
 
 > It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the [sync.sh](../hack/sync.sh) script.
 
@@ -74,7 +74,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
    # `environment-repo`: STATUS should be True
     NAMESPACE   NAME               URL                                                                     READY   STATUS                                                                      AGE
-    bigbang     environment-repo   https://repo1.dsop.io/platform-one/big-bang/customers/bigbang.git       True    Fetched revision: master/185e252f4452d897531ab0314adc7a189562be31     2m7s
+    bigbang     environment-repo   https://repo1.dsop.io/platform-one/big-bang/customers/template.git      True    Fetched revision: main/185e252f4452d897531ab0314adc7a189562be31       2m7s
    ```
 
 1. Verify the environment Kustomization properly worked
@@ -84,7 +84,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
    # `environment`: READY should be True
     NAMESPACE   NAME          READY   STATUS                                                                    AGE
-    bigbang     environment   True    Applied revision: master/185e252f4452d897531ab0314adc7a189562be31   6m41s
+    bigbang     environment   True    Applied revision: main/185e252f4452d897531ab0314adc7a189562be31     6m41s
    ```
 
 1. Verify the ConfigMaps were deployed
@@ -92,10 +92,10 @@ The following commands will help you monitor the progress of the Big Bang deploy
    ```bash
    kubectl get configmap -l kustomize.toolkit.fluxcd.io/namespace -A
 
-   # 'configmap' and 'configmap-common' should exist
+   # 'common' and 'environment' should exist
     NAMESPACE   NAME                          DATA   AGE
-    bigbang     configmap-cch6942dk9          1      19m
-    bigbang     configmap-common-d2tgb27f56   1      19m
+    bigbang     common-cch6942dk9             1      19m
+    bigbang     environment-d2tgb27f56        1      19m
    ```
 
 1. Verify the Secrets were deployed
@@ -103,10 +103,10 @@ The following commands will help you monitor the progress of the Big Bang deploy
    ```bash
    kubectl get secrets -l kustomize.toolkit.fluxcd.io/namespace -A
 
-   # 'secrets' and 'secrets-common' should exist
+   # 'common-bb' and 'environment-bb' should exist
     NAMESPACE   NAME                        TYPE     DATA   AGE
-    bigbang     secrets-common-kc5t8dbdfh   Opaque   1      18m
-    bigbang     secrets-mhddkt46bd          Opaque   1      18m
+    bigbang     common-bb-kc5t8dbdfh        Opaque   1      18m
+    bigbang     environment-bb-mhddkt46bd   Opaque   1      18m
    ```
 
 1. Verify the Big Bang Helm Chart was pulled
@@ -114,9 +114,9 @@ The following commands will help you monitor the progress of the Big Bang deploy
    ```bash
    kubectl get gitrepositories -A
 
-   # 'umbrella-repo' READY should be True
+   # 'bigbang' READY should be True
     NAME            URL                                                        READY   STATUS                                                                      AGE
-    umbrella-repo   https://repo1.dsop.io/platform-one/big-bang/umbrella.git   True    Fetched revision: master/8a4a1ddd0c9edf316f5362680cf2921baf0c3451   25m
+    bigbang         https://repo1.dsop.io/platform-one/big-bang/umbrella.git   True    Fetched revision: master/8a4a1ddd0c9edf316f5362680cf2921baf0c3451   25m
    ```
 
 1. Verify the Big Bang Helm Chart was deployed
@@ -124,9 +124,9 @@ The following commands will help you monitor the progress of the Big Bang deploy
    ```bash
    kubectl get hr -A
 
-   # 'umbrella-helm' READY should be True
+   # 'bigbang' READY should be True
     NAMESPACE   NAME             READY   STATUS                             AGE
-    bigbang     umbrella-helm    True    Release reconciliation succeeded   28m
+    bigbang     bigbang    True    Release reconciliation succeeded   28m
    ```
 
 1. Verify Big Bang package Helm charts are pulled
@@ -137,7 +137,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
    # The Git repository holding the Helm charts for each package can be seen in the URL column.
    # The STATUS column shows the branch and tag of the revision being used.
     NAMESPACE     NAME              URL                                                                             READY   STATUS                                                                      AGE
-    bigbang       umbrella-chart    https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/umbrella               True    Fetched revision: master/3a44686520152e576a8c2c6f264876efff497c4b           8m25s
+    bigbang       bigbang           https://repo1.dsop.io/platform-one/big-bang/umbrella.git                        True    Fetched revision: master/3a44686520152e576a8c2c6f264876efff497c4b           8m25s
     bigbang       logging           https://repo1.dsop.io/platform-one/big-bang/apps/core/logging.git               True    Fetched revision: release-v0.2.x/9cfe1e14c12098464ee89eb877614f781cd78fb7   8m23s
     bigbang       certmanager       https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/cert-manager.git       True    Fetched revision: release-v1.0.x/1247135baf145dcfad4a4a02ef679c48fb76d9fb   8m23s
     bigbang       istio             https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git           True    Fetched revision: chart-release/2b02a51b7950ce21bac26403fa25d09e7e3f86c3    8m23s

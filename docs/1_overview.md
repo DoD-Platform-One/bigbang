@@ -5,7 +5,7 @@ Table of Contents
 - [Big Bang Overview](#big-bang-overview)
   - [Key Concepts](#key-concepts)
     - [Big Bang](#big-bang)
-    - [Big Bang Umbrella](#big-bang-umbrella)
+    - [Big Bang Components](#big-bang-components)
     - [Flux v2](#flux-v2)
     - [GitOps](#gitops)
     - [SOPS](#sops)
@@ -25,9 +25,9 @@ Table of Contents
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved [packages](#packages) into a Kubernetes cluster.  Big Bang follows a [GitOps](#gitops) approach to configuration management, using [Flux v2](#flux-v2) to reconcile Git with the cluster.  Environments (e.g. dev, prod) and packages (e.g. istio) can be fully configured to suit the deployment needs.
 
-### Big Bang Umbrella
+### Big Bang Components
 
-The umbrella is a sub-component of Big Bang that controls the deployment of all the packages.  This is deployed via a Helm chart.
+Big Bang is made of several components that operate together.  These include a [base Kustomize](../base/), a [Helm chart](../chart), [packages](../chart/templates), and an [environment](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang).  The environment and base Kustomize are used together to deploy the Big Bang configuration and Helm chart.  The Helm chart is then used to facilitate deployment of the packages.
 
 ### Flux v2
 
@@ -92,11 +92,11 @@ The diagram below shows a typcial deployment of Big Bang into a Kubernetes clust
    1. Next, Kustomize is run on the environment configuration
       1. The Kustomize files use Big Bang's Git repo as a base before applying overlays and patches for the configuration.
       1. Flux uses SOPS to decrypt any secrets before deploying the manifests
-      1. After completing the Kustomization process, Flux deploys two ConfigMaps, two Secrets, and flux resources for Big Bang Umbrella
-1. Big Bang's flux resources include a Git repository holding the umbrella Helm chart and a Helm Release resource that tells Flux how to deploy the Helm chart.
+      1. After completing the Kustomization process, Flux deploys two ConfigMaps, two Secrets, and flux resources for Big Bang
+1. Big Bang's flux resources include a Git repository holding the Helm chart and a Helm Release resource that tells Flux how to deploy the Helm chart.
    1. The repository is reconciled first, pulling the Helm chart from Git.
    1. The Helm Release will check for the Helm chart and the Secrets / ConfigMaps deployed before performing a Helm install
-1. Once the Helm release deploys the Helm chart for Big Bang umbrella, each package that is enabled will have a Flux Git Repository and Helm Release resource deployed.
+1. Once the Helm release deploys the Helm chart for Big Bang, each package that is enabled will have a Flux Git Repository and Helm Release resource deployed.
 1. All of the package Git repos containing Helm charts will be pulled so that Flux can reconcile dependencies.
 1. Each package's Helm Release has dependencies built in.  Flux will reconcile these dependencies and deploy the Helm chart for the package once all of the dependencies are ready.
 1. Once all of the packages are ready, Big Bang will monitor Git periodically for changes and reconcile using the methods above.
@@ -110,31 +110,31 @@ graph TD
     style CustomVals fill:#00758f
     style EncryptSecrets fill:#00758f
     style PushToGit fill:#00758f
-    style DeployBB fill:#00758f
+    style DeployMan fill:#00758f
 
     SetupSOPS(Setup SOPS keys) --> EncryptSecrets(Encrypt secrets)
     SetupSOPS --> CustomVals(Customize values)
     CustomSecrets(Customize secrets) --> EncryptSecrets
     CustomVals --> PushToGit(Push customization to Git)
     EncryptSecrets --> PushToGit
-    PushToGit --> DeployBB(Deploy BigBang Manifest)
+    PushToGit --> DeployMan(Deploy BigBang Manifest)
 
-    DeployBB --> KustResEnv[[Deploy Environment Kustomization Resource]]
-    KustResEnv --> HelmResUmb[[Deploy Umbrella Helm Release Resource]]
-    DeployBB --> GitResEnv[[Deploy Environment Git Repository Resource]]
-    KustResEnv --> GitResUmb[[Deploy Umbrella Git Repository Resource]]
+    DeployMan --> KustResEnv[[Deploy Environment Kustomization Resource]]
+    KustResEnv --> HelmResBB[[Deploy Big Bang Helm Release Resource]]
+    DeployMan --> GitResEnv[[Deploy Environment Git Repository Resource]]
+    KustResEnv --> GitResBB[[Deploy Big Bang Git Repository Resource]]
     KustResEnv --> SOPS
 
     GitResEnv --> PullEnv[[Pull environment]]
     PullEnv --> SOPS[[SOPS Decrypt secrets]]
     SOPS --> DeployVals[[Deploy ConfigMap and Secrets]]
 
-    GitResUmb --> PullUmb[[Pull Umbrella Helm Chart]]
-    PullUmb --> DeployUmb[[Deploy Umbrella w/ Helm Chart]]
-    HelmResUmb --> DeployUmb
-    DeployVals --> DeployUmb
+    GitResBB --> PullBB[[Pull Big Bang Helm Chart]]
+    PullBB --> DeployBB[[Deploy Big Bang Helm Chart]]
+    HelmResBB --> DeployBB
+    DeployVals --> DeployBB
 
-    DeployUmb --> PackGit[[Deploy Package Git Repository Resources]]
+    DeployBB --> PackGit[[Deploy Package Git Repository Resources]]
     PackGit --> PackPull[[Pull Package Helm Charts]]
     PackPull --> PackDep[[Resolve Package Dependencies]]
     PackDep --> PackReady{Package Ready?}

@@ -19,7 +19,7 @@ Table of Contents
 
 ## Overview
 
-Configuration of Big Bang is achieved by overriding default values set in the package or Big Bang using the [environment template](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang).  The template has a 4 potential locations for setting values: `base/secrets.enc.yaml`, `base/configmap.yaml`, `<env>/secrets.enc.yaml`, and `<env>/configmap.yaml`.  Overrides proceed as follows, with `<env>/configmap.yaml` having the highest precedence.
+Configuration of Big Bang is achieved by overriding default values set in the package or Big Bang using the [environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template).  The template has a 4 potential locations for setting values: `base/secrets.enc.yaml`, `base/configmap.yaml`, `<env>/secrets.enc.yaml`, and `<env>/configmap.yaml`.  Overrides proceed as follows, with `<env>/configmap.yaml` having the highest precedence.
 
 ```mermaid
 graph TD
@@ -31,7 +31,7 @@ graph TD
   -->env-c[`<env>/configmap.yaml` values]
 ```
 
-In all four cases, Big Bang reads a single key named `values.yaml` that contains the data to override.  See the [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang) for examples on how to use these files to override values.
+In all four cases, Big Bang reads a single key named `values.yaml` that contains the data to override.  See the [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template) for examples on how to use these files to override values.
 
 ## Pre-configuration
 
@@ -54,7 +54,7 @@ At a minimum, the following items must be configured for a default Big Bang depl
 - [SOPS private key reference](3_encryption.md).
 - [Registry pull credentials](#registry-pull-credentials)
 
-The Big Bang [Environment Template](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang) has placeholders for all of the above.
+The Big Bang [Environment Template](https://repo1.dsop.io/platform-one/big-bang/customers/template) has placeholders for all of the above.
 
 ## Big Bang Globals
 
@@ -111,10 +111,10 @@ Big Bang deploys four flux resources that can be customized:
 |--|--|--|
 | GitRepository | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
 | Kustomization | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
-| GitRepostiory | Big Bang Umbrella | [Link](../base/gitrepository.yaml) |
-| HelmRelease | Big Bang Umbrealla | [Link](../base/helmrelease.yaml) |
+| GitRepostiory | Big Bang | [Link](../base/gitrepository.yaml) |
+| HelmRelease | Big Bang | [Link](../base/helmrelease.yaml) |
 
-In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Umbrella templates](../chart/templates) for the these resources.
+In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Helm chart templates](../chart/templates) for the these resources.
 
 Settings for eny of these resources can be overridden by [patching](https://kubectl.docs.kubernetes.io/references/kustomize/patches/) the resource in your environment's kustomization files.  Use Flux's documentation for [GitRepository](https://toolkit.fluxcd.io/components/source/gitrepositories/), [HelmRelease](https://toolkit.fluxcd.io/components/helm/helmreleases/), and [Kustomization](https://toolkit.fluxcd.io/components/kustomize/kustomization/) to find settings for these resources.
 
@@ -130,7 +130,7 @@ patchesStrategicMerge:
   apiVersion: source.toolkit.fluxcd.io/v1beta1
   kind: GitRepository
   metadata:
-    name: umbrella-repo
+    name: bigbang
   spec:
     ref:
       $patch: replace
@@ -151,9 +151,9 @@ metadata:
   namespace: bigbang
 spec:
   interval: 1m
-  url: https://repo1.dsop.io/platform-one/big-bang/customers/bigbang.git
+  url: https://repo1.dsop.io/platform-one/big-bang/customers/template.git
   ref:
-    branch: master
+    branch: main
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
@@ -165,7 +165,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: environment-repo
-  path: ./bigbang/dev
+  path: ./dev
   prune: true
   decryption:
     provider: sops
@@ -177,13 +177,13 @@ spec:
 
 If you have pull credentials for your docker registry, add them to `secrets.enc.yaml`.  Here is an example:
 
-> The name of the Secret must be `secrets` or `secrets-common` for Big Bang to read values from it.
+> The name of the Secret must be `common-bb` or `environment-bb` for Big Bang to read values from it.
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-    name: secrets-common
+    name: common-bb
 stringData:
     values.yaml: |-
         registryCredentials:
@@ -216,12 +216,12 @@ gatekeeper:
 
 You will also need to merge this file with the existing configmaps in `kustomization.yaml`.
 
-> The name of the ConfigMap must be `configmap` or `configmap-common` for Big Bang to read values from it.
+> The name of the ConfigMap must be `common` or `environment` for Big Bang to read values from it.
 
 ```yaml
 namespace: bigbang
 configMapGenerator:
-  - name: configmap
+  - name: common
     behavior: merge
     files:
       - values.yaml=configmap.yaml

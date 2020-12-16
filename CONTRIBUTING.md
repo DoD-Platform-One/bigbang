@@ -2,59 +2,79 @@
 
 Thanks for taking the time to contribute to BigBang!
 
+Table of Contents:
+
+- [Contributing to Big Bang](#contributing-to-big-bang)
+  - [Developers Guide](#developers-guide)
+  - [Iron Bank Images](#iron-bank-images)
+  - [Local Kubernetes cluster](#local-kubernetes-cluster)
+  - [Deploying Big Bang (Quick Start)](#deploying-big-bang-quick-start)
+  - [Testing Big Bang Development Changes](#testing-big-bang-development-changes)
+  - [DNS](#dns)
+  - [Secrets & Certificates](#secrets--certificates)
+  - [Merge requests process](#merge-requests-process)
+    - [Pipeline Stages](#pipeline-stages)
+      - [Linting](#linting)
+      - [Smoke Testing](#smoke-testing)
+      - [Infrastructure Testing](#infrastructure-testing)
+        - [Network Creation](#network-creation)
+        - [Cluster(s) Creation](#clusters-creation)
+        - [Big Bang Installation](#big-bang-installation)
+        - [Big Bang Tests](#big-bang-tests)
+      - [Teardown](#teardown)
+
 ## Developers Guide
 
 Big Bang is designed in such a way as to be as easily deployed locally as it is in production.  In fact, most contributions begin locally.
 
-Follow the steps below to get a complete local instantiation of Big Bang up locally using [k3d](https://k3d.io/).
+## Iron Bank Images
 
-### Local Development Quickstart
+Per the [charter](https://repo1.dsop.io/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dsop.io/).  In order to pull these images, ImagePullSecrets must be provided to BigBang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dsop.io)
 
-#### Local `k3d` cluster
+1) Register for a free Ironbank account [Here](https://sso-info.il2.dsop.io/new_account.html)
+1) Log into the [Iron Bank Registry](https://registry1.dsop.io), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
+1) When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token
+
+## Local Kubernetes cluster
+
+Follow the steps below to get a local Kubernetes cluster for Big Bang  using [k3d](https://k3d.io/).
 
 ```bash
 # Create a local k3d cluster with the appropriate port forwards
 k3d cluster create --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
-#### Deploying Big Bang
+## Deploying Big Bang (Quick Start)
 
-The [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang) should be copied locally to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang/README.md) and in the [Big Bang docs](./docs) for configuration.
+For development, it is quicker to test changes without having to push to Git.  To do this, we can bypass Flux2 and deploy Big Bang directly with its Helm chart.
+
+Start by creating `myvalues.yaml` to configure your local Big Bang.  Big Bang's template repository contains a starter [development values.yaml](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
+
+Configure `myvalues.yaml` to suit your needs.
 
 ```bash
-# Deploy official, hardened fluxv2 from Iron Bank
-# Alternatives:
-# - Install non-hardened image: `flux install`
-# - Install unofficial images from Big Bang repo: `flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2`
-hack/flux-install.sh
-
-# Apply the development sops secret
-# Modify sops-create.sh if you use your own SOPS secret
-hack/sops-create.sh
-
-# The above command creates the 'bigbang' namespace. If you skip it, create your own
-kubectl create namespace bigbang
-
-# Apply the necessary dev secrets (e.g. pull secrets, certs)
-# The .yaml files used for this are from the Big Bang environment template
-sops -d bigbang/base/secrets.enc.yaml | kubectl apply -n bigbang -f -
-sops -d bigbang/dev/secrets.enc.yaml | kubectl apply -n bigbang -f -
+# Deploy the latest fluxv2 with Iron Bank images
+# For development, you can use flux from the internet using 'flux install`
+# Be aware, the internet version is likely newer than the Iron Bank version
+./hack/flux-install.sh
 
 # Apply a local version of the umbrella chart
 # NOTE: This is the alternative to deploying a HelmRelease and having flux manage it, we use a local copy to avoid having to commit every change
-# NOTE: Use yq to parse the kustomize values patch and pipe it to the helm values
-# The .yaml files used for yq are from the Big Bang environment template
-# NOTE: Flux will take care of the reconcilitation and retry loops for us, it is normal to see resources fail to deploy a few times on boot
-yq m bigbang/prod/configmap.yaml bigbang/base/configmap.yaml | helm helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
+helm upgrade -i bigbang chart -n bigbang --create-namespace -f myvalues.yaml
 
-# After making changes to the umbrella chart or values, you can update the chart idempotently
-yq m bigbang/prod/configmap.yaml bigbang/base/configmap.yaml | helm helm upgrade -i bigbang chart -n bigbang --create-namespace -f -
-
-# A convenience development script is provided to force fluxv2 to reconcile all helmreleases within the cluster
+# A convenience development script is provided to force fluxv2 to reconcile all helmreleases within the cluster insteading of waiting for the next polling interval.
 hack/sync.sh
 ```
 
-#### DNS
+For more extensive development, use the [Development Guide](docs/c_development.md).
+
+## Testing Big Bang Development Changes
+
+Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
+
+Follow the [Big Bang documentation](./docs) for testing a full deployment of Big Bang.
+
+## DNS
 
 To ease with local development, the TLD `bigbang.dev` has been purchased with the following CNAME record:
 
@@ -62,22 +82,13 @@ To ease with local development, the TLD `bigbang.dev` has been purchased with th
 
 All routable endpoints BigBang deploys will use the TLD of `bigbang.dev` by default.  It is expected that consumers modify this appropriately for their environment.
 
-#### Secrets & Certificates
+## Secrets & Certificates
 
-A __development only__ gpg key is provided at `hack/bigbang-dev.asc` that is used to encrypt and decrypt the "secret" information in `hack/secrets`.
+A __development only__ gpg key is provided at `bigbang-dev.asc` that is used to encrypt and decrypt the secrets in this Git repository (e.g. [hack/secrets](hack/secrets/).
 
 We cannot stress enough, __do not use this key to encrypt real secret data__.  It is a shared key meant to demonstrate the workflow of secrets management within Big Bang.
 
-```bash
-# Import the gpg key
-gpg --import bigbang-dev.asc
-
-# Decrypt the Big Bang Development Wildcard Cert
-sops -d hack/secrets/ingress-cert.yaml
-
-# Encrypt the Big Bang Development Wildcard Cert
-sops -e hack/ingress-cert.yaml
-```
+Follow instructions in the [Big Bang encryption guide](docs/3_encryption.md) for how to encrypt and decrypt secrets.
 
 ## Merge requests process
 
@@ -95,13 +106,13 @@ This stage is ran on every commit, and is a requirement for merging.
 
 #### Smoke Testing
 
-For fast feedback testing, an ephemeral in cluster pipeline is created using [k3d](https://k3d.io/) that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
+For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`](https://k3d.io) that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
 
 This stage verifies several easy to check assumptions such as:
 
-* does BigBang successfully install
-* does BigBang successfully upgrade (from master)
-* are endpoints routable
+- does BigBang successfully install
+- does BigBang successfully upgrade (from master)
+- are endpoints routable
 
 This stage also serves as a guide for local development, and care is taken to ensure all pipeline actions within this stage are repeatable locally.
 
