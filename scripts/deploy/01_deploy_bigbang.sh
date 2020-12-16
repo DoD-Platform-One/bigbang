@@ -29,4 +29,9 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace \
 
 ## Apply secrets kustomization pointing to current branch
 echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
-cat tests/ci/shared-secrets.yaml | sed 's|master|'$CI_COMMIT_REF_NAME'|g' | kubectl apply -f -
+if [[ -z "${CI_COMMIT_TAG}" ]]; then
+  cat tests/ci/shared-secrets.yaml | sed 's|master|'$CI_COMMIT_REF_NAME'|g' | kubectl apply -f -
+else
+  # NOTE: $CI_COMMIT_REF_NAME = $CI_COMMIT_TAG when running on a tagged build
+  cat tests/ci/shared-secrets.yaml | sed 's|branch: master|tag: '$CI_COMMIT_REF_NAME'|g' | kubectl apply -f -
+fi
