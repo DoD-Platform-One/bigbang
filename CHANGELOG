@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
+## 0.0.4
+
+* Update Monitoring to [11.0.0-bb.2](https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring/-/tags/11.0.0-bb.2)
+
+
 ## 0.0.3
 
 * Updated Argo to [2.9.5-bb.1](https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd/-/merge_requests/10) for Iron Bank images
