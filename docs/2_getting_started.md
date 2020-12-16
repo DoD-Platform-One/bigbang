@@ -56,7 +56,7 @@ Table of Contents
 
 ## Configuration Template
 
-A [template for configuring multi-cluster environments](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/tree/master/bigbang) is provided to assist with getting Big Bang setup correctly.  You should make a copy of the `./bigbang` folder from the [customer Big Bang repository](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang) and place it into a Git repository under your control.
+A [template for configuring multi-cluster environments](https://repo1.dsop.io/platform-one/big-bang/customers/template/) is provided to assist with getting Big Bang setup correctly.  You should make a copy of the `./bigbang` folder from the [customer Big Bang repository](https://repo1.dsop.io/platform-one/big-bang/customers/template) and place it into a Git repository under your control.
 
 ### Overview
 
@@ -68,7 +68,7 @@ The template is setup to allow you to customize the Big Bang deployment for your
 - Reference to SOPS private key - See the [encryption help](3_encryption.md) for more information.
 - Iron Bank pull credentials
 
-The [Configuration Template help](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/blob/master/bigbang/README.md) contains details on how to setup these items.
+The [Configuration Template help](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/blob/main/README.md) contains details on how to setup these items.
 
 If there is additional configuration you want, refer to the [configuration help](4_configuration.md) for details.
 

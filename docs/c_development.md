@@ -1,6 +1,6 @@
 # Appendix C - Big Bang Development
 
-## So you want to develop on Big Bang Umbrella?
+## So you want to develop on Big Bang?
 
 Included here is a setup that will allow you to checkout and begin development using your workstation and a minimal EC2 instance in AWS.
 
@@ -8,7 +8,7 @@ Included here is a setup that will allow you to checkout and begin development u
 
 + AWS access (with permissions to create an EC2 instance)
 + Flux CLI installed on your local machine
-+ Access to the Umbrella Git Repo
++ Access to the Git Repo
 + kubectl installed on local machine
 + yq installed on local machine
 
@@ -128,33 +128,100 @@ optional:
 cat ~/.kube/config
 ```
 
-+ Move to your workstation and install Big Bang Umbrella on the cluster
++ Move to your workstation and setup namespace
 
 ```bash
 # Test to see if you can connect to your cluster
-
 kubectl get nodes
 
 # From the base of the project
-
 flux install
 
 kubectl create ns bigbang
+```
 
++ Customize your Helm values
+
+```bash
+# You will be overriding values in `chart/values.yaml` for development
+# You can use the [Big Bang template's dev ConfigMap](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/blob/template/bigbang/dev/configmap.yaml) to start.  This will minimize the resources for deploying BigBang.
+# For convenience, it is also copied here
+
+cat << EOF > my-values.yaml
+hostname: bigbang.dev
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+gatekeeper:
+  values:
+    replicas: 1
+istio:
+  values:
+    kiali:
+      dashboard:
+        auth:
+          strategy: anonymous
+    ingressGateway:
+      serviceAnnotations:
+        # Ensure mission apps have internal load balancer only
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        # Enable cross zone load balancing
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+logging:
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+      data:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+
+twistlock:
+  values:
+    console:
+      persistence:
+        size: 5Gi
+EOF
+
+# Add any additional development values to this file as needed
+# You can add registry1 pull credentials here for development
+# Examples included enabling add-ons, disabling unneeded features, etc.
+```
+
++ Deploy secrets
+
+```bash
+# These are all OPTIONAL.  Deploy them if you need them
+
+# Deploy the bigbang-dev.asc SOPS key into the bigbang namespace
+./hack/create-sops.sh
+
+# Deploy the authservice configuration
+sops -d ./hack/secrets/authservice-config.yaml | kubectl apply -f -
+
+# Deploy the ingress certificates
+sops -d ./hack/secrets/ingress-cert.yaml | kubectl apply -f -
+
+# Apply tests CI shared secrets
 kubectl apply -f tests/ci/shared-secrets.yaml
+```
 
-# Helm install BigBang umbrella
++ Install BigBang
 
-# Method 1 - go for it. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)
-
-yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' | helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f -
-
-# Method 2 - Modify some values
-
-yq r examples/complete/envs/dev/patch-bigbang.yaml 'spec.values' > my-values.yaml
-
-# Modify my-values.yaml
-# Install using your new values. You could also modify the values in place. (Note: You don't need to set registryCredentials if you configured registry pull secret on the cluster in previous steps)
+```bash
+# Helm install BigBang
 
 helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f my-values.yaml
 ```
@@ -162,8 +229,8 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCreden
 + You can now modify your local /etc/hosts files (Or whatever the Windows people call it these days)
 
 ```bash
-160.1.38.137     kibana.bigbang.dev
-160.1.38.137     kiali.bigbang.dev
+160.1.38.137    kibana.bigbang.dev
+160.1.38.137    kiali.bigbang.dev
 160.1.38.137    prometheus.bigbang.dev
 160.1.38.137    graphana.bigbang.dev
 ```
