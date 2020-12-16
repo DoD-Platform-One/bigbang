@@ -22,6 +22,14 @@ stages:
   - bigbang down
   - cluster down
   - network down
+  - package
+  - release
+
+variables:
+  RELEASE_BUCKET: umbrella-bigbang-releases
+  IMAGE_LIST: images.txt
+  IMAGE_PKG: images.tar.gz
+  REPOS_PKG: repositories.tar.gz
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Pre Stage Jobs
@@ -86,6 +94,11 @@ clean install:
   script:
     - *deploy_bigbang
     - *test_bigbang
+    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+  artifacts:
+    paths:
+      - images.txt
+    expire_in: 7 days
 
 upgrade:
   stage: smoke tests
@@ -109,6 +122,62 @@ upgrade:
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
     - *deploy_bigbang
     - *test_bigbang
+
+package:
+  stage: package
+  image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+    - when: never
+  dependencies:
+    - clean install
+  before_script:
+    # Set up auth
+    - mkdir -p /root/.docker
+    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+  script:
+    - cp ./scripts/package/synker.yaml ./synker.yaml
+
+    # Populate images list in synker config
+    # NOTE: This is stupid and hacky, use yq or something better to do this
+    - cat images.txt | sed -e 's/^/    - /' >> synker.yaml
+
+    - synker pull -b=1
+
+    # Tar up synker as well?
+    - cp /usr/local/bin/synker /var/lib/registry/synker
+    - tar -C /var/lib/registry -czvf $IMAGE_PKG .
+    - tar -czvf $IMAGE_PKG /var/lib/registry
+
+    # Package dependent repos
+    - ./scripts/package/gits.sh
+    - tar -czf $REPOS_PKG repos/
+
+    # Prep release
+    - mkdir -p release
+    - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+
+    # Publish packages to s3 release
+    - aws s3 sync --quiet --dryrun release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+  after_script: []
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+    - when: never
+  variables:
+    RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
+  script:
+    - |
+      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+        --description "Automated release notes are a WIP." \
+        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
 
 #-----------------------------------------------------------------------------------------------------------------------
 
