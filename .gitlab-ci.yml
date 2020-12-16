@@ -127,7 +127,6 @@ package:
   stage: package
   image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG'
     - when: never
   dependencies:
@@ -159,21 +158,20 @@ package:
     - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
 
     # Publish packages to s3 release
-    - aws s3 sync --quiet --dryrun release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+    - aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
   after_script: []
 
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - if: '$CI_COMMIT_TAG'
     - when: never
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:
     - |
-      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+      release-cli create --name "Big Bang v${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
         --description "Automated release notes are a WIP." \
         --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
         --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
