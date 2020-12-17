@@ -6,91 +6,111 @@ Included here is a setup that will allow you to checkout and begin development u
 
 ### Prequisites
 
-+ AWS access (with permissions to create an EC2 instance)
-+ Flux CLI installed on your local machine
-+ Access to the Git Repo
-+ kubectl installed on local machine
+#### Access
++ [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
++ [Umbrella repository](https://repo1.dsop.io/platform-one/big-bang/umbrella)
++ [Iron Bank registry](https://registry1.dsop.io/)
+
+#### Utilities
++ kubectl installed on local machine. This will also need to be installed on the remote if you wish to verify the K3D cluster using `kubectl cluster-info`
+```Bash
+# Install kubectl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update && sudo apt-get install -y kubectl
+kubectl version --client
+```
 + yq installed on local machine
+```Bash
+# Install yq
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CC86BB64
+sudo add-apt-repository ppa:rmescandon/yq -y
+sudo apt update && sudo apt install yq -y
+yq --version
+```
++ Flux CLI installed on your local machine
+```Bash
+curl -s https://toolkit.fluxcd.io/install.sh | sudo bash
+flux --version
+```
 
 ### Manual Creation of a Development Environment
 
 This section will cover the creation of an environment manually. This is a good place to start because it creates an understanding of everything that the automated method does for you.
 
-Step 1: Create an Ubuntu 20.04 xlarge EC2 instance with the following attributes:
-        (see addendum for using Amazon Linux2 - but it really does not matter)
-
-+ 50 Gigs of disk space
-+ IAM Role: InstanceOpsRole  (this will add support for sops encryption with KMS)
-+ A security group that allows all TCP traffic from your IP address.
-+ The following in the User Data
-
+Step 1: Create an Ubuntu EC2 instance with the following attributes:
+        (see addendum for using Amazon Linux2)
++ Ubuntu Server 20.04 LTS (HVM), SSD Volume Type
++ t2.xlarge
++ IAM Role: InstanceOpsRole (This will add support for sops encryption with KMS)
++ User Data (as Text):
 ```bash
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+    MIME-Version: 1.0
+    Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+    
+    --==MYBOUNDARY==
+    Content-Type: text/x-shellscript; charset="us-ascii"
 
---==MYBOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
-
-#!/bin/bash
-sysctl -w vm.max_map_count=262144
+    #!/bin/bash
+    # Set the vm.max_map_count to 262144. 
+    # Required for Elastic to run correctly without OOM errors.
+    sysctl -w vm.max_map_count=262144
 ```
-
-** The user data in this case will set the vm.max_map_count to 262144. This is required for Elastic to launch and run correctly without OOM errors.
++ 50 Gigs of disk space
++ Tags: ```Owner: <IAM User>```
++ Security Group: All TCP, My IP
++ If you have created an existing key pair that you still have access to, select it. If not, create a new key pair. 
 
 Step 2: SSH into your new EC2 instance and configure it with the following:
 
 + Install Docker CE
 
 ```bash
-#Remove any old Docker items
+# Remove any old Docker items
 sudo apt remove docker docker-engine docker.io containerd runc
 
-#Install all pre-reqs for Docker
+# Install all pre-reqs for Docker
 sudo apt update
-sudo apt install apt-transport-https ca-certificates curl     gnupg-agent software-properties-common
+sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
-#Add the Docker repository, we are installing from Docker and not the
-#Ubuntu APT repo.
+# Add the Docker repository, we are installing from Docker and not the Ubuntu APT repo.
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-
 sudo apt-key fingerprint 0EBFCD88
-
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
-#Install Docker
+# Install Docker
 sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io
+sudo apt install -y docker-ce docker-ce-cli containerd.io
 
-#Add your base user to the Docker group so that you do not need sudo
-#to run docker commands
+# Add your base user to the Docker group so that you do not need sudo to run docker commands
 sudo usermod -aG docker $USER
 
-** It is important at this point that you log out and back in to
-** have the user group changes take effect.
+# It is important to log out and back in to have the user group changes take effect.
+logout
 ```
 
 + Install K3D on the EC2 instance
 
 ```bash
 wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
-
-k3d //to check the install
+k3d version
 ```
 
 + We can now spin up our dev cluster on the EC2 instance using K3D
 
 ```bash
-k3d cluster create -s 1 -a 3  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=<your-public-ec2-ip>"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+YOURPUBLICEC2IP=$( curl https://ipinfo.io/ip )
+echo $YOURPUBLICEC2IP
+k3d cluster create -s 1 -a 3  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
-+ Optionally you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
++ ___Optionally___ you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
 
 ```bash
-# create the directory for the k3s registry config.
+# Create the directory for the k3s registry config.
 mkdir ~/.k3d/
 
-# create the config file. Use your registry1 credentials. Copy your user name and token secret from your Harbor profile.
-
+# Create the config file. Use your registry1 credentials. Copy your user name and token secret from your Harbor profile.
 cat << EOF > ~/.k3d/p1-registries.yaml
 configs:
   "registry1.dsop.io":
@@ -99,44 +119,67 @@ configs:
       password: "place_token_secret_here"
 EOF
 
-k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=<your-public-ec2-ip>"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+YOURPUBLICEC2IP=$( curl https://ipinfo.io/ip )
+k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
-Here is a break down of what we are doing with this command.
-
-`-s 1` Creating 1 master/server
-
-`-a 3` Creating 3 agent nodes
-
-`--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
-
-`--k3s-server-arg "--disable=metrics-server"` Disable default metrics
-
-`--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
-
-`-p 80:80@loadbalancer` Exposes the cluster on the host on port 80
-
-`-p 443:443@loadbalancer` Exposes the cluster on the host on port 443
+Here is a break down of what we are doing with this command:
++ `-s 1` Creating 1 master/server
++ `-a 3` Creating 3 agent nodes
++ `--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
++ `--k3s-server-arg "--disable=metrics-server"` Disable default metrics
++ `--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
++ `-p 80:80@loadbalancer` Exposes the cluster on the host on port 80
++ `-p 443:443@loadbalancer` Exposes the cluster on the host on port 443
 
 optional:
 `-v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster
 `--api-port 0.0.0.0:38787` Chooses a port for the API server instead of being assigned a random one. You can set this to any port number that you want.
 
-+ Once your cluster is up, you can bring over the kubeconfig from the EC2 instance to your workstation.
++ Once your cluster is up, you can copy the kubeconfig from the EC2 instance to your workstation and update the IP Address. If you do not have an existing configuration to preserve on your local workstation, you can delete and recreate the configuration file.
 
+Copy the contents of the remote configuation file.
 ```bash
 cat ~/.kube/config
 ```
 
 + Move to your workstation and setup namespace
 
+Update the configuration file on your local workstation.
+```Bash
+# Remove existing configuation if defined.
+rm ~/.kube/config
+
+# Create empty configuation
+touch ~/kube/config
+
+# Update permissions
+# (Prevents Helm warnings)
+chmod go-r ~/.kube/config
+
+# Open vi to edit configuation
+vi ~/.kube/config
+```
+Paste the contents into the new file, and update the `server` URL to the public IP address (```$YOURPUBLICEC2IP```).
+
 ```bash
 # Test to see if you can connect to your cluster
+kubectl cluster-info
 kubectl get nodes
 
-# From the base of the project
+# Create Project base
+
+mkdir -pv ~/repos/
+cd ~/repos
+git clone https://repo1.dsop.io/platform-one/big-bang/umbrella.git
+cd ~/repos/umbrella
+```
+From the base of the project
+```Bash
+# Flux - Install the toolkit components
 flux install
 
+# kubectl - Create a namespace with the specified name.
 kubectl create ns bigbang
 ```
 
@@ -206,7 +249,7 @@ EOF
 # These are all OPTIONAL.  Deploy them if you need them
 
 # Deploy the bigbang-dev.asc SOPS key into the bigbang namespace
-./hack/create-sops.sh
+./hack/sops-create.sh
 
 # Deploy the authservice configuration
 sops -d ./hack/secrets/authservice-config.yaml | kubectl apply -f -
@@ -218,26 +261,27 @@ sops -d ./hack/secrets/ingress-cert.yaml | kubectl apply -f -
 kubectl apply -f tests/ci/shared-secrets.yaml
 ```
 
-+ Install BigBang
-
++ Install BigBang using Iron Bank (Harbor) credentials.
 ```bash
 # Helm install BigBang
-
 helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f my-values.yaml
 ```
 
-+ You can now modify your local /etc/hosts files (Or whatever the Windows people call it these days)
++ You can now modify your local `/etc/hosts` file to allow for local name resolution. On Windows, this file is located at `$env:windir\System32\drivers\etc\hosts`
 
-```bash
-160.1.38.137    kibana.bigbang.dev
-160.1.38.137    kiali.bigbang.dev
-160.1.38.137    prometheus.bigbang.dev
-160.1.38.137    graphana.bigbang.dev
+```HOSTS
+<X.X.X.X>     kibana.bigbang.dev
+<X.X.X.X>     kiali.bigbang.dev
+<X.X.X.X>     prometheus.bigbang.dev
+<X.X.X.X>     graphana.bigbang.dev
 ```
 
 + You can watch your install take place with
-
 ```bash
+# macOS does not include watch
+# recommend install with brew
+# brew install watch
+
 watch kubectl get po,gitrepository,kustomizations,helmreleases -A
 ```
 
@@ -250,16 +294,20 @@ Here are the configuration steps if you want to use a Fedora based instance. All
 ```bash
 # update system
 sudo yum update -y
+
 # install and start docker
 sudo yum install docker -y
 sudo usermod -aG docker $USER
 sudo systemctl enable docker.service
 sudo systemctl start docker.service
+
 # fix docker config for ulimit nofile.
 # this is a bug in the AMI that will eventually be fixed
 sudo sed -i 's/^OPTIONS=.*/OPTIONS=\"--default-ulimit nofile=65535:65535\"/' /etc/sysconfig/docker
 sudo systemctl restart docker.service
+
 # install k3d
 sudo wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
 # exit ssh and then reconnect so you can use docker as non-root
 ```
