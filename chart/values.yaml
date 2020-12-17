@@ -122,7 +122,7 @@ monitoring:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.2"
+    tag: "11.0.0-bb.3"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
