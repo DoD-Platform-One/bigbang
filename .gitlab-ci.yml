@@ -145,7 +145,7 @@ package:
     - synker pull -b=1
 
     # Tar up synker as well?
-    - cp /usr/local/bin/synker /var/lib/registry/synker
+    - cp /usr/local/bin/synker synker.yaml /var/lib/registry/
     - tar -C /var/lib/registry -czvf $IMAGE_PKG .
     - tar -czvf $IMAGE_PKG /var/lib/registry
 

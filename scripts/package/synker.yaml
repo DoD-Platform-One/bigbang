@@ -14,6 +14,18 @@ options:
   quiet: false
   debug: info
 
+# NOTE: destination configurations below are environment specific and should be modified to match your environment.
+destination:
+  registry:
+    # Hostname of the destination registry to push to
+    hostname: p1-registry
+    # Port of the destination registry to push to
+    port: 5000
+
+    #
+    osChoice: linux
+    disablePolicyChecks: true
+
 source:
   authFile: /root/.docker/config.json
   images:
