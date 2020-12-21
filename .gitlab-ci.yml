@@ -12,6 +12,7 @@ workflow:
 include:
   - project: 'platform-one/big-bang/pipeline-templates/umbrella-templates'
     file: '/global.gitlab-ci.yml'
+    ref: 0.0.1
 
 stages:
   - smoke tests
