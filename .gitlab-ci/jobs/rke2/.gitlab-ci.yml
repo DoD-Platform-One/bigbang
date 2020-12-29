@@ -1,0 +1,22 @@
+.rke2 tf:
+  extends: .terraformer
+  variables:
+    TF_ROOT: ".gitlab-ci/jobs/rke2/dependencies/terraform/env/ci"
+
+.rke2 up:
+  extends: .rke2 tf
+  script:
+    # Fetch dependencies
+    - apk add bash aws-cli
+    - terraform apply -input=false -auto-approve
+    - mv rke2.yaml ${CI_PROJECT_DIR}/rke2.yaml
+  artifacts:
+    paths:
+      - ${CI_PROJECT_DIR}/rke2.yaml
+
+.rke2 down:
+  extends:
+    - .rke2 tf
+    - .terraform destroy workspace
+  script:
+    - terraform destroy -input=false -auto-approve

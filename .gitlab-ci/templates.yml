@@ -1,0 +1,33 @@
+include:
+  # "Default" AWS Networking
+  - local: '/.gitlab-ci/jobs/networking/aws/.gitlab-ci.yml'
+
+  # K3D Gitlab CI job
+  - local: '/.gitlab-ci/jobs/k3d/.gitlab-ci.yml'
+
+  # RKE2 Gitlab CI jobs
+  - local: '/.gitlab-ci/jobs/rke2/.gitlab-ci.yml'
+
+.terraformer:
+  image:
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/terraform:0.13.5
+    entrypoint:
+      - /usr/bin/env
+      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  interruptible: false
+  variables:
+    TF_IN_AUTOMATION: "1"
+    TF_VAR_env: ${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  before_script:
+    # Shorten the env name down to 15 characters
+    - export TF_VAR_env=$(echo "${CI_COMMIT_REF_SLUG}"| cut -c 1-7)-$(echo "${CI_COMMIT_SHA}" | cut -c 1-7)
+    - cd ${CI_PROJECT_DIR}/${TF_ROOT}
+    - terraform version
+    - terraform init -input=false
+    - terraform workspace select $TF_VAR_env || terraform workspace new $TF_VAR_env
+    - terraform validate
+
+.terraform destroy workspace:
+  after_script:
+    - cd ${CI_PROJECT_DIR}/${TF_ROOT}
+    - terraform workspace select default && terraform workspace delete "${TF_VAR_env}"
