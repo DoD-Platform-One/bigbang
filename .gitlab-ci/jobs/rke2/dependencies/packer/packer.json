@@ -1,0 +1,65 @@
+{
+  "variables": {
+    "aws_region": "us-gov-west-1",
+    "rke2_version": "v1.18.12+rke2r1",
+    "rke2_url": "https://github.com/rancher/rke2/releases/download",
+    "ami_name": "rhel8",
+    "ami_description": "An RKE2 base image based on RHEL 8 Build Date: {{ isotime }}",
+    "source_ami_name": "RHEL-8.3*",
+    "source_ami_owner": "309956199498",
+    "source_ami_owner_govcloud": "219670896067",
+    "source_ami_ssh_user": "ec2-user"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `aws_region`}}",
+      "ami_regions": "us-gov-west-1",
+      "source_ami_filter": {
+        "filters": {
+          "name": "{{user `source_ami_name`}}",
+          "root-device-type": "ebs",
+          "state": "available",
+          "virtualization-type": "hvm",
+          "architecture": "x86_64"
+        },
+        "owners": [ "{{user `source_ami_owner`}}", "{{user `source_ami_owner_govcloud`}}" ],
+        "most_recent": true
+      },
+      "instance_type": "m5.large",
+      "ssh_username": "{{user `source_ami_ssh_user`}}",
+      "subnet_id": "{{user `subnet_id`}}",
+      "kms_key_id": "{{user `kms_key_id`}}",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 25,
+          "volume_type": "gp2",
+          "delete_on_termination": true
+        }
+      ],
+      "tags": {
+        "Name": "rke2-{{user `ami_name`}}-{{ timestamp }}",
+        "BuildDate": "{{ isotime }}",
+        "RKE2-Version": "{{user `rke2_version`}}"
+      },
+      "ami_name": "rke2-{{user `ami_name`}}-{{ timestamp }}",
+      "ami_description": "{{user `ami_description` }}",
+      "ami_virtualization_type": "hvm",
+      "run_tags": {
+        "Name": "packer-builder-rke2-{{user `ami_name`}}-ami"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "RKE2_VERSION={{ user `rke2_version` }}",
+        "RKE2_URL={{ user `rke2_url` }}"
+      ],
+      "script": "./setup.sh",
+      "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}"
+    }
+  ]
+}

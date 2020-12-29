@@ -1,0 +1,28 @@
+.calc_unique_cidr: &calc_unique_cidr
+  - apk add python3 py3-boto3
+  - echo "Calculating unique cidr range for vpc"
+  - chmod 755 ../../../get-vpc.py
+  - TF_VAR_vpc_cidr=$(terraform output vpc_cidr | tr -d '\n' | tr -d '\r' | grep 10) || TF_VAR_vpc_cidr=$(python3 ../../../get-vpc.py | tr -d '\n' | tr -d '\r')
+  - echo "Using VPC CIDR $TF_VAR_vpc_cidr for $CLUSTER_NAME cluster"
+  - export TF_VAR_vpc_cidr=$TF_VAR_vpc_cidr
+
+.network:
+  extends: .terraformer
+  variables:
+    TF_ROOT: ".gitlab-ci/jobs/networking/aws/dependencies/terraform/env/ci"
+
+.network up:
+  extends: .network
+  script:
+    - *calc_unique_cidr
+    - echo "Creating network with cidr range ${TF_VAR_vpc_cidr}"
+    - terraform apply -auto-approve
+
+.network down:
+  extends:
+    - .network
+    - .terraform destroy workspace
+  script:
+    - *calc_unique_cidr
+    - echo "Destroying network"
+    - terraform destroy -auto-approve
