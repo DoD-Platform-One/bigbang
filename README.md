@@ -69,7 +69,7 @@ pipeline validation.
 
 ### Pre-Defined Variables
 
-The [Packages](https://repo1.dsop.io/platform-one/big-bang/apps) group has the following variables pre-configured:
+The [Packages](https://repo1.dso.mil/platform-one/big-bang/apps) group has the following variables pre-configured:
 
 | Variable Name | Purpose | Last updated |
 |--|--|--|
@@ -116,7 +116,7 @@ specified the default main/master branch will be used.
 
 ```bash
 variables:
-  DEPENDENCY_REPO: "https://repo1.dsop.io/platform-one/big-bang/apps/core/eck-operator.git"
+  DEPENDENCY_REPO: "https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git"
   DEPENDENCY_REPO_BRANCH: master
 ```
 
