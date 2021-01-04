@@ -103,7 +103,7 @@ upgrade:
     - .k3d
   rules:
     # skip job when MR title starts with 'Breaking Change'
-    - if: $CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
       when: never
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
