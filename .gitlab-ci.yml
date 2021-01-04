@@ -273,7 +273,7 @@ aws/rke2/bigbang test:
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
-    # - job: aws/rke2/bigbang up
+    - job: aws/rke2/bigbang up
   before_script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
@@ -293,7 +293,7 @@ aws/rke2/bigbang down:
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
-    # - job: aws/rke2/bigbang test
+    - job: aws/rke2/bigbang test
   before_script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
@@ -311,6 +311,6 @@ aws/rke2/cluster down:
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
-    # - job: aws/rke2/bigbang down
+    - job: aws/rke2/bigbang down
 
 #-----------------------------------------------------------------------------------------------------------------------
