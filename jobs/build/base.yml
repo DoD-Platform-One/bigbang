@@ -11,7 +11,7 @@
     IMAGE: $CI_REGISTRY_IMAGE
     # The registry1 user has a $ in it.  This causes problems in GitLab
     # The workaround is to reassign it (https://gitlab.com/gitlab-org/gitlab-foss/-/issues/27436#note_33922439)
-    REGISTRY1: "registry1.dsop.io"
+    REGISTRY1: "registry1.dso.mil"
     REGISTRY1_USER_: $REGISTRY1_USER
     REGISTRY1_PASSWORD_: $REGISTRY1_PASSWORD
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs the conftest stage of the package pipeline
 conftest() {( set -e
-    git clone https://repo1.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates.git pipeline-templates-dev
+    git clone https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git pipeline-templates-dev
     echo "Directory structure of repository:"
     tree $1
     echo "Generic configuration validation tests:"
