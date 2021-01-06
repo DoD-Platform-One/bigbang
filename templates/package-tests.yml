@@ -68,6 +68,12 @@ package tests:
     - kubectl create namespace ${CI_PROJECT_NAME}
     - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
     # Check for istio in package name if not there install istio
+    - >
+       if [ ! -z "${PROJECT_NAME}" ]; then
+         kubectl create ns ${PROJECT_NAME}
+         echo "additional name space created"
+         kubectl create -n ${PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+       fi
     - |
       if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
         istioctl install -y
