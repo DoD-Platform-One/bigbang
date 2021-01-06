@@ -10,9 +10,9 @@ configuration validation:
     - privileged
 
   image: 
-    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
   variables:
-    PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+    PIPELINE_REPO: https://repo1.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates.git
     PIPELINE_REPO_DESTINATION: "../pipeline-repo"
     GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
 
@@ -40,9 +40,9 @@ package tests:
     - privileged
 
   image: 
-    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
+    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
   services:
-    - registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
+    - registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
   variables:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
@@ -57,7 +57,7 @@ package tests:
 
   before_script:
     # Starting dnsmasq for cluster dns resolution
-    - docker run -d -p 53:53/udp -p 53:53 registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:87fca1d1
+    - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:87fca1d1
     - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
 
     # Create cluster and wait for deployments and pods
@@ -66,7 +66,7 @@ package tests:
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
     # Need namespace and secret for registry1 images
     - kubectl create namespace ${CI_PROJECT_NAME}
-    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
     # Check for istio in package name if not there install istio
     - >
        if [ ! -z "${PROJECT_NAME}" ]; then
@@ -94,7 +94,7 @@ package tests:
         fi
         helm dependency update dependency-repo/chart
         kubectl create namespace ${CI_PROJECT_NAME}-dependency
-        kubectl create -n ${CI_PROJECT_NAME}-dependency secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+        kubectl create -n ${CI_PROJECT_NAME}-dependency secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
         if [ -f dependency-repo/tests/test-values.yml ]; then
           helm install --wait --timeout 600s ${CI_PROJECT_NAME}-dependency dependency-repo/chart -n ${CI_PROJECT_NAME}-dependency --create-namespace -f dependency-repo/tests/test-values.yml
         else
