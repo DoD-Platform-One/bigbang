@@ -105,6 +105,9 @@ upgrade:
     # skip job when MR title starts with 'Breaking Change'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
       when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
@@ -197,7 +200,9 @@ release:
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
-
+    # run pipeline on commits to default branch
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    
 # Abstract for jobs responsible for cleaning up infrastructure
 .infra cleanup:
   rules:
