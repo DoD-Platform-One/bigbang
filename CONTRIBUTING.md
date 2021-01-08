@@ -6,6 +6,11 @@ Table of Contents:
 
 - [Contributing to Big Bang](#contributing-to-big-bang)
   - [Developers Guide](#developers-guide)
+  - [Local Git Setup](#local-git-setup)
+    - [Pre-commit hooks](#pre-commit-hooks)
+      - [Local Setup](#local-setup)
+        - [Prereqs](#prereqs)
+        - [Steps](#steps)
   - [Iron Bank Images](#iron-bank-images)
   - [Local Kubernetes cluster](#local-kubernetes-cluster)
   - [Deploying Big Bang (Quick Start)](#deploying-big-bang-quick-start)
@@ -23,9 +28,34 @@ Table of Contents:
         - [Big Bang Tests](#big-bang-tests)
       - [Teardown](#teardown)
 
-## Developers Guide
+## Developers Guide 
 
 Big Bang is designed in such a way as to be as easily deployed locally as it is in production.  In fact, most contributions begin locally.
+
+## Local Git Setup
+
+### Pre-commit hooks
+
+We would like developers to leverage [conventional commits](https://www.conventionalcommits.org/) when contributing. In order to help enforce this we are leveraging client-side pre-commit hooks. This is done using the following tools:
+
+- [husky](https://www.npmjs.com/package/husky)
+- [commitlint](https://commitlint.js.org/#/)
+
+#### Local Setup
+
+##### Prereqs
+
+- Install [npm](https://www.npmjs.com/get-npm)
+
+##### Steps
+
+After cloning this git repo run the following command:
+
+```bash
+npm install --only=dev
+```
+
+This will download `husky` and `commitlint` to your local repo and modify your `.git/hooks` to allow husky to run pre-commit hooks. Once installed it will enforce the usage of convential-commits.
 
 ## Iron Bank Images
 
