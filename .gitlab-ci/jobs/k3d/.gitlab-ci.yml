@@ -1,7 +1,7 @@
 .k3d_before_script: &k3d_before_script
   # Starting dnsmasq for cluster dns resolution
-  # - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:0eddd476
-  # - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+  - docker run -d -p 53:53/udp -p 53:53 registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:0eddd476
+  - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
   # Standup cluster
   - k3d cluster create ${CLUSTER_NAME}  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait --agents $N_AGENTS --servers $N_SERVERS
   - while ! (kubectl get node | grep "server" > /dev/null); do sleep 3; done
