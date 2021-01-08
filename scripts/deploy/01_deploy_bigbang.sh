@@ -9,7 +9,7 @@ flux check --pre
 # Install flux in the cluster
 kubectl create ns flux-system || true
 
-kubectl create secret docker-registry ironbank -n flux-system \
+kubectl create secret docker-registry private-registry -n flux-system \
    --docker-server=registry1.dsop.io \
    --docker-username='robot$bigbang' \
    --docker-password=${REGISTRY1_PASSWORD} \
