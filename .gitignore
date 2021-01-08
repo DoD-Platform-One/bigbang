@@ -2,3 +2,9 @@
 certs/
 
 .DS_Store
+
+# dependencies
+/node_modules
+
+# debug
+npm-debug.log*
