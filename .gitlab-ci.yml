@@ -123,6 +123,12 @@ upgrade:
 package:
   stage: package
   image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
+  rules:
+    # skip job for manual tag events
+    - if: $CI_COMMIT_TAG
+      when: never
+    # run job on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   dependencies:
     - clean install
   before_script:
