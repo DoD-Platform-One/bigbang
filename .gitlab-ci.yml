@@ -50,7 +50,6 @@ pre vars:
   - echo "CHART_MR_VERSION=$CHART_MR_VERSION" >> variables.env
   - echo "CHART_MA_VERSION=$CHART_MA_VERSION" >> variables.env
   # obtain semver differences (subtract master version from mr verison)
-  - chmod +x ./scripts/semver_diff.sh
   - CHART_VERSION_DIFF=$(./scripts/semver_diff.sh $CHART_MR_VERSION $CHART_MA_VERSION)
   - IFS=. DIFF_ARR=(${CHART_VERSION_DIFF##*-})
   - echo "CHART_VERSION_DIFF=$CHART_VERSION_DIFF" >> variables.env
@@ -75,10 +74,10 @@ pre vars:
     - kubectl get helmrelease -A
 
 .deploy_bigbang: &deploy_bigbang
-  - for script in ./scripts/deploy/*.sh; do chmod +x $script && $script; done
+  - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
 
 .test_bigbang: &test_bigbang
-  - for test in ./tests/bash/*.sh; do chmod +x $test && $test; done 
+  - find ./tests -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
 
 clean install:
   stage: smoke tests
@@ -285,7 +284,7 @@ aws/rke2/bigbang test:
     ## Move this yum install to the dockerfile for the builder
     ## putting it here now for a quick way to install dig
     - yum install bind-utils -y
-    - chmod +x scripts/hosts.sh && ./scripts/hosts.sh
+    - ./scripts/hosts.sh
     - *test_bigbang
 
 # Uninstall BigBang on RKE2 cluster on AWS

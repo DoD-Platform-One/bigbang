@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -ex
 
 # Deploy flux and wait for it to be ready
