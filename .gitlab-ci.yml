@@ -268,11 +268,12 @@ package:
   stage: package
   image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
   rules:
-    # skip job for manual tag events
-    - if: $CI_COMMIT_TAG
-      when: never
-    # run job on commits to default branch
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # # skip job for manual tag events
+    # - if: $CI_COMMIT_TAG
+    #   when: never
+    # # run job on commits to default branch
+    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    when: never # TODO - Job should not run yet
   dependencies:
     - clean install
   before_script:
@@ -309,11 +310,12 @@ release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    # skip job for manual tag events
-    - if: $CI_COMMIT_TAG
-      when: never
-    # run job on commits to default branch
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # # skip job for manual tag events
+    # - if: $CI_COMMIT_TAG
+    #   when: never
+    # # run job on commits to default branch
+    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    when: never # TODO - Job should not run yet
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:
