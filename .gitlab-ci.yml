@@ -281,8 +281,8 @@ package:
     # # run job on commits to default branch
     # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - when: never # TODO - Job should not run yet
-  dependencies:
-    - clean install
+  # dependencies:
+  #   - clean install
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
