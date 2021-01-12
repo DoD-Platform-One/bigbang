@@ -196,8 +196,6 @@ aws/rke2/cluster up:
     - .rke2 up
   needs:
     - job: aws/network up
-  environment:
-    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Install BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang up:
@@ -215,8 +213,6 @@ aws/rke2/bigbang up:
     - kubectl apply -f ${CI_PROJECT_DIR}/.gitlab-ci/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
   script:
     - *deploy_bigbang
-  environment:
-      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
@@ -237,8 +233,6 @@ aws/rke2/bigbang test:
     - yum install bind-utils -y
     - ./scripts/hosts.sh
     - *test_bigbang
-  environment:
-      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Uninstall BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang down:
@@ -257,8 +251,6 @@ aws/rke2/bigbang down:
     - helm un -n bigbang bigbang
     # TODO: Smarter wait
     - sleep 180
-  environment:
-      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Destroy RKE2 cluster on AWS
 aws/rke2/cluster down:
@@ -267,11 +259,7 @@ aws/rke2/cluster down:
     - .infra cleanup
     - .rke2 down
   needs:
-    - job: aws/rke2/cluster up
-      artifacts: true
     - job: aws/rke2/bigbang down
-  environment:
-      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 #-----------------------------------------------------------------------------------------------------------------------
 
