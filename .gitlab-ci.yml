@@ -109,7 +109,6 @@ upgrade:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
-    - exit 1
     - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
