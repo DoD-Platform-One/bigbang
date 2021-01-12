@@ -205,8 +205,9 @@ aws/rke2/bigbang up:
   extends:
     - .infra create
     - .bigbang
-  dependencies:
-    - aws/rke2/cluster up
+  needs:
+    - job: aws/rke2/cluster up
+      artifacts: true
   before_script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
@@ -223,9 +224,10 @@ aws/rke2/bigbang test:
   extends:
     - .infra create
     - .bigbang
-  dependencies:
-    - aws/rke2/cluster up
-    - aws/rke2/bigbang up
+  needs:
+    - job: aws/rke2/cluster up
+      artifacts: true
+    - job: aws/rke2/bigbang up
   before_script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
@@ -244,9 +246,10 @@ aws/rke2/bigbang down:
   extends:
     - .infra cleanup
     - .bigbang
-  dependencies:
-    - aws/rke2/cluster up
-    - aws/rke2/bigbang test
+  needs:
+    - job: aws/rke2/cluster up
+      artifacts: true
+    - job: aws/rke2/bigbang test
   before_script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
@@ -263,9 +266,10 @@ aws/rke2/cluster down:
   extends:
     - .infra cleanup
     - .rke2 down
-  dependencies:
-    - aws/rke2/cluster up
-    - aws/rke2/bigbang down
+  needs:
+    - job: aws/rke2/cluster up
+      artifacts: true
+    - job: aws/rke2/bigbang down
   environment:
       name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
