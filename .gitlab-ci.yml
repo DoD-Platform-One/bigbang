@@ -7,6 +7,10 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     # run pipeline on commits to default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # skip pipeline for branches that start with "docs"
+    - if: '$CI_COMMIT_REF_NAME =~ /^docs/'
+      when: never
+
 
 # include templates
 include:
