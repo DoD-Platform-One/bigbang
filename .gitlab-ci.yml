@@ -78,21 +78,21 @@ pre vars:
 .test_bigbang: &test_bigbang
   - find ./tests -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
 
-clean install:
-  stage: smoke tests
-  extends:
-    - .k3d
-  variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
-  script:
-    - exit 0
-    - *deploy_bigbang
-    - *test_bigbang
-    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
-  artifacts:
-    paths:
-      - images.txt
-    expire_in: 7 days
+# clean install:
+#   stage: smoke tests
+#   extends:
+#     - .k3d
+#   variables:
+#     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
+#   script:
+#     - exit 0
+#     - *deploy_bigbang
+#     - *test_bigbang
+#     - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+#   artifacts:
+#     paths:
+#       - images.txt
+#     expire_in: 7 days
 
 upgrade:
   stage: smoke tests
@@ -215,7 +215,6 @@ aws/rke2/bigbang up:
     - *deploy_bigbang
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
