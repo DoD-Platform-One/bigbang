@@ -85,6 +85,7 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
+    - exit 0
     - *deploy_bigbang
     - *test_bigbang
     - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
@@ -105,10 +106,10 @@ upgrade:
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
+    - exit 0
     - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
@@ -135,8 +136,8 @@ upgrade:
       when: never
     # run job on merge requests when manually activated
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: manual
       allow_failure: false
+      when: manual
 
 # Abstract for jobs responsible for creating infrastructure
 .infra create:
@@ -195,6 +196,8 @@ aws/rke2/cluster up:
     - .rke2 up
   needs:
     - job: aws/network up
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Install BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang up:
@@ -211,6 +214,8 @@ aws/rke2/bigbang up:
     - kubectl apply -f ${CI_PROJECT_DIR}/.gitlab-ci/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
   script:
     - *deploy_bigbang
+  environment:
+      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
@@ -230,6 +235,8 @@ aws/rke2/bigbang test:
     - yum install bind-utils -y
     - ./scripts/hosts.sh
     - *test_bigbang
+  environment:
+      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Uninstall BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang down:
@@ -247,6 +254,8 @@ aws/rke2/bigbang down:
     - helm un -n bigbang bigbang
     # TODO: Smarter wait
     - sleep 180
+  environment:
+      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 # Destroy RKE2 cluster on AWS
 aws/rke2/cluster down:
@@ -257,6 +266,8 @@ aws/rke2/cluster down:
   dependencies:
     - aws/rke2/cluster up
     - aws/rke2/bigbang down
+  environment:
+      name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
 #-----------------------------------------------------------------------------------------------------------------------
 
