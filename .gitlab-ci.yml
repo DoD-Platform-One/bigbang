@@ -40,6 +40,7 @@ variables:
 commitlint:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  allow_failure: true
   script:
   - dnf module install -y nodejs
   - npm install --only=dev
