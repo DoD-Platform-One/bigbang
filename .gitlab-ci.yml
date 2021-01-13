@@ -282,40 +282,31 @@ package:
   stage: package
   image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
   rules:
-    # # skip job for manual tag events
-    # - if: $CI_COMMIT_TAG
+    # run job for manual tag events
+    - if: $CI_COMMIT_TAG
     #   when: never
     # # run job on commits to default branch
     # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - when: never # TODO - Job should not run yet
-  dependencies:
-    - clean install
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
     - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
   script:
     - cp ./scripts/package/synker.yaml ./synker.yaml
-
     # Populate images list in synker config
     # NOTE: This is stupid and hacky, use yq or something better to do this
     - cat images.txt | sed -e 's/^/    - /' >> synker.yaml
-
     - synker pull -b=1
-
     # Tar up synker as well?
     - cp /usr/local/bin/synker synker.yaml /var/lib/registry/
     - tar -C /var/lib/registry -czvf $IMAGE_PKG .
     - tar -czvf $IMAGE_PKG /var/lib/registry
-
     # Package dependent repos
     - ./scripts/package/gits.sh
     - tar -czf $REPOS_PKG repos/
-
     # Prep release
     - mkdir -p release
     - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
-
     # Publish packages to s3 release
     - aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
   after_script: []
@@ -324,12 +315,11 @@ release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
-    # # skip job for manual tag events
-    # - if: $CI_COMMIT_TAG
+    # run job for manual tag events
+    - if: $CI_COMMIT_TAG
     #   when: never
     # # run job on commits to default branch
     # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - when: never # TODO - Job should not run yet
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:
