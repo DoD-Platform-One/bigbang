@@ -64,7 +64,9 @@ This will download `husky` and `commitlint` to your local repo and modify your `
 
 #### Combining Multiple Commits
 
-If you have pushed commits that do not conform to the conventional-commit guide lines, you can combine all of the incorrectly formatted commit messages by using `git rebase`. A more expansive guide of how this is done can be found [here](https://www.w3docs.com/snippets/git/how-to-combine-multiple-commits-into-one-with-3-steps.html).
+If you have pushed commits that do not conform to the conventional-commit guide lines, you can combine all of the incorrectly formatted commit messages by using `git rebase`.
+
+A more expansive guide of how this is done can be found [here](https://www.w3docs.com/snippets/git/how-to-combine-multiple-commits-into-one-with-3-steps.html).
 
 Here is a quick tip to squash all commits for a branch named `test`:
 
