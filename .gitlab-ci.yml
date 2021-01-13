@@ -35,6 +35,15 @@ variables:
 # Pre Stage Jobs
 #
 
+commitlint:
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  stage: .pre
+  script:
+  - dnf module install -y nodejs
+  - npm install --only=dev
+  - git fetch --all
+  - ./scripts/commitlint.sh
+
 pre vars:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
@@ -101,9 +110,8 @@ clean install:
 
 upgrade:
   stage: smoke tests
-  needs:
-    - job: pre vars
-      artifacts: true  
+  dependencies:
+    - pre vars
   extends:
     - .k3d
   rules:

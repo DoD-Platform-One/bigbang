@@ -11,6 +11,7 @@ Table of Contents:
       - [Local Setup](#local-setup)
         - [Prereqs](#prereqs)
         - [Steps](#steps)
+      - [Combining Multiple Commits](#combining-multiple-commits)
   - [Iron Bank Images](#iron-bank-images)
   - [Local Kubernetes cluster](#local-kubernetes-cluster)
   - [Deploying Big Bang (Quick Start)](#deploying-big-bang-quick-start)
@@ -56,6 +57,10 @@ npm install --only=dev
 ```
 
 This will download `husky` and `commitlint` to your local repo and modify your `.git/hooks` to allow husky to run pre-commit hooks. Once installed it will enforce the usage of convential-commits.
+
+#### Combining Multiple Commits
+
+If you have pushed commits that do not conform to the conventional-commit guide lines, you can combine all of the incorrectly formatted commit messages by using `git rebase`. A more expansive guide of how this is done can be found [here](https://www.w3docs.com/snippets/git/how-to-combine-multiple-commits-into-one-with-3-steps.html).
 
 ## Iron Bank Images
 
