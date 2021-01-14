@@ -64,14 +64,8 @@ pre vars:
   - CURRENT_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
 
   # obtain next releae version
-  # TODO - This is where I need help
-  # Use semantic-release? Or something else?
   - git fetch && git checkout ${CI_COMMIT_REF_NAME}
-  - npx semantic-release --dryRun | grep -oP 'Published release \K.*? '
-
-
-  # - NEXT_VERSION=$(some command)
-  - NEXT_VERSION=$CURRENT_VERSION
+  - NEXT_VERSION=$(npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p')
 
   # obtain semver differences (subtract master version from mr verison)
   - VERSION_DIFF=$(./scripts/semver_diff.sh $NEXT_VERSION $CURRENT_VERSION)
