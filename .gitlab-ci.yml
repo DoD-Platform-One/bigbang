@@ -59,14 +59,16 @@ pre vars:
   - npm ci
   
   script:
-  
+
+  - git config --global user.name "${GITLAB_USER_NAME}"
+  - git config --global user.email "${GITLAB_USER_EMAIL}"
   - export GITLAB_TOKEN=$CI_JOB_TOKEN
 
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
   - CURRENT_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
 
-  # obtain next releae version
+  # obtain next release version
   - git fetch && git checkout ${CI_COMMIT_REF_NAME}
 
   - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d --no-ci
