@@ -1,0 +1,65 @@
+*                     @runyontr @joshwolf @megamind
+
+[Chart Values]
+chart/values.yaml
+chart/Chart.yaml
+
+[Docs Owners]
+docs/                 @michaelmcleroy @egoode
+
+[Kustomize Base Owners]
+base/                 @michaelmcleroy
+
+[CI Owners]
+.gitlab-ci/           @zdzielinksi @iahmad @toladipupo
+tests/                @zdzielinksi @iahmad @toladipupo
+
+[Hack Owners]
+scripts/              @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
+hack/                 @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
+
+[Istio and Authservice]
+chart/Chart.yaml                @kenna81 @kavitha @cmcgrath
+chart/values.yaml               @kenna81 @kavitha @cmcgrath
+chart/templates/authservice     @kenna81 @kavitha @cmcgrath
+chart/templates/istio           @kenna81 @kavitha @cmcgrath
+
+[Anchore]
+chart/Chart.yaml                @@micah.nagel @andre
+chart/values.yaml
+chart/templates/argocd
+
+[ArgoCD]
+chart/Chart.yaml                @matthew.kaiser
+chart/values.yaml               @matthew.kaiser
+chart/templates/argocd          @matthew.kaiser
+
+[Cluster Auditor]
+chart/Chart.yaml
+chart/values.yaml
+chart/templates/clusterauditor
+
+[Gatekeeper]
+chart/Chart.yaml
+chart/values.yaml
+chart/templates/gatekeeper
+
+[Logging]
+chart/Chart.yaml                @kavitha @ryan.j.garcia
+chart/values.yaml               @kavitha @ryan.j.garcia
+chart/templates/logging         @kavitha @ryan.j.garcia
+
+[Monitoring]
+chart/Chart.yaml                @lynnstill @ryan.j.garcia
+chart/values.yaml               @lynnstill @ryan.j.garcia
+chart/templates/monitoring      @lynnstill @ryan.j.garcia
+
+[Twistlock]
+chart/Chart.yaml                @thomas.burton
+chart/values.yaml               @thomas.burton
+chart/templates/twistlock       @thomas.burton
+
+[Gitlab]
+chart/Chart.yaml                @egoode @kevin.wilder
+chart/values.yaml               @egoode @kevin.wilder
+chart/templates/gitlab          @egoode @kevin.wilder
