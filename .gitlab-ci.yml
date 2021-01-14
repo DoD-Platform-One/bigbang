@@ -43,7 +43,7 @@ commitlint:
   allow_failure: true
   before_script:
   - dnf module install -y nodejs
-  - npm install
+  - npm ci
   script:
   - git fetch --all
   - ./scripts/commitlint.sh
@@ -56,7 +56,7 @@ pre vars:
       dotenv: variables.env
   before_script:
   - dnf module install -y nodejs
-  - npm install
+  - npm ci
   script:
 
   # obtain current release version
