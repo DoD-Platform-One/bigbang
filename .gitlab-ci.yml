@@ -57,6 +57,7 @@ pre vars:
   before_script:
   - dnf module install -y nodejs
   - npm ci
+  - git remote set-url origin $CI_REPOSITORY_URL
   script:
 
   # obtain current release version
