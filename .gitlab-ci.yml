@@ -55,6 +55,10 @@ pre vars:
       dotenv: variables.env
   script:
 
+  # install node packages
+  - dnf module install -y nodejs
+  - npm install --only=dev
+
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
   - CURRENT_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
@@ -63,6 +67,9 @@ pre vars:
   # TODO - This is where I need help
   # Use semantic-release? Or something else?
   - git fetch && git checkout ${CI_COMMIT_REF_NAME}
+  - npx semantic-release --dryRun | grep -oP 'Published release \K.*? '
+
+
   # - NEXT_VERSION=$(some command)
   - NEXT_VERSION=$CURRENT_VERSION
 
