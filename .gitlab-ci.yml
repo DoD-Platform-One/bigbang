@@ -41,9 +41,10 @@ commitlint:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   allow_failure: true
-  script:
+  before_script:
   - dnf module install -y nodejs
-  - npm install --only=dev
+  - npm install
+  script:
   - git fetch --all
   - ./scripts/commitlint.sh
 
@@ -53,11 +54,10 @@ pre vars:
   artifacts:
     reports:
       dotenv: variables.env
-  script:
-
-  # install node packages
+  before_script:
   - dnf module install -y nodejs
-  - npm install --only=dev
+  - npm install
+  script:
 
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
