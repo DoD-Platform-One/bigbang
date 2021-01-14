@@ -59,10 +59,8 @@ pre vars:
   - npm ci
   
   script:
-
-  - echo $CI_REPOSITORY_URL
-
-  - git remote set-url origin $CI_REPOSITORY_URL
+  
+  - export GITLAB_TOKEN=$CI_JOB_TOKEN
 
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
