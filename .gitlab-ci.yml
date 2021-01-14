@@ -62,7 +62,8 @@ pre vars:
 
   - git config --global user.name "${GITLAB_USER_NAME}"
   - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - export GITLAB_TOKEN=$CI_JOB_TOKEN
+  - export GITLAB_TOKEN="${CI_JOB_TOKEN}"
+  - git clone ${CI_REPOSITORY_URL} && cd umbrella
 
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
