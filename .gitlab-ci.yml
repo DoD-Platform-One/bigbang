@@ -66,7 +66,7 @@ pre vars:
   # obtain next releae version
   - git fetch && git checkout ${CI_COMMIT_REF_NAME}
 
-  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d
+  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d --no-ci
   - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p'
   
   - NEXT_VERSION=$(npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p')
