@@ -3,6 +3,12 @@ certs/
 
 .DS_Store
 
+.terraform
+*.pem
+*rke2.yaml
+
+*tfstate*
+
 # dependencies
 /node_modules
 
