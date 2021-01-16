@@ -3,4 +3,4 @@ variable "aws_region" {
 }
 
 variable "env" {}
-variable  "ci_pipeline_url" {}
+variable "ci_pipeline_url" {}

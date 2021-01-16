@@ -22,10 +22,10 @@ data "terraform_remote_state" "networking" {
 module "ci" {
   source = "../../main"
 
-  env     = var.env
-  ci_pipeline_url = var.ci_pipeline_url 
-  vpc_id  = data.terraform_remote_state.networking.outputs.vpc_id
-  subnets = data.terraform_remote_state.networking.outputs.intra_subnets
+  env             = var.env
+  ci_pipeline_url = var.ci_pipeline_url
+  vpc_id          = data.terraform_remote_state.networking.outputs.vpc_id
+  subnets         = data.terraform_remote_state.networking.outputs.intra_subnets
 
   download   = false
   server_ami = "ami-00aab2121681e4a31"
