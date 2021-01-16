@@ -29,7 +29,8 @@ locals {
   tags = {
     "terraform" = "true",
     "env"       = var.env,
-    "project"   = "umbrella"
+    "project"   = "umbrella",
+    "ci_pipeline_url"  = var.ci_pipeline_url
   }
 }
 

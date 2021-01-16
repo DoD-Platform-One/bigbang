@@ -29,3 +29,9 @@ variable "hub_tgwa" {
 variable "hub_tgw_rt" {
   default = "tgw-rtb-04b66987e7d96a3d4"
 }
+
+variable ci_pipeline_url {
+  type        = string
+  default     = "none"
+  description = "URL to the pipeline that created this resource"
+}

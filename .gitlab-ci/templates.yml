@@ -17,6 +17,7 @@ include:
   interruptible: false
   variables:
     TF_IN_AUTOMATION: "1"
+    TF_VAR_ci_pipeline_url: $CI_PIPELINE_URL
   before_script:
     - echo "$TF_VAR_env"
     - cd ${CI_PROJECT_DIR}/${TF_ROOT}
