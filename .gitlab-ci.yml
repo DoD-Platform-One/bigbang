@@ -72,7 +72,7 @@ pre vars:
   # store variables
   - echo "CHART_BREAKING_CHANGE=$CHART_BREAKING_CHANGE" >> variables.env
   # Create the TF_VAR_env variable
-  - echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)"
+  - echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
   - cat variables.env
 
 #-----------------------------------------------------------------------------------------------------------------------
