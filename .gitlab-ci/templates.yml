@@ -18,7 +18,6 @@ include:
   variables:
     TF_IN_AUTOMATION: "1"
   before_script:
-    # Shorten the env name down to 15 characters
     - echo "$TF_VAR_env"
     - cd ${CI_PROJECT_DIR}/${TF_ROOT}
     - terraform version

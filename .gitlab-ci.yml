@@ -209,6 +209,8 @@ aws/rke2/cluster up:
     - .rke2 up
   needs:
     - job: aws/network up
+    - job: pre vars
+      artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
@@ -281,6 +283,8 @@ aws/rke2/cluster down:
     - .rke2 down
   needs:
     - job: aws/rke2/bigbang down
+    - job: pre vars
+      artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
 
