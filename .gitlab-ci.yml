@@ -51,47 +51,34 @@ commitlint:
 pre vars:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  variables:
+    GITLAB_TOKEN: $CI_JOB_TOKEN
   artifacts:
     reports:
       dotenv: variables.env
   before_script:
   - dnf module install -y nodejs
   - npm ci
-  
   script:
-
-  - git config --global user.name "${GITLAB_USER_NAME}"
-  - git config --global user.email "${GITLAB_USER_EMAIL}"
-  - export GITLAB_TOKEN="${CI_JOB_TOKEN}"
-  - git clone ${CI_REPOSITORY_URL} && cd umbrella
-
+  # obtain next release version
+  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d --no-ci
+  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p'
+  - NEXT_VERSION=$(npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p')
   # obtain current release version
   - git fetch && git checkout ${CI_DEFAULT_BRANCH}
   - CURRENT_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
-
-  # obtain next release version
-  - git fetch && git checkout ${CI_COMMIT_REF_NAME}
-
-  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d --no-ci
-  - npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p'
-  
-  - NEXT_VERSION=$(npx semantic-release -b ${CI_COMMIT_REF_NAME} -d | sed -n 's/^.*Published release \(.*\) on.*$/\1/p')
-
   # obtain semver differences (subtract master version from mr verison)
   - VERSION_DIFF=$(./scripts/semver_diff.sh $NEXT_VERSION $CURRENT_VERSION)
   - IFS=. DIFF_ARR=(${VERSION_DIFF##*-})
-
   # detect breaking change (first two version sections in semver diff)
   - CHART_BREAKING_CHANGE="false"
   - if (( ${DIFF_ARR[0]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi
   - if (( ${DIFF_ARR[1]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi  
-  
   # store variables
   - echo "CURRENT_VERSION=$CURRENT_VERSION" >> variables.env
   - echo "NEXT_VERSION=$NEXT_VERSION" >> variables.env
   - echo "VERSION_DIFF=$VERSION_DIFF" >> variables.env
   - echo "CHART_BREAKING_CHANGE=$CHART_BREAKING_CHANGE" >> variables.env  
-
   # echo variables
   - cat variables.env
 
