@@ -25,4 +25,8 @@ echo "Local version: $local_version"
 # error if the versions are not different
 if [[ "$default_version" == "$local_version" ]]; then
   echo "The version has not been updated in ${CHART_FILE}, please update this file"
+  exit 1
 fi
+
+# default to success
+exit 0
