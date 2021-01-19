@@ -152,5 +152,5 @@ addons:
     git:
       repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice.git
       path: "./chart"
-      tag: "0.1.4-bb.0"
+      tag: "0.1.6-bb.0"
     values: {}
