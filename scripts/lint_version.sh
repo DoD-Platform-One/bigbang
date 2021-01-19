@@ -5,7 +5,7 @@ default_version=$(git show ${CI_DEFAULT_BRANCH}:${CHART_FILE} | ggrep -oP 'versi
 
 # check for command error
 if [ $? -ne 0 ]; then
-  echo "Error: An unknown error has occurred when attempting to retrieve the default version"
+  echo "Error: An unknown error has occurred when attempting to retrieve the default version from ${CHART_FILE}"
   exit 1
 fi
 
@@ -14,7 +14,7 @@ local_version=$(cat ${CHART_FILE} | ggrep -oP 'version: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
-  echo "Error: An unknown error has occurred when attempting to retrieve the local version"
+  echo "Error: An unknown error has occurred when attempting to retrieve the local version from ${CHART_FILE}"
   exit 1
 fi
 
