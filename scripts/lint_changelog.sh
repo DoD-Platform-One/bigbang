@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # diff the file silently, while still printing errors
-git diff --exit-code ${CI_DEFAULT_BRANCH}:${CHANGELOG_FILE} ${CHANGELOG_FILE} >/dev/null
+git diff --exit-code origin/${CI_DEFAULT_BRANCH}:${CHANGELOG_FILE} ${CHANGELOG_FILE} >/dev/null
 
 # exit code of 0 indicates non changed file
 if [ $? -eq 0 ]; then
