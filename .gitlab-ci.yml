@@ -37,15 +37,30 @@ variables:
 # Pre Stage Jobs
 #
 
+changelog:
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  stage: .pre
+  allow_failure: true
+  variables:
+    CHANGELOG_FILE: CHANGELOG.md
+  script:
+  - ./scripts/lint_changelog.sh
+
+version:
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  stage: .pre
+  allow_failure: true
+  variables:
+    CHART_FILE: chart/Chart.yaml
+  script:
+  - ./scripts/lint_version.sh
+
 commitlint:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   allow_failure: true
   script:
-  - dnf module install -y nodejs
-  - npm install --only=dev
-  - git fetch --all
-  - ./scripts/commitlint.sh
+  - ./scripts/lint_version.sh
 
 pre vars:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
