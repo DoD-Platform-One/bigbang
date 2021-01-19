@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # obtain the default version
-default_version=$(git show ${CI_DEFAULT_BRANCH}:${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+default_version=$(git show ${CI_DEFAULT_BRANCH}:${CHART_FILE} | grep -oP 'version: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
@@ -10,7 +10,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # obtain the local version
-local_version=$(cat ${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+local_version=$(cat ${CHART_FILE} | grep -oP 'version: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
