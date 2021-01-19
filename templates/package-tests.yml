@@ -9,7 +9,7 @@ configuration validation:
     - public
     - privileged
 
-  image: 
+  image:
     name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
   variables:
     PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
@@ -18,7 +18,6 @@ configuration validation:
 
   before_script:
     - git clone ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
-
   script:
     # Place configuration validation tests here
     - echo "Directory structure of repository:"
@@ -43,7 +42,7 @@ package tests:
     - public
     - privileged
 
-  image: 
+  image:
     name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
   services:
     - registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
@@ -51,7 +50,7 @@ package tests:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
-  
+
   artifacts:
     when: always
     paths:
@@ -68,24 +67,30 @@ package tests:
     - k3d cluster create ${CI_PROJECT_NAME} --servers 1 --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-
-    # Need namespace and secret for registry1 images
-    - kubectl create namespace ${CI_PROJECT_NAME}
-    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-    # Remove once everything is moved to dso.mil
-    - kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-
-    # Need additional namespace and secret for registry1 images
+    
+    # Setup pull secrets for project
     - |
-       if [ ! -z "${PROJECT_NAME}" ]; then
-         kubectl create ns ${PROJECT_NAME}
-         echo "additional name space created"
-         kubectl create -n ${PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-         # Remove once everything is moved to dso.mil
-         kubectl create -n ${PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-       fi
+      if [ ! -z ${PROJECT_NAME} ]; then
+        CI_PROJECT_NAME=${PROJECT_NAME}
+      fi
+      kubectl create namespace ${CI_PROJECT_NAME}
+      kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
 
-    # Check for istio in package name if not there install istio
+    # Setup dependency repo pull secrets if needed
+    - |
+      if [ ! -z ${DEPENDENCY_REPO} ]; then
+        if [ ! -z ${ADD_DEPENDENCY_NAMESPACE} ]; then
+          CI_PROJECT_DEPENDENCY_NAME=${ADD_DEPENDENCY_NAMESPACE}
+        else
+          CI_PROJECT_DEPENDENCY_NAME=${CI_PROJECT_NAME}-dependency
+        fi
+        kubectl create namespace ${CI_PROJECT_DEPENDENCY_NAME}
+        kubectl create -n ${CI_PROJECT_DEPENDENCY_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+        kubectl create -n ${CI_PROJECT_DEPENDENCY_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+      fi
+
+    # Check for istio in project name and install it if needed
     - |
       if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
         istioctl install -y
@@ -108,19 +113,16 @@ package tests:
           git clone ${DEPENDENCY_REPO} dependency-repo
         fi
         helm dependency update dependency-repo/chart
-        kubectl create namespace ${CI_PROJECT_NAME}-dependency
-        kubectl create -n ${CI_PROJECT_NAME}-dependency secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-        # Remove once everything is moved to dso.mil
-        kubectl create -n ${CI_PROJECT_NAME}-dependency secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-        if [ -f dependency-repo/tests/test-values.yml ]; then
-          helm install --wait --timeout 600s ${CI_PROJECT_NAME}-dependency dependency-repo/chart -n ${CI_PROJECT_NAME}-dependency --create-namespace -f dependency-repo/tests/test-values.yml
+        if [ -f dependency-repo/tests/test-values.yml ] ; then 
+          helm install ${CI_PROJECT_DEPENDENCY_NAME} dependency-repo/chart -n ${CI_PROJECT_DEPENDENCY_NAME}  -f dependency-repo/tests/test-values.yml;
         else
-          helm install --wait --timeout 600s ${CI_PROJECT_NAME}-dependency dependency-repo/chart -n ${CI_PROJECT_NAME}-dependency --create-namespace
+          helm install --wait --timeout 600s ${CI_PROJECT_DEPENDENCY_NAME} dependency-repo/chart -n ${CI_PROJECT_DEPENDENCY_NAME}
         fi
+       sleep 10
       fi
 
-    # Wait for Running state
-    - kubectl wait --for=condition=established --timeout 600s -A crd --all > /dev/null
+    # Wait for resources to be created and come alive
+    - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
@@ -137,23 +139,33 @@ package tests:
 
     # Check for test values file
     - |
-      if [ -f "tests/test-values.yml" ]; then 
-        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace -f tests/test-values.yml
+      if [ -f "tests/test-values.yml" ]  ; then
+        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
       else 
-        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} --create-namespace
+        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
       fi
+
+    # Wait for resources to be created and come alive
     - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+
     - echo "Package tests"
+    - |
+      if [ $CI_PROJECT_NAME == "istio-system" ]; then
+        echo "certs required for gateway is created"
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
+        sleep 30
+      fi
 
     # If istio-ingressgateway has a loadBalancer IP and ${CI_PROJECT_NAME} namespace has a virtualService hostname add value to /etc/hosts
     - |
-      if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
-        echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -n ${CI_PROJECT_NAME} -o jsonpath='{.items[*].spec.hosts[0]}')" >> /etc/hosts
+      if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -A -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
+        echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -A -o jsonpath='{.items[*].spec.hosts[0]}')" >> /etc/hosts
       fi
 
-    # Cypress Tests
+    # Run Cypress tests
     - |
       if [ -f "tests/cypress.json" ]; then
         cd tests && cypress run
