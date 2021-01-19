@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# obtain the default version
+default_version=$(git show ${CI_DEFAULT_BRANCH}:${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+
+# check for command error
+if [ $? -ne 0 ]; then
+  echo "Error: An unknown error has occurred when attempting to retrieve the default version"
+  exit 1
+fi
+
+# obtain the local version
+local_version=$(cat ${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+
+# check for command error
+if [ $? -ne 0 ]; then
+  echo "Error: An unknown error has occurred when attempting to retrieve the local version"
+  exit 1
+fi
+
+# debug print
+echo "Default version: $default_version"
+echo "Local version: $local_version"
+
+# error if the versions are not different
+if [[ "$default_version" == "$local_version" ]]; then
+  echo "The version has not been updated in ${CHART_FILE}, please update this file"
+fi
