@@ -44,6 +44,7 @@ changelog:
   variables:
     CHANGELOG_FILE: CHANGELOG.md
   script:
+  - git fetch --all
   - ./scripts/lint_changelog.sh
 
 version:
@@ -53,6 +54,7 @@ version:
   variables:
     CHART_FILE: chart/Chart.yaml
   script:
+  - git fetch --all
   - ./scripts/lint_version.sh
 
 commits:
