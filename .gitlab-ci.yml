@@ -55,7 +55,7 @@ version:
   script:
   - ./scripts/lint_version.sh
 
-commitlint:
+commits:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   allow_failure: true
@@ -63,7 +63,7 @@ commitlint:
   - dnf module install -y nodejs
   - npm install --only=dev
   - git fetch --all
-  - ./scripts/commitlint.sh
+  - ./scripts/lint_commits.sh
 
 pre vars:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
