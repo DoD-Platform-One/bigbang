@@ -100,10 +100,12 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
-    - ./scripts/k3d_list_images.sh > images.txt
+    - ./scripts/k3d_list_images.sh > images-initial.txt
     - *deploy_bigbang
     - *test_bigbang
-    - ./scripts/k3d_list_images.sh > images.txt
+    - ./scripts/k3d_list_images.sh > images-all.txt
+    - grep -v -F -f images-initial.txt images-all.txt | sort > images.txt
+    - cat images.txt
   artifacts:
     paths:
       - images.txt
