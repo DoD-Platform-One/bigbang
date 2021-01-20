@@ -100,9 +100,10 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
+    - ./scripts/k3d_list_images.sh > images.txt
     - *deploy_bigbang
     - *test_bigbang
-    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+    - ./scripts/k3d_list_images.sh > images.txt
   artifacts:
     paths:
       - images.txt
