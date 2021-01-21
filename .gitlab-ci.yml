@@ -124,7 +124,7 @@ upgrade:
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
-    - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
+    - if $CHART_BREAKING_CHANGE; then exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
     - *deploy_bigbang
@@ -328,7 +328,6 @@ package:
     - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
     # Publish packages to s3 release
     - aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CHART_MR_VERSION}
-  after_script: []
 
 release:
   stage: release
