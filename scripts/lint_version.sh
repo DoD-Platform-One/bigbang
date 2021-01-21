@@ -51,8 +51,8 @@ fi
 
 echo "--------------------------------------------------------"
 
-echo "Default branch base git repository version (${BASEGIT_FILE}): $basegit_default_tag"
-echo "Local branch base git repository version (${BASEGIT_FILE}): $basegit_local_tag"
+echo "Default branch base git repository tag (${BASEGIT_FILE}): $basegit_default_tag"
+echo "Local branch base git repository tag (${BASEGIT_FILE}): $basegit_local_tag"
 
 # error if the versions are not different
 if [[ "$chart_default_version" == "$chart_local_version" ]]; then
