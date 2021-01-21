@@ -53,6 +53,7 @@ version:
   allow_failure: true
   variables:
     CHART_FILE: chart/Chart.yaml
+    BASEGIT_FILE: base/gitrepository.yaml
   script:
   - git fetch --all
   - ./scripts/lint_version.sh
