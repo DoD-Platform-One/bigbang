@@ -55,6 +55,7 @@ package tests:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
     YAML_PARSE_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/yml-parse/parse_yaml.sh"
+    WAIT_STS_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/wait-sts/wait_sts.sh"
 
   artifacts:
     when: always
@@ -84,6 +85,8 @@ package tests:
 
     # Clone pipeline repo for yaml parsing
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${YAML_PARSE_PATH}
+    - source ${WAIT_STS_PATH}
 
     # Check for istio in project name and install it if needed
     - |
@@ -102,7 +105,6 @@ package tests:
     # Check for dependency repos, set up pull secrets, helm dep update, secret, and helm install with test-values if present default if not
     - |
       if [ -f "tests/dependencies.yaml" ]; then
-        source ${YAML_PARSE_PATH}
         eval $(parse_yaml tests/dependencies.yaml "dependencies_")
         for git_repo in $(compgen -A variable | grep -w "dependencies_.*_git"); do
           
@@ -134,12 +136,13 @@ package tests:
           else
             helm install --wait --timeout 600s ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}
           fi
-          sleep 10
         done
       fi
 
     # Wait for resources to be created and come alive
+    - sleep 10
     - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+    - wait_sts
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
@@ -163,7 +166,9 @@ package tests:
       fi
 
     # Wait for resources to be created and come alive
+    - sleep 10
     - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+    - wait_sts
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
