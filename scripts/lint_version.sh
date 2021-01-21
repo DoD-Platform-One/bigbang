@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # obtain the default chart version
-chart_default_version=$(git show origin/${CI_DEFAULT_BRANCH}:${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+chart_default_version=$(git show origin/${CI_DEFAULT_BRANCH}:${CHART_FILE} | grep -oP 'version: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
@@ -10,7 +10,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # obtain the local chart version
-chart_local_version=$(cat ${CHART_FILE} | ggrep -oP 'version: \K(.*)')
+chart_local_version=$(cat ${CHART_FILE} | grep -oP 'version: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
@@ -19,7 +19,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # obtain the default base git repository tag
-basegit_default_tag=$(git show origin/${CI_DEFAULT_BRANCH}:${BASEGIT_FILE} | ggrep -oP 'tag: \K(.*)')
+basegit_default_tag=$(git show origin/${CI_DEFAULT_BRANCH}:${BASEGIT_FILE} | grep -oP 'tag: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # obtain the local base git repository tag
-basegit_local_tag=$(cat ${BASEGIT_FILE} | ggrep -oP 'tag: \K(.*)')
+basegit_local_tag=$(cat ${BASEGIT_FILE} | grep -oP 'tag: \K(.*)')
 
 # check for command error
 if [ $? -ne 0 ]; then
