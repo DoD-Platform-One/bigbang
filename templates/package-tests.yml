@@ -2,6 +2,11 @@ stages:
   - configuration validation
   - package tests
 
+variables:
+  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO_DESTINATION: "../pipeline-repo"
+  PIPELINE_REPO_BRANCH: master
+
 configuration validation:
   stage: configuration validation
   tags:
@@ -11,13 +16,12 @@ configuration validation:
 
   image:
     name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
+
   variables:
-    PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
-    PIPELINE_REPO_DESTINATION: "../pipeline-repo"
     GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
 
   before_script:
-    - git clone ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
   script:
     # Place configuration validation tests here
     - echo "Directory structure of repository:"
@@ -50,6 +54,7 @@ package tests:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    YAML_PARSE_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/yml-parse/parse_yaml.sh"
 
   artifacts:
     when: always
@@ -77,18 +82,8 @@ package tests:
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
 
-    # Setup dependency repo pull secrets if needed
-    - |
-      if [ ! -z ${DEPENDENCY_REPO} ]; then
-        if [ ! -z ${ADD_DEPENDENCY_NAMESPACE} ]; then
-          CI_PROJECT_DEPENDENCY_NAME=${ADD_DEPENDENCY_NAMESPACE}
-        else
-          CI_PROJECT_DEPENDENCY_NAME=${CI_PROJECT_NAME}-dependency
-        fi
-        kubectl create namespace ${CI_PROJECT_DEPENDENCY_NAME}
-        kubectl create -n ${CI_PROJECT_DEPENDENCY_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-        kubectl create -n ${CI_PROJECT_DEPENDENCY_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-      fi
+    # Clone pipeline repo for yaml parsing
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
 
     # Check for istio in project name and install it if needed
     - |
@@ -104,21 +99,43 @@ package tests:
         kubectl apply -f tests/main-test-gateway.yaml 
       fi
 
-    # Check for dependency repo, create namespace, helm dep update, secret, and helm install with test-values if present default if not
+    # Check for dependency repos, set up pull secrets, helm dep update, secret, and helm install with test-values if present default if not
     - |
-      if [ ! -z ${DEPENDENCY_REPO} ]; then
-        if [ ! -z ${DEPENDENCY_REPO_BRANCH} ]; then
-          git clone -b ${DEPENDENCY_REPO_BRANCH} ${DEPENDENCY_REPO} dependency-repo
-        else
-          git clone ${DEPENDENCY_REPO} dependency-repo
-        fi
-        helm dependency update dependency-repo/chart
-        if [ -f dependency-repo/tests/test-values.yml ] ; then 
-          helm install ${CI_PROJECT_DEPENDENCY_NAME} dependency-repo/chart -n ${CI_PROJECT_DEPENDENCY_NAME}  -f dependency-repo/tests/test-values.yml;
-        else
-          helm install --wait --timeout 600s ${CI_PROJECT_DEPENDENCY_NAME} dependency-repo/chart -n ${CI_PROJECT_DEPENDENCY_NAME}
-        fi
-       sleep 10
+      if [ -f "tests/dependencies.yaml" ]; then
+        source ${YAML_PARSE_PATH}
+        eval $(parse_yaml tests/dependencies.yaml "dependencies_")
+        for git_repo in $(compgen -A variable | grep -w "dependencies_.*_git"); do
+          
+          dep_prefix=${git_repo%_*}
+          dep_namespace_var=${dep_prefix}_namespace
+          dep_namespace=$(printf '%s\n' "${!dep_namespace_var}")
+          if [ -z ${dep_namespace} ]; then
+            dep_namespace=$(echo "$dep_prefix" | sed -e "s/^dependencies_//")
+          fi
+          dep_branch_var=${dep_prefix}_branch
+          dep_branch=$(printf '%s\n' "${!dep_branch_var}")
+          dep_repo=$(printf '%s\n' "${!git_repo}")
+          dep_repo_folder=${dep_namespace}-repo
+
+          echo "Installing dependency: ${dep_namespace}"
+          kubectl create namespace ${dep_namespace}
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+
+          if [ ! -z ${dep_branch} ]; then
+            git clone -b ${dep_branch} ${dep_repo} ${dep_repo_folder}
+          else
+            git clone ${dep_repo} ${dep_repo_folder}
+          fi
+
+          helm dependency update ${dep_repo_folder}/chart
+          if [ -f ${dep_repo_folder}/tests/test-values.yml ] ; then 
+            helm install ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}  -f ${dep_repo_folder}/tests/test-values.yml
+          else
+            helm install --wait --timeout 600s ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}
+          fi
+          sleep 10
+        done
       fi
 
     # Wait for resources to be created and come alive
