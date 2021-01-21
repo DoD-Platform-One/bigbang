@@ -158,10 +158,8 @@ package tests:
     - |
       if [ -f "tests/test-values.yml" ]  ; then
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
-        sleep 10
       else 
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
-        sleep 10
       fi
 
     # Wait for resources to be created and come alive
