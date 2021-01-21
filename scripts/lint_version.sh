@@ -37,8 +37,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # debug print
-echo "Default chart version: $chart_default_version"
-echo "Local chart version: $chart_local_version"
+echo "Default branch chart version (${CHART_FILE}): $chart_default_version"
+echo "Local branch chart version (${CHART_FILE}): $chart_local_version"
 
 # assume success
 exit_code=0
@@ -49,14 +49,14 @@ if [[ "$chart_default_version" == "$chart_local_version" ]]; then
   exit_code=1
 fi
 
-echo "--"
+echo "--------------------------------------------------------"
 
-echo "Default base git repository version: $basegit_default_tag"
-echo "Local base git repository version: $basegit_local_tag"
+echo "Default branch base git repository version (${BASEGIT_FILE}): $basegit_default_tag"
+echo "Local branch base git repository version (${BASEGIT_FILE}): $basegit_local_tag"
 
 # error if the versions are not different
 if [[ "$chart_default_version" == "$chart_local_version" ]]; then
-  echo "The tag has not been updated in ${CHART_FILE}, please update this file"
+  echo "The tag has not been updated in ${BASEGIT_FILE}, please update this file"
   exit_code=1
 fi
 
