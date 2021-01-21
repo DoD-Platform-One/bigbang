@@ -1,11 +1,11 @@
-{{- if and .Values.istio.enabled .Values.addons.authservice.enabled }}
+{{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled .Values.istio.sso.enabled ) }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: authservice
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: istio-system
+  targetNamespace: authservice
   chart:
     spec:
       chart: {{ .Values.addons.authservice.git.path }}
@@ -39,9 +39,45 @@ spec:
   values:
     imagePullSecrets:
       - name: private-registry
-
-    filterLabel: keycloak
-
+    global:
+      oidc:
+        host: {{ .Values.sso.oidc.host }}
+        realm: {{ .Values.sso.oidc.realm }}
+      {{- if .Values.sso.jwks }}
+      jwks: "{{ .Values.sso.jwks }}"
+      {{- end }}
+{{- if .Values.sso.client_id}}
+      client_id: {{ .Values.sso.client_id }}
+{{- end }}
+{{- if .Values.sso.client_secret }}
+      client_secret: {{ .Values.sso.client_secret }}
+{{- end }}
+      certificate_authority: {{ .Values.sso.certificate_authority }}
+    chains:
+      kiali:
+        match:
+          header: ":authority"
+          prefix: "kiali"
+        client_id: {{ .Values.istio.sso.kiali.client_id }}
+        callback_uri: https://kiali.{{ .Values.hostname }}/login
+      jaeger:
+        match:
+          header: ":authority"
+          prefix: "tracing"
+        client_id: "{{ .Values.istio.sso.jaeger.client_id }}"
+        callback_uri: https://tracing.{{ .Values.hostname }}/login
+      prometheus:
+        match:
+          header: ":authority"
+          prefix: "prometheus"
+        client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
+        callback_uri: https://prometheus.{{ .Values.hostname }}/login/generic_oauth
+      alertmanager:
+        match:
+          header: ":authority"
+          prefix: "alertmanager"
+        client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
+        callback_uri: https://alertmanager.{{ .Values.hostname }}/login/generic_oauth
   dependsOn:
   - name: istio
     namespace: {{ .Release.Namespace }}

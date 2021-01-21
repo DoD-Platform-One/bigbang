@@ -41,6 +41,8 @@ spec:
     hostname: {{ .Values.hostname }}
     istio:
       enabled: {{ .Values.istio.enabled }}
+    sso:
+      enabled: {{ .Values.monitoring.sso.enabled }}
     global:
       imagePullSecrets:
         - name: private-registry
@@ -55,6 +57,18 @@ spec:
     kube-state-metrics:
       imagePullSecrets:
       - name: private-registry
+
+{{- if .Values.monitoring.sso.enabled }}
+    ingress:
+      prometheus:
+        service: authservice-haproxy-sso
+        port: 8080
+        namespace: authservice
+      alertmanager:
+        service: authservice-haproxy-sso
+        port: 8080
+        namespace: authservice
+{{- end }}
 
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}

@@ -38,9 +38,23 @@ spec:
       valuesKey: "istio.yaml"
   values:
     hostname: {{ .Values.hostname }}
+    sso:
+      enabled: {{ .Values.istio.sso.enabled }}
 
     imagePullSecrets:
       - private-registry
+
+{{- if .Values.istio.sso.enabled }}
+    ingress:
+      kiali:
+        service: authservice-haproxy-sso
+        port: 8080
+        namespace: authservice
+      jaeger:
+        service: authservice-haproxy-sso
+        port: 8080
+        namespace: authservice
+{{- end }}
 
   dependsOn:
     - name: istio-operator

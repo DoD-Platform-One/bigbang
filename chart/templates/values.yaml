@@ -11,8 +11,22 @@ stringData:
 {{ toYaml .Values.addons.argocd.values | indent 4 }}
   istiooperator.yaml: |
 {{ toYaml .Values.istiooperator.values | indent 4  }}
-  authservice.yaml: |
+  authservice.yaml: | 
+    chains:
+    {{- if .Values.addons.authservice.chains }}
+      {{ .Values.addons.authservice.chains | toYaml | nindent 6 }}
+    {{- end }}
+      kiali:
+        client_secret: "{{ .Values.istio.sso.kiali.client_secret }}"
+      jaeger:
+        client_secret: "{{ .Values.istio.sso.jaeger.client_secret }}"
+      prometheus:
+        client_secret: "{{ .Values.monitoring.sso.prometheus.client_secret }}"
+      alertmanager:
+        client_secret: "{{ .Values.monitoring.sso.alertmanager.client_secret }}"
+{{ if .Values.addons.authservice.values }}
 {{ toYaml .Values.addons.authservice.values | indent 4 }}
+{{- end }}
   istio.yaml: |
 {{ toYaml .Values.istio.values | indent 4  }}
   gatekeeper.yaml: |
@@ -24,7 +38,11 @@ stringData:
   logging.yaml: |
 {{ toYaml .Values.logging.values | indent 4 }}
   monitoring.yaml: |
+    grafana_client_id: {{ .Values.monitoring.sso.grafana.client_id | quote }}
+    grafana_client_secret: {{ .Values.monitoring.sso.grafana.client_secret | quote }}
+{{ if .Values.monitoring.values }}
 {{ toYaml .Values.monitoring.values | indent 4 }}
+{{- end }}
   twistlock.yaml: |
 {{ toYaml .Values.twistlock.values | indent 4 }} 
   clusterauditor.yaml: |
