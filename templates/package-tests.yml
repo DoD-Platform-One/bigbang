@@ -158,10 +158,11 @@ package tests:
     - |
       if [ -f "tests/test-values.yml" ]  ; then
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
+        sleep 10
       else 
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
+        sleep 10
       fi
-      sleep 10
 
     # Wait for resources to be created and come alive
     - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
