@@ -110,19 +110,30 @@ include:
     file: '/templates/package-tests.yml'
 ```
 
-If the package has an operator dependency (i.e. elasticsearch-kibana must have the eck-operator deployed first), add 
-additional lines to specify the repo for the dependency. The ${DEPENDENCY_REPO_BRANCH} variable is optional, if not 
-specified the default main/master branch will be used.
+If the package has any dependencies that must be installed first (i.e. an operator) you will need to create a file 
+in the package repo - `tests/dependencies.yaml` - with the following contents (note optional values):
 
-```bash
-variables:
-  DEPENDENCY_REPO: "https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git"
-  DEPENDENCY_REPO_BRANCH: master
+- dependencyname: The top level for each dependency, a simple string, no hypens (use camelcase if multiple words)
+- git: This should be the direct link to clone the dependency repo, in quotes
+- branch: Optional, pass in a branch to clone the dependency from
+- namespace: Optional, pass in a namespace to install the dependency under (useful if the dependency needs to be 
+installed under a specific name). This defaults to $dependencyname if not provided
+
+Structure these values in your yaml file as follows (must use 2 spaces to structure):
+
+```yaml
+dependencyname:
+  git: "Git Repo Clone URL"
+  branch: "main"
+  namespace: "example"
+# Example
+opa:
+  git: "https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git"
+  namespace: "gatekeeper-system"
+  branch: "main"
 ```
 
 ### Using the CI pipline infrastrcuture to test packages locally
 
 This repo also contains the infrastructure and scripts needed to execute the above described stages in a local environment.
 This infrastructure is located in the "local-dev" directory of this repository and documented in the README.md file located there.
-
-
