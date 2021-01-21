@@ -1,0 +1,96 @@
+Thank you for supporting PlatformOne! 
+
+{{ if $.Values.addons.gitlab.enabled }}
+Gitlab is enabled.
+Please follow the Gitlab online documentation for proper configuration. 
+Here is an example of how to configure external perstistent storage for postgres DB and object storage.
+
+addons:
+  gitlab:
+    enabled: true
+    values:
+      postgresql:
+        install: false
+      global:
+        minio:
+          enabled: false
+        psql:
+          host: postgres-postgresql-headless.postgres.svc.cluster.local
+          port: 5432
+          username: postgres
+          database: postgres
+          password:
+            secret: db-credentials
+            key: PGPASSWORD
+        registry:
+          bucket: gitlab-registry-storage
+        appConfig:
+          lfs:
+            bucket: gitlab-lfs
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          artifacts:
+            bucket: gitlab-artifacts
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          uploads:
+            bucket: gitlab-uploads
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          packages:
+            bucket: gitlab-packages
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          externalDiffs:
+            bucket: gitlab-mr-diffs
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          terraformState:
+            enabled: false
+            bucket: gitlab-terraform-state
+            connection:
+              secret: gitlab-object-storage
+              key: rails
+          backups:
+            bucket: gitlab-backup
+            tmpBucket: gitlab-backup-tmp
+      gitlab:
+        task-runner:
+          psql:
+            host: postgres-postgresql-headless.postgres.svc.cluster.local
+            port: 5432
+            username: postgres
+            database: postgres
+            password:
+              secret: db-credentials
+              key: PGPASSWORD
+          backups:
+            objectStorage:
+              config:
+                secret: gitlab-object-storage
+                key: backups
+      registry:
+        storage:
+          secret: gitlab-object-storage
+          key: registry
+
+
+{{- if $.Values.addons.gitlab.values.postgresql.install }}
+PLATFORM ONE GITLAB WARNING:
+  You have enabled an internal postgres database in the values configuration.
+  PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
+  This option should only be used for development or CI pipelines.
+{{- end -}}
+
+{{- if $.Values.addons.gitlab.values.global.minio.enabled }}
+PLATFORM ONE GITLAB WARNING: 
+  You have enabled a MinIO internal service in the values configuration.
+  PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- end }}

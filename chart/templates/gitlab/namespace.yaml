@@ -1,15 +1,17 @@
-{{- if .Values.twistlock.enabled }}
+{{- if .Values.addons.gitlab.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: twistlock
+  labels:
+    app: gitlab
+  name: gitlab
 ---
 {{- if ( include "imagePullSecret" . ) }}
 apiVersion: v1
 kind: Secret
 metadata:
   name: private-registry
-  namespace: twistlock
+  namespace: gitlab
 type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}

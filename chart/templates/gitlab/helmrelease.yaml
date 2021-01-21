@@ -1,0 +1,136 @@
+{{- if .Values.addons.gitlab.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: gitlab
+  namespace: {{ .Release.Namespace }}
+spec:
+  releaseName: gitlab
+  targetNamespace: gitlab
+  chart:
+    spec:
+      chart: {{ .Values.addons.gitlab.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: gitlab
+        namespace: {{ .Release.Namespace }}
+
+{{- with .Values.flux }}
+  interval: {{ .interval }}
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: {{ .install.retries }}
+  upgrade:
+    remediation:
+      retries: {{ .upgrade.retries }}
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: {{ .rollback.timeout }}
+    cleanupOnFail: {{ .rollback.cleanupOnFail }}
+  {{- end }}
+
+  valuesFrom:
+    - name: values
+      kind: Secret
+      valuesKey: "gitlab.yaml"
+
+  values:
+    hostname: {{ .Values.hostname }}
+    istio:
+      enabled: {{ .Values.istio.enabled }}
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
+{{- if ( include "imagePullSecret" . ) }}
+    ## values for image pull secrets
+    redis:
+      metrics:
+        image:
+          pullSecrets: 
+          - private-registry
+      image:
+        pullSecrets: 
+        - private-registry
+    registry:
+      image:
+        pullSecrets:
+        - name: private-registry
+    shared-secrets:
+      selfsign:
+        image:
+          pullSecrets:
+          - name: private-registry
+    gitlab:
+      task-runner:
+        image:
+          pullSecrets:
+          - name: private-registry
+      migrations:
+        image:
+          pullSecrets:
+          - name: private-registry
+      webservice:
+        image:
+          pullSecrets:
+          - name: private-registry 
+        workhorse:
+          pullSecrets:
+          - name: private-registry 
+      sidekiq:
+        image:
+          pullSecrets:
+          - name: private-registry
+      gitaly:
+        image:
+          pullSecrets:
+          - name: private-registry
+      gitlab-shell:
+        image:
+          pullSecrets:
+          - name: private-registry
+      gitlab-exporter:
+        image:
+          pullSecrets:
+          - name: private-registry
+    minio:
+      pullSecrets:
+      - name: private-registry
+    {{- end }}
+    global:
+      hosts:
+        domain: code.{{ .Values.hostname }}
+        gitlab:
+          name: code.{{ .Values.hostname }}
+        registry:
+          name: registry.{{ .Values.hostname }}
+{{- if ( include "imagePullSecret" . ) }}
+      ## values for image pull secrets
+      certificates:
+        image:
+          pullSecrets:
+          - name: private-registry
+      kubectl:
+        image:
+          pullSecrets:
+          - name: private-registry
+      {{ end }}
+
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.gatekeeper.enabled }}
+  - name: gatekeeper
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.istio.enabled }}
+  - name: istio
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+  - name: monitoring
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

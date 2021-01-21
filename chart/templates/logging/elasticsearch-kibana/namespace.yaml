@@ -4,13 +4,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: logging
-  {{- if .Values.istio.enabled }}
-  labels:
-    istio-injection: enabled
-  {{- end}}
-
 ---
-  {{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+{{- if ( include "imagePullSecret" . ) }}
 apiVersion: v1
 kind: Secret
 metadata:

@@ -4,10 +4,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [Unreleased]
+## [1.0.3]
+
+* Added [Gitlab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)
+* Added ability to provide multiple registry credentials while maintaining current capabilities:
+
+```
+registryCredentials:
+  username: registry1user
+  password: somesecretpassword
+```
+
+or
+```
+registryCredentials:
+- registry: registry1.dso.mil
+  username: registry1user
+  password: somesecretpassword
+- registry: registry.dsop.io
+  username: registry1user
+  password: somesecretpassword
+- registry: somewhere.else.io
+  username: someuser
+  password: someothersecret
+```
+will correctly create the ImagePullSecrets for all those registries
+
+
+## [1.0.2]
 
 ### Changed
 
+* Updated istio-controlplane to [1.7.3-bb.5](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane/-/tags/1.7.3-bb.5) to allow
+for setting ingressgateway to use nodeports
+
+## [1.0.1]
+
+
+### Changed
+
+* Updated Istio Control plane to support Node Ports for ingressGateway
+* Update Istio Control plane to support SSO for Kiali and Jaeger
+* Update Authservice to refact definitions of filter chains
 * Updated documentation
 
 ---

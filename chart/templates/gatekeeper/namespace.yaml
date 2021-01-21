@@ -10,7 +10,7 @@ metadata:
   name: gatekeeper-system
 
 ---
-{{- if and (ne .Values.registryCredentials.username "") (ne .Values.registryCredentials.password "") }}
+{{- if ( include "imagePullSecret" . ) }}
 apiVersion: v1
 kind: Secret
 metadata:

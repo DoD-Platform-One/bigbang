@@ -4,12 +4,27 @@ hostname: bigbang.dev
 # TODO: All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false
 
-# Registry credentials to use from pulling images from private registry, will create an appropriate imagePullSecret in all relevant namespaces
+# Regisitires can be an explicit map of registries as provided here
 registryCredentials:
   registry: registry1.dsop.io
   username: ""
   password: ""
   email: ""
+
+# Or a list of registires:
+# registryCredentials:
+# - registry: registry1.dsop.io
+#   username: user.name
+#   password: user-secret
+#   email: xxx@xxx.xxx
+# - registry: registry1.dso.mil
+#   username: user.name
+#   password: user-secret
+#   email: xxx@xxx.xxx
+# - registry: registry.dso.mil
+#   username: user.name
+#   password: user-secret
+#   email: xxx@xxx.xxx
 
 # Global git values
 # Order of precedence is:
@@ -39,7 +54,7 @@ flux:
   upgrade:
     retries: 3
   rollback:
-    timeout: 5m
+    timeout: 10m
     cleanupOnFail: true
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -152,5 +167,12 @@ addons:
     git:
       repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice.git
       path: "./chart"
-      tag: "0.1.4-bb.0"
+      tag: "0.1.6-bb.0"
     values: {}
+
+  gitlab:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      path: "./chart"
+      tag: "4.2.0-bb.1"
