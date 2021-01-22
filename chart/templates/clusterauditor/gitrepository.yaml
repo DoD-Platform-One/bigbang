@@ -4,6 +4,10 @@ kind: GitRepository
 metadata:
   name: cluster-auditor
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: cluster-auditor
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.clusterAuditor.git.repo }}

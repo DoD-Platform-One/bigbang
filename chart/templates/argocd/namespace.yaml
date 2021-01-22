@@ -3,7 +3,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app: {{ .Release.Name }}-argocd
+    app.kubernetes.io/name: authservice
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
   name: argocd
 
 ---
