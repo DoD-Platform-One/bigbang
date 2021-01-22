@@ -27,8 +27,7 @@ configuration validation:
     - echo "Directory structure of repository:"
     - tree .
     - echo "Generic configuration validation tests:"
-    - helm dependency update chart
-    
+
     # Global policy tests
     - helm conftest chart --policy ${GENERIC_POLICY_PATH}
 
@@ -73,7 +72,7 @@ package tests:
     - k3d cluster create ${CI_PROJECT_NAME} --servers 1 --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-    
+
     # Setup pull secrets for project
     - |
       if [ ! -z ${PROJECT_NAME} ]; then
@@ -90,24 +89,24 @@ package tests:
 
     # Check for istio in project name and install it if needed
     - |
-      if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then 
+      if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then
         istioctl install -y
       fi
 
     # Check for gateway if found generate throw away wildcard-cert secret and apply gateway
     - |
-      if [ -f "tests/main-test-gateway.yaml" ]; then 
+      if [ -f "tests/main-test-gateway.yaml" ]; then
         openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"  
-        kubectl apply -f tests/main-test-gateway.yaml 
+        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
+        kubectl apply -f tests/main-test-gateway.yaml
       fi
 
-    # Check for dependency repos, set up pull secrets, helm dep update, secret, and helm install with test-values if present default if not
+    # Check for dependency repos, set up pull secrets, secret, and helm install with test-values if present default if not
     - |
       if [ -f "tests/dependencies.yaml" ]; then
         eval $(parse_yaml tests/dependencies.yaml "dependencies_")
         for git_repo in $(compgen -A variable | grep -w "dependencies_.*_git"); do
-          
+
           dep_prefix=${git_repo%_*}
           dep_namespace_var=${dep_prefix}_namespace
           dep_namespace=$(printf '%s\n' "${!dep_namespace_var}")
@@ -130,8 +129,7 @@ package tests:
             git clone ${dep_repo} ${dep_repo_folder}
           fi
 
-          helm dependency update ${dep_repo_folder}/chart
-          if [ -f ${dep_repo_folder}/tests/test-values.yml ] ; then 
+          if [ -f ${dep_repo_folder}/tests/test-values.yml ] ; then
             helm install ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}  -f ${dep_repo_folder}/tests/test-values.yml
           else
             helm install --wait --timeout 600s ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}
@@ -155,13 +153,12 @@ package tests:
   script:
     # Place kubernetes package test here
     - echo "Package install"
-    - helm dependency update chart
 
     # Check for test values file
     - |
       if [ -f "tests/test-values.yml" ]  ; then
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
-      else 
+      else
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
       fi
 
