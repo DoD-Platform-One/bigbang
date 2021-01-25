@@ -4,6 +4,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.6]
+
+* Added [HAProxy Addon](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy)
+* Added support for automatically populating configs and settings for the following placing SSO in front of apps without support:
+```
+istio:
+  sso:
+    enabled: true
+    prometheus:
+      client_id:
+      client_secret:
+    alertmanager:
+      client_id:
+      client_secret:
+
+monitoring:
+  sso:
+    enabled: true
+    kiali:
+      client_id:
+      client_secret:
+    jaeger:
+      client_id:
+      client_secret:
+```
+* Added authservice namespace where authservice addon and haproxy deployment will be created.
+* Added global sso options for umbrella which will be applied to all configured authservice chains:
+```
+sso:
+  oidc:
+    host: login.dso.mil
+    realm: baby-yoda
+  certificate_authority: ''
+  jwks: ""
+  client_id: ""
+  client_secret: ""
+```
+* Updated syntax for authservice chains definition.
+
 ## [1.0.5]
 
 * Bumped monitoring chart to consume kiwigrid/sidecar from IronBank
