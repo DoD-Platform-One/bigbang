@@ -37,6 +37,7 @@ spec:
       kind: Secret
       valuesKey: "argocd.yaml"
   values:
+    hostname: {{ .Values.hostname }}
     createNamespace: false
     imagePullSecrets:
       - name: private-registry

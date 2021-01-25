@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.4]
+
+* Bug fix where argocd's VirtualService wouldn't recieve the top level hostname value.
+
 ## [1.0.3]
 
 * Added [Gitlab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)

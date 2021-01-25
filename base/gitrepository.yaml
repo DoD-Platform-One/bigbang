@@ -11,4 +11,4 @@ spec:
   interval: 10m
   url: https://repo1.dsop.io/platform-one/big-bang/umbrella.git
   ref:
-    tag: 1.0.3
+    tag: 1.0.4
