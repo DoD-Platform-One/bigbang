@@ -1,0 +1,26 @@
+.k8s-util:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.2
+
+.dind-runner:
+  tags:
+    - bigbang
+    - privileged
+    - dogfood
+
+.k3s-ci:
+  extends:
+    - .k8s-util
+    - .dind-runner
+  services:
+    - name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3s-ci:v1.20.2-k3s1-bb.0
+      alias: k3s
+      command:
+        - "server"
+        - "--tls-san=k3s"
+        - "--disable=metrics-server"
+        - "--disable=traefik"
+  before_script:
+    - mkdir -p ~/.kube
+    - curl -sfL k3s:8081?service=k3s > ~/.kube/config
+    - kubectl version
+    - kubectl cluster-info
