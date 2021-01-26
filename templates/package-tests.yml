@@ -116,23 +116,33 @@ package tests:
           dep_branch_var=${dep_prefix}_branch
           dep_branch=$(printf '%s\n' "${!dep_branch_var}")
           dep_repo=$(printf '%s\n' "${!git_repo}")
-          dep_repo_folder=${dep_namespace}-repo
+          dep_repo_folder=$(echo "$dep_prefix" | sed -e "s/^dependencies_//")
 
-          echo "Installing dependency: ${dep_namespace}"
-          kubectl create namespace ${dep_namespace}
-          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-          kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+          echo "Installing dependency: ${dep_repo_folder} into ${dep_namespace} namespace"
+          if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
+            kubectl create namespace ${dep_namespace};
+          fi
+          if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
+            kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+          fi
+          if ! kubectl get secret -n ${dep_namespace} private-registry-mil 2> /dev/null; then
+            kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+          fi
 
           if [ ! -z ${dep_branch} ]; then
+            echo "Cloning ${dep_branch} branch from ${dep_repo}"
             git clone -b ${dep_branch} ${dep_repo} ${dep_repo_folder}
           else
+            echo "Cloning default branch from ${dep_repo}"
             git clone ${dep_repo} ${dep_repo_folder}
           fi
 
           if [ -f ${dep_repo_folder}/tests/test-values.yml ] ; then
-            helm install ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}  -f ${dep_repo_folder}/tests/test-values.yml
+            echo "Helm installing ${dep_repo_folder}/chart into ${dep_namespace} namespace using ${dep_repo_folder}/tests/test-values.yml for values"
+            helm install --wait --timeout 600s ${dep_repo_folder} ${dep_repo_folder}/chart -n ${dep_namespace} -f ${dep_repo_folder}/tests/test-values.yml
           else
-            helm install --wait --timeout 600s ${dep_namespace} ${dep_repo_folder}/chart -n ${dep_namespace}
+            echo "Helm installing ${dep_repo_folder}/chart into ${dep_namespace} namespace using default values"
+            helm install --wait --timeout 600s ${dep_repo_folder} ${dep_repo_folder}/chart -n ${dep_namespace}
           fi
         done
       fi
@@ -157,8 +167,10 @@ package tests:
     # Check for test values file
     - |
       if [ -f "tests/test-values.yml" ]  ; then
+        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${CI_PROJECT_NAME} namespace using ${CI_PROJECT_NAME}/tests/test-values.yml for values"
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
       else
+        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${CI_PROJECT_NAME} namespace using default values"
         helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
       fi
 
