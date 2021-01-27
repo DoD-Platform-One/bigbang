@@ -50,6 +50,24 @@ spec:
       image:
         pullSecrets:
         - private-registry
+      grafana.ini:
+{{- if .Values.istio.enabled }}
+        server:
+          root_url: https://grafana.{{ .Values.hostname }}/
+{{- end }}
+        auth: 
+          signout_redirect_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/logout
+        auth.generic_oauth:
+          enabled: {{ .Values.monitoring.sso.enabled }}
+          client_id: {{ .Values.monitoring.sso.grafana.client_id }}
+          client_secret: {{ .Values.monitoring.sso.grafana.client_secret }}
+          scopes: {{ .Values.monitoring.sso.grafana.scopes }}
+          auth_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth
+          token_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token
+          api_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/userinfo
+          allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up }}
+          role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path }}
+
     prometheus-node-exporter:
       serviceAccount:
         imagePullSecrets:

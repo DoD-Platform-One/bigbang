@@ -155,7 +155,7 @@ monitoring:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.6"
+    branch: "sso-support"
   sso:
     enabled: false
     prometheus:
@@ -167,6 +167,9 @@ monitoring:
     grafana:
       client_id: grafana
       client_secret: "change_me"
+      scopes: "Grafana"
+      allow_sign_up: "true"
+      role_attribute_path: "Viewer"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
