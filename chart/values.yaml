@@ -157,7 +157,7 @@ monitoring:
     path: "./chart"
     branch: "11.0.0-bb.9"
   sso:
-    enabled: true
+    enabled: false
     prometheus:
       client_id: prometheus
       client_secret: "change_me"
