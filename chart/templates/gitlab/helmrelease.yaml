@@ -15,7 +15,7 @@ spec:
         kind: GitRepository
         name: gitlab
         namespace: {{ .Release.Namespace }}
-
+  timeout: 10m
 {{- with .Values.flux }}
   interval: {{ .interval }}
   test:
