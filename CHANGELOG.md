@@ -4,11 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-<<<<<<< HEAD
-## [1.0.5]
+## [1.0.7]
 
-* Added Kubernetes labels to all objects created by umbrella
-=======
+* Added Kubernetes labelgit s to all objects created by umbrella
+
 ## [1.0.6]
 
 * Added [HAProxy Addon](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy)
@@ -55,7 +54,6 @@ sso:
 ## [1.0.4]
 
 * Bug fix where argocd's VirtualService wouldn't recieve the top level hostname value.
->>>>>>> origin/master
 
 ## [1.0.3]
 
