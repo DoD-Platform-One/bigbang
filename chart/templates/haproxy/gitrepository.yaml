@@ -1,0 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: haproxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.haproxy.git.repo}}
+  ref:
+    {{- include "validRef" .Values.addons.haproxy.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" .Values.git | nindent 2 }}

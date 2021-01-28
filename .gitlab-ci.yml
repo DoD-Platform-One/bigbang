@@ -33,6 +33,18 @@ variables:
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
 
+.bigbang-dogfood:
+  tags:
+    - bigbang
+    - dogfood
+
+.bigbang:
+  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+  extends: .bigbang-dogfood
+  after_script:
+    - kubectl get all -A
+    - kubectl get helmrelease -A
+
 #-----------------------------------------------------------------------------------------------------------------------
 # Pre Stage Jobs
 #
@@ -40,6 +52,8 @@ variables:
 changelog:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  extends:
+    - .bigbang-dogfood
   allow_failure: true
   variables:
     CHANGELOG_FILE: CHANGELOG.md
@@ -50,6 +64,8 @@ changelog:
 version:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  extends:
+    - .bigbang-dogfood
   allow_failure: true
   variables:
     CHART_FILE: chart/Chart.yaml
@@ -61,6 +77,8 @@ version:
 commits:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  extends:
+    - .bigbang-dogfood
   allow_failure: true
   script:
   - dnf module install -y nodejs
@@ -71,6 +89,8 @@ commits:
 pre vars:
   image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
+  extends:
+    - .bigbang-dogfood
   artifacts:
     reports:
       dotenv: variables.env
@@ -102,12 +122,6 @@ pre vars:
 # Smoke Tests
 #
 
-.bigbang:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
-  after_script:
-    - kubectl get all -A
-    - kubectl get helmrelease -A
-
 .deploy_bigbang: &deploy_bigbang
   - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
 
@@ -117,13 +131,15 @@ pre vars:
 clean install:
   stage: smoke tests
   extends:
-    - .k3d
+    - .k3s-ci
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   script:
     - *deploy_bigbang
     - *test_bigbang
-    - docker exec -i k3d-${CLUSTER_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+
+    # Fetch list of all images ran
+    - curl -sfL k3s:8081/images | jq -r '.images[].repoTags[0]' > images.txt
   artifacts:
     paths:
       - images.txt
@@ -134,7 +150,7 @@ upgrade:
   dependencies:
     - pre vars
   extends:
-    - .k3d
+    - .k3s-ci
   rules:
     # skip job when MR title starts with 'Breaking Change'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
@@ -142,7 +158,7 @@ upgrade:
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
-    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
+    CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
     - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
@@ -201,6 +217,7 @@ upgrade:
 
 aws/network up:
   extends:
+    - .bigbang-dogfood
     - .infra fork
     - .network up
   environment:
@@ -209,6 +226,7 @@ aws/network up:
 
 aws/network down:
   extends:
+    - .bigbang-dogfood
     - .infra cleanup
     - .network down
   stage: network down
@@ -226,6 +244,7 @@ aws/network down:
 aws/rke2/cluster up:
   stage: cluster up
   extends:
+    - .bigbang-dogfood
     - .infra create
     - .rke2 up
   needs:
@@ -239,6 +258,7 @@ aws/rke2/cluster up:
 aws/rke2/bigbang up:
   stage: bigbang up
   extends:
+    - .bigbang-dogfood
     - .infra create
     - .bigbang
   needs:
@@ -258,6 +278,7 @@ aws/rke2/bigbang up:
 aws/rke2/bigbang test:
   stage: test
   extends:
+    - .bigbang-dogfood
     - .infra create
     - .bigbang
   needs:
@@ -280,6 +301,7 @@ aws/rke2/bigbang test:
 aws/rke2/bigbang down:
   stage: bigbang down
   extends:
+    - .bigbang-dogfood
     - .infra cleanup
     - .bigbang
   needs:
@@ -300,6 +322,7 @@ aws/rke2/bigbang down:
 aws/rke2/cluster down:
   stage: cluster down
   extends:
+    - .bigbang-dogfood
     - .infra cleanup
     - .rke2 down
   needs:
@@ -318,6 +341,8 @@ aws/rke2/cluster down:
 package:
   stage: package
   image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
+  extends:
+    - .bigbang-dogfood
   rules:
     # run job for manual tag events
     - if: $CI_COMMIT_TAG
@@ -351,6 +376,8 @@ package:
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
+  extends:
+    - .bigbang-dogfood
   rules:
     # run job for manual tag events
     - if: $CI_COMMIT_TAG
