@@ -155,7 +155,7 @@ monitoring:
   git:
     repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    branch: "11.0.0-bb.9"
+    tag: "11.0.0-bb.9"
   sso:
     enabled: false
     prometheus:
