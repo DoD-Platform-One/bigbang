@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.0.7]
 
-* Added Kubernetes labelgit s to all objects created by umbrella
+* Added Kubernetes labels to all objects created by umbrella
+* Add OIDC integration for Grafana
 
 ## [1.0.6]
 
