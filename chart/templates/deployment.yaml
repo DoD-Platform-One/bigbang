@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mattermost-operator
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    sidecar.istio.io/inject: 'false'
+spec:
+  replicas: {{ .Values.replicas.count }}
+  selector:
+    matchLabels:
+      name: mattermost-operator
+  template:
+    metadata:
+      labels:
+        name: mattermost-operator
+    spec:
+      serviceAccountName: mattermost-operator
+      containers:
+        - name: mattermost-operator
+          image: {{ .Values.image.name }}
+          command:
+          - mattermost-operator
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          env:
+            - name: WATCH_NAMESPACE
+              value: {{ .Values.watchedNamespace }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "mattermost-operator"
