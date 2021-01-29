@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: fluent-bit
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: logging
   chart:

@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: gitlab
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gitlab
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   releaseName: gitlab
   targetNamespace: gitlab

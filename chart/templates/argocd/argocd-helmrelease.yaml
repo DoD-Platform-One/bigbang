@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: argocd
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: argocd
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: argocd
   chart:

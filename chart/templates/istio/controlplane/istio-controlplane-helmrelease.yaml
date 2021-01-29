@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: istio
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-controlplane
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: istio-system
   chart:

@@ -4,6 +4,10 @@ kind: GitRepository
 metadata:
   name: monitoring
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.monitoring.git.repo }}
