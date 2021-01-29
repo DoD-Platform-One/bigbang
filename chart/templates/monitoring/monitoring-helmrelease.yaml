@@ -61,12 +61,12 @@ spec:
           enabled: {{ .Values.monitoring.sso.enabled }}
           client_id: {{ .Values.monitoring.sso.grafana.client_id }}
           client_secret: {{ .Values.monitoring.sso.grafana.client_secret }}
-          scopes: {{ .Values.monitoring.sso.grafana.scopes }}
+          scopes: {{ .Values.monitoring.sso.grafana.scopes | default "openid profile email" }}
           auth_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth
           token_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token
           api_url: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/userinfo
-          allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up }}
-          role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path }}
+          allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up | default "True" }}
+          role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path | default "Viewer" }}
 
     prometheus-node-exporter:
       serviceAccount:
