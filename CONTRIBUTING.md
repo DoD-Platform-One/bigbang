@@ -72,7 +72,7 @@ Here is a quick tip to squash all commits for a branch named `test`:
 
 ```
 git checkout test
-git reset $(git merge-base master $(git rev-parse --abbrev-ref HEAD))
+git reset $(git merge-base origin/master $(git rev-parse --abbrev-ref HEAD))
 git add -A
 git commit -m "feat: example conventional commit"
 git push --force
