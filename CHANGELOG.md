@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.X]
+
+* Added support for deployment of Minio operator and instance deployment of minio.    
+
+
 ## [1.0.6]
 
 * Added [HAProxy Addon](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy)
