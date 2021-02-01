@@ -184,8 +184,8 @@ upgrade:
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
-    # run job on merge requests when manually activated
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # run infrastructure pipelines only on merges into master, and run regardless of failure
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       allow_failure: false
       when: manual
 
@@ -195,17 +195,17 @@ upgrade:
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
-    # run pipeline on commits to default branch
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    
+    # run infrastructure pipelines only on merges into master
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+
 # Abstract for jobs responsible for cleaning up infrastructure
 .infra cleanup:
   rules:
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
-    # run job on merge requests regardless of failure
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # run infrastructure pipelines only on merges into master, and run regardless of failure
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
       allow_failure: true
       when: always
 
