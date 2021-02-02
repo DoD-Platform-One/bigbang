@@ -3,7 +3,7 @@
 set -e
 
 ## This is an array to instantiate the order of wait conditions
-ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab"
+ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab minio-operator minio"
 
 
 ## This the actual deployed helmrelease objects in the cluster
