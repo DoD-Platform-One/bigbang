@@ -48,8 +48,8 @@ spec:
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
   {{- if .Values.gatekeeper.enabled }}
-    - name: gatekeeper
-      namespace: {{ .Release.Namespace }}
+  - name: gatekeeper
+    namespace: {{ .Release.Namespace }}
   {{- end }}
 
   {{- if .Values.istio.enabled }}
