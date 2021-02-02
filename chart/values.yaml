@@ -181,6 +181,24 @@ twistlock:
     tag: "0.0.2-bb.0"
   values: {}
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Minio Operator and Instance
+#
+minio:
+  enabled: true
+  miniooperator:
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      path: "./chart"
+      branch: "bb-1233"
+    values: {}
+  minioinstance:
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      path: "./chart"
+      branch: "bb-1233"
+    values: {}
+
 #
 # ----------------------------------------------------------------------------------------------------------------------
 #
@@ -217,27 +235,10 @@ addons:
       path: "./chart"
       tag: "4.2.0-bb.1"
 
-  # ----------------------------------------------------------------------------------------------------------------------
-  # Minio Operator
-  #
-  minio:
-    enabled: true
-    miniooperator:
-      git:
-        repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
-        path: "./chart"
-        branch: "bb-1233"
-      values: {}
-    minioinstance:
-      git:
-        repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
-        path: "./chart"
-        branch: "bb-1233"
-      values: {}
-
   haproxy:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
       path: "./chart"
       tag: 1.1.2-bb.0
     values: {}
+

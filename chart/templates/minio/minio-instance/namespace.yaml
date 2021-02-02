@@ -1,4 +1,4 @@
-{{- if .Values.addons.minio.enabled }}
+{{- if .Values.minio.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -6,7 +6,7 @@ metadata:
   labels:
     istio-injection: enabled
 ---
-{{- if ( include "imagePullSecret" . ) }}
+{{- if (   include "imagePullSecret" . ) }}
 apiVersion: v1
 kind: Secret
 metadata:

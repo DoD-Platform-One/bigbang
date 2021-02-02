@@ -1,4 +1,4 @@
-{{- if .Values.addons.minio.enabled }}
+{{- if .Values.minio.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -8,7 +8,7 @@ spec:
   targetNamespace: minio
   chart:
     spec:
-      chart: {{ .Values.addons.minio.minioinstance.git.path }}
+      chart: {{ .Values.minio.minioinstance.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
