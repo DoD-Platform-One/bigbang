@@ -1,4 +1,4 @@
-{{- if .Values.addons.minio.enabled }}
+{{- if .Values.minio.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
