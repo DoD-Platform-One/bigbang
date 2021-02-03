@@ -9,3 +9,13 @@ Provide any steps possible used to reproduce the error (ideally in an isolated f
 ## BigBang Version
 
 What version of BigBang were you running?
+
+This can be retrieved multiple ways:
+
+```bash
+# via helm
+helm ls -n bigbang
+
+# via the deployed umbrella git tag
+kubectl get gitrepository -n bigbang
+```
