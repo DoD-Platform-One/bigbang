@@ -35,7 +35,6 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
   valuesFrom:
     - name: values
       kind: Secret
@@ -43,7 +42,17 @@ spec:
   values:
     hostname: {{ .Values.hostname }}
     createNamespace: false
-    imagePullSecrets:
+    global:
+      imagePullSecrets:
+      - name: private-registry
+    controller:
+      imagePullSecrets:
+      - name: private-registry
+    dex:
+      imagePullSecrets:
+      - name: private-registry
+    redis:
+      imagePullSecrets:
       - name: private-registry
     server:
       config:

@@ -80,10 +80,10 @@ git push --force
 
 ## Iron Bank Images
 
-Per the [charter](https://repo1.dsop.io/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dsop.io/).  In order to pull these images, ImagePullSecrets must be provided to BigBang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dsop.io)
+Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to BigBang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
 
-1) Register for a free Ironbank account [Here](https://sso-info.il2.dsop.io/new_account.html)
-1) Log into the [Iron Bank Registry](https://registry1.dsop.io), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
+1) Register for a free Ironbank account [Here](https://sso-info.il2.dso.mil/new_account.html)
+1) Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
 1) When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token
 
 ## Local Kubernetes cluster
@@ -99,7 +99,7 @@ k3d cluster create --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disa
 
 For development, it is quicker to test changes without having to push to Git.  To do this, we can bypass Flux2 and deploy Big Bang directly with its Helm chart.
 
-Start by creating `myvalues.yaml` to configure your local Big Bang.  Big Bang's template repository contains a starter [development values.yaml](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
+Start by creating `myvalues.yaml` to configure your local Big Bang.  Big Bang's template repository contains a starter [development values.yaml](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
 
 Configure `myvalues.yaml` to suit your needs.
 
@@ -121,7 +121,7 @@ For more extensive development, use the [Development Guide](docs/c_development.m
 
 ## Testing Big Bang Development Changes
 
-Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
+Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dso.mil/platform-one/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
 
 Follow the [Big Bang documentation](./docs) for testing a full deployment of Big Bang.
 
@@ -173,7 +173,7 @@ This stage is ran on every commit, and is a requirement for merging.
 
 Ultimately, BigBang is designed to deploy production ready workloads on real infrastructure.  While local and ephemeral clusters are excellent for fast feedback during development, changes must ultimately be tested on real clusters on real infrastructure.
 
-As part of BigBang's [charter](https://repo1.dsop.io/platform-one/big-bang/charter), it is expected work on any CNCF conformant kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
+As part of BigBang's [charter](https://repo1.dso.mil/platform-one/big-bang/charter), it is expected work on any CNCF conformant kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
 
 When you are comfortable your branch is ready to be merged, opening up an merge request will trigger the creation of a suite of infrastructure testing jobs which will require a manual action from a project maintainer (assuming previous linting and smoke tests have passed).  Once the commit(s) are validated against the infrastructure tests, your changes are ready to be merged!
 
@@ -191,7 +191,7 @@ For each cloud, a BigBang owned network will be created that conform with the ap
 
 Several types of clusters are created within the previously provisioned network(s), and follow the vendors recommended iac approach.
 
-For example, an `rke2` cluster is created that leverages the upstream [terraform modules](https://repo1.dsop.io/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform), and an `eks` cluster is created with the upstream [terraform modules](https://docs.microsoft.com/en-us/azure/developer/terraform/create-k8s-cluster-with-tf-and-aks).
+For example, an `rke2` cluster is created that leverages the upstream [terraform modules](https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform), and an `eks` cluster is created with the upstream [terraform modules](https://docs.microsoft.com/en-us/azure/developer/terraform/create-k8s-cluster-with-tf-and-aks).
 
 It is a hard requriement at this stage that every cluster outputs an admin scoped `kubeconfig` as a gitlab ci artifact.  This artifact will be leveraged in the following stages for interacting with the created cluster.
 

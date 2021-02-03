@@ -106,7 +106,7 @@ for setting ingressgateway to use nodeports
 
 ### Changed
 
-* Update Monitoring to [11.0.0-bb.2](https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring/-/tags/11.0.0-bb.2)
+* Update Monitoring to [11.0.0-bb.2](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring/-/tags/11.0.0-bb.2)
 
 ---
 
@@ -118,11 +118,11 @@ for setting ingressgateway to use nodeports
 
 ### Changed
 
-* Updated Argo to [2.9.5-bb.1](https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd/-/merge_requests/10) for Iron Bank images
-* Updated Authservice to [0.1.3-bb.0](https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0) for authservice secret generation: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0
-* Updated ECK-Operator to [1.3.1-bb.1](https://repo1.dsop.io/platform-one/big-bang/apps/core/eck-operator/-/tags/1.3.0-bb.1)
-* Updated Twistlock to [0.0.2-bb.0](https://repo1.dsop.io/platform-one/big-bang/apps/security-tools/twistlock/-/tags/0.0.2-bb.0) to add istio.enabled flag
-* Updated Elasticsearch Kibana to [0.1.2-bb.0](https://repo1.dsop.io/platform-one/big-bang/apps/core/elasticsearch-kibana/-/tags/0.1.2-bb.0) and Pass istio.enabled to Elasticsearch Kibana
+* Updated Argo to [2.9.5-bb.1](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/merge_requests/10) for Iron Bank images
+* Updated Authservice to [0.1.3-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0) for authservice secret generation: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0
+* Updated ECK-Operator to [1.3.1-bb.1](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator/-/tags/1.3.0-bb.1)
+* Updated Twistlock to [0.0.2-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/tags/0.0.2-bb.0) to add istio.enabled flag
+* Updated Elasticsearch Kibana to [0.1.2-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/tags/0.1.2-bb.0) and Pass istio.enabled to Elasticsearch Kibana
 
 ---
 

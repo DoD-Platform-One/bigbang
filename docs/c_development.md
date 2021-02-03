@@ -7,6 +7,9 @@ Included here is a setup that will allow you to checkout and begin development u
 ### Prequisites
 
 #### Access
++ [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
++ [Umbrella repository](https://repo1.dso.mil/platform-one/big-bang/umbrella)
++ [Iron Bank registry](https://registry1.dso.mil/)
 
 - [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
 - [Umbrella repository](https://repo1.dsop.io/platform-one/big-bang/umbrella)
@@ -199,7 +202,7 @@ mkdir ~/.k3d/
 # Create the config file. Use your registry1 credentials. Copy your user name and token secret from your Harbor profile.
 cat << EOF > ~/.k3d/p1-registries.yaml
 configs:
-  "registry1.dsop.io":
+  "registry1.dso.mil":
     auth:
       username: "user.name"
       password: "place_token_secret_here"
@@ -261,7 +264,7 @@ kubectl get nodes
 
 mkdir -pv ~/repos/
 cd ~/repos
-git clone https://repo1.dsop.io/platform-one/big-bang/umbrella.git
+git clone https://repo1.dso.mil/platform-one/big-bang/umbrella.git
 cd ~/repos/umbrella
 ```
 
@@ -279,7 +282,7 @@ kubectl create ns bigbang
 
 ```bash
 # You will be overriding values in `chart/values.yaml` for development
-# You can use the [Big Bang template's dev ConfigMap](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang/-/blob/template/bigbang/dev/configmap.yaml) to start.  This will minimize the resources for deploying BigBang.
+# You can use the [Big Bang template's dev ConfigMap](https://repo1.dso.mil/platform-one/big-bang/customers/bigbang/-/blob/template/bigbang/dev/configmap.yaml) to start.  This will minimize the resources for deploying BigBang.
 # For convenience, it is also copied here
 
 cat << EOF > my-values.yaml

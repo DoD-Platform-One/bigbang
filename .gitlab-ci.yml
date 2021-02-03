@@ -39,7 +39,7 @@ variables:
     - dogfood
 
 .bigbang:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
   extends: .bigbang-dogfood
   after_script:
     - kubectl get all -A
@@ -50,7 +50,7 @@ variables:
 #
 
 changelog:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   extends:
     - .bigbang-dogfood
@@ -62,7 +62,7 @@ changelog:
   - ./scripts/lint_changelog.sh
 
 version:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   extends:
     - .bigbang-dogfood
@@ -75,7 +75,7 @@ version:
   - ./scripts/lint_version.sh
 
 commits:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   extends:
     - .bigbang-dogfood
@@ -87,7 +87,7 @@ commits:
   - ./scripts/lint_commits.sh
 
 pre vars:
-  image: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   extends:
     - .bigbang-dogfood
@@ -340,7 +340,7 @@ aws/rke2/cluster down:
 
 package:
   stage: package
-  image: registry.dsop.io/platform-one/big-bang/umbrella/synker:0.0.1
+  image: registry.dso.mil/platform-one/big-bang/umbrella/synker:0.0.1
   extends:
     - .bigbang-dogfood
   rules:

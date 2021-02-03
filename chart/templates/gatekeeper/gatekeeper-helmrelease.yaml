@@ -43,10 +43,10 @@ spec:
 
   values:
     image:
-      repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
+      repository: registry1.dso.mil/ironbank/opensource/openpolicyagent/gatekeeper
       release: v3.1.2
     disableValidatingWebhook: true
     createNamespace: false
     imagePullSecrets:
-      - name: private-registry
+    - name: private-registry
 {{- end }}

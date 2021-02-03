@@ -14,3 +14,8 @@ certs/
 
 # debug
 npm-debug.log*
+
+# ignore developer specific files
+# (used frequently in deployments)
+patch.yaml
+notes

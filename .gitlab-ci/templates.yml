@@ -10,7 +10,7 @@ include:
 
 .terraformer:
   image:
-    name: registry.dsop.io/platform-one/big-bang/pipeline-templates/pipeline-templates/terraform:0.13.5
+    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/terraform:0.13.5
     entrypoint:
       - /usr/bin/env
       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
