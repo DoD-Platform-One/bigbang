@@ -42,7 +42,7 @@ spec:
       valuesKey: "authservice.yaml"
   values:
     imagePullSecrets:
-      - name: private-registry
+    - name: private-registry
     global:
       oidc:
         host: {{ .Values.sso.oidc.host }}

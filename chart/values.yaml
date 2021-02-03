@@ -6,14 +6,14 @@ offline: false
 
 # Regisitires can be an explicit map of registries as provided here
 registryCredentials:
-  registry: registry1.dsop.io
+  registry: registry1.dso.mil
   username: ""
   password: ""
   email: ""
 
 # Or a list of registires:
 # registryCredentials:
-# - registry: registry1.dsop.io
+# - registry: registry.dso.mil
 #   username: user.name
 #   password: user-secret
 #   email: xxx@xxx.xxx
@@ -21,7 +21,7 @@ registryCredentials:
 #   username: user.name
 #   password: user-secret
 #   email: xxx@xxx.xxx
-# - registry: registry.dso.mil
+# - registry: registry.example.com
 #   username: user.name
 #   password: user-secret
 #   email: xxx@xxx.xxx
@@ -73,9 +73,9 @@ flux:
 istio:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/istio-controlplane.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.7.3-bb.6"
+    tag: "1.7.3-bb.7"
   sso:
     enabled: false
     kiali:
@@ -89,9 +89,9 @@ istio:
 istiooperator:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/istio-operator.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
-    tag: "1.7.0-bb.0"
+    tag: "1.7.0-bb.1"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -101,9 +101,9 @@ istiooperator:
 clusterAuditor:
   enabled: true
   git: 
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/cluster-auditor.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "0.1.7-bb.0"
+    tag: "0.1.8-bb.1"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -113,9 +113,9 @@ clusterAuditor:
 gatekeeper:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    tag: "3.1.2-bb.2"
+    tag: "3.1.2-bb.3"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -125,25 +125,25 @@ gatekeeper:
 logging:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.1.2-bb.0"
+    tag: "0.1.3-bb.1"
   values: {}
 
 eckoperator:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/eck-operator.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
-    tag: "1.3.0-bb.2"
+    tag: "1.3.0-bb.3"
   values: {}
 
 fluentbit:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/fluentbit.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.1.0-bb.0"
+    tag: "0.1.0-bb.1"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -153,9 +153,9 @@ fluentbit:
 monitoring:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.9"
+    tag: "11.0.0-bb.10"
   sso:
     enabled: false
     prometheus:
@@ -179,9 +179,9 @@ monitoring:
 twistlock:
   enabled: true
   git:
-    repo: https://repo1.dsop.io/platform-one/big-bang/apps/security-tools/twistlock.git
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.2-bb.0"
+    tag: "0.0.2-bb.1"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -189,9 +189,9 @@ addons:
   argocd:
     enabled: false
     git:
-      repo: https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd.git
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "2.9.5-bb.2"
+      tag: "2.9.5-bb.4"
     values: {}
 
   authservice:
@@ -203,9 +203,9 @@ addons:
     #       callback_uri: "https://somecallback"
     enabled: false
     git:
-      repo: https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice.git
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice.git
       path: "./chart"
-      tag: "0.1.6-bb.0"
+      tag: "0.1.6-bb.1"
     # Dont put chain configuraitons in this section
     values: {}
     # Put additional chain configuration in this section
@@ -219,6 +219,7 @@ addons:
       tag: "4.2.0-bb.1"
 
   haproxy:
+    enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
       path: "./chart"

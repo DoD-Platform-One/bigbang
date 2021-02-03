@@ -130,7 +130,7 @@ resource "aws_security_group" "endpoints" {
 # Attaches the management vpc (the hub) to the created vpc (the spokes).
 #
 module "spoke" {
-  source = "git::https://repo1.dsop.io/platform-one/big-bang/terraform-modules/spoke-tgw-attachments.git"
+  source = "git::https://repo1.dso.mil/platform-one/big-bang/terraform-modules/spoke-tgw-attachments.git"
 
   name       = local.name
   hub_vpc_id = var.hub_vpc_id
