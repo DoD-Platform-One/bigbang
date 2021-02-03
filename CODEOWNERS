@@ -18,6 +18,9 @@ tests/                @zdzielinksi @iahmad @toladipupo
 scripts/              @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
 hack/                 @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
 
+^[Charter Owners]
+charter/              @runyontr @joshwolf
+
 ^[Istio and Authservice]
 chart/Chart.yaml                @kenna81 @kavitha @cmcgrath
 chart/values.yaml               @kenna81 @kavitha @cmcgrath
