@@ -76,6 +76,9 @@ istio:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
     tag: "1.7.3-bb.7"
+  ingress:
+    key: ""
+    cert: ""
   sso:
     enabled: false
     kiali:

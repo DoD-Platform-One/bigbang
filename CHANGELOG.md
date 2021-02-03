@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 * Added Kubernetes labels to all objects created by umbrella
 * Add OIDC integration for Grafana
+* Allow creation of wildcard cert for istio ingress to be passed to BigBang chart
 
 ## [1.0.6]
 
