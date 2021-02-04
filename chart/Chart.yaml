@@ -1,5 +1,6 @@
 --- 
 apiVersion: v2
+version: "1.5.0-bb.0"
 appVersion: "5.27.0"
 dependencies: ~
 description: "Deployment of mattermost operator using Helm"
@@ -13,4 +14,3 @@ maintainers:
     name: ~
 name: mattermost-operator
 type: application
-version: "1.5.0"
