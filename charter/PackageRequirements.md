@@ -4,6 +4,16 @@ All Big Bang Packages shall adhere to the following requirements.  Where possibl
 
 [[_TOC_]]
 
+## Gitlab Project Settings
+
+* The `main` branch should be default in each project
+* Merge Requests should require 1 approver
+* The `main` branch should be protected:
+  * Devs + Maintainers should be allowed to merge.  
+  * No one should be allowed to push and it should allow 
+  * CODEOWNERs approval should be allowed
+* There should exist a protected tag with the wildcard `*-bb*`
+
 ## PR-X. Kubernetes Cluster Requirements
 
 Each package will work with any cluster under the following criteria.
