@@ -8,6 +8,7 @@ certs/
 *rke2.yaml
 
 *tfstate*
+*terraform.lock*
 
 # dependencies
 /node_modules
