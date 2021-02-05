@@ -19,7 +19,7 @@ Table of Contents
 
 ## Overview
 
-Configuration of Big Bang is achieved by overriding default values set in the package or Big Bang using the [environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template).  The template has a 4 potential locations for setting values: `base/secrets.enc.yaml`, `base/configmap.yaml`, `<env>/secrets.enc.yaml`, and `<env>/configmap.yaml`.  Overrides proceed as follows, with `<env>/configmap.yaml` having the highest precedence.
+Configuration of Big Bang is achieved by overriding default values set in the package or Big Bang using the [environment template](https://repo1.dso.mil/platform-one/big-bang/customers/template).  The template has a 4 potential locations for setting values: `base/secrets.enc.yaml`, `base/configmap.yaml`, `<env>/secrets.enc.yaml`, and `<env>/configmap.yaml`.  Overrides proceed as follows, with `<env>/configmap.yaml` having the highest precedence.
 
 ```mermaid
 graph TD
@@ -31,7 +31,7 @@ graph TD
   -->env-c[`<env>/configmap.yaml` values]
 ```
 
-In all four cases, Big Bang reads a single key named `values.yaml` that contains the data to override.  See the [Big Bang environment template](https://repo1.dsop.io/platform-one/big-bang/customers/template) for examples on how to use these files to override values.
+In all four cases, Big Bang reads a single key named `values.yaml` that contains the data to override.  See the [Big Bang environment template](https://repo1.dso.mil/platform-one/big-bang/customers/template) for examples on how to use these files to override values.
 
 ## Pre-configuration
 
@@ -54,7 +54,7 @@ At a minimum, the following items must be configured for a default Big Bang depl
 - [SOPS private key reference](3_encryption.md).
 - [Registry pull credentials](#registry-pull-credentials)
 
-The Big Bang [Environment Template](https://repo1.dsop.io/platform-one/big-bang/customers/template) has placeholders for all of the above.
+The Big Bang [Environment Template](https://repo1.dso.mil/platform-one/big-bang/customers/template) has placeholders for all of the above.
 
 ## Big Bang Globals
 
@@ -72,7 +72,7 @@ Registry credentials are used to pull images for Big Bang.  By default, it point
 
 | Key | Description | Type | Default |
 |--|--|--|--|
-| `registry` | Container registry location | Domain Name | `registry1.dsop.io`
+| `registry` | Container registry location | Domain Name | `registry1.dso.mil`
 | `username`* | Container registry username | String | "" |
 | `password`* | User's password | String | "" |
 | `email` | User's email | Email | "" |
@@ -97,7 +97,7 @@ Each package (e.g. `istio`, `clusterAuditor`) has configuration to control how B
 | Key | Description | Type | Default |
 |--|--|--|--|
 | `enabled` | Determines if the package will get deployed or skipped | Boolean | `true` (unless its an `addon`) |
-| `git.repo` | Location of the Git repo holding the package deployment resources | URL | `https://repo1.dsop.io/platform-one/big-bang/apps/...`
+| `git.repo` | Location of the Git repo holding the package deployment resources | URL | `https://repo1.dso.mil/platform-one/big-bang/apps/...`
 | `git.branch` | Branch to use for package deployment resources | string | `chart-release` or `release-vx.x.x` |
 | `git.commit` | SHA of specific commit to use in Git for package deployment resources | SHA | null |
 | `git.tag` | Git tag to use for package deployment resources | string | null |
@@ -124,7 +124,7 @@ In your `kustomization.yaml` under your environment, here is an example of how t
 
 ```yaml
 bases:
-- https://repo1.dsop.io/platform-one/big-bang/umbrella.git/base/?ref=v1.2.*
+- https://repo1.dso.mil/platform-one/big-bang/umbrella.git/base/?ref=v1.2.*
 patchesStrategicMerge:
 - |-
   apiVersion: source.toolkit.fluxcd.io/v1beta1
@@ -151,7 +151,7 @@ metadata:
   namespace: bigbang
 spec:
   interval: 1m
-  url: https://repo1.dsop.io/platform-one/big-bang/customers/template.git
+  url: https://repo1.dso.mil/platform-one/big-bang/customers/template.git
   ref:
     branch: main
 ---

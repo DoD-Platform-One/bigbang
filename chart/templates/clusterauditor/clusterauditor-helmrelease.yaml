@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: cluster-auditor
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: cluster-auditor
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: logging
   chart:
@@ -38,8 +42,9 @@ spec:
       valuesKey: "clusterauditor.yaml"
 
   values:
-    #conversion from umbrella values to package values
-    imagePullSecrets: [ private-registry ]
+    elasticsearch:
+      imagePullSecrets:
+      - name: private-registry
 
   dependsOn:
   - name: ek

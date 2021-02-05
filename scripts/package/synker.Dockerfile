@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 # Clone the latest release of p8kr and built the binrary statically
-RUN git clone https://repo1.dsop.io/platform-one/hagrid/sync.git synker && \
+RUN git clone https://repo1.dso.mil/platform-one/hagrid/sync.git synker && \
     cd synker && \
     make binary-local-static DISABLE_CGO=1
 

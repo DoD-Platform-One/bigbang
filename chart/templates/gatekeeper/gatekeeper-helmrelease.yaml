@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: gatekeeper
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gatekeeper
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: gatekeeper-system
   chart:
@@ -39,10 +43,10 @@ spec:
 
   values:
     image:
-      repository: registry1.dsop.io/ironbank/opensource/openpolicyagent/gatekeeper
+      repository: registry1.dso.mil/ironbank/opensource/openpolicyagent/gatekeeper
       release: v3.1.2
     disableValidatingWebhook: true
     createNamespace: false
     imagePullSecrets:
-      - name: private-registry
+    - name: private-registry
 {{- end }}

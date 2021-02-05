@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: ek
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: logging
   chart:
@@ -44,11 +48,11 @@ spec:
     kibana:
       version: 7.9.2
       imagePullSecrets:
-        - name: private-registry
+      - name: private-registry
     elasticsearch:
       version: 7.9.2
       imagePullSecrets:
-        - name: private-registry
+      - name: private-registry
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:

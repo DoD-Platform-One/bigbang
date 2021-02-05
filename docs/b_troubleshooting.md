@@ -17,7 +17,7 @@ Big Bang is configured to retry failed package installations and upgrades.  Befo
 
 | Symptom | Cause | Resolution |
 |--|--|--|
-| Despite entering correct credentials, get `anauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dsop.io`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
+| Despite entering correct credentials, get `anauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dso.mil`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
 
 ## Flux install
 
