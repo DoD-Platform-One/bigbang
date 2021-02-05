@@ -79,7 +79,6 @@ spec:
     kube-state-metrics:
       imagePullSecrets:
       - name: private-registry
-
 {{- if .Values.monitoring.sso.enabled }}
     ingress:
       prometheus:
