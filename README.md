@@ -113,7 +113,7 @@ include:
 If the package has any dependencies that must be installed first (i.e. an operator) you will need to create a file 
 in the package repo - `tests/dependencies.yaml` - with the following contents (note optional values):
 
-- dependencyname: The top level for each dependency, a simple string, no hypens (use camelcase if multiple words)
+- dependencyname: The top level for each dependency, a simple string, no hyphens (use camelcase if multiple words)
 - git: This should be the direct link to clone the dependency repo, in quotes
 - branch: Optional, pass in a branch to clone the dependency from
 - namespace: Optional, pass in a namespace to install the dependency under (useful if the dependency needs to be 
@@ -131,6 +131,30 @@ opa:
   git: "https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git"
   namespace: "gatekeeper-system"
   branch: "main"
+```
+
+If the package makes use of an operator and creates custom resources it is best to create a custom wait script for the pipeline to run. 
+This script should be added under `tests/wait.sh` and follow this format below. You will need to check what sort of health status is available 
+in the k8s object and update the jsonpath and if check accordingly. The timeElapsed portion provides a timeout after 10 minutes. You should 
+only need to update the two commented lines below in most cases. Some projects may have more than one custom resource (i.e. Elasticsearch has 
+both elasticsearch and kibana) and in these situations you can add another resourceHealth line and change the if check to verify both.
+
+```bash
+#!/bin/sh
+wait_project() {
+   timeElapsed=0
+   while true; do
+      resourceHealth=$(kubectl get RESOURCE -A -o jsonpath='{.items[0].status.health}' | xargs)     # Update with the resource to check and jsonpath
+      if [[ $resourceHealth == "DESIREDHEALTH" ]]; then                                             # Update with desired health/output of the jsonpath
+         break
+      fi
+      sleep 5
+      timeElapsed=$(($timeElapsed+5))
+      if [[ $timeElapsed -ge 600 ]]; then
+         exit 1
+      fi
+   done
+}
 ```
 
 ### Using the CI pipline infrastrcuture to test packages locally
