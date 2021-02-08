@@ -196,13 +196,13 @@ minio:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
-      branch: "2.0.9-bb.1"
+      tag: "2.0.9-bb.1"
     values: {}
   minioinstance:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      branch: "2.0.9-bb.1"
+      tag: "2.0.9-bb.1"
     values: {}
 
 #

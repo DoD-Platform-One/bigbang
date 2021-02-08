@@ -31,9 +31,7 @@ function array_contains() {
 ## $1: package name
 function wait_on() {
   echo "Waiting on package $1"
-  kubectl get hr,kustomizations,gitrepositories -A
   kubectl wait --for=condition=Ready --timeout 100s helmrelease -n bigbang $1;
-  kubectl get all -A
 }
 
 for package in $ORDERED_HELMRELEASES;
