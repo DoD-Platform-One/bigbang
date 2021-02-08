@@ -190,7 +190,7 @@ minio:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
-      branch: "bb-1233"
+      branch: "2.0.9-bb.1"
     values: {}
   minioinstance:
     git:
