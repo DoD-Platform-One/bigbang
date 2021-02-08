@@ -31,7 +31,8 @@ function array_contains() {
 ## $1: package name
 function wait_on() {
   echo "Waiting on package $1"
-  kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang $1;
+  kubectl get hr,kustomizations,gitrepositories -A
+  kubectl wait --for=condition=Ready --timeout 100s helmrelease -n bigbang $1;
   kubectl get all -A
 }
 
@@ -42,6 +43,8 @@ do
   else echo "Expected package: $package, but not found in release. Update the array in this script if this package is no longer needed"
   fi
 done
+
+kubectl get hr,kustomizations,gitrepositories -A
 
 for package in $DEPLOYED_HELMRELEASES;
 do
