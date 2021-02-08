@@ -73,3 +73,19 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 | app.kubernetes.io/part-of | the name of a higher level application this one is part of | `bigbang` |
 | app.kubernetes.io/managed-by | the tool being used to manage the operation of an application | `flux` |
 | app.kubernetes.io/bigbang-version | The version of bigbang deployed | `1.0.7` |
+
+
+## Kubernetes Objects
+
+
+These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices
+
+* Resource Limits and Requests set for cpu and memory and they are [Guaranteed QoS](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed)
+* Containers are not run in privileged mode
+* Read Only Root File System is set to true
+* Containers are not run as root
+* runAsUser > 1000
+* Each deployment/daemonset/statefulset should use its own service account with least privilege permission set
+* HostPath volumes are not allowed
+* All resources contain the [Kubernetes Common Labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/)
+* All containers contain health and liveness checks

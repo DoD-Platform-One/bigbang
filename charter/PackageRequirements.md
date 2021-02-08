@@ -108,20 +108,6 @@ If a Package has a dependency on another Package to function, the dependency sha
 
 Each Package will clearly articulate in documentation any dependent Big Bang Package and versions.
 
-## PR-X Kubernetes Component Requirements
-
-These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices
-
-* Resource Limits and Requests set for cpu and memory and they are [Guaranteed QoS](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed)
-* Containers are not run in privileged mode
-* Read Only Root File System is set to true
-* Containers are not run as root
-* runAsUser > 1000
-* Each deployment/daemonset/statefulset should use its own service account with least privilege permission set
-* HostPath volumes are not allowed
-* All resources contain the [Kubernetes Common Labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/)
-* All containers contain health and liveness checks
-
 ## Branching
 
 Each package will have a default branch of `main`.  Immutable tags will be used to identify releases and will follow a semver versioning scheme.  For more information, see the [versioning](#pr-x.-package-versioning-scheme) section.
@@ -129,21 +115,7 @@ Each package will have a default branch of `main`.  Immutable tags will be used 
 ## Package Standards
 
 * Helm Packages contain one kubernetes object definition
-* Helm charts should have the flexibility to enable istio and defaults to disable
 
-```yaml
-   istio:
-     enabled: false
-```
-
-* Helm charts should have the flexibility to enable service monitors and defaults to disable
-
-```yaml
-   monitoring:
-     enabled: false
-```
-
-* Helm charts should have the flexibility to enable keycloak and defaults to disable
 * Helm dependency manage charts dependencies in Chart.yaml and the dependency chart can be enabled or disabled using condition.
 * All Chart names are lower case letters and numbers, separated with dashes. No dots, uppercase or underscores.
 * Helm Chart values variable names should begin with a lowercase letter and words should be separated with Camel case
