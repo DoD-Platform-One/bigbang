@@ -73,14 +73,6 @@ Forked upstream helm charts will be configured with the appropriate BigBang _add
 
 In the case where an accepted upstream helm chart does not exist, BigBang will create and maintain it's own custom helm chart for the package in question.  The helm chart will be in conformance with the [Package Standards](#pr-x.-package-standards).
 
-## PR-X. Package Versioning Scheme
-
-Big Bang packages follow a standard semantic versioning scheme for both the package tag and the chart version.  The package tag will always be in line with the chart version (not the `appVersion`).  To distinguish between BigBang specific changes within the semantic version of the upstream chart, a suffix of `-bb.#` will be added to _all_ charts and tags.
-
-For example, for the upstream [`istio-operator`](https://github.com/istio/istio/tree/1.7.3/manifests/charts/istio-operator) pinned at version `1.7.3`, the big bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.7.3-bb.0`.  If in the same `istio-operator` release, BigBang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.7.3-bb.1`.
-
-For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`.  Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
-
 ## PR-X. Package Standards
 
 The common components that each package will have are defined in the following folder layout:
