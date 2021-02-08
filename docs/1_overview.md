@@ -27,7 +27,7 @@ Big Bang is a declarative, continuous delivery tool for core DoD hardened and ap
 
 ### Big Bang Components
 
-Big Bang is made of several components that operate together.  These include a [base Kustomize](../base/), a [Helm chart](../chart), [packages](../chart/templates), and an [environment](https://repo1.dsop.io/platform-one/big-bang/customers/bigbang).  The environment and base Kustomize are used together to deploy the Big Bang configuration and Helm chart.  The Helm chart is then used to facilitate deployment of the packages.
+Big Bang is made of several components that operate together.  These include a [base Kustomize](../base/), a [Helm chart](../chart), [packages](../chart/templates), and an [environment](https://repo1.dso.mil/platform-one/big-bang/customers/bigbang).  The environment and base Kustomize are used together to deploy the Big Bang configuration and Helm chart.  The Helm chart is then used to facilitate deployment of the packages.
 
 ### Flux v2
 
@@ -57,19 +57,19 @@ The following packages are included in a default deployment of Big Bang:
 
 |Name|Description|Helm Chart Repo|
 |--|--|--|
-|[Istio](https://istio.io/)|[Service Mesh](https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh)|[Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/servicemesh.git)|
-|Cluster Auditor| |[Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/cluster-auditor.git)|
-|[Open Policy Agent Gatekeeper](https://github.com/open-policy-agent/gatekeeper)| Policy Management | [Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git)|
-|[Elastic Cloud on Kubernetes (ECK)](https://www.elastic.co/guide/en/cloud-on-k8s/current/index.html)| Logging; Incl. Elasticsearch & Kibana |[Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/elasticsearch-kibana.git)|
-|[Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/)| Monitoring |[Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/monitoring.git)|
-|[Twistlock](https://www.paloaltonetworks.com/prisma/cloud)| Security Scanning |[Link](https://repo1.dsop.io/platform-one/big-bang/apps/security-tools/twistlock.git)|
+|[Istio](https://istio.io/)|[Service Mesh](https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh)|[Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/servicemesh.git)|
+|Cluster Auditor| |[Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git)|
+|[Open Policy Agent Gatekeeper](https://github.com/open-policy-agent/gatekeeper)| Policy Management | [Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git)|
+|[Elastic Cloud on Kubernetes (ECK)](https://www.elastic.co/guide/en/cloud-on-k8s/current/index.html)| Logging; Incl. Elasticsearch & Kibana |[Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git)|
+|[Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/)| Monitoring |[Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git)|
+|[Twistlock](https://www.paloaltonetworks.com/prisma/cloud)| Security Scanning |[Link](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git)|
 
 In addition, the following packages can be added onto the default deployment:
 
 |Name|Description|Helm Chart Repo|
 |--|--|--|
-|[Argo CD](https://argoproj.github.io/argo-cd/)| Continuous Delivery |[Link](https://repo1.dsop.io/platform-one/big-bang/apps/core/argocd.git)|
-|Auth Service|Single Sign On|[Link](https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/authservice.git)
+|[Argo CD](https://argoproj.github.io/argo-cd/)| Continuous Delivery |[Link](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git)|
+|Auth Service|Single Sign On|[Link](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice.git)
 
 ---
 

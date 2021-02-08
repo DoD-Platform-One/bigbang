@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: eck-operator
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: eck-operator
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: eck-operator
   chart:

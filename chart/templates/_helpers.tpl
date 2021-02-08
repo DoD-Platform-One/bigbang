@@ -72,3 +72,13 @@ Build common set of file extensions to include/exclude
     /**/*.txt
     /**/*.sh
 {{- end -}}
+
+{{/*
+Common labels for all objects
+*/}}
+{{- define "commonLabels" -}}
+app.kubernetes.io/instance: "{{ .Release.Name }}"
+app.kubernetes.io/version: "{{ .Chart.Version }}"
+app.kubernetes.io/part-of: "bigbang"
+app.kubernetes.io/managed-by: "flux"
+{{- end -}}

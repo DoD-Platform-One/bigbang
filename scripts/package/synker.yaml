@@ -29,4 +29,4 @@ destination:
 source:
   authFile: /root/.docker/config.json
   images:
-    - registry.dsop.io/platform-one/big-bang/apps/security-tools/twistlock/defender:20.04.163
+    - registry.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/defender:20.04.163

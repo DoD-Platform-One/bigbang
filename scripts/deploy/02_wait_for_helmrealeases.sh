@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 ## This is an array to instantiate the order of wait conditions
-ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab minio-operator minio"
 
+ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab haproxy-sso minio-operator minio"
 
 ## This the actual deployed helmrelease objects in the cluster
 DEPLOYED_HELMRELEASES=$(kubectl get hr --no-headers -n bigbang | awk '{ print $1}')
@@ -31,7 +31,7 @@ function array_contains() {
 ## $1: package name
 function wait_on() {
   echo "Waiting on package $1"
-  kubectl wait --for=condition=Ready --timeout 500s helmrelease -n bigbang $1;
+  kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang $1;
 }
 
 for package in $ORDERED_HELMRELEASES;

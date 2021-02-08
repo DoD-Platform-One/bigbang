@@ -4,6 +4,10 @@ kind: HelmRelease
 metadata:
   name: istio-operator
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-operator
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: istio-operator
   chart:
@@ -38,7 +42,7 @@ spec:
       valuesKey: "istiooperator.yaml"
 
   values:
-    hub: registry1.dsop.io/ironbank/opensource/istio
+    hub: registry1.dso.mil/ironbank/opensource/istio
     tag: 1.7.3
     createNamespace: false
 

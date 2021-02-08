@@ -1,65 +1,68 @@
 *                     @runyontr @joshwolf @megamind
 
-# [Chart Values]
+# ^[Chart Values]
 # chart/values.yaml
 # chart/Chart.yaml
 
-[Docs Owners]
+^[Docs Owners]
 docs/                 @michaelmcleroy @egoode
 
-[Kustomize Base Owners]
+^[Kustomize Base Owners]
 base/                 @michaelmcleroy
 
-[CI Owners]
+^[CI Owners]
 .gitlab-ci/           @zdzielinksi @iahmad @toladipupo
 tests/                @zdzielinksi @iahmad @toladipupo
 
-[Hack Owners]
+^[Hack Owners]
 scripts/              @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
 hack/                 @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
 
-[Istio and Authservice]
+^[Charter Owners]
+charter/              @runyontr @joshwolf
+
+^[Istio and Authservice]
 chart/Chart.yaml                @kenna81 @kavitha @cmcgrath
 chart/values.yaml               @kenna81 @kavitha @cmcgrath
 chart/templates/authservice     @kenna81 @kavitha @cmcgrath
 chart/templates/istio           @kenna81 @kavitha @cmcgrath
 
-[Anchore]
+^[Anchore]
 chart/Chart.yaml
 # chart/values.yaml
 # chart/templates/argocd
 
-[ArgoCD]
+^[ArgoCD]
 chart/Chart.yaml                @matthew.kaiser
 chart/values.yaml               @matthew.kaiser
 chart/templates/argocd          @matthew.kaiser
 
-# [Cluster Auditor]
+# ^[Cluster Auditor]
 # chart/Chart.yaml
 # chart/values.yaml
 # chart/templates/clusterauditor
 
-# [Gatekeeper]
+# ^[Gatekeeper]
 # chart/Chart.yaml
 # chart/values.yaml
 # chart/templates/gatekeeper
 
-[Logging]
+^[Logging]
 chart/Chart.yaml                @kavitha @ryan.j.garcia
 chart/values.yaml               @kavitha @ryan.j.garcia
 chart/templates/logging         @kavitha @ryan.j.garcia
 
-[Monitoring]
+^[Monitoring]
 chart/Chart.yaml                @lynnstill @ryan.j.garcia
 chart/values.yaml               @lynnstill @ryan.j.garcia
 chart/templates/monitoring      @lynnstill @ryan.j.garcia
 
-[Twistlock]
+^[Twistlock]
 chart/Chart.yaml                @thomas.burton
 chart/values.yaml               @thomas.burton
 chart/templates/twistlock       @thomas.burton
 
-[Gitlab]
+^[Gitlab]
 chart/Chart.yaml                @egoode @kevin.wilder
 chart/values.yaml               @egoode @kevin.wilder
 chart/templates/gitlab          @egoode @kevin.wilder

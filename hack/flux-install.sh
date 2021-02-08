@@ -5,7 +5,7 @@
 # After Flux2 is installed, the secret will be removed from the cluster
 
 # Constants
-reg=registry1.dsop.io
+reg=registry1.dso.mil
 repo=ironbank/fluxcd
 fluxver="v0.2.4"
 ns=flux-system

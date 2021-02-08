@@ -8,9 +8,15 @@ certs/
 *rke2.yaml
 
 *tfstate*
+*terraform.lock*
 
 # dependencies
 /node_modules
 
 # debug
 npm-debug.log*
+
+# ignore developer specific files
+# (used frequently in deployments)
+patch.yaml
+notes

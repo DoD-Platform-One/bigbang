@@ -31,7 +31,7 @@ Table of Contents
 
 [Flux v2](https://toolkit.fluxcd.io/) must be installed into the Kubernetes cluster before deploying Big Bang.  There are three options for doing this:
 
-1. (Recommended) Deploy officially through [Iron Bank](registry1.dsop.io)
+1. (Recommended) Deploy officially through [Iron Bank](registry1.dso.mil)
 
     ```bash
     # The script will do the following:
@@ -42,10 +42,10 @@ Table of Contents
     hack/flux-install.sh
     ```
 
-1. Deploy unofficially through [Big Bang's Repo](https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2/container_registry)
+1. Deploy unofficially through [Big Bang's Repo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/fluxv2/container_registry)
 
    ```bash
-   flux install --registry registry.dsop.io/platform-one/big-bang/apps/sandbox/fluxv2
+   flux install --registry registry.dso.mil/platform-one/big-bang/apps/sandbox/fluxv2
    ```
 
 1. Deploy for development through [DockerHub](https://hub.docker.com/search?q=fluxcd)
@@ -56,7 +56,7 @@ Table of Contents
 
 ## Configuration Template
 
-A [template for configuring multi-cluster environments](https://repo1.dsop.io/platform-one/big-bang/customers/template/) is provided to assist with getting Big Bang setup correctly.  You should make a copy of the `./bigbang` folder from the [customer Big Bang repository](https://repo1.dsop.io/platform-one/big-bang/customers/template) and place it into a Git repository under your control.
+A [template for configuring multi-cluster environments](https://repo1.dso.mil/platform-one/big-bang/customers/template/) is provided to assist with getting Big Bang setup correctly.  You should make a copy of the `./bigbang` folder from the [customer Big Bang repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) and place it into a Git repository under your control.
 
 ### Overview
 
@@ -68,7 +68,7 @@ The template is setup to allow you to customize the Big Bang deployment for your
 - Reference to SOPS private key - See the [encryption help](3_encryption.md) for more information.
 - Iron Bank pull credentials
 
-The [Configuration Template help](https://repo1.dsop.io/platform-one/big-bang/customers/template/-/blob/main/README.md) contains details on how to setup these items.
+The [Configuration Template help](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/blob/main/README.md) contains details on how to setup these items.
 
 If there is additional configuration you want, refer to the [configuration help](4_configuration.md) for details.
 

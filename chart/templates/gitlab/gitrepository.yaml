@@ -4,6 +4,10 @@ kind: GitRepository
 metadata:
   name: gitlab
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gitlab
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.addons.gitlab.git.repo }}

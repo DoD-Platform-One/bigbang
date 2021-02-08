@@ -4,6 +4,10 @@ kind: GitRepository
 metadata:
   name: argocd
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: argocd
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
   url: {{ .Values.addons.argocd.git.repo }}
