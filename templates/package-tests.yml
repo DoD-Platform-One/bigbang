@@ -213,7 +213,19 @@ package tests:
       if [ -f "tests/cypress.json" ]; then
         cd tests && cypress run
       fi
+      
+    # File to indicate Job succeeded 
+    - touch $CI_PROJECT_DIR/success
 
   after_script:
+    - |
+        if [ -e success ]; then
+          echo "Job Succeeded"
+        else
+          echo "Job Failed Printing Debug Logs"
+          echo "kubectl get all -A"
+          kubectl get all -A
+        fi
+
     # Delete Cluster
     - k3d cluster delete ${CI_PROJECT_NAME}
