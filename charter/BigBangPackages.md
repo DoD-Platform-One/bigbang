@@ -130,12 +130,37 @@ Dependency: None
 Owners:
 
 * @runyontr - Runyon Solutions
+* @nick_tetrate - Tetrate
 
 Understudy:
 
 * Chris McGrath
 * @kavitha
 * @kenna81
+
+### Auth Service
+
+authservice helps delegate the OIDC Authorization Code Grant Flow to the Istio mesh. authservice is compatible with any standard OIDC Provider as well as other Istio End-user Auth features, including Authentication Policy and RBAC. Together, they allow developers to protect their APIs and web apps without any application code required.
+
+Product:
+
+* [authservice](https://github.com/istio-ecosystem/authservice)
+
+Repository:
+
+* [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice)
+
+# Needs to be moved !!
+
+Dependency: None
+
+Owners:
+
+* @runyontr - Runyon Solutions
+* @nick_tetrate - Tetrate
+* @adam.toy - Rancher Federal
+
+Understudy:
 
 ### Logging
 
