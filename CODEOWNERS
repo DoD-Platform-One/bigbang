@@ -66,3 +66,8 @@ chart/templates/twistlock       @thomas.burton
 chart/Chart.yaml                @egoode @kevin.wilder
 chart/values.yaml               @egoode @kevin.wilder
 chart/templates/gitlab          @egoode @kevin.wilder
+
+[Anchore]
+chart/Chart.yaml                @aneufville @micah.nagel
+chart/values.yaml               @aneufville @micah.nagel
+chart/templates/anchore         @aneufville @micah.nagel

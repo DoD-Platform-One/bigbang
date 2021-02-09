@@ -49,4 +49,6 @@ stringData:
 {{ toYaml .Values.twistlock.values | indent 4 }}
   gitlab.yaml: |
 {{ toYaml .Values.addons.gitlab.values | indent 4 }}
+  anchore.yaml: |
+{{ toYaml .Values.addons.anchore.values | indent 4 }}
 data:

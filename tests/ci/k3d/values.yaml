@@ -65,4 +65,5 @@ addons:
     enabled: true
     sso:
       enabled: false
-
+  anchore:
+    enabled: true
