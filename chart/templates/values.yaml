@@ -53,4 +53,6 @@ stringData:
 {{ toYaml .Values.addons.gitlab.values | indent 4 }}
   anchore.yaml: |
 {{ toYaml .Values.addons.anchore.values | indent 4 }}
+  sonarqube.yaml: |
+{{ toYaml .Values.addons.sonarqube.values | indent 4 }}
 data:

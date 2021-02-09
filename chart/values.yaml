@@ -257,6 +257,35 @@ addons:
       tag: "0.19.2-bb.2"
     values: {}
 
+  sonarqube:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      path: "./chart"
+      tag: "9.2.6-bb.2"
+    sso:
+      enabled: false
+      client_id: # sso clientID example: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
+      providerName: # login as name example: P1 SSO
+      certificate: # SAML sso certificate example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
+      login: # login sso attribute example: login
+      name: # name sso attribute example: name
+      email: # email sso attribute example: email
+      group: # (optional) group sso attribute example: group
+    database:
+      enabled: false
+      server: # postgres location example: postgres.bigbang.dev
+      port: # 5432
+      database: # database name example: sonarDB
+      user: # postgres user example: sonarUser
+      password: # unencoded stringData. This should be put in the secret values
+    objectStorage:
+      enabled: true
+      storageClass:
+      accessMode: ReadWriteOnce
+      size: 10Gi
+    values: {}
+      
   haproxy:
     enabled: false
     git:
