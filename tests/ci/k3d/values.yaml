@@ -67,3 +67,5 @@ addons:
       enabled: false
   anchore:
     enabled: true
+  sonarqube:
+    enabled: true
