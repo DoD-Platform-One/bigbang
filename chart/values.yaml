@@ -256,3 +256,35 @@ addons:
       path: "./chart"
       tag: 1.1.2-bb.0
     values: {}
+
+  anchore:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      path: "./chart"
+      tag: "1.9.5-bb.1"
+    adminPassword: "" # Required, set the Admin password
+    enterprise:
+      enabled: false
+      licenseYaml: |
+        FULL LICENSE
+    sso:
+      enabled: false
+      client_id: ""
+      role_attribute: ""
+    database:
+      # Entering connection info will enable external database and will auto-create any required secrets.
+      # Anchore will not provison the database when using an external service
+      host: ""
+      port: ""
+      username: ""
+      password: ""
+      database: ""
+      feeds_database: "" # Only needed for enterprise
+    redis:
+      # Entering connection info will enable external redis and will auto-create any required secrets.
+      # Anchore only requires redis for enterprise deployments and will not provision an instance if using external
+      host: ""
+      port: ""
+      password: ""
+    values: {}

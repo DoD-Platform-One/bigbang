@@ -80,3 +80,38 @@ PLATFORM ONE GITLAB WARNING:
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
+
+{{- if $.Values.addons.anchore.enabled }}
+Anchore is enabled.
+{{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.database) }}
+PLATFORM ONE ANCHORE WARNING:
+  You have enabled an internal postgres database (main-db) in the values configuration.
+  PlatformOne does not support this option for production deployments.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- if $.Values.addons.anchore.enterprise.enabled }}
+{{- if not (and $.Values.addons.anchore.redis.host $.Values.addons.anchore.redis.port $.Values.addons.anchore.redis.password) }}
+PLATFORM ONE ANCHORE WARNING:
+  You have enabled an internal redis database in the values configuration.
+  PlatformOne does not support this option for production deployments.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.feeds_database) }}
+PLATFORM ONE ANCHORE WARNING:
+  You have enabled an internal postgres database (feeds-db) in the values configuration.
+  PlatformOne does not support this option for production deployments.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- end }}
+{{- if and ($.Values.addons.anchore.enterprise.enabled) (not $.Values.addons.anchore.enterprise.licenseYaml) }}
+PLATFORM ONE ANCHORE WARNING:
+  You have enabled an enterprise Anchore in the values configuration, but not provided a license.
+  Your deployment will fail without a license, please review your configuration and supply a license
+  or disable the enterprise features.
+{{- end }}
+{{- if and ($.Values.addons.anchore.sso.enabled) (not $.Values.addons.anchore.enterprise.enabled) }}
+PLATFORM ONE ANCHORE WARNING:
+  You have enabled SSO in the values configuration, but not enabled enterprise Anchore.
+  Your SSO configuration will be ignored, the Anchore UI is only available for enterprise deployments.
+{{- end }}
+{{- end }}
