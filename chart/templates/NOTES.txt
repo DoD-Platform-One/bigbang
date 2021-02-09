@@ -3,93 +3,79 @@ Thank you for supporting PlatformOne!
 {{ if $.Values.addons.gitlab.enabled }}
 Gitlab is enabled.
 Please follow the Gitlab online documentation for proper configuration. 
-Here is an example of how to configure external perstistent storage for postgres DB and object storage.
+This BigBang chart provides convenient enhancements to the Gitlab Package helm chart.
+If you enable these features certain settings will be defaulted for you and any required secrets will be automatically created.
+You should point to your cloud provider's RDS and object storage.
+Gitlab will not provision storage for you. You will need to provision the database and the S3 buckets.
+Here is an example of how to configure your deployment.
 
 addons:
   gitlab:
     enabled: true
-    values:
-      postgresql:
-        install: false
-      global:
-        minio:
-          enabled: false
-        psql:
-          host: postgres-postgresql-headless.postgres.svc.cluster.local
-          port: 5432
-          username: postgres
-          database: postgres
-          password:
-            secret: db-credentials
-            key: PGPASSWORD
-        registry:
-          bucket: gitlab-registry-storage
-        appConfig:
-          lfs:
-            bucket: gitlab-lfs
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          artifacts:
-            bucket: gitlab-artifacts
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          uploads:
-            bucket: gitlab-uploads
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          packages:
-            bucket: gitlab-packages
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          externalDiffs:
-            bucket: gitlab-mr-diffs
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          terraformState:
-            enabled: false
-            bucket: gitlab-terraform-state
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          backups:
-            bucket: gitlab-backup
-            tmpBucket: gitlab-backup-tmp
-      gitlab:
-        task-runner:
-          psql:
-            host: postgres-postgresql-headless.postgres.svc.cluster.local
-            port: 5432
-            username: postgres
-            database: postgres
-            password:
-              secret: db-credentials
-              key: PGPASSWORD
-          backups:
-            objectStorage:
-              config:
-                secret: gitlab-object-storage
-                key: backups
-      registry:
-        storage:
-          secret: gitlab-object-storage
-          key: registry
+    hostnames:
+      gitlab: gitlab.example.mil
+      registry: registry.example.mil
+    sso:
+      enabled: true
+      label: "Platform One SSO"
+      client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-gitlab"
+      client_secret: ""
+    database:
+      host: postgres.example.mil
+      port: 5432
+      username: gitlab
+      database: gitlab
+      password: mysecretpassword
+    objectstorage:
+      type: s3
+      endpoint: https://s3.us-gov-west-1.amazonaws.com
+      region: us-gov-west-1
+      accessKey: myaccesskey
+      accessSecret: mysecretkey
+      bucketPrefix: prod
 
+{{ if $.Values.addons.gitlab.objectstorage.endpoint }}
+GITLAB: You have enabled Gitlab external object storage. 
+Here is the list of buckets that you must provision in your s3 service:
+{{- if .Values.addons.gitlab.objectstorage.bucketPrefix }}
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-registry
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-lfs
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-artifacts
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-uploads
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-packages
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-mr-diffs
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-terraform-state
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-dependency-proxy
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-pseudo
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-backup
+{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-backup-tmp
+{{- else }}
+gitlab-registry
+gitlab-lfs
+gitlab-artifacts
+gitlab-uploads
+gitlab-packages
+gitlab-mr-diffs
+gitlab-terraform-state
+gitlab-dependency-proxy
+gitlab-pseudo
+gitlab-backup
+gitlab-backup-tmp
+{{- end }}
+{{- end }}
 
-{{- if $.Values.addons.gitlab.values.postgresql.install }}
+{{ if $.Values.addons.gitlab.database.host }}
+{{ else }}
 PLATFORM ONE GITLAB WARNING:
-  You have enabled an internal postgres database in the values configuration.
+  You have enabled an internal postgres database in the BigBang configuration.
   PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
   This option should only be used for development or CI pipelines.
 {{- end -}}
 
-{{- if $.Values.addons.gitlab.values.global.minio.enabled }}
+{{ if $.Values.addons.gitlab.objectstorage.endpoint }}
+{{ else }}
 PLATFORM ONE GITLAB WARNING: 
-  You have enabled a MinIO internal service in the values configuration.
+  You have enabled a MinIO internal service in the BigBang configuration.
   PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
   This option should only be used for development or CI pipelines.
 {{- end }}

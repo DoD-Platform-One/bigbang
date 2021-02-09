@@ -216,10 +216,38 @@ addons:
 
   gitlab:
     enabled: false
+    hostnames:
+      gitlab: gitlab.bigbang.dev
+      registry: registry.bigbang.dev
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "4.2.0-bb.1"
+      tag: "4.7.2-bb.0"
+    sso:
+      # enabling this option will auto-create any required secrets. 
+      # The defaults assume an OIDC provider. 
+      enabled: false
+      label: ""  # the text next to the login button
+      client_id: ""
+      client_secret: ""
+    database:
+      # entering connection info will enable external database and will auto-create any required secrets.
+      # Gitlab will not provison the database when using an external service
+      host: ""     # example: postgres.bigbang.dev
+      port: ""     # example: 5432
+      username: "" # example: gitlab
+      database: "" # example: gitlab
+      password: "" # unencoded string data. This should be placed in the secret values and then encrypted
+    objectstorage:
+      # entering connection info will enable this option and will auto-create any required secrets
+      # Gitlab will not provision the S3 buckets when using an external service
+      type: ""         # supported types are "s3" or "minio"
+      endpoint: ""     # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      region: ""       # example: us-gov-west-1
+      accessKey: ""    # unencoded string data
+      accessSecret: "" # unencoded string data. This should be placed in the secret values and then encrypted
+      bucketPrefix: "" # optional. example: "prod"
+    values: {}
 
   haproxy:
     enabled: false
