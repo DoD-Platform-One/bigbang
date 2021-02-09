@@ -22,4 +22,97 @@ type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}
 {{- end }}
+---
+# create sso secret. The assumption is OIDC
+{{- if .Values.addons.gitlab.sso.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-sso-provider
+  namespace: gitlab
+type: kubernetes.io/opaque
+stringData:
+  gitlab-sso.json: |-
+    {
+      "name": "openid_connect",
+      "label": "{{ .Values.addons.gitlab.sso.label }}",
+      "args": {
+        "name": "openid_connect",
+        "scope": [
+          "Gitlab"
+        ],
+        "response_type": "code",
+        "issuer": "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}",
+        "client_auth_method": "query",
+        "discovery": true,
+        "uid_field": "preferred_username",
+        "client_options": {
+          "identifier": "{{ .Values.addons.gitlab.sso.client_id | default .Values.sso.client_id }}",
+          "secret": "{{ .Values.addons.gitlab.sso.client_secret | default .Values.sso.client_secret }}",
+          "redirect_uri": "https://{{ .Values.addons.gitlab.hostnames.gitlab }}/users/auth/openid_connect/callback",
+          "end_session_endpoint": "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/logout"
+        }
+      }
+    }
+{{- end }}
+---
+# create database secret
+{{- if .Values.addons.gitlab.database.host }}
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gitlab-database
+    namespace: gitlab
+type: kubernetes.io/opaque
+stringData:
+    PGPASSWORD: {{ .Values.addons.gitlab.database.password }}
+{{- end }}
+---
+# create object storage secret
+{{- if .Values.addons.gitlab.objectstorage.endpoint }}
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gitlab-object-storage
+    namespace: gitlab
+type: kubernetes.io/opaque
+stringData:
+    rails: |-
+      provider: AWS
+      region: {{ .Values.addons.gitlab.objectstorage.region }}
+      aws_access_key_id: {{ .Values.addons.gitlab.objectstorage.accessKey }}
+      aws_secret_access_key: {{ .Values.addons.gitlab.objectstorage.accessSecret }}
+      {{- if eq .Values.addons.gitlab.objectstorage.type "minio" }}
+      aws_signature_version: 4
+      host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectstorage.endpoint "${2}" }}
+      endpoint: "{{ .Values.addons.gitlab.objectstorage.endpoint }}"
+      path_style: true
+      {{- end }}
+    registry: |-
+      s3:
+        {{- if .Values.addons.gitlab.objectstorage.bucketPrefix }}
+        bucket: {{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-registry
+        {{- else }}
+        bucket: gitlab-registry
+        {{- end }}
+        accesskey: {{ .Values.addons.gitlab.objectstorage.accessKey }}
+        secretkey: {{ .Values.addons.gitlab.objectstorage.accessSecret }}
+        region: {{ .Values.addons.gitlab.objectstorage.region }}
+        {{- if eq .Values.addons.gitlab.objectstorage.type "s3" }}
+        v4auth: true
+        {{- end }}
+        {{- if eq .Values.addons.gitlab.objectstorage.type "minio" }}
+        aws_signature_version: 4
+        host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectstorage.endpoint "${2}" }}
+        regionendpoint: "{{ .Values.addons.gitlab.objectstorage.endpoint }}"
+        path_style: true
+        {{- end }}
+    backups: |-
+      [default]
+      access_key = {{ .Values.addons.gitlab.objectstorage.accessKey }}
+      secret_key = {{ .Values.addons.gitlab.objectstorage.accessSecret }}
+      bucket_location = {{ .Values.addons.gitlab.objectstorage.region }}
+      host_bucket = %(bucket)s.{{ regexReplaceAll "http(s*)://" .Values.addons.gitlab.objectstorage.endpoint "" }}
+{{- end }}
+
 {{- end }}
