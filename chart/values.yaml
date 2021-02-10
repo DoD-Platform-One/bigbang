@@ -6,7 +6,7 @@ offline: false
 
 # Regisitires can be an explicit map of registries as provided here
 registryCredentials:
-  registry: registry1.dso.mil
+- registry: registry1.dso.mil
   username: ""
   password: ""
   email: ""
@@ -82,7 +82,7 @@ istio:
   sso:
     enabled: false
     kiali:
-      client_id: kiali
+      client_id: kiali  
       client_secret: "change_me"
     jaeger:
       client_id: jaeger
@@ -158,7 +158,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.10"
+    tag: "11.0.0-bb.12"
   sso:
     enabled: false
     prometheus:
