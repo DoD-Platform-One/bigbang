@@ -299,7 +299,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.9.5-bb.1"
+      tag: "1.9.5-bb.2"
     adminPassword: "" # Required, set the Admin password
     enterprise:
       enabled: false
