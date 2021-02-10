@@ -6,7 +6,7 @@ offline: false
 
 # Regisitires can be an explicit map of registries as provided here
 registryCredentials:
-- registry: registry1.dso.mil
+  registry: registry1.dso.mil
   username: ""
   password: ""
   email: ""
@@ -82,7 +82,7 @@ istio:
   sso:
     enabled: false
     kiali:
-      client_id: kiali  
+      client_id: kiali
       client_secret: "change_me"
     jaeger:
       client_id: jaeger
