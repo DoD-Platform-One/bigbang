@@ -150,7 +150,6 @@ Repository:
 
 * [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice)
 
-# Needs to be moved !!
 
 Dependency: None
 
