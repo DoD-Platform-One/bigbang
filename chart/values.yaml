@@ -158,7 +158,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.12"
+    tag: "11.0.0-bb.13"
   sso:
     enabled: false
     prometheus:
