@@ -51,71 +51,22 @@ spec:
     {{- if .Values.addons.gitlab.database.host }}
     postgresql:
       install: false
-    {{- end }}
-    redis:
-      metrics:
-        image:
-          pullSecrets: 
-          - private-registry
-      image:
-        pullSecrets: 
-        - private-registry
-    registry:
-      {{- if .Values.addons.gitlab.objectstorage.endpoint }}
+    {{- end }} 
+    {{- if .Values.addons.gitlab.objectstorage.endpoint }}
+    registry:      
       storage:
         secret: gitlab-object-storage
         key: registry
-      {{- end }}
-      image:
-        pullSecrets:
-        - name: private-registry
-    shared-secrets:
-      selfsign:
-        image:
-          pullSecrets:
-          - name: private-registry
+    {{- end }}
+    {{- if .Values.addons.gitlab.objectstorage.endpoint }}
     gitlab:
-      task-runner:
-        {{- if .Values.addons.gitlab.objectstorage.endpoint }}
+      task-runner:        
         backups:
           objectStorage:
             config:
               secret: gitlab-object-storage
               key: backups
-        {{- end }}
-        image:
-          pullSecrets:
-          - name: private-registry
-      migrations:
-        image:
-          pullSecrets:
-          - name: private-registry
-      webservice:
-        image:
-          pullSecrets:
-          - name: private-registry 
-        workhorse:
-          pullSecrets:
-          - name: private-registry 
-      sidekiq:
-        image:
-          pullSecrets:
-          - name: private-registry
-      gitaly:
-        image:
-          pullSecrets:
-          - name: private-registry
-      gitlab-shell:
-        image:
-          pullSecrets:
-          - name: private-registry
-      gitlab-exporter:
-        image:
-          pullSecrets:
-          - name: private-registry
-    minio:
-      pullSecrets:
-      - name: private-registry
+    {{- end }}
     global:
       hosts:
         domain: {{ .Values.hostname }}
@@ -253,14 +204,6 @@ spec:
           tmpBucket: gitlab-backup-tmp
           {{- end }}
         {{- end }}
-      certificates:
-        image:
-          pullSecrets:
-          - name: private-registry
-      kubectl:
-        image:
-          pullSecrets:
-          - name: private-registry
 
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.monitoring.enabled }}
   dependsOn:
