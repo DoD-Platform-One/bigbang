@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: mattermost-operator
+upstream:
+  type: git
+  git:
+    commit: 840e75f82be4ec111c0c53e58705691107069e72
+    repo: https://github.com/mattermost/mattermost-operator
+    directory: /docs/mattermost-operator
+    ref: v1.12.0

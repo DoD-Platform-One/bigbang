@@ -1,14 +1,12 @@
 # Repo and image tag 
 image: 
   imagePullPolicy: IfNotPresent
-  name: "registry1.dsop.io/ironbank/opensource/mattermost/mattermost-operator:v1.5.0"
+  repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
+  tag: v1.12.0
 
 #Mattermost operator desired replicas
 replicas: 
   count: 1
 
-# Watched namespace, blank for all namspaces
-watchedNamespace: 
-
 imagePullSecrets: 
-- name: private-registry
+- name: private-registry-mil

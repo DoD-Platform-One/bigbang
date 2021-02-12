@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: mattermost-operator
   namespace: {{ .Release.Namespace }}
-  annotations:
-    sidecar.istio.io/inject: 'false'
+  labels:
+    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"
+    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
   replicas: {{ .Values.replicas.count }}
   selector:
@@ -17,18 +20,18 @@ spec:
     spec:
       serviceAccountName: mattermost-operator
       containers:
-        - name: mattermost-operator
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          args:
-            - --enable-leader-election
-          command:
-            - /mattermost-operator
-          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
-          env:
-            - name: MAX_RECONCILING_INSTALLATIONS
-              value: "20"
-            - name: REQUEUE_ON_LIMIT_DELAY
-              value: 20s
+      - name: mattermost-operator
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        args:
+        - --enable-leader-election
+        command:
+        - /mattermost-operator
+        env:
+        - name: MAX_RECONCILING_INSTALLATIONS
+          value: "20"
+        - name: REQUEUE_ON_LIMIT_DELAY
+          value: 20s
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
