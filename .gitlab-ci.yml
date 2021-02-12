@@ -1,4 +1,4 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: remove-helm-dependency
+    ref: master
     file: '/templates/package-tests.yml' 
