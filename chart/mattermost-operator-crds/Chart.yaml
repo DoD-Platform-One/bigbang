@@ -1,0 +1,15 @@
+apiVersion: v2
+name: mattermost-operator-crds
+description: "Deployment of mattermost operator crds using Helm"
+home: https://github.com/mattermost/mattermost-operator
+type: application
+version: "1.12.0"
+appVersion: "1.12.0"
+kubeVersion: ">=1.12.0-0"
+keywords: 
+  - Mattermost
+  - Operator
+  - CRDs
+maintainers: 
+  - name: Mattermost
+    email: info@mattermost.com

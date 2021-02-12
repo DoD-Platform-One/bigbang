@@ -24,7 +24,7 @@ Install the local chart
 git clone https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
 
 # Install the chart (be sure to add a namespace to it if you don't want it in default)
-cd mattermost-operator
+cd mattermost-operator && helm dependency update chart
 helm install mattermost-operator chart 
 
 # Check to see if it is up

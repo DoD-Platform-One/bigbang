@@ -12,3 +12,9 @@ keywords:
 maintainers: 
   - name: Mattermost
     email: info@mattermost.com
+
+dependencies:
+  - name: mattermost-operator-crds
+    version: 1.12.0
+    condition: installCRDs
+    repository: "file://mattermost-operator-crds"
