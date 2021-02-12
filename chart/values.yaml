@@ -4,12 +4,13 @@ hostname: bigbang.dev
 # TODO: All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false
 
+registryCredentials: ~
 # Regisitires can be an explicit map of registries as provided here
-registryCredentials:
-  registry: registry1.dso.mil
-  username: ""
-  password: ""
-  email: ""
+# registryCredentials:
+#   registry: registry1.dso.mil
+#   username: ""
+#   password: ""
+#   email: ""
 
 # Or a list of registires:
 # registryCredentials:
