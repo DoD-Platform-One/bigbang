@@ -18,16 +18,18 @@ spec:
       serviceAccountName: mattermost-operator
       containers:
         - name: mattermost-operator
-          image: {{ .Values.image.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          args:
+            - --enable-leader-election
           command:
-          - mattermost-operator
+            - /mattermost-operator
           imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           env:
-            - name: WATCH_NAMESPACE
-              value: {{ .Values.watchedNamespace }}
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: OPERATOR_NAME
-              value: "mattermost-operator"
+            - name: MAX_RECONCILING_INSTALLATIONS
+              value: "20"
+            - name: REQUEUE_ON_LIMIT_DELAY
+              value: 20s
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

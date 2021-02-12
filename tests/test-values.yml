@@ -9,3 +9,6 @@ replicas:
 
 # Watched namespace, blank for all namspaces
 watchedNamespace: 
+
+imagePullSecrets: 
+- name: private-registry
