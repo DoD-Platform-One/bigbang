@@ -76,7 +76,7 @@ variable "agent_spot" {
   default = false
 }
 
-variable ci_pipeline_url {
+variable "ci_pipeline_url" {
   type        = string
   default     = "none"
   description = "URL to the pipeline that created this resource"
