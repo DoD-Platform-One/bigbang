@@ -52,13 +52,13 @@ branch: {{ .branch | quote }}
 Build the appropriate git credentials secret for private git repositories
 */}}
 {{- define "gitCreds" -}}
-{{- if .existingSecret -}}
+{{- if .Values.git.existingSecret -}}
 secretRef:
-  name: {{ .existingSecret }}
-{{- else if coalesce .credentials.username .credentials.password .credentials.privateKey .credentials.publicKey .credentials.knownHosts "" -}}
+  name: {{ .Values.git.existingSecret }}
+{{- else if coalesce .Values.git.credentials.username .Values.git.credentials.password .Values.git.credentials.privateKey .Values.git.credentials.publicKey .Values.git.credentials.knownHosts "" -}}
 {{- /* Input validation happens in git-credentials.yaml template */ -}}
 secretRef:
-  name: git-credentials
+  name: {{ $.Release.Name }}-git-credentials
 {{- end -}}
 {{- end -}}
 

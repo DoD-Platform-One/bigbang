@@ -13,5 +13,5 @@ spec:
   url: {{ .Values.addons.gitlab.git.repo }}
   ref:
     {{- include "validRef" .Values.addons.gitlab.git | nindent 4 }}
-  {{- include "gitCreds" .Values.git | nindent 2 }}
+  {{- include "gitCreds" . | nindent 2 }}
 {{- end }}
