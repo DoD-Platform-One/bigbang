@@ -9,4 +9,4 @@ spec:
   ref:
     {{- include "validRef" .Values.addons.haproxy.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" .Values.git | nindent 2 }}
+  {{- include "gitCreds" . | nindent 2 }}
