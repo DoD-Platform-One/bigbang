@@ -49,6 +49,10 @@ stringData:
 {{ toYaml .Values.twistlock.values | indent 4 }} 
   clusterauditor.yaml: |
 {{ toYaml .Values.twistlock.values | indent 4 }}
+  miniooperator.yaml: |
+{{ toYaml .Values.minio.miniooperator.values | indent 4 }}
+  minio.yaml: |
+{{ toYaml .Values.minio.minioinstance.values | indent 4 }}
   gitlab.yaml: |
 {{ toYaml .Values.addons.gitlab.values | indent 4 }}
   anchore.yaml: |

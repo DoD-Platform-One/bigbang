@@ -1,0 +1,30 @@
+{{- if .Values.minio.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio
+  labels:
+    istio-injection: enabled
+---
+{{- if (   include "imagePullSecret" . ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: minio
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+{{- end }}
+---
+# probably want to get rid of this eventually
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-creds-secret
+  namespace: minio
+type: Opaque
+data:
+  accesskey: bWluaW8= # base 64 encoded "minio" (echo -n 'minio' | base64)
+  secretkey: bWluaW8xMjM= # based 64 encoded "minio123" (echo -n 'minio123' | base64)
+{{- end }}

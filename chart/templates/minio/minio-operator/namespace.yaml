@@ -1,0 +1,19 @@
+{{- if .Values.minio.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio-operator
+  labels:
+    istio-injection: enabled
+---
+{{- if ( include "imagePullSecret" . ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: minio-operator
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ template "imagePullSecret" . }}
+{{- end }}
+{{- end }}
