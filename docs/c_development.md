@@ -8,11 +8,11 @@ Included here is a setup that will allow you to checkout and begin development u
 
 #### Access
 + [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
-+ [Umbrella repository](https://repo1.dso.mil/platform-one/big-bang/umbrella)
++ [Umbrella repository](https://repo1.dso.mil/platform-one/big-bang/bigbang)
 + [Iron Bank registry](https://registry1.dso.mil/)
 
 - [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
-- [Umbrella repository](https://repo1.dsop.io/platform-one/big-bang/umbrella)
+- [Umbrella repository](https://repo1.dsop.io/platform-one/big-bang/bigbang)
 - [Iron Bank registry](https://registry1.dsop.io/)
 
 #### Utilities
@@ -274,8 +274,8 @@ kubectl get nodes
 
 mkdir -pv ~/repos/
 cd ~/repos
-git clone https://repo1.dso.mil/platform-one/big-bang/umbrella.git
-cd ~/repos/umbrella
+git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+cd ~/repos/bigbang
 ```
 
 From the base of the project

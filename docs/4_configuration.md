@@ -124,7 +124,7 @@ In your `kustomization.yaml` under your environment, here is an example of how t
 
 ```yaml
 bases:
-- https://repo1.dso.mil/platform-one/big-bang/umbrella.git/base/?ref=v1.2.*
+- https://repo1.dso.mil/platform-one/big-bang/bigbang.git/base/?ref=v1.2.*
 patchesStrategicMerge:
 - |-
   apiVersion: source.toolkit.fluxcd.io/v1beta1

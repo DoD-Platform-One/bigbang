@@ -3,7 +3,7 @@
   "description": "Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved [packages](#packages) into a Kubernetes cluster.  Big Bang follows a [GitOps](#gitops) approach to configuration management, using [Flux v2](#flux-v2) to reconcile Git with the cluster.  Environments (e.g. dev, prod) and packages (e.g. istio) can be fully configured to suit the deployment needs.",
   "repository": {
     "type": "git",
-    "url": "https://repo1.dso.mil/platform-one/big-bang/umbrella.git"
+    "url": "https://repo1.dso.mil/platform-one/big-bang/bigbang.git"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
