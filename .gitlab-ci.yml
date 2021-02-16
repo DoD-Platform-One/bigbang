@@ -55,6 +55,8 @@ changelog:
   extends:
     - .bigbang-dogfood
   allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     CHANGELOG_FILE: CHANGELOG.md
   script:
@@ -67,6 +69,8 @@ version:
   extends:
     - .bigbang-dogfood
   allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     CHART_FILE: chart/Chart.yaml
     BASEGIT_FILE: base/gitrepository.yaml
@@ -80,6 +84,8 @@ commits:
   extends:
     - .bigbang-dogfood
   allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
   - dnf module install -y nodejs
   - npm install --only=dev
@@ -181,31 +187,31 @@ upgrade:
 .infra fork:
   stage: network up
   rules:
-    # skip job when branch name starts with "hotfix" or "patch"
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
-      when: never
-    # run infrastructure pipelines only on merges into master, and run regardless of failure
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    # run infrastructure pipelines only on merges into release branches, and run regardless of failure
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
       allow_failure: false
       when: manual
+    # Run on scheduled jobs
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
+      allow_failure: false
 
 # Abstract for jobs responsible for creating infrastructure
 .infra create:
   rules:
-    # skip job when branch name starts with "hotfix" or "patch"
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
-      when: never
-    # run infrastructure pipelines only on merges into master
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    # run infrastructure pipelines only on merges into release branches
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
+    # Run on scheduled jobs
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
 
 # Abstract for jobs responsible for cleaning up infrastructure
 .infra cleanup:
   rules:
-    # skip job when branch name starts with "hotfix" or "patch"
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
-      when: never
-    # run infrastructure pipelines only on merges into master, and run regardless of failure
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+    # run infrastructure pipelines only on merges into release branches, and run regardless of failure
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
+      allow_failure: true
+      when: always
+    # Run on scheduled jobs
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
       allow_failure: true
       when: always
 
@@ -346,9 +352,6 @@ package:
   rules:
     # run job for manual tag events
     - if: $CI_COMMIT_TAG
-    #   when: never
-    # # run job on commits to default branch
-    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
@@ -381,9 +384,6 @@ release:
   rules:
     # run job for manual tag events
     - if: $CI_COMMIT_TAG
-    #   when: never
-    # # run job on commits to default branch
-    # - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:

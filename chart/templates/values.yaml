@@ -31,6 +31,8 @@ stringData:
 {{ toYaml .Values.istio.values | indent 4  }}
   gatekeeper.yaml: |
 {{ toYaml .Values.gatekeeper.values | indent 4 }}
+  gitlab-runner.yaml: |
+{{ toYaml .Values.addons.gitlabRunner.values | indent 4 }}
   fluentbit.yaml: |
 {{ toYaml .Values.fluentbit.values | indent 4 }}
   eckoperator.yaml: |
@@ -53,4 +55,8 @@ stringData:
 {{ toYaml .Values.minio.minioinstance.values | indent 4 }}
   gitlab.yaml: |
 {{ toYaml .Values.addons.gitlab.values | indent 4 }}
+  anchore.yaml: |
+{{ toYaml .Values.addons.anchore.values | indent 4 }}
+  sonarqube.yaml: |
+{{ toYaml .Values.addons.sonarqube.values | indent 4 }}
 data:

@@ -63,9 +63,9 @@ addons:
         callback_uri: "https://minimal.bigbang.dev"
   gitlab:
     enabled: true
-    values:
-      postgresql:
-        install: true
-      global:
-        minio:
-          enabled: true
+    sso:
+      enabled: false
+  anchore:
+    enabled: true
+  sonarqube:
+    enabled: true
