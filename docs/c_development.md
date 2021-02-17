@@ -190,7 +190,7 @@ k3d version
 ```bash
 YOURPUBLICEC2IP=$( curl https://ipinfo.io/ip )
 echo $YOURPUBLICEC2IP
-k3d cluster create -s 1 -a 3  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+k3d cluster create -s 1 -a 3 -v /etc/machine-id:/etc/machine-id  --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
 - **_Optionally_** you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
@@ -209,7 +209,7 @@ configs:
 EOF
 
 YOURPUBLICEC2IP=$( curl https://ipinfo.io/ip )
-k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml -v /etc/machine-id:/etc/machine-id --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$YOURPUBLICEC2IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
 Here is a break down of what we are doing with this command:
@@ -225,6 +225,7 @@ Here is a break down of what we are doing with this command:
 optional:
 `-v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster
 `--api-port 0.0.0.0:38787` Chooses a port for the API server instead of being assigned a random one. You can set this to any port number that you want.
+`-v /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
 
 - Once your cluster is up, you can copy the kubeconfig from the EC2 instance to your workstation and update the IP Address. If you do not have an existing configuration to preserve on your local workstation, you can delete and recreate the configuration file.
 
