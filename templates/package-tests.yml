@@ -29,13 +29,28 @@ configuration validation:
     - echo "Generic configuration validation tests:"
 
     # Global policy tests
-    - helm conftest chart --policy ${GENERIC_POLICY_PATH}
+    - |
+      if [ -f "tests/test-values.yml" ]; then
+        echo "Checking test values..."
+        helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.yml
+        echo "Checking chart values..."
+        helm conftest chart --policy ${GENERIC_POLICY_PATH}
+      else
+        helm conftest chart --policy ${GENERIC_POLICY_PATH}
+      fi
 
     # Package specific tests
     - |
       if [ -d "tests/policy" ]; then
         echo "App specific configuration validation tests:"
-        helm conftest chart --policy tests/policy
+        if [ -f "tests/test-values.yml" ]; then
+          echo "Checking test values..."
+          helm conftest chart --policy tests/policy -f tests/test-values.yml
+          echo "Checking chart values..."
+          helm conftest chart --policy tests/policy
+        else
+          helm conftest chart --policy tests/policy
+        fi
       fi
 
 package tests:
