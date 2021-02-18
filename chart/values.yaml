@@ -288,25 +288,19 @@ addons:
       tag: "9.2.6-bb.2"
     sso:
       enabled: false
-      client_id: # sso clientID example: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
-      providerName: # login as name example: P1 SSO
-      certificate: # SAML sso certificate example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
-      login: # login sso attribute example: login
-      name: # name sso attribute example: name
-      email: # email sso attribute example: email
-      group: # (optional) group sso attribute example: group
+      client_id: "" # sso clientID example: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
+      label: "" # login as name example: P1 SSO
+      certificate: "" # SAML sso certificate example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
+      login: login # login sso attribute example: login
+      name: name # name sso attribute example: name
+      email: email # email sso attribute example: email
+      group: group # (optional) group sso attribute example: group
     database:
-      enabled: false
-      server: # postgres location example: postgres.bigbang.dev
-      port: # 5432
-      database: # database name example: sonarDB
-      user: # postgres user example: sonarUser
-      password: # unencoded stringData. This should be put in the secret values
-    objectStorage:
-      enabled: true
-      storageClass:
-      accessMode: ReadWriteOnce
-      size: 10Gi
+      host: "" # postgres location example: postgres.bigbang.dev
+      port: 5432 # 5432
+      database: "" # database name example: sonarDB
+      username: "" # postgres user example: sonarUser
+      password: "" # unencoded stringData. This should be put in the secret values
     values: {}
       
   haproxy:
