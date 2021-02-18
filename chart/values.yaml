@@ -234,7 +234,7 @@ addons:
     #       callback_uri: "https://somecallback"
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice.git
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
       tag: "0.1.6-bb.3"
     # Dont put chain configuraitons in this section
