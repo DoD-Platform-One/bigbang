@@ -317,7 +317,7 @@ addons:
   haproxy:
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
       path: "./chart"
       tag: 1.1.2-bb.0
     values: {}
