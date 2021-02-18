@@ -34,21 +34,21 @@ addons:
       accessSecret: mysecretkey
       bucketPrefix: prod
 
-{{ if $.Values.addons.gitlab.objectstorage.endpoint }}
+{{ if $.Values.addons.gitlab.objectStorage.endpoint }}
 GITLAB: You have enabled Gitlab external object storage. 
 Here is the list of buckets that you must provision in your s3 service:
-{{- if .Values.addons.gitlab.objectstorage.bucketPrefix }}
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-registry
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-lfs
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-artifacts
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-uploads
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-packages
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-mr-diffs
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-terraform-state
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-dependency-proxy
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-pseudo
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-backup
-{{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-backup-tmp
+{{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-registry
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-lfs
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-artifacts
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-uploads
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-packages
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-mr-diffs
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-terraform-state
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-dependency-proxy
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-pseudo
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-backup
+{{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-backup-tmp
 {{- else }}
 gitlab-registry
 gitlab-lfs
@@ -72,7 +72,7 @@ PLATFORM ONE GITLAB WARNING:
   This option should only be used for development or CI pipelines.
 {{- end -}}
 
-{{ if $.Values.addons.gitlab.objectstorage.endpoint }}
+{{ if $.Values.addons.gitlab.objectStorage.endpoint }}
 {{ else }}
 PLATFORM ONE GITLAB WARNING: 
   You have enabled a MinIO internal service in the BigBang configuration.

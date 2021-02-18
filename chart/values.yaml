@@ -257,11 +257,11 @@ addons:
       # entering connection info will enable external database and will auto-create any required secrets.
       # Gitlab will not provison the database when using an external service
       host: ""     # example: postgres.bigbang.dev
-      port: ""     # example: 5432
-      username: "" # example: gitlab
+      port: 5432     # example: 5432
       database: "" # example: gitlab
+      username: "" # example: gitlab
       password: "" # unencoded string data. This should be placed in the secret values and then encrypted
-    objectstorage:
+    objectStorage:
       # entering connection info will enable this option and will auto-create any required secrets
       # Gitlab will not provision the S3 buckets when using an external service
       type: ""         # supported types are "s3" or "minio"
@@ -269,7 +269,7 @@ addons:
       region: ""       # example: us-gov-west-1
       accessKey: ""    # unencoded string data
       accessSecret: "" # unencoded string data. This should be placed in the secret values and then encrypted
-      bucketPrefix: "" # optional. example: "prod"
+      bucketPrefix: "" # optional, includes "-". example: "prod" becomes "prod-gitlab-backups"
     values: {}
 
   gitlabRunner:

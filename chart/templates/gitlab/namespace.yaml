@@ -69,7 +69,7 @@ stringData:
 {{- end }}
 ---
 # create object storage secret
-{{- if .Values.addons.gitlab.objectstorage.endpoint }}
+{{- if .Values.addons.gitlab.objectStorage.endpoint }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -79,40 +79,40 @@ type: kubernetes.io/opaque
 stringData:
     rails: |-
       provider: AWS
-      region: {{ .Values.addons.gitlab.objectstorage.region }}
-      aws_access_key_id: {{ .Values.addons.gitlab.objectstorage.accessKey }}
-      aws_secret_access_key: {{ .Values.addons.gitlab.objectstorage.accessSecret }}
-      {{- if eq .Values.addons.gitlab.objectstorage.type "minio" }}
+      region: {{ .Values.addons.gitlab.objectStorage.region }}
+      aws_access_key_id: {{ .Values.addons.gitlab.objectStorage.accessKey }}
+      aws_secret_access_key: {{ .Values.addons.gitlab.objectStorage.accessSecret }}
+      {{- if eq .Values.addons.gitlab.objectStorage.type "minio" }}
       aws_signature_version: 4
-      host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectstorage.endpoint "${2}" }}
-      endpoint: "{{ .Values.addons.gitlab.objectstorage.endpoint }}"
+      host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectStorage.endpoint "${2}" }}
+      endpoint: "{{ .Values.addons.gitlab.objectStorage.endpoint }}"
       path_style: true
       {{- end }}
     registry: |-
       s3:
-        {{- if .Values.addons.gitlab.objectstorage.bucketPrefix }}
-        bucket: {{ .Values.addons.gitlab.objectstorage.bucketPrefix }}-gitlab-registry
+        {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
+        bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-registry
         {{- else }}
         bucket: gitlab-registry
         {{- end }}
-        accesskey: {{ .Values.addons.gitlab.objectstorage.accessKey }}
-        secretkey: {{ .Values.addons.gitlab.objectstorage.accessSecret }}
-        region: {{ .Values.addons.gitlab.objectstorage.region }}
-        {{- if eq .Values.addons.gitlab.objectstorage.type "s3" }}
+        accesskey: {{ .Values.addons.gitlab.objectStorage.accessKey }}
+        secretkey: {{ .Values.addons.gitlab.objectStorage.accessSecret }}
+        region: {{ .Values.addons.gitlab.objectStorage.region }}
+        {{- if eq .Values.addons.gitlab.objectStorage.type "s3" }}
         v4auth: true
         {{- end }}
-        {{- if eq .Values.addons.gitlab.objectstorage.type "minio" }}
+        {{- if eq .Values.addons.gitlab.objectStorage.type "minio" }}
         aws_signature_version: 4
-        host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectstorage.endpoint "${2}" }}
-        regionendpoint: "{{ .Values.addons.gitlab.objectstorage.endpoint }}"
+        host: {{ regexReplaceAll "http(s{0,1})://(.*):(\\d+)" .Values.addons.gitlab.objectStorage.endpoint "${2}" }}
+        regionendpoint: "{{ .Values.addons.gitlab.objectStorage.endpoint }}"
         path_style: true
         {{- end }}
     backups: |-
       [default]
-      access_key = {{ .Values.addons.gitlab.objectstorage.accessKey }}
-      secret_key = {{ .Values.addons.gitlab.objectstorage.accessSecret }}
-      bucket_location = {{ .Values.addons.gitlab.objectstorage.region }}
-      host_bucket = %(bucket)s.{{ regexReplaceAll "http(s*)://" .Values.addons.gitlab.objectstorage.endpoint "" }}
+      access_key = {{ .Values.addons.gitlab.objectStorage.accessKey }}
+      secret_key = {{ .Values.addons.gitlab.objectStorage.accessSecret }}
+      bucket_location = {{ .Values.addons.gitlab.objectStorage.region }}
+      host_bucket = %(bucket)s.{{ regexReplaceAll "http(s*)://" .Values.addons.gitlab.objectStorage.endpoint "" }}
 {{- end }}
 
 {{- end }}
