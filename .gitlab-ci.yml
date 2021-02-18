@@ -187,10 +187,6 @@ upgrade:
 .infra fork:
   stage: network up
   rules:
-    # run infrastructure pipelines only on merges into release branches, and run regardless of failure
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
-      allow_failure: false
-      when: manual
     # Run on scheduled jobs
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
       allow_failure: false
@@ -198,18 +194,12 @@ upgrade:
 # Abstract for jobs responsible for creating infrastructure
 .infra create:
   rules:
-    # run infrastructure pipelines only on merges into release branches
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
     # Run on scheduled jobs
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
 
 # Abstract for jobs responsible for cleaning up infrastructure
 .infra cleanup:
   rules:
-    # run infrastructure pipelines only on merges into release branches, and run regardless of failure
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^release*/'
-      allow_failure: true
-      when: always
     # Run on scheduled jobs
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
       allow_failure: true
