@@ -25,6 +25,10 @@ kind: HelmRelease
 metadata:
   name: haproxy-sso
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: haproxy
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: authservice
   chart:
