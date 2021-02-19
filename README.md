@@ -1,8 +1,8 @@
 # bigbang
 
-![Version: 1.0.8](https://img.shields.io/badge/Version-1.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved [packages](#packages) into a Kubernetes cluster.
+Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
 **Homepage:** <https://p1.dso.mil/#/products/big-bang>
 
@@ -150,44 +150,35 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.database.database | string | `""` | Database name to connect to on host. |
 | addons.gitlab.database.username | string | `""` | Username to connect as to external database, the user must have all privileges on the database. |
 | addons.gitlab.database.password | string | `""` | Database password for the username used to connect to the existing database. |
-| addons.gitlab.objectstorage.type | string | `""` | Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used. Entering connection info will enable this option and will auto-create any required secrets |
-| addons.gitlab.objectstorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"P |
-| addons.gitlab.objectstorage.region | string | `""` | S3 compatible region to use for connection information. |
-| addons.gitlab.objectstorage.accessKey | string | `""` | Access key for connecting to object storage endpoint. |
-| addons.gitlab.objectstorage.accessSecret | string | `""` | Secret key for connecting to object storage endpoint. Unencoded string data. This should be placed in the secret values and then encrypted |
-| addons.gitlab.objectstorage.bucketPrefix | string | `""` | Bucket prefix to use for identifying buckets. Example: "prod" will produce "prod-gitlab-bucket" |
+| addons.gitlab.objectStorage.type | string | `""` | Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used. Entering connection info will enable this option and will auto-create any required secrets |
+| addons.gitlab.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
+| addons.gitlab.objectStorage.region | string | `""` | S3 compatible region to use for connection information. |
+| addons.gitlab.objectStorage.accessKey | string | `""` | Access key for connecting to object storage endpoint. |
+| addons.gitlab.objectStorage.accessSecret | string | `""` | Secret key for connecting to object storage endpoint. Unencoded string data. This should be placed in the secret values and then encrypted |
+| addons.gitlab.objectStorage.bucketPrefix | string | `""` | Bucket prefix to use for identifying buckets. Example: "prod" will produce "prod-gitlab-bucket" |
 | addons.gitlab.values | object | `{}` | Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git |
 | addons.gitlabRunner.enabled | bool | `false` | Toggle deployment of Gitlab Runner. |
 | addons.gitlabRunner.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git"` |  |
 | addons.gitlabRunner.git.path | string | `"./chart"` |  |
-| addons.gitlabRunner.git.tag | string | `"0.19.2-bb.2"` |  |
+| addons.gitlabRunner.git.tag | string | `"0.19.2-bb.3"` |  |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git |
 | addons.sonarqube.enabled | bool | `false` | Toggle deployment of SonarQube. |
 | addons.sonarqube.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git"` |  |
 | addons.sonarqube.git.path | string | `"./chart"` |  |
 | addons.sonarqube.git.tag | string | `"9.2.6-bb.2"` |  |
-| addons.sonarqube.git.enabled | bool | `false` | Toggle OIDC SSO for SonarQube on and off. Enabling this option will auto-create any required secrets. |
-| addons.sonarqube.git.client_id | string | `""` | SonarQube OIDC client ID |
-| addons.sonarqube.git.client_secret | string | `""` | SonarQube OIDC client secret |
-| addons.sonarqube.git.label | string | `""` | SonarQube SSO login button label |
 | addons.sonarqube.sso.enabled | bool | `false` | Toggle OIDC SSO for SonarQube. Enabling this option will auto-create any required secrets. |
 | addons.sonarqube.sso.client_id | string | `""` | SonarQube OIDC client ID |
-| addons.sonarqube.sso.providerName | string | `""` | SonarQube SSO login button label |
+| addons.sonarqube.sso.label | string | `""` | SonarQube SSO login button label |
 | addons.sonarqube.sso.certificate | string | `""` | SonarQube plaintext SAML sso certificate. example: MITCAYCBFyIEUjNBkqhkiG9w0BA.... |
-| addons.sonarqube.sso.login | string | `""` | SonarQube login sso attribute. |
-| addons.sonarqube.sso.name | string | `""` | SonarQube name sso attribute. |
-| addons.sonarqube.sso.email | string | `""` | SonarQube email sso attribute. |
-| addons.sonarqube.sso.group | string | `""` | (optional) SonarQube group sso attribute. |
-| addons.sonarqube.database.enabled | bool | `false` |  |
-| addons.sonarqube.database.server | string | `""` | Hostname of a pre-existing PostgreSQL database to use for SonarQube. |
+| addons.sonarqube.sso.login | string | `"login"` | SonarQube login sso attribute. |
+| addons.sonarqube.sso.name | string | `"name"` | SonarQube name sso attribute. |
+| addons.sonarqube.sso.email | string | `"email"` | SonarQube email sso attribute. |
+| addons.sonarqube.sso.group | string | `"group"` | (optional) SonarQube group sso attribute. |
+| addons.sonarqube.database.host | string | `""` | Hostname of a pre-existing PostgreSQL database to use for SonarQube. |
 | addons.sonarqube.database.port | int | `5432` | Port of a pre-existing PostgreSQL database to use for SonarQube. |
 | addons.sonarqube.database.database | string | `""` | Database name to connect to on host. |
-| addons.sonarqube.database.user | string | `""` | Username to connect as to external database, the user must have all privileges on the database. |
+| addons.sonarqube.database.username | string | `""` | Username to connect as to external database, the user must have all privileges on the database. |
 | addons.sonarqube.database.password | string | `""` | Database password for the username used to connect to the existing database. |
-| addons.sonarqube.objectStorage.enabled | bool | `true` |  |
-| addons.sonarqube.objectStorage.storageClass | string | `nil` |  |
-| addons.sonarqube.objectStorage.accessMode | string | `"ReadWriteOnce"` |  |
-| addons.sonarqube.objectStorage.size | string | `"10Gi"` |  |
 | addons.sonarqube.values | object | `{}` | Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git |
 | addons.haproxy.enabled | bool | `false` | Toggle deployment of HAProxy. |
 | addons.haproxy.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy"` |  |
