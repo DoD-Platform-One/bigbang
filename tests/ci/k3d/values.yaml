@@ -65,6 +65,8 @@ addons:
     enabled: true
     sso:
       enabled: false
+  gitlabRunner:
+    enabled: true
   anchore:
     enabled: true
   sonarqube:
