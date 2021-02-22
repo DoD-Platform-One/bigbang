@@ -30,3 +30,17 @@ source:
   authFile: /root/.docker/config.json
   images:
     - registry.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/defender:20.04.163
+
+    # Images used by pipeline-templates
+    # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner:4.5.0.2216
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/git-kustomize203-skopeo12:8.2.276.test
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/kaniko-project-executor:debug-v1.3.0
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/skopeo-bash-git-lfs-kustomize:1.0
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/anchore:0.8.2
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/test:gcc
+    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check611-sonar-scanner45-dotnet-31:021921
+
+      # Don't include until fortify is supported
+#    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0

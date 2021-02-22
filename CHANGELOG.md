@@ -4,6 +4,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.0]
+
+* [&2](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/2): Add support for Gitlab (with sso) 13.8.0
+* [&3](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/3): Add support for Gitlab Runners 13.2.2
+* [&7](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/7): Add support for SonarQube (with sso) 8.6
+* [&15](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/15): Add support for Anchore (with sso) 0.8.1
+* [#129](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/129): Updated FluentBit to 1.6.3
+* [#63](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/63): Fix bug with elasticsearch failing to start due to invalid file permissions
+* [#49](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/49): Add consistent labels to authservice deployment
+* [#32](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/32): Add support for PodAntiAffinity and NodeAffinity for elasticsearch deployments
+* [#6](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/6): Add support for new elasticsearch cluster node types
+* [#16](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/16): Fix bug with incorrect git credentials being created when specifying a private repository
+* [#66](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/66): Fix bug with EnvoyFilter being applied in the wrong non-global namespace
+* [#99](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/99): Fix bug that allowed for incorrect ImagePullSecrets to be created when providing incomplete credentials
 
 ## [1.0.8]
 

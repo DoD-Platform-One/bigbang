@@ -1,18 +1,20 @@
+# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
 hostname: bigbang.dev
 
-# Toggle sourcing from external repos
-# TODO: All this does right now is toggle GitRepositories, it is _not_ fully functional
+# -- (experimental) Toggle sourcing from external repos.
+# All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false
 
-# Regisitires can be an explicit map of registries as provided here
+# -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
   registry: registry1.dso.mil
   username: ""
   password: ""
   email: ""
 
+# -- Multiple sets of registry credentials used to pull all images deployed by BigBang.
+# Credentials will only be created when a valid combination exists, registry, username, and password (email is optional)
 # Or a list of registires:
-#registryCredentials:
 #  - registry: registry1.dso.mil
 #    username: ""
 #    password: ""
@@ -22,37 +24,48 @@ registryCredentials:
 #    password: ""
 #    email: ""
 
-# Global git values
+# -- Git credential settings for accessing private repositories
 # Order of precedence is:
 #   1. existingSecret
 #   2. http credentials (username/password)
 #   3. ssh credentials (privateKey/publicKey/knownHosts)
 git:
-  # Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+  # -- Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
   existingSecret: ""
 
-  # Chart created secrets with user defined values
+  # -- Chart created secrets with user defined values
   credentials:
-    # HTTP git credentials, both username and password must be provided
+    # -- HTTP git credentials, both username and password must be provided
     username: ""
     password: ""
 
-    # SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+    # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
     privateKey: ""
     publicKey: ""
     knownHosts: ""
 
-# Gloabl SSO parameters
+# -- Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages.
 sso:
   oidc:
+    # -- Domain for keycloak used for configuring SSO
     host: login.dso.mil
+    # -- Keycloak realm containing clients
     realm: baby-yoda
-  certificate_authority: ''
+
+  # -- Keycloak's certificate authority (unencoded) used by authservice to support SSO for various packages
+  certificate_authority: ""
+
+  # -- Keycloak realm's json web key uri, obtained through https://<keycloak-server>/auth/realms/<realm>/.well-known/openid-configuration
   jwks: ""
+
+  # -- OIDC client ID used for packages authenticated through authservice
   client_id: ""
+
+  # -- OIDC client secret used for packages authenticated through authservice
   client_secret: ""
 
-# Flux reconciliation parameters
+# -- (Advanced) Flux reconciliation parameters.
+# The default values provided will be sufficient for the majority of workloads.
 flux:
   interval: 2m
   install:
@@ -67,30 +80,47 @@ flux:
 # Istio
 #
 istio:
+  # -- Toggle deployment of Istio.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
     tag: "1.7.3-bb.7"
+
+  # -- Certificate/Key pair to use as the default certificate for exposing BigBang created applications.
+  # If nothing is provided, applications will expect a valid tls secret to exist in the `istio-system` namespace called `wildcard-cert`.
   ingress:
     key: ""
     cert: ""
+
   sso:
+    # -- Toggle SSO for kiali and jaeger on and off
     enabled: false
+
     kiali:
-      client_id: kiali
-      client_secret: "change_me"
+      # -- OIDC Client ID use for kiali
+      client_id: ""
+      # -- OIDC Client Secret to use for kiali
+      client_secret: ""
+
     jaeger:
-      client_id: jaeger
-      client_secret: "change_me"
+      # -- OIDC Client ID to use for jaeger
+      client_id: ""
+      # -- OIDC Client Secret to use for jaeger
+      client_secret: ""
+
+  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
   values: {}
 
 istiooperator:
+  # -- Toggle deployment of Istio Operator.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
     tag: "1.7.0-bb.1"
+
+  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -98,11 +128,14 @@ istiooperator:
 # Cluster Auditor
 #
 clusterAuditor:
+  # -- Toggle deployment of Cluster Auditor.
   enabled: true
-  git: 
+  git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
     tag: "0.1.8-bb.1"
+
+  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -110,11 +143,14 @@ clusterAuditor:
 # OPA Gatekeeper
 #
 gatekeeper:
+  # -- Toggle deployment of OPA Gatekeeper.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
     tag: "3.1.2-bb.3"
+
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -122,22 +158,29 @@ gatekeeper:
 # Logging
 #
 logging:
+  # -- Toggle deployment of Logging (EFK).
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
     tag: "0.1.4-bb.3"
+
+  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
   values: {}
 
 eckoperator:
+  # -- Toggle deployment of ECK Operator.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
     tag: "1.3.0-bb.3"
+
+  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
   values: {}
 
 fluentbit:
+  # -- Toggle deployment of Fluent-Bit.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
@@ -150,25 +193,43 @@ fluentbit:
 # Monitoring
 #
 monitoring:
+  # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
     tag: "11.0.0-bb.13"
+
   sso:
+    # -- Toggle SSO for monitoring components on and off
     enabled: false
     prometheus:
-      client_id: prometheus
-      client_secret: "change_me"
+      # -- Prometheus OIDC client ID
+      client_id: ""
+
+      # -- Prometheus OIDC client secret
+      client_secret: ""
+
     alertmanager:
-      client_id: alertmanager
-      client_secret: "change_me"
+      # -- Alertmanager OIDC client ID
+      client_id: ""
+
+      # -- Alertmanager OIDC client secret
+      client_secret: ""
+
     grafana:
-      client_id: grafana
-      client_secret: "change_me"
+      # -- Grafana OIDC client ID
+      client_id: ""
+
+      # -- Grafana OIDC client secret
+      client_secret: ""
+
+      # -- Grafana OIDC client scopes, comma separated
       scopes: ""
       allow_sign_up: "true"
       role_attribute_path: "Viewer"
+
+  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -176,29 +237,38 @@ monitoring:
 # Twistlock
 #
 twistlock:
+  # -- Toggle deployment of Twistlock.
   enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
     tag: "0.0.2-bb.1"
+
+  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Minio Operator and Instance
 #
 minio:
+  # -- Toggle deployment of minio operator and instance.
   enabled: true
   miniooperator:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
       tag: "2.0.9-bb.1"
+
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
     values: {}
+
   minioinstance:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
       tag: "2.0.9-bb.1"
+
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
     values: {}
 
 #
@@ -206,21 +276,34 @@ minio:
 #
 addons:
   argocd:
+    # -- Toggle deployment of ArgoCD.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
       tag: "2.9.5-bb.4"
     sso:
+      # -- Toggle SSO for ArgoCD on and off
       enabled: false
-      client_id: "" # sso clientID example: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-argocd
-      provider_name: "" # login as name example: P1 SSO
-      client_secret: ""  # for dev this can be set to anything
+
+      # -- ArgoCD OIDC client ID
+      client_id: ""
+
+      # -- ArgoCD OIDC client secret
+      client_secret: ""
+
+      # -- ArgoCD SSO login text
+      provider_name: ""
+
+      # -- ArgoCD SSO group roles, see docs for more details: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
       groups: |
         g, Impact Level 2 Authorized, role:admin
+
+    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
     values: {}
 
   authservice:
+    # -- Toggle deployment of Authservice.
     # if enabling authservice, a filter needs to be provided by either enabling
     # sso for monitoring or istio, or manually adding a filter chain in the values here:
     # values:
@@ -232,119 +315,223 @@ addons:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
       tag: "0.1.6-bb.3"
-    # Dont put chain configuraitons in this section
+
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice.git
     values: {}
-    # Put additional chain configuration in this section
+
+    # -- Additional authservice chain configurations.
     chains: {}
 
   gitlab:
+    # -- Toggle deployment of Gitlab.
     enabled: false
+
     hostnames:
       gitlab: gitlab.bigbang.dev
       registry: registry.bigbang.dev
+
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
       tag: "4.8.0-bb.0"
+
     sso:
-      # enabling this option will auto-create any required secrets. 
-      # The defaults assume an OIDC provider. 
+      # -- Toggle OIDC SSO for Gitlab on and off.
+      # Enabling this option will auto-create any required secrets.
       enabled: false
-      label: ""  # the text next to the login button
+
+      # -- Gitlab OIDC client ID
       client_id: ""
+
+      # -- Gitlab OIDC client secret
       client_secret: ""
+
+      # -- Gitlab SSO login button label
+      label: ""
+
     database:
-      # entering connection info will enable external database and will auto-create any required secrets.
-      # Gitlab will not provison the database when using an external service
-      host: ""     # example: postgres.bigbang.dev
-      port: ""     # example: 5432
-      username: "" # example: gitlab
+      # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Gitlab.
+      port: 5432
+
+      # -- Database name to connect to on host.
       database: "" # example: gitlab
-      password: "" # unencoded string data. This should be placed in the secret values and then encrypted
-    objectstorage:
-      # entering connection info will enable this option and will auto-create any required secrets
-      # Gitlab will not provision the S3 buckets when using an external service
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    objectStorage:
+      # -- Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used.
+      # Entering connection info will enable this option and will auto-create any required secrets
       type: ""         # supported types are "s3" or "minio"
-      endpoint: ""     # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
-      region: ""       # example: us-gov-west-1
-      accessKey: ""    # unencoded string data
-      accessSecret: "" # unencoded string data. This should be placed in the secret values and then encrypted
-      bucketPrefix: "" # optional. example: "prod"
+
+      # -- S3 compatible endpoint to use for connection information.
+      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- S3 compatible region to use for connection information.
+      region: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket prefix to use for identifying buckets.
+      # Example: "prod" will produce "prod-gitlab-bucket"
+      bucketPrefix: ""
+
+    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
     values: {}
 
   gitlabRunner:
+    # -- Toggle deployment of Gitlab Runner.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
       path: "./chart"
-      tag: "0.19.2-bb.2"
+      tag: "0.19.2-bb.3"
+
+    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
     values: {}
 
   sonarqube:
+    # -- Toggle deployment of SonarQube.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
       path: "./chart"
       tag: "9.2.6-bb.2"
+
     sso:
+      # -- Toggle OIDC SSO for SonarQube.
+      # Enabling this option will auto-create any required secrets.
       enabled: false
-      client_id: # sso clientID example: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
-      providerName: # login as name example: P1 SSO
-      certificate: # SAML sso certificate example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
-      login: # login sso attribute example: login
-      name: # name sso attribute example: name
-      email: # email sso attribute example: email
-      group: # (optional) group sso attribute example: group
+
+      # -- SonarQube OIDC client ID
+      client_id: ""
+
+      # -- SonarQube SSO login button label
+      label: ""
+
+      # -- SonarQube plaintext SAML sso certificate.
+      # example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
+      certificate: ""
+
+      # -- SonarQube login sso attribute.
+      login: login
+
+      # -- SonarQube name sso attribute.
+      name: name
+
+      # -- SonarQube email sso attribute.
+      email: email
+
+      # -- (optional) SonarQube group sso attribute.
+      group: group
+
     database:
-      enabled: false
-      server: # postgres location example: postgres.bigbang.dev
-      port: # 5432
-      database: # database name example: sonarDB
-      user: # postgres user example: sonarUser
-      password: # unencoded stringData. This should be put in the secret values
-    objectStorage:
-      enabled: true
-      storageClass:
-      accessMode: ReadWriteOnce
-      size: 10Gi
+      # -- Hostname of a pre-existing PostgreSQL database to use for SonarQube.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for SonarQube.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
     values: {}
-      
+
   haproxy:
+    # -- Toggle deployment of HAProxy.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
       path: "./chart"
       tag: 1.1.2-bb.0
+
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
     values: {}
 
   anchore:
+    # -- Toggle deployment of Anchore.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
       tag: "1.9.5-bb.2"
-    adminPassword: "" # Required, set the Admin password
+
+    # -- Initial admin password used to authenticate to Anchore.
+    adminPassword: ""
+
+    # -- Anchore Enterprise functionality.
     enterprise:
+      # -- Toggle the installation of Anchore Enterprise.  This must be accompanied by a valid license.
       enabled: false
+
+      # -- License for Anchore Enterprise.
+      # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
       licenseYaml: |
         FULL LICENSE
+
     sso:
+      # -- Toggle OIDC SSO for Anchore on and off.
+      # Enabling this option will auto-create any required secrets.
       enabled: false
+
+      # -- Anchore OIDC client ID
       client_id: ""
+
+      # -- Anchore OIDC client role attribute
       role_attribute: ""
+
     database:
-      # Entering connection info will enable external database and will auto-create any required secrets.
-      # Anchore will not provison the database when using an external service
+      # -- Hostname of a pre-existing PostgreSQL database to use for Anchore.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
       host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Anchore.
       port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
       username: ""
+
+      # -- Database password for the username used to connect to the existing database.
       password: ""
+
+      # -- Database name to connect to on host.
       database: ""
-      feeds_database: "" # Only needed for enterprise
+
+      # -- Feeds database name to connect to on host.
+      # Only required for enterprise edition of anchore.
+      feeds_database: ""
+
     redis:
+      # -- Hostname of a pre-existing Redis to use for Anchore Enterprise.
       # Entering connection info will enable external redis and will auto-create any required secrets.
       # Anchore only requires redis for enterprise deployments and will not provision an instance if using external
       host: ""
+
+      # -- Port of a pre-existing Redis to use for Anchore Enterprise.
       port: ""
+
+      # -- Password to connect to pre-existing Redis.
       password: ""
+
+    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
     values: {}
