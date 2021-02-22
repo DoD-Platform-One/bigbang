@@ -30,6 +30,8 @@ source:
   authFile: /root/.docker/config.json
   images:
     - registry.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/defender:20.04.163
+    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:2.4.1
+    - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:2.4.1
 
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
