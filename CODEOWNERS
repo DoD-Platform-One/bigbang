@@ -11,12 +11,12 @@ docs/                 @michaelmcleroy @egoode
 base/                 @michaelmcleroy
 
 ^[CI Owners]
-.gitlab-ci/           @zdzielinksi @iahmad @toladipupo
-tests/                @zdzielinksi @iahmad @toladipupo
+.gitlab-ci/           @toladipupo
+tests/                @toladipupo
 
 ^[Hack Owners]
-scripts/              @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
-hack/                 @zdzielinksi @iahmad @toladipupo @michaelmcleroy @egoode
+scripts/              @toladipupo @michaelmcleroy @egoode
+hack/                 @toladipupo @michaelmcleroy @egoode
 
 ^[Charter Owners]
 charter/              @runyontr @joshwolf
