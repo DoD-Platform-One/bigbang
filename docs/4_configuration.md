@@ -111,7 +111,7 @@ Big Bang deploys four flux resources that can be customized:
 |--|--|--|
 | GitRepository | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
 | Kustomization | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
-| GitRepostiory | Big Bang | [Link](../base/gitrepository.yaml) |
+| GitRepository | Big Bang | [Link](../base/gitrepository.yaml) |
 | HelmRelease | Big Bang | [Link](../base/helmrelease.yaml) |
 
 In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Helm chart templates](../chart/templates) for the these resources.
