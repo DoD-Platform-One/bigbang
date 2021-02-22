@@ -45,6 +45,15 @@ spec:
     hostname: {{ .Values.hostname }}
     istio:
       enabled: {{ .Values.istio.enabled }}
+    {{- if .Values.logging.sso.enabled }}
+    sso:
+      enabled: {{ .Values.logging.sso.enabled }}
+      client_id: {{ .Values.logging.sso.client_id }}
+      client_secret: {{ .Values.logging.sso.client_secret }}
+      oidc:
+        host: {{ .Values.sso.oidc.host }}
+        realm: {{ .Values.sso.oidc.realm }}
+    {{- end }}
     kibana:
       version: 7.9.2
       imagePullSecrets:

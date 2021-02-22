@@ -42,6 +42,10 @@ spec:
       valuesKey: "eckoperator.yaml"
 
   values:
+    license:
+      trial: {{ .Values.logging.license.trial }}
+      keyJSON: |
+        {{ .Values.logging.license.keyJSON | nindent 8 }}
     podAnnotations:
       sidecar.istio.io/inject: "true"
       traffic.sidecar.istio.io/includeInboundPorts: "*"
