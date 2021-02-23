@@ -2,10 +2,19 @@
 
 Package owners will be responsible for the following:
 
-* Cutting Releases
+* Cutting Releases for the packages and getting into BigBang
 * Implementing Package requirements outlined by [Package Requirements](PackageRequirements.md)
 * Reviewing Merge Requests into the Package Repository
 * Reviewing Merge Request CI/CD pipeline execution results to ensure that there are no regressions in conformance tests nor package cypress tests.  
+* Tracking upstream changes to packages including new features, architectures, depedenecies.
+* Upgrading package with new upstream versions
+* Implementing features based on customer requests/requirements
+* Adding and improving interactions with current new new Big Bang Packages
+* IronBank interactions
+  * Identifying new Images to harden
+  * Notify IronBank of new versions available
+  * Testing new IronBank imaages
+  * [Long term] Providing CI processes for hardening images
 
 Package Owners will be identified by the use of [CODEOWNERS](https://docs.gitlab.com/ee/user/project/code_owners.html) files in the repository.
 
