@@ -185,7 +185,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.7.5-bb.0"
+    tag: "0.7.10-bb.0"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
