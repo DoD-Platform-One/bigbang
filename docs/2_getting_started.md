@@ -37,7 +37,7 @@ Table of Contents
     # The script will do the following:
     #   Check flux prerequisites
     #   Interactively login to Iron Bank and store credentials in Secret
-    #   Install flux into Kubernetes cluser using Iron Bank repo
+    #   Install flux into Kubernetes cluster using Iron Bank repo
     #   Remove Iron Bank credentials from cluster
     hack/flux-install.sh
     ```

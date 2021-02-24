@@ -14,7 +14,7 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
 
 ## Installation
 
-1. Before pushing changes to Git, validate all configuration is syntatically correct.
+1. Before pushing changes to Git, validate all configuration is syntactically correct.
 
    ```bash
    # If everything is successful, YAML should be output
@@ -27,7 +27,7 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
    git push
    ```
 
-1. Validate the Kuberbernetes context is correct
+1. Validate the Kubernetes context is correct
 
    ```bash
    # This should match the environment you intend to deploy

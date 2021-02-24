@@ -4,7 +4,7 @@
 
 Included here is a setup that will allow you to checkout and begin development using your workstation and a minimal EC2 instance in AWS.
 
-### Prequisites
+### Prerequisites
 
 #### Access
 + [AWS GovCloud (US) EC2](https://console.amazonaws-us-gov.com/ec2)
@@ -165,7 +165,7 @@ ssh -i $AWSUSERNAME.pem ubuntu@$YOURPUBLICEC2IP
 # Remove any old Docker items
 sudo apt remove docker docker-engine docker.io containerd runc
 
-# Install all pre-reqs for Docker
+# Install all prerequisites for Docker
 sudo apt update
 sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
@@ -236,9 +236,9 @@ optional:
 `--api-port 0.0.0.0:38787` Chooses a port for the API server instead of being assigned a random one. You can set this to any port number that you want.
 `-v /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
 
-- Once your cluster is up, you can copy the kubeconfig from the EC2 instance to your workstation and update the IP Address. If you do not have an existing configuration to preserve on your local workstation, you can delete and recreate the configuration file.
+- Once your cluster is up, you can copy the ./kube/config file from the EC2 instance to your workstation and update the IP Address. If you do not have an existing configuration to preserve on your local workstation, you can delete and recreate the configuration file.
 
-Copy the contents of the remote configuation file.
+Copy the contents of the remote configuration file.
 
 ```bash
 cat ~/.kube/config
@@ -249,7 +249,7 @@ cat ~/.kube/config
 Update the configuration file on your local workstation.
 
 ```bash
-# Remove existing configuation if defined.
+# Remove existing configuration if defined.
 rm ~/.kube/config
 
 # Create empty configuation
@@ -259,7 +259,7 @@ touch ~/.kube/config
 # (Prevents Helm warnings)
 chmod go-r ~/.kube/config
 
-# Open vi to edit configuation
+# Open vi to edit configuration
 vi ~/.kube/config
 ```
 
@@ -379,7 +379,7 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCreden
 <X.X.X.X>     kibana.bigbang.dev
 <X.X.X.X>     kiali.bigbang.dev
 <X.X.X.X>     prometheus.bigbang.dev
-<X.X.X.X>     graphana.bigbang.dev
+<X.X.X.X>     grafana.bigbang.dev
 ```
 
 - You can watch your install take place with
@@ -392,7 +392,7 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCreden
 watch kubectl get po,gitrepository,kustomizations,helmreleases -A
 ```
 
-As of this time, Twistlock is the last thing to be installed. Once you see Twistlock sync and everything else is up and healty you are fully installed.
+As of this time, Twistlock is the last thing to be installed. Once you see Twistlock sync and everything else is up and healthy you are fully installed.
 
 ### Addendum for Amazon Linux 2
 
