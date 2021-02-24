@@ -24,6 +24,9 @@ registryCredentials:
 #    password: ""
 #    email: ""
 
+# Openshift Container Platform Feature Toggle
+openshift: false
+
 # -- Git credential settings for accessing private repositories
 # Order of precedence is:
 #   1. existingSecret

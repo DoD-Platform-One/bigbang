@@ -90,6 +90,11 @@ spec:
       serviceAccount:
         imagePullSecrets:
         - name: private-registry
+      {{- if .Values.openshift }}
+      service: 
+        targetPort: 9102
+        port: 9102
+      {{- end }}
     kube-state-metrics:
       imagePullSecrets:
       - name: private-registry
