@@ -42,9 +42,6 @@ spec:
       valuesKey: "gatekeeper.yaml"
 
   values:
-    image:
-      repository: registry1.dso.mil/ironbank/opensource/openpolicyagent/gatekeeper
-      release: v3.1.2
     disableValidatingWebhook: true
     createNamespace: false
     imagePullSecrets:
