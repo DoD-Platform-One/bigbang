@@ -75,11 +75,11 @@ In addition, the following packages can be added onto the default deployment:
 
 ## Architecture
 
-The diagram below shows a typcial deployment of Big Bang into a Kubernetes cluster.  The items in blue require user interaction.  The remaining items are automated by Big Bang.
+The diagram below shows a typical deployment of Big Bang into a Kubernetes cluster.  The items in blue require user interaction.  The remaining items are automated by Big Bang.
 
 ### Configuration
 
-1. The user must [setup an encryption key pair](./3_encryption.md) for SOPS and store the private key securely (e.g. KMS).  This shoud **NOT** be stored in Git.
+1. The user must [setup an encryption key pair](./3_encryption.md) for SOPS and store the private key securely (e.g. KMS).  This should **NOT** be stored in Git.
 1. The user should then [configure Big Bang](./4_configuration.md) values and secrets for the targeted Kubernetes cluster.
 1. All secrets should be encrypted with SOPS to protect them.
 1. Once all of the configuration has been completed, it must be pushed to a Git repository.
@@ -97,7 +97,7 @@ The diagram below shows a typcial deployment of Big Bang into a Kubernetes clust
    1. The repository is reconciled first, pulling the Helm chart from Git.
    1. The Helm Release will check for the Helm chart and the Secrets / ConfigMaps deployed before performing a Helm install
 1. Once the Helm release deploys the Helm chart for Big Bang, each package that is enabled will have a Flux Git Repository and Helm Release resource deployed.
-1. All of the package Git repos containing Helm charts will be pulled so that Flux can reconcile dependencies.
+1. All of the package Git repositories containing Helm charts will be pulled so that Flux can reconcile dependencies.
 1. Each package's Helm Release has dependencies built in.  Flux will reconcile these dependencies and deploy the Helm chart for the package once all of the dependencies are ready.
 1. Once all of the packages are ready, Big Bang will monitor Git periodically for changes and reconcile using the methods above.
 

@@ -41,7 +41,7 @@ Before configuring Big Bang, it is expected that you have already setup:
 - A [SOPS key pair](3_encryption.md)
 - A Git repository to hold your configuration
   - Pull credentials for the Git repository (if not public)
-- An Iron Bank robot account (for production)
+- An Iron Bank robot account for production, or a non-robot account for testing. Reference [Iron Bank authentication](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/b_troubleshooting.md#iron-bank-authentication) for additional details.
 - Certificates specific to your environment (if needed)
 
 ## Minimum Viable Configuration
@@ -80,7 +80,7 @@ Registry credentials are used to pull images for Big Bang.  By default, it point
 
 ### `flux`
 
-Flux settings are used to setup the default continous deployment configuration for Big Bang packages.
+Flux settings are used to setup the default continuos deployment configuration for Big Bang packages.
 
 | Key | Description | Type | Default |
 |--|--|--|--|

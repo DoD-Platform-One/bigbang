@@ -12,10 +12,10 @@ Table of Contents
     - [AWS KMS](#aws-kms)
     - [GCP KMS](#gcp-kms)
     - [Azure KeyVault](#azure-keyvault)
-    - [Hashicorp Vault](#hashicorp-vault)
+    - [HashiCorp Vault](#hashicorp-vault)
   - [Configure Big Bang](#configure-big-bang)
 
-Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approach to managing the Big Bang Kubernetes cluster configuration.  Using GitOps, we must securely store secrets in Git using encryption.  The private key, which is stored in key storage, is used by the continous deployment tool to decrypt and deploy the secrets for use in the cluster.
+Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approach to managing the Big Bang Kubernetes cluster configuration.  Using GitOps, we must securely store secrets in Git using encryption.  The private key, which is stored in key storage, is used by the continuous deployment tool to decrypt and deploy the secrets for use in the cluster.
 
 ## SOPS
 
@@ -33,9 +33,9 @@ To setup Big Bang with SOPS, a key pair must be created.  The private key is use
 | [GNU Privacy Guard (GPG)*](https://gnupg.org/) | `gpg --full-generate-key` | Use `key type` = `RSA and RSA`, `keysize` = `4096`, `expiration` = `0` |
 | [Amazon Web Services (AWS) Key Management Service (KMS)](https://aws.amazon.com/kms/) | [Link](https://github.com/mozilla/sops#2usage) | [Advanced setup help](https://github.com/mozilla/sops#26kms-aws-profiles) (e.g. roles, profiles, contexts)
 | [Google Cloud Platform (GCP) Key Management Service (KMS)](https://cloud.google.com/security-key-management) | [Link](https://github.com/mozilla/sops#encrypting-using-gcp-kms) |
-| [Hashicorp Vault](https://www.vaultproject.io/) | [Link](https://github.com/mozilla/sops#23encrypting-using-azure-key-vault) |
+| [HashiCorp Vault](https://www.vaultproject.io/) | [Link](https://github.com/mozilla/sops#23encrypting-using-azure-key-vault) |
 
-> *GPG is not recommended for production use because the private key can be misplaced or comprimised too easily
+> *GPG is not recommended for production use because the private key can be misplaced or compromised too easily
 
 ### Samples
 
@@ -59,18 +59,18 @@ If you plan to utilize Big Bang provided samples, either in the template or in t
 
 SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly created files.  Once a file is created, the key fingerprints are stored in the file and must be re-keyed to use any changes to `.sops.yaml`.
 
-1. Follow the [SOPS instructions](https://github.com/mozilla/sops#210using-sopsyaml-conf-to-select-kmspgp-for-new-files) to configure `.sops.yaml` based on the encryption method you used.  Multiple keys of the same type can be added using the block scalar yaml construct, `>-`, and separating them by a comman and newline.
+1. Follow the [SOPS instructions](https://github.com/mozilla/sops#210using-sopsyaml-conf-to-select-kmspgp-for-new-files) to configure `.sops.yaml` based on the encryption method you used.  Multiple keys of the same type can be added using the block scalar yaml construct, `>-`, and separating them by a comma and newline.
    > If you are using the Big Bang sample files, make sure to remove the development Big Bang key.
 
-1. Add the following regex to only encrypt data in the yaml files
+2. Add the following regex to only encrypt data in the yaml files
 
     ```yaml
     creation_rules:
     - encrypted_regex: '^(data|stringData)$'
     ```
 
-1. Save `.sops.yaml` in the root of folder of your configuration
-1. If you have existing secrets, use the following to re-key them with the configuration in `.sops.yaml`
+3. Save `.sops.yaml` in the root of folder of your configuration
+4. If you have existing secrets, use the following to re-key them with the configuration in `.sops.yaml`
 
    ```bash
    # You must have the old private key to rekey the file
@@ -101,7 +101,7 @@ TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-o
 
 TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-or-vault-into-a-kubernetes-pod-d5a0e84ba892) may help to automate secret consumption in Kubernetes.
 
-### Hashicorp Vault
+### HashiCorp Vault
 
 TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-or-vault-into-a-kubernetes-pod-d5a0e84ba892) may help to automate secret consumption in Kubernetes.
 

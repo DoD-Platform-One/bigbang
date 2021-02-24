@@ -17,7 +17,7 @@ Big Bang is configured to retry failed package installations and upgrades.  Befo
 
 | Symptom | Cause | Resolution |
 |--|--|--|
-| Despite entering correct credentials, get `anauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dso.mil`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
+| Despite entering correct credentials, get `unauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dso.mil`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
 
 ## Flux install
 
@@ -75,7 +75,7 @@ kubectl get events --field-selector involvedObject.kind=HelmRelease -A
 
 | Symptom | Cause | Resolution |
 |--|--|--|
-| `Reconcilliation in Progress` | This is normal and indicates flux is currently applying updates | Wait |
+| `Reconciliation in Progress` | This is normal and indicates flux is currently applying updates | Wait |
 | `dependency ... is not ready` | This is normal and indicates flux is currently waiting on another resource to complete | Wait |
 | `Error: YAML parse error on ...` | Syntax error in helm chart | Use `helm template` to narrow down the problem.  Fix it and commit to Git |
 | `Helm install failed: failed to create resource ... unable to create new content in namespace because it is being terminated` | This seems to happen when a re-deploy of Big Bang occurs to early after a Big Bang delete. |  Try to remove the namespace using `kubectl get ns <stuck namespace> -o json | jq '.spec.finalizers = []' | kubectl replace --raw "/api/v1/namespaces/$NS/finalize" -f`.  If this does not work, a cluster restart may be necessary. |
@@ -102,7 +102,7 @@ kubectl get events --field-selector involvedObject.kind=Kustomization -A
 | `evalsymlink failure ... no such file or directory` | A reference to a file in `kustomization.yaml` is incorrect | Use `kustomize build` on the `<env>` folder or `base` folder to narrow down the problem.  Fix the error and push to Git. |
 | `Error: accumulating resources ...` | A reference to a base is incorrect | Use `kustomize build` on the `<env>` folder or `base` folder to narrow down the problem.Review the `bases:` section for correct paths to find the error.  Fix the error and push to Git. |
 | `Error fetchingref: fatal: couldn't find remote ref ...` | The branch, tag, or sha used for a remote base is incorrect | Use `kustomize build` on the `<env>` folder or `base` folder to narrow down the problem.  It is likely the remote reference to the Big Bang's Kustomize in the `base` folder.  Review the `bases:` section for correct paths to find the error.  Fix the error and push to Git. |
-| `Error: merging from generator ...` | Kustomize is trying to merge with a resource that is non-existant.  This is usually due to naming the merging `ConfigMap` or `Secret` incorrectly compared to a base `ConfigMap` or `Secret`. | Use `kustomize build` on the `<env>` folder or `base` folder to narrow down the problem.  Look for the keyword `merge` in the `kustomization.yaml` files and verify the `name` is correctly set. |
+| `Error: merging from generator ...` | Kustomize is trying to merge with a resource that is non-existent.  This is usually due to naming the merging `ConfigMap` or `Secret` incorrectly compared to a base `ConfigMap` or `Secret`. | Use `kustomize build` on the `<env>` folder or `base` folder to narrow down the problem.  Look for the keyword `merge` in the `kustomization.yaml` files and verify the `name` is correctly set. |
 
 ## Packages
 
