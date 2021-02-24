@@ -49,49 +49,6 @@ variables:
 # Pre Stage Jobs
 #
 
-changelog:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
-  stage: .pre
-  extends:
-    - .bigbang-dogfood
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  variables:
-    CHANGELOG_FILE: CHANGELOG.md
-  script:
-  - git fetch --all
-  - ./scripts/lint_changelog.sh
-
-version:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
-  stage: .pre
-  extends:
-    - .bigbang-dogfood
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  variables:
-    CHART_FILE: chart/Chart.yaml
-    BASEGIT_FILE: base/gitrepository.yaml
-  script:
-  - git fetch --all
-  - ./scripts/lint_version.sh
-
-commits:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
-  stage: .pre
-  extends:
-    - .bigbang-dogfood
-  allow_failure: true
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  script:
-  - dnf module install -y nodejs
-  - npm install --only=dev
-  - git fetch --all
-  - ./scripts/lint_commits.sh
-
 pre vars:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
