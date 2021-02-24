@@ -370,10 +370,10 @@ kubectl apply -f tests/ci/shared-secrets.yaml
 
 ```bash
 # Helm install BigBang
-helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f my-values.yaml
+helm upgrade -i bigbang chart -n bigbang --create-namespace --set registryCredentials.username='<your user>' --set registryCredentials.password=<your cli key> -f my-values.yaml -f chart/ingress-certs.yaml
 ```
 
-- You can now modify your local `/etc/hosts` file to allow for local name resolution. On Windows, this file is located at `$env:windir\System32\drivers\etc\hosts`
+- You can now modify your local `/etc/hosts` file to allow for local name resolution. On Windows, this file is located at `$env:windir\System32\drivers\etc\hosts`. Add additional hostnames as you enable different UIs, replacing <X.X.X.X> with your Amazon EC2 instance IP (all host entries will point to the same IP and Istio will route based on the hostname).
 
 ```HOSTS
 <X.X.X.X>     kibana.bigbang.dev
