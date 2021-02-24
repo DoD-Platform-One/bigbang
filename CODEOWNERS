@@ -29,7 +29,7 @@ chart/templates/istio           @kenna81 @kavitha @cmcgrath
 
 ^[Anchore]
 chart/Chart.yaml
-# chart/values.yaml
+# chart/values.yaml             @jasonkrause 
 # chart/templates/argocd
 
 ^[ArgoCD]
