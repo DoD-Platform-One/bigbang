@@ -88,7 +88,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.7.3-bb.7"
+    tag: "1.7.3-bb.8"
 
   # -- Certificate/Key pair to use as the default certificate for exposing BigBang created applications.
   # If nothing is provided, applications will expect a valid tls secret to exist in the `istio-system` namespace called `wildcard-cert`.
