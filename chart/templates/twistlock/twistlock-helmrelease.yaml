@@ -42,11 +42,12 @@ spec:
     valuesKey: "twistlock.yaml"
 
   values:
-    console:
-      hostname: {{ .Values.hostname }}
+    hostname: {{ .Values.hostname }}
     prometheus:
       servicemonitor:
         enabled: {{ .Values.monitoring.enabled }}
+    imagePullSecrets:
+    - name: private-registry
     istio:
       enabled: {{ .Values.istio.enabled }}
   # TODO: DRY this up
