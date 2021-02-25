@@ -54,9 +54,6 @@ spec:
     redis:
       imagePullSecrets:
       - name: private-registry
-    server:
-      config:
-        url: https://argocd.{{ .Values.hostname }}
     {{- if .Values.addons.argocd.sso.enabled }}
     sso:
       enabled: {{ .Values.addons.argocd.sso.enabled }}
