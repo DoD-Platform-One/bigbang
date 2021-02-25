@@ -554,3 +554,18 @@ addons:
 
     # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
     values: {}
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Mattermost Operator
+  #
+  mattermostoperator:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      path: "./chart"
+      tag: "1.12.0-bb.0"
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    values: {}
+  #
+  # ----------------------------------------------------------------------------------------------------------------------
+  #

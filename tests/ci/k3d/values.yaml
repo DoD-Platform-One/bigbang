@@ -71,3 +71,5 @@ addons:
     enabled: true
   sonarqube:
     enabled: true
+  mattermostoperator:
+    enabled: true
