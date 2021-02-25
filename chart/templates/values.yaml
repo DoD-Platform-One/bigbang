@@ -59,4 +59,6 @@ stringData:
 {{ toYaml .Values.addons.anchore.values | indent 4 }}
   sonarqube.yaml: |
 {{ toYaml .Values.addons.sonarqube.values | indent 4 }}
+  mattermostoperator.yaml: |
+{{ toYaml .Values.addons.mattermostoperator.values | indent 4 }}
 data:
