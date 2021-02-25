@@ -85,6 +85,14 @@ pre vars:
 # Smoke Tests
 #
 
+.chart_changes: &chart_changes
+  changes:
+    - chart/**/*
+    - .gitlab-ci.yml
+    - .gitlab-ci/jobs/**/*
+    - scripts/**/*
+    - tests/**/*
+
 .deploy_bigbang: &deploy_bigbang
   - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
 
@@ -97,6 +105,8 @@ clean install:
     - .k3s-ci
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
+  rules:
+    - *chart_changes
   script:
     - *deploy_bigbang
     - *test_bigbang
@@ -120,6 +130,7 @@ upgrade:
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      <<: *chart_changes
   variables:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
@@ -153,6 +164,9 @@ upgrade:
   rules:
     # Run on scheduled jobs
     - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
+    # skip job when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
 
 # Abstract for jobs responsible for cleaning up infrastructure
 .infra cleanup:
