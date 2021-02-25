@@ -1,0 +1,26 @@
+{{- if .Values.istio.enabled -}}
+{{- $serviceName := include "nexus.fullname" . -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ template "nexus.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "nexus.name" . }}
+    helm.sh/chart: {{ include "nexus.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: nexus-repository-manager
+    app.kubernetes.io/component: {{ include "nexus.name" . }}
+spec:
+  gateways:
+    - main.istio-system.svc.cluster.local
+  hosts:
+    - "nexus-repository-manager.{{ .Values.hostname }}"
+  http:
+    - route:
+        - destination:
+            port:
+              number: {{ .Values.nexus.nexusPort }}
+            host: {{ $serviceName }}
+{{- end }}

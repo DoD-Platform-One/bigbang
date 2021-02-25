@@ -1,0 +1,17 @@
+{{- if .Values.nexus.properties.override -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nexus.name" . }}-properties
+  labels: {{- include "nexus.labels" . | nindent 4 }}
+    {{- if .Values.nexus.extraLabels }}
+      {{- with .Values.nexus.extraLabels }}
+        {{ toYaml . | indent 4 }}
+      {{- end }}
+    {{- end }}
+data:
+  nexus.properties: |
+    {{- range $k, $v := .Values.nexus.properties.data }}
+    {{ $k }}={{ $v }}
+    {{- end }}
+{{- end }}

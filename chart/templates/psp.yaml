@@ -1,0 +1,36 @@
+{{- if .Values.psp.create -}}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels: {{- include "nexus.labels" . | nindent 4 }}
+  {{- with .Values.nexus.extraLabels }}
+    {{ toYaml . | indent 4 }}
+  {{- end }}
+  name: {{ template "nexus.name" . }}
+spec:
+  requiredDropCapabilities:
+    - ALL
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - persistentVolumeClaim
+  - secret
+  - projected
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+  fsGroup:
+    rule: 'MustRunAs'
+    ranges:
+      # Forbid adding the root group.
+      - min: 1
+        max: 65535
+{{- end }}

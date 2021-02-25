@@ -3,11 +3,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ .Values.route.name }}
-  namespace: {{ template "nexus.namespace" . }}
-  labels: 
-    {{- range $key, $value := .Values.route.labels }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
+  labels: {{ .Values.route.labels }}
   annotations:
     {{- range $key, $value := .Values.route.annotations }}
     {{ $key }}: {{ $value | quote }}
@@ -28,6 +24,4 @@ spec:
 {{- end }}
     weight: 100
   wildcardPolicy: None
-status:
-  ingress: []
 {{- end }}

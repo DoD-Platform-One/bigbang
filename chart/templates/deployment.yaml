@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "nexus.fullname" . }}
+  labels:
+{{ include "nexus.labels" . | indent 4 }}
+  {{- if .Values.nexus.extraLabels }}
+    {{- with .Values.nexus.extraLabels }}
+      {{ toYaml . | indent 4 }}
+    {{- end }}
+  {{- end }}
+{{- if .Values.deployment.annotations }}
+  annotations:
+{{ toYaml .Values.deployment.annotations | indent 4 }}
+{{- end }}
+spec:
+  replicas: 1
+  strategy:
+    type: {{ .Values.deploymentStrategy }}
+  selector:
+    matchLabels:
+      {{- include "nexus.selectorLabels" . | nindent 6 }}
+      {{- if .Values.nexus.extraSelectorLabels }}
+        {{- with .Values.nexus.extraSelectorLabels }}
+          {{ toYaml . | indent 6 }}
+        {{- end }}
+      {{- end }}      
+  template:
+    metadata:
+      annotations:
+        checksum/configmap-properties: {{ include (print .Template.BasePath "/configmap-properties.yaml") $ | sha256sum }}
+        {{- if .Values.nexus.podAnnotations }}
+{{ toYaml .Values.nexus.podAnnotations | indent 8}}
+        {{- end }}
+      labels:
+        {{- include "nexus.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "nexus.serviceAccountName" . }}
+      {{- if .Values.deployment.initContainers }}
+      initContainers:
+{{ toYaml .Values.deployment.initContainers | indent 6 }}
+      {{- end }}
+      {{- if .Values.nexus.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nexus.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.nexus.hostAliases }}
+      hostAliases:
+{{ toYaml .Values.nexus.hostAliases | indent 8 }}
+      {{- end }}
+      {{- if .Values.nexus.imagePullSecret }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.deployment.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          lifecycle:
+          {{- if .Values.deployment.postStart.command }}
+            postStart:
+              exec:
+                command: {{ .Values.deployment.postStart.command }}
+          {{- end }}
+          env:
+{{ toYaml .Values.nexus.env | indent 12 }}
+          envFrom:
+{{ toYaml .Values.nexus.envFrom | indent 12 }}
+          resources:
+{{ toYaml .Values.nexus.resources | indent 12 }}
+          ports:
+            - name: nexus-ui
+              containerPort: {{ .Values.nexus.nexusPort }}
+            {{- if .Values.nexus.docker.enabled }}
+            {{- range .Values.nexus.docker.registries }}
+            - name: docker-{{ .port }}
+              containerPort: {{ .port }}
+            {{- end }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.nexus.livenessProbe.path }}
+              port: {{ .Values.nexus.nexusPort }}
+            initialDelaySeconds: {{ .Values.nexus.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nexus.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nexus.livenessProbe.failureThreshold }}
+            {{- if .Values.nexus.livenessProbe.timeoutSeconds }}
+            timeoutSeconds: {{ .Values.nexus.livenessProbe.timeoutSeconds }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.nexus.readinessProbe.path }}
+              port: {{ .Values.nexus.nexusPort }}
+            initialDelaySeconds: {{ .Values.nexus.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.nexus.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nexus.readinessProbe.failureThreshold }}
+            {{- if .Values.nexus.readinessProbe.timeoutSeconds }}
+            timeoutSeconds: {{ .Values.nexus.readinessProbe.timeoutSeconds }}
+            {{- end }}
+          volumeMounts:
+            - mountPath: /nexus-data
+              name: {{ template "nexus.name" . }}-data
+            {{- if .Values.config.enabled }}
+            - mountPath: {{ .Values.config.mountPath }}
+              name: {{ template "nexus.name" . }}-conf
+            {{- end }}
+            {{- if .Values.nexus.properties.override }}
+            - mountPath: /nexus-data/etc/nexus.properties
+              name: {{ template "nexus.name" . }}-properties
+              subPath: nexus.properties
+            {{- end }}
+            {{- if .Values.secret.enabled }}
+            - mountPath: {{ .Values.secret.mountPath }}
+              name: {{ template "nexus.name" . }}-secret
+              subPath: {{ .Values.secret.subPath }}
+              readOnly: {{ .Values.secret.readOnly }}
+            {{- end }}
+            {{- if .Values.deployment.additionalVolumeMounts}}
+{{ toYaml .Values.deployment.additionalVolumeMounts | indent 12 }}
+            {{- end }}
+        {{- if .Values.deployment.additionalContainers }}
+{{ toYaml .Values.deployment.additionalContainers | indent 8 }}
+        {{- end }}
+      {{- if .Values.nexus.securityContext }}
+      securityContext:
+{{ toYaml .Values.nexus.securityContext | indent 8 }}
+      {{- end }}
+      volumes:
+        - name: {{ template "nexus.name" . }}-data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" (include "nexus.fullname" .) "data") }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.config.enabled }}
+        - name: {{ template "nexus.name" . }}-conf
+          configMap:
+            name: {{ template "nexus.name" . }}-conf
+        {{- end }}
+        {{- if .Values.nexus.properties.override }}
+        - name: {{ template "nexus.name" . }}-properties
+          configMap:
+            name: {{ template "nexus.name" . }}-properties
+            items:
+            - key: nexus.properties
+              path: nexus.properties
+        {{- end }}
+        {{- if .Values.secret.enabled }}
+        - name: {{ template "nexus.name" . }}-secret
+          secret:
+            secretName: {{ template "nexus.name" . }}-secret
+            items:
+            - key: admin.password
+              path: admin.password
+        {{- end }}
+        {{- if .Values.deployment.additionalVolumes }}
+{{ toYaml .Values.deployment.additionalVolumes | indent 8 }}
+        {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
