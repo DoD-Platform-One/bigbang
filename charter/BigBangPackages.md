@@ -463,7 +463,7 @@ Product:
 
 * [Nexus](https://www.sonatype.com/nexus/repository-pro)
 * Scope: 
-  * The Nexus OSS will not be supported as the licenced pro version is required for HA and SAML SSO capabilities
+  * The Nexus OSS will not be supported as the licenced pro version is required for [HA and SAML SSO capabilities](https://www.sonatype.com/nexus/repository-oss-vs-pro-features)
   * Only Licended Nexus Repository Pro will be supported
 
 Repository:
