@@ -61,3 +61,10 @@
 ### 6. Developer Contribution Docs: 
   - Only the latest version matters, and maybe improving docs around developer environment / process / doing things like updating a broken link should be allowed to be added to a master document faster / not go through the same level of scrutiny as a code merge where only Josh/Tom can accept it. Maybe it could exist in the [wiki?](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/wikis/developer/developer-documentation) and the BB Charter could link to the wiki so it'd still be readily discoverable.
   - Otherwise this should should exist in BB Charter. (needs discussion)
+
+### 7. Big Bang Onboarding Residency: 
+  - Phase 1: Move the majority of these docs to upstream documentation locations, mentioned above.
+  - Phase 2: Let the residency have it's own repo, but heavily rewrite it so that it's just referencing upstream documentation/walking people through the upstream documentation. (and then have a few residency specific intro to kubernetes labs stay in residency)
+    - 01-Preflight-Access-Checks
+    - 02-Kubernetes-Refresher
+    - 04-Big-Bang-Prep-Work-and-Deployment
