@@ -257,7 +257,6 @@ Owners:
 
 Understudy:
 
-* @agill17
 * @kenna81
 
 Repository:
@@ -463,6 +462,9 @@ Nexus provides a robust artifact repository, supporting artifacts of multiple pr
 Product:
 
 * [Nexus](https://www.sonatype.com/nexus/repository-pro)
+* Scope: 
+  * The Nexus OSS will not be supported as the licenced pro version is required for HA and SAML SSO capabilities
+  * Only Licended Nexus Repository Pro will be supported
 
 Repository:
 
