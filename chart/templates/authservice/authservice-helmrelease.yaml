@@ -56,7 +56,9 @@ spec:
 {{- if .Values.sso.client_secret }}
       client_secret: {{ .Values.sso.client_secret }}
 {{- end }}
-      certificate_authority: {{ .Values.sso.certificate_authority }}
+{{- if .Values.sso.certificate_authority }}
+      certificate_authority: {{ .Values.sso.certificate_authority  }}
+{{- end }}
     chains:
       kiali:
         match:
