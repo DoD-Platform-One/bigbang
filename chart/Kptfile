@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: chart
+upstream:
+  type: git
+  git:
+    commit: 17a9c316624427587ac197ebfcd368ac89883278
+    repo: https://github.com/Oteemo/charts
+    directory: /charts/sonatype-nexus
+    ref: sonatype-nexus-4.2.0
