@@ -71,6 +71,10 @@ addons:
     enabled: true
   sonarqube:
     enabled: true
+  minioOperator:
+    enabled: true
+  minio:
+    enabled: true
   mattermostoperator:
     enabled: true
   mattermost:
