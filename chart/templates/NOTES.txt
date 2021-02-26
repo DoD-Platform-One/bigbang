@@ -125,3 +125,28 @@ PLATFORM ONE LOGGING WARNING:
     {{- end }}
   {{- end }}
 {{- end }}
+
+{{- if $.Values.addons.mattermost.enabled }}
+Mattermost is enabled.
+{{- with .Values.addons.mattermost.database }}
+{{- if not (and .username .password .host .port .database .ssl_mode) }}
+PLATFORM ONE MATTERMOST WARNING:
+  You have enabled an internal postgres database in the values configuration.
+  PlatformOne does not support this option for production deployments.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- end }}
+{{- with .Values.addons.mattermost.objectStorage }}
+{{- if not (and .endpoint .accessKey .accessSecret .bucket) }}
+PLATFORM ONE MATTERMOST WARNING:
+  You have enabled an internal Minio instance in the values configuration.
+  PlatformOne does not support this option for production deployments.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+{{- end }}
+{{- if and (.Values.addons.mattermost.enterprise.enabled) (not .Values.addons.mattermost.enterprise.license) }}
+PLATFORM ONE MATTERMOST WARNING:
+  You have enabled enterprise Mattermost in the values configuration, but not provided a license.
+  Make sure to go back and edit your values or ensure you add the license through the mattermost settings page.
+{{- end }}
+{{- end }}

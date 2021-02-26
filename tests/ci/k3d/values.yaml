@@ -73,3 +73,5 @@ addons:
     enabled: true
   mattermostoperator:
     enabled: true
+  mattermost:
+    enabled: true
