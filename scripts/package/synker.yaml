@@ -29,7 +29,7 @@ destination:
 source:
   authFile: /root/.docker/config.json
   images:
-    - registry.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/defender:20.04.163
+    - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
     - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:2.4.1
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:2.4.1
 
