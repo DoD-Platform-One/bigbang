@@ -266,30 +266,6 @@ twistlock:
   # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Minio Operator and Instance
-#
-minio:
-  # -- Toggle deployment of minio operator and instance.
-  enabled: true
-  miniooperator:
-    git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
-      path: "./chart"
-      tag: "2.0.9-bb.1"
-
-    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
-    values: {}
-
-  minioinstance:
-    git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
-      path: "./chart"
-      tag: "2.0.9-bb.1"
-
-    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
-    values: {}
-
 #
 # ----------------------------------------------------------------------------------------------------------------------
 #
@@ -340,6 +316,37 @@ addons:
 
     # -- Additional authservice chain configurations.
     chains: {}
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Minio Operator and Instance
+  #
+  minioOperator:
+    # -- Toggle deployment of minio operator and instance.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      path: "./chart"
+      tag: "2.0.9-bb.2"
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+    values: {}
+
+  minio:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      path: "./chart"
+      tag: "2.0.9-bb.2"
+
+    # Provide a specific name for the minio instance.
+    name: minio
+
+    # Settings to enable/disable and name the minio virtual service for external access to the minio UI.
+    virtualService:
+      enabled: true
+      name: minio
+
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+    values: {}
 
   gitlab:
     # -- Toggle deployment of Gitlab.
