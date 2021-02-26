@@ -556,7 +556,7 @@ addons:
     values: {}
 
   # ----------------------------------------------------------------------------------------------------------------------
-  # Mattermost Operator
+  # Mattermost Operator and Instance
   #
   mattermostoperator:
     enabled: false
@@ -565,6 +565,87 @@ addons:
       path: "./chart"
       tag: "1.12.0-bb.0"
     # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    values: {}
+
+  mattermost:
+    # -- Toggle deployment of Mattermost.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      path: "./chart"
+      tag: "0.1.0-bb.1"
+
+    # -- Mattermost Enterprise functionality.
+    enterprise:
+      # -- Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install.
+      enabled: false
+
+      # -- License for Mattermost.
+      # This should be the entire contents of the license file from Mattermost (should be one line), example below
+      # license: "eyJpZCI6InIxM205bjR3eTdkYjludG95Z3RiOD---REST---IS---HIDDEN
+      license: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Mattermost on and off.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- Mattermost OIDC client ID
+      client_id: ""
+
+      # -- Mattermost OIDC client secret
+      client_secret: ""
+
+      # -- Mattermost OIDC auth endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      auth_endpoint: ""
+
+      # -- Mattermost OIDC token endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      token_endpoint: ""
+
+      # -- Mattermost OIDC user API endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      user_api_endpoint: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Mattermost.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Mattermost.
+      port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- SSL Mode to use when connecting to the database.
+      # Allowable values for this are viewable in the postgres documentation: https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
+      ssl_mode: ""
+
+    objectStorage:
+      # -- S3 compatible endpoint to use for connection information.
+      # Entering connection info will enable this option and will auto-create any required secrets.
+      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket name to use for Mattermost - will be auto-created.
+      bucket: ""
+
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
     values: {}
   #
   # ----------------------------------------------------------------------------------------------------------------------

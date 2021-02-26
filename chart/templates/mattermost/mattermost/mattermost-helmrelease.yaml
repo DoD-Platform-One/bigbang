@@ -1,0 +1,114 @@
+{{- if .Values.addons.mattermost.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mattermost
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: mattermost
+    app.kubernetes.io/component: "collaboration-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  releaseName: mattermost
+  targetNamespace: mattermost
+  chart:
+    spec:
+      chart: {{ .Values.addons.mattermost.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: mattermost
+        namespace: {{ .Release.Namespace }}
+
+  {{- with .Values.flux }}
+  interval: {{ .interval }}
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: {{ .install.retries }}
+  upgrade:
+    remediation:
+      retries: {{ .upgrade.retries }}
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: {{ .rollback.timeout }}
+    cleanupOnFail: {{ .rollback.cleanupOnFail }}
+  {{- end }}
+
+  valuesFrom:
+    - name: values
+      kind: Secret
+      valuesKey: "mattermost.yaml"
+
+  values:
+    hostname: {{ .Values.hostname }}
+    istio:
+      enabled: {{ .Values.istio.enabled }}
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
+    {{- with .Values.addons.mattermost.sso }}
+    sso:
+      enabled: {{ .enabled }}
+      client_id: {{ .client_id }}
+      client_secret: {{ .client_secret | default "no-secret" }}
+      auth_endpoint: {{ .auth_endpoint | default (printf "https://%s/oauth/authorize" $.Values.sso.oidc.host) }}
+      token_endpoint: {{ .token_endpoint | default (printf "https://%s/oauth/token" $.Values.sso.oidc.host) }}
+      user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/api/v4/user" $.Values.sso.oidc.host) }}
+    {{- end }}
+    global:
+      imagePullSecrets:
+        - name: private-registry
+    {{- with .Values.addons.mattermost.enterprise }}
+    enterprise:
+      enabled: {{ .enabled }}
+      license: {{ .license }}
+    {{- end }}
+    {{- with .Values.addons.mattermost.database }}
+    {{- if and .username .password .host .port .database .ssl_mode }}
+    database:
+      secret: "mattermost-database-secret"
+    {{- else }}
+    postgresql:
+      image:
+        pullSecrets:
+          - private-registry
+      install: true
+    {{- end }}
+    {{- end }}
+    {{- with .Values.addons.mattermost.objectStorage }}
+    {{- if and .endpoint .accessKey .accessSecret .bucket }}
+    fileStore:
+      secret: "mattermost-objectstorage-secret"
+      url: {{ .endpoint }}
+      bucket: {{ .bucket }}
+    {{- else }}
+    minio:
+      install: true
+      accessKey: {{ .accessKey | default "minio" }}
+      secretKey: {{ .secretKey | default "BigBangDEVONLY" }}
+    {{- end }}
+    {{- end }}
+
+  dependsOn:
+    - name: mattermost-operator
+      namespace: {{ .Release.Namespace }}
+
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- with .Values.addons.mattermost.objectStorage }}
+    {{- if not (and .endpoint .accessKey .accessSecret .bucket) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- end }}
+{{- end }}
