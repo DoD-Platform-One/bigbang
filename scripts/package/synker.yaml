@@ -44,5 +44,9 @@ source:
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/test:gcc
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check611-sonar-scanner45-dotnet-31:021921
 
+    # Gitlab Runner images
+    - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner:v13.2.2
+    - registry.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner/gitlab-runner-helper:ib-v13.2.2
+
       # Don't include until fortify is supported
 #    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
