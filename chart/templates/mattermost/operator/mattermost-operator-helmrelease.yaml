@@ -44,4 +44,16 @@ spec:
   values:
     imagePullSecrets:
       - name: private-registry
+
+  {{- if or .Values.gatekeeper.enabled .Values.monitoring.enabled }}
+  dependsOn:
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
 {{- end }}
