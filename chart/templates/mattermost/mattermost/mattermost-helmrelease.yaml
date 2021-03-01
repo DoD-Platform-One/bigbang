@@ -66,7 +66,7 @@ spec:
       license: {{ .license }}
     {{- end }}
     {{- with .Values.addons.mattermost.database }}
-    {{- if and .username .password .host .port .database .ssl_mode }}
+    {{- if and .username .password .host .port .database }}
     database:
       secret: "mattermost-database-secret"
     {{- else }}
