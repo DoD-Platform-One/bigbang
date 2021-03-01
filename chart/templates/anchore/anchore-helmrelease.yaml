@@ -24,6 +24,7 @@ spec:
     remediation:
       retries: {{ .install.retries }}
   upgrade:
+    disableWait: true
     remediation:
       retries: {{ .upgrade.retries }}
       remediateLastFailure: true
