@@ -639,7 +639,7 @@ addons:
     objectStorage:
       # -- S3 compatible endpoint to use for connection information.
       # Entering connection info will enable this option and will auto-create any required secrets.
-      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
       endpoint: ""
 
       # -- Access key for connecting to object storage endpoint.
