@@ -65,7 +65,6 @@ pre vars:
   - git fetch && git checkout ${CI_COMMIT_REF_NAME}
   - echo "CHART_MR_VERSION=$CHART_MR_VERSION" >> variables.env
   - echo "CHART_MA_VERSION=$CHART_MA_VERSION" >> variables.env
-  # obtain semver differences (subtract master version from mr verison)
   - CHART_VERSION_DIFF=$(./scripts/semver_diff.sh $CHART_MR_VERSION $CHART_MA_VERSION)
   - IFS=. DIFF_ARR=(${CHART_VERSION_DIFF##*-})
   - echo "CHART_VERSION_DIFF=$CHART_VERSION_DIFF" >> variables.env
