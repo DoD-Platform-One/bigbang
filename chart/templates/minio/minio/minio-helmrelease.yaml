@@ -51,6 +51,8 @@ spec:
         enabled: {{ .Values.addons.minio.virtualService.enabled }}
         name: {{ .Values.addons.minio.virtualService.name }}
     nameOverride: {{ .Values.addons.minio.name }}
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
 
   dependsOn:
     - name: minio-operator

@@ -335,7 +335,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "2.0.9-bb.2"
+      tag: "2.0.9-bb.3"
 
     # Provide a specific name for the minio instance.
     name: minio
