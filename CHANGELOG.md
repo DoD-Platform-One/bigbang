@@ -4,6 +4,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.2]
+
+* [#279](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/279): Allowed ArgoCD SSO url configuration to be overrideable by customer values
+
+## [1.1.1]
+
+* [!262](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/262): Fixed issue with sso not being enabled properly for kibana/elasticsearch
+* [!234](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/234): Ensure default for kibana/elasticsearch is to use istio injection
+* [!263](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/263): Added missing non-runtime anchore images to release artifacts for airgap deployments
+
 ## [1.1.0]
 
 * [&2](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/2): Add support for Gitlab (with sso) 13.8.0
