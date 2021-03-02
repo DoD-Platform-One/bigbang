@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+  - "{{ .Values.cr.spec.server.address }}"
+  gateways:
+  - main.{{ .Release.Namespace }}.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        port:
+          number: {{ .Values.cr.spec.server.port | default "20001" }}
+        host: kiali.{{ .Release.Namespace }}.svc.cluster.local

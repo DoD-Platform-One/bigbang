@@ -1,0 +1,5 @@
+istio:
+  enabled: false
+createNamespace: false
+imagePullSecrets:
+- name: private-registry-mil
