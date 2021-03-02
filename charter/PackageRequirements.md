@@ -24,7 +24,34 @@ Each package will work with any cluster under the following criteria.
 
 ## PR-X. Iron Bank Images
 
-Every Big Bang Package shall be configured to use exclusively Iron Bank approved images.
+Every Big Bang Package shall be configured to use exclusively Iron Bank approved images.  The images used __must__ be approved.
+
+In general, the following rules must be met:
+
+* Images must be __approved__ in IronBank
+* Unmodified IronBank image must be fully functional
+
+When the above are true, the package _may_ be considered for approval and inclusion within BigBang based off the requirements in [New Package Requests](NewPackageRequests.md).
+
+Depending on the package, the customer need, and the approval process, packages may not comply with the above requirements to be integrated with BigBang, but still be heavily desired by customers.  To account for these packages, BigBang Third Party Packages can be used.
+
+### Third Party Packages
+
+[Third Party Packages](https://repo1.dso.mil/platform-one/big-bang/apps/third-party) are packages that adhere by all the BigBang package standards _except_ the IronBank containers/approvals.  These packages in many cases are still maintained by BigBang, but for security purposes are not included into the BigBang product.
+
+[Third Party Packages](https://repo1.dso.mil/platform-one/big-bang/apps/third-party) are packages that adhere by all the BigBang package standards, but are missing key requirements (defined in [New Package Requests](NewPackageRequests.md)).  The most common being approved IronBank containers.
+
+There are two types of third party packages:
+
+#### Big Bang Supported and Maintained
+
+These are packages that are supported, updated, and maintained by team members of BigBang. This designation is usually reserved for packages that key customers require, but are missing approved IronBank containers, or blanket approval that allows them to be included with the BigBang product.
+
+These products are labeled with the "BigBang Supported" badge on the repositorys `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
+
+#### Independent
+
+These are packages that are not owned by team members of BigBang, but are still actively maintained independent of BigBang.  There are no rules as to who/what is allowed to own these packages, only that they must be actively maintained and up to BigBang Package Requirements.  Stale packages will be removed over time (exact timeline TBD) by members of BigBang.
 
 ## PR-X. Packages are Helm Charts
 
