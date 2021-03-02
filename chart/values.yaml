@@ -500,7 +500,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.11.0-bb.0"
+      tag: "1.11.0-bb.2"
 
     # -- Initial admin password used to authenticate to Anchore.
     adminPassword: ""
