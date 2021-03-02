@@ -1,4 +1,4 @@
-{{- if .Values.addons.gitlab.enabled }}
+{{- if or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -23,6 +23,8 @@ data:
   .dockerconfigjson: {{ template "imagePullSecret" . }}
 {{- end }}
 ---
+{{- end }}
+{{- if .Values.addons.gitlab.enabled }}
 # create sso secret. The assumption is OIDC
 {{- if .Values.addons.gitlab.sso.enabled }}
 apiVersion: v1
