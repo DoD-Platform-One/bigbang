@@ -1,9 +1,13 @@
 nameOverride: ""
 fullnameOverride: ""
 
+host: kiali.bigbang.dev
+port: 20001
+
 image:
-  repo: registry1.dso.mil/ironbank/opensource/kiali-operator
-  tag: 1.28.1
+  # repo: registry1.dso.mil/ironbank/opensource/kiali-operator
+  repo: quay.io/kiali/kiali-operator
+  tag: v1.28.1
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -52,11 +56,33 @@ cr:
   namespace: ""
 
   spec:
-    server:
-      address: kiali.bigbang.dev
     deployment:
+      image_name: registry1.dso.mil/ironbank/opensource/kiali
+      image_version: 1.28.1
       accessible_namespaces:
       - '**'
+      logger:
+        log_level: info
+    auth:
+      strategy: "anonymous"
+    external_services:
+      custom_dashboards:
+        prometheus:
+          url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
+
+      prometheus:
+        url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
+
+      grafana:
+        enabled: true
+        in_cluster_url: "http://monitoring-monitoring-grafana.monitoring.svc.cluster.local"
+        url: grafana.bigbang.dev
+
+      tracing:
+        enabled: true
+        url: "https://tracing.bigbang.dev"
+        in_cluster_url: "tracing.istio-system.svc.cluster.local"
+
     # Taken from https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
     ###################################################################
     # kiali_cr.yaml
