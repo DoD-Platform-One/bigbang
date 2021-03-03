@@ -1,70 +1,85 @@
-# This page where different types of documentation can be found:
+# 1. Big Bang's Primary Readme:
+## Location: 
+- https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/README.md
 
-## How this document is organized 
-* Each type of documentation will have it's own section that covers
-  - Summary of the use / purpose of the documentation
-  - What you can expect to find here
-  - How it should be organized if applicable 
-  - Where it should be located
-  - Any nuances around this documentation type
+## Purpose: 
+- Acts as a Table of Contents for discovering all other docs
+  - All other docs should link back here
+- Gives an Overview of BigBang that:
+  - Explicitly spells out the value of BigBang in terms a Non Technical User can understand
+  - Contains an Architecture Diagram
+  - Contains a Component Maturity Matrix that lists available apps and their maturity level
+- Documents the default values of the Umbrella Helm Chart
 
-## Use Cases / Purpose / Types of Documentation: 
-### 1. Big Bang Overview Docs: 
-  - Should explicitly spell out the value of Big Bang in terms a Non technical PM can understand.
-  - Engineer who has never seen Big Bang before should be able to get a concrete understanding of Big Bang via:
-    - Architecture Diagram(s) needed to understand overview should exist here
-    - A Component Maturity Matrix (This can explicitly list what's available and set expectations on mature vs new features)
-  - A link + description of this should live in the root README.md of the [BB UHC Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang).
-  - This should live in /docs/overview.md of the [BB UHC Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang).
-  - This content https://confluence.il2.dso.mil/pages/viewpage.action?spaceKey=BB1&title=BigBang+UHC+Generic+Architecture+Diagram should be moved into /docs/overview.md
 
-### 2. Big Bang Quick Start Demo, Code, and Docs: 
-  - This should have example code + user friendly spell it out for me documentation that a random DoD Service member with little to no prior knowledge of Docker / Kubernetes, but access to hardware or a cloud account can use to spin up Big Bang Demo from scratch with minimal intervention.
-  - This should live in a [quickstart repo](https://repo1.dso.mil/platform-one/quick-start/big-bang)
-   A Nice thing about docs living in another repo is that we can be more lax when it comes to giving team members rights to a documentation repo / we can allow anyone on the team to review anyone elses MR before commiting instead of requiring only code owners to approve.
-  - A link + description of this should live in the root README.md of the [BB UHC Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang).
-  - This should have a link to BB workshop, and BB workshop's public repo should have a link to a video walkthrough of the BB quickstart uploaded to git lfs (the video should stay out of the demo repo to optimize cloning)
-  - An Architecture Diagram of how the quickstart works / leverages k3d should exist
-  - Besides CI, this is the only place where non production demo hack type documenetation should exist. So shortcuts like using docker flux, not using a git repo to inject the BB UHC input helm values, using personal registry1 creds vs Iron Bank Robot Credential, k3d deployment helper scripts can exist here.    
-  - [The following Big Bang Onboarding Residency Lab-Guides](https://repo1.dso.mil/platform-one/onboarding/big-bang/big-bang-residency-internal/-/tree/master/Lab-Guides) should be moved here
-    - 17-Take-Home-DIY-Lab-Env
+# 2. Big Bang Quick Start, Local Dev Env Setup, and Docs: 
+## Location: 
+- https://repo1.dso.mil/platform-one/big-bang/deployments/quick-start
 
-### 3. Post Installation Package Configuration Docs: 
-  - Should exist in the repo of each individual package, and a documentation server hosted on BigBang as outlined [here](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/charter/PackageDocumentation.md). 
-  - [The following Big Bang Onboarding Residency Lab-Guides](https://repo1.dso.mil/platform-one/onboarding/big-bang/big-bang-residency-internal/-/tree/master/Lab-Guides) should be moved into documentation of individual package repos
-    - 08-Istio
-    - 13-Prometheus-Operator-Stack
-    - 14-Consolidated-Logging
+## Purpose: 
+- Guides new users with zero prior knowledge on how they can spin up Big Bang from scratch within 2 hours, will cover:
+  - Any Prerequesites and suggestions for meeting them
+  - Explanation of how k3d and BigBang automation works, so that new new users can understand whats happening as they follow quick start guide.
+  - Multiple Methods of provisioning and interfacing with a k3d node
+  - 2 Methods of installing BigBang to cover the following 2 use cases:
+    1. Quick Start Demo:
+       - Leverages preset config values in a public git repo
+    2. Local Development Environment Setup:
+       - Cover how to inject values using 100% local overrides (minimal GitOps / SOPS encryption) so new developers are aware of how to achieve fast feedback loop
 
-### 4. Internet Connected Production Deployment Docs:
-  - This should have BB Residency level of detail
-  - The customer template repo https://repo1.dso.mil/platform-one/big-bang/customers/template     
-   Should be renamed and moved to https://repo1.dso.mil/platform-one/big-bang/deployments/bb-internet-connected     
-   (It'd act as a template + documentation on how to customize the template to a customers deployment env)
-   A Nice thing about docs living in another repo is that we can be more lax when it comes to giving team members rights to a documentation repo / we can allow anyone on the team to review anyone elses MR before commiting instead of requiring only code owners to approve.     
-  - A link + description of this should live in the root README.md of the [BB UHC Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang).
-  - [The following Big Bang Onboarding Residency Lab-Guides](https://repo1.dso.mil/platform-one/onboarding/big-bang/big-bang-residency-internal/-/tree/master/Lab-Guides) should be moved here
-    - 01-Preflight-Access-Checks 
-    - 04-Big-Bang-Prep-Work-and-Deployment
-    - 05-Secrets-with-Mozilla-SOPS
-    - 06-install-umbrella
-    - 15-Customizing-and-Extending-Big-Bang
-    - 16-Debug-Scenarios
-  - The [current docs in the BB UHC repo](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs) should be moved here as well / all of these docs should be merged together.
 
-### 5. Internet Disconnected Production Deployment Docs: 
-  - This would be where the BB Airgap solution team would store code and docs for the BB official upstream airgap deployment solution.
-  - Should exist here https://repo1.dso.mil/platform-one/big-bang/deployments/bb-internet-disconnected 
-   A Nice thing about docs living in another repo is that we can be more lax when it comes to giving team members rights to a documentation repo / we can allow anyone on the team to review anyone elses MR before commiting instead of requiring only code owners to approve.     
-  - After it's stable a link + description of this should live in the root README.md of the [BB UHC Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang).
-  
-### 6. Developer Contribution Docs: 
-  - Only the latest version matters, and maybe improving docs around developer environment / process / doing things like updating a broken link should be allowed to be added to a master document faster / not go through the same level of scrutiny as a code merge where only Josh/Tom can accept it. Maybe it could exist in the [wiki?](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/wikis/developer/developer-documentation) and the BB Charter could link to the wiki so it'd still be readily discoverable.
-  - Otherwise this should should exist in BB Charter. (needs discussion)
+# 3. Developer Contribution Docs: 
+## Location: 
+- https://repo1.dso.mil/platform-one/big-bang/bigbang/-/wikis/home
 
-### 7. Big Bang Onboarding Residency: 
-  - Phase 1: Move the majority of these docs to upstream documentation locations, mentioned above.
-  - Phase 2: Let the residency have it's own repo, but heavily rewrite it so that it's just referencing upstream documentation/walking people through the upstream documentation. (and then have a few residency specific intro to kubernetes labs stay in residency)
-    - 01-Preflight-Access-Checks
-    - 02-Kubernetes-Refresher
-    - 04-Big-Bang-Prep-Work-and-Deployment
+## Purpose:
+- Home of Developer / Contributor facing Documentation
+
+
+# 4. Internet Connected GitOps Deployment Docs:
+## Location: 
+- https://repo1.dso.mil/platform-one/big-bang/deployments/internet-connected
+
+## Purpose:
+- In Depth Documentation on how to configure a production grade internet connected deployment of Big Bang Covering:
+  - Overview of the deployment process that includes explanations of how the automation works and why certain design decisions were made so that new users can understand what is happening and why things are done how they're done as they work through the deployment guide.
+  - Suggested Repo organization conventions, standards, and reasoning
+  - Any Prerequesites and suggestions for meeting them
+    - How to prepare a new repo (this repo can double as a template repo)
+    - How to Configure GitOps Encryption using SOPS
+      - AWS KMS and IAM
+      - (Future Additions)
+    - A Checklist of secret config files to prepare
+    - How to prepare secret config files, store them encrypted in git, and leverage them using GitOps
+    - Flux Configuration for:
+      - A Public Git Repo using HTTPS signed by Public CA
+      - A Private Git Repo using HTTPS signed by Public CA
+
+
+# 5. Internet Disconnected GitOps Deployment Docs:
+## Location: 
+- https://repo1.dso.mil/platform-one/big-bang/deployments/internet-disconnected 
+
+## Purpose:
+- In Depth Documentation on how to configure a production grade internet disconnected deployment of Big Bang Covering:
+  - Overview of the deployment process that includes explanations of how the automation works and why certain design decisions were made so that new users can understand what is happening and why things are done how they're done as they work through the deployment guide.
+  - Suggested Repo organization conventions, standards, and reasoning
+  - Any Prerequesites and suggestions for meeting them
+    - How to prepare a new repo (this repo can double as a template repo)
+    - How to setup a Private SSH based Git Repo
+    - How to setup and maintain a Internet Disconnected Registry
+    - How to Configure GitOps Encryption using SOPS
+      - Generic GPG Key Pairs
+    - Flux Configuration for:
+      - A Private Git Repo using HTTPS signed by a Private CA
+      - A Private SSH based Git Repo
+
+
+# 6. Post Installation Package Configuration Docs: 
+## Location:  
+- Should exist in the repo of each individual package, and a documentation server hosted on BigBang as outlined [here](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/charter/PackageDocumentation.md)
+- These docs should be available on a webpage hosted on the Big Bang Cluster using Hugo
+  (https://docs.bigbang.dev by default)
+
+## Purpose:
+- This allows us to support a centralized location for package configuration documentation, while allowing support for dynamically added versions of distributed packages in a maintainable way. 
