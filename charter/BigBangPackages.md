@@ -629,12 +629,12 @@ Redis is an open source, in-memory data structure store, used as a database, cac
 
 Repository:
 
-* TBD
+* [Redis Package](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/redis)
 
 Owners:
 
-* TBD
-* TBD
+* @runyontr - Runyon Solutions
+* @still - Parsons
 
 ### Sandbox
 
