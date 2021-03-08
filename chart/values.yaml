@@ -59,6 +59,7 @@ cr:
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali
       image_version: 1.28.1
+      ingress_enabled: false
       accessible_namespaces:
       - '**'
       logger:
