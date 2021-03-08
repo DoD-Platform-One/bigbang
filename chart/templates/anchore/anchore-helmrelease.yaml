@@ -24,6 +24,7 @@ spec:
     remediation:
       retries: {{ .install.retries }}
   upgrade:
+    disableWait: true
     remediation:
       retries: {{ .upgrade.retries }}
       remediateLastFailure: true
@@ -41,6 +42,8 @@ spec:
     hostname: {{ .Values.hostname }}
     istio:
       enabled: {{ .Values.istio.enabled }}
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
     {{- if and .Values.addons.anchore.enterprise.enabled .Values.addons.anchore.enterprise.licenseYaml }}
     enterpriseLicenseYaml: |
       {{ .Values.addons.anchore.enterprise.licenseYaml | nindent 6 }}
@@ -70,8 +73,6 @@ spec:
       defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
       {{- end }}
       imagePullSecretName: private-registry
-      enableMetrics: {{ .Values.monitoring.enabled }}
-      metricsAuthDisabled: {{ .Values.monitoring.enabled }}
       {{- if .Values.addons.anchore.enterprise.enabled }}
       oauthEnabled: {{ .Values.addons.anchore.sso.enabled }}
       hashedPasswords: {{ .Values.addons.anchore.sso.enabled }}

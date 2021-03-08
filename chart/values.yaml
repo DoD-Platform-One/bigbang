@@ -88,7 +88,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.7.3-bb.8"
+    tag: "1.7.3-bb.9"
 
   # -- Certificate/Key pair to use as the default certificate for exposing BigBang created applications.
   # If nothing is provided, applications will expect a valid tls secret to exist in the `istio-system` namespace called `wildcard-cert`.
@@ -166,7 +166,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.1.4-bb.3"
+    tag: "0.1.4-bb.4"
 
   sso:
     # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
@@ -359,7 +359,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "4.8.0-bb.0"
+      tag: "4.8.0-bb.2"
 
     sso:
       # -- Toggle OIDC SSO for Gitlab on and off.
@@ -500,7 +500,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.9.5-bb.2"
+      tag: "1.11.0-bb.2"
 
     # -- Initial admin password used to authenticate to Anchore.
     adminPassword: ""
@@ -639,7 +639,7 @@ addons:
     objectStorage:
       # -- S3 compatible endpoint to use for connection information.
       # Entering connection info will enable this option and will auto-create any required secrets.
-      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
       endpoint: ""
 
       # -- Access key for connecting to object storage endpoint.

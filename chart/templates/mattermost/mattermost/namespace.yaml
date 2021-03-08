@@ -27,7 +27,7 @@ data:
 
 ---
 {{- with .Values.addons.mattermost.database }}
-{{- if and .username .password .host .port .database .ssl_mode }}
+{{- if and .username .password .host .port .database }}
 apiVersion: v1
 kind: Secret
 type: Opaque
@@ -37,10 +37,10 @@ metadata:
   labels:
     app.kubernetes.io/name: mattermost
     app.kubernetes.io/component: "collaboration-tools"
-    {{- include "commonLabels" . | nindent 4}}
+    {{- include "commonLabels" $ | nindent 4}}
 stringData:
-  DB_CONNECTION_CHECK_URL: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/{{ .database }}?connect_timeout=10&sslmode={{ .ssl_mode }}"
-  DB_CONNECTION_STRING: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/{{ .database }}?connect_timeout=10&sslmode={{ .ssl_mode }}"
+  DB_CONNECTION_CHECK_URL: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/{{ .database }}?connect_timeout=10&sslmode={{ .ssl_mode | default "disable" }}"
+  DB_CONNECTION_STRING: "postgres://{{ .username }}:{{ .password }}@{{ .host }}:{{ .port }}/{{ .database }}?connect_timeout=10&sslmode={{ .ssl_mode | default "disable" }}"
 {{- end }}
 {{- end }}
 
@@ -56,10 +56,10 @@ metadata:
   labels:
     app.kubernetes.io/name: mattermost
     app.kubernetes.io/component: "collaboration-tools"
-    {{- include "commonLabels" . | nindent 4}}
+    {{- include "commonLabels" $ | nindent 4}}
 data:
   accesskey: {{ .accessKey | b64enc }}
-  secretkey: {{ .secretKey | b64enc }}
+  secretkey: {{ .accessSecret | b64enc }}
 {{- end }}
 {{- end }}
 

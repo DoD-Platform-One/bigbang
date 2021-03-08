@@ -68,6 +68,8 @@ spec:
           clientSecret: $oidc.keycloak.clientSecret
           requestedScopes: ["openid","ArgoCD"]
     {{- end }}
+    istio:
+      enabled: {{ if .Values.istio.enabled }}true{{ else }}false{{ end }}
   {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
