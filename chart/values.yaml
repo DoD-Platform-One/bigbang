@@ -82,7 +82,7 @@ cr:
       tracing:
         enabled: true
         url: "https://tracing.bigbang.dev"
-        in_cluster_url: "tracing.istio-system.svc.cluster.local"
+        in_cluster_url: "http://tracing.istio-system.svc.cluster.local"
 
     # Taken from https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
     ###################################################################
