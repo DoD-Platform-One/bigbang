@@ -9,7 +9,8 @@ image:
   repo: quay.io/kiali/kiali-operator
   tag: v1.28.1
   pullPolicy: IfNotPresent
-  pullSecrets: []
+  pullSecrets:
+  - private-registry
 
 # Deployment options for the operator pod.
 nodeSelector: {}
@@ -84,7 +85,7 @@ cr:
       tracing:
         enabled: true
         url: "https://tracing.bigbang.dev"
-        in_cluster_url: "http://tracing.istio-system.svc.cluster.local"
+        in_cluster_url: "http://tracing.istio-system.svc.cluster.local/jaeger"
 
     # Taken from https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
     ###################################################################
