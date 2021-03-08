@@ -22,20 +22,20 @@ hack/                 @toladipupo @michaelmcleroy @egoode
 charter/              @runyontr @joshwolf
 
 ^[Istio and Authservice]
-chart/Chart.yaml                @kenna81 @kavitha @cmcgrath
-chart/values.yaml               @kenna81 @kavitha @cmcgrath
-chart/templates/authservice     @kenna81 @kavitha @cmcgrath
-chart/templates/istio           @kenna81 @kavitha @cmcgrath
+chart/Chart.yaml                @kenna81 @kavitha @cmcgrath @nick_tetrate
+chart/values.yaml               @kenna81 @kavitha @cmcgrath @nick_tetrate
+chart/templates/authservice     @kenna81 @kavitha @cmcgrath 
+chart/templates/istio           @kenna81 @kavitha @cmcgrath @nick_tetrate
 
 ^[Anchore]
-chart/Chart.yaml
-# chart/values.yaml             @jasonkrause 
-# chart/templates/argocd
+chart/Chart.yaml                @blake.hearn @micah.nagel @jasonkrause
+chart/values.yaml               @blake.hearn @micah.nagel @jasonkrause
+chart/templates/anchore         @blake.hearn @micah.nagel @jasonkrause
 
 ^[ArgoCD]
-chart/Chart.yaml                @matthew.kaiser
-chart/values.yaml               @matthew.kaiser
-chart/templates/argocd          @matthew.kaiser
+chart/Chart.yaml                @matthew.kaiser @brian.rexrode
+chart/values.yaml               @matthew.kaiser @brian.rexrode
+chart/templates/argocd          @matthew.kaiser @brian.rexrode
 
 # ^[Cluster Auditor]
 # chart/Chart.yaml
@@ -43,9 +43,9 @@ chart/templates/argocd          @matthew.kaiser
 # chart/templates/clusterauditor
 
 # ^[Gatekeeper]
-# chart/Chart.yaml
-# chart/values.yaml
-# chart/templates/gatekeeper
+# chart/Chart.yaml              @toladipupo
+# chart/values.yaml             @toladipupo   
+# chart/templates/gatekeeper    @toladipupo
 
 ^[Logging]
 chart/Chart.yaml                @kavitha @ryan.j.garcia
@@ -67,7 +67,10 @@ chart/Chart.yaml                @egoode @kevin.wilder
 chart/values.yaml               @egoode @kevin.wilder
 chart/templates/gitlab          @egoode @kevin.wilder
 
-[Anchore]
-chart/Chart.yaml                @aneufville @micah.nagel
-chart/values.yaml               @aneufville @micah.nagel
-chart/templates/anchore         @aneufville @micah.nagel
+^[KeyCloak]
+chart/Chart.yaml                @megamind
+chart/values.yaml               @megamind
+chart/templates/keycloak        @megamind
+
+
+
