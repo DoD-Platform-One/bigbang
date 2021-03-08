@@ -58,7 +58,7 @@ cr:
   spec:
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.28.0
+      image_version: v1.28.1
       image_pull_secrets:
       - private-registry
       ingress_enabled: false
