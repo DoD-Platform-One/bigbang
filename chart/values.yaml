@@ -80,7 +80,7 @@ cr:
       grafana:
         enabled: true
         in_cluster_url: "http://monitoring-monitoring-grafana.monitoring.svc.cluster.local"
-        url: grafana.bigbang.dev
+        url: "https://grafana.bigbang.dev"
 
       tracing:
         enabled: true
