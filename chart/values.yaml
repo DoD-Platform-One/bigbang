@@ -57,6 +57,11 @@ cr:
   namespace: ""
 
   spec:
+    istio_component_namespaces:
+      grafana: monitoring
+      prometheus: monitoring
+      tracing: monitoring
+      
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
       image_version: v1.28.1
@@ -70,17 +75,21 @@ cr:
     auth:
       strategy: "anonymous"
     external_services:
+      # https://kiali.io/documentation/latest/runtimes-monitoring/
       custom_dashboards:
-        prometheus:
-          url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
+        enabled: false
 
       prometheus:
         url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
 
       grafana:
         enabled: true
-        in_cluster_url: "http://monitoring-monitoring-grafana.monitoring.svc.cluster.local"
+        in_cluster_url: "http://monitoring-monitoring-grafana.monitoring.svc.cluster.local:80"
         url: "https://grafana.bigbang.dev"
+        auth:
+          username: "admin"
+          password: "prom-operator"
+          type: basic
 
       tracing:
         enabled: true
