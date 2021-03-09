@@ -172,6 +172,7 @@ package tests:
         wait_project
       fi
     - wait_sts
+    - wait_daemonset
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
@@ -205,6 +206,7 @@ package tests:
         wait_project
       fi
     - wait_sts
+    - wait_daemonset
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
