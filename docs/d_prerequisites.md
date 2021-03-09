@@ -43,3 +43,15 @@ EOF
 oc -n logging create -f NetworkAttachmentDefinition.yaml
 oc -n monitoring create -f NetworkAttachmentDefinition.yaml
 ```
+
+## RKE2
+
+### OPA Gatekeeper
+
+Default PSP configurations for RKE2 prevent OPA Gatekeeper from coming up correctly.  See [RKE2 Issue](https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform/-/issues/2) and [Big Bang Issue](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/10) Patching the PSPs in the cluster allow OPA Gatekeeper to start correctly:
+
+```bash
+kubectl patch psp system-unrestricted-psp  -p '{"metadata": {"annotations":{"seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*"}}}'
+kubectl patch psp global-unrestricted-psp  -p '{"metadata": {"annotations":{"seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*"}}}'
+kubectl patch psp global-restricted-psp  -p '{"metadata": {"annotations":{"seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*"}}}'
+```
