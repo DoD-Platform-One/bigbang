@@ -73,10 +73,6 @@ spec:
       defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
       {{- end }}
       imagePullSecretName: private-registry
-      {{- if .Values.addons.anchore.enterprise.enabled }}
-      oauthEnabled: {{ .Values.addons.anchore.sso.enabled }}
-      hashedPasswords: {{ .Values.addons.anchore.sso.enabled }}
-      {{- end }}
     {{- if .Values.addons.anchore.enterprise.enabled }}
     anchore-feeds-db:
       imagePullSecrets: private-registry
