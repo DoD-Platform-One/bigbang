@@ -2,6 +2,8 @@
 
 set -ex
 
+CI_VALUES_FILE="tests/ci/k3d/values.yaml"
+
 # Deploy flux and wait for it to be ready
 echo "Installing Flux"
 flux --version
@@ -26,12 +28,22 @@ kubectl apply -f ./scripts/deploy/flux.yaml
 # wait for flux
 flux check
 
+IFS=","
+for package in $CI_MERGE_REQUEST_LABELS; do
+  if [ "$(yq e ".addons.${package}.enabled" $CI_VALUES_FILE 2>/dev/null)" == "false" ]; then
+    echo "Identified \"$package\" from labels"
+    yq e ".addons.${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+  fi
+done
+
 # deploy BigBang using dev sized scaling
-echo "Installing BigBang"
+echo "Installing BigBang with the following configurations:"
+cat $CI_VALUES_FILE
+
 helm upgrade -i bigbang chart -n bigbang --create-namespace \
 --set registryCredentials[0].username='robot$bigbang' --set registryCredentials[0].password=${REGISTRY1_PASSWORD} \
 --set registryCredentials[0].registry=registry1.dso.mil \
--f tests/ci/k3d/values.yaml
+-f ${CI_VALUES_FILE}
 
 # apply secrets kustomization pointing to current branch
 echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"

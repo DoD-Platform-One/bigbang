@@ -101,17 +101,20 @@ pre vars:
 clean install:
   stage: smoke tests
   extends:
-    - .k3s-ci
+    - .k3d-ci
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
+      when: never
     - *chart_changes
   script:
     - *deploy_bigbang
     - *test_bigbang
 
     # Fetch list of all images ran
-    - curl -sfL k3s:8081/images | jq -r '.images[].repoTags[0]' > images.txt
+    - cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
+    - docker exec $cid crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
   artifacts:
     paths:
       - images.txt
@@ -122,7 +125,7 @@ upgrade:
   dependencies:
     - pre vars
   extends:
-    - .k3s-ci
+    - .k3d-ci
   rules:
     # skip job when MR title starts with 'Breaking Change'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
