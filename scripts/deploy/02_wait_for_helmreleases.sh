@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 ## This is an array to instantiate the order of wait conditions
 ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab haproxy-sso gitlab-runner minio-operator minio anchore sonarqube mattermost-operator mattermost"
 
-## This the actual deployed helmrelease objects in the cluster
+## This is the actual deployed helmrelease objects in the cluster
 DEPLOYED_HELMRELEASES=$(kubectl get hr --no-headers -n bigbang | awk '{ print $1}')
+
+printf "Identified the following deployed helmreleases:\n%s" "${DEPLOYED_HELMRELEASES}"
 
 ## Function to test an array contains an element
 ## Args:

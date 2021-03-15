@@ -14,17 +14,17 @@ logging:
         persistence:
           size: 5Gi
         resources:
-          limits:
-            cpu: 1
-            memory: 2Gi
+          requests:
+            cpu: .5
+          limits: {}
       data:
         count: 1
         persistence:
           size: 5Gi
         resources:
-          limits:
-            cpu: 1
-            memory: 2Gi
+          requests:
+            cpu: .5
+          limits: {}
 
 istio:
   enabled: true
@@ -36,14 +36,64 @@ istio:
 
 clusterAuditor:
   enabled: true
+  values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: .5Gi
+      limits: {}
 
 monitoring:
   enabled: true
+  values:
+    alertmanager:
+      alertmanagerSpec:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+    prometheusOperator:
+      resources:
+        requests:
+          cpu: 250m
+          memory: 400Mi
+        limits: {}
+    prometheus:
+      prometheusSpec:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+    grafana:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits: {}
+    kubeStateMetrics:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits: {}
+    nodeExporter:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 30Mi
+        limits: {}
 
 gatekeeper:
   enabled: true
   values:
     replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits: {}
 
 twistlock:
   enabled: true
@@ -55,27 +105,243 @@ twistlock:
 # Explicitly enable all addons for CI
 addons:
   argocd:
-    enabled: true
+    enabled: false
+    values:
+      controller:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      dex:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      redis:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      server:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      repoServer:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+
   authservice:
-    enabled: true
+    enabled: false
     chains:
       minimal:
         callback_uri: "https://minimal.bigbang.dev"
+    values:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits: {}
+
   gitlab:
-    enabled: true
+    enabled: false
     sso:
       enabled: false
+    values:
+      global:
+        rails:
+          bootstrap:
+            enabled: false
+      gitlab-runner:
+        resources:
+          requests:
+            cpu: 10m
+          limits: {}
+      gitlab:
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+        sidekiq:
+          minReplicas: 1
+          maxReplicas: 1
+        gitlab-shell:
+          minReplicas: 1
+          maxReplicas: 1
+        gitaly:
+          resources:
+            requests:
+              cpu: 50m
+            limits: {}
+        shared-secrets:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+        migrations:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+        task-runner:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+      registry:
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      postgresql:
+        metrics:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+      minio:
+        resources:
+          requests:
+            cpu: 50m
+          limits: {}
+
   gitlabRunner:
-    enabled: true
+    enabled: false
+    values:
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 50m
+        limits: {}
+
   anchore:
-    enabled: true
+    enabled: false
+    values:
+      postgresql:
+        persistence:
+          size: 20Gi
+      anchoreAnalyzer:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreApi:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreCatalog:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchorePolicyEngine:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreSimpleQueue:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseFeeds:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseRbac:
+        authResource:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
+        managerResources:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
+      anchoreEnterpriseReports:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseNotifications:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEntperpiseUi:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+
   sonarqube:
-    enabled: true
+    enabled: false
+    values:
+      plugins:
+        install: []
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits: {}
+      persistence:
+        enabled: false
+        size: 5Gi
+      postgresql:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      tests:
+        enabled: false
+
   minioOperator:
-    enabled: true
+    enabled: false
+
   minio:
-    enabled: true
+    enabled: false
+    values:
+      zones:
+        servers: 1
+      volumesPerServer: 1
+
   mattermostoperator:
-    enabled: true
+    enabled: false
+
   mattermost:
-    enabled: true
+    enabled: false
+    values:
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits: {}
+      minio:
+        zones:
+          servers: 1

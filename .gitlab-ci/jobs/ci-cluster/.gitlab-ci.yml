@@ -1,5 +1,5 @@
 .k8s-util:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.2
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.2
 
 .dind-runner:
   tags:
@@ -7,20 +7,73 @@
     - privileged
     - dogfood
 
+#
+# In cluster k3s using K3D with the docker daemon as a sidecar
+#
+#   This will connect to a remote docker daemon over tls tcp (defined at installation of gitlab runners) and create
+#   a k3d cluster in a custom built docker bridge network.
+#
+.k3d-ci:
+  extends:
+    - .k8s-util
+    - .dind-runner
+  #  services:
+  #      # Added in through gitlab ci configuration, left in incase some poor soul needs to come debug this later
+  #    - name: docker:20.10.5-dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450"
+    - k3d cluster create ${CI_JOB_ID} --config tests/ci/k3d/config.yaml --network ${CI_JOB_ID}
+    - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
+    - kubectl get all -A
+  after_script:
+    - kubectl get all -A
+    - kubectl get gitrepository,helmrelease,kustomizations -A
+    - k3d cluster delete ${CI_JOB_ID}
+    - docker network rm ${CI_JOB_ID}
+
+#
+# In cluster k3s using k3s as a sidecar
+#
+#   This will spin up k3s as a gitlab ci sidecar
+#
 .k3s-ci:
   extends:
     - .k8s-util
     - .dind-runner
   services:
-    - name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3s-ci:v1.20.2-k3s1-bb.0
+    - name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3s-ci:v1.20.4-k3s1-bb.0
       alias: k3s
       command:
         - "server"
         - "--tls-san=k3s"
-        - "--disable=metrics-server"
         - "--disable=traefik"
   before_script:
     - mkdir -p ~/.kube
     - curl -sfL k3s:8081?service=k3s > ~/.kube/config
     - kubectl version
     - kubectl cluster-info
+  after_script:
+    - kubectl get all -A
+    - kubectl get gitrepository,helmrelease,kustomizations -A
+
+#
+# In cluster k3d using K3D with a dind container
+#
+#   This will spin up a k3d cluster using a dind container as the base container
+#
+.k3d-dind-ci:
+  extends:
+    - .dind-runner
+  image:
+    name: rancher/k3d:v4.3.0-dind
+  before_script:
+    - nohup dockerd-entrypoint.sh &
+    - until docker ps 2>&1 > /dev/null; do sleep 1s; done
+    - k3d cluster create --config tests/ci/k3d/config.yaml
+    - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
