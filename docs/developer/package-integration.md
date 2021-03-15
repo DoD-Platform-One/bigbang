@@ -13,7 +13,7 @@
 
    Note that helm does not handle any missing parent tags in the yaml tree. The 'if' statement and 'default' method throw 'nil' errors when parent tags are missing. The work-around is to inspect each level of the tree and assign an empty 'dict' if the value does not exist. Then you will be able to use 'hasKey' in your 'if' statements as shown below in this example from Gitlab. Having described all this, you should understand that coding conditional values is optional. The passthrough values will take priority regardless. But the overridden values will not show up in the deployed flux HelmRelease object if you don't code the conditional values. The value overrides will be obscured in the Package values secret. The only way to confirm that the overrides have been applied is to use "helm get values <releasename> -n bigbang" command on the deployed helm release. When the passthrough values show up in the HelmRelease object the Package configuration is much easier to see and verify. Use your own judgement on when to code conditional values.
 
-   ```
+   ```yaml
    global: 
      appConfig:
        {{- if .Values.addons.gitlab.sso.enabled }}
@@ -41,7 +41,7 @@
 1. Edit the chart/templates/values.yaml.  Add your Package to the list of Packages.  Just copy one of the others and change the name. This supports adding chart values from a secret. Pay attention to whether this is a core Package or an add-on package, the toYaml values are different for add-ons. This template allows a Package to add chart values that need to be encrypted in a secret.
 
 1. Edit the chart/values.yaml.  Add your Package to the bottom of the core section if a core package or addons section if an add-on. You can copy from one of the other packages and modify appropriately.  Some possible tags underneath your package are [ enabled, git, sso, database, objectstorage ].  Avoid duplicating value tags from the upstream chart in the BigBang chart.  The goal is not to cover every edge case. Instead code reasonable defaults in the helmrelease template and allow customer to override values in addons.<packageName>.values
-   ```
+   ```yaml
    addons:
      mypackage:
        enabled: false     # default to false
@@ -80,7 +80,8 @@
 1. When you are done developing the BigBang chart features for your Package make a merge request. Keep your merge request in "Draft" status until all issues are resolved. The merge request will start a pipeline. Fix any errors.  Address any issues raised in the merge request comments.
 
 1. The final step before removing "draft" status from your merge request is to squash commits and rebase your development branch with the master branch
-   ```
+   ```bash
+   git rebase origin/master
    git reset $(git merge-base origin/master $(git rev-parse --abbrev-ref HEAD))
    git add -A
    git commit -m "feat: example conventional commit"
@@ -92,7 +93,7 @@
 There are two ways to test BigBang, imperative or GitOps with Flux.  Your initial development can start with imperative testing.  But you should finish with GitOps to make sure that your code works with Flux.
 
 1. **Imperative:** you can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little".  From the root of your local bigbang repo:
-   ```
+   ```bash
    # deploy with helm while pointing to your test values files
    # bigbang packages should create any needed secrets from the chart values
    # if you have the values file encrypted with sops, temporarily decrypt it
@@ -111,7 +112,7 @@ There are two ways to test BigBang, imperative or GitOps with Flux.  Your initia
    ```
 
 2. **GitOps with Flux:**  You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development banches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You can create a branch from one of the other developer's branch or start clean from the master branch. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. This is a public repo so DO NOT commit unencrypted secrets. Before committing code it is a good idea to manually run "helm template" and a "helm install" with dry run.  This will reveal many errors before you make a commit. Here are the steps you can iterate:
-   ```
+   ```bash
    # verify chart code before committing
    helm template bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --debug
    helm install bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --dry-run

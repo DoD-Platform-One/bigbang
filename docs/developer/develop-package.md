@@ -96,7 +96,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
    If your pipeline deploys a customresource (i.e. istio-controlplane deploys an "istiooperator" resource) you should add a wait script to make sure these resources are running properly before Cypress runs. Review this [README](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to set this up. The pipeline will run configuration tests, install your helm chart, and run cypress tests. If there is no UI or external facing API that could be tested using Cypress do not include those files and the pipeline will automatically skip over cypress testing.
 
-   ```yaml
+   ```
    |-- .gitlab-ci.yml
    |-- chart
    |   |-- Chart.yml
@@ -116,7 +116,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add the following markdown files to complete the Package. Reference other that Packages for examples of how to create them.
 
-   ```bash  
+   ```  
    CHANGELOG.md      <  standard history of changes made  
    CODEOWNERS        <  list of the code maintainers. Minimum of two people from separate organizations  
    CONTRIBUTING.md   <  instructions for how to contribute to the project  
@@ -175,6 +175,7 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
 1. Wait to create a git tag release until integration testing with BigBang chart is completed.  You will very likely discover more Package changes that are needed during BigBang integration. When you are confident that the Package code is complete, squash commits and rebase your development branch with the "main" branch.
 
    ```bash
+   git rebase origin/main
    git reset $(git merge-base origin/main $(git rev-parse --abbrev-ref HEAD))
    git add -A
    git commit -m "feat: example conventional commit"
