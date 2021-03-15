@@ -41,9 +41,6 @@ spec:
   values:
     imagePullSecrets:
     - name: private-registry
-    runners:
-      imagePullSecrets:
-      - private-registry
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
 
