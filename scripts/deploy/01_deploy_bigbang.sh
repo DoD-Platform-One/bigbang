@@ -28,13 +28,18 @@ kubectl apply -f ./scripts/deploy/flux.yaml
 # wait for flux
 flux check
 
-IFS=","
-for package in $CI_MERGE_REQUEST_LABELS; do
-  if [ "$(yq e ".addons.${package}.enabled" $CI_VALUES_FILE 2>/dev/null)" == "false" ]; then
-    echo "Identified \"$package\" from labels"
-    yq e ".addons.${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-  fi
-done
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]]; then
+  echo "On default branch, enabling all addons"
+  yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+else
+  IFS=","
+  for package in $CI_MERGE_REQUEST_LABELS; do
+    if [ "$(yq e ".addons.${package}.enabled" $CI_VALUES_FILE 2>/dev/null)" == "false" ]; then
+      echo "Identified \"$package\" from labels"
+      yq e ".addons.${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+    fi
+  done
+fi
 
 # deploy BigBang using dev sized scaling
 echo "Installing BigBang with the following configurations:"
