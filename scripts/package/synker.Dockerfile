@@ -19,7 +19,7 @@ COPY --from=builder /go/synker/synker /usr/local/bin/synker
 RUN yum install -y unzip git jq
 
 # Install yq
-RUN curl -sfL -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/3.4.1/yq_linux_amd64 && \
+RUN curl -sfL -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.6.1/yq_linux_amd64 && \
     chmod +x /usr/local/bin/yq
 
 # Install aws cli
