@@ -14,7 +14,6 @@ Table of Contents
 
 - Admin tools
   - [Docker](https://docs.docker.com/engine/install/)
-  - [Flux CLI](https://toolkit.fluxcd.io/get-started/#install-the-flux-cli):     `brew install fluxcd/tap/flux`
   - [Git](https://git-scm.com/download/)
   - [Helm](https://helm.sh/docs/intro/install/)
   - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -29,30 +28,24 @@ Table of Contents
 
 ## Flux Installation
 
-[Flux v2](https://toolkit.fluxcd.io/) must be installed into the Kubernetes cluster before deploying Big Bang.  There are three options for doing this:
+[Flux v2](https://toolkit.fluxcd.io/) must be installed into the Kubernetes cluster before deploying Big Bang:
 
-1. (Recommended) Deploy officially through [Iron Bank](registry1.dso.mil)
+1. Deploy officially through [Iron Bank](registry1.dso.mil)
 
-    ```bash
-    # The script will do the following:
-    #   Check flux prerequisites
-    #   Interactively login to Iron Bank and store credentials in Secret
-    #   Install flux into Kubernetes cluster using Iron Bank repo
-    #   Remove Iron Bank credentials from cluster
-    hack/flux-install.sh
-    ```
+Official flux installation helper script:
 
-1. Deploy unofficially through [Big Bang's Repo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/fluxv2/container_registry)
+```
+./scripts/install_flux.sh --help
+```
 
-   ```bash
-   flux install --registry registry.dso.mil/platform-one/big-bang/apps/sandbox/fluxv2
-   ```
+Example baseline IronBank deployment:
 
-1. Deploy for development through [DockerHub](https://hub.docker.com/search?q=fluxcd)
-
-   ```bash
-   flux install
-   ```
+```
+./scripts/install_flux.sh \
+  --registry-username "$REGISTRY_USERNAME" \
+  --registry-password "$REGISTRY_PASSWORD" \
+  --registry-email "$REGISTRY_EMAIL"
+```
 
 ## Configuration Template
 
