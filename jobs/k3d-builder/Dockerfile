@@ -81,6 +81,11 @@ RUN npm install cypress && \
 # Install tree for directory structure
 RUN yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/tree-1.7.0-15.el8.x86_64.rpm
 
+# Install yq for dependency handling
+ENV YQ_VERSION='4.6.1'
+ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 /usr/local/bin/yq
+RUN chmod +x /usr/local/bin/yq
+
 # Remove needed repos
 RUN rm -rf /etc/yum.repos.d/docker-ce.repo && \
     rm -rf /etc/yum.repos.d/CentOS.repo && \

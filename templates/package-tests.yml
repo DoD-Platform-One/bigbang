@@ -1,11 +1,18 @@
 stages:
   - configuration validation
   - package tests
+  - package
+  - release
 
 variables:
   PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
   PIPELINE_REPO_BRANCH: master
+  IMAGE_LIST: images.txt
+  IMAGE_PKG: images.tar.gz
+  REPOS_PKG: repositories.tar.gz
+  RELEASE_NAME: ${CI_PROJECT_NAME}
+  RELEASE_BUCKET: umbrella-bigbang-releases
 
 configuration validation:
   stage: configuration validation
@@ -61,14 +68,13 @@ package tests:
     - privileged
 
   image:
-    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
+    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.3
   services:
     - registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
   variables:
     DOCKER_HOST: tcp://localhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
-    YAML_PARSE_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/yml-parse/parse_yaml.sh"
     WAIT_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/wait/wait.sh"
 
   artifacts:
@@ -97,9 +103,8 @@ package tests:
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
 
-    # Clone pipeline repo for yaml parsing
+    # Clone pipeline repo for waits
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
-    - source ${YAML_PARSE_PATH}
     - source ${WAIT_PATH}
 
     # Check for istio in project name and install it if needed
@@ -116,24 +121,39 @@ package tests:
         kubectl apply -f tests/main-test-gateway.yaml
       fi
 
-    # Check for dependency repos, set up pull secrets, secret, and helm install with test-values if present default if not
+    # Check for dependency repos, set up pull secrets, and helm install with test-values if present default if not
     - |
       if [ -f "tests/dependencies.yaml" ]; then
-        eval $(parse_yaml tests/dependencies.yaml "dependencies_")
-        for git_repo in $(compgen -A variable | grep -w "dependencies_.*_git"); do
+        yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+          dep_name=$i
 
-          dep_prefix=${git_repo%_*}
-          dep_namespace_var=${dep_prefix}_namespace
-          dep_namespace=$(printf '%s\n' "${!dep_namespace_var}")
-          if [ -z ${dep_namespace} ]; then
-            dep_namespace=$(echo "$dep_prefix" | sed -e "s/^dependencies_//")
+          dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+          if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+            dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
+            if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+              continue
+            fi
           fi
-          dep_branch_var=${dep_prefix}_branch
-          dep_branch=$(printf '%s\n' "${!dep_branch_var}")
-          dep_repo=$(printf '%s\n' "${!git_repo}")
-          dep_repo_folder=$(echo "$dep_prefix" | sed -e "s/^dependencies_//")
 
-          echo "Installing dependency: ${dep_repo_folder} into ${dep_namespace} namespace"
+          dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
+          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+            dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+          fi
+
+          dep_namespace=$(yq e ".${i}.namespace" "tests/dependencies.yaml")
+          if [[ -z ${dep_namespace} || ${dep_namespace} == "null" ]]; then
+            dep_namespace=$dep_name
+          fi
+
+          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+            echo "Cloning default branch from ${dep_repo}"
+            git clone ${dep_repo} repos/${dep_name}
+          else
+            echo "Cloning tag ${dep_branch} from ${dep_repo}"
+            git clone -b ${dep_branch} ${dep_repo} repos/${dep_name}
+          fi
+
+          echo "Installing dependency: repos/${dep_name} into ${dep_namespace} namespace"
           if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
             kubectl create namespace ${dep_namespace};
           fi
@@ -144,43 +164,33 @@ package tests:
             kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
           fi
 
-          if [ ! -z ${dep_branch} ]; then
-            echo "Cloning ${dep_branch} branch from ${dep_repo}"
-            git clone -b ${dep_branch} ${dep_repo} ${dep_repo_folder}
+          if [ -f repos/${dep_name}/tests/test-values.yml ] ; then
+            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yml for values"
+            helm install --wait --timeout 600s ${dep_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.yml
           else
-            echo "Cloning default branch from ${dep_repo}"
-            git clone ${dep_repo} ${dep_repo_folder}
-          fi
-
-          if [ -f ${dep_repo_folder}/tests/test-values.yml ] ; then
-            echo "Helm installing ${dep_repo_folder}/chart into ${dep_namespace} namespace using ${dep_repo_folder}/tests/test-values.yml for values"
-            helm install --wait --timeout 600s ${dep_repo_folder} ${dep_repo_folder}/chart -n ${dep_namespace} -f ${dep_repo_folder}/tests/test-values.yml
-          else
-            echo "Helm installing ${dep_repo_folder}/chart into ${dep_namespace} namespace using default values"
-            helm install --wait --timeout 600s ${dep_repo_folder} ${dep_repo_folder}/chart -n ${dep_namespace}
+            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using default values"
+            helm install --wait --timeout 600s ${dep_name} repos/${dep_name}/chart -n ${dep_namespace}
           fi
         done
       fi
 
-    # Wait for resources to be created and come alive
     - sleep 10
     - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
     - |
-      if [ -f ${dep_repo_folder}/tests/wait.sh ]; then
-        source ${dep_repo_folder}/tests/wait.sh
-        echo "Waiting on dependency resources..."
-        wait_project
+      if [ -f tests/dependencies.yaml ]; then
+        yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+          dep_name=$i
+          if [ -f repos/${dep_name}/tests/wait.sh ]; then
+            source repos/${dep_name}/tests/wait.sh
+            echo "Waiting on dependency resources..."
+            wait_project
+          fi
+        done
       fi
     - wait_sts
     - wait_daemonset
     - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-
-    # If test-sysctl-mod exists apply it
-    - |
-      if [ -f "tests/test-sysctl-mod.yml" ]; then
-        kubectl apply -f tests/test-sysctl-mod.yml
-      fi
 
   script:
     # Place kubernetes package test here
@@ -243,6 +253,112 @@ package tests:
           echo "kubectl get all -A"
           kubectl get all -A
         fi
-
+    # Fetch list of all images run
+    - docker exec -i k3d-${CI_PROJECT_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+    # Remove istio and rancher upstream images
+    - sed -i '/docker.io\/istio\//d' images.txt
+    - sed -i '/docker.io\/rancher\//d' images.txt
+    - |
+      if [ -f tests/images.txt ]; then
+        cat tests/images.txt >> images.txt
+      fi
     # Delete Cluster
     - k3d cluster delete ${CI_PROJECT_NAME}
+
+  artifacts:
+    paths:
+      - images.txt
+    expire_in: 3 days
+
+package:
+  stage: package
+  tags:
+    - bigbang
+    - public
+    - privileged
+  image: registry.dso.mil/platform-one/big-bang/bigbang/synker:0.0.2
+  rules:
+    # run job for manual tag events, check for AWS access
+    - if: '$CI_COMMIT_TAG && $AWS_ACCESS_KEY_ID'
+  before_script:
+    # Set up auth
+    - mkdir -p /root/.docker
+    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+  script:
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - cp ${PIPELINE_REPO_DESTINATION}/jobs/release/synker.yaml ./synker.yaml
+    # Populate images list in synker config -- TODO: Trim out Istio?
+    - cat images.txt | sed -e 's/^/    - /' >> synker.yaml
+    - synker pull -b=1
+    # Tar up synker as well
+    - cp /usr/local/bin/synker synker.yaml /var/lib/registry/
+    - tar -C /var/lib/registry -czvf $IMAGE_PKG .
+    - tar -czvf $IMAGE_PKG /var/lib/registry
+    # Package repos
+    - mkdir -p repos/
+    - git -C repos/ clone -b ${CI_COMMIT_TAG} ${CI_REPOSITORY_URL}
+    - |
+      if [ -f tests/dependencies.yaml ]; then
+        yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+          dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
+          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+            dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+          fi
+
+          dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+          if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+            dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
+            if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+              continue
+            fi
+          fi
+
+          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+            git -C repos/ clone ${dep_repo}
+          else
+            git -C repos/ clone -b ${dep_branch} ${dep_repo}
+          fi
+        done
+      fi
+    - tar -czf $REPOS_PKG repos/
+    # Prep release
+    - mkdir -p release
+    - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+    # Publish packages to s3 release
+    - aws s3 sync --quiet release/ s3://${RELEASE_BUCKET}/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
+    # Get release notes from CHANGELOG
+    - echo "# RELEASE NOTES:" >> release_notes.txt
+    - echo "Please see the repo [documentation](${CI_PROJECT_URL}/-/tree/${CI_COMMIT_TAG}/docs) for additional info on this package." >> release_notes.txt
+    - release_notes=$(cat CHANGELOG.md | sed  "1,/## \[${CI_COMMIT_TAG}]/d;/## \[/Q")
+    - |
+      if [[ -z $release_notes ]]; then
+        printf "\n" >> release_notes.txt;
+        echo "NO ENTRY IN CHANGELOG FOR THIS TAG, ADD RELEASE NOTES HERE" >> release_notes.txt;
+      else
+        printf "\n" >> release_notes.txt;
+        echo "${release_notes}" >> release_notes.txt;
+      fi
+  artifacts:
+    paths:
+      - release_notes.txt
+    expire_in: 3 days
+
+release:
+  stage: release
+  tags:
+    - bigbang
+    - public
+    - privileged
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    # run job for manual tag events, check for AWS access
+    - if: '$CI_COMMIT_TAG && $AWS_ACCESS_KEY_ID'
+  variables:
+    RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
+  script:
+    - |
+      release-cli create --name "${RELEASE_NAME} ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+        --description "$(cat release_notes.txt)" \
+        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"

@@ -101,36 +101,42 @@ small K3D cluster is created and any cypress tests located in the "tests" direct
 The Package Pipeline template is used to execute a conformance (linting) stage and a functional test phase for 
 a package (application).   This template (located in templates/package-tests.yml) is intended to be included in the 
 gitlab-ci.yml file of a package repo.  The following code example can be placed in the gitlab-ci.yml file to include 
-the package pipeline template.    
+the package pipeline template. Make sure to update the `RELEASE_NAME` variable, it will be used in CI as the title for releases. This will default to the repo name.
 
-```bash
+```yaml
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
     ref: master
     file: '/templates/package-tests.yml'
+# Optional
+variables:
+  RELEASE_NAME: "Pick a name for the package to release as"
+  # Example:
+  # RELEASE_NAME: "Elasticsearch & Kibana"
 ```
 
 If the package has any dependencies that must be installed first (i.e. an operator) you will need to create a file 
 in the package repo - `tests/dependencies.yaml` - with the following contents (note optional values):
 
-- dependencyname: The top level for each dependency, a simple string, no hyphens (use camelcase if multiple words)
-- git: This should be the direct link to clone the dependency repo, in quotes
-- branch: Optional, pass in a branch to clone the dependency from
-- namespace: Optional, pass in a namespace to install the dependency under (useful if the dependency needs to be 
-installed under a specific name). This defaults to $dependencyname if not provided
+- `dependencyname`: The top level for each dependency, name for it
+- `git.repo`: This should be the direct link to clone the dependency repo, in quotes
+- `git.tag`: Optional, pass in a specific tag (or technically branch) to clone the dependency from, will default to main
+- `namespace`: Optional, pass in a namespace to install the dependency under (useful if the dependency needs to be installed under a specific namespace, i.e. gitlab-runners need to be in gitlab namespace), defaults to the dependency name (top level yaml) if not provided
 
-Structure these values in your yaml file as follows (must use 2 spaces to structure):
+Structure these values in your yaml file as follows:
 
 ```yaml
 dependencyname:
-  git: "Git Repo Clone URL"
-  branch: "main"
-  namespace: "example"
+  git:
+    repo: "Git repo clone URL"
+    tag: "Tag to clone from"
+  namespace: "Namespace to install in"
 # Example
 opa:
-  git: "https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git"
+  git:
+    repo: "https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git"
+    tag: "1.1.0-bb.0"
   namespace: "gatekeeper-system"
-  branch: "main"
 ```
 
 If the package makes use of an operator and creates custom resources it is best to create a custom wait script for the pipeline to run. 
