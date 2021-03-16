@@ -47,10 +47,7 @@ spec:
     hostname: {{ .Values.hostname }}
     istio:
       enabled: {{ .Values.istio.enabled }}
-      virtualService:
-        enabled: {{ .Values.addons.minio.virtualService.enabled }}
-        name: {{ .Values.addons.minio.virtualService.name }}
-    nameOverride: {{ .Values.addons.minio.name }}
+    minioRootCreds: minio-root-creds-secret
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
 

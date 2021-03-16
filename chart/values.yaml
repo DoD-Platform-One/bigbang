@@ -335,15 +335,13 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "2.0.9-bb.3"
+      tag: "2.0.9-bb.5"
 
-    # Provide a specific name for the minio instance.
-    name: minio
+    # -- Default access key to use for minio.
+    accesskey: ""
 
-    # Settings to enable/disable and name the minio virtual service for external access to the minio UI.
-    virtualService:
-      enabled: true
-      name: minio
+    # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
+    secretkey: ""
 
     # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
     values: {}
