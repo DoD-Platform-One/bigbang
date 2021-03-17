@@ -1,15 +1,30 @@
-*                     @runyontr @joshwolf @megamind @phillip.record
+[Project Managers]
+# protect individual files in the root directory such as the CODEOWNERS file
+/*                     @runyontr @joshwolf @megamind @phillip.record
+# Recursive protection for directories
+/.gitlab-ci/           @runyontr @joshwolf @megamind @phillip.record
+/.gitlab/              @runyontr @joshwolf @megamind @phillip.record
+/base/                 @runyontr @joshwolf @megamind @phillip.record
+/chart/                @runyontr @joshwolf @megamind @phillip.record
+/charter/              @runyontr @joshwolf @megamind @phillip.record
+/hack/                 @runyontr @joshwolf @megamind @phillip.record
+/scripts/              @runyontr @joshwolf @megamind @phillip.record
+/tests/                @runyontr @joshwolf @megamind @phillip.record
 
-# ^[Chart Values]
-# chart/values.yaml
-# chart/Chart.yaml
 
 [Docs Owners]
-docs/                 @michaelmcleroy @egoode @aaronbeger @aaron.ruse @branden.cobb @shouseba @chadningle @chuck.laverde @daryndecker @dyoung @egnoriega @egoode @iahmad @jcookehg   
+# Allow any one of the listed codeowners to approve merges to the documentation 
+# Does not allow the creator of the merge request to be the approveer.
+/docs/                @michaelmcleroy @egoode @aaronbeger @aaron.ruse @branden.cobb @shouseba @chadningle @chuck.laverde @daryndecker @dyoung @egnoriega @egoode @iahmad @jcookehg   
                       @jasonkrause @jpower_rfed @jkayse @jdale @joshwolf @karchaf @kavitha @kenna81 @kevin.wilder @killian.byrne @mgauto @msbrown47 @mdutton @matthew.kaiser 
                       @michaelmcleroy @nick_tetrate @racosta @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @seanthomaswilliams1 @thomas.burton @Ozzie100 @tsiddique1 
-                      @toladipupo @visuth.dy @zdzielinski
+                      @toladipupo @visuth.dy @zdzielinski @micah.nagel @LynnStill 
 
+
+################################################
+# The following entries are for optional approval. 
+# They are only included to document contacts and have no impact on approval requirements
+################################################
 
 ^[Kustomize Base Owners]
 base/                 @michaelmcleroy
