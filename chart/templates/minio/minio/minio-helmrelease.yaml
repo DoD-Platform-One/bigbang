@@ -33,23 +33,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-minio-values
       kind: Secret
-      valuesKey: "minio.yaml"
-
-  values:
-    podAnnotations:
-      sidecar.istio.io/inject: "true"
-      traffic.sidecar.istio.io/includeInboundPorts: "*"
-      traffic.sidecar.istio.io/excludeInboundPorts: "9443"
-    imagePullSecrets:
-      - name: private-registry
-    hostname: {{ .Values.hostname }}
-    istio:
-      enabled: {{ .Values.istio.enabled }}
-    minioRootCreds: minio-root-creds-secret
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-minio-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-minio-values
+      kind: Secret
+      valuesKey: "overlays"
 
   dependsOn:
     - name: minio-operator

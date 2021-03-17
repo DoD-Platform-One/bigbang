@@ -1,0 +1,40 @@
+{{- if .Values.addons.argocd.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.argocd "name" "argocd" "defaults" (include "bigbang.defaults.argocd" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.argocd" -}}
+hostname: {{ .Values.hostname }}
+
+createNamespace: false
+
+global:
+  imagePullSecrets:
+    - name: private-registry
+
+controller:
+  imagePullSecrets:
+    - name: private-registry
+
+dex:
+  imagePullSecrets:
+    - name: private-registry
+
+redis:
+  imagePullSecrets:
+    - name: private-registry
+
+{{- if .Values.addons.argocd.sso.enabled }}
+sso:
+  enabled: {{ .Values.addons.argocd.sso.enabled }}
+  rbac:
+    policy.csv: {{- toYaml .Values.addons.argocd.sso.groups | nindent 4 }}
+  keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
+  config:
+    oidc.config: |
+      name: {{ .Values.addons.argocd.sso.provider_name }}
+      issuer: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
+      clientID: {{ .Values.addons.argocd.sso.client_id }}
+      clientSecret: $oidc.keycloak.clientSecret
+      requestedScopes: ["openid","ArgoCD"]
+{{- end }}
+{{- end -}}

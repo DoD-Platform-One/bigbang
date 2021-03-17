@@ -37,13 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-mattermost-operator-values
       kind: Secret
-      valuesKey: "mattermostoperator.yaml"
-
-  values:
-    imagePullSecrets:
-      - name: private-registry
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-mattermost-operator-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-mattermost-operator-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{- if or .Values.gatekeeper.enabled .Values.monitoring.enabled }}
   dependsOn:

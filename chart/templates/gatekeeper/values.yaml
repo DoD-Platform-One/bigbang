@@ -1,0 +1,6 @@
+{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.gatekeeper "name" "gatekeeper" "defaults" (include "bigbang.defaults.gatekeeper" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.gatekeeper" -}}
+{{- end -}}

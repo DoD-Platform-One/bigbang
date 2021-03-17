@@ -37,31 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-ek-values
       kind: Secret
-      valuesKey: "logging.yaml"
-
-  values:
-    hostname: {{ .Values.hostname }}
-    istio:
-      enabled: {{ .Values.istio.enabled }}
-    {{- if .Values.logging.sso.enabled }}
-    sso:
-      enabled: {{ .Values.logging.sso.enabled }}
-      client_id: {{ .Values.logging.sso.client_id }}
-      client_secret: {{ .Values.logging.sso.client_secret }}
-      oidc:
-        host: {{ .Values.sso.oidc.host }}
-        realm: {{ .Values.sso.oidc.realm }}
-    {{- end }}
-    kibana:
-      version: 7.9.2
-      imagePullSecrets:
-      - name: private-registry
-    elasticsearch:
-      version: 7.9.2
-      imagePullSecrets:
-      - name: private-registry
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:

@@ -1,0 +1,11 @@
+{{- if .Values.addons.gitlabRunner.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.gitlabRunner "name" "gitlab-runner" "defaults" (include "bigbang.defaults.gitlab-runner" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.gitlab-runner" -}}
+imagePullSecrets:
+- name: private-registry
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+{{- end -}}

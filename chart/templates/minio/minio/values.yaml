@@ -1,0 +1,21 @@
+{{- if .Values.addons.minio.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.minio "name" "minio" "defaults" (include "bigbang.defaults.minio" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.minio" -}}
+hostname: {{ .Values.hostname }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+minioRootCreds: minio-root-creds-secret
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  traffic.sidecar.istio.io/includeInboundPorts: "*"
+  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+
+{{- end -}}

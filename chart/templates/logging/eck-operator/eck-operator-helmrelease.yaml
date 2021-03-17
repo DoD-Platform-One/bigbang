@@ -37,21 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-eck-operator-values
       kind: Secret
-      valuesKey: "eckoperator.yaml"
-
-  values:
-    license:
-      trial: {{ .Values.logging.license.trial }}
-      keyJSON: |
-        {{ .Values.logging.license.keyJSON | nindent 8 }}
-    podAnnotations:
-      sidecar.istio.io/inject: "true"
-      traffic.sidecar.istio.io/includeInboundPorts: "*"
-      traffic.sidecar.istio.io/excludeInboundPorts: "9443"
-    imagePullSecrets:
-      - name: private-registry
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-eck-operator-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-eck-operator-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{- if .Values.gatekeeper.enabled }}
   dependsOn:

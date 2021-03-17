@@ -36,23 +36,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-fluentbit-values
       kind: Secret
-      valuesKey: "fluentbit.yaml"
-
-  values:
-    elasticsearch:
-      host: "logging-ek-es-http"
-      password:
-        secret: "logging-ek-es-elastic-user"
-
-    imagePullSecrets:
-      - name: private-registry
-    {{- if .Values.openshift }}
-    podSecurityContext:
-      seLinuxOptions:
-        type: "spc_t"
-    {{- end }}
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
   dependsOn:

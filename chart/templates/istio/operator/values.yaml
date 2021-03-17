@@ -1,0 +1,12 @@
+{{- if .Values.istiooperator.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.istiooperator "name" "istio-operator" "defaults" (include "bigbang.defaults.istiooperator" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.istiooperator" -}}
+hub: registry1.dso.mil/ironbank/opensource/istio
+tag: 1.7.3
+createNamespace: false
+
+imagePullSecrets:
+  - name: private-registry
+{{- end -}}

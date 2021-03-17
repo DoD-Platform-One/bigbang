@@ -1,0 +1,17 @@
+{{- if .Values.twistlock.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.twistlock "name" "twistlock" "defaults" (include "bigbang.defaults.twistlock" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.twistlock" -}}
+hostname: {{ .Values.hostname }}
+
+prometheus:
+  servicemonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+imagePullSecrets:
+- name: private-registry
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+{{- end -}}

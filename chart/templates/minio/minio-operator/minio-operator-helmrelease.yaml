@@ -33,9 +33,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-minio-operator-values
       kind: Secret
-      valuesKey: "miniooperator.yaml"
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-minio-operator-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-minio-operator-values
+      kind: Secret
+      valuesKey: "overlays"
 
   values:
     podAnnotations:

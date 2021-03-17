@@ -1,0 +1,74 @@
+{{- if .Values.addons.anchore.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.anchore "name" "anchore" "defaults" (include "bigbang.defaults.anchore" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.anchore" -}}
+hostname: {{ .Values.hostname }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- if and .Values.addons.anchore.enterprise.enabled .Values.addons.anchore.enterprise.licenseYaml }}
+enterpriseLicenseYaml: |
+  {{ .Values.addons.anchore.enterprise.licenseYaml | nindent 2 }}
+{{- end }}
+
+  {{- if .Values.addons.anchore.enterprise.enabled }}
+sso:
+  enabled: {{ .Values.addons.anchore.sso.enabled }}
+  spEntityId: {{ .Values.addons.anchore.sso.client_id }}
+  acsUrl: "https://anchore.{{ .Values.hostname }}/service/sso/auth/keycloak"
+  idpMetadataUrl: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml/descriptor"
+  roleAttribute: {{ .Values.addons.anchore.sso.role_attribute }}
+  {{- end }}
+
+anchoreEnterpriseGlobal:
+  enabled: {{ .Values.addons.anchore.enterprise.enabled }}
+  imagePullSecretName: private-registry
+
+postgresql:
+  imagePullSecrets: private-registry
+  {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.database }}
+  enabled: false
+  postgresUser: {{ .Values.addons.anchore.database.username }}
+  postgresPassword: {{ .Values.addons.anchore.database.password }}
+  postgresDatabase: {{ .Values.addons.anchore.database.database }}
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  {{- end }}
+
+anchoreGlobal:
+  {{- if .Values.addons.anchore.adminPassword }}
+  defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
+  {{- end }}
+  imagePullSecretName: private-registry
+
+{{- if .Values.addons.anchore.enterprise.enabled }}
+anchore-feeds-db:
+  imagePullSecrets: private-registry
+  {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.feeds_database }}
+  enabled: false
+  postgresUser: {{ .Values.addons.anchore.database.username }}
+  postgresPassword: {{ .Values.addons.anchore.database.password }}
+  postgresDatabase: {{ .Values.addons.anchore.database.feeds_database }}
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  {{- end }}
+
+anchoreEnterpriseUi:
+  imagePullSecretName: private-registry
+
+anchore-ui-redis:
+  {{- if and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password }}
+  enabled: false
+  externalEndpoint: "redis://:{{ .Values.addons.anchore.redis.password }}@{{ .Values.addons.anchore.redis.host }}:{{ .Values.addons.anchore.redis.port }}"
+  password: {{ .Values.addons.anchore.redis.password }}
+  {{- end }}
+  image:
+    pullSecrets:
+      - private-registry
+{{- end }}
+
+{{- end }}
+

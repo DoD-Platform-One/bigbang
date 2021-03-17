@@ -1,0 +1,67 @@
+{{- if and .Values.istio.enabled .Values.addons.authservice.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.authservice" -}}
+imagePullSecrets:
+  - name: private-registry
+
+global:
+  oidc:
+    host: {{ .Values.sso.oidc.host }}
+    realm: {{ .Values.sso.oidc.realm }}
+
+  {{- if .Values.sso.jwks }}
+  jwks: "{{ .Values.sso.jwks }}"
+  {{- end }}
+
+  {{- if .Values.sso.client_id}}
+  client_id: {{ .Values.sso.client_id }}
+  {{- end }}
+
+  {{- if .Values.sso.client_secret }}
+  client_secret: {{ .Values.sso.client_secret }}
+  {{- end }}
+
+  {{- if .Values.sso.certificate_authority }}
+  certificate_authority: {{ .Values.sso.certificate_authority  }}
+  {{- end }}
+
+chains:
+  {{- if .Values.addons.authservice.chains }}
+  {{ .Values.addons.authservice.chains | toYaml | nindent 2 }}
+  {{- end }}
+
+  kiali:
+    match:
+      header: ":authority"
+      prefix: "kiali"
+    client_id: {{ .Values.istio.sso.kiali.client_id }}
+    client_secret: "{{ .Values.istio.sso.kiali.client_secret }}"
+    callback_uri: https://kiali.{{ .Values.hostname }}/login
+
+  jaeger:
+    match:
+      header: ":authority"
+      prefix: "tracing"
+    client_id: "{{ .Values.istio.sso.jaeger.client_id }}"
+    client_secret: "{{ .Values.istio.sso.jaeger.client_secret }}"
+    callback_uri: https://tracing.{{ .Values.hostname }}/login
+
+  prometheus:
+    match:
+      header: ":authority"
+      prefix: "prometheus"
+    client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
+    client_secret: "{{ .Values.monitoring.sso.prometheus.client_secret }}"
+    callback_uri: https://prometheus.{{ .Values.hostname }}/login/generic_oauth
+
+  alertmanager:
+    match:
+      header: ":authority"
+      prefix: "alertmanager"
+    client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
+    client_secret: "{{ .Values.monitoring.sso.alertmanager.client_secret }}"
+    callback_uri: https://alertmanager.{{ .Values.hostname }}/login/generic_oauth
+
+{{- end -}}

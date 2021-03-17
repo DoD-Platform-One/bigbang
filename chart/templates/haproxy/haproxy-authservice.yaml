@@ -1,23 +1,34 @@
-{{- if .Values.twistlock.enabled }}
+{{- if and .Values.istio.enabled .Values.addons.authservice.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: twistlock
+  name: haproxy-sso
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: twistlock
-    app.kubernetes.io/component: "security"
-    {{- include "commonLabels" . | nindent 4}}
+    app.kubernetes.io/name: haproxy
+    app.kubernetes.io/component: "developer-tools"
+  {{- include "commonLabels" . | nindent 4}}
 spec:
-  targetNamespace: twistlock
+  targetNamespace: authservice
   chart:
     spec:
-      chart: {{ .Values.twistlock.git.path }}
+      chart: "./chart"
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: twistlock
+        name: haproxy
         namespace: {{ .Release.Namespace }}
+
+  valuesFrom:
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{- with .Values.flux }}
   interval: {{ .interval }}
@@ -36,24 +47,7 @@ spec:
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "overlays"
-
-  # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
-    {{- if .Values.gatekeeper.enabled }}
-    - name: gatekeeper
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
     {{- if .Values.istio.enabled }}
     - name: istio
       namespace: {{ .Release.Namespace }}
@@ -62,5 +56,5 @@ spec:
     - name: monitoring
       namespace: {{ .Release.Namespace }}
     {{- end }}
-  {{- end }}
+
 {{- end }}

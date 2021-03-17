@@ -1,4 +1,5 @@
-{{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled ( or .Values.monitoring.sso.enabled .Values.istio.sso.enabled ) ) }}
+
+  {{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled ( or .Values.monitoring.sso.enabled .Values.istio.sso.enabled ) ) }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -37,54 +38,19 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-authservice-values
       kind: Secret
-      valuesKey: "authservice.yaml"
-  values:
-    imagePullSecrets:
-    - name: private-registry
-    global:
-      oidc:
-        host: {{ .Values.sso.oidc.host }}
-        realm: {{ .Values.sso.oidc.realm }}
-      {{- if .Values.sso.jwks }}
-      jwks: "{{ .Values.sso.jwks }}"
-      {{- end }}
-{{- if .Values.sso.client_id}}
-      client_id: {{ .Values.sso.client_id }}
-{{- end }}
-{{- if .Values.sso.client_secret }}
-      client_secret: {{ .Values.sso.client_secret }}
-{{- end }}
-{{- if .Values.sso.certificate_authority }}
-      certificate_authority: {{ .Values.sso.certificate_authority  }}
-{{- end }}
-    chains:
-      kiali:
-        match:
-          header: ":authority"
-          prefix: "kiali"
-        client_id: {{ .Values.istio.sso.kiali.client_id }}
-        callback_uri: https://kiali.{{ .Values.hostname }}/login
-      jaeger:
-        match:
-          header: ":authority"
-          prefix: "tracing"
-        client_id: "{{ .Values.istio.sso.jaeger.client_id }}"
-        callback_uri: https://tracing.{{ .Values.hostname }}/login
-      prometheus:
-        match:
-          header: ":authority"
-          prefix: "prometheus"
-        client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
-        callback_uri: https://prometheus.{{ .Values.hostname }}/login/generic_oauth
-      alertmanager:
-        match:
-          header: ":authority"
-          prefix: "alertmanager"
-        client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
-        callback_uri: https://alertmanager.{{ .Values.hostname }}/login/generic_oauth
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-authservice-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-authservice-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if .Values.istio.enabled }}
   dependsOn:
   - name: istio
     namespace: {{ .Release.Namespace }}
+  {{- end }}
 {{- end }}
