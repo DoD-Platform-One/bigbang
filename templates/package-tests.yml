@@ -77,13 +77,6 @@ package tests:
     DOCKER_TLS_CERTDIR: ""
     WAIT_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/wait/wait.sh"
 
-  artifacts:
-    when: always
-    paths:
-      - tests/cypress/screenshots
-      - tests/cypress/videos
-    expire_in: 3 days
-
   before_script:
     # Starting dnsmasq for cluster dns resolution
     - docker run -d -p 53:53/udp -p 53:53 registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:87fca1d1
@@ -266,8 +259,11 @@ package tests:
     - k3d cluster delete ${CI_PROJECT_NAME}
 
   artifacts:
+    when: always
     paths:
       - images.txt
+      - tests/cypress/screenshots
+      - tests/cypress/videos
     expire_in: 3 days
 
 package:
