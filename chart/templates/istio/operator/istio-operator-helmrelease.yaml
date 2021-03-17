@@ -1,4 +1,4 @@
-{{- if .Values.istio.enabled }}
+{{- if .Values.istiooperator.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -37,22 +37,19 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-istio-operator-values
       kind: Secret
-      valuesKey: "istiooperator.yaml"
-
-  values:
-    hub: registry1.dso.mil/ironbank/opensource/istio
-    tag: 1.7.3
-    createNamespace: false
-
-    imagePullSecrets:
-      - name: private-registry
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-istio-operator-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-istio-operator-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{- if .Values.gatekeeper.enabled }}
   dependsOn:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
   {{- end }}
-
 {{- end }}

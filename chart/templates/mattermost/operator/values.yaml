@@ -1,0 +1,8 @@
+{{- if or .Values.addons.mattermostoperator.enabled .Values.addons.mattermost.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.mattermostoperator "name" "mattermost-operator" "defaults" (include "bigbang.defaults.mattermostoperator" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.mattermostoperator" -}}
+imagePullSecrets:
+  - name: private-registry
+{{- end -}}

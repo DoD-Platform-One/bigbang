@@ -1,0 +1,19 @@
+{{- if and .Values.logging.enabled .Values.fluentbit.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.fluentbit "name" "fluentbit" "defaults" (include "bigbang.defaults.fluentbit" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.fluentbit" -}}
+elasticsearch:
+  host: "logging-ek-es-http"
+  password:
+    secret: "logging-ek-es-elastic-user"
+
+imagePullSecrets:
+  - name: private-registry
+
+{{- if .Values.openshift }}
+podSecurityContext:
+  seLinuxOptions:
+    type: "spc_t"
+{{- end }}
+{{- end -}}

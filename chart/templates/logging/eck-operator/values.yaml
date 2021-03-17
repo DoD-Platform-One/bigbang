@@ -1,0 +1,18 @@
+{{- if or .Values.logging.enabled .Values.clusterAuditor.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.eckoperator "name" "eck-operator" "defaults" (include "bigbang.defaults.eck-operator" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.eck-operator" -}}
+license:
+  trial: {{ .Values.logging.license.trial }}
+  keyJSON: |
+    {{ .Values.logging.license.keyJSON | nindent 4 }}
+
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  traffic.sidecar.istio.io/includeInboundPorts: "*"
+  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+
+imagePullSecrets:
+  - name: private-registry
+{{- end -}}

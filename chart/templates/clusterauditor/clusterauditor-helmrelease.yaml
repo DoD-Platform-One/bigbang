@@ -37,9 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-cluster-auditor-values
       kind: Secret
-      valuesKey: "clusterauditor.yaml"
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-cluster-auditor-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-cluster-auditor-values
+      kind: Secret
+      valuesKey: "overlays"
 
   values:
     elasticsearch:

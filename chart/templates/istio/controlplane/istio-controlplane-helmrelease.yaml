@@ -37,29 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-istio-values
       kind: Secret
-      valuesKey: "istio.yaml"
-  values:
-    hostname: {{ .Values.hostname }}
-    sso:
-      enabled: {{ .Values.istio.sso.enabled }}
-
-    imagePullSecrets:
-      - private-registry
-    openshift: {{ .Values.openshift }}
-
-{{- if .Values.istio.sso.enabled }}
-    ingress:
-      kiali:
-        service: authservice-haproxy-sso
-        port: 8080
-        namespace: authservice
-      jaeger:
-        service: authservice-haproxy-sso
-        port: 8080
-        namespace: authservice
-{{- end }}
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-istio-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-istio-values
+      kind: Secret
+      valuesKey: "overlays"
 
   dependsOn:
     - name: istio-operator

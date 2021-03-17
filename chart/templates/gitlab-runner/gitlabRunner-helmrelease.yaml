@@ -34,15 +34,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-  - name: values
-    kind: Secret
-    valuesKey: "gitlab-runner.yaml"
-
-  values:
-    imagePullSecrets:
-    - name: private-registry
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
+    - name: {{ .Release.Name }}-gitlab-runner-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-gitlab-runner-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-gitlab-runner-values
+      kind: Secret
+      valuesKey: "overlays"
 
   {{- if or .Values.gatekeeper.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
   dependsOn:

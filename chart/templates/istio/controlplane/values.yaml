@@ -1,0 +1,26 @@
+{{- if .Values.istio.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.istio "name" "istio" "defaults" (include "bigbang.defaults.istio" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.istio" -}}
+hostname: {{ .Values.hostname }}
+sso:
+  enabled: {{ .Values.istio.sso.enabled }}
+
+imagePullSecrets:
+  - private-registry
+
+openshift: {{ .Values.openshift }}
+
+{{- if .Values.istio.sso.enabled }}
+ingress:
+  kiali:
+    service: authservice-haproxy-sso
+    port: 8080
+    namespace: authservice
+  jaeger:
+    service: authservice-haproxy-sso
+    port: 8080
+    namespace: authservice
+{{- end }}
+{{- end -}}

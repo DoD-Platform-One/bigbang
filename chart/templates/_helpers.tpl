@@ -87,3 +87,17 @@ app.kubernetes.io/version: "{{ .Chart.Version }}"
 app.kubernetes.io/part-of: "bigbang"
 app.kubernetes.io/managed-by: "flux"
 {{- end -}}
+
+{{- define "values-secret" -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .root.Release.Name }}-{{ .name }}-values
+  namespace: {{ .root.Release.Namespace }}
+type: generic
+stringData:
+  common: |
+  defaults: {{- toYaml .defaults | nindent 4 }}
+  overlays: |
+    {{- toYaml .package.values | nindent 4 }}
+{{- end -}}

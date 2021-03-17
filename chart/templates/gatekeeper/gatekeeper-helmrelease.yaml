@@ -37,9 +37,15 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-gatekeeper-values
       kind: Secret
-      valuesKey: "gatekeeper.yaml"
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-gatekeeper-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-gatekeeper-values
+      kind: Secret
+      valuesKey: "overlays"
 
   values:
     disableValidatingWebhook: true

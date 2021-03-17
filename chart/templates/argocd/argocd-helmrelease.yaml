@@ -35,41 +35,18 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
+
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-argocd-values
       kind: Secret
-      valuesKey: "argocd.yaml"
-  values:
-    hostname: {{ .Values.hostname }}
-    createNamespace: false
-    global:
-      imagePullSecrets:
-      - name: private-registry
-    controller:
-      imagePullSecrets:
-      - name: private-registry
-    dex:
-      imagePullSecrets:
-      - name: private-registry
-    redis:
-      imagePullSecrets:
-      - name: private-registry
-    {{- if .Values.addons.argocd.sso.enabled }}
-    sso:
-      enabled: {{ .Values.addons.argocd.sso.enabled }}
-      rbac:
-        policy.csv: {{- toYaml .Values.addons.argocd.sso.groups | nindent 8 }}
-      keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
-      config:
-        oidc.config: |
-          name: {{ .Values.addons.argocd.sso.provider_name }}
-          issuer: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
-          clientID: {{ .Values.addons.argocd.sso.client_id }}
-          clientSecret: $oidc.keycloak.clientSecret
-          requestedScopes: ["openid","ArgoCD"]
-    {{- end }}
-    istio:
-      enabled: {{ if .Values.istio.enabled }}true{{ else }}false{{ end }}
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-argocd-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-argocd-values
+      kind: Secret
+      valuesKey: "overlays"
+
   {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}

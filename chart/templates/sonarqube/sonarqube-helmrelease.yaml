@@ -39,57 +39,17 @@ spec:
   {{- end }}
   
   valuesFrom:
-    - name: values
+    - name: {{ .Release.Name }}-sonarqube-values
       kind: Secret
-      valuesKey: "sonarqube.yaml"
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-sonarqube-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-sonarqube-values
+      kind: Secret
+      valuesKey: "overlays"
 
   values:
-    hostname: {{ .Values.hostname }}
-    istio:
-      enabled: {{ .Values.istio.enabled }}
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
-    {{- if ( include "imagePullSecret" . ) }}
-    ## value for image pull secret
-    image:
-      pullSecret: private-registry
-    {{- end }}
-
-    # SAML SSO config
-    {{- if .Values.addons.sonarqube.sso.enabled }}
-    sonarProperties:
-      sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
-      sonar.core.serverBaseURL: https://sonarqube.{{ .Values.hostname }}
-      sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
-      sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.label }}
-      sonar.auth.saml.providerId: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
-      sonar.auth.saml.loginUrl: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml
-      sonar.auth.saml.certificate.secured: {{ .Values.addons.sonarqube.sso.certificate }}
-      sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}
-      sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}
-      sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}
-      {{- if .Values.addons.sonarqube.sso.group }}
-      sonar.auth.saml.user.group: {{ .Values.addons.sonarqube.sso.group }}
-      {{- end }}
-    {{- end }}
-
-    # External Postgres config
-    {{- with .Values.addons.sonarqube.database }}
-    postgresql:
-      {{- if and .host .username .password .database .port }}
-      # Use external database
-      enabled: false
-      postgresqlServer: {{ .host }}
-      postgresqlDatabase: {{ .database }}
-      postgresqlUsername: {{ .username }}
-      existingSecret: sonarqube-db-secret
-      service:
-        port: {{ .port }}
-      {{- else }}
-      # Use internal database, defaults are fine
-      enabled: true
-      {{- end }}
-    {{- end }}
 
   {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.monitoring.enabled }}
   dependsOn:
