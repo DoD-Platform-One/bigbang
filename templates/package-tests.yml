@@ -283,8 +283,11 @@ package:
   script:
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - cp ${PIPELINE_REPO_DESTINATION}/jobs/release/synker.yaml ./synker.yaml
-    # Populate images list in synker config -- TODO: Trim out Istio?
-    - cat images.txt | sed -e 's/^/    - /' >> synker.yaml
+    # Populate images list in synker config
+    - |
+      for image in $(cat images.txt); do
+        yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
+      done
     - synker pull -b=1
     # Tar up synker as well
     - cp /usr/local/bin/synker synker.yaml /var/lib/registry/
