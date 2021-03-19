@@ -31,7 +31,7 @@ Create an Ubuntu EC2 instance using the AWS console with the following attribute
 - IAM Role: InstanceOpsRole (This will add support for sops encryption with KMS)
 - User Data (as Text):
 
-```bash
+```shell
     MIME-Version: 1.0
     Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
     
@@ -54,14 +54,14 @@ Configure the EC2 instance. SSH into your new EC2 instance and configure it with
 
 - SSH: Find your instance's public IP. This may be in the output of your `run-instance` command, if not search for your instance id in the AWS web console and under the details copy your public ipv4 address. Example below assumes this value is `1.2.3.4`, replace that with the actual value.
 
-```bash
+```shell
 EC2_PUBLIC_IP=1.2.3.4
 ssh -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP
 ```
 
 - Install Docker CE
 
-```bash
+```shell
 # Remove any old Docker items
 sudo apt remove docker docker-engine docker.io containerd runc
 
@@ -75,8 +75,7 @@ sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Install Docker
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io
 
 # Add your base user to the Docker group so that you do not need sudo to run docker commands
 sudo usermod -aG docker $USER
@@ -87,7 +86,7 @@ logout
 
 - Install K3D on the EC2 instance
 
-```bash
+```shell
 wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 # check version
 k3d version
@@ -95,15 +94,25 @@ k3d version
 
 - Start our dev cluster on the EC2 instance using K3D. See addendum for more secure way with only port 22 exposed using private ip and sshuttle.
 
-```bash
+```shell
 EC2_PUBLIC_IP=$( curl https://ipinfo.io/ip )
 echo $EC2_PUBLIC_IP
-k3d cluster create -s 1 -a 3 -v /etc/machine-id:/etc/machine-id --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+
+# Create k3d cluster
+k3d cluster create \
+    --servers 1 \
+    --agents 3 \
+    --volume /etc/machine-id:/etc/machine-id \
+    --k3s-server-arg "--disable=traefik" \
+    --k3s-server-arg "--disable=metrics-server" \
+    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
+    --port 80:80@loadbalancer \
+    --port 443:443@loadbalancer
 ```
 
 **_Optionally_** you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
 
-```bash
+```shell
 # Create the directory for the k3s registry config.
 mkdir ~/.k3d/
 
@@ -122,25 +131,34 @@ configs:
 EOF
 
 # Create k3d cluster
-k3d cluster create --servers 1 --agents 3 -v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml -v /etc/machine-id:/etc/machine-id --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
+k3d cluster create \
+    --servers 1 \
+    --agents 3 \
+    --volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml \
+    --volume /etc/machine-id:/etc/machine-id \
+    --k3s-server-arg "--disable=traefik" \
+    --k3s-server-arg "--disable=metrics-server" \
+    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
+    --port 80:80@loadbalancer \
+    --port 443:443@loadbalancer
 ```
 
 Here is an explanation of what we are doing with this command:
 
-- `-s 1` Creating 1 master/server
-- `-a 3` Creating 3 agent nodes
+- `--servers 1` Creating 1 master/server
+- `--agents 3` Creating 3 agent nodes
 - `--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
 - `--k3s-server-arg "--disable=metrics-server"` Disable default metrics
 - `--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
-- `-p 80:80@loadbalancer` Exposes the cluster on the host on port 80
-- `-p 443:443@loadbalancer` Exposes the cluster on the host on port 443
-- `-v ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster.
-- `-v /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
+- `--port 80:80@loadbalancer` Exposes the cluster on the host on port 80
+- `--port 443:443@loadbalancer` Exposes the cluster on the host on port 443
+- `--volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster.
+- `--volume /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
 
 **STEP 3:**  
 Test the cluster from your local workstation. Copy the contents of the k3d kubeconfig from the EC2 instance to your local workstation. Do it manually with copy and paste.
 
-```bash
+```shell
 # on the EC2 instance
 echo $EC2_PUBLIC_IP
 cat ~/.kube/config
@@ -148,13 +166,14 @@ cat ~/.kube/config
 
 Or, use secure copy to move it to your workstation. example:
 
-```bash
+```shell
 scp -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP:~/.kube/config ~/.kube/config
 ```
 
 Edit the kubeconfig on your workstation. Replace the server host ```0.0.0.0``` with with the public IP of the EC2 instance. Test cluster access from your local workstation.
 
-```bash
+
+```shell
 kubectl cluster-info
 kubectl get nodes
 ```
@@ -165,7 +184,7 @@ kubectl get nodes
 
 Instead of opening all TCP traffic (all ports) to your local public ip address you only need port 22 for ssh traffic. And then use sshuttle to tunnel into your EC2 instance. Here is an example assuming that your EC2 is in the default VPC. All other steps being the same as above.
 
-```bash
+```shell
 # ssh to your EC2 instance using the public IP. For Amazon Linux 2 the user is "ec2-user"
 ssh -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP
 
@@ -173,12 +192,22 @@ ssh -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP
 EC2_PRIVATE_IP=$(hostname -I | awk '{print $1}')
 
 # create the k3d cluster with SAN for private IP
-k3d cluster create -s 1 -a 3 -v /etc/machine-id:/etc/machine-id --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$EC2_PRIVATE_IP"  -p 80:80@loadbalancer -p 443:443@loadbalancer 
+# Create k3d cluster
+k3d cluster create \
+    --servers 1 \
+    --agents 3 \
+    --volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml \
+    --volume /etc/machine-id:/etc/machine-id \
+    --k3s-server-arg "--disable=traefik" \
+    --k3s-server-arg "--disable=metrics-server" \
+    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
+    --port 80:80@loadbalancer \
+    --port 443:443@loadbalancer
 ```
 
 Then on your workstation edit the kubeconfig with the EC2 private ip. In a separate terminal window start a tunnel session with sshuttle using the EC2 public IP.
 
-```bash
+```shell
 sshuttle --dns -vr ec2-user@$EC2_PUBLIC_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your-ec2.pem'
 ```
 
@@ -186,7 +215,7 @@ sshuttle --dns -vr ec2-user@$EC2_PUBLIC_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ss
 
 Here are the configuration steps if you want to use a Fedora based instance. All other steps are similar to Ubuntu.
 
-```bash
+```shell
 # update system
 sudo yum update -y
 
@@ -209,7 +238,7 @@ sudo wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh 
 
 ### AWS CLI commands to manually create EC2 instance
 
-```bash
+```shell
 # install aws cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
