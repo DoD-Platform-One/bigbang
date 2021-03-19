@@ -51,6 +51,9 @@ spec:
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
 
+    # prevent unwatend default name of "minio-minio-minio-instance"
+    nameOverride: "minio"
+
   dependsOn:
     - name: minio-operator
       namespace: {{ .Release.Namespace }}
