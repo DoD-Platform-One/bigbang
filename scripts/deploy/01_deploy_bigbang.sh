@@ -4,8 +4,8 @@ set -ex
 
 CI_VALUES_FILE="tests/ci/k3d/values.yaml"
 
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]]; then
-  echo "On default branch, enabling all addons"
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]]; then
+  echo "On default branch or tag, enabling all addons"
   yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 else
   IFS=","
