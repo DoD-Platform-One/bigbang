@@ -30,7 +30,7 @@
 
 # 3. Developer Contribution Docs: 
 ## Location: 
-- https://repo1.dso.mil/platform-one/big-bang/bigbang/-/wikis/home
+- https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/developer
 
 ## Purpose:
 - Home of Developer / Contributor facing Documentation
