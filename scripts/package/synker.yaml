@@ -6,14 +6,12 @@ transport:
     port: 25000
     osChoice: linux
     disablePolicyChecks: true
-
 options:
   # TODO: Turn this off for now until parallel syncing is more "production" ready
   # NOTE: Finding some bugs (even with retry) in pushing images to the airgapped registry that trace back to paralell syncing
   parallelSync: false
   quiet: false
   debug: info
-
 # NOTE: destination configurations below are environment specific and should be modified to match your environment.
 destination:
   registry:
@@ -21,18 +19,15 @@ destination:
     hostname: p1-registry
     # Port of the destination registry to push to
     port: 5000
-
     #
     osChoice: linux
     disablePolicyChecks: true
-
 source:
   authFile: /root/.docker/config.json
   images:
     - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
     - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.1
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.0.1
-
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
@@ -43,10 +38,8 @@ source:
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/anchore:0.8.2
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/test:gcc
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check611-sonar-scanner45-dotnet-31:021921
-
     # Gitlab Runner images
     - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner:v13.2.2
     - registry.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner/gitlab-runner-helper:ib-v13.2.2
-
-      # Don't include until fortify is supported
-#    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
+    # Don't include until fortify is supported
+    #- registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
