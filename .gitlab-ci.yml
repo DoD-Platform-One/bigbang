@@ -322,9 +322,13 @@ package:
   script:
     - cp ./scripts/package/synker.yaml ./synker.yaml
     # Populate images list in synker config
-    # NOTE: This is stupid and hacky, use yq or something better to do this
-    - cat images.txt | sed -e 's/^/    - /' >> synker.yaml
+    - |
+      for image in $(cat images.txt); do
+        yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
+      done
     - synker pull -b=1
+    # Create image list from synker, overwrite since ./synker.yaml contains everything at this point
+    - yq e '.source.images | .[] | ... comments=""' "./synker.yaml" > images.txt
     # Tar up synker as well?
     - cp /usr/local/bin/synker synker.yaml /var/lib/registry/
     - tar -C /var/lib/registry -czvf $IMAGE_PKG .
