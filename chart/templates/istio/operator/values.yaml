@@ -3,8 +3,6 @@
 {{- end }}
 
 {{- define "bigbang.defaults.istiooperator" -}}
-hub: registry1.dso.mil/ironbank/opensource/istio
-tag: 1.7.3
 createNamespace: false
 
 imagePullSecrets:
