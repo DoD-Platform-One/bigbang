@@ -19,9 +19,13 @@ dex:
   imagePullSecrets:
     - name: private-registry
 
-redis:
-  imagePullSecrets:
-    - name: private-registry
+redis-ha:
+  enabled: true
+redis-bb:
+  usePassword: false
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
 
 {{- if .Values.addons.argocd.sso.enabled }}
 sso:
@@ -38,3 +42,4 @@ sso:
       requestedScopes: ["openid","ArgoCD"]
 {{- end }}
 {{- end -}}
+
