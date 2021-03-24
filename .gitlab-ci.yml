@@ -168,14 +168,14 @@ upgrade:
   stage: network up
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ "test-ci::infra"'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       allow_failure: false
 
 # Abstract for jobs responsible for creating infrastructure
 .infra create:
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ "test-ci::infra"'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
@@ -184,7 +184,7 @@ upgrade:
 .infra cleanup:
   rules:
     # Run on scheduled jobs
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ "test-ci::infra"'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       allow_failure: true
       when: always
 
@@ -248,6 +248,14 @@ aws/rke2/bigbang up:
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
     # Deploy a default storage class for aws
     - kubectl apply -f ${CI_PROJECT_DIR}/.gitlab-ci/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
+    - echo "Patching default rke2 PSPs to be less restrictive so OPA Gatekeeper can successfully deploy"
+    - |
+      kubectl --kubeconfig rke2.yaml patch psp global-unrestricted-psp  -p '{"metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
+    - |
+      kubectl --kubeconfig rke2.yaml patch psp system-unrestricted-psp  -p '{ "metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
+    - |
+      kubectl --kubeconfig rke2.yaml patch psp global-restricted-psp  -p '{ "metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
+
   script:
     - *deploy_bigbang
   environment:

@@ -26,8 +26,4 @@ module "ci" {
   ci_pipeline_url = var.ci_pipeline_url
   vpc_id          = data.terraform_remote_state.networking.outputs.vpc_id
   subnets         = data.terraform_remote_state.networking.outputs.intra_subnets
-
-  download   = false
-  server_ami = "ami-00aab2121681e4a31"
-  agent_ami  = "ami-00aab2121681e4a31"
 }

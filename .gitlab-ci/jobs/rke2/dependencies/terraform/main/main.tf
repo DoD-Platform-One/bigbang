@@ -1,6 +1,22 @@
 locals {
   name = "umbrella-${var.env}"
 
+  # Bigbang specific OS tuning
+  os_prep = <<EOF
+# Configure aws cli default region to current region, it'd be great if the aws cli did this on install........
+aws configure set default.region $(curl -s http://169.254.169.254/latest/meta-data/placement/region)
+
+# Tune vm sysctl for elasticsearch
+sysctl -w vm.max_map_count=262144
+
+# Preload kernel modules required by istio-init, required for selinux enforcing instances using istio-init
+modprobe xt_REDIRECT
+modprobe xt_owner
+modprobe xt_statistic
+# Persist modules after reboots
+printf "xt_REDIRECT\nxt_owner\nxt_statistic\n" | sudo tee -a /etc/modules
+EOF
+
   tags = {
     "project"         = "umbrella"
     "env"             = var.env
@@ -10,7 +26,7 @@ locals {
 }
 
 module "rke2" {
-  source = "git::https://github.com/rancherfederal/rke2-aws-tf.git"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v1.1.7"
 
   cluster_name          = local.name
   vpc_id                = var.vpc_id
@@ -25,21 +41,13 @@ module "rke2" {
   enable_ccm = var.enable_ccm
   download   = var.download
 
-  # TODO: These need to be set in pre-baked ami's
-  pre_userdata = <<-EOF
-# Temporarily disable selinux enforcing due to missing policies in containerd
-# The change is currently being upstreamed and can be tracked here: https://github.com/rancher/k3s/issues/2240
-setenforce 0
-
-# Tune vm sysctl for elasticsearch
-sysctl -w vm.max_map_count=262144
-EOF
+  pre_userdata = local.os_prep
 
   tags = merge({}, local.tags, var.tags)
 }
 
 module "generic_agents" {
-  source = "git::https://github.com/rancherfederal/rke2-aws-tf.git//modules/agent-nodepool"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v1.1.7"
 
   name                = "generic-agent"
   vpc_id              = var.vpc_id
@@ -56,14 +64,7 @@ module "generic_agents" {
   download          = var.download
 
   # TODO: These need to be set in pre-baked ami's
-  pre_userdata = <<-EOF
-# Temporarily disable selinux enforcing due to missing policies in containerd
-# The change is currently being upstreamed and can be tracked here: https://github.com/rancher/k3s/issues/2240
-setenforce 0
-
-# Tune vm sysct for elasticsearch
-sysctl -w vm.max_map_count=262144
-EOF
+  pre_userdata = local.os_prep
 
   # Required data for identifying cluster to join
   cluster_data = module.rke2.cluster_data

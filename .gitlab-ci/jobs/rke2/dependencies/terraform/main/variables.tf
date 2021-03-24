@@ -39,8 +39,7 @@ variable "ssh_authorized_keys" {
 
 variable "download" {
   type    = bool
-  default = true
-  # TODO: Probably makes the most sense to set this to false and just use the ami for everything
+  default = false
   description = "Toggle dependency downloading"
 }
 
@@ -48,7 +47,8 @@ variable "download" {
 # Server variables
 #
 variable "server_ami" {
-  default = "ami-57ecd436" # RHEL 8.3
+  # RHEL 8 RKE2 STIG: https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-image-builder
+  default = "ami-09d02b6cbe719f221"
 }
 variable "server_instance_type" {
   default = "m5a.large"
@@ -64,7 +64,8 @@ variable "rke2_version" {
 # Generic agent variables
 #
 variable "agent_ami" {
-  default = "ami-57ecd436" # RHEL 8.3
+  # RHEL 8 RKE2 STIG: https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-image-builder
+  default = "ami-09d02b6cbe719f221"
 }
 variable "agent_instance_type" {
   default = "m5a.4xlarge"
