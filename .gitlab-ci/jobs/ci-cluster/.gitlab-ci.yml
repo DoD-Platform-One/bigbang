@@ -4,6 +4,7 @@
 .dind-runner:
   tags:
     - bigbang
+    - umbrella
     - privileged
     - dogfood
 
