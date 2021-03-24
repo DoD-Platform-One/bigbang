@@ -313,8 +313,8 @@ package:
   extends:
     - .bigbang-dogfood
   rules:
-    # run job for manual tag events
-    - if: $CI_COMMIT_TAG
+    # run job for manual tag events or test-ci::release MRs
+    - if: '$CI_COMMIT_TAG || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/'
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
@@ -340,7 +340,12 @@ package:
     - mkdir -p release
     - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
     # Publish packages to s3 release
-    - aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+    - |
+      if [ -z $CI_COMMIT_TAG ]; then
+        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/tests/${CI_COMMIT_SHA}
+      else
+        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+      fi
   after_script: []
 
 release:
@@ -349,16 +354,27 @@ release:
   extends:
     - .bigbang-dogfood
   rules:
-    # run job for manual tag events
-    - if: $CI_COMMIT_TAG
+    # run job for manual tag events or test-ci::release MRs
+    - if: '$CI_COMMIT_TAG || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/'
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:
+    # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - |
-      release-cli create --name "Big Bang v${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
-        --description "Automated release notes are a WIP." \
-        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
-        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
-        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
+      if [ -z $CI_COMMIT_TAG ]; then
+        RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/tests/${CI_COMMIT_SHA}"
+        printf "Release will run: \n\
+          release-cli create --name \"Big Bang \${CI_COMMIT_TAG}\" --tag-name \${CI_COMMIT_TAG} \n\
+          --description \"Automated release notes are a WIP.\" \n\
+          --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
+          --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
+          --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
+      else
+        release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+          --description "Automated release notes are a WIP." \
+          --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+          --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+          --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
+      fi
 
 #-----------------------------------------------------------------------------------------------------------------------
