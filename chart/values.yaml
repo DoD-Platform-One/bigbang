@@ -217,7 +217,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.13"
+    tag: "11.0.0-bb.15"
 
   sso:
     # -- Toggle SSO for monitoring components on and off
@@ -276,7 +276,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "2.14.7-bb.0"
+      tag: "2.14.7-bb.1"
     sso:
       # -- Toggle SSO for ArgoCD on and off
       enabled: false

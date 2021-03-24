@@ -118,7 +118,9 @@ clean install:
   artifacts:
     paths:
       - images.txt
-    expire_in: 7 days
+      - "cypress-tests/*/tests/cypress/screenshots"
+      - "cypress-tests/*/tests/cypress/videos"
+    expire_in: 7 days 
 
 upgrade:
   stage: smoke tests
@@ -146,6 +148,12 @@ upgrade:
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
     - *deploy_bigbang
     - *test_bigbang
+  artifacts:
+    paths:
+      - "cypress-tests/*/tests/cypress/screenshots"
+      - "cypress-tests/*/tests/cypress/videos"
+    expire_in: 7 days
+    when: always
 
 #-----------------------------------------------------------------------------------------------------------------------
 
