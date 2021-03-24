@@ -3,6 +3,9 @@
 # exit on error
 set -e
 
+#Clear out folder if present
+rm -rf cypress-tests/
+#Create folder for cypress tests
 mkdir -p cypress-tests/
 
 #Cloning core
