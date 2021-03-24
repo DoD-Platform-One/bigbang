@@ -355,7 +355,7 @@ package:
     # Publish packages to s3 release
     - |
       if [ -z $CI_COMMIT_TAG ]; then
-        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/tests/${CI_COMMIT_SHA}
+        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/tests/${CI_COMMIT_SHA}
       else
         aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
       fi
@@ -375,7 +375,7 @@ release:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - |
       if [ -z $CI_COMMIT_TAG ]; then
-        RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/tests/${CI_COMMIT_SHA}"
+        RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_COMMIT_SHA}"
         printf "Release will run: \n\
           release-cli create --name \"Big Bang \${CI_COMMIT_TAG}\" --tag-name \${CI_COMMIT_TAG} \n\
           --description \"Automated release notes are a WIP.\" \n\
