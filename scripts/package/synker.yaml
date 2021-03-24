@@ -25,6 +25,9 @@ destination:
 source:
   authFile: /root/.docker/config.json
   images:
+    # Include registry image
+    - registry:2
+
     - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
     - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.1
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.0.1
