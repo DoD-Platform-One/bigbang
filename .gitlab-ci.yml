@@ -121,7 +121,8 @@ clean install:
       - images.txt
       - "cypress-tests/*/tests/cypress/screenshots"
       - "cypress-tests/*/tests/cypress/videos"
-    expire_in: 7 days 
+    expire_in: 7 days
+    when: always
 
 upgrade:
   stage: smoke tests
