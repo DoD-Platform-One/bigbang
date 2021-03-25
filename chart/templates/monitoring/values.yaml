@@ -5,6 +5,9 @@
 {{- define "bigbang.defaults.monitoring" -}}
 hostname: {{ .Values.hostname }}
 
+flux:
+  enabled: true
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
