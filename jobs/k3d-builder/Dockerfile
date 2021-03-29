@@ -16,17 +16,25 @@ enabled=1\n\
 gpgcheck=0\n'\
 >> /etc/yum.repos.d/CentOS.repo
 
+RUN echo $'[google-chrome]\n\
+name=google-chrome\n\
+baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64\n\
+enabled=1\n\
+gpgcheck=1\n\
+gpgkey=https://dl-ssl.google.com/linux/linux_signing_key.pub\n'\
+>> /etc/yum.repos.d/google.repo
+
 RUN curl https://download.docker.com/linux/centos/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
 
-RUN yum -y install npm git xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib docker-ce-cli unzip jq
+RUN yum -y install npm git xorg-x11-server-Xvfb gtk2-devel gtk3-devel libnotify-devel GConf2 nss libXScrnSaver alsa-lib docker-ce-cli unzip jq google-chrome-stable
 
 # Install Conftest
-ENV CONFTEST_VERSION='0.22.0'
+ENV CONFTEST_VERSION='0.23.0'
 ADD https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
 RUN tar xzf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz -C /usr/local/bin/  && chmod +x /usr/local/bin/conftest && rm -rf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
 
 # Install Helm
-ENV HELM_VERSION='3.4.2'
+ENV HELM_VERSION='3.5.2'
 ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /helm-v${HELM_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /helm-v${HELM_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ --strip-components 1 && chmod +x /usr/local/bin/helm && rm -rf /helm-v${HELM_VERSION}-linux-amd64.tar.gz
 
@@ -34,17 +42,17 @@ RUN tar xzf /helm-v${HELM_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ --strip
 RUN helm plugin install https://github.com/instrumenta/helm-conftest
 
 # Install ArgoCD CLI
-ENV ARGO_VERSION='1.8.1'
+ENV ARGO_VERSION='1.8.7'
 ADD https://github.com/argoproj/argo-cd/releases/download/v${ARGO_VERSION}/argocd-linux-amd64 /usr/local/bin/argocd
 RUN chmod +x /usr/local/bin/argocd
 
 # Install fluxcd
-ENV FLUX_VERSION='0.5.6'
+ENV FLUX_VERSION='0.10.0'
 ADD https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_amd64.tar.gz /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /flux_${FLUX_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/flux && rm -rf /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 
 # Install Istio
-ENV ISTIO_VERSION='1.8.1'
+ENV ISTIO_VERSION='1.8.4'
 ADD https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/istioctl && rm -rf /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz
 
@@ -54,22 +62,22 @@ ADD https://github.com/FiloSottile/mkcert/releases/download/v${MKCERT_VERSION}/m
 RUN chmod +x /usr/local/bin/mkcert
 
 # Install SOPS
-ENV SOPS_VERSION='3.6.1'
+ENV SOPS_VERSION='3.7.0'
 ADD https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
 RUN chmod +x /usr/local/bin/sops
 
-# Install SopsSecretGenerator 
+# Install SopsSecretGenerator
 ENV SSG_VERSION='1.3.2'
 ADD https://github.com/goabout/kustomize-sopssecretgenerator/releases/download/v${SSG_VERSION}/SopsSecretGenerator_${SSG_VERSION}_linux_amd64 /usr/local/bin/SopsSecretGenerator
 RUN chmod +x /usr/local/bin/SopsSecretGenerator
 
 # Install K3d
-ENV K3D_VERSION='3.4.0'
+ENV K3D_VERSION='4.3.0'
 ADD https://github.com/rancher/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
 RUN chmod +x /usr/local/bin/k3d
 
 # Install kubectl
-ENV KUBECTL_VERSION='1.19.3'
+ENV KUBECTL_VERSION='1.20.5'
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
@@ -82,11 +90,12 @@ RUN npm install cypress && \
 RUN yum -y install http://mirror.centos.org/centos/8/BaseOS/x86_64/os/Packages/tree-1.7.0-15.el8.x86_64.rpm
 
 # Install yq for dependency handling
-ENV YQ_VERSION='4.6.1'
+ENV YQ_VERSION='4.6.3'
 ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 /usr/local/bin/yq
 RUN chmod +x /usr/local/bin/yq
 
 # Remove needed repos
 RUN rm -rf /etc/yum.repos.d/docker-ce.repo && \
     rm -rf /etc/yum.repos.d/CentOS.repo && \
+    rm -rf /etc/yum.repos.d/google.repo && \
     yum clean all
