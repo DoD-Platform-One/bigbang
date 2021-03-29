@@ -29,7 +29,7 @@ source:
     - registry:2
 
     - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
-    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.1
+    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.2
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.0.1
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
