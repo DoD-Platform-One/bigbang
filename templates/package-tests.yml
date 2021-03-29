@@ -14,16 +14,32 @@ variables:
   RELEASE_NAME: ${CI_PROJECT_NAME}
   RELEASE_BUCKET: umbrella-bigbang-releases
 
-configuration validation:
-  stage: configuration validation
+.bigbang-dogfood:
   tags:
     - bigbang
-    - public
+    - dogfood
+    - generic
+
+.k3d-ci:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.5
+  tags:
+    - bigbang
     - privileged
+    - dogfood
+    - packages
+  variables:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_DRIVER: overlay2
 
-  image:
-    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:afdd9b77
 
+configuration validation:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.5
+  stage: configuration validation
+  extends:
+    - .bigbang-dogfood
   variables:
     GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
 
@@ -62,30 +78,22 @@ configuration validation:
 
 package tests:
   stage: package tests
-  tags:
-    - bigbang
-    - public
-    - privileged
+  extends:
+    - .k3d-ci
 
-  image:
-    name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.3
-  services:
-    - registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/docker:dind
   variables:
-    DOCKER_HOST: tcp://localhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
     WAIT_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/wait/wait.sh"
+    K3D_CONFIG_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/k3d-ci/config.yaml"
 
   before_script:
-    # Starting dnsmasq for cluster dns resolution
-    - docker run -d -p 53:53/udp -p 53:53 registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/go-dnsmasq:87fca1d1
-    - echo "nameserver 127.0.0.1" >> /etc/resolv.conf
+    # Clone pipeline repo for waits & k3d config
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${WAIT_PATH}
 
-    # Create cluster and wait for deployments and pods
-    - k3d cluster create ${CI_PROJECT_NAME} --servers 1 --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--disable=traefik" -p 80:80@loadbalancer -p 443:443@loadbalancer --wait
-    - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
-    - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+    # Create docker network and cluster
+    - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450"
+    - k3d cluster create ${CI_JOB_ID} --config ${K3D_CONFIG_PATH} --network ${CI_JOB_ID}
+    - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
 
     # Setup pull secrets for project
     - |
@@ -95,10 +103,6 @@ package tests:
       kubectl create namespace ${CI_PROJECT_NAME}
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
       kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-
-    # Clone pipeline repo for waits
-    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
-    - source ${WAIT_PATH}
 
     # Check for istio in project name and install it if needed
     - |
@@ -231,7 +235,7 @@ package tests:
     # Run Cypress tests
     - |
       if [ -f "tests/cypress.json" ]; then
-        cd tests && cypress run
+        cd tests && cypress run --browser chrome --headless
       fi
       
     # File to indicate Job succeeded 
@@ -247,7 +251,7 @@ package tests:
           kubectl get all -A
         fi
     # Fetch list of all images run
-    - docker exec -i k3d-${CI_PROJECT_NAME}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
+    - docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
     # Remove istio and rancher upstream images
     - sed -i '/docker.io\/istio\//d' images.txt
     - sed -i '/docker.io\/rancher\//d' images.txt
@@ -256,7 +260,8 @@ package tests:
         cat tests/images.txt >> images.txt
       fi
     # Delete Cluster
-    - k3d cluster delete ${CI_PROJECT_NAME}
+    - k3d cluster delete ${CI_JOB_ID}
+    - docker network rm ${CI_JOB_ID}
 
   artifacts:
     when: always
@@ -268,10 +273,8 @@ package tests:
 
 package:
   stage: package
-  tags:
-    - bigbang
-    - public
-    - privileged
+  extends:
+    - .bigbang-dogfood
   image: registry.dso.mil/platform-one/big-bang/bigbang/synker:0.0.2
   rules:
     # run job for manual tag events, check for AWS access
@@ -344,10 +347,8 @@ package:
 
 release:
   stage: release
-  tags:
-    - bigbang
-    - public
-    - privileged
+  extends:
+    - .bigbang-dogfood
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     # run job for manual tag events, check for AWS access
