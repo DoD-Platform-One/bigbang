@@ -96,6 +96,13 @@ executed if there is a directory in the package repo named "policy".
 Functional smoke tests can be executing using the cypress testing tool.  After conformance testing is performed, a 
 small K3D cluster is created and any cypress tests located in the "tests" directory of the package will be executed. 
 
+### Release CI
+When you tag a new release (must be a protected tag) the pipeline will run two additional stages, package (bundles 
+artifacts for docker images and git repos, uploads to S3) and release (hits the Gitlab API to publish a release with 
+artifact links). The artifacts are designed to be used for airgap installations. If you want to test out these stages 
+to verify changes or view the release CI process without creating a tag, make an MR and add the `test-ci::release` 
+label. The pipeline will run both stages, uploading to a "timed-disposal" S3 bucket and "dry-running" a release.
+
 ### Using the infrastructure in your package CI gitlab pipeline
 
 The Package Pipeline template is used to execute a conformance (linting) stage and a functional test phase for 
