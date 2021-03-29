@@ -345,3 +345,4 @@ addons:
       minio:
         zones:
           servers: 1
+        volumesPerServer: 1
