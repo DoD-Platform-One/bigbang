@@ -9,3 +9,15 @@ replicas:
   count: 1
 
 imagePullSecrets: []
+
+# Available options are "soft" and "hard"
+antiAffinity: ""
+
+nodeAffinity: {}
+  # requiredDuringSchedulingIgnoredDuringExecution:
+  #   nodeSelectorTerms:
+  #   - matchExpressions:
+  #     - key: node-type
+  #       operator: In
+  #       values:
+  #       - "operator"
