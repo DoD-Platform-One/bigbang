@@ -20,7 +20,6 @@ stages:
 variables:
   PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
-  PIPELINE_REPO_BRANCH: master
   IMAGE_LIST: images.txt
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
@@ -57,6 +56,13 @@ configuration validation:
     GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
 
   before_script:
+    - |
+      if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+        PIPELINE_REPO_BRANCH="$(yq e '.include[0].ref' ./.gitlab-ci.yml)"
+        if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+          PIPELINE_REPO_BRANCH="master"
+        fi
+      fi
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
   script:
     # Place configuration validation tests here
@@ -100,6 +106,13 @@ package tests:
 
   before_script:
     # Clone pipeline repo for waits & k3d config
+    - |
+      if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+        PIPELINE_REPO_BRANCH="$(yq e '.include[0].ref' ./.gitlab-ci.yml)"
+        if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+          PIPELINE_REPO_BRANCH="master"
+        fi
+      fi
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - source ${WAIT_PATH}
 
@@ -297,6 +310,13 @@ package:
     - mkdir -p /root/.docker
     - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
   script:
+    - |
+      if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+        PIPELINE_REPO_BRANCH="$(yq e '.include[0].ref' ./.gitlab-ci.yml)"
+        if [ -z ${PIPELINE_REPO_BRANCH} ]; then
+          PIPELINE_REPO_BRANCH="master"
+        fi
+      fi
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - cp ${PIPELINE_REPO_DESTINATION}/jobs/release/synker.yaml ./synker.yaml
     # Populate images list in synker config
