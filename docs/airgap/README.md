@@ -397,3 +397,53 @@ You can watch to see if Flux is reconciling the projects by watching the progres
 
 You should see the diffent projects configure working through their reconciliation starting with "gatekeeper".
 
+## Using 3rd Party Packages
+
+The third party guide assumes that you already have or are planning to install Big Bang Core.
+
+### Package your Git repository
+
+Packaging your repository from Git
+
+```
+git clone --no-checkout https://repo1.dso.mil/platform-one/big-bang/apps/third-party/kafka.git && tar -zcvf kafka-repo.tar.gz kafka
+```
+
+This creates a tar of a full git repo without a checkout. After you have placed this git repo in its destination you can get the files to view by doing.
+
+    git checkout
+
+### Package your registry images
+
+Package image 
+```
+docker save -o image-name.tar image-name:image-version
+```
+
+Unpack the image on your utility server
+```
+tar -xvf image-name.tar
+```
+
+Move the image to the location of your other images.
+
+Restart your local registry and it should pick up the new image.
+```
+cd ./var/lib/registry
+docker run -p 25000:5000 -v $(pwd):/var/lib/registry registry:2
+# verify the registry mounted correctly
+curl http://localhost:25000/v2/_catalog -k
+# a list of Big Bang images should be displayed, if not check the volume mount of the registry
+```
+Configure `./synker.yaml`
+
+Example
+```
+destination:
+  registry:
+    # Hostname of the destination registry to push to
+    hostname: 10.0.0.10
+    # Port of the destination registry to push to
+    port: 5000
+```
+If you are using runtime mirroring the new image should be available at the original location on your cluster.
