@@ -658,6 +658,25 @@ Owners:
 * @runyontr - Runyon Solutions
 * @still - Parsons
 
+### Cluster Utilities
+
+Packages that provider cluster level utility, such as RWX storage or generic backup capabilities.
+
+#### Velero
+
+Velero is an open source tool to safely backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes
+
+* [Velero](https://velero.io/)
+
+Repository:
+
+* [Velero Package](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/tree/main)
+
+Owners:
+
+* @tunde - Oteemo
+* @adam.toy - Rancher Federal
+
 ### Sandbox
 
 The [Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox) is an area for packages that are currently being or will be worked that do not yet meet the requirements of a supported package.  Due to the fluidity of sandbox apps, they are not tracked in the charter.

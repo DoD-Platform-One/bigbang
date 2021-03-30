@@ -1,0 +1,16 @@
+{{- if .Values.addons.velero.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.velero "name" "velero" "defaults" (include "bigbang.defaults.velero" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.velero" -}}
+hostname: {{ .Values.hostname }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+imagePullSecrets:
+- name: private-registry
+{{- end -}}
