@@ -88,7 +88,7 @@ You can follow the process below to setup git with `repositories.tar.gz` on the 
 
 ```bash
 $ sudo useradd --create-home --shell /bin/bash git
-$ ssh-keygen -f ~/.ssh/identity
+$ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
 ```
 
 - Create .SSH folder for `git` user
@@ -114,17 +114,28 @@ $ ssh-keygen -f ~/.ssh/identity
   $ sudo tar -xvf repositories.tar.gz --directory /home/git/
   ```
 
+- Add Hostname alias
+
+  ```bash
+  PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
+  sudo sed -i -e '1i'$PRIVATEIP'   'myhostname.com'\' /etc/hosts
+  sudo sed -i -e '1i'$PRIVATEIP'   'host.k3d.internal'\' /etc/hosts #only for k3d
+  ```
+  
+  
+
 - To test the client key;
 
   ```bash
   GIT_SSH_COMMAND='ssh -i /[client-private-key-path] -o IdentitiesOnly=yes' git clone git@[hostname/IP]:/home/git/repos/[sample-repo]
   
   #For example;
-  PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
-  GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@$PRIVATEIP:/home/git/repos/istio-controlplane
+  GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:/home/git/repos/bigbang 
+  #checkout release branch
+  git checkout 1.3.0
   ```
-
   
+
 
 ## Private Registry 
 
@@ -134,16 +145,28 @@ Images needed to run BB in your cluster is packaged as part of the release in `i
 
 To setup the registry, we will be using `registry:2` to run a  private registry with  self-signed certificate.
 
-First, untar `images.tar.gz`;
+- First, untar `images.tar.gz`;
 
 ```bash
-tar -xf images.tar.gz -C .
+tar -xvf images.tar.gz -C .
 ```
 
-Use the script [registry.sh](./scripts/registry.sh) to create registry;
+- SCP `registry:2` tar file
+
+  ```bash
+  docker save -o registry2.tar registry:2
+  docker save -o k3s.tar rancher/k3s:v1.20.5-rc1-k3s1 #check release matching version
+  scp registry2.tar k3s.tar ubuntu@hostname:~ #modify according to your environment
+  docker load -i registry2.tar #on your registry server
+  docker load -i k3s.tar
+  ```
+
+  
+
+- Use the script [registry.sh](./scripts/registry.sh) to create registry;
 
 ```bash
-$ sudo ./registry.sh
+$ chmod +x registry.sh && sudo ./registry.sh
 
 Required information:
 Enter bit size for certs (Ex. 4096): 4096
@@ -181,7 +204,7 @@ Notes
 To see images in the registry;
 
 =========================
-curl https://myregistry.com:5443/v2/_catalog -k
+curl https://myhostname.com:5443/v2/_catalog -k
 =========================
 
 ```
@@ -191,7 +214,7 @@ A folder is created with TLS certs that we are going to supply to our k8s cluste
 You can ensure the images are now loaded in the registry;
 
 ```bash
- curl -k https://10.0.52.144:5443/v2/_catalog 
+ curl -k https://myhostname.com:5443/v2/_catalog 
 {"repositories":["ironbank/anchore/engine/engine","ironbank/anchore/enterprise/enterprise","ironbank/anchore/enterpriseui/enterpriseui","ironbank/big-bang/argocd","ironbank/bitnami/analytics/redis-exporter","ironbank/elastic/eck-operator/eck-operator","ironbank/elastic/elasticsearch/elasticsearch","ironbank/elastic/kibana/kibana","ironbank/fluxcd/helm-controller","ironbank/fluxcd/kustomize-controller","ironbank/fluxcd/notification-controller","ironbank/fluxcd/source-controller","ironbank/gitlab/gitlab/alpine-certificates","ironbank/gitlab/gitlab/cfssl-self-sign","ironbank/gitlab/gitlab/gitaly",...]
 ```
 
@@ -246,15 +269,19 @@ spec:
 #### RKE2 cluster
 
 ```yaml
+#registries.yaml
 mirrors:
   registry.dso.mil:
     endpoint:
-      - https://myregistry.com:5443
+      - https://myhostname.com:5443
   registry1.dso.mil:
     endpoint:
-      - https://myregistry.com:5443
+      - https://myhostname.com:5443
+  registry1.dso.mil:
+    endpoint:
+      - https://myhostname.com:5443
 configs:
-  myregistry.com:5443:
+  myhostname.com:5443:
     tls:
       ca_file: "/etc/ssl/certs/registry1.pem"
 ```
@@ -263,10 +290,7 @@ configs:
 
 ## Installing Big Bang
 
-Untar bigbag
-
 ```bash
-$ tar -xf bigbang-[version].tar.gz -C .
 $ cd bigbang
 ```
 
@@ -276,10 +300,13 @@ Install Flux 2 into the cluster using the provided artifacts. These are located 
 
     kubectl apply -f ./scripts/deploy/flux.yaml
 
-
 After Flux is up and running you are ready to deploy Big Bang. We will do this using Helm. To first check to see if Flux is ready you can do.
 
-    kubectl get all -n flux-system
+You can watch to see if Flux is reconciling the projects by watching the progress.
+
+```bash
+watch kubectl get all -n flux-system
+```
 
 We need a namespace for our preparations and eventually for Big Bang to deploy into.
 
@@ -308,8 +335,8 @@ For your Git repository you have two options for setting up the credentials.
 Option 1: Use an existing secret.
 
     cd ~/.ssh
-    ssh-keygen -q -N "" -f ./identity
-    ssh-keyscan <YOUR GIT URL HERE> ./known_hosts
+    ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
+    ssh-keyscan  <YOUR GIT URL HERE> ./known_hosts
     
     kubectl create secret generic -n bigbang ssh-credentials \
         --from-file=./identity \
@@ -388,12 +415,9 @@ Take the values from each of these files and place in the correct fields in the 
 Then install Big Bang using Helm.
 
     helm upgrade -i bigbang chart -n bigbang --create-namespace -f values.yaml
+    watch kubectl get gitrepositories,kustomizations,hr,po -A
 
 ** Note that the --create-namespace isn't needed if you created it earlier, but it doesn't hurt anything.
-
-You can watch to see if Flux is reconciling the projects by watching the progress.
-
-     watch kubectl get gitrepositories,kustomizations,hr,po -A
 
 You should see the diffent projects configure working through their reconciliation starting with "gatekeeper".
 
