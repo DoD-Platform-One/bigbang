@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Installs/Configures:
 #  - Docker Registy Container with self-signed cert
@@ -37,10 +38,8 @@ prompt STATE "Enter the 'State' for the cert (Ex. CO)"
 prompt LOCATION "Enter the 'Location' for the cert (Ex. ColoradoSprings)"
 prompt ORGANIZATION "Enter the 'Organization' for the cert (Ex. PlatformOne)"
 prompt OUNIT "Enter the 'Organizational Unit' for the cert (Ex. Bigbang)"
-prompt COMMON  "Enter the 'Common Name' for the cert (Must be a FQDN (at least one period character) E.g. myregistry.com)"
-
-PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
-
+prompt COMMON  "Enter the 'Common Name' for the cert (Must be a FQDN (at least one period character) E.g. host.k3d.internal"
+prompt ALTNAMES  "Enter the 'Subject Alternative Names' for the cert E.g. DNS:host.k3d.internal,IP:PRIVATEIP)"
 
 # ... Certs ...
 # ~~~~~~~~~~~~~
@@ -48,7 +47,7 @@ PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
 # ... prep certs ...
 
 echo -e "\nGenerating certs ..."
-mkdir certs
+mkdir -p certs
 cd certs
 # Generate a root key
 openssl genrsa -out rootCA.key ${BITS}
@@ -67,9 +66,10 @@ openssl req -new -key ${COMMON}.key \
     -out ${COMMON}.csr
 
 # Sign certificate request
-echo subjectAltName = IP:${PRIVATEIP} > extfile.cnf
+echo subjectAltName = DNS:${COMMON},${ALTNAMES} > extfile.cnf
 openssl x509 -req -in ${COMMON}.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -days ${DAYS} \
 -out ${COMMON}.crt -extfile extfile.cnf
+
 
 openssl rsa -in ${COMMON}.key -text > ${COMMON}.private.pem
 openssl x509 -inform PEM -in ${COMMON}.crt > ${COMMON}.public.pem
@@ -100,7 +100,8 @@ Notes
 To see images in the registry;
 
 =========================
-curl https://${PRIVATEIP}:5443/v2/_catalog -k
+For example, 
+  curl https://host.k3d.internal:5443/v2/_catalog -k
 =========================
 
 "
