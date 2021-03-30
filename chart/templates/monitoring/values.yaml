@@ -7,11 +7,6 @@ hostname: {{ .Values.hostname }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
-
-global:
-  imagePullSecrets:
-  - name: private-registry
-
   {{- if .Values.monitoring.sso.enabled }}
   prometheus:
     enabled: true
@@ -26,6 +21,10 @@ global:
   grafana:
     enabled: true
   {{- end }}
+
+global:
+  imagePullSecrets:
+  - name: private-registry
 
 sso:
   enabled: {{ .Values.monitoring.sso.enabled }}
