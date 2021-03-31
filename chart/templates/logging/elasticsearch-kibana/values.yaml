@@ -11,7 +11,7 @@ istio:
 sso:
   enabled: {{ .Values.logging.sso.enabled }}
   client_id: {{ .Values.logging.sso.client_id }}
-  client_secret: {{ .Values.logging.sso.client_secret }}
+  client_secret: {{ .Values.logging.sso.client_secret | default "no-secret" }}
   oidc:
     host: {{ .Values.sso.oidc.host }}
     realm: {{ .Values.sso.oidc.realm }}
