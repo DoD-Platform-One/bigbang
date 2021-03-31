@@ -110,7 +110,7 @@ a package (application).   This template (located in templates/package-tests.yml
 gitlab-ci.yml file of a package repo.  The following code example can be placed in the gitlab-ci.yml file to include 
 the package pipeline template.
 
-Make sure to update the `RELEASE_NAME` variable, it will be used in CI as the title for releases. This will default to the repo name.
+All variables are optional, but can provide additional flexibility for more complicated packages.
 
 Make sure to also update the ref to the tagged version of the pipeline you want to use. Latest versions and changes can always be found in the [CHANGELOG](./CHANGELOG.md).
 
@@ -121,9 +121,14 @@ include:
     file: '/templates/package-tests.yml'
 # Optional
 variables:
-  RELEASE_NAME: "Pick a name for the package to release as"
-  # Example:
+  RELEASE_NAME: "Pick a name for the package to release as, default is the repo name"
+  PACKAGE_NAMESPACE: "Install package to a specific namespace, default is the repo name"
+  PACKAGE_HELM_NAME: "Install via Helm with specific name, default is the repo name"
+
+# Example:
   # RELEASE_NAME: "Elasticsearch & Kibana"
+  # PACKAGE_NAMESPACE: "logging"
+  # PACKAGE_HELM_NAME: "logging-ek"
 ```
 
 If the package has any dependencies that must be installed first (i.e. an operator) you will need to create a file 
@@ -133,6 +138,7 @@ in the package repo - `tests/dependencies.yaml` - with the following contents (n
 - `git.repo`: This should be the direct link to clone the dependency repo, in quotes
 - `git.tag`: Optional, pass in a specific tag (or technically branch) to clone the dependency from, will default to main
 - `namespace`: Optional, pass in a namespace to install the dependency under (useful if the dependency needs to be installed under a specific namespace, i.e. gitlab-runners need to be in gitlab namespace), defaults to the dependency name (top level yaml) if not provided
+- `package-name`: Optional, pass in a specific name for the dependency to be installed as via Helm. Can be helpful to match the HelmRelease names at the top Big Bang level. Defaults to the dependency name (top level yaml) if not provided.
 
 Structure these values in your yaml file as follows:
 
@@ -142,12 +148,15 @@ dependencyname:
     repo: "Git repo clone URL"
     tag: "Tag to clone from"
   namespace: "Namespace to install in"
+  package-name: "Name of the Helm release"
+
 # Example
 opa:
   git:
     repo: "https://repo1.dsop.io/platform-one/big-bang/apps/core/policy.git"
     tag: "1.1.0-bb.0"
   namespace: "gatekeeper-system"
+  package-name: "gatekeeper"
 ```
 
 If the package makes use of an operator and creates custom resources it is best to create a custom wait script for the pipeline to run. 

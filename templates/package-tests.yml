@@ -25,6 +25,8 @@ variables:
   REPOS_PKG: repositories.tar.gz
   RELEASE_NAME: ${CI_PROJECT_NAME}
   RELEASE_BUCKET: umbrella-bigbang-releases
+  PACKAGE_NAMESPACE: ${CI_PROJECT_NAME}
+  PACKAGE_HELM_NAME: ${CI_PROJECT_NAME}
 
 .bigbang-dogfood:
   tags:
@@ -72,9 +74,9 @@ configuration validation:
 
     # Global policy tests
     - |
-      if [ -f "tests/test-values.yml" ]; then
+      if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
         echo "Checking test values..."
-        helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.yml
+        helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.y*ml
         echo "Checking chart values..."
         helm conftest chart --policy ${GENERIC_POLICY_PATH}
       else
@@ -85,9 +87,9 @@ configuration validation:
     - |
       if [ -d "tests/policy" ]; then
         echo "App specific configuration validation tests:"
-        if [ -f "tests/test-values.yml" ]; then
+        if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
           echo "Checking test values..."
-          helm conftest chart --policy tests/policy -f tests/test-values.yml
+          helm conftest chart --policy tests/policy -f tests/test-values.y*ml
           echo "Checking chart values..."
           helm conftest chart --policy tests/policy
         else
@@ -124,11 +126,13 @@ package tests:
     # Setup pull secrets for project
     - |
       if [ ! -z ${PROJECT_NAME} ]; then
-        CI_PROJECT_NAME=${PROJECT_NAME}
+        if [ ${PACKAGE_NAMESPACE} == ${CI_PROJECT_NAME} ]; then
+          PACKAGE_NAMESPACE=${PROJECT_NAME}
+        fi
       fi
-      kubectl create namespace ${CI_PROJECT_NAME}
-      kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-      kubectl create -n ${CI_PROJECT_NAME} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create namespace ${PACKAGE_NAMESPACE}
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dsop.io" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
 
     # Check for istio in project name and install it if needed
     - |
@@ -168,6 +172,11 @@ package tests:
             dep_namespace=$dep_name
           fi
 
+          dep_helm_name=$(yq e ".${i}.package-name" "tests/dependencies.yaml")
+          if [[ -z ${dep_helm_name} || ${dep_helm_name} == "null" ]]; then
+            dep_helm_name=$dep_name
+          fi
+
           if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
             echo "Cloning default branch from ${dep_repo}"
             git clone ${dep_repo} repos/${dep_name}
@@ -187,12 +196,12 @@ package tests:
             kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
           fi
 
-          if [ -f repos/${dep_name}/tests/test-values.yml ] ; then
-            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yml for values"
-            helm install --wait --timeout 600s ${dep_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.yml
+          if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yaml for values"
+            helm install --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.y*ml
           else
             echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using default values"
-            helm install --wait --timeout 600s ${dep_name} repos/${dep_name}/chart -n ${dep_namespace}
+            helm install --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace}
           fi
         done
       fi
@@ -219,14 +228,22 @@ package tests:
     # Place kubernetes package test here
     - echo "Package install"
 
+    # Override the PACKAGE_HELM_NAME with PROJECT_NAME (backwards compatibility)
+    - |
+      if [ ! -z ${PROJECT_NAME} ]; then
+        if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
+          PACKAGE_HELM_NAME=${PROJECT_NAME}
+        fi
+      fi
+
     # Check for test values file
     - |
-      if [ -f "tests/test-values.yml" ]  ; then
-        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${CI_PROJECT_NAME} namespace using ${CI_PROJECT_NAME}/tests/test-values.yml for values"
-        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME} -f tests/test-values.yml
+      if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
+        helm install --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml
       else
-        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${CI_PROJECT_NAME} namespace using default values"
-        helm install --wait --timeout 600s ${CI_PROJECT_NAME} chart -n ${CI_PROJECT_NAME}
+        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
+        helm install --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE}
       fi
 
     # Wait for resources to be created and come alive
@@ -246,7 +263,7 @@ package tests:
     - echo "Package tests"
     - |
       if [ $CI_PROJECT_NAME == "istio-system" ]; then
-        echo "certs required for gateway is created"
+        echo "Creating certs for gateway..."
         openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
         kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
         sleep 10
