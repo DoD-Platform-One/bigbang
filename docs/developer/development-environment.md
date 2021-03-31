@@ -12,7 +12,7 @@ There are 2 methods to create a remote k3d cluster. Manually or with IaC/CaC cod
 
 - [AWS GovCloud "coder" account](https://927962728993.signin.amazonaws-us-gov.com/console)
 - [BigBang repository](https://repo1.dso.mil/platform-one/big-bang/bigbang)
-- [Iron Bank registry](https://registry1.dsop.io)
+- [Iron Bank registry](https://registry1.dso.mil/)
 
 ### Utilities installed on local workstation
 
@@ -294,7 +294,7 @@ DATETIME=$( date +%Y%m%d%H%M%S )
 # A security group acts as a virtual firewall for your instance to control inbound and outbound traffic.
 aws ec2 create-security-group \
     --group-name $AWSUSERNAME \
-    --description "Created by $AWSUSERNAME at $DATETIME" \
+    --description "Created by $AWSUSERNAME at $DATETIME"
 
 # Get public IP
 YOURLOCALPUBLICIP=$( curl https://checkip.amazonaws.com )
