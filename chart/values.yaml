@@ -67,6 +67,12 @@ sso:
   # -- OIDC client secret used for packages authenticated through authservice
   client_secret: ""
 
+  # -- OIDC token URL template string (to be used as default)
+  token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
+    
+  # -- OIDC auth URL template string (to be used as default)
+  auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
+
 # -- (Advanced) Flux reconciliation parameters.
 # The default values provided will be sufficient for the majority of workloads.
 flux:
