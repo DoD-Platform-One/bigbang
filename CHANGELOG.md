@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.13.0-bb.1] - 2021-03-30
+### Added
+- Added pod affinity and anti-affinity, documentation
+
 ## [1.13.0-bb.0] - 2021-03-15
 ### Changed
 - Bumped the operator image to 1.13.0 from Ironbank
