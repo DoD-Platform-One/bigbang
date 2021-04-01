@@ -1,0 +1,17 @@
+#
+# The values below demonstrate how to override the default SSO provider (Keycloak) in favor of google auth.
+#
+# Current tested implementations and reference docs:
+#   * grafana - https://grafana.com/docs/grafana/latest/auth/google/
+#
+
+monitoring:
+  sso:
+    grafana:
+      client_id: <client_id>
+      client_secret: <client_secret>
+      scopes: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+      allowed_domains: <allowed_domains>
+      auth_url: https://accounts.google.com/o/oauth2/auth
+      token_url: https://oauth2.googleapis.com/token
+      signout_redirect_url: https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=https://grafana.bigbang.dev
