@@ -4,6 +4,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.13.0-bb.2] - 2021-04-05
+- Modified pod affinity spec and values, documentation
+
 ## [1.13.0-bb.1] - 2021-03-30
 ### Added
 - Added pod affinity and anti-affinity, documentation
