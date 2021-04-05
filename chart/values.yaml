@@ -10,14 +10,21 @@ replicas:
 
 imagePullSecrets: []
 
-# Available options are "soft" and "hard"
-antiAffinity: ""
+affinity: {}
+  # podAntiAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     - topologyKey: "kubernetes.io/hostname"
+  #       labelSelector:
+  #         matchLabels:
+  #           dont-schedule-with: operator
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #     - matchExpressions:
+  #       - key: node-type
+  #         operator: In
+  #         values:
+  #         - "operator"
 
-nodeAffinity: {}
-  # requiredDuringSchedulingIgnoredDuringExecution:
-  #   nodeSelectorTerms:
-  #   - matchExpressions:
-  #     - key: node-type
-  #       operator: In
-  #       values:
-  #       - "operator"
+nodeSelector: {}
+  # node-type: operator
