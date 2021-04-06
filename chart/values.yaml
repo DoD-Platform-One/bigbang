@@ -1,34 +1,87 @@
-## Overrides for generated resource names
-# namespaceOverride:
+# -- Big Bang Additions
+hostname: bigbang.dev
+istio:
+  enabled: false
+license_key: "test"
+license:
+  mountPath: /nexus-data/sonatype-license.lic
+  subPath: sonatype-license.lic
+sso:
+  enabled: false
+  idp_data:
+    entityId: ""
+    usernameAttribute: ""
+    firstNameAttribute: ""
+    lastNameAttribute: ""
+    emailAttribute: ""
+    groupsAttribute: ""
+    validateResponseSignature: true
+    validateAssertionSignature: true
+    idpMetadata: ''
+  realm:
+    - "NexusAuthenticatingRealm"
+    - "NexusAuthorizingRealm"
+    - "SamlRealm"
+  role:
+    id: "nexus"
+    name: "nexus"
+    description: "nexus group"
+    privileges:
+      - "nx-all"
+    roles:
+      - "nx-admin"
+# -- End of BigBang Additions
+
+global:
+  hosts:
+    name: nexus-repository-manager
+  service:
+    name: nexus-repository-manager
+
+ingress:
+  enabled: true
+  annotations: {kubernetes.io/ingress.class: nginx}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostPath: /
+  hostRepo: repo.demo
+  tls: []
+    # - secretName: nexus-local-tls
+    #   hosts:
+    #     - nexus.local
+    #     - nexus-docker.local
+    #     - nexus-docker-hosted.local
 
 statefulset:
+  # This is not supported
   enabled: false
-replicaCount: 1
 # By default deploymentStrategy is set to rollingUpdate with maxSurge of 25% and maxUnavailable of 25% . you can change type to `Recreate` or can uncomment `rollingUpdate` specification and adjust them to your usage.
-deploymentStrategy: {}
-  # rollingUpdate:
-  #   maxSurge: 25%
-  #   maxUnavailable: 25%
-  # type: RollingUpdate
-
-# If enabled, a Job will be launched after the chart is installed to initialize the admin password of your choice
-initAdminPassword:
-  enabled: false
-  # Set this in the instance where default admin password is different
-  defaultPasswordOverride:
-  password: "admin321"
+deploymentStrategy: Recreate
+image:
+  # IB Nexus Image
+  repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
+  tag: latest
+  pullPolicy: IfNotPresent
 
 nexus:
-  imageName: quay.io/travelaudience/docker-nexus
-  imageTag: 3.27.0
-  imagePullPolicy: IfNotPresent
-  # Uncomment this to scheduler pods on priority
-  # priorityClassName: "high-priority"
+  docker:
+    enabled: false
+    registries: []
+    #  - host: chart.local
+    #    port: 5000
+    #    secretName: registrySecret
   env:
-    - name: INSTALL4J_ADD_VM_PARAMS
-      value: "-Xms1200M -Xmx1200M -XX:MaxDirectMemorySize=2G -XX:ActiveProcessorCount=4"
+    - name: install4jAddVmParams
+      value: "-Xms1200M -Xmx1200M -XX:MaxDirectMemorySize=2G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
-      value: "false"
+      value: "true"
+  properties:
+    override: true
+    data:
+      nexus.licenseFile: /nexus-data/sonatype-license.lic
+      # nexus.scripts.allowCreation: true
+      # See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
+      #nexus.ldap.env.java.naming.security.authentication: simple
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
   resources: {}
@@ -44,40 +97,22 @@ nexus:
       # cpu: 250m
       # memory: 4800Mi
   # The ports should only be changed if the nexus image uses a different port
-  dockerPort: 5003
   nexusPort: 8081
-  additionalPorts: []
-  service:
-    type: NodePort
-    # clusterIP: None
-  # annotations: {}
-    ## When using LoadBalancer service type, use the following AWS certificate from ACM
-    ## https://aws.amazon.com/documentation/acm/
-    # service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:eu-west-1:123456789:certificate/abc123-abc123-abc123-abc123"
-    # service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "https"
-    # service.beta.kubernetes.io/aws-load-balancer-backend-port: "https"
-  ## When using LoadBalancer service type, whitelist these source IP ranges
-  ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/
-  # loadBalancerSourceRanges:
-  #   - 192.168.1.10/32
-  # labels: {}
-  ## Configures the requested IP on the loadBalancer when using LoadBalancer service type
-  # loadBalancerIP: "192.168.1.10"
-  securityContextEnabled: true
+
   securityContext:
-    fsGroup: 200
+    fsGroup: 2000
   podAnnotations: {}
   livenessProbe:
-    initialDelaySeconds: 300
+    initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 6
-    # timeoutSeconds: 10
+    timeoutSeconds: 10
     path: /
   readinessProbe:
     initialDelaySeconds: 30
     periodSeconds: 30
     failureThreshold: 6
-    # timeoutSeconds: 10
+    timeoutSeconds: 10
     path: /
   # hostAliases allows the modification of the hosts file inside a container
   hostAliases: []
@@ -85,10 +120,49 @@ nexus:
   #   hostnames:
   #   - "example.com"
   #   - "www.example.com"
-  context:
-  # When using nexus it is important that all the files in the data directory have the proper owner configured. Therefore this
-  # value defaults to true to apply chown -R nexus:nexus to the mounted directory at every startup of the container.
-  chownNexusData: true
+
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+deployment:
+  # # Add annotations in deployment to enhance deployment configurations
+  annotations: {}
+  # # Add init containers. e.g. to be used to give specific permissions for nexus-data.
+  # # Add your own init container or uncomment and modify the given example.
+  initContainers:
+  # - name: fmp-volume-permission
+    # image: busybox
+    # imagePullPolicy: IfNotPresent
+    # command: ['chown','-R', '200', '/nexus-data']
+    # volumeMounts:
+      # - name: nexus-data
+        # mountPath: /nexus-data
+  # # Uncomment and modify this to run a command after starting the nexus container.
+  postStart:
+    command:    # '["/bin/sh", "-c", "ls"]'
+  preStart:
+    command:    # '["/bin/rm", "-f", "/path/to/lockfile"]'
+  terminationGracePeriodSeconds: 120
+  additionalContainers:
+  additionalVolumes:
+  additionalVolumeMounts:
+
+service:
+  name: nexus3
+  enabled: true
+  labels: {}
+  annotations: {}
+  serviceType: ClusterIP
+
 
 route:
   enabled: false
@@ -97,37 +171,6 @@ route:
   labels:
   annotations:
   # path: /docker
-
-nexusProxy:
-  enabled: true
-  # svcName: proxy-svc
-  imageName: quay.io/travelaudience/docker-nexus-proxy
-  imageTag: 2.6.0
-  imagePullPolicy: IfNotPresent
-  port: 8080
-  targetPort: 8080
-  # labels: {}
-  env:
-    nexusDockerHost:
-    nexusHttpHost:
-    enforceHttps: false
-    cloudIamAuthEnabled: false
-## If cloudIamAuthEnabled is set to true uncomment the variables below and remove this line
-  #   clientId: ""
-  #   clientSecret: ""
-  #   organizationId: ""
-  #   redirectUrl: ""
-  #   requiredMembershipVerification: "true"
-  # secrets:
-  #   keystore: ""
-  #   password: ""
-  resources: {}
-    # requests:
-      # cpu: 100m
-      # memory: 256Mi
-    # limits:
-      # cpu: 200m
-      # memory: 512Mi
 
 nexusProxyRoute:
   enabled: false
@@ -153,183 +196,29 @@ persistence:
   # pdName: nexus-data-disk
   # fsType: ext4
 
-nexusBackup:
-  enabled: false
-  imageName: dbcc/docker-nexus-backup
-  imageTag: 0.0.1
-  imagePullPolicy: IfNotPresent
-  env:
-    rcloneRemote:
-    targetBucket:
-    nexusAuthorization:
-    # Size of the data chunk to stream to the remote
-    streamingUploadCutoff: "5000000"
-    offlineRepos: "maven-central maven-public maven-releases maven-snapshots"
-    gracePeriod: 60
-  # This should match the value of `initAdminPassword.password` if `initAdminPassword.enabled` is true
-  nexusAdminPassword: "admin123"
-  persistence:
-    enabled: true
-    # existingClaim:
-    # annotations:
-    #  "helm.sh/resource-policy": keep
-    accessMode: ReadWriteOnce
-    # See comment above for information on setting the backup storageClass
-    # storageClass: "-"
-    storageSize: 8Gi
-    # If PersistentDisk already exists you can create a PV for it by including the 2 following keypairs.
-    # pdName: nexus-backup-disk
-    # fsType: ext4
-  resources: {}
-    # requests:
-      # cpu: 100m
-      # memory: 256Mi
-    # limits:
-      # cpu: 200m
-      # memory: 512Mi
-  rcloneConfig:
-    rclone.conf: |
-      [AWS]
-      type = s3
-      provider = AWS
-      env_auth = true
-      region = us-east-1
-      acl = authenticated-read
+tolerations: []
 
-nexusCloudiam:
+# # Enable configmap and add data in configmap	
+config:
   enabled: false
-  persistence:
-    enabled: true
-    # existingClaim:
-    # annotations:
-    #  "helm.sh/resource-policy": keep
-    accessMode: ReadWriteOnce
-    # See comment above for information on setting the backup storageClass
-    # storageClass: "-"
-    storageSize: 1Mi
-    # If PersistentDisk already exists you can create a PV for it by including the 2 following keypairs.
-    # pdName: nexus-cloudiam-path
-    # fsType: ext4
+  mountPath: /sonatype-nexus-conf
+  data: []
+
+# # To use an additional secret, set enable to true and add data
+secret:
+  enabled: true
+  mountPath: /nexus-data/admin.password
+  subPath: admin.password
+  readOnly: true
 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
+  # Annotations to add to the service account
+  annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name:
-  annotations: {}
+  name: ""
 
-rbac:
+psp:
   create: false
-  roleRef: {}
-  annotations: {}
-
-ingress:
-  enabled: false
-  path: /
-  labels: {}
-  annotations: {}
-  # # NOTE: Can't use 'false' due to https://github.com/jetstack/kube-lego/issues/173.
-  # kubernetes.io/ingress.allow-http: true
-  # kubernetes.io/ingress.class: gce
-  # kubernetes.io/ingress.global-static-ip-name: ""
-  # kubernetes.io/tls-acme: true
-  tls:
-    enabled: true
-    secretName: nexus-tls
-  # Specify custom rules in addition to or instead of the nexus-proxy rules
-  rules:
-  # - host: http://nexus.127.0.0.1.nip.io
-  #   http:
-  #     paths:
-  #     - backend:
-  #         serviceName: additional-svc
-  #         servicePort: 80
-
-ingressDocker:
-  enabled: false
-  path: /
-  labels: {}
-  annotations: {}
-  # # NOTE: Can't use 'false' due to https://github.com/jetstack/kube-lego/issues/173.
-  # kubernetes.io/ingress.allow-http: true
-  # kubernetes.io/ingress.class: gce
-  # kubernetes.io/ingress.global-static-ip-name: ""
-  # kubernetes.io/tls-acme: true
-  tls:
-    enabled: true
-    secretName: nexus-tls
-  # Specify custom rules in addition to or instead of the nexus-proxy rules
-  rules:
-  # - host: http://nexus.127.0.0.1.nip.io
-  #   http:
-  #     paths:
-  #     - backend:
-  #         serviceName: additional-svc
-  #         servicePort: 80
-
-affinity: {}
-
-tolerations: []
-
-# # Enable configmap and add data in configmap
-config:
-  enabled: false
-  mountPath: /sonatype-nexus-conf
-  data:
-
-deployment:
-  # # Add annotations in deployment to enhance deployment configurations
-  annotations: {}
-  # # Add init containers. e.g. to be used to give specific permissions for nexus-data.
-  # # Add your own init container or uncomment and modify the given example.
-  initContainers:
-  # - name: fmp-volume-permission
-    # image: busybox
-    # imagePullPolicy: IfNotPresent
-    # command: ['chown','-R', '200', '/nexus-data']
-    # volumeMounts:
-      # - name: nexus-data
-        # mountPath: /nexus-data
-  # # Uncomment and modify this to run a command after starting the nexus container.
-  postStart:
-    command:    # '["/bin/sh", "-c", "ls"]'
-    # # Enable nexus scripts settings, disabled by default for versions >= 3.21.2
-    # command:    '["/bin/sh", "-c", "if [[ -z $(grep ^nexus.scripts.allowCreation=true /nexus-data/etc/nexus.properties) ]];then echo nexus.scripts.allowCreation=true >> /nexus-data/etc/nexus.properties;fi"]'
-
-  additionalContainers:
-  additionalVolumes:
-  additionalVolumeMounts:
-
-# # To use an additional secret, set enable to true and add data
-secret:
-  enabled: false
-  mountPath: /etc/secret-volume
-  readOnly: true
-  data:
-
-# # To use an additional service, set enable to true
-service:
-  type: ClusterIP
-  # name: additional-svc
-  enabled: false
-  labels: {}
-  annotations: {}
-  ports:
-  - name: nexus-service
-    targetPort: 80
-    port: 80
-  ## Configures the requested IP on the loadBalancer when using LoadBalancer service type
-  # loadBalancerIP: "192.168.1.10"
-
-additionalConfigMaps: []
-#  - name: maven-central
-#    labels:
-#      nexus-type: repository
-#    data:
-#      recipe: 'MavenProxy'
-#      remoteUrl: 'https://repo.maven.apache.org/maven2/'
-#      blobStoreName: 'default'
-#      strictContentTypeValidation: 'true'
-#      versionPolicy: 'RELEASE'
-#      layoutPolicy: 'STRICT'

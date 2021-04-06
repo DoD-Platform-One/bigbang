@@ -51,6 +51,10 @@ app.kubernetes.io/name: {{ include "nexus.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "nexus.licenseKey" -}}
+sonatype-license.lic: {{ .Values.license_key }}
+{{- end -}}
+
 {{/*
 Create the name of the service account to use
 */}}

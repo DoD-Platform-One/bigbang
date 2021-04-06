@@ -1,0 +1,76 @@
+{{- if and .Values.sso.enabled .Values.secret.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+{{ include "nexus.labels" . | indent 4 }}
+  {{- if .Values.nexus.extraLabels }}
+    {{- with .Values.nexus.extraLabels }}
+      {{ toYaml . | indent 4 }}
+    {{- end }}
+  {{- end }}
+  annotations:
+    "helm.sh/hook": post-install
+  creationTimestamp: null
+  name: saml
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      containers:
+      - image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
+        name: saml
+        command:
+          - sh
+        args:
+          - -c
+          - |
+            until curl --head localhost:15000; do echo "Waiting for Sidercar"; sleep 10; done; echo "Sidecar available"  &&
+            BASE_URL="http://{{ template "nexus.name" . }}.{{ template "nexus.name" . }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
+            # saml metadata
+            curl -X PUT \
+                 -u admin:"$API_CREDENTIALS" \
+                 "$BASE_URL/service/rest/v1/security/saml" \
+                 -H "accept: application/json" \
+                 -H "Content-Type: application/json" \
+                 -d "$IDP_DATA" &&
+            # realm configuration
+            curl -X PUT \
+                 -u admin:"$API_CREDENTIALS" \
+                 "$BASE_URL/service/rest/v1/security/realms/active" \
+                 -H "accept: application/json" \
+                 -H "Content-Type: application/json" \
+                 -d "$REALM" &&
+            # role creation
+            curl -X POST \
+                 -u admin:"$API_CREDENTIALS" \
+                 "$BASE_URL/service/rest/v1/security/roles" \
+                 -H "accept: application/json" \
+                 -H "Content-Type: application/json" \
+                 -d "$ROLE"
+        env:
+        - name: API_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "nexus.name" . }}-secret
+              key: admin.password
+        - name: IDP_DATA
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "nexus.name" . }}-sso
+              key: idp-metadata
+        - name: REALM
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "nexus.name" . }}-sso
+              key: realm
+        - name: ROLE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "nexus.name" . }}-sso
+              key: role
+        resources: {}
+      restartPolicy: Never
+status: {}
+{{- end }}
