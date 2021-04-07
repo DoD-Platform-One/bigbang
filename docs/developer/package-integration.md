@@ -6,16 +6,20 @@
 1. Inside this folder will be 3 helm template files. You can copy one of the other package folders and tweak the code for your package. Gitlab is a good example to reference because it is one of the more complicated Packages. Note that the Istio VirtualService comes from the Package and is not created in the BigBang chart. The purpose of these helm template files is to create an easy-to-use spec for deploying supported applications. Reasonable and safe defaults are provided and any needed secrets are auto-created. We accept the trade off of easy deployment for complicated template code. More details are in the following steps. 
    ```
    gitrepository.yaml  # Flux GitRepository. Is configured by BigBang chart values.
-   helmrelease.yaml    # Flux HelmRelease. Implements all the BigBang customizations of the base Package.
+   helmrelease.yaml    # Flux HelmRelease. Is configured by BigBang chart values.
    namespace.yaml      # Contains the namespace and any needed secrets
+   values.yaml         # Implements all the BigBang customizations of the package and passthrough for values.
    ```
-1. More details about helmrelease.yaml:  Code reasonable and safe defaults but prioritize any user defined passthrough values wherever this makes sense. Avoid duplicating tags that are provided in the upstream chart values. Instead code reasonable defaults in the helmrelease.yaml template. The following is an example from Gitlab that handles SSO config. The code uses Package chart passthrough values if the user has entered them but otherwise defaults to the BigBang chart values or the HelmRelease default values. Notice that the secret is not handled this way. The assumption is that if the user has enabled the BigBang SSO feature the secret will be auto created. In this case the user should not be overriding the secret. If the user wants to create their own secret they should not be enabling the BigBang SSO feature.  
+1. More details about values.yaml:  Code reasonable and safe defaults but prioritize any user defined passthrough values wherever this makes sense. Avoid duplicating tags that are provided in the upstream chart values. Instead code reasonable defaults in the values.yaml template. The following is an example from Gitlab that handles SSO config. The code uses Package chart passthrough values if the user has entered them but otherwise defaults to the BigBang chart values or the Helm default values. Notice that the secret is not handled this way. The assumption is that if the user has enabled the BigBang SSO feature the secret will be auto created. In this case the user should not be overriding the secret. If the user wants to create their own secret they should not be enabling the BigBang SSO feature.  
 
    Note that helm does not handle any missing parent tags in the yaml tree. The 'if' statement and 'default' method throw 'nil' errors when parent tags are missing. The work-around is to inspect each level of the tree and assign an empty 'dict' if the value does not exist. Then you will be able to use 'hasKey' in your 'if' statements as shown below in this example from Gitlab. Having described all this, you should understand that coding conditional values is optional. The passthrough values will take priority regardless. But the overridden values will not show up in the deployed flux HelmRelease object if you don't code the conditional values. The value overrides will be obscured in the Package values secret. The only way to confirm that the overrides have been applied is to use "helm get values <releasename> -n bigbang" command on the deployed helm release. When the passthrough values show up in the HelmRelease object the Package configuration is much easier to see and verify. Use your own judgement on when to code conditional values.
 
    ```yaml
    global: 
+     {{- if or .Values.addons.gitlab.sso.enabled .Values.addons.gitlab.objectStorage.endpoint }}
      appConfig:
+     {{- end }}
+
        {{- if .Values.addons.gitlab.sso.enabled }}
        omniauth:
          enabled: true
@@ -32,9 +36,12 @@
          {{- else }}
          blockAutoCreatedUsers: false
          {{- end }}
+
          providers:
-             - secret: gitlab-sso-provider
-               key: gitlab-sso.json
+           - secret: gitlab-sso-provider
+             key: gitlab-sso.json
+     {{- end }}
+
    ```
 1. More details about namespace.yaml: This template is where the code for secrets go. Typically you will see secrets for imagePullSecret, sso, and database. These secrets are a BigBang chart enhancement.  They are created conditionally based on what the user enables in the config.
 
@@ -69,7 +76,7 @@
        values: {}
    ```
 
-1. Edit tests/ci/k3d/values.yaml. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values.  When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
+1. Edit tests/ci/k3d/values.yaml. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minumum to reduce straing on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
 
 1. Add your packages name to the ORDERED_HELMRELEASES list in scripts/deploy/02_wait_for_helmreleases.sh.
 
@@ -77,17 +84,7 @@
 
 1. Make sure to change the chart/values.yaml file to point to the tag rather than your branch (i.e. tag: "1.2.3-bb.0" in place of branch: "bb-9999").
 
-1. When you are done developing the BigBang chart features for your Package make a merge request. Keep your merge request in "Draft" status until all issues are resolved. The merge request will start a pipeline. Fix any errors.  Address any issues raised in the merge request comments.
-
-1. The final step before removing "draft" status from your merge request is to squash commits and rebase your development branch with the master branch
-   ```bash
-   git rebase origin/master
-   git reset $(git merge-base origin/master $(git rev-parse --abbrev-ref HEAD))
-   git add -A
-   git commit -m "feat: example conventional commit"
-   git push --force
-   ```
-
+1. When you are done developing the BigBang chart features for your Package make a merge request in "Draft" status and add a label corresponding to your package name (must match the name in `values.yaml`). Also add any labels for dependencies of the package that are NOT core apps. The merge request will start a pipeline and use the labels to determine which addons to deploy. Fix any errors that appear in the pipeline. When the pipeline has pass and the MR is ready take it out of "Draft" and add the `status::review` label. Address any issues raised in the merge request comments.
 
 # BigBang Development and Testing Cycle
 There are two ways to test BigBang, imperative or GitOps with Flux.  Your initial development can start with imperative testing.  But you should finish with GitOps to make sure that your code works with Flux.
