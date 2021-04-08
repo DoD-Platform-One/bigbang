@@ -52,7 +52,6 @@ chart/templates/istio           @kenna81 @kavitha @cmcgrath @nick_tetrate
 # chart/values.yaml             @?
 # chart/templates/haproxy       @?
 
-
 ^[Anchore]
 chart/Chart.yaml                @blake.hearn @micah.nagel @jasonkrause
 chart/values.yaml               @blake.hearn @micah.nagel @jasonkrause
