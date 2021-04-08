@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.2]
+### Fixed
+- Bug where istio would not create the cert due to variables not being up to date
+
 ## [1.0.1]
 ### Changed
 - Test values now looks at both `test-values.yaml` and `test-values.yml`
