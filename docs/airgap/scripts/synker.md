@@ -3,23 +3,12 @@
 ## Prerequisite
 
 - `images.tar.gz` from [Big Bang Releases](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases)
-- `registry:2`, directions below to package dependency
 - 40gb disk space
 - docker
 
 ## Usage
 
-Package registry to take airgap
-```
-docker save -o registry.tar registry:2
-```
-
-Load registry in airgap
-```
-docker load < registry.tar
-```
-
-Unpack images
+Unpack 
 ```
 tar -xvf images.tar.gz
 ```
@@ -27,6 +16,7 @@ tar -xvf images.tar.gz
 Start a local registry based on the images we just unpacked
 ```
 cd ./var/lib/registry
+docker load < registry.tar
 docker run -p 25000:5000 -v $(pwd):/var/lib/registry registry:2
 # verify the registry mounted correctly
 curl http://localhost:25000/v2/_catalog -k
