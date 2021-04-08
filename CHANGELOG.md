@@ -4,6 +4,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.4.0]
+
+### Upgrade Notice
+
+This update includes updated `EnvoyFilters` for `authservice` to fix #65 and is a component of a future upgrade to istio 1.8 (#191).
+
+__After upgrading BigBang to this version, you must follow the steps below to ensure apps protected by `authservice` are still protected.__
+
+In order to ensure sso for all services protected by `authservice` remain functional (`kiali`, `jaeger`, `prometheus`, and `alertmanager`), the `istio-proxy` sidecar attached to the `haproxy` infront of the services must be updated to `1.7.7`.
+
+The easiest way to do this is to cycle the pod:
+
+```bash
+kubectl delete po -n authservice -l app.kubernetes.io/instance=authservice-haproxy-sso
+```
+
+> __Note__: these 4 services (`kiali`, `jaeger`, `prometheus`, and `alertmanager`) will be unavailable for ~10s while the pod cycles. In the future we aim to provide an HA implementation of authservice's haproxy so the above operations can happen without downtime.
+
+* [!300](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/300): Velero Addon Addition
+* [!308](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/308): BigBang values migrated to Secret objects parsed by `HelmRelease` objects within chart. (also fixes #221)
+* [!357](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/357): Updated Anchore (Engine 0.9.3, Enterprise 3.0.2).
+* [!333](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/333): Updated Mattermost (Operator: 1.13.0, Instance: 5.32.1).
+* [!346](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/346): Redis Integration with Anchore Enterprise Package.
+* [!318](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/318): Redis Integration with ArgoCD Package.
+
+## [1.3.0]
+
+* [!322](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/322): Updated anchore to 0.9.2, enterprise 3.0.1, this also fixes #135
+* [!309](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/309): Add support for Gitlab CAC signed commits and custom CAs
+* [!311](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/311): Update minio to `RELEASE.2020-11-19T23-48-16Z` and expose more user configuration options
+* [!220](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/220): Added consolidatedflux installation (without `flux` cli)
+* [!319](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/319): Updated gitlab-runner to `13.9.0` IronBank image (note this uses a different chart schema than previous versions, see [here](https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration) for more information)
+* [!340](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/340): Package `bigbang` repo in `repositories.tar.gz` release artifact
+  
+In addition, [Big Bang Pre-requisites](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/1.4.0/docs/d_prerequisites.md) has been added as a location to store all (known) pre-requisites for running BigBang on various distributions.  Over time, more distributions will be added as they are tested, community (and vendor) contributions are welcomed!
+
+## [1.2.0]
+
+* [!270](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/270): upgrade to flux 0.7.x, this requires updating flux and fixes #13
+* [!250](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/250): Filename spelling correction in scripts directory
+* [!259](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/259), [!265](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/265), [!274](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/274): documentation updates
+* [!263](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/263), [!271](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/271): Update codeowners
+* [!263](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/263): add missing enterprise Anchore images to airgap bundle
+* [!237](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/237): add gitlab-runner to test values
+* [!266](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/266): update fluentbit package version
+* [!269](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/269): Update charter/PackageOwner.md
+* [!256](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/256): update developer documentation
+* [!272](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/272): Remove CI jobs that check for things no longer required as part of the developer workflow
+* [!264](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/264), [!238](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/238): Update BigBang repo url references from "umbrella" to "bigbang"
+* [!249](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/249): image for gatekeeper is set in the chart and should not be hardcoded in the HelmRelease
+* [!202](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/202): add initial support for openshift (ocp)
+* [!272](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/272): upgrade argocd helm chart to 2.14.7-bb.0
+* [!232](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/232): Twistlock IB image and VirtualServcie customization
+* [!210](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/210): only run cluster tests when chart contents have changed
+* [!279](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/279): remove hardcoded ArgoCD server url config, allow users to set their own sso url
+* [!215](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/215): add sample sso values
+* [!286](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/286): add Ironbank defender image to synker config
+* [!287](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/287): add gitlab runner images to synker config
+* [!288](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/288): split minio into minio operator and minio and move to addons
+* [!255](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/255): Integrate Mattermost Operator as an addon
+* [!273](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/273): Integrate Mattermost as an addon
+* [!291](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/291): enable MinIO in CI tests
+* [!290](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/290): upgrade Mattermost chart version. Uses latest IronBank image
+
 ## [1.1.0]
 
 * [&2](https://repo1.dso.mil/groups/platform-one/big-bang/-/epics/2): Add support for Gitlab (with sso) 13.8.0
