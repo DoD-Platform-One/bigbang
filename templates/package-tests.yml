@@ -140,11 +140,12 @@ package tests:
         istioctl install -y
       fi
 
-    # Check for gateway if found generate throw away wildcard-cert secret and apply gateway
+    # Generate throwaway cert for *.bigbang.dev
+    - openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+    - kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
+    # Apply gateway if it exists (don't always create since istio creates its own)
     - |
       if [ -f "tests/main-test-gateway.yaml" ]; then
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
         kubectl apply -f tests/main-test-gateway.yaml
       fi
 
@@ -261,14 +262,6 @@ package tests:
     - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
 
     - echo "Package tests"
-    - |
-      if [ $CI_PROJECT_NAME == "istio-system" ]; then
-        echo "Creating certs for gateway..."
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
-        sleep 10
-      fi
-
     # If istio-ingressgateway has a loadBalancer IP and ${CI_PROJECT_NAME} namespace has a virtualService hostname add value to /etc/hosts
     - |
       if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') ] && [ ! -z $(kubectl get vs -A -o jsonpath='{.items[0].spec.hosts[0]}') ]; then
