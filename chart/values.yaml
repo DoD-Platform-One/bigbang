@@ -282,7 +282,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "2.14.7-bb.2"
+      tag: "2.14.7-bb.3"
     sso:
       # -- Toggle SSO for ArgoCD on and off
       enabled: false
@@ -439,7 +439,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
       path: "./chart"
-      tag: "9.2.6-bb.6"
+      tag: "9.2.6-bb.7"
 
     sso:
       # -- Toggle OIDC SSO for SonarQube.
