@@ -47,6 +47,12 @@ chart/values.yaml               @kenna81 @kavitha @cmcgrath @nick_tetrate
 chart/templates/authservice     @kenna81 @kavitha @cmcgrath 
 chart/templates/istio           @kenna81 @kavitha @cmcgrath @nick_tetrate
 
+# ^[HAProxy]
+# chart/Chart.yaml              @?
+# chart/values.yaml             @?
+# chart/templates/haproxy       @?
+
+
 ^[Anchore]
 chart/Chart.yaml                @blake.hearn @micah.nagel @jasonkrause
 chart/values.yaml               @blake.hearn @micah.nagel @jasonkrause
@@ -78,19 +84,37 @@ chart/values.yaml               @lynnstill @ryan.j.garcia
 chart/templates/monitoring      @lynnstill @ryan.j.garcia
 
 ^[Twistlock]
-chart/Chart.yaml                @thomas.burton
-chart/values.yaml               @thomas.burton
-chart/templates/twistlock       @thomas.burton
+chart/Chart.yaml                @thomas.burton @ryan.j.garcia @runyontr @joshwolf
+chart/values.yaml               @thomas.burton @ryan.j.garcia @runyontr @joshwolf
+chart/templates/twistlock       @thomas.burton @ryan.j.garcia @runyontr @joshwolf
 
-^[Gitlab]
-chart/Chart.yaml                @egoode @kevin.wilder
-chart/values.yaml               @egoode @kevin.wilder
-chart/templates/gitlab          @egoode @kevin.wilder
+^[Sonarqube]
+chart/Chart.yaml                @kevin.wilder @lynnstill @branden.cobb
+chart/values.yaml               @kevin.wilder @lynnstill @branden.cobb
+chart/templates/sonarqube       @kevin.wilder @lynnstill @branden.cobb
+
+^[Gitlab and Gitlab Runners]
+chart/Chart.yaml                @lynnstill @ryan.j.garcia @kevin.wilder
+chart/values.yaml               @lynnstill @ryan.j.garcia @kevin.wilder
+chart/templates/gitlab          @lynnstill @ryan.j.garcia @kevin.wilder
 
 ^[KeyCloak]
 chart/Chart.yaml                @megamind
 chart/values.yaml               @megamind
 chart/templates/keycloak        @megamind
 
+^[Mattermost (and operator)]
+chart/Chart.yaml                @micah.nagel @branden.cobb
+chart/values.yaml               @micah.nagel @branden.cobb
+chart/templates/mattermost      @micah.nagel @branden.cobb
 
+^[Minio (and operator)]
+chart/Chart.yaml                @LynnStill @kevin.wilder @branden.cobb
+chart/values.yaml               @LynnStill @kevin.wilder @branden.cobb
+chart/templates/minio           @LynnStill @kevin.wilder @branden.cobb
+
+^[Velero]
+chart/Chart.yaml                @tunde @adam.toy
+chart/values.yaml               @tunde @adam.toy
+chart/templates/velero          @tunde @adam.toy
 
