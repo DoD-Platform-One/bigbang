@@ -11,6 +11,26 @@ elasticsearch:
 imagePullSecrets:
   - name: private-registry
 
+{{- if .Values.monitoring.enabled }}
+serviceMonitor:
+  enabled: true
+  namespace: monitoring
+  interval: 10s
+  scrapeTimeout: 10s
+  selector:
+    prometheus: monitoring-monitoring-kube-prometheus
+
+dashboards:
+  enabled: true
+  labelKey: grafana_dashboard
+  namespace: monitoring
+{{- end }}
+
+{{- if .Values.istio.enabled }}
+podLabels:
+  traffic.sidecar.istio.io/excludeOutboundPorts: "443"
+{{- end }}
+
 {{- if .Values.openshift }}
 podSecurityContext:
   seLinuxOptions:

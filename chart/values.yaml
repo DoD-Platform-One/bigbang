@@ -172,7 +172,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.1.4-bb.4"
+    tag: "0.1.7-bb.0"
 
   sso:
     # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
@@ -210,7 +210,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.7.10-bb.0"
+    tag: "0.15.3-bb.0"
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 
