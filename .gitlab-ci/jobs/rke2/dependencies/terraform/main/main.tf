@@ -7,7 +7,12 @@ locals {
 aws configure set default.region $(curl -s http://169.254.169.254/latest/meta-data/placement/region)
 
 # Tune vm sysctl for elasticsearch
-sysctl -w vm.max_map_count=262144
+sysctl -w vm.max_map_count=524288
+
+# SonarQube host pre-requisites
+sysctl -w fs.file-max=131072
+ulimit -n 131072
+ulimit -u 8192
 
 # Preload kernel modules required by istio-init, required for selinux enforcing instances using istio-init
 modprobe xt_REDIRECT
