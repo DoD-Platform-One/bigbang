@@ -3,6 +3,35 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.5.0]
+
+### Upgrade Notice
+
+This update includes several additions to fluent-bit which are recommended for production environments to increase reliability of log ingestion to the ECK stack.
+
+This is mainly accomplished within fluent-bit by introducing a [filesystem storage buffer](https://docs.fluentbit.io/manual/administration/buffering-and-storage#filesystem-buffering-to-the-rescue) interacting with a new `hostPath` volume in fluent-bit containers.
+By default, this is mounted to nodes at `/var/log/flb-storage/`, however it can be updated in the package's values in 3 places:
+```yaml
+storage_buffer:
+  path: /var/log/flb-storage/
+
+extraVolumes:
+  - hostPath:
+      path: /var/log/flb-storage/
+      type: DirectoryOrCreate
+    name: flb-storage
+
+extraVolumeMounts:
+  - mountPath: /var/log/flb-storage/
+    name: flb-storage
+```
+
+* [!386](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/386): Updated Fluentbit to 1.7.2 which fixes #335.
+* [!356](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/356): Enabled flux monitoring via Prometheus/Grafana in Monitoring package.
+* [!380](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/380): Fixed `eckoperator.enabled` conditional.
+* Added and Documented Affinity support.
+  * [!379](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/379) Twistlock
+  * [!393](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/393) Cluster Auditor
 
 ## [1.4.0]
 
@@ -38,6 +67,7 @@ kubectl delete po -n authservice -l app.kubernetes.io/instance=authservice-hapro
 * [!319](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/319): Updated gitlab-runner to `13.9.0` IronBank image (note this uses a different chart schema than previous versions, see [here](https://docs.gitlab.com/runner/install/kubernetes.html#additional-configuration) for more information)
 * [!340](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/340): Package `bigbang` repo in `repositories.tar.gz` release artifact
   
+
 In addition, [Big Bang Pre-requisites](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/1.4.0/docs/d_prerequisites.md) has been added as a location to store all (known) pre-requisites for running BigBang on various distributions.  Over time, more distributions will be added as they are tested, community (and vendor) contributions are welcomed!
 
 ## [1.2.0]
