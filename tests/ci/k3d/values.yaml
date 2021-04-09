@@ -26,6 +26,11 @@ logging:
             cpu: .5
           limits: {}
 
+fluentbit:
+  values:
+    securityContext:
+      privileged: true
+
 istio:
   enabled: true
   values:
