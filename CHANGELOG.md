@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.3]
+### Added
+- Added helm test invocation in the package pipeline to execute any helm chart tests in the package.
+- Added log dump to display the results of any chart tests in the pipeline log
+
 ## [1.0.2]
 ### Fixed
 - Bug where istio would not create the cert due to variables not being up to date
