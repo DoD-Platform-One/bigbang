@@ -50,6 +50,7 @@ spec:
   values:
     disableValidatingWebhook: true
     createNamespace: false
-    imagePullSecrets:
-    - name: private-registry
+    image:
+      pullSecrets:
+      - name: private-registry
 {{- end }}
