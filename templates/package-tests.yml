@@ -273,7 +273,16 @@ package tests:
       if [ -f "tests/cypress.json" ]; then
         cd tests && cypress run --browser chrome --headless
       fi
-      
+
+    # Run Helm Tests
+    - |
+      if [ -d "chart/templates/tests" ]; then
+      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME}
+      echo "***** Start Helm Test Logs *****"
+      kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+      echo "***** End Helm Test Logs *****"
+      fi
+
     # File to indicate Job succeeded 
     - touch $CI_PROJECT_DIR/success
 
