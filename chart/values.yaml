@@ -1,13 +1,20 @@
 nameOverride: ""
 fullnameOverride: ""
 
-host: kiali.bigbang.dev
+istio:
+  enabled: false
+  kiali:
+    gateways:
+    - "istio-system/main"
+    hosts:
+    - kiali.bigbang.dev
+
 port: 20001
 
 image:
-  # repo: registry1.dso.mil/ironbank/opensource/kiali-operator
-  repo: quay.io/kiali/kiali-operator
-  tag: v1.28.1
+  repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
+  # repo: quay.io/kiali/kiali-operator
+  tag: v1.32.0
   pullPolicy: IfNotPresent
   pullSecrets:
   - private-registry
@@ -64,7 +71,7 @@ cr:
       
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.28.1
+      image_version: v1.32.0
       image_pull_secrets:
       - private-registry
       ingress_enabled: false
@@ -94,7 +101,7 @@ cr:
       tracing:
         enabled: true
         url: "https://tracing.bigbang.dev"
-        in_cluster_url: "http://tracing.istio-system.svc.cluster.local/jaeger"
+        in_cluster_url: "http://jaeger-query.jaeger.svc.cluster.local:16686"
 
     # Taken from https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
     ###################################################################
