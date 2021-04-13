@@ -78,9 +78,9 @@ Utility Server is an internet-disconected server that will host the private regi
 
 ## Git Server
 
-As part of  BB release, we provide `repositories.tar.gz` which contains all the git repositories that BB depend on for deployment. 
+As part of  BB release, we provide `repositories.tar.gz` which contains all the git repositories that BB depend on for deployment. You have two options for serving up these packages for Flux.
 
-### Process
+### Option One
 
 You can follow the process below to setup git with `repositories.tar.gz` on the Utility Server.
 
@@ -135,6 +135,40 @@ $ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   git checkout 1.3.0
   ```
   
+### Option Two
+
+There are some cases where you do not have access to or cannot create an ssh user on the utility server. It is possible to run an ssh git server on a non-standard port using Docker.
+
+- Create an SSH key
+
+```bash
+$ ssh-keygen  -b 4096 -t rsa -f ./identity -q -N ""
+```
+
+- Extract `repositories.tar.gz` to your working directory
+
+```bash
+$ sudo tar -xvf repositories.tar.gz
+```
+
+- Start the provided Docker image (TODO: move this to an IB image when ready)
+
+```bash
+docker run -d -p 4001:22 -v ${PWD}/identity.pub:/home/git/.ssh/authorized_keys -v ${PWD}/repos:/home/git servicesengineering/gitshim:0.0.1
+```
+
+You will now be able to test by checking out some of the code.
+
+ ```bash
+  GIT_SSH_COMMAND='ssh -i /[client-private-key-path] -o IdentitiesOnly=yes' git clone git@[hostname/IP]:[PORT]/home/git/repos/[sample-repo]
+  
+  #For example;
+  GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:[PORT]/home/git/repos/bigbang 
+  #checkout release branch
+  git checkout 1.3.0
+  ```
+
+
 
 
 ## Private Registry 
