@@ -140,9 +140,12 @@ package tests:
         istioctl install -y
       fi
 
-    # Generate throwaway cert for *.bigbang.dev
-    - openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-    - kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
+    # Generate throwaway cert for *.bigbang.dev, NOTE: special case for istio-operator - no cert needed
+    - |
+      if [[ "${PACKAGE_NAMESPACE}" != "istio-operator" ]]; then
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
+        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
+      fi
     # Apply gateway if it exists (don't always create since istio creates its own)
     - |
       if [ -f "tests/main-test-gateway.yaml" ]; then
