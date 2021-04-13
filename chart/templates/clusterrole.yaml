@@ -62,6 +62,17 @@ rules:
   - patch
   - update
   - watch
+- apiGroups: ["autoscaling"]
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups: ["monitoring.coreos.com"]
   resources:
   - servicemonitors
@@ -204,6 +215,7 @@ rules:
   - post
 - apiGroups: ["extensions", "apps"]
   resources:
+  - daemonsets
   - deployments
   - replicasets
   - statefulsets
@@ -283,4 +295,9 @@ rules:
   - delete
   - patch
   {{- end }}
+- apiGroups: ["authentication.k8s.io"]
+  resources:
+  - tokenreviews
+  verbs:
+  - create
 ...

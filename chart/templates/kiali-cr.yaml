@@ -12,7 +12,7 @@ metadata:
   labels:
   {{- include "kiali-operator.labels" . | nindent 4 }}
 annotations:
-  ansible.operator-sdk/verbosity: {{ .Values.debug.verbosity | quote }}
+  ansible.sdk.operatorframework.io/verbosity: {{ .Values.debug.verbosity | quote }}
 spec:
   {{- toYaml .Values.cr.spec | nindent 2 }}
 ...
