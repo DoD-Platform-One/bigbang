@@ -9,7 +9,7 @@ metadata:
 spec:
   initContainers:
   - name: copier
-    image: cypress/included:5.0.0
+    image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/cypress/included:5.0.0
     command:
     - "/bin/bash"
     - "-c"
@@ -27,7 +27,7 @@ spec:
       mountPath: /dest
   containers:
     - name: {{ .Release.Name }}-ui-test
-      image: cypress/included:5.0.0
+      image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/cypress/included:5.0.0
       imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
       workingDir: /e2e
       env:
