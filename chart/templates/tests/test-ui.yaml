@@ -1,0 +1,50 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: "{{ .Release.Name }}-ui-test"
+  annotations:
+    "helm.sh/hook": test
+  labels:
+    "helm.sh/hook": test
+spec:
+  initContainers:
+  - name: copier
+    image: cypress/included:5.0.0
+    command:
+    - "/bin/bash"
+    - "-c"
+    - |
+        ls -la /src/
+        cp /src/cypress.json /dest/
+        mkdir -p /dest/cypress/integration/
+        cp /src/*.js /dest/cypress/integration/
+        ls -la /dest/
+        ls -la /dest/cypress/integration/
+    volumeMounts:
+    - name: cypress-tests
+      mountPath: /src
+    - name: workdir
+      mountPath: /dest
+  containers:
+    - name: {{ .Release.Name }}-ui-test
+      image: cypress/included:5.0.0
+      imagePullPolicy: {{ .Values.image.imagePullPolicy | quote }}
+      workingDir: /e2e
+      env:
+        - name: cypress_url
+          value: "http://{{ .Values.cr.name }}:{{ .Values.port | default "20001" }}"
+      args:
+      - "--"
+      - "--reporter-options=list"
+      - "--reporter=spec"
+      volumeMounts:
+      - name: workdir
+        mountPath: /e2e/
+  restartPolicy: Never
+  volumes:
+  - name: cypress-tests
+    configMap:
+      name: cypress-tests
+  - name: workdir
+    emptyDir: {}
+

@@ -67,8 +67,10 @@ cr:
     istio_component_namespaces:
       grafana: monitoring
       prometheus: monitoring
-      tracing: monitoring
-      
+      tracing: jaeger
+    istio_namespace: istio-system
+    custom_dashboards:
+      includes: ['*']
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
       image_version: v1.32.0
@@ -84,7 +86,7 @@ cr:
     external_services:
       # https://kiali.io/documentation/latest/runtimes-monitoring/
       custom_dashboards:
-        enabled: false
+        enabled: true
 
       prometheus:
         url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
@@ -97,13 +99,27 @@ cr:
           username: "admin"
           password: "prom-operator"
           type: basic
+        dashboards:
+        - name: "Istio Service Dashboard"
+          variables:
+            namespace: "var-namespace"
+            service: "var-service"
+        - name: "Istio Workload Dashboard"
+          variables:
+            namespace: "var-namespace"
+            workload: "var-workload"
+        - name: "Istio Mesh Dashboard"
+        - name: "Istio Control Plane Dashboard"
+        - name: "Istio Performance Dashboard"
+        - name: "Istio Wasm Extension Dashboard"
 
       tracing:
         enabled: true
         url: "https://tracing.bigbang.dev"
         in_cluster_url: "http://jaeger-query.jaeger.svc.cluster.local:16686"
-
-    # Taken from https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
+        use_grpc: false
+        whitelist_istio_system: ["istio"]
+    # Taken from https://github.com/kiali/kiali-operator/blob/v1.30/deploy/kiali/kiali_cr.yaml
     ###################################################################
     # kiali_cr.yaml
     #
