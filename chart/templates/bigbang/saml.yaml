@@ -2,13 +2,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  labels:
-{{ include "nexus.labels" . | indent 4 }}
-  {{- if .Values.nexus.extraLabels }}
-    {{- with .Values.nexus.extraLabels }}
-      {{ toYaml . | indent 4 }}
-    {{- end }}
-  {{- end }}
   annotations:
     "helm.sh/hook": post-install
   creationTimestamp: null
@@ -48,7 +41,9 @@ spec:
                  "$BASE_URL/service/rest/v1/security/roles" \
                  -H "accept: application/json" \
                  -H "Content-Type: application/json" \
-                 -d "$ROLE"
+                 -d "$ROLE" &&
+            curl -fsI -X POST http://localhost:15020/quitquitquit &&
+            exit
         env:
         - name: API_CREDENTIALS
           valueFrom:
