@@ -18,21 +18,4 @@ podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 
-istio:
-  enabled: {{ .Values.istio.enabled }}
-  {{- if .Values.monitoring.sso.enabled }}
-  prometheus:
-    enabled: true
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-  alertmanager:
-    enabled: true
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-  grafana:
-    enabled: true
-  {{- end }}
-
 {{- end -}}
