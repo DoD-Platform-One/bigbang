@@ -1,8 +1,9 @@
 istio:
   enabled: false
-createNamespace: false
 image:
   pullSecrets:
   - private-registry-mil
-imagePullSecrets:
-- name: private-registry-mil
+spec:
+  deployment:
+    image_pull_secrets:
+    - private-registry-mil
