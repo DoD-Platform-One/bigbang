@@ -3,7 +3,8 @@ istio:
 image:
   pullSecrets:
   - private-registry-mil
-spec:
-  deployment:
-    image_pull_secrets:
-    - private-registry-mil
+cr:
+  spec:
+    deployment:
+      image_pull_secrets:
+      - private-registry-mil
