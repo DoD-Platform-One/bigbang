@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: kiali-operator
+upstream:
+  type: git
+  git:
+    commit: 16be408eff5c6cf0814ca6a16167e8564d6b6e50
+    repo: git@github.com:kiali/helm-charts
+    directory: /kiali-operator
+    ref: v1.32.0

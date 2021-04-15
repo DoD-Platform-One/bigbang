@@ -1,0 +1,29 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "kiali-operator.name" . }}
+    helm.sh/chart: {{ include "kiali-operator.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: kiali
+    app.kubernetes.io/component: kiali
+spec:
+  gateways:
+  {{- range .Values.istio.kiali.gateways }}
+    - {{ . }}
+  {{- end }}
+  hosts:
+  {{- range .Values.istio.kiali.hosts }}
+    - {{ tpl . $}}
+  {{- end }}
+  http:
+  - route:
+    - destination:
+        port:
+          number: {{ .Values.port | default "20001" }}
+        host: kiali.{{ .Release.Namespace }}.svc.cluster.local
+{{- end }}

@@ -1,0 +1,10 @@
+istio:
+  enabled: false
+image:
+  pullSecrets:
+  - private-registry-mil
+cr:
+  spec:
+    deployment:
+      image_pull_secrets:
+      - private-registry-mil
