@@ -504,7 +504,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.12.7-bb.1"
+      tag: "1.12.7-bb.2"
 
     # -- Initial admin password used to authenticate to Anchore.
     adminPassword: ""
@@ -521,7 +521,7 @@ addons:
 
     sso:
       # -- Toggle OIDC SSO for Anchore on and off.
-      # Enabling this option will auto-create any required secrets.
+      # Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license).
       enabled: false
 
       # -- Anchore OIDC client ID
@@ -544,11 +544,12 @@ addons:
       # -- Database password for the username used to connect to the existing database.
       password: ""
 
-      # -- Database name to connect to on host.
+      # -- Database name to connect to on host (Note: database name CANNOT contain hyphens).
       database: ""
 
-      # -- Feeds database name to connect to on host.
+      # -- Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens).
       # Only required for enterprise edition of anchore.
+      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#handling-dependencies
       feeds_database: ""
 
     redis:
