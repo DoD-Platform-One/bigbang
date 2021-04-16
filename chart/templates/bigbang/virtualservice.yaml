@@ -16,7 +16,7 @@ spec:
   gateways:
     - main.istio-system.svc.cluster.local
   hosts:
-    - "nexus-repository-manager.{{ .Values.hostname }}"
+    - "{{ .Values.hostname }}.{{ .Values.domain }}"
   http:
     - route:
         - destination:

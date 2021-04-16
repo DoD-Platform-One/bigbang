@@ -1,5 +1,6 @@
 # -- Big Bang Additions
-hostname: bigbang.dev
+hostname: nexus
+domain: bigbang.dev
 istio:
   enabled: false
 license_key: ""
@@ -31,12 +32,6 @@ sso:
     roles:
       - "nx-admin"
 # -- End of BigBang Additions
-
-global:
-  hosts:
-    name: nexus-repository-manager
-  service:
-    name: nexus-repository-manager
 
 ingress:
   enabled: true
