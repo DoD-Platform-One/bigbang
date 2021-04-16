@@ -1,4 +1,4 @@
-{{- if .Values.sso.enabled -}}
+{{- if and .Values.sso.enabled .Values.license_key -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

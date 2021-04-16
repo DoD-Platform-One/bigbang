@@ -108,9 +108,11 @@ spec:
               name: {{ template "nexus.name" . }}-data
             - mountPath: /nexus-data/etc
               name: {{ template "nexus.name" . }}-data
+            {{- if .Values.license_key }}
             - mountPath: {{ .Values.license.mountPath }}
               name: {{ template "nexus.name" . }}-license
               subPath: {{ .Values.license.subPath }}
+            {{- end }}
             {{- if .Values.config.enabled }}
             - mountPath: {{ .Values.config.mountPath }}
               name: {{ template "nexus.name" . }}-conf
@@ -144,12 +146,14 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- if .Values.license_key }}
         - name: nexus-repository-manager-license
           secret:
             secretName: {{ template "nexus.name" . }}-license
             items:
             - key: sonatype-license.lic
               path: sonatype-license.lic
+        {{- end }}
         {{- if .Values.config.enabled }}
         - name: {{ template "nexus.name" . }}-conf
           configMap:

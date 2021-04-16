@@ -1,3 +1,4 @@
+{{- if .Values.license_key }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -11,3 +12,4 @@ metadata:
     {{- end }}
 data:
 {{ include "nexus.licenseKey" . | indent 2 }}
+{{- end -}}

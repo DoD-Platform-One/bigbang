@@ -2,7 +2,7 @@
 hostname: bigbang.dev
 istio:
   enabled: false
-license_key: "test"
+license_key: ""
 license:
   mountPath: /nexus-data/sonatype-license.lic
   subPath: sonatype-license.lic
@@ -77,11 +77,12 @@ nexus:
       value: "true"
   properties:
     override: true
-    data:
-      nexus.licenseFile: /nexus-data/sonatype-license.lic
-      # nexus.scripts.allowCreation: true
-      # See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
-      #nexus.ldap.env.java.naming.security.authentication: simple
+    data: {}
+    # data: 
+    #   nexus.licenseFile: /nexus-data/sonatype-license.override.lic
+    #   nexus.scripts.allowCreation: true
+    #   See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
+    #   nexus.ldap.env.java.naming.security.authentication: simple
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
   resources: {}

@@ -11,7 +11,13 @@ metadata:
     {{- end }}
 data:
   nexus.properties: |
-    {{- range $k, $v := .Values.nexus.properties.data }}
+    {{- $data := dict -}}
+    {{- $licenseDict := dict -}}
+    {{- if .Values.license_key -}}
+    {{- $_ := set $licenseDict "nexus.licenseFile" .Values.license.mountPath -}}
+    {{- end -}}
+    {{- $data := mergeOverwrite $licenseDict .Values.nexus.properties.data -}}
+    {{- range $k, $v := $data }}
     {{ $k }}={{ $v }}
     {{- end }}
 {{- end }}
