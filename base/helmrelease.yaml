@@ -26,6 +26,10 @@ spec:
     timeout: 10m
     cleanupOnFail: false
   valuesFrom:
+    # Optional secret injected with https://repo1.dso.mil/platform-one/big-bang/terraform-modules/big-bang-terraform-launcher
+    - kind: Secret
+      name: terraform
+      optional: true
     - kind: Secret
       name: common-bb
     - kind: ConfigMap

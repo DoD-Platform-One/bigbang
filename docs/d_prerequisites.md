@@ -144,3 +144,25 @@ kubectl patch psp global-restricted-psp  -p '{"metadata": {"annotations":{"secco
 ### Istio
 
 By default, BigBang will use `istio-init`, and `rke2` clusters will come with `selinux` in `Enforcing` mode, please see the [`istio-init`](#istio-pre-requisites-on-selinux-enforcing-systems) above for pre-requisites and warnings.
+
+### Sonarqube
+
+Sonarqube requires the following kernel configurations set at the node level: 
+
+```bash
+sysctl -w vm.max_map_count=524288
+sysctl -w fs.file-max=131072
+ulimit -n 131072
+ulimit -u 8192
+```
+
+Another option includes running the init container to modify the kernel values on the host (this requires a busybox container run as root):
+
+```yaml
+addons:
+  sonarqube:
+    values:
+      initSysctl:
+        enabled: true
+```
+**This is not the recommended solution as it requires running an init container as privileged.**

@@ -74,27 +74,9 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
 
-1. Add a continuous integration(CI) pipeline to the Package. Copy the ./gitlab-ci.yml from another Package and add it to your Package.
+1. Add a continuous integration (CI) pipeline to the Package. The [pipeline documentation](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) provides a great rundown of how to reference the package pipeline template and handle more complicated situations like dependencies.
 
-   ```yaml
-   include:
-     - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-       ref: master 
-       file: '/templates/package-tests.yml'
-   ```
-
-1. If the Package requires dependencies to be installed before it can function properly add a ./tests/dependencies.yaml file to specify these. A great example of where this is required is packages that require an operator or a database.
-
-   ```yaml
-   dependencyname:
-     git: "https://repo1.dso.mil/platform-one/big-bang/apps/DEPENDENCY.git" # Required: Git clone link for the dependency
-     namespace: "namespace" # Optional: Specify the namespace to install the dependency chart, this will default to the "dependencyname" for the yaml block
-     branch: "master" # Optional: Specify a specific branch/tag to install the dependency from
-   ```
-
-1. Add CI pipeline test to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. Create a test directory and a test yaml file at "tests/test-values.yml".  Set any values that are necessary for this test to pass.  The pipeline automatically creates an image pull secret "private-registry-mil".  All you need to do is reverence that secret in your test values. You can view the pipeline status from the Repo1 console. Keep iterating on your Package code and the test code until the pipeline passes. Refer to the test-values.yml from other Packages to get started. The repo structure must match what the CI pipeline code expects.
-
-   If your pipeline deploys a customresource (i.e. istio-controlplane deploys an "istiooperator" resource) you should add a wait script to make sure these resources are running properly before Cypress runs. Review this [README](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to set this up. The pipeline will run configuration tests, install your helm chart, and run cypress tests. If there is no UI or external facing API that could be tested using Cypress do not include those files and the pipeline will automatically skip over cypress testing.
+1. Add CI pipeline test values to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. Create a tests directory and a test yaml file at "tests/test-values.yaml".  Set any values that are necessary for this test to pass.  The pipeline automatically creates an image pull secret "private-registry-mil".  All you need to do is reference that secret in your test values. You can view the pipeline status from the Repo1 console. Keep iterating on your Package code and the test code until the pipeline passes. Refer to the test-values.yaml from other Packages to get started. The repo structure must match what the CI pipeline code expects.
 
    ```
    |-- .gitlab-ci.yml

@@ -6,4 +6,7 @@
 elasticsearch:
   imagePullSecrets:
     - name: private-registry
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
 {{- end -}}
