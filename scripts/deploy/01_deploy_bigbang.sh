@@ -25,13 +25,14 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace \
   --set registryCredentials[0].username='robot$bigbang' \
   --set registryCredentials[0].password="$REGISTRY1_PASSWORD" \
   --set registryCredentials[0].registry=registry1.dso.mil \
-  -f ${CI_VALUES_FILE}
+  -f ${CI_VALUES_FILE} \
+  -f chart/ingress-certs.yaml
 
-# apply secrets kustomization pointing to current branch
-echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
-if [ -z "$CI_COMMIT_TAG" ]; then
-  cat tests/ci/shared-secrets.yaml | sed 's|master|'"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
-else
-  # NOTE: $CI_COMMIT_REF_NAME = $CI_COMMIT_TAG when running on a tagged build
-  cat tests/ci/shared-secrets.yaml | sed 's|branch: master|tag: '"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
-fi
+# # apply secrets kustomization pointing to current branch
+# echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
+# if [ -z "$CI_COMMIT_TAG" ]; then
+#   cat tests/ci/shared-secrets.yaml | sed 's|master|'"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
+# else
+#   # NOTE: $CI_COMMIT_REF_NAME = $CI_COMMIT_TAG when running on a tagged build
+#   cat tests/ci/shared-secrets.yaml | sed 's|branch: master|tag: '"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
+# fi
