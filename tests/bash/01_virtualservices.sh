@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # exit on error
-# set -e
+set -e
 
 # Populate /etc/hosts
 ip=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
