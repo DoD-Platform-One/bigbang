@@ -96,8 +96,8 @@ do
   fi
 done
 
-echo "Waiting on Secrets Kustomization"
-kubectl wait --for=condition=Ready --timeout 300s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
+# echo "Waiting on Secrets Kustomization"
+# kubectl wait --for=condition=Ready --timeout 300s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
 # In case some helm releases are marked as ready before all objects are live...
 echo "Waiting on all deployments, statefulsets, and daemonsets"
