@@ -6,6 +6,8 @@ Big Bang is a declarative, continuous delivery tool for core DoD hardened and ap
 
 **Homepage:** <https://p1.dso.mil/#/products/big-bang>
 
+> _This is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to https://repo1.dso.mil/platform-one/big-bang/bigbang_
+
 Big Bang follows a [GitOps](#gitops) approach to configuration management, using [Flux v2](#flux-v2) to reconcile Git with the cluster.  Environments (e.g. dev, prod) and packages (e.g. istio) can be fully configured to suit the deployment needs.
 
 ## Usage
