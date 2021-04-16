@@ -19,7 +19,7 @@ sudo chown -R tom certs
 ## Unencrypt Cert
 
 ```bash
-kubectl create secret tls wildcard-cert --key=certs/privkey.pem --cert=certs/fullchain.pem --dry-run=client -oyaml > ingress-cert.yaml
+kubectl create secret tls wildcard-cert -n istio-system --key=certs/privkey.pem --cert=certs/fullchain.pem --dry-run=client -oyaml > ingress-cert.yaml
 ```
 
 ## Recrypt Cert

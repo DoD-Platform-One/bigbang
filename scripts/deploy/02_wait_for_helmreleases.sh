@@ -84,7 +84,7 @@ do
   fi
 done
 
-kubectl get hr,kustomizations,gitrepositories -A
+kubectl get helmreleases,kustomizations,gitrepositories -A
 
 for package in $DEPLOYED_HELMRELEASES;
 do

@@ -8,7 +8,7 @@ ip=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.sta
 
 echo "Checking "
 
-hosts=`kubectl get vs -A -o jsonpath="{ .items[*].spec.hosts[*] }"`
+hosts=`kubectl get virtualservices -A -o jsonpath="{ .items[*].spec.hosts[*] }"`
 for host in $hosts; do
     echo "$ip $host" >> /etc/hosts
     curl -svv https://$host/ > /dev/null
