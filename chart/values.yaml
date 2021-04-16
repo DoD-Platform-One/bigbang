@@ -121,9 +121,8 @@ nexus:
   #   hostnames:
   #   - "example.com"
   #   - "www.example.com"
+  imagePullSecrets: []
 
-
-imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
