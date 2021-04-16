@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # exit on error
-set -e
+# set -e
 
 #Clear out folder if present
 rm -rf cypress-tests/
