@@ -94,9 +94,9 @@ pre vars:
     - tests/**/*
 
 .deploy_bigbang: &deploy_bigbang
-  - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'$CI_COMMIT_REF_NAME
+  - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
   - kubectl get secrets -n istio-system wildcard-cert -o jsonpath="{ .data.tls\.crt }" | base64 --decode | openssl x509 -text
-  
+
 .test_bigbang: &test_bigbang
   - find ./tests -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
    
