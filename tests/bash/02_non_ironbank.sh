@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # exit on error
-set -e
+# set -e
 
 # Quick check for non iron bank images
 echo "Showing images not from ironbank:"
