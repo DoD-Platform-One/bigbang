@@ -1,4 +1,4 @@
-{{- if and .Values.logging.enabled .Values.fluentbit.enabled }}
+{{- if .Values.fluentbit.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.fluentbit "name" "fluentbit" "defaults" (include "bigbang.defaults.fluentbit" .)) }}
 {{- end }}
 

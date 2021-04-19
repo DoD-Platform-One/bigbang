@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) (or .Values.logging.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (not .Values.offline) (.Values.fluentbit.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
