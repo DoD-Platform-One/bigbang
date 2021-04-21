@@ -6,6 +6,7 @@ There are multiple phases of testing for an application to get into a customer e
 
 * New Iron Bank Image
 * Changes to Manifests for deployments
+* Helm Chart Tests to verify operation within the cluster
 * Newly supported configurations of application
 
 ## Testing Platform
@@ -35,6 +36,52 @@ Each "Test" scenario will contain the following information:
 3. A smoke test configuration file.  Format TBD based on tool decided.  Look at Locust.io, Selenium, Citrus
 
 The Smoke tests will be run internal on the Kubernetes cluster via a Job.  The testing framework will inject a configuration object provided in the repo as a configmap for the job and run the job, ensure its successful, and provide the logs back to the user CI/CD pipeline for review.
+
+### Helm Chart Testing
+
+The Big Bang application pipelines have the ability to execute one or more [Helm Chart tests](https://helm.sh/docs/topics/chart_tests)
+after a chart has been deployed to the cluster.  Helm tests deploy one or more pods/containers and any other supporting
+kubernetes objects in order to verify that the application is operational.
+  
+For example, the  Minio instance package has additional CLI testing capabilities via the use of Helm Chart Tests.  These
+tests invoke the MC command line tool to create, delete, populate, and retrieve information from Minio buckets.  Examples of
+other types of Helm Chart Tests including:
+
+* Validate that your configuration from the values.yaml file was properly injected.
+* Make sure your username and password work correctly for the configuration
+* Use CLI or API tests to access the application
+
+The package pipelines have been enhanced to execute the "helm test" command and dump the log files of the tests results.
+
+In order to add Helm Chart tests to your application, the following enhancements need to be made to the Helm Chart.
+
+* A test directory is added to templates/ directory within the helm chart.  This directory contains Kubernetes object
+definitions which are deployed only when a "helm Test" command is executed.  As an example, tests can be YAML files that
+execute pods with containers, deply config maps, secrets, or other objects.
+* When a files contain a pod / container defintion that executions tests, the container must return success or failure
+(i.e., the container should exit successfully with an exit 0 for a test to be considered a success).
+* Each test object defintion must contain a "helm.sh/hook: test-success" annotation telling Helm that this object is a
+test and should only be deployed when tests are executed. The following example create a configmap that is only
+created during testing.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Release.Name }}-cypress-test-configmap"
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+    {{- include "minio.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+data:
+{{ (.Files.Glob "cypress/*").AsConfig | indent 2 }}
+
+```
+Also note that the "helm.sh/hook-weight" can be used to order the creation and execution of test objects.
 
 ## Umbrella Testing
 
