@@ -1,0 +1,35 @@
+{{- if .Values.kiali.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.kiali "name" "kiali" "defaults" (include "bigbang.defaults.kiali" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kiali" -}}
+hostname: {{ .Values.hostname }}
+istio:
+  enabled: {{ .Values.istio.enabled }}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+elasticsearch:
+  enabled: {{ .Values.logging.enabled }}
+cr:
+  spec:
+    server:
+      web_port: "443"
+    auth:
+      {{- if .Values.kiali.sso.enabled }}
+      strategy: openid
+      openid:
+        client_id: "{{ .Values.kiali.sso.client_id }}"
+        disable_rbac: true
+        issuer_uri: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}"
+        scopes:
+        - openid
+        - email
+        username_claim: email
+      {{- else }}
+      strategy: token
+      {{- end }}
+    api:
+      namespaces:
+        # bigbang watches all!
+        exclude: []
+{{- end -}}

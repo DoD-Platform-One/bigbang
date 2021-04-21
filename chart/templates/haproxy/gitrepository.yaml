@@ -1,4 +1,4 @@
-{{- if and .Values.istio.enabled .Values.addons.authservice.enabled }}
+{{- if and .Values.istio.enabled .Values.monitoring.sso.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:

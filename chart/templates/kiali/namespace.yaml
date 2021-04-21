@@ -1,0 +1,11 @@
+{{- if .Values.kiali.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kiali
+  labels:
+    istio-injection: enabled
+    app.kubernetes.io/name: kiali
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}

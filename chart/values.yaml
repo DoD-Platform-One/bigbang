@@ -94,29 +94,13 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.7.3-bb.9"
+    tag: "1.8.4-bb.0"
 
   # -- Certificate/Key pair to use as the default certificate for exposing BigBang created applications.
   # If nothing is provided, applications will expect a valid tls secret to exist in the `istio-system` namespace called `wildcard-cert`.
   ingress:
     key: ""
     cert: ""
-
-  sso:
-    # -- Toggle SSO for kiali and jaeger on and off
-    enabled: false
-
-    kiali:
-      # -- OIDC Client ID use for kiali
-      client_id: ""
-      # -- OIDC Client Secret to use for kiali
-      client_secret: ""
-
-    jaeger:
-      # -- OIDC Client ID to use for jaeger
-      client_id: ""
-      # -- OIDC Client Secret to use for jaeger
-      client_secret: ""
 
   # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
   values: {}
@@ -127,9 +111,49 @@ istiooperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
-    tag: "1.7.0-bb.1"
+    tag: "1.8.4-bb.1"
 
   # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+  values: {}
+
+jaeger:
+  # -- Toggle deployment of Jaeger.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    path: "./chart"
+    tag: "2.19.1-bb.4"
+  sso:
+    # -- Toggle SSO for Jaeger on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Jaeger
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Jaeger
+    client_secret: ""
+
+  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+  values: {}
+
+kiali:
+  # -- Toggle deployment of Kiali.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    path: "./chart"
+    tag: "1.32.0-bb.0"
+  sso:
+    # -- Toggle SSO for Kiali on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Kiali
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Kiali
+    client_secret: ""
+
+  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
   values: {}
 # ----------------------------------------------------------------------------------------------------------------------
 

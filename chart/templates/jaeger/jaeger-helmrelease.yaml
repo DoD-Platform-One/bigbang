@@ -1,22 +1,22 @@
-{{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled .Values.monitoring.sso.enabled .Values.jaeger.sso.enabled ) }}
+{{- if .Values.jaeger.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: authservice
+  name: jaeger
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: authservice
+    app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
-  targetNamespace: authservice
+  targetNamespace: jaeger
   chart:
     spec:
-      chart: {{ .Values.addons.authservice.git.path }}
+      chart: {{ .Values.jaeger.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
-        name: authservice
+        name: jaeger
         namespace: {{ .Release.Namespace }}
 
   {{- with .Values.flux }}
@@ -37,19 +37,33 @@ spec:
   {{- end }}
 
   valuesFrom:
-    - name: {{ .Release.Name }}-authservice-values
+    - name: {{ .Release.Name }}-jaeger-values
       kind: Secret
       valuesKey: "common"
-    - name: {{ .Release.Name }}-authservice-values
+    - name: {{ .Release.Name }}-jaeger-values
       kind: Secret
       valuesKey: "defaults"
-    - name: {{ .Release.Name }}-authservice-values
+    - name: {{ .Release.Name }}-jaeger-values
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if .Values.istio.enabled }}
+  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.logging.enabled }}
   dependsOn:
-  - name: istio
-    namespace: {{ .Release.Namespace }}
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.jaeger.sso.enabled }}
+    - name: authservice
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.logging.enabled }}
+    - name: ek
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
   {{- end }}
 {{- end }}

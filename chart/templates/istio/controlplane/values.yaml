@@ -4,23 +4,13 @@
 
 {{- define "bigbang.defaults.istio" -}}
 hostname: {{ .Values.hostname }}
-sso:
-  enabled: {{ .Values.istio.sso.enabled }}
+
+tracing:
+  enabled:  {{ .Values.jaeger.enabled }}
 
 imagePullSecrets:
   - private-registry
 
 openshift: {{ .Values.openshift }}
 
-{{- if .Values.istio.sso.enabled }}
-ingress:
-  kiali:
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-  jaeger:
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-{{- end }}
 {{- end -}}

@@ -1,0 +1,23 @@
+{{- if .Values.jaeger.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.jaeger "name" "jaeger" "defaults" (include "bigbang.defaults.jaeger" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.jaeger" -}}
+imagePullSecrets:
+  - name: private-registry
+hostname: {{ .Values.hostname }}
+istio:
+  enabled: {{ .Values.istio.enabled }}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+elasticsearch:
+  enabled: {{ .Values.logging.enabled }}
+jaeger:
+  spec:
+    allInOne:
+      labels:
+        protect: keycloak
+    query:
+      labels:
+        protect: keycloak
+{{- end -}}
