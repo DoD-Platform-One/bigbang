@@ -92,6 +92,8 @@ The common components that each package will have are defined in the following f
 ├── tests/
     ├── cypress             # folder containing e2e tests using the cypress test framework
 ├── chart/                  # Folder containing helm chart
+    ├── templates           # folder helm chart templates
+      ├── tests             # folder containing helm chart tests 
 ```
 
 ## PR-X. CI/CD pipeline is required for each Big Bang Package
