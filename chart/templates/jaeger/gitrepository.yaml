@@ -1,18 +1,18 @@
-{{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled .Values.monitoring.sso.enabled .Values.jaeger.sso.enabled ) }}
+{{- if and (not .Values.offline) .Values.jaeger.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
-  name: authservice
+  name: jaeger
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: authservice
+    app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.authservice.git.repo }}
+  url: {{ .Values.jaeger.git.repo }}
   ref:
-    {{- include "validRef" .Values.addons.authservice.git | nindent 4 }}
+    {{- include "validRef" .Values.jaeger.git | nindent 4 }}
   {{ include "gitIgnore" . }}
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}
