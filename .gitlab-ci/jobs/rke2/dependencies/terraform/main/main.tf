@@ -43,6 +43,11 @@ module "rke2" {
   controlplane_internal = var.controlplane_internal
   rke2_version          = var.rke2_version
 
+  rke2_config = <<EOF
+disable:
+  - rke2-ingress-nginx
+EOF
+
   enable_ccm = var.enable_ccm
   download   = var.download
 
@@ -106,4 +111,9 @@ resource "aws_ec2_tag" "private_subnets_tags" {
   resource_id = var.private_subnets[count.index]
   key         = "kubernetes.io/cluster/${module.rke2.cluster_name}"
   value       = "shared"
+}
+
+output "cluster_sg" {
+  description = "Cluster SG ID, used for dev ssh access"
+  value = module.rke2.cluster_data.cluster_sg
 }
