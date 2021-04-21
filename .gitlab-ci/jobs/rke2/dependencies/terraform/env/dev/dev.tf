@@ -31,3 +31,12 @@ module "dev" {
   public_subnets      = data.terraform_remote_state.networking.outputs.public_subnets
   ssh_authorized_keys = [tls_private_key.ssh.public_key_openssh]
 }
+
+resource "aws_security_group_rule" "dev-ssh" {
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  security_group_id = module.dev.cluster_sg
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
