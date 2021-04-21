@@ -317,7 +317,7 @@ addons:
       path: "./chart"
       tag: "0.1.6-bb.4"
 
-    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice.git
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
     values: {}
 
     # -- Additional authservice chain configurations.
