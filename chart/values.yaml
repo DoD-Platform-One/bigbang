@@ -1,13 +1,15 @@
 nameOverride: ""
 fullnameOverride: ""
 
+hostname: bigbang.dev
+
 istio:
   enabled: false
   kiali:
     gateways:
     - "istio-system/main"
     hosts:
-    - kiali.bigbang.dev
+    - kiali.{{ .Values.hostname }}
 
 port: 20001
 
