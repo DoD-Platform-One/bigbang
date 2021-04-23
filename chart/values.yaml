@@ -3,6 +3,8 @@ hostname: nexus
 domain: bigbang.dev
 istio:
   enabled: false
+monioring:
+  enabled: false
 license_key: ""
 license:
   mountPath: /nexus-data/sonatype-license.lic

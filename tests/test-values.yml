@@ -2,6 +2,7 @@
 istio: 
   enabled: true
 nexus:
-  imagePullSecrets: [name:  private-registry]
+  imagePullSecrets: [name:  
+  - name: private-registry-mil
  
 
