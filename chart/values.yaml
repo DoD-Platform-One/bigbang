@@ -142,7 +142,7 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.32.0-bb.0"
+    tag: "1.32.0-bb.1"
   sso:
     # -- Toggle SSO for Kiali on and off
     enabled: false
