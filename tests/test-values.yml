@@ -1,0 +1,7 @@
+
+istio: 
+  enabled: true
+nexus:
+  imagePullSecrets: [name:  private-registry]
+ 
+

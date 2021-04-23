@@ -1,0 +1,10 @@
+{
+ 
+  "pluginsFile": false,
+  "supportFile": false,
+  "fixturesFolder": false,
+  "env": {
+    "nexus_url": "nexus.bigbang.dev"
+    
+  }
+}

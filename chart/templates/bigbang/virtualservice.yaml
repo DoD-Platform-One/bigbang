@@ -14,7 +14,7 @@ metadata:
     app.kubernetes.io/component: {{ include "nexus.name" . }}
 spec:
   gateways:
-    - main.istio-system.svc.cluster.local
+    - istio-system/main
   hosts:
     - "{{ .Values.hostname }}.{{ .Values.domain }}"
   http:
