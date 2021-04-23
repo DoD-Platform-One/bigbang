@@ -3,6 +3,29 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.6.0]
+
+### Known Issues
+
+This update includes an update to the Anchore chart. There is a [known issue](https://github.com/anchore/anchore-engine/issues/882) with running this version (and some previous versions) on FIPS enabled nodes. All Anchore services continue to function properly on non-FIPS nodes. Once an upstream fix is pushed, we will update the BB version accordingly.
+
+Anchore's default resource requests/limits (specifically for memory for the RBAC Manager) may be problematic depending on the customer and usage. Currently Big Bang consumes the defaults from the upstream chart, but Anchore also provides a list of [requirements](https://docs.anchore.com/current/docs/overview/requirements/) that address best practices for configuration for production workloads. These recommendations can be used as BB value overrides to specify resource limits and requests (example: [RBAC Manager](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/chart/values.yaml#L868)).
+
+* [!436](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/436): Resolve "fluentbit requires modification to work when selinux: Enforcing"
+* [!416](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/416): Fix Minio SecurityContext for Mattermost
+* [!385](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/385): update anchore to 1.12.7-bb.2
+* [!330](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/330): upgrade to istio 1.8.4, split jaeger and kiali into separate deployments
+* [!427](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/427): IronBank image for Cluster Auditor
+* [!428](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/428): feat: Bumping eck-operator to 1.4.0-bb.1
+* [!421](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/421): Resolve "Upgrade eck-operator to 1.4.0"
+* [!405](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/405): Upgrade OPA Gatekeeper
+* [!443](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/443): Resolve "Fluentbit upgrade to application version 1.7.4"
+* [!442](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/442): Resolve "feat: Update authservice to use latest IB image and templating"
+* [!432](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/432): feat: ek package to 0.1.8-bb.0 for pod lifecycle support
+
+There are additional minor changes and documentation updates that are included with this release. Full changes can always be seen by viewing the commit logs and completed MRs.
+
+
 ## [1.5.0]
 
 ### Upgrade Notice
