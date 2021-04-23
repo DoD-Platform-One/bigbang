@@ -339,7 +339,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.1.6-bb.4"
+      tag: "0.4.0-bb.1"
 
     # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
     values: {}
