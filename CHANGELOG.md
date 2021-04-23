@@ -32,6 +32,7 @@ Anchore's default resource requests/limits (specifically for memory for the RBAC
 * [!443](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/443): Resolve "Fluentbit upgrade to application version 1.7.4"
 * [!442](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/442): Resolve "feat: Update authservice to use latest IB image and templating"
 * [!432](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/432): feat: ek package to 0.1.8-bb.0 for pod lifecycle support
+* [!418](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/418): Minio VS update
 
 There are additional minor changes and documentation updates that are included with this release. Full changes can always be seen by viewing the commit logs and completed MRs.
 
