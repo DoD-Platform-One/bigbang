@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [1.6.0]
 
+### Upgrade Notice
+
+This update includes several major changes to istio. Kiali and Jaeger are now separated into their own repos, helmreleases, and namespaces.
+
+A manual cleanup task is required to delete the previous Kiali and Jaeger deployments post upgrade:
+```bash
+kubectl delete deploy -n istio-system -l app=kiali
+kubectl delete deploy -n istio-system -l app=jaeger
+```
+
 ### Known Issues
 
 This update includes an update to the Anchore chart. There is a [known issue](https://github.com/anchore/anchore-engine/issues/882) with running this version (and some previous versions) on FIPS enabled nodes. All Anchore services continue to function properly on non-FIPS nodes. Once an upstream fix is pushed, we will update the BB version accordingly.
