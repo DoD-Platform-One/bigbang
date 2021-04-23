@@ -80,8 +80,9 @@ nexus:
     #   nexus.scripts.allowCreation: true
     #   See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
     #   nexus.ldap.env.java.naming.security.authentication: simple
-  # nodeSelector:
+  nodeSelector: {}
   #   cloud.google.com/gke-nodepool: default-pool
+  affinity: {}
   resources: {}
     # requests:
       ## Based on https://support.sonatype.com/hc/en-us/articles/115006448847#mem
