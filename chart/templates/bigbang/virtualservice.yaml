@@ -14,7 +14,9 @@ metadata:
     app.kubernetes.io/component: {{ include "nexus.name" . }}
 spec:
   gateways:
-    - istio-system/main
+  {{- range .Values.istio.nexus.gateways }}
+    - {{ . }}
+  {{- end }}
   hosts:
     - "{{ .Values.hostname }}.{{ .Values.domain }}"
   http:
@@ -24,3 +26,28 @@ spec:
               number: {{ .Values.nexus.nexusPort }}
             host: {{ $serviceName }}
 {{- end }}
+{{- $fullName := include "nexus.fullname" . -}}
+{{ if .Values.nexus.docker.enabled }}
+{{ range $registry := .Values.nexus.docker.registries }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ $fullName | trunc 49 }}-docker-{{ $registry.port }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  gateways:
+  {{- range $.Values.istio.nexus.gateways }}
+    - {{ . }}
+  {{- end }}
+  hosts:
+  - {{ $registry.host | quote }}
+  http:
+  - route:
+    - destination:
+        port:
+          number: {{ $registry.port }}
+        host: {{ $fullName | trunc 49 }}-docker-{{ $registry.port }}
+{{- end }}
+{{- end }}
+

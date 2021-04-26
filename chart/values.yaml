@@ -3,6 +3,9 @@ hostname: nexus
 domain: bigbang.dev
 istio:
   enabled: false
+  nexus:
+    gateways:
+    - "istio-system/main"
 monioring:
   enabled: false
 license_key: ""
