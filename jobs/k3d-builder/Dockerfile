@@ -94,6 +94,26 @@ ENV YQ_VERSION='4.6.3'
 ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 /usr/local/bin/yq
 RUN chmod +x /usr/local/bin/yq
 
+# Install popeye for package testing
+ENV POPEYE_VERSION='0.9.0'
+ADD https://github.com/derailed/popeye/releases/download/v${POPEYE_VERSION}/popeye_Linux_x86_64.tar.gz /popeye_Linux_x86_64.tar.gz
+RUN tar xzf /popeye_Linux_x86_64.tar.gz popeye && mv popeye /usr/local/bin/ && chmod +x /usr/local/bin/popeye && rm -rf /popeye_Linux_x86_64.tar.gz
+
+# Install Clusterlint for package testing
+ENV CLUSTERLINT_VERSION='0.2.6'
+ADD https://github.com/digitalocean/clusterlint/releases/download/v${CLUSTERLINT_VERSION}/clusterlint-${CLUSTERLINT_VERSION}-linux-amd64.tar.gz /clusterlint-${CLUSTERLINT_VERSION}-linux-amd64.tar.gz
+RUN tar xzvf /clusterlint-${CLUSTERLINT_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/clusterlint && rm -rf /clusterlint-${CLUSTERLINT_VERSION}-linux-amd64.tar.gz
+
+# Install Polaris for configuration testing
+ENV POLARIS_VERSION='3.2.1'
+ADD https://github.com/FairwindsOps/polaris/releases/download/${POLARIS_VERSION}/polaris_${POLARIS_VERSION}_linux_amd64.tar.gz /polaris_${POLARIS_VERSION}_linux_amd64.tar.gz
+RUN tar xzf /polaris_${POLARIS_VERSION}_linux_amd64.tar.gz polaris && mv polaris /usr/local/bin/ && chmod +x /usr/local/bin/polaris && rm -rf /polaris_${POLARIS_VERSION}_linux_amd64.tar.gz
+
+# Install kube-linter for package linting
+ENV KUBE_LINTER_VERSION='0.1.6'
+ADD https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-linux.tar.gz /kube-linter-linux.tar.gz
+RUN tar xzvf /kube-linter-linux.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/kube-linter && rm -rf /kube-linter-linux.tar.gz
+
 # Remove needed repos
 RUN rm -rf /etc/yum.repos.d/docker-ce.repo && \
     rm -rf /etc/yum.repos.d/CentOS.repo && \
