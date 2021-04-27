@@ -31,7 +31,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
+  {{- if .Values.addons.minio.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.minio.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-minio-values
       kind: Secret

@@ -37,7 +37,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-  
+  {{- if .Values.addons.sonarqube.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.sonarqube.postRenderers | nindent 4 }}
+  {{- end }}  
   valuesFrom:
     - name: {{ .Release.Name }}-sonarqube-values
       kind: Secret

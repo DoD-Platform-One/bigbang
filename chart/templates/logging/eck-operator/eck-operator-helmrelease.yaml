@@ -35,7 +35,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
+  {{- if .Values.eckoperator.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.eckoperator.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-eck-operator-values
       kind: Secret

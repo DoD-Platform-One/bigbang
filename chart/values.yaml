@@ -105,6 +105,9 @@ istio:
   # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
   values: {}
 
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 istiooperator:
   # -- Toggle deployment of Istio Operator.
   enabled: true
@@ -115,6 +118,9 @@ istiooperator:
 
   # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 jaeger:
   # -- Toggle deployment of Jaeger.
@@ -136,6 +142,9 @@ jaeger:
   # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
   values: {}
 
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 kiali:
   # -- Toggle deployment of Kiali.
   enabled: true
@@ -155,6 +164,10 @@ kiali:
 
   # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -170,6 +183,9 @@ clusterAuditor:
 
   # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -185,6 +201,9 @@ gatekeeper:
 
   # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -219,6 +238,9 @@ logging:
   # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
   values: {}
 
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 eckoperator:
   # -- Toggle deployment of ECK Operator.
   enabled: true
@@ -236,6 +258,9 @@ fluentbit:
     path: "./chart"
     tag: "0.15.8-bb.0"
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -280,6 +305,9 @@ monitoring:
 
   # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -295,6 +323,9 @@ twistlock:
 
   # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 #
 # ----------------------------------------------------------------------------------------------------------------------
@@ -327,6 +358,9 @@ addons:
     # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   authservice:
     # -- Toggle deployment of Authservice.
     # if enabling authservice, a filter needs to be provided by either enabling
@@ -344,6 +378,9 @@ addons:
     # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
     # -- Additional authservice chain configurations.
     chains: {}
 
@@ -360,6 +397,9 @@ addons:
     # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   minio:
     enabled: false
     git:
@@ -375,6 +415,9 @@ addons:
 
     # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
     values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
 
   gitlab:
     # -- Toggle deployment of Gitlab.
@@ -446,6 +489,9 @@ addons:
     # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   gitlabRunner:
     # -- Toggle deployment of Gitlab Runner.
     enabled: false
@@ -511,6 +557,9 @@ addons:
     # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   haproxy:
     # -- Toggle deployment of HAProxy.
     enabled: false
@@ -521,6 +570,9 @@ addons:
 
     # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
     values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
 
   anchore:
     # -- Toggle deployment of Anchore.
@@ -591,6 +643,9 @@ addons:
     # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   # ----------------------------------------------------------------------------------------------------------------------
   # Mattermost Operator and Instance
   #
@@ -600,8 +655,12 @@ addons:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
       path: "./chart"
       tag: "1.13.0-bb.2"
+
     # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
     values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
 
   mattermost:
     # -- Toggle deployment of Mattermost.
@@ -684,6 +743,9 @@ addons:
     # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   velero:
     # -- Toggle deployment of Velero.
     enabled: false
@@ -698,6 +760,9 @@ addons:
       # Requires at least one plugin installed. Current supported values: aws, azure
       plugins: []
       # - aws
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
   #
   # ----------------------------------------------------------------------------------------------------------------------
 

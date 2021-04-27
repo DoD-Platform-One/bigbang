@@ -35,7 +35,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
+  {{- if .Values.clusterAuditor.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.clusterAuditor.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-cluster-auditor-values
       kind: Secret
