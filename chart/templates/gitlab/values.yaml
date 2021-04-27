@@ -8,9 +8,6 @@ hostname: {{ .Values.hostname }}
 istio:
   enabled: {{ .Values.istio.enabled }}
 
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
-
 {{- if .Values.addons.gitlab.database.host }}
 postgresql:
   install: false
@@ -23,15 +20,17 @@ registry:
     key: registry
 {{- end }}
 
-{{- if .Values.addons.gitlab.objectStorage.endpoint }}
 gitlab:
+  {{- if .Values.addons.gitlab.objectStorage.endpoint }}
   task-runner:
     backups:
       objectStorage:
         config:
           secret: gitlab-object-storage
           key: backups
-{{- end }}
+  {{- end }}
+  gitlab-exporter:
+    enabled: {{ .Values.monitoring.enabled }}
 
 global:
   hosts:

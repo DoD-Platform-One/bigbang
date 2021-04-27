@@ -430,7 +430,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "4.8.0-bb.3"
+      tag: "4.10.3-bb.0"
 
     sso:
       # -- Toggle OIDC SSO for Gitlab on and off.
