@@ -18,7 +18,10 @@ spec:
         kind: GitRepository
         name: haproxy
         namespace: {{ .Release.Namespace }}
-
+  {{- if .Values.addons.haproxy.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.haproxy.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-haproxy-sso-values
       kind: Secret

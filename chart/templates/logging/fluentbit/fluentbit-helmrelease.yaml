@@ -34,7 +34,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
+  {{- if .Values.fluentbit.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.fluentbit.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-fluentbit-values
       kind: Secret

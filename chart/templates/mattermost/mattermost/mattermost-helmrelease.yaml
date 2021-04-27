@@ -36,7 +36,10 @@ spec:
     timeout: {{ .rollback.timeout }}
     cleanupOnFail: {{ .rollback.cleanupOnFail }}
   {{- end }}
-
+  {{- if .Values.addons.mattermost.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.mattermost.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-mattermost-values
       kind: Secret
