@@ -117,7 +117,7 @@ Make sure to also update the ref to the tagged version of the pipeline you want 
 ```yaml
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: '1.0.1'
+    ref: '1.0.5'
     file: '/templates/package-tests.yml'
 # Optional
 variables:

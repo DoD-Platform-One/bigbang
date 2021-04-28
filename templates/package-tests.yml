@@ -274,7 +274,7 @@ package tests:
     # Run Cypress tests
     - |
       if [ -f "tests/cypress.json" ]; then
-        cd tests && cypress run --browser chrome --headless
+        cypress run --project tests --browser chrome --headless
       fi
 
     # Run Helm Tests
