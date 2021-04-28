@@ -1,35 +1,30 @@
 package main
 
-name = input.metadata.name
+import data.lib.kubernetes
 
-registries_allow := ["registry1.dsop.io/ironbank", "registry1.dso.mil/ironbank", "registry.dsop.io", "registry.dso.mil"]
-registries_warn := ["registry.dsop.io", "registry.dso.mil"]
+registries_allow := ["registry1.dso.mil/ironbank", "registry.dso.mil"]
+registries_warn := ["registry.dso.mil"]
 
 in_allowed_registries(image) {
-  startswith(image, registries_allow[i])
+    startswith(image, registries_allow[i])
 }
 
 in_warning_registries(image) {
-  startswith(image, registries_warn[i])
+    startswith(image, registries_warn[i])
 }
 
 # Deny non-approved registries
 deny[msg] {
-  image := input.spec.template.spec.containers[_].image
-  not in_allowed_registries(image)
-  msg := sprintf("Image '%v' in '%v' is not from approved registries", [image, name])
+	kubernetes.containers[container]
+	[image_name, tag] = kubernetes.split_image(container.image)
+	not in_allowed_registries(image_name)
+	msg := sprintf("Image '%v' in '%v' '%v' is not from approved registries", [image_name, kubernetes.kind, kubernetes.name])
 }
 
-# Warn about non-Ironbank Images
+# Warn about non-Ironbank registries
 warn[msg] {
-  image := input.spec.template.spec.containers[_].image
-  in_warning_registries(image)
-  msg := sprintf("Image '%v' in '%v' is not from Ironbank", [image, name])
-}
-
-# Warn about DSOP Images
-warn[msg] {
-  image := input.spec.template.spec.containers[_].image
-  contains(image, ".dsop.io")
-  msg := sprintf("Update 'dsop.io' to 'dso.mil' for image '%v' in '%v'", [image, name])
+	kubernetes.containers[container]
+	[image_name, tag] = kubernetes.split_image(container.image)
+    not in_allowed_registries(image_name)
+    msg := sprintf("Image '%v' in '%v' '%v' is not from Ironbank", [image_name, kubernetes.kind, kubernetes.name])
 }

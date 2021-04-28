@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.0.7]
+### Added
+- better rego policies to cover our package requirements
+
 ## [1.0.6]
 ### Changed
 - moved `private-registry` secret to dso.mil IB address
