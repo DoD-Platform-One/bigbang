@@ -1,13 +1,9 @@
 apiVersion: v2
 name: nexus-repository-manager
-
-version: 29.1.0-bb.0
-appVersion: 3.29.0-bb.1
-
+version: 29.1.0-bb.1
+appVersion: 3.29.0
 description: Sonatype Nexus Repository Manager - Universal Binary repository
-
 type: application
-
 keywords:
   - artifacts
   - dependency
