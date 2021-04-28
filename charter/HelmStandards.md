@@ -46,6 +46,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
       username: ""
       password: ""
       database: ""
+      type: "" # Optional. One of mysql, mssql, postgres, mongo if ther
     ```
 * Monitoring
     * Charts should expect a value `monitoring.enabled` to be set by the BigBang chart to conditionally create monitoring components (`ServiceMonitors`, `PodMonitors`, etc).  This value should default to false
@@ -58,7 +59,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 
 ## Big Bang Helm Release
 
-* The `HelmRelease` for the package should hardcode the ImagePullSecret name as `private-registry`
+* The `ImagePullSecret` name as `private-registry` should be configured in each package's `chart/template/{package}/values.yaml` to be passed in to each Package.
 
 ## Common Values
 
@@ -70,10 +71,24 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 | app.kubernetes.io/instance | The unique name identifying the instance of an application. Name of the `HelmRelease` | `argocd`
 | app.kubernetes.io/version | The chart version that manages the object | `1.0.1-bb.10`
 | app.kubernetes.io/component | the component within the architecture | `database` |
+
+Each package shall have the ability to add labels to all objects via a top level `commonLabels` map.  The labels that will be passed in from
+the Big Bang chart shall include at least:
+
+| Key | Description | Example |
+| ------| -------| ------|
 | app.kubernetes.io/part-of | the name of a higher level application this one is part of | `bigbang` |
 | app.kubernetes.io/managed-by | the tool being used to manage the operation of an application | `flux` |
 | app.kubernetes.io/bigbang-version | The version of bigbang deployed | `1.0.7` |
 
+which would be passed in via:
+
+```yaml
+commonLabels:
+  app.kubernetes.io/part-of: bigbang
+  app.kubernetes.io/managed-by: flux
+  app.kubernetes.io/bigbang-version: 1.6.0
+```
 
 ## Kubernetes Objects
 
@@ -84,7 +99,7 @@ These requirements for the kubernetes components come from the Kubernetes STIG, 
 * Containers are not run in privileged mode
 * Read Only Root File System is set to true
 * Containers are not run as root
-* runAsUser > 1000
+* runAsUser >= 1000
 * Each deployment/daemonset/statefulset should use its own service account with least privilege permission set
 * HostPath volumes are not allowed
 * All resources contain the [Kubernetes Common Labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/)
