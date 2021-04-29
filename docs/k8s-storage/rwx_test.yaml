@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rwx-test
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rwx-test
+  labels:
+    app: rwx-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rwx-test
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rwx-test
+    spec:
+      containers:
+        - image: ubuntu:xenial
+          imagePullPolicy: Always
+          command: ["/bin/sh", "-c"]
+          args:
+            - sleep 30; touch /mnt/rwx-test/test.log; while true; do date >> /mnt/rwx-test/test.log; sleep 1; done;
+          name: rwx-test
+          stdin: true
+          tty: true
+          livenessProbe:
+            exec:
+              command:
+                - timeout
+                - "10"
+                - ls
+                - /mnt/rwx-test
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 10
+          volumeMounts:
+            - mountPath: /mnt/rwx-test
+              name: rwx-test
+      restartPolicy: Always
+      volumes:
+        - name: rwx-test
+          persistentVolumeClaim:
+            claimName: rwx-test
