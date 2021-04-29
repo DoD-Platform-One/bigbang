@@ -6,7 +6,7 @@ istio:
   nexus:
     gateways:
     - "istio-system/main"
-monioring:
+monitoring:
   enabled: false
 license_key: ""
 license:

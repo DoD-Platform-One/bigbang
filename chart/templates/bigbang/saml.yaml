@@ -11,6 +11,11 @@ spec:
     metadata:
       creationTimestamp: null
     spec:
+      activeDeadlineSeconds: 90
+      {{- with .Values.nexus.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8}}
+      {{- end }}
       containers:
       - image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
         name: saml
