@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
+## [1.6.1]
+
+* [#19](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane/-/issues/19): istio-cni image hub reverted to dsop.io domain
+* [#387](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/387): Latest Fluent-Bit release removed Grafana Dashboard Functionality
+
 ## [1.6.0]
 
 ### Upgrade Notice
