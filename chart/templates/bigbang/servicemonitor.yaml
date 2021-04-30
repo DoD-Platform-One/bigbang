@@ -14,7 +14,7 @@ spec:
       - {{ .Release.Namespace }}
   endpoints:
     - interval: 30s
-      path: /service/metrics/data
+      path: /service/metrics/prometheus
       port: nexus-ui
       scheme: http
       basicAuth:
