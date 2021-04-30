@@ -49,11 +49,4 @@ spec:
     - name: {{ .Release.Name }}-gatekeeper-values
       kind: Secret
       valuesKey: "overlays"
-
-  values:
-    disableValidatingWebhook: true
-    createNamespace: false
-    image:
-      pullSecrets:
-      - name: private-registry
 {{- end }}
