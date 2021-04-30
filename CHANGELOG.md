@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.6.2]
+
+* [!455](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/455): gatekeeper values not hardcoded
+
 ## [1.6.1]
 
 * [#19](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane/-/issues/19): istio-cni image hub reverted to dsop.io domain
