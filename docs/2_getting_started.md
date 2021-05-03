@@ -30,17 +30,21 @@ Table of Contents
 
 [Flux v2](https://toolkit.fluxcd.io/) must be installed into the Kubernetes cluster before deploying Big Bang:
 
-1. Deploy officially through [Iron Bank](registry1.dso.mil)
+1. Deploy officially through [Iron Bank](https://registry1.dso.mil)
 
 Official flux installation helper script:
 
-```
+```Shell
 ./scripts/install_flux.sh --help
 ```
 
 Example baseline IronBank deployment:
 
-```
+```Shell
+REGISTRY_USERNAME="<Username>"
+REGISTRY_EMAIL="<Email>"
+REGISTRY_PASSWORD="<CLI secret>"
+
 ./scripts/install_flux.sh \
   --registry-username "$REGISTRY_USERNAME" \
   --registry-password "$REGISTRY_PASSWORD" \
