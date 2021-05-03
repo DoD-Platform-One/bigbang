@@ -66,4 +66,9 @@ spec:
       namespace: {{ $.Release.Namespace }}
     {{- end }}
     {{- end }}
+
+    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.logging.enabled }}
+    - name: ek
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
 {{- end }}

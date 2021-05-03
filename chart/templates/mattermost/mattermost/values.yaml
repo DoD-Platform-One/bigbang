@@ -60,4 +60,9 @@ minio:
     - name: private-registry
 {{- end }}
 {{- end }}
+
+{{- if .Values.addons.mattermost.elasticsearch.enabled }}
+elasticsearch:
+  enabled: true
+{{- end }}
 {{- end -}}
