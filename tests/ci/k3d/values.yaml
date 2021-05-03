@@ -340,6 +340,8 @@ addons:
 
   mattermost:
     enabled: false
+    elasticsearch:
+      enabled: true
     values:
       replicaCount: 1
       resources:
