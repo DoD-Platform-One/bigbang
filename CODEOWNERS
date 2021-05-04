@@ -1,16 +1,16 @@
 [Project Managers]
 # protect individual files in the root directory such as the CODEOWNERS file
-/*                     @runyontr @joshwolf @megamind @phillip.record
+/*                     @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
 # Recursive protection for directories
-/.gitlab-ci/           @runyontr @joshwolf @megamind @phillip.record
-/.gitlab/              @runyontr @joshwolf @megamind @phillip.record
-/base/                 @runyontr @joshwolf @megamind @phillip.record
-/chart/                @runyontr @joshwolf @megamind @phillip.record
-/charter/              @runyontr @joshwolf @megamind @phillip.record
-/hack/                 @runyontr @joshwolf @megamind @phillip.record
-/scripts/              @runyontr @joshwolf @megamind @phillip.record
-/tests/                @runyontr @joshwolf @megamind @phillip.record
-/docs/                 @runyontr @joshwolf @megamind @phillip.record
+/.gitlab-ci/           @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/.gitlab/              @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/base/                 @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/chart/                @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/charter/              @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/hack/                 @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/scripts/              @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/tests/                @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/docs/                 @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
 
 
 [Docs Owners]
@@ -39,7 +39,7 @@ scripts/              @toladipupo @michaelmcleroy @egoode
 hack/                 @toladipupo @michaelmcleroy @egoode
 
 ^[Charter Owners]
-charter/              @runyontr @joshwolf
+charter/              @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
 
 ^[Istio and Authservice]
 chart/Chart.yaml                @kenna81 @kavitha @cmcgrath @nick_tetrate
