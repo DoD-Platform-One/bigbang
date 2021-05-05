@@ -1,3 +1,4 @@
+{{- $fluxSettingsVelero := merge .Values.addons.velero.flux .Values.flux -}}
 {{- if .Values.addons.velero.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -19,22 +20,8 @@ spec:
         name: velero
         namespace: {{ .Release.Namespace }}
 
-  {{- with .Values.flux }}
-  interval: {{ .interval }}
-  test:
-    enable: false
-  install:
-    remediation:
-      retries: {{ .install.retries }}
-  upgrade:
-    remediation:
-      retries: {{ .upgrade.retries }}
-      remediateLastFailure: true
-    cleanupOnFail: true
-  rollback:
-    timeout: {{ .rollback.timeout }}
-    cleanupOnFail: {{ .rollback.cleanupOnFail }}
-  {{- end }}
+  {{- toYaml $fluxSettingsVelero | nindent 2 }}
+  
   {{- if .Values.addons.velero.postRenderers }}
   postRenderers:
   {{ toYaml .Values.addons.velero.postRenderers | nindent 4 }}

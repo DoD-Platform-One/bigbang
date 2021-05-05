@@ -1,3 +1,4 @@
+{{- $fluxSettingsGitlabRunner := merge .Values.addons.gitlabRunner.flux .Values.flux -}}
 {{- if .Values.addons.gitlabRunner.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -16,22 +17,8 @@ spec:
         name: gitlab-runner
         namespace: {{ .Release.Namespace }}
 
-  {{- with .Values.flux }}
-  interval: {{ .interval }}
-  test:
-    enable: false
-  install:
-    remediation:
-      retries: {{ .install.retries }}
-  upgrade:
-    remediation:
-      retries: {{ .upgrade.retries }}
-      remediateLastFailure: true
-    cleanupOnFail: true
-  rollback:
-    timeout: {{ .rollback.timeout }}
-    cleanupOnFail: {{ .rollback.cleanupOnFail }}
-  {{- end }}
+  {{- toYaml $fluxSettingsGitlabRunner | nindent 2 }}
+
   {{- if .Values.addons.gitlab.postRenderers }}
   postRenderers:
   {{ toYaml .Values.addons.gitlab.postRenderers | nindent 4 }}
