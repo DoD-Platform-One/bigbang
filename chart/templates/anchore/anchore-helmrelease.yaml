@@ -1,3 +1,4 @@
+{{- $fluxSettingsAnchore := merge .Values.addons.anchore.flux .Values.flux -}}
 {{- if .Values.addons.anchore.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
@@ -16,23 +17,7 @@ spec:
         name: anchore
         namespace: {{ .Release.Namespace }}
 
-  {{- with .Values.flux }}
-  interval: {{ .interval }}
-  test:
-    enable: false
-  install:
-    remediation:
-      retries: {{ .install.retries }}
-  upgrade:
-    disableWait: true
-    remediation:
-      retries: {{ .upgrade.retries }}
-      remediateLastFailure: true
-    cleanupOnFail: true
-  rollback:
-    timeout: {{ .rollback.timeout }}
-    cleanupOnFail: {{ .rollback.cleanupOnFail }}
-  {{- end }}
+  {{- toYaml $fluxSettingsAnchore | nindent 2 }}
 
   valuesFrom:
     - name: {{ .Release.Name }}-anchore-values
