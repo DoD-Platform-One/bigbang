@@ -1,8 +1,8 @@
-{{- if .Values.config.enabled -}}
+{{- if .Values.license_key }}
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
-  name: {{ template "nexus.name" . }}-conf
+  name: {{ template "nexus.name" . }}-license
   labels:
 {{ include "nexus.labels" . | indent 4 }}
     {{- if .Values.nexus.extraLabels }}
@@ -11,5 +11,5 @@ metadata:
       {{- end }}
     {{- end }}
 data:
-{{ toYaml .Values.config.data | indent 2 }}
-{{- end }}
+{{ include "nexus.licenseKey" . | indent 2 }}
+{{- end -}}

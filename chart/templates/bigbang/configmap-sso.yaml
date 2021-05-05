@@ -1,0 +1,18 @@
+{{- if and .Values.sso.enabled .Values.license_key -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nexus.name" . }}-sso
+  labels: {{- include "nexus.labels" . | nindent 4 }}
+    {{- if .Values.nexus.extraLabels }}
+      {{- with .Values.nexus.extraLabels }}
+        {{ toYaml . | indent 4 }}
+      {{- end }}
+    {{- end }}
+data:
+  idp-metadata: {{ .Values.sso.idp_data | toJson | quote }}
+  #realm: {{ .Values.sso.realm | quote }}
+  realm: '[{{ join "\",\"" .Values.sso.realm | printf "\"%s\""}}]'
+  role: {{ .Values.sso.role | toJson | quote }}
+{{- end }}
+

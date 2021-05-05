@@ -1,0 +1,29 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "nexus.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      name: {{ include "nexus.fullname" . }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - interval: 30s
+      path: /service/metrics/prometheus
+      port: nexus-ui
+      scheme: http
+      basicAuth:
+        password:
+          name: {{ template "nexus.name" . }}-secret
+          key: admin.password
+        username:
+          name: {{ template "nexus.name" . }}-secret
+          key: admin.user
+  jobLabel: {{ template "nexus.fullname" . }}-metrics
+{{- end }}
