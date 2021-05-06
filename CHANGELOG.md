@@ -3,6 +3,39 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.7.0]
+
+* [!453](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/453): Global Timeout for flux and allow for HR flux settings to be populated via values
+* [!459](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/459): Gitlab monitoring fix
+* [!406](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/406): Authservice Support For Non Keycloak OIDC Endpoints
+* [!447](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/447): Sonarqube updated to 8.7.1
+* [!446](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/446): Mattermost elastic integration
+* [!437](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/437): Postrenders
+* [!440](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/440): GitLab Upgrade to 13.10.3
+* [!450](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/450): Ironbank image version check script
+
+* [!369](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/369): Update development-environment
+* [!371](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/371): Update 2_getting_started
+* [!483](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/438): cluster auditor architecture
+* [!454](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/454): Storage Documentation
+* [!221](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/221): Add initial thoughts on Hugo
+* [!408](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/408): Adding Architecture Doc for ek package
+* [!462](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/462): Document GitLab package architecture in charter
+* [!463](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/463): Update CODEOWNERS
+
+## Upgrade Notice
+This release comes with a new version of Sonarqube which requires a manual database upgrade that can be easily done through the web interface. If you see a message stating Sonarqube is under maintenance go to the following url and click update database:
+```
+https://sonarqube.your.url/setup
+```
+After a few minutes you should be able to log back in.
+
+## Known Issues
+If the following error is seen on any helm releases ```scheme "" not supported``` try updating flux to latest ib images. A simple way to do this is by adding registry credentials to the flux-system namespace and applying the flux.yaml:
+```bash
+kubectl create -n flux-system secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='<IB_Username>' --docker-password="<CLI_TOKEN>"
+kubectl apply -f scripts/deploy/flux.yaml
+```
 
 ## [1.6.2]
 
