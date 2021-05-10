@@ -14,6 +14,8 @@ Table of Contents
     - [Azure KeyVault](#azure-keyvault)
     - [HashiCorp Vault](#hashicorp-vault)
   - [Configure Big Bang](#configure-big-bang)
+    - [GPG](#gpg-1)
+    - [AWS KMS](#aws-kms-1)
 
 Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approach to managing the Big Bang Kubernetes cluster configuration.  Using GitOps, we must securely store secrets in Git using encryption.  The private key, which is stored in key storage, is used by the continuous deployment tool to decrypt and deploy the secrets for use in the cluster.
 
@@ -91,7 +93,15 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
 
 ### AWS KMS
 
-TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-or-vault-into-a-kubernetes-pod-d5a0e84ba892) may help to automate secret consumption in Kubernetes.
+1. Configure your KMS key(s) in your `.sops.yaml` by adding the target key's ARN to the `kms` field within each creation rule.
+2. Ensure your cluster (specifically the `flux-system/flux-controller`) has access to the specified key.
+   1. For AWS deployments, this can be managed via IAM roles as [described in the SOPS documentation](https://github.com/mozilla/sops#28assuming-roles-and-using-kms-in-various-aws-accounts).
+   2. For non-AWS deployments
+      1. Create an AWS user with appropriate permissions.
+      2. Create a secret named `sops-aws-creds` in the cluster using the access creds from the target user:
+      ```bash
+      k create secret generic -n flux-system sops-aws-creds --from-literal=access_key_id=<key_id> --from-literal=access_key_secret=<key>
+      ```
 
 ### GCP KMS
 
@@ -107,8 +117,10 @@ TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-o
 
 ## Configure Big Bang
 
-Big Bang needs to know how to retrieve the private key so it can deploy the encrypted secrets from Git.  Decryption configuration is placed in the top-level manifest (e.g. `dev.yaml`, `prod.yaml`) from the [Big Bang template](https://repo1.dso.mil/platform-one/big-bang/customers/template).  By default, the `Kustomization` resource uses a Secret named `sops-gpg` for the private key as shown here:
+Big Bang needs to know how to retrieve the private key so it can deploy the encrypted secrets from Git.  Decryption configuration is placed in the top-level manifest (e.g. `dev.yaml`, `prod.yaml`) from the [Big Bang template](https://repo1.dso.mil/platform-one/big-bang/customers/template). 
 
+### GPG
+By default, the `Kustomization` resource uses a Secret named `sops-gpg` for the private key as shown here:
 ```yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
@@ -121,4 +133,47 @@ spec:
       name: sops-gpg
 ```
 
-TBD - Instructions on how to update for AWS, GCP, Vault
+### AWS KMS
+Configure the `Kustomization` resource to use sops for decryption:
+```yaml
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: environment
+spec:
+  decryption:
+    provider: sops
+```
+> Note, we are not providing the `secretRef` field, which is specific to GPG
+
+If Big Bang is deployed within AWS, KMS key access can be handled via IAM roles and permissions on the cluster resources themselves. 
+However, if the deployment is in a different environment from the KMS keys, AWS credentials may need to be provided via a secret as follows. 
+
+Configure the `kustomize-controller` deployment with AWS credential environment variables using the `kustomization.yaml`'s `patchesStrategicMerge` list:
+```yaml
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: kustomize-controller
+    namespace: flux-system
+  spec:
+    template:
+      spec:
+        containers:
+        - name: manager
+          env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: sops-aws-creds
+                key: access_key_id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: sops-aws-creds
+                key: access_key_secret
+```
+> Values should come from the `sops-aws-creds` secret created in [AWS KMS](#aws-kms) above
+
+TBD - Instructions on how to update for GCP, Vault
