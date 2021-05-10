@@ -1,0 +1,19 @@
+{{- define "bb-test-lib.cypress-configmap.base" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-cypress-config"
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+  namespace: {{ .Release.Namespace }}
+data:
+  {{ (.Files.Glob "tests/cypress/*").AsConfig | nindent 2 }}
+{{- end }}
+
+{{- define "bb-test-lib.cypress-configmap.overrides" }}
+{{- include "bb-test-lib.util.merge" (append . "bb-test-lib.cypress-configmap.base") }}
+{{- end }}

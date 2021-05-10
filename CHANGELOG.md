@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.0]
+### Added
+- Added bb-test-lib with templates to consume in packages for easy testing
+- Handle helm logs better and provide for cypress artifact retrieval from helm tests
+
 ## [1.0.7]
 ### Added
 - better rego policies to cover our package requirements

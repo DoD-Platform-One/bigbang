@@ -280,10 +280,25 @@ package tests:
     # Run Helm Tests
     - |
       if [ -d "chart/templates/tests" ]; then
-      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME}
-      echo "***** Start Helm Test Logs *****"
-      kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
-      echo "***** End Helm Test Logs *****"
+        helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
+        echo "***** Start Helm Test Logs *****"
+        kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+        echo "***** End Helm Test Logs *****"
+        if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
+          kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
+          cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
+          mkdir -p cypress-artifacts
+          tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
+        fi
+        if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
+          kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
+          cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
+          mkdir -p cypress-artifacts
+          tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
+        fi
+        if [[ ${EXIT_CODE} -ne 0 ]]; then
+          exit ${EXIT_CODE}
+        fi
       fi
 
     # File to indicate Job succeeded 
@@ -317,6 +332,7 @@ package tests:
       - images.txt
       - tests/cypress/screenshots
       - tests/cypress/videos
+      - cypress-artifacts
     expire_in: 3 days
 
 package:
