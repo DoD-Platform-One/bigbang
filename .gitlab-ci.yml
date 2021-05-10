@@ -94,10 +94,22 @@ pre vars:
     - tests/**/*
 
 .deploy_bigbang: &deploy_bigbang
-  - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
+  - |
+    set -e
+    for deploy_script in $(find ./scripts/deploy -type f -name '*.sh' | sort); do
+      chmod +x ${deploy_script}
+      echo "Executing ${deploy_script}..."
+      ./${deploy_script}
+    done
 
 .test_bigbang: &test_bigbang
-  - find ./tests -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
+  - |
+    set -e
+    for test_script in $(find ./tests -type f -name '*.sh' | sort); do
+      chmod +x ${test_script}
+      echo "Executing ${test_script}..."
+      ./${test_script}
+    done
 
 clean install:
   stage: smoke tests
