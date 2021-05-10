@@ -94,14 +94,20 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
 ### AWS KMS
 
 1. Configure your KMS key(s) in your `.sops.yaml` by adding the target key's ARN to the `kms` field within each creation rule.
+    ```yaml
+    creation_rules:
+    - encrypted_regex: '^(data|stringData)$'
+      path_regex: ./dev/.*
+      kms: '<kms_key_arn>'
+    ```
 2. Ensure your cluster (specifically the `flux-system/flux-controller`) has access to the specified key.
    1. For AWS deployments, this can be managed via IAM roles as [described in the SOPS documentation](https://github.com/mozilla/sops#28assuming-roles-and-using-kms-in-various-aws-accounts).
    2. For non-AWS deployments
-      1. Create an AWS user with appropriate permissions.
+      1. Create an AWS user with appropriate permissions as [described in the SOPS documentation](https://github.com/mozilla/sops#28assuming-roles-and-using-kms-in-various-aws-accounts).
       2. Create a secret named `sops-aws-creds` in the cluster using the access creds from the target user:
-      ```bash
-      k create secret generic -n flux-system sops-aws-creds --from-literal=access_key_id=<key_id> --from-literal=access_key_secret=<key>
-      ```
+          ```bash
+          k create secret generic -n flux-system sops-aws-creds --from-literal=access_key_id=<key_id> --from-literal=access_key_secret=<key>
+          ```
 
 ### GCP KMS
 
