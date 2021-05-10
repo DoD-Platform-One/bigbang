@@ -1,0 +1,52 @@
+{{- define "bb-test-lib.cypress-sa" }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Chart.Name }}-cypress-sa
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+{{- end }}
+
+{{- define "bb-test-lib.cypress-role" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Chart.Name }}-cypress-role
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create", "get", "list", "delete"]
+{{- end }}
+
+{{- define "bb-test-lib.cypress-rolebinding" }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Chart.Name }}-cypress-rolebinding
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Chart.Name }}-cypress-role
+subjects:
+- kind: ServiceAccount
+  name: {{ .Chart.Name }}-cypress-sa
+  namespace: {{ .Release.Namespace }}
+{{- end }}
+
+{{- define "bb-test-lib.cypress-rbac" }}
+{{- include "bb-test-lib.cypress-sa" . }}
+---
+{{- include "bb-test-lib.cypress-role" . }}
+---
+{{- include "bb-test-lib.cypress-rolebinding" . }}
+{{- end }}

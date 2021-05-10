@@ -1,0 +1,32 @@
+{{- define "bb-test-lib.script-configmap.base" }}
+{{- if .Values.bbtests }}
+{{- if .Values.bbtests.scripts }}
+{{- if .Values.bbtests.scripts.image }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-script-config"
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+  namespace: {{ .Release.Namespace }}
+data:
+  {{ (.Files.Glob "tests/scripts/*").AsConfig | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "bb-test-lib.script-configmap.overrides" }}
+{{- $values := (first .) }}
+{{- if $values.Values.bbtests }}
+{{- if $values.Values.bbtests.scripts }}
+{{- if $values.Values.bbtests.scripts.image }}
+{{- include "bb-test-lib.util.merge" (append . "bb-test-lib.script-configmap.base") }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
