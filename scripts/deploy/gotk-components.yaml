@@ -1,13 +1,10 @@
----
-# Installed with flux install --image-pull-secret=private-registry --registry=registry1.dso.mil/ironbank/fluxcd --dry-run --export > flux.yaml
-# Flux version: v0.10.0
-# Components: source-controller,kustomize-controller,helm-controller,notification-controller
 apiVersion: v1
 kind: Namespace
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: flux-system
 ---
 apiVersion: apiextensions.k8s.io/v1
@@ -18,7 +15,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: alerts.notification.toolkit.fluxcd.io
 spec:
   group: notification.toolkit.fluxcd.io
@@ -167,6 +165,10 @@ spec:
                   - type
                   type: object
                 type: array
+              observedGeneration:
+                description: ObservedGeneration is the last observed generation.
+                format: int64
+                type: integer
             type: object
         type: object
     served: true
@@ -188,7 +190,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: buckets.source.toolkit.fluxcd.io
 spec:
   group: source.toolkit.fluxcd.io
@@ -375,7 +378,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: gitrepositories.source.toolkit.fluxcd.io
 spec:
   group: source.toolkit.fluxcd.io
@@ -383,6 +387,8 @@ spec:
     kind: GitRepository
     listKind: GitRepositoryList
     plural: gitrepositories
+    shortNames:
+    - gitrepo
     singular: gitrepository
   scope: Namespaced
   versions:
@@ -428,6 +434,9 @@ spec:
               interval:
                 description: The interval at which to check for repository updates.
                 type: string
+              recurseSubmodules:
+                description: When enabled, after the clone is created, initializes all submodules within, using their default settings. This option is available only when using the 'go-git' GitImplementation.
+                type: boolean
               ref:
                 description: The Git reference to checkout and monitor for changes, defaults to master branch.
                 properties:
@@ -590,7 +599,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: helmcharts.source.toolkit.fluxcd.io
 spec:
   group: source.toolkit.fluxcd.io
@@ -598,6 +608,8 @@ spec:
     kind: HelmChart
     listKind: HelmChartList
     plural: helmcharts
+    shortNames:
+    - hc
     singular: helmchart
   scope: Namespaced
   versions:
@@ -669,8 +681,13 @@ spec:
                 description: This flag tells the controller to suspend the reconciliation of this source.
                 type: boolean
               valuesFile:
-                description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Ignored when omitted.
+                description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Deprecated in favor of ValuesFiles, for backwards compatibility the file defined here is merged before the ValuesFiles items. Ignored when omitted.
                 type: string
+              valuesFiles:
+                description: Alternative list of values files to use as the chart values (values.yaml is not included by default), expected to be a relative path in the SourceRef. Values files are merged in the order of this list with the last file overriding the first. Ignored when omitted.
+                items:
+                  type: string
+                type: array
               version:
                 default: '*'
                 description: The chart version semver expression, ignored for charts from GitRepository and Bucket sources. Defaults to latest when omitted.
@@ -781,7 +798,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: helmreleases.helm.toolkit.fluxcd.io
 spec:
   group: helm.toolkit.fluxcd.io
@@ -859,8 +877,13 @@ spec:
                         - name
                         type: object
                       valuesFile:
-                        description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Ignored when omitted.
+                        description: Alternative values file to use as the default chart values, expected to be a relative path in the SourceRef. Deprecated in favor of ValuesFiles, for backwards compatibility the file defined here is merged before the ValuesFiles items. Ignored when omitted.
                         type: string
+                      valuesFiles:
+                        description: Alternative list of values files to use as the chart values (values.yaml is not included by default), expected to be a relative path in the SourceRef. Values files are merged in the order of this list with the last file overriding the first. Ignored when omitted.
+                        items:
+                          type: string
+                        type: array
                       version:
                         default: '*'
                         description: Version semver expression, ignored for charts from v1beta1.GitRepository and v1beta1.Bucket sources. Defaults to latest when omitted.
@@ -890,6 +913,13 @@ spec:
               install:
                 description: Install holds the configuration for Helm install actions for this HelmRelease.
                 properties:
+                  crds:
+                    description: "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Create` and if omitted CRDs are installed but not updated. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are applied (installed) during Helm install action. With this option users can opt-in to CRD replace existing CRDs on Helm install actions, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions."
+                    enum:
+                    - Skip
+                    - Create
+                    - CreateReplace
+                    type: string
                   createNamespace:
                     description: CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.
                     type: boolean
@@ -919,7 +949,7 @@ spec:
                     description: Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.
                     type: boolean
                   skipCRDs:
-                    description: SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present.
+                    description: "SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present. \n Deprecated use CRD policy (`crds`) attribute with value `Skip` instead."
                     type: boolean
                   timeout:
                     description: Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.
@@ -1119,6 +1149,13 @@ spec:
                   cleanupOnFail:
                     description: CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.
                     type: boolean
+                  crds:
+                    description: "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Skip` and if omitted CRDs are neither installed nor upgraded. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are not applied during Helm upgrade action. With this option users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions."
+                    enum:
+                    - Skip
+                    - Create
+                    - CreateReplace
+                    type: string
                   disableHooks:
                     description: DisableHooks prevents hooks from running during the Helm upgrade action.
                     type: boolean
@@ -1296,7 +1333,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: helmrepositories.source.toolkit.fluxcd.io
 spec:
   group: source.toolkit.fluxcd.io
@@ -1304,6 +1342,8 @@ spec:
     kind: HelmRepository
     listKind: HelmRepositoryList
     plural: helmrepositories
+    shortNames:
+    - helmrepo
     singular: helmrepository
   scope: Namespaced
   versions:
@@ -1463,7 +1503,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: kustomizations.kustomize.toolkit.fluxcd.io
 spec:
   group: kustomize.toolkit.fluxcd.io
@@ -1859,7 +1900,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: providers.notification.toolkit.fluxcd.io
 spec:
   group: notification.toolkit.fluxcd.io
@@ -1900,6 +1942,15 @@ spec:
                 description: HTTP/S webhook address of this provider
                 pattern: ^(http|https)://
                 type: string
+              certSecretRef:
+                description: CertSecretRef can be given the name of a secret containing a PEM-encoded CA certificate (`caFile`)
+                properties:
+                  name:
+                    description: Name of the referent
+                    type: string
+                required:
+                - name
+                type: object
               channel:
                 description: Alert channel for this provider
                 type: string
@@ -1929,6 +1980,8 @@ spec:
                 - bitbucket
                 - azuredevops
                 - googlechat
+                - webex
+                - sentry
                 type: string
               username:
                 description: Bot username for this provider
@@ -2003,7 +2056,8 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: receivers.notification.toolkit.fluxcd.io
 spec:
   group: notification.toolkit.fluxcd.io
@@ -2157,6 +2211,10 @@ spec:
                   - type
                   type: object
                 type: array
+              observedGeneration:
+                description: ObservedGeneration is the last observed generation.
+                format: int64
+                type: integer
               url:
                 description: Generated webhook URL in the format of '/hook/sha256sum(token+name+namespace)'.
                 type: string
@@ -2178,7 +2236,8 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: helm-controller
   namespace: flux-system
 ---
@@ -2187,7 +2246,8 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: kustomize-controller
   namespace: flux-system
 ---
@@ -2196,7 +2256,8 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: notification-controller
   namespace: flux-system
 ---
@@ -2205,7 +2266,8 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: source-controller
   namespace: flux-system
 ---
@@ -2214,7 +2276,8 @@ kind: ClusterRole
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: crd-controller-flux-system
 rules:
 - apiGroups:
@@ -2293,7 +2356,8 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: cluster-reconciler-flux-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -2312,7 +2376,8 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: crd-controller-flux-system
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -2343,7 +2408,8 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: notification-controller
   namespace: flux-system
@@ -2362,7 +2428,8 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: source-controller
   namespace: flux-system
@@ -2381,7 +2448,8 @@ kind: Service
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: webhook-receiver
   namespace: flux-system
@@ -2400,7 +2468,8 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: helm-controller
   namespace: flux-system
@@ -2429,7 +2498,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: registry1.dso.mil/ironbank/fluxcd/helm-controller:v0.9.0
+        image: ghcr.io/fluxcd/helm-controller:v0.10.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -2451,16 +2520,14 @@ spec:
             cpu: 1000m
             memory: 1Gi
           requests:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 100m
+            memory: 64Mi
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /tmp
           name: temp
-      imagePullSecrets:
-      - name: private-registry
       nodeSelector:
         kubernetes.io/os: linux
       serviceAccountName: helm-controller
@@ -2474,7 +2541,8 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: kustomize-controller
   namespace: flux-system
@@ -2503,7 +2571,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: registry1.dso.mil/ironbank/fluxcd/kustomize-controller:v0.9.3
+        image: ghcr.io/fluxcd/kustomize-controller:v0.12.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -2525,16 +2593,14 @@ spec:
             cpu: 1000m
             memory: 1Gi
           requests:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 100m
+            memory: 64Mi
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /tmp
           name: temp
-      imagePullSecrets:
-      - name: private-registry
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -2550,7 +2616,8 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: notification-controller
   namespace: flux-system
@@ -2578,7 +2645,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: registry1.dso.mil/ironbank/fluxcd/notification-controller:v0.12.0
+        image: ghcr.io/fluxcd/notification-controller:v0.13.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -2604,16 +2671,14 @@ spec:
             cpu: 1000m
             memory: 1Gi
           requests:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 100m
+            memory: 64Mi
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /tmp
           name: temp
-      imagePullSecrets:
-      - name: private-registry
       nodeSelector:
         kubernetes.io/os: linux
       serviceAccountName: notification-controller
@@ -2627,7 +2692,8 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
     control-plane: controller
   name: source-controller
   namespace: flux-system
@@ -2660,7 +2726,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: registry1.dso.mil/ironbank/fluxcd/source-controller:v0.9.1
+        image: ghcr.io/fluxcd/source-controller:v0.12.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -2683,8 +2749,8 @@ spec:
             cpu: 1000m
             memory: 1Gi
           requests:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 50m
+            memory: 64Mi
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
@@ -2693,8 +2759,6 @@ spec:
           name: data
         - mountPath: /tmp
           name: tmp
-      imagePullSecrets:
-      - name: private-registry
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -2712,7 +2776,28 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
+  name: allow-egress
+  namespace: flux-system
+spec:
+  egress:
+  - {}
+  ingress:
+  - from:
+    - podSelector: {}
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/instance: flux-system
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: allow-scraping
   namespace: flux-system
 spec:
@@ -2731,7 +2816,8 @@ kind: NetworkPolicy
 metadata:
   labels:
     app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
+    app.kubernetes.io/part-of: flux
+    app.kubernetes.io/version: v0.13.2
   name: allow-webhooks
   namespace: flux-system
 spec:
@@ -2743,23 +2829,3 @@ spec:
       app: notification-controller
   policyTypes:
   - Ingress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  labels:
-    app.kubernetes.io/instance: flux-system
-    app.kubernetes.io/version: v0.10.0
-  name: deny-ingress
-  namespace: flux-system
-spec:
-  egress:
-  - {}
-  ingress:
-  - from:
-    - podSelector: {}
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
----
