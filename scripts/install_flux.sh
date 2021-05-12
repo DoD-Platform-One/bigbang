@@ -9,7 +9,7 @@ set -e
 #
 
 REGISTRY_URL=registry1.dso.mil
-FLUX_KUSTOMIZATION=scripts/deploy
+FLUX_KUSTOMIZATION=base/flux
 FLUX_SECRET=private-registry
 WAIT_TIMEOUT=120
 
