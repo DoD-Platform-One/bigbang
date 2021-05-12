@@ -20,23 +20,30 @@ spec:
       imagePullPolicy: IfNotPresent
       workingDir: /test
       command:
-      - "/bin/bash"
-      - "-c"
-      - |
-        set -e
-        cp /src/* /test/
-        chmod +x *
-        for script in *; do
-          echo "---"
-          echo "Running ${script}..."
-          echo "---"
-          ./${script}
-        done
+        - "/bin/bash"
+        - "-c"
+        - |
+          set -e
+          cp /src/* /test/
+          chmod +x *
+          for script in *; do
+            echo "---"
+            echo "Running ${script}..."
+            echo "---"
+            ./${script}
+          done
       volumeMounts:
-      - name: script-tests
-        mountPath: /src
-      - name: workdir
-        mountPath: /test
+        - name: script-tests
+          mountPath: /src
+        - name: workdir
+          mountPath: /test
+        {{- if .Values.bbtests }}
+        {{- if .Values.bbtests.scripts }}
+        {{- with .Values.bbtests.scripts.additionalVolumeMounts }}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
       {{- if or .Values.bbtests.scripts.envs .Values.bbtests.scripts.secretEnvs }}
       env:
       {{- range $k, $v := .Values.bbtests.scripts.envs }}
@@ -49,11 +56,18 @@ spec:
       {{- end }}
   restartPolicy: Never
   volumes:
-  - name: script-tests
-    configMap:
-      name: "{{ .Chart.Name }}-script-config"
-  - name: workdir
-    emptyDir: {}
+    - name: script-tests
+      configMap:
+        name: "{{ .Chart.Name }}-script-config"
+    - name: workdir
+      emptyDir: {}
+    {{- if .Values.bbtests }}
+    {{- if .Values.bbtests.scripts }}
+    {{- with .Values.bbtests.scripts.additionalVolumes }}
+      {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
   imagePullSecrets:
     - name: private-registry
 {{- end -}}
