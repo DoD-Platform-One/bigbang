@@ -2,11 +2,13 @@
 
 ## Core
 
-Logging - fluentbit configurations for standardized logging
-Telemetry - Integration with Prometheus and dedicated Grafana dashbaords as appropriate
-Tracing - Insertion of Tracing data for application traffic
-Zero Trust - Network Policies for L2 connectivity, mTLS for applicatoin traffic
-Behavior Detection - Twistlock Policies for applications
+Columns:
+* Logging - fluentbit configurations for standardized logging
+* Telemetry - Integration with Prometheus and dedicated Grafana dashbaords as appropriate
+* Tracing - Insertion of Tracing data for application traffic
+* Zero Trust - Network Policies for L2 connectivity, mTLS for applicatoin traffic
+* Behavior Detection - Twistlock Policies for applications
+
 
 | Package | Status | Logging | Telemetry | Tracing Tracing | Zero Trust | Behavior Detection |
 | ----    | ---  |
