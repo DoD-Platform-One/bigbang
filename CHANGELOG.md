@@ -4,6 +4,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.2]
+
+### Updated
+
+- Updated readme with how to make cypress videos smaller.
+
+### Changed
+
+- Changed tar command in bb-test-lib library for better compression of cypress videos and screenshots.
+
+### Removed
+
+- Removed container builds from .gitlab-ci.yaml that were creating numerious builds for unused containers.
+
 ## [1.1.1]
 
 ### Added
