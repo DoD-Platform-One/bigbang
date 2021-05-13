@@ -4,6 +4,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.3]
+
+### Fixed
+
+- Fixed tar command in cypress runner.
+
 ## [1.1.2]
 
 ### Updated

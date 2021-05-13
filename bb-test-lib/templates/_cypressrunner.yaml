@@ -36,7 +36,7 @@ spec:
         {{- if .Values.bbtests.cypress }}
         {{- if .Values.bbtests.cypress.artifacts }}
         if [ -d /test/cypress/screenshots ]; then
-          tar -cf -I 'gzip -9' cypress-screenshots.tar.gz /test/cypress/screenshots
+          tar -I 'gzip -9' -cf cypress-screenshots.tar.gz /test/cypress/screenshots
           cat cypress-screenshots.tar.gz | base64 > cypress-screenshots.tar.gz.b64
           if kubectl get configmap -n {{ .Release.Namespace }} cypress-screenshots &>/dev/null; then
             kubectl delete configmap -n {{ .Release.Namespace }} cypress-screenshots
@@ -44,7 +44,7 @@ spec:
           kubectl create configmap -n {{ .Release.Namespace }} cypress-screenshots --from-file cypress-screenshots.tar.gz.b64
         fi
         if [ -d /test/cypress/videos ]; then
-          tar -cf -I 'gzip -9' cypress-videos.tar.gz /test/cypress/videos
+          tar -I 'gzip -9' -cf cypress-videos.tar.gz /test/cypress/videos
           cat cypress-videos.tar.gz | base64 > cypress-videos.tar.gz.b64
           if kubectl get configmap -n {{ .Release.Namespace }} cypress-videos &>/dev/null; then
             kubectl delete configmap -n {{ .Release.Namespace }} cypress-videos
