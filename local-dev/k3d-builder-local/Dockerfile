@@ -75,6 +75,11 @@ ENV MKCERT_VERSION='1.4.1'
 ADD https://github.com/FiloSottile/mkcert/releases/download/v${MKCERT_VERSION}/mkcert-v${MKCERT_VERSION}-linux-amd64 /usr/local/bin/mkcert
 RUN chmod +x /usr/local/bin/mkcert
 
+# Install Kustomize
+ENV KUSTOMIZE_VERSION='4.1.2'
+ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz /kustomize-${KUSTOMIZE_VERSION}-linux-amd64.tar.gz
+RUN tar xzf /kustomize-${KUSTOMIZE_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/kustomize && rm -rf /kustomize-${KUSTOMIZE_VERSION}-linux-amd64.tar.gz
+
 COPY cy-run.sh /usr/local/bin/
 
 COPY dockerd-entrypoint.sh /usr/local/bin/
