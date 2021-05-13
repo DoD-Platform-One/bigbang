@@ -172,7 +172,6 @@ scp -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP:~/.kube/config ~/.kube/config
 
 Edit the kubeconfig on your workstation. Replace the server host ```0.0.0.0``` with with the public IP of the EC2 instance. Test cluster access from your local workstation.
 
-
 ```shell
 kubectl cluster-info
 kubectl get nodes

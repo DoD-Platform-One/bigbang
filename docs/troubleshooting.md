@@ -23,7 +23,7 @@ Big Bang is configured to retry failed package installations and upgrades.  Befo
 
 Helpful debugging commands:
 
-```bash
+```shell
 # Get the status
 kubectl get pods -n flux-system
 
@@ -40,7 +40,7 @@ kubectl get events -n flux-system
 
 Helpful debugging commands:
 
-```bash
+```shell
 # Get the status
 kubectl get gitrepositories -A
 
@@ -65,7 +65,7 @@ kubectl get events --field-selector involvedObject.kind=GitRepository -A
 
 Helpful debugging commands:
 
-```bash
+```shell
 # Get the status
 kubectl get hr -A
 
@@ -85,7 +85,7 @@ kubectl get events --field-selector involvedObject.kind=HelmRelease -A
 
 Helpful debugging commands:
 
-```bash
+```shell
 # Get the status
 kubectl get kustomizations -A
 
@@ -108,7 +108,7 @@ kubectl get events --field-selector involvedObject.kind=Kustomization -A
 
 Helpful debugging commands:
 
-```bash
+```shell
 # Get the status
 kubectl get deployments,po -n <namespace of package>
 

@@ -16,27 +16,27 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
 
 1. Before pushing changes to Git, validate all configuration is syntactically correct.
 
-   ```bash
+   ```shell
    # If everything is successful, YAML should be output
    kustomize build ./dev
    ```
 
 1. If you have not already done so, push configuration changes to Git
 
-   ```bash
+   ```shell
    git push
    ```
 
 1. Validate the Kubernetes context is correct
 
-   ```bash
+   ```shell
    # This should match the environment you intend to deploy
    kubectl config current-context
    ```
 
 1. Deploy the Big Bang manifest to the cluster
 
-   ```bash
+   ```shell
    kubectl apply -f dev.yaml
    ```
 
@@ -56,7 +56,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify Flux is running
 
-   ```bash
+   ```shell
    kubectl get deploy -n flux-system
 
    # All resources should be in the 'Ready' state
@@ -69,7 +69,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the environment was pulled from the Git repo
 
-   ```bash
+   ```shell
    kubectl get gitrepository -A
 
    # `environment-repo`: STATUS should be True
@@ -79,7 +79,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the environment Kustomization properly worked
 
-   ```bash
+   ```shell
    kubectl get kustomizations -A
 
    # `environment`: READY should be True
@@ -89,7 +89,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the ConfigMaps were deployed
 
-   ```bash
+   ```shell
    kubectl get configmap -l kustomize.toolkit.fluxcd.io/namespace -A
 
    # 'common' and 'environment' should exist
@@ -100,7 +100,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the Secrets were deployed
 
-   ```bash
+   ```shell
    kubectl get secrets -l kustomize.toolkit.fluxcd.io/namespace -A
 
    # 'common-bb' and 'environment-bb' should exist
@@ -111,7 +111,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the Big Bang Helm Chart was pulled
 
-   ```bash
+   ```shell
    kubectl get gitrepositories -A
 
    # 'bigbang' READY should be True
@@ -121,7 +121,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the Big Bang Helm Chart was deployed
 
-   ```bash
+   ```shell
    kubectl get hr -A
 
    # 'bigbang' READY should be True
@@ -131,7 +131,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify Big Bang package Helm charts are pulled
 
-   ```bash
+   ```shell
    kubectl get gitrepository -A
 
    # The Git repository holding the Helm charts for each package can be seen in the URL column.
@@ -149,7 +149,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
 
 1. Verify the packages get deployed
 
-   ```bash
+   ```shell
    # Use watch since it take a long time to deploy
    watch kubectl get hr,deployments,po -A
 
