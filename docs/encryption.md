@@ -155,8 +155,12 @@ spec:
 If Big Bang is deployed within AWS, KMS key access can be handled via IAM roles and permissions on the cluster resources themselves. 
 However, if the deployment is in a different environment from the KMS keys, AWS credentials may need to be provided via a secret as follows. 
 
-Configure the `kustomize-controller` deployment with AWS credential environment variables using the `kustomization.yaml`'s `patchesStrategicMerge` list:
+Configure the flux-system `kustomize-controller` component with AWS credential environment variables using `kustomize`. Specific instructions for doing this may vary by deployment and environment but [an example](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/master#flux-components) is covered in the bigbang template repo. Broadly speaking, adding environment variables to the `kustomize-controller` component can be accomplished by adding a patch to the `flux/kustomization.yaml` for the target deployment or environment. An example of such a `kustomization.yaml` is shown below:
 ```yaml
+bases:
+- ../../base/flux
+
+patchesStrategicMerge:
 - |-
   apiVersion: apps/v1
   kind: Deployment
