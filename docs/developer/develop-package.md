@@ -9,8 +9,8 @@ Package is the term we use for an application that has been prepared to be deplo
 1. There are two ways to start a new Package.  
    A. If there is no upstream helm chart we create a helm chart from scratch. Here is a T3 video that demonstrates creating a new helm chart. Create a directory called "chart" in your repo, change to the chart directory, and scaffold a new chart in the chart directory
 
-   ```bash
-   # scaffold new helm chart
+   ```shell
+   # Scaffold new helm chart
    mkdir chart
    cd chart
    helm create name-of-your-application
@@ -18,13 +18,13 @@ Package is the term we use for an application that has been prepared to be deplo
 
    B. If there is an existing upstream chart we will use it and modify it. Essentially we create a "fork" of the upstream code. Use kpt to import the helm chart code into your repository. Note that kpt is not used to keep the Package code in sync with the upstream chart. It is a one time pull just to document where the upstream chart code came from. Kpt will generate a Kptfile that has the details. Do not manually create the "chart" directory.  The kpt command will create it. Here is an example from when Gitlab Package was created. It is a good idea to push a commit "initial upstream chart with no changes" so you can refer back to the original code while you are developing.
 
-   ```bash
+   ```shell
    kpt pkg get https://gitlab.com/gitlab-org/charts/gitlab.git@v4.8.0 chart
    ```
 
 1. Run a helm dependency update that will download any external sub-chart dependencies. Commit any *.tgz files that are downloaded into the "charts" directory. The reason for doing this is that BigBang Packages must be able to be installed in an air-gap without any internet connectivity.
 
-   ```bash
+   ```shell
    helm dependency update
    ```
 
@@ -54,7 +54,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. In the values.yaml replace public upstream images with IronBank hardened images. The image version should be compatible with the chart version. Here is a command to identify the images that need to be changed.
 
-   ```bash
+   ```shell
    # list images
    helm template <releasename> ./chart -n <namespace> -f chart/values.yaml | grep image:
    ```
@@ -78,7 +78,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add CI pipeline test values to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. Create a tests directory and a test yaml file at "tests/test-values.yaml".  Set any values that are necessary for this test to pass.  The pipeline automatically creates an image pull secret "private-registry-mil".  All you need to do is reference that secret in your test values. You can view the pipeline status from the Repo1 console. Keep iterating on your Package code and the test code until the pipeline passes. Refer to the test-values.yaml from other Packages to get started. The repo structure must match what the CI pipeline code expects.
 
-   ```
+   ```yaml
    |-- .gitlab-ci.yml
    |-- chart
    |   |-- Chart.yml
@@ -98,7 +98,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add the following markdown files to complete the Package. Reference other that Packages for examples of how to create them.
 
-   ```  
+   ```shell
    CHANGELOG.md      <  standard history of changes made  
    CODEOWNERS        <  list of the code maintainers. Minimum of two people from separate organizations  
    CONTRIBUTING.md   <  instructions for how to contribute to the project  
@@ -116,12 +116,12 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
 1. Development Testing Cycle: Test your Package chart by deploying with helm. Test frequently so you don't pile up multiple layers of errors. The goal is for Packages to be deployable independently of the bigbang chart. Most upstream helm charts come with internal services like a database that can be toggled on or off. If available use them for testing and CI pipelines. In some cases this is not an option. You can manually deploy required in-cluster services in order to complete your development testing.  
    Here is an example of an in-cluster postgres database
 
-   ```bash
+   ```shell
    helm repo add bitnami https://charts.bitnami.com/bitnami
    helm install postgres bitnami/postgresql -n postgres --create-namespace --set postgresqlPostgresPassword=postgres --set postgresqlPassword=postgres
    # test it
    kubectl run postgresql-postgresql-client --rm --tty -i --restart='Never' --namespace default --image bitnami/postgresql --env="PGPASSWORD=postgres" --command -- psql --host postgres-postgresql-headless.postgres.svc.cluster.local -U postgres -d postgres -p 5432
-   # postgres commands
+   # Postgres commands
     \l             < list tables
     \du            < list users
     \q             < quit
@@ -129,7 +129,7 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
 
    Here is an example of an in-cluster object storage service using MinIO (api compatible with AWS S3 storage)
 
-   ```bash
+   ```shell
    helm repo add minio https://helm.min.io/
    helm install minio minio/minio --set accessKey=myaccesskey --set secretKey=mysecretkey -n minio --create-namespace
    # test and configure it
@@ -142,21 +142,21 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
 
    Here are the dev test steps you can iterate:
 
-   ```bash
-   # test that the helm chart templates successfully and examine the output to insure expected results
+   ```shell
+   # Test that the helm chart templates successfully and examine the output to insure expected results
    helm template <releasename> ./chart -n <namespace> -f chart/values.yaml
-   # deploy with helm
+   # Deploy with helm
    helm upgrade -i <releasename> ./chart -n <namespace> --create-namespace -f chart/values.yaml
-   # conduct testing
-   # tear down
+   # Conduct testing
+   # Tear down
    helm delete <releasename> -n <namespace>
-   # manually delete the namespace to insure that everything is gone
+   # Manually delete the namespace to insure that everything is gone
    kubectl delete ns <namespace>
    ```
 
 1. Wait to create a git tag release until integration testing with BigBang chart is completed.  You will very likely discover more Package changes that are needed during BigBang integration. When you are confident that the Package code is complete, squash commits and rebase your development branch with the "main" branch.
 
-   ```bash
+   ```shell
    git rebase origin/main
    git reset $(git merge-base origin/main $(git rev-parse --abbrev-ref HEAD))
    git add -A

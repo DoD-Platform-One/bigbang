@@ -1,8 +1,10 @@
-# Goals of this Diagram: 
+# Goals of this Diagram
+
 * Help new users understand the data flow of prometheus metrics
 
-# Prometheus Metrics Data Flow Diagram: 
-![](images/metrics_data_flow_diagram.app.diagrams.net.png)
+## Prometheus Metrics Data Flow Diagram
+
+![metrics_data_flow_diagram.app.diagrams.net.png](images/metrics_data_flow_diagram.app.diagrams.net.png)
 
 | Line Number | Protocol | Port | Description |
 | --- |  --- | --- | --- |

@@ -8,24 +8,28 @@
 
 ## Usage
 
-Unpack 
-```
+Unpack
+
+```shell
 tar -xvf images.tar.gz
 ```
 
-Start a local registry based on the images we just unpacked
-```
+Start a local registry based on the images we just unpacked.
+
+```shell
 cd ./var/lib/registry
 docker load < registry.tar
 docker run -p 25000:5000 -v $(pwd):/var/lib/registry registry:2
-# verify the registry mounted correctly
+# Verify the registry mounted correctly
 curl http://localhost:25000/v2/_catalog -k
-# a list of Big Bang images should be displayed, if not check the volume mount of the registry
+# A list of Big Bang images should be displayed, if not check the volume mount of the registry
 ```
+
 Configure `./synker.yaml`
 
-Example
-```
+Example:
+
+```yaml
 destination:
   registry:
     # Hostname of the destination registry to push to
@@ -33,8 +37,10 @@ destination:
     # Port of the destination registry to push to
     port: 5000
 ```
-If using Harbor reference the project name
-```
+
+If using Harbor, reference the project name.
+
+```yaml
 destination:
   registry:
     # Hostname of the destination registry to push to
@@ -42,8 +48,10 @@ destination:
     # Port of the destination registry to push to
     port: 443
 ```
-If your destination repo requires credentials add them to ` ~/.docker/config.json`
-```
+
+If your destination repo requires credentials add them to `~/.docker/config.json`
+
+```json
 {
   "auths": {
     "registry.dso.mil": {
@@ -61,11 +69,12 @@ If your destination repo requires credentials add them to ` ~/.docker/config.jso
     }
   }
 }
-``` 
+```
 
 **WARNING:** Verify your credentials with docker login before running synker. If your environment has login lockout after failed attempts synker could trigger a lockout if your credentials are incorrect.
 
-```
+```shell
 ./synker push
 ```
-Verify the images were pushed to your registry
+
+Verify the images were pushed to your registry.
