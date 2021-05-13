@@ -32,12 +32,12 @@ variables with the proper values for your package (you can check the helmrelease
 #### Including the test library
 
 To include the test library, you need to add a dependency to the packages Chart.yaml, with the latest version
-(0.5.0 as of this doc, latest version can be seen in `bb-test-lib/Chart.yaml`):
+(latest version can be seen in [bb-test-lib/Chart.yaml](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/bb-test-lib/Chart.yaml#L18)):
 
 ```yaml
 dependencies:
   - name: bb-test-lib
-    version: "0.5.0"
+    version: "x.x.x" # See https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/bb-test-lib/Chart.yaml#L18 for latest
     repository: "oci://registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates"
 ```
 
@@ -170,6 +170,14 @@ Your final directory structure and files should look like this:
 `-- tests
    `-- test-values.yaml (with your bbtests values)
 ```
+
+##### Cypress artifacts
+
+Cypress artifacts, if enabled, are tar'd, base64 encoded, and stored in a configmap. This means the max size for them is 1MiB. If your cypress test is failing to save as an artifact in the pipeline due to size you can try lowering the video quality by placing the following line in your cypress.json:
+```json
+  "videoCompression": 35
+```
+``videoCompression`` defaults to 32 and can be set all the way up to 51, though your video will most likely not be watchable at 51 you can increment from 32 until the video fits and is watchable. For more information see [this doc](https://docs.cypress.io/guides/references/configuration#Videos)
 
 #### Scripts
 
@@ -319,7 +327,7 @@ always be found in the [CHANGELOG](./CHANGELOG.md).
 ```yaml
 include:
   - project: "platform-one/big-bang/pipeline-templates/pipeline-templates"
-    ref: "1.1.1"
+    ref: "master"
     file: "/templates/package-tests.yml"
 # Optional
 variables:
