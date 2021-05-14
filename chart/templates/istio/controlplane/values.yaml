@@ -12,5 +12,4 @@ imagePullSecrets:
   - private-registry
 
 openshift: {{ .Values.openshift }}
-
 {{- end -}}

@@ -3,27 +3,4 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: sonarqube
----
-{{- if ( include "imagePullSecret" . ) }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: sonarqube
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
----
-# create database secret
-{{- if and .Values.addons.sonarqube.database.host .Values.addons.sonarqube.database.username .Values.addons.sonarqube.database.password .Values.addons.sonarqube.database.database .Values.addons.sonarqube.database.port }}
-apiVersion: v1
-kind: Secret
-metadata:
-    name: sonarqube-db-secret
-    namespace: sonarqube
-type: kubernetes.io/opaque
-stringData:
-    postgresql-password: {{ .Values.addons.sonarqube.database.password }}
-{{- end }}
 {{- end }}
