@@ -18,3 +18,8 @@ sources:
 - https://github.com/kiali/kiali-operator
 - https://github.com/kiali/helm-charts
 icon: https://raw.githubusercontent.com/kiali/kiali.io/master/themes/kiali/static/img/kiali_logo_masthead.png
+
+dependencies:
+  - name: bb-test-lib
+    version: "0.4.0"
+    repository: "oci://registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates"

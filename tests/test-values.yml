@@ -1,10 +1,9 @@
 istio:
   enabled: false
-image:
-  pullSecrets:
-  - private-registry-mil
-cr:
-  spec:
-    deployment:
-      image_pull_secrets:
-      - private-registry-mil
+
+
+bbtests:
+  cypress:
+    artifacts: true
+    envs:
+      cypress_url: 'http://kiali:{{ default 20001 .Values.port }}'
