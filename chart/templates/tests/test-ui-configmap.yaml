@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cypress-tests
-  annotations:
-    "helm.sh/hook": test
-data:
-{{ (.Files.Glob "cypress/*").AsConfig | indent 2 }}
-
