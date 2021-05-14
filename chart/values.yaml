@@ -654,7 +654,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.12.7-bb.2"
+      tag: "1.12.13-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -715,6 +715,9 @@ addons:
 
       # -- Port of a pre-existing Redis to use for Anchore Enterprise.
       port: ""
+
+      # -- OPTIONAL: Username to connect to a pre-existing Redis (for password-only auth leave empty)
+      username: ""
 
       # -- Password to connect to pre-existing Redis.
       password: ""
