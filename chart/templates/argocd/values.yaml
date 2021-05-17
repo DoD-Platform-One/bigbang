@@ -27,6 +27,9 @@ redis-bb:
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
 {{- if .Values.addons.argocd.sso.enabled }}
 sso:
   enabled: {{ .Values.addons.argocd.sso.enabled }}
