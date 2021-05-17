@@ -65,8 +65,20 @@ config: |
     unique-id-format %{+X}o\ 1-%[date,hex,bytes(8,8),lower]-%[capture.req.hdr(3)]
     http-request set-header X-Amzn-Trace-Id Root=%[unique-id,lower]
     bind :8080
+    {{- $monitoringValues := .Values.monitoring.values | default dict }}
+    {{- $monitoringIstioValues := $monitoringValues.istio | default dict }}
+    {{- $prometheusHostValues := $monitoringIstioValues.prometheus | default dict}}
+    {{- $alertmanagerHostValues := $monitoringIstioValues.alertmanager | default dict}}
+    {{- if hasKey $alertmanagerHostValues "hosts" }}
+    acl host_alertmanager hdr(host) -i {{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}
+    {{- else }}
     acl host_alertmanager hdr(host) -i alertmanager.{{ .Values.hostname }}
+    {{- end }}
+    {{- if hasKey $prometheusHostValues "hosts" }}
+    acl host_prometheus hdr(host) -i {{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}
+    {{- else }}
     acl host_prometheus hdr(host) -i prometheus.{{ .Values.hostname }}
+    {{- end }}
 
     option forwardfor
     use_backend alertmanager_main if host_alertmanager
