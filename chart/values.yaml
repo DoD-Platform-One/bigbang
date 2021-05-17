@@ -56,7 +56,7 @@ sso:
     realm: baby-yoda
 
   # -- Keycloak's certificate authority (unencoded) used by authservice to support SSO for various packages
-  certificate_authority: ""
+  certificate_authority: ''
 
   # -- Keycloak realm's json web key uri, obtained through https://<keycloak-server>/auth/realms/<realm>/.well-known/openid-configuration
   jwks: ""
