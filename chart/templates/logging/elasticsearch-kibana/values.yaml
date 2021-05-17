@@ -7,14 +7,35 @@ hostname: {{ .Values.hostname }}
 istio:
   enabled: {{ .Values.istio.enabled }}
 
-{{- if .Values.logging.sso.enabled }}
+{{- with .Values.logging.sso }}
+{{- if .enabled }}
 sso:
-  enabled: {{ .Values.logging.sso.enabled }}
-  client_id: {{ .Values.logging.sso.client_id }}
-  client_secret: {{ .Values.logging.sso.client_secret | default "no-secret" }}
+  enabled: {{ .enabled }}
+  client_id: {{ .client_id | quote }}
+  client_secret: {{ .client_secret | default "no-secret" }}
   oidc:
-    host: {{ .Values.sso.oidc.host }}
-    realm: {{ .Values.sso.oidc.realm }}
+    {{- if $.Values.logging.sso.oidc }}
+    host: {{ .oidc.host | default $.Values.sso.oidc.host | quote }}
+    realm: {{ .oidc.realm | default $.Values.sso.oidc.realm | quote }}
+    {{- else }}
+    host: {{ $.Values.sso.oidc.host | quote }}
+    realm: {{ $.Values.sso.oidc.realm | quote }}
+    {{- end }}
+  {{- /* Optional fields should be nil checked */ -}}
+  {{- list "issuer" .issuer | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "auth_url" .auth_url | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "token_url" .token_url | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "userinfo_url" .userinfo_url | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "jwkset_url" .jwkset_url | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_principal" .claims_principal | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_principal_pattern" .claims_principal_pattern | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "requested_scopes" .requested_scopes | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "signature_algorithm" .signature_algorithm | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "endsession_url" .endsession_url | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_group" .claims_group | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_mail" .claims_mail | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "cert_authorities" .cert_authorities | include "bigbang.addValueIfSet" | indent 2 }}
+{{- end }}
 {{- end }}
 
 kibana:
