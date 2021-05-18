@@ -3,6 +3,44 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.8.0]
+
+* [!447](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/447): Sonarqube upgrade app version 8.7.1 chart version 9.2.6-bb.8
+* [!406](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/406): Authservice Support For Non Keycloak OIDC Endpoints
+* [!459](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/459): Gitlab update to fix monitoring
+* [!463](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/463),[!480](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/480): update codeowners
+* [!462](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/462): Document GitLab package architecture in charter
+* [!453](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/453): Set Global Timeout for Flux & Allow for HelmRelease Flux Settings to be Populated via Values File
+* [!466](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/466): Updating name for kiali oidc secret secret
+* [!465](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/465): Mattermost update app version 5.34.2 chart version 0.1.5-bb.0
+* [!467](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/467): update changelog for release 1.7.0
+* [!468](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/468): Modify continuous integration (CI) pipeline script execution
+* [!474](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/474): Update twistlock app version 21.04.412 chart version 0.0.4-bb.0
+* [!464](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/464): Documentation updates
+* [!475](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/475): Anchore upgrade app version 0.9.3 chart version 1.12.13-bb.0
+* [!430](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/430): Charter update for istio architecture
+* [!451](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/451),[!481](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/481),[!482](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/482): Breakout secrets into individual files in Package templates
+* [!417](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/417): update Kibana
+* [!350](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/350): Authservice Redirect URLs dont respect virtual service name overrides
+* [!485](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/485): ArgoCD upgrade app version 1.8.4 chart version 2.14.7-bb.5
+* [!476](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/476): Charter documentation updates
+* [!134](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/134),[!489](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/489): BETA release of Keycloak app version 13.0.0 helm chart version 11.0.0
+* [!342](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/342): Upgrade elasticsearch-kibana package app version 7.10.x chart version 0.1.11-bb.0
+* [!457](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/457): Add labels to authservice namespace in compliance with charter
+
+### Upgrade Notices
+* Release 1.8.0 upgrades Elasticsearch and Kibana to 7.10 versions and if the [autoRollingUpgrade](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/#autorollingupgrade) job does not complete successfully or is interfered with it could cause ECK data loss. Please leave autoRollingUpgrade enabled and read [documentation](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/blob/main/docs/troubleshooting.md) to prepare for upgrade issues.
+
+
+### Known Issues
+* If the following error is seen on any helm releases ```scheme "" not supported``` try updating flux to latest ib images. A simple way to do this is by adding registry credentials to the flux-system namespace and applying the flux.yaml:
+```bash
+kubectl create secret docker-registry private-registry --docker-server=registry1.dso.mil --docker-username=<Your IronBank Username> --docker-password=<Your IronBank Personal Access Token> --docker-email=<Your E-mail Address> -n flux-system
+curl https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/scripts/deploy/flux.yaml | kubectl apply -f -
+```
+* There is a [known issue](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/329) with Velero ability to restore PersistentVolumes.
+
+
 ## [1.7.0]
 
 * [!453](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/453): Global Timeout for flux and allow for HR flux settings to be populated via values
@@ -23,14 +61,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * [!462](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/462): Document GitLab package architecture in charter
 * [!463](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/463): Update CODEOWNERS
 
-## Upgrade Notice
+### Upgrade Notice
 This release comes with a new version of Sonarqube which requires a manual database upgrade that can be easily done through the web interface. If you see a message stating Sonarqube is under maintenance go to the following url and click update database:
 ```
 https://sonarqube.your.url/setup
 ```
 After a few minutes you should be able to log back in.
 
-## Known Issues
+### Known Issues
 If the following error is seen on any helm releases ```scheme "" not supported``` try updating flux to latest ib images. A simple way to do this is by adding registry credentials to the flux-system namespace and applying the flux.yaml:
 ```bash
 kubectl create -n flux-system secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='<IB_Username>' --docker-password="<CLI_TOKEN>"
