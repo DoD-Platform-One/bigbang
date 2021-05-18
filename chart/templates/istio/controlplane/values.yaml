@@ -12,4 +12,20 @@ imagePullSecrets:
   - private-registry
 
 openshift: {{ .Values.openshift }}
+
+{{- if .Values.addons.keycloak.enabled }}
+extraServers:
+- port:
+    name: https-keycloak
+    protocol: TLS
+    number: 8443
+  hosts:
+    - keycloak.{{ .Values.hostname }}
+  tls:
+    mode: PASSTHROUGH
+
+gateway:
+  hosts:
+    - "*.admin.{{ .Values.hostname }}"
+{{- end }}
 {{- end -}}

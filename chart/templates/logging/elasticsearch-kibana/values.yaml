@@ -6,6 +6,9 @@
 hostname: {{ .Values.hostname }}
 istio:
   enabled: {{ .Values.istio.enabled }}
+  kibana:
+    hosts:
+      - kibana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 
 {{- with .Values.logging.sso }}
 {{- if .enabled }}

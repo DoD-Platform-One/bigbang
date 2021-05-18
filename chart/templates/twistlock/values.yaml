@@ -14,4 +14,7 @@ imagePullSecrets:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  console:
+    hosts:
+      - twistlock{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 {{- end -}}

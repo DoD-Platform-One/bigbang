@@ -8,6 +8,9 @@ imagePullSecrets:
 hostname: {{ .Values.hostname }}
 istio:
   enabled: {{ .Values.istio.enabled }}
+  jaeger:
+    hosts:
+    - tracing{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:
