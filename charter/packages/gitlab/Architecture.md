@@ -2,13 +2,13 @@
 
 ## Overview
 
-[Gitlab](https://about.gitlab.com/) is an open-source with premium offering, self-hostable Git respository, build system and container registry.
+[Gitlab](https://about.gitlab.com/) is an open-source with premium offering, self-hostable Git repository, build system and container registry.
 
 Big Bang's implementation uses the [Gitlab Helm Chart](https://docs.gitlab.com/charts/) to provide custom resources and manage the application.
 
-A more detail view of Bigbang's implementation of Gitlab can be found in the [package docs](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/tree/main/chart/doc).
+A more detail view of Big Bang's implementation of Gitlab can be found in the [package docs](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/tree/main/chart/doc).
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ### UI
 
@@ -35,34 +35,36 @@ monitoring:
 
 Gitlab provides built in health checks.
 
-```bash
+```shell
 GET /-/health
 ```
 
 Example request
 
-```bash
+```shell
 curl "https://gitlab.example.com/-/health"
 ```
 
 Gitlab also provides a separate liveness and readiness probes.
 
-```bash
+```shell
 GET /-/readiness
 GET /-/readiness?all=1
 ```
 
 Example request
-```bash
+
+```shell
 curl "https://gitlab.example.com/-/readiness"
 ```
 
-```bash
+```shell
 GET /-/liveness
 ```
 
 Example request
-```bash
+
+```shell
 curl "https://gitlab.example.com/-/liveness"
 ```
 
@@ -89,13 +91,13 @@ Bigbang currently used the community edition. This can be overwritten in the val
   edition: ce
 ```
 
-More information about Gitlab's licensing can be found [here](https://about.gitlab.com/install/ce-or-ee/) for the information page and [here](https://gitlab.com/gitlab-org/gitlab/blob/master/LICENSE) for the actual license.
+More information about GitLab licensing can be found [here](https://about.gitlab.com/install/ce-or-ee/) for the information page and [here](https://gitlab.com/gitlab-org/gitlab/blob/master/LICENSE) for the actual license.
 
 ## Storage
 
 ### Database Storage
 
-Gitlab uses a Postgresql database to store all metadata for git repositories as well as all business logic around the UI and workflows within the application. By default Bigbang will install a internal Postgres instance to support Gitlab. The reccommended approach is to provision and use an external Postgres instance.
+Gitlab uses a Postgresql database to store all metadata for git repositories as well as all business logic around the UI and workflows within the application. By default Bigbang will install a internal Postgres instance to support Gitlab. The recommended approach is to provision and use an external Postgres instance.
 
 You can configure an external database by providing the values needed in the Bigbang values.yaml file under the Gitlab section. Entering connection info will automatically disable the deployment of an internal database and will deploy using the external instance.
 
@@ -122,6 +124,7 @@ You can configure an external database by providing the values needed in the Big
 ### File Storage
 
 Gitlab uses S3, Minio, or another S3-style storage for file storage. By default Big Bang deploys an in-cluster Minio instance for this purpose, but you have the option to point to an external Minio or S3 if desired. See the below example for the values to supply:
+
 ```yaml
     objectStorage:
       # -- Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used.
@@ -150,11 +153,9 @@ Gitlab uses S3, Minio, or another S3-style storage for file storage. By default 
 
 ## Dependencies
 
-Additional pass throughs for dependencies that deviate from rationalized standards can be passed using the values: tag in the main Bigbang values.yaml.
+Additional pass-throughs for dependencies that deviate from rationalized standards can be passed using the values: tag in the main Bigbang values.yaml.
 
 ```yaml
 # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
     values: {}
 ```
-
-

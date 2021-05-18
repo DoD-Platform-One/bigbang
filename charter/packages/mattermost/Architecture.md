@@ -7,6 +7,7 @@
 Big Bang's implementation uses the [Mattermost operator](https://github.com/mattermost/mattermost-operator) to provide custom resources and manage the application.
 
 ### Basic Tier
+
 ```mermaid
 graph LR
   subgraph "Mattermost"
@@ -33,6 +34,7 @@ graph LR
 ```
 
 ### Enterprise Tier with Integrations
+
 ```mermaid
 graph LR
   subgraph "Mattermost"
@@ -64,11 +66,11 @@ graph LR
   end
 ```
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ### UI
 
-The Mattermost UI is the primary way of interacting with Mattermost. The UI is accessible via a web browser, desktop client, and mobile apps. The UI provides access to all mattermost features as well as configuration of the instance via the settings (or "System Console"). 
+The Mattermost UI is the primary way of interacting with Mattermost. The UI is accessible via a web browser, desktop client, and mobile apps. The UI provides access to all mattermost features as well as configuration of the instance via the settings (or "System Console").
 
 ### Logging
 
@@ -90,19 +92,22 @@ The Mattermost Operator ships by default with health checks on the address `/api
 
 **Important Note:** Mattermost by default handles scaling and what it interprets as your needs based upon the users it is configured for. See this note from the Mattermost Operator:
 
-    Size defines the size of the Mattermost. This is typically
-    specified in number of users. This will override replica and resource
-    requests/limits appropriately for the provided number of users.
-    values of resources. Accepted values are: 100users, 1000users, 5000users,
-    10000users, and 250000users. If replicas and resource requests/limits
-    are not specified, and Size is not provided the configuration for
-    5000users will be applied. Setting ''Replicas'', ''Scheduling.Resources'',
-    ''FileStore.Replicas'', ''FileStore.Resource'', ''Database.Replicas'',
-    or ''Database.Resources'' will override the values set by Size.
-    Setting new Size will override previous values regardless if set
-    by Size or manually.
+```plaintext
+Size defines the size of the Mattermost. This is typically
+specified in number of users. This will override replica and resource
+requests/limits appropriately for the provided number of users.
+values of resources. Accepted values are: 100users, 1000users, 5000users,
+10000users, and 250000users. If replicas and resource requests/limits
+are not specified, and Size is not provided the configuration for
+5000users will be applied. Setting ''Replicas'', ''Scheduling.Resources'',
+''FileStore.Replicas'', ''FileStore.Resource'', ''Database.Replicas'',
+or ''Database.Resources'' will override the values set by Size.
+Setting new Size will override previous values regardless if set
+by Size or manually.
+```
 
 To update the "size" (`users` value) for Mattermost, you need to override the default of 100 in your values (note you do not need to include the word `users` since Big Bang handles this for you), as an example to set 1000:
+
 ```yaml
 addons:
   mattermost:
@@ -111,6 +116,7 @@ addons:
 ```
 
 To override Mattermost's handling of replicas and explicitly set replicas you can specify this workaround in your values:
+
 ```yaml
 addons:
   mattermost:
@@ -126,6 +132,7 @@ SSO is built in for Mattermost and Big Bang uses the [Gitlab SSO integration](ht
 If using Big Bang's SSO implementation, Keycloak is used behind the scenes to "spoof" the way Gitlab interaction works for SSO. The set up for how to configure Keycloak to handle this is well documented via the [Mattermost docs](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md).
 
 See below for an example of the values to provide to Mattermost for SSO setup:
+
 ```yaml
 addons:
   mattermost:
@@ -143,6 +150,7 @@ addons:
 Big Bang deploys the free version of Mattermost by default, but there are two additional tiers of paid licenses for additional features. Pricing for these licenses is typically based upon number of users. Full details can be viewed on [Mattermost's tier page](https://docs.mattermost.com/overview/product.html). If you want to trial the E20 features you can request a trial via Mattermost's [request page](https://mattermost.com/trial/) or after deploying via the System Console you can begin a 30 day trial under the "Edition and License" page.
 
 ### Mattermost E10 Additional Features
+
 - Active Directory/LDAP Single Sign-on
 - OAuth 2.0 authentication for team creation, account creation, and user sign-in
 - Encrypted push notifications with service level agreements (SLAs) via HPNS
@@ -151,6 +159,7 @@ Big Bang deploys the free version of Mattermost by default, but there are two ad
 - Scale to handle hundreds of users per team
 
 ### Mattermost E20 Additional Features
+
 - Advanced SAML 2.0 authentication with Okta, OneLogin, and Active Directory Federation Services
 - Active Directory/LDAP group sync
 - OpenID Connect authentication for team creation, account creation, and user sign-in
@@ -165,6 +174,7 @@ Big Bang deploys the free version of Mattermost by default, but there are two ad
 ### License Values
 
 Once you have obtained a license this can be added to your values in Big Bang to automatically set up your Mattermost instance with the license (replacing the `license:` value with your full license string):
+
 ```yaml
 addons:
   mattermost:
@@ -177,7 +187,8 @@ addons:
 
 ### Database Storage
 
-Mattermost makes use of a database to store all chat information as well as persistent configuration for all of Mattermost. By default Big Bang deploys an in-cluster Postgresql instance for this purpose, but it is reccomended to point to an external DB instance for HA. Currently Big Bang supports pointing to any external Postgres instance via values config. See the below example for values to point your database connection to an external instance:
+Mattermost makes use of a database to store all chat information as well as persistent configuration for all of Mattermost. By default Big Bang deploys an in-cluster Postgresql instance for this purpose, but it is recommended to point to an external DB instance for HA. Currently Big Bang supports pointing to any external Postgres instance via values config. See the below example for values to point your database connection to an external instance:
+
 ```yaml
 addons:
   mattermost:
@@ -194,6 +205,7 @@ addons:
 ### File Storage
 
 Mattermost uses S3, Minio, or another S3-style storage for file storage. By default Big Bang deploys an in-cluster Minio instance for this purpose, but you have the option to point to an external Minio or S3 if desired. See the below example for the values to supply:
+
 ```yaml
 addons:
   mattermost:

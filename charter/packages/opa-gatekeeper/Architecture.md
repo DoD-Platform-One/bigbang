@@ -4,7 +4,7 @@
 
 Gatekeeper is an auditing tool that allows administrators to see what resources are currently violating any given policy.
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph LR
