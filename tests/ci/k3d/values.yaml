@@ -18,13 +18,15 @@ logging:
             cpu: .5
           limits: {}
       data:
-        count: 1
+        count: 2
         persistence:
           size: 5Gi
         resources:
           requests:
             cpu: .5
           limits: {}
+    kibana:
+      count: 1
 
 fluentbit:
   values:
