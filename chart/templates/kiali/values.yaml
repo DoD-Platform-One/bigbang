@@ -6,6 +6,9 @@
 hostname: {{ .Values.hostname }}
 istio:
   enabled: {{ .Values.istio.enabled }}
+  kiali:
+    hosts:
+      - kiali{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:

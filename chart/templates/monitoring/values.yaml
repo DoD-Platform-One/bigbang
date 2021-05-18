@@ -10,20 +10,28 @@ flux:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
-  {{- if .Values.monitoring.sso.enabled }}
   prometheus:
     enabled: true
+    {{- if .Values.monitoring.sso.enabled }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
+    {{- end }}
+    hosts:
+    - prometheus{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
   alertmanager:
     enabled: true
+    {{- if .Values.monitoring.sso.enabled }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
+    {{- end }}
+    hosts:
+    - alertmanager{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
   grafana:
     enabled: true
-  {{- end }}
+    hosts:
+    - grafana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 
 global:
   imagePullSecrets:
@@ -40,7 +48,7 @@ grafana:
   grafana.ini:
     {{- if .Values.istio.enabled }}
     server:
-      root_url: https://grafana.{{ .Values.hostname }}/
+      root_url: https://grafana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}/
     {{- end }}
 
     auth:

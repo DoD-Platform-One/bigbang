@@ -310,6 +310,19 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.velero.flux | object | `{}` | Flux reconciliation overrides specifically for the Velero Package |
 | addons.velero.values | object | `{"plugins":[]}` | Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml |
 | addons.velero.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
+| addons.keycloak.enabled | bool | `false` | Toggle deployment of Keycloak |
+| addons.keycloak.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git"` | Git repo for Keycloak Helm chart |
+| addons.keycloak.git.path | string | `"./chart"` | Path to helm chart in Git repository |
+| addons.keycloak.git.tag | string | `"x.x.x-bb.x"` | Git tag for Helm chart |
+| addons.keycloak.ingress.key | string | `-----BEGIN PRIVATE KEY-----...` | Private certificate key for Keycloak |
+| addons.keycloak.ingress.cert | string | `-----BEGIN CERTIFICATE-----...` | TLS certificate for Keycloak |
+| addons.keycloak.database.host | string | `""` | Hostname of a pre-existing database to use. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
+| addons.keycloak.database.type | string | `postgres` | Specifies the database type (e.g. `postgres`, `mysql`) |
+| addons.keycloak.database.port | string | `""` | Port of a pre-existing database to use. |
+| addons.keycloak.database.database | string | `""` | Database name to connect (Note: database name CANNOT contain hyphens). |
+| addons.keycloak.database.username | string | `""` | Username for access to the external database, the user must have all privileges on the database. |
+| addons.keycloak.database.password | string | `""` | Password for the username for access to the external database. |
+| addons.keycloak.values | map | `{}` | Additional values to pass through to the Keycloak Helm chart |
 
 ## Contributing
 

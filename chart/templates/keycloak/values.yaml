@@ -1,0 +1,59 @@
+{{- if .Values.addons.keycloak.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.keycloak "name" "keycloak" "defaults" (include "bigbang.defaults.keycloak" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.keycloak" -}}
+replicas: 2
+
+imagePullSecrets:
+- name: private-registry
+
+hostname: {{ .Values.hostname }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  keycloak:
+    enabled: true
+    hosts:
+      - keycloak.{{ .Values.hostname }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- if .Values.addons.keycloak.database.host }}
+postgresql:
+  enabled: false
+{{- end }}
+
+{{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
+secrets:
+  {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+  certificates:
+    stringData:
+      tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
+      tls.key: {{ .Values.addons.keycloak.ingress.key  | quote }}
+  {{- end }}
+
+  {{- with .Values.addons.keycloak.database }}
+  {{- if .host }}
+  db:
+    stringData:
+      DB_USER: {{ .username | quote }}
+      DB_PASSWORD: {{ .password | quote }}
+      DB_VENDOR: {{ default "postgres" .type }}
+      DB_ADDR: {{ .host }}
+      DB_PORT: {{ .port | quote }}
+      DB_DATABASE: {{ .database }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.addons.keycloak.database.host }}
+extraEnvFrom: |
+  - secretRef:
+      name: 'keycloak-db'
+{{- end }}
+
+{{- end }}

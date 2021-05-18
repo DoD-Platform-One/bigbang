@@ -399,3 +399,13 @@ addons:
       # Backup data in object storage will _not_ be deleted, however Backup instances in the Kubernetes API will.
       # Always clean up CRDs in CI.
       cleanUpCRDs: true
+
+  keycloak:
+    enabled: false
+    values:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits: {}

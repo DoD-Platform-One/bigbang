@@ -40,7 +40,28 @@ done
 for dir in cypress-tests/*/
 do
   if [ -f "${dir}tests/cypress.json" ]; then
-    echo "Running cypress tests in ${dir}"
-    cypress run --project "${dir}"tests
+    if [ "$(yq e ".addons.keycloak.enabled" "tests/ci/k3d/values.yaml")" == "true" ]; then
+      echo "Running cypress tests. Keycloak is enabled. Directory is ${dir}"
+      if [ "${dir}" == "cypress-tests/elasticsearch-kibana/" ]; then
+        echo "Keycloak is enabled and cypress directory is ${dir}"
+        echo "Running cypress tests in ${dir}"
+        CYPRESS_kibana_url=kibana.admin.bigbang.dev cypress run --project "${dir}"tests
+      fi
+      if [ "${dir}" == "cypress-tests/monitoring/" ]; then
+        echo "Keycloak is enabled and cypress directory is ${dir}"
+        echo "Running cypress tests in ${dir}"
+        CYPRESS_prometheus_url=prometheus.admin.bigbang.dev CYPRESS_grafana_url=grafana.admin.bigbang.dev cypress run --project "${dir}"tests
+      fi
+      if [ "${dir}" == "cypress-tests/twistlock/" ]; then
+        echo "Keycloak is enabled and cypress directory is ${dir}"
+        echo "Running cypress tests in ${dir}"
+        CYPRESS_twistlock_url=twistlock.admin.bigbang.dev cypress run --project "${dir}"tests
+      fi
+    else
+      echo "Keycloak not enabled"
+      echo "Running cypress tests in ${dir}"
+      cypress run --project "${dir}"tests
+    fi
   fi
 done
+

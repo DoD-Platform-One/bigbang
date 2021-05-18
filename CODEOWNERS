@@ -98,9 +98,9 @@ chart/values.yaml               @lynnstill @ryan.j.garcia @kevin.wilder
 chart/templates/gitlab          @lynnstill @ryan.j.garcia @kevin.wilder
 
 ^[KeyCloak]
-chart/Chart.yaml                @megamind
-chart/values.yaml               @megamind
-chart/templates/keycloak        @megamind
+chart/Chart.yaml                @megamind @kevin.wilder @michaelmcleroy
+chart/values.yaml               @megamind @kevin.wilder @michaelmcleroy
+chart/templates/keycloak        @megamind @kevin.wilder @michaelmcleroy
 
 ^[Mattermost (and operator)]
 chart/Chart.yaml                @micah.nagel @branden.cobb

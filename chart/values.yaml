@@ -69,7 +69,7 @@ sso:
 
   # -- OIDC token URL template string (to be used as default)
   token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
-    
+
   # -- OIDC auth URL template string (to be used as default)
   auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
 
@@ -864,3 +864,44 @@ addons:
   #
   # ----------------------------------------------------------------------------------------------------------------------
 
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Keycloak
+  #
+  keycloak:
+    # -- Toggle deployment of Keycloak.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      path: "./chart"
+      tag: "11.0.0-bb.0"
+
+    # -- Certificate/Key pair to use as the certificate for exposing Keycloak
+    ingress:
+      key: ""
+      cert: ""
+
+    database:
+      # -- Hostname of a pre-existing database to use for Keycloak.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Pre-existing database type (e.g. postgres) to use for Keycloak.
+      type: postgres
+
+      # -- Port of a pre-existing database to use for Keycloak.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: "" # example: keycloak
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+    flux: {}
+
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+    values: {}
