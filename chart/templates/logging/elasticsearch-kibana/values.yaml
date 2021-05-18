@@ -39,12 +39,10 @@ sso:
 {{- end }}
 
 kibana:
-  version: 7.9.2
   imagePullSecrets:
     - name: private-registry
 
 elasticsearch:
-  version: 7.9.2
   imagePullSecrets:
     - name: private-registry
 {{- end -}}
