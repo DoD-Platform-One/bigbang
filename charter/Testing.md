@@ -57,10 +57,10 @@ In order to add Helm Chart tests to your application, the following enhancements
 
 * A test directory is added to templates/ directory within the helm chart.  This directory contains Kubernetes object
 definitions which are deployed only when a "helm Test" command is executed.  As an example, tests can be YAML files that
-execute pods with containers, deply config maps, secrets, or other objects.
-* When a files contain a pod / container defintion that executions tests, the container must return success or failure
+execute pods with containers, deploy config maps, secrets, or other objects.
+* When a files contain a pod / container definition that executions tests, the container must return success or failure
 (i.e., the container should exit successfully with an exit 0 for a test to be considered a success).
-* Each test object defintion must contain a "helm.sh/hook: test-success" annotation telling Helm that this object is a
+* Each test object definition must contain a "helm.sh/hook: test-success" annotation telling Helm that this object is a
 test and should only be deployed when tests are executed. The following example create a configmap that is only
 created during testing.
 
@@ -81,6 +81,7 @@ data:
 {{ (.Files.Glob "cypress/*").AsConfig | indent 2 }}
 
 ```
+
 Also note that the "helm.sh/hook-weight" can be used to order the creation and execution of test objects.
 
 ## Umbrella Testing

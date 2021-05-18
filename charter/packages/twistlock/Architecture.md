@@ -8,7 +8,7 @@
 
 [Developer Guide](docs/developer-guide.md)
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph LR
@@ -29,6 +29,7 @@ graph LR
   end
 
 ```
+
 ### UI
 
 Twistlock Console serves as the user interface within Twistlock. The graphical
@@ -38,7 +39,7 @@ user interface (GUI) lets you define policy, configure and control your Twistloc
 
 In Bigbang the  twistlock defender is installed manual.
 Follow the document to install defender as a daemonset.
-https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/README.md
+<https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/README.md>
 
 ### Storage
 
@@ -53,6 +54,7 @@ console:
 ```
 
 ### Database
+
 N/A
 
 ### Istio Configuration
@@ -91,8 +93,7 @@ SSO can be configured for twistlock  manually using the documentation provided. 
 ## Licensing
 
 Twistlock deployment requires license to operate. Enter your license key in the twistlock console. \
-[TwistLock  License Documentation](https://docs.paloaltonetworks.com/prisma/prisma-cloud/20-04/prisma-cloud-compute-edition-admin/welcome/licensing.html) 
-
+[TwistLock License Documentation](https://docs.paloaltonetworks.com/prisma/prisma-cloud/20-04/prisma-cloud-compute-edition-admin/welcome/licensing.html)
 
 ### Health Checks
 

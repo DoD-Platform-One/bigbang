@@ -4,7 +4,7 @@
 
 [Sonarqube](https://www.sonarqube.org/) is an open-source platform for continuous inspection of code quality to perform automatic reviews with static analysis of code to detect bugs, code smells, and security vulnerabilities.
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph TB
@@ -27,7 +27,7 @@ graph TB
 
 ### Storage
 
-Persistant storage can be enabled by setting the following values in the bigbang chart:
+Persistent storage can be enabled by setting the following values in the bigbang chart:
 
 ```yaml
 addons:
@@ -129,4 +129,4 @@ Sonarqube is released under the [Lesser GNU General Public License](https://en.w
 ## Dependencies
 
 Node kernel mods:
-https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/d_prerequisites.md#sonarqube
+<https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/d_prerequisites.md#sonarqube>

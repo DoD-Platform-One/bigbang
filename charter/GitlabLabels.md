@@ -13,7 +13,7 @@ The kind label shows the type of work that needs to be accomplished
 
 #### `kind::bug`
 
-Issues releated to Bigbang not functioning as expected
+Issues related to Bigbang not functioning as expected
 
 #### `kind::chore`
 
@@ -21,11 +21,11 @@ Catch all kind that captures administrative tasking for the BigBang project
 
 #### `kind:ci`
 
-Issues related to the CI/CD, developer workflows and/or the releaes process
+Issues related to the CI/CD, developer workflows and/or the release process
 
 #### `kind::docs`
 
-Issues related to documentaiton
+Issues related to documentation
 
 #### `kind::feature`
 
@@ -33,7 +33,7 @@ Creation of a new capability for BigBang and/or one of its packages
 
 #### `kind::enhancement`
 
-Improvement of an existing capablity to work more efficiently in specific environments
+Improvement of an existing capability to work more efficiently in specific environments
 
 #### `kind::test`
 
@@ -43,7 +43,7 @@ Improvements on testing for individual packages or Big Bang.  Does not change th
 
 #### `priority::high`
 
-`priority::high` issues are causing runtime issues in production enviornments. These issues justify a patch of a release.
+`priority::high` issues are causing runtime issues in production environments. These issues justify a patch of a release.
 
 #### `priority:: medium`
 
@@ -75,7 +75,7 @@ This Issue has not been started.
 
 ### Packages
 
-Package labels are identified by their package name and serve two purposes. 
+Package labels are identified by their package name and serve two purposes.
 
 1. Packages owners subscribe to the package labels for their packages and will be notified when a new issue or merge request is created with the label
 
@@ -163,7 +163,7 @@ The `size` label helps identify the scope of work needed as part of the epic
 
 #### `size::small`
 
-Sufficently small enough to be completed by an engineer in a two week period
+Sufficiently small enough to be completed by an engineer in a two week period
 
 #### `size::medium`
 

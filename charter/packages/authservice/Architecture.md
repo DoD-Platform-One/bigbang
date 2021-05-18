@@ -41,7 +41,7 @@ graph LR
   end
 ```
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ### Licensing
 
@@ -49,7 +49,7 @@ graph LR
 
 ### Single Sign On
 
-Authservice provides OIDC Single Sign On capabilities for apps that don't have native support. 
+Authservice provides OIDC Single Sign On capabilities for apps that don't have native support.
 
 Pods just need to have istio-injection, a single label which by default is `protect=keycloak` applied to the pods, and a corresponding chain to load into authservice.
 
@@ -118,9 +118,10 @@ There is no UI feature for authservice.
 
 Within Big Bang, logs are captured by fluentbit and shipped to elastic by default.
 
-### Healthchecks
+### Health Checks
 
 The authservice Dockerfile includes a [healthcheck](https://repo1.dso.mil/dsop/istio-ecosystem/authservice/-/blob/master/Dockerfile#L23-24) and the authservice Helm Chart includes [liveness & readiness probes](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/chart/templates/deployment.yaml#L42-47) in its deployment:
+
 ```yaml
 livenessProbe:
   tcpSocket:
@@ -130,6 +131,6 @@ readinessProbe:
     port: 10003
 ```
 
-### Dependant Packages
+### Dependent Packages
 
 When setting `replicaCount` above `1`, a redis configuration is required.

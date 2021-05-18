@@ -52,7 +52,7 @@ package
    |  index.html [landing page for application within hugo]
    |  overview.md [Overview of application, purpose, and default config options]
    |  keycloak.md [Manual or automated steps to configure sso]
-   |  example-optional-config.md [Addtional files for optional configuration for the app]
+   |  example-optional-config.md [Additional files for optional configuration for the app]
 ```
 
 ### Formatting Needed

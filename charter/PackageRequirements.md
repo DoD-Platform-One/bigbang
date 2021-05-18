@@ -9,8 +9,8 @@ All Big Bang Packages shall adhere to the following requirements.  Where possibl
 * The `main` branch should be default in each project
 * Merge Requests should require 1 approver
 * The `main` branch should be protected:
-  * Devs + Maintainers should be allowed to merge.  
-  * No one should be allowed to push and it should allow 
+  * Developers + Maintainers should be allowed to merge.  
+  * No one should be allowed to push and it should allow
   * CODEOWNERs approval should be allowed
 * There should exist a protected tag with the wildcard `*-bb*`
 
@@ -47,7 +47,7 @@ There are two types of third party packages:
 
 These are packages that are supported, updated, and maintained by team members of BigBang. This designation is usually reserved for packages that key customers require, but are missing approved IronBank containers, or blanket approval that allows them to be included with the BigBang product.
 
-These products are labeled with the "BigBang Supported" badge on the repositorys `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
+These products are labeled with the "BigBang Supported" badge on the repository's `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
 
 #### Independent
 
@@ -85,7 +85,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 
 The common components that each package will have are defined in the following folder layout:
 
-```bash
+```shell
 ├── CODEOWNERS              # GitLab Code Owners for Package Owners/Understudies.
 ├── README.md               # top level summary of package
 ├── docs/                   # detailed documentation folder describing package consumption details and assumptions
@@ -101,7 +101,7 @@ The common components that each package will have are defined in the following f
 Each package shall contain a .gitlab-ci.yml file at the top of the package repo.   This file shall reference the pipeline CI/CD infrastructure
 files and include the following contents:
 
-```bash
+```shell
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
     ref: master
@@ -159,5 +159,3 @@ Each package will have a default branch of `main`.  Immutable tags will be used 
     version: ~1.2.3
 * There should be a Helm values file located at `tests/test-values.yaml` used for pipeline testing.
 * Charts should support `affinity` and `nodeSelector` configuration for all components.  If there is only one type of `Pods`, then a single, top level value shall be provided, otherwise there should be `affinity` and `nodeSelector` regions for each component.  See [the Kubernetes Docs](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) for more information
-
-

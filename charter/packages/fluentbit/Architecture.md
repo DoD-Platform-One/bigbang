@@ -4,7 +4,7 @@
 
 [FluentBit](https://fluentbit.io/) is an open source Log Processor and Forwarder which allows you to collect any data like metrics and logs from different sources, enrich them with filters and send them to multiple destinations. It's the preferred choice for containerized environments like Kubernetes.
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph TB 
