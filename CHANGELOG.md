@@ -4,6 +4,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.1.4]
+
+### Fixed
+
+- Fixed pipeline robot user.
+
 ## [1.1.3]
 
 ### Fixed

@@ -131,8 +131,8 @@ package tests:
         fi
       fi
       kubectl create namespace ${PACKAGE_NAMESPACE}
-      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
-      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="$(echo -n $REGISTRY1_PASSWORD | base64 -d -)"
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="$(echo -n $REGISTRY1_PASSWORD | base64 -d -)"
 
     # Check for istio in project name and install it if needed
     - |
@@ -194,10 +194,10 @@ package tests:
             kubectl create namespace ${dep_namespace};
           fi
           if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
-            kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+            kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="$(echo -n REGISTRY1_PASSWORD | base64 -d -)"
           fi
           if ! kubectl get secret -n ${dep_namespace} private-registry-mil 2> /dev/null; then
-            kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bigbang' --docker-password="${REGISTRY1_PASSWORD}"
+            kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="$(echo -n REGISTRY1_PASSWORD | base64 -d -)"
           fi
 
           if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
@@ -346,7 +346,7 @@ package:
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
-    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+    - echo $DOCKER_AUTH_CONFIG | base64 -d - > /root/.docker/config.json
   script:
     - |
       if [ -z ${PIPELINE_REPO_BRANCH} ]; then
