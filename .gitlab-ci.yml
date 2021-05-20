@@ -348,7 +348,11 @@ package:
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
-    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+    - |
+      jq -n '{"auths": {"registry.dso.mil": {"auth": $bb_registry_auth}, "registry1.dso.mil": {"auth": $registry1_auth}, "registry.il2.dso.mil": {"auth": $il2_registry_auth} } }' \
+        --arg bb_registry_auth ${BB_REGISTRY_AUTH} \
+        --arg registry1_auth ${REGISTRY1_AUTH} \
+        --arg il2_registry_auth ${IL2_REGISTRY_AUTH} > /root/.docker/config.json
   script:
     - cp ./scripts/package/synker.yaml ./synker.yaml
     # Populate images list in synker config

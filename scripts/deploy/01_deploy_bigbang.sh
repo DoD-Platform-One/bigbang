@@ -28,8 +28,8 @@ echo "Installing BigBang with the following configurations:"
 cat $CI_VALUES_FILE
 
 helm upgrade -i bigbang chart -n bigbang --create-namespace \
-  --set registryCredentials[0].username='robot$bigbang' \
-  --set registryCredentials[0].password="$REGISTRY1_PASSWORD" \
+  --set registryCredentials[0].username='robot$bb-dev-imagepullonly' \
+  --set registryCredentials[0].password="${REGISTRY1_PASSWORD}" \
   --set registryCredentials[0].registry=registry1.dso.mil \
   -f ${CI_VALUES_FILE}
 
