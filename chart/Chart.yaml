@@ -14,6 +14,12 @@ sources:
   - https://repo1.dso.mil/platform-one/big-bang/bigbang
 
 maintainers:
+  - name: Ryan Garcia
+    email: garcia.ryan@solute.us
+  - name: Michael McLeroy
+    email: michaelmcleroy@cloudfitsoftware.com
+  - name: Micah Nagel
+    email: micah.nagel@parsons.com
   - name: Tom Runyon
     email: tom@runyon.dev
   - name: Josh Wolf
