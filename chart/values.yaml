@@ -8,7 +8,8 @@ image:
 replicas: 
   count: 1
 
-imagePullSecrets: []
+imagePullSecrets:
+- name: private-registry
 
 affinity: {}
   # podAntiAffinity:
@@ -28,3 +29,6 @@ affinity: {}
 
 nodeSelector: {}
   # node-type: operator
+
+networkPolicies:
+  enabled: false
