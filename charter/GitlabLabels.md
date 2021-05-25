@@ -153,11 +153,11 @@ Epic is blocked by an external dependency that needs to be solved before work ca
 
 ### Priority
 
-#### `priority::5`
+#### `priority::1`
 
 Top of the backlog and should be broken down and worked on when cycles become available.
 
-#### `priority::4`
+#### `priority::2`
 
 TBD
 
@@ -165,11 +165,11 @@ TBD
 
 Medium term delivery providing long term value.
 
-#### `priority::2`
+#### `priority::4`
 
 TBD
 
-#### `priority::1`
+#### `priority::5`
 
 A nice to have, but not needed to advance the product.
 
