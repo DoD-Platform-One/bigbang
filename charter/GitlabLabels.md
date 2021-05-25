@@ -43,7 +43,7 @@ Improvements on testing for individual packages or Big Bang.  Does not change th
 
 #### `priority::1`
 
-`priority::3` issues are causing runtime issues in production environments. These issues justify a patch of a release.
+`priority::1` issues are causing runtime issues in production environments. These issues justify a patch of a release.
 
 #### `priority::2`
 
