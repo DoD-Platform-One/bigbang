@@ -41,17 +41,25 @@ Improvements on testing for individual packages or Big Bang.  Does not change th
 
 ### priority
 
-#### `priority::high`
+#### `priority::1`
 
-`priority::high` issues are causing runtime issues in production environments. These issues justify a patch of a release.
+`priority::3` issues are causing runtime issues in production environments. These issues justify a patch of a release.
 
-#### `priority:: medium`
+#### `priority::2`
 
-`priority:: medium` issues are defined by bugs that degrade system performance, but workarounds are available.  
+`priority::2` 
 
-#### `priority::low`
+#### `priority::3`
 
-`priority::low` issues are superficial and do not have any impact on the functioning of production systems
+`priority:: 3` issues are defined by bugs that degrade system performance, but workarounds are available.
+
+#### `priority::4`
+
+`priority:: 4` 
+
+#### `priority::5`
+
+`priority::5` issues are superficial and do not have any impact on the functioning of production systems
 
 ### Status
 
