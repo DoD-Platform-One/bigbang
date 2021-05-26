@@ -7,4 +7,5 @@ metadata:
     app.kubernetes.io/name: monitoring
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
 {{- end }}

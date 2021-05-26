@@ -8,4 +8,5 @@ metadata:
     app.kubernetes.io/name: minio
     app.kubernetes.io/component: "application-utilities"
     {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
 {{- end }}
