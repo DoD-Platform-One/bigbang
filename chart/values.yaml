@@ -582,17 +582,17 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
       path: "./chart"
-      tag: "9.2.6-bb.9"
+      tag: "9.2.6-bb.11"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
 
     sso:
-      # -- Toggle OIDC SSO for SonarQube.
+      # -- Toggle SAML SSO for SonarQube.
       # Enabling this option will auto-create any required secrets.
       enabled: false
 
-      # -- SonarQube OIDC client ID
+      # -- SonarQube SAML client ID
       client_id: ""
 
       # -- SonarQube SSO login button label
