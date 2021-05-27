@@ -2,6 +2,10 @@
 
 **SAML/SSO integration is a *Pro* license feature.**
 
+Nexus is a SAML client, not OIDC; the client ID must be a URL. Due to these facts it is not practical to automate SSO testing.
+
+Due to this limitation, we will not be providing a complete values example here or in bigbang.
+
 BigBang requires/prefers SAML/SSO integration out of the box; unfortunately, the upstream Helm chart did not have a solution at the drafting of this integration. To achieve our goal, we added a Kubernetes job that handles the SAML/SSO integration as part of the NXRM Helm installation. To enable this functionality, ensure `sso.enabled` is set to `true`; you will additionally require a Keycloak instance, the IDP metadata file, along with other parameters you may define in `sso.idp_data`.
 
 Our implementation closely follows the [Sonatype SAML Integration](https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak) documentation.
