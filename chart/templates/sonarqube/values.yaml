@@ -11,6 +11,9 @@ istio:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 image:
   pullSecret: private-registry
 
