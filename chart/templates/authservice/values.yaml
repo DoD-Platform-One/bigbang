@@ -6,6 +6,9 @@
 imagePullSecrets:
   - name: private-registry
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 global:
   oidc:
     host: {{ .Values.sso.oidc.host }}
