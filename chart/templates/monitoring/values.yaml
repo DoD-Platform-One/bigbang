@@ -8,6 +8,9 @@ hostname: {{ .Values.hostname }}
 flux:
   enabled: true
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   prometheus:
