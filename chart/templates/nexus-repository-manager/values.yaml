@@ -1,0 +1,46 @@
+{{- if .Values.addons.nexus.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.nexus "name" "nexus-repository-manager" "defaults" (include "bigbang.defaults.nexus-repository-manager" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.nexus-repository-manager" -}}
+domain: {{ .Values.hostname }}
+hostname: nexus
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+nexus:
+  imagePullSecrets:
+    - name: private-registry
+
+license_key: "{{ .Values.addons.nexus.license_key }}"
+
+{{- if .Values.addons.nexus.sso.enabled }}
+sso:
+  enabled: {{ .Values.addons.nexus.sso.enabled }}
+  idp_data:
+    entityId: "https://nexus.{{ .Values.hostname }}/service/rest/v1/security/saml/metadata"
+    usernameAttribute: "{{ .Values.addons.nexus.sso.idp_data.username }}"
+    firstNameAttribute: "{{ .Values.addons.nexus.sso.idp_data.firstName }}"
+    lastNameAttribute: "{{ .Values.addons.nexus.sso.idp_data.lastName }}"
+    emailAttribute: "{{ .Values.addons.nexus.sso.idp_data.email }}"
+    groupsAttribute: "{{ .Values.addons.nexus.sso.idp_data.groups }}"
+    validateResponseSignature: "true"
+    validateAssertionSignature: "true"
+    idpMetadata: '{{ .Values.addons.nexus.sso.idp_data.idpMetadata }}'
+  realm:
+    - "NexusAuthenticatingRealm"
+    - "NexusAuthorizingRealm"
+    - "SamlRealm"
+  role:
+    id: "keycloak"
+    name: "keycloak"
+    description: "all keycloak users as admins"
+    privileges:
+      - "nx-all"
+    roles:
+      - "nx-admin"
+{{- end }}
+{{- end -}}
