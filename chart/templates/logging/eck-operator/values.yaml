@@ -13,6 +13,9 @@ podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 imagePullSecrets:
   - name: private-registry
 {{- end -}}
