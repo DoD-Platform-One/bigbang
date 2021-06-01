@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.14.0-bb.0] - 2021-06-01
+### Changed
+- Updated to latest v1.14.0 operator from IB
+
 ## [1.13.0-bb.3] - 2021-05-25
 ### Added
 - Basic network policies to deny all ingress, allow egress only within cluster

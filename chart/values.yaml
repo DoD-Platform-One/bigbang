@@ -2,7 +2,7 @@
 image: 
   imagePullPolicy: IfNotPresent
   repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
-  tag: v1.13.0
+  tag: v1.14.0
 
 #Mattermost operator desired replicas
 replicas: 
