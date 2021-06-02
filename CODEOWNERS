@@ -16,10 +16,7 @@
 [Docs Owners]
 # Allow any one of the listed codeowners to approve merges to the documentation 
 # Does not allow the creator of the merge request to be the approveer.
-/docs/                @michaelmcleroy @egoode @aaronbeger @aaron.ruse @branden.cobb @shouseba @chuck.laverde @daryndecker @dyoung @egnoriega @iahmad @jcookehg   
-                      @jasonkrause @jpower_rfed @jkayse @jdale @joshwolf @karchaf @kavitha @kenna81 @kevin.wilder @killian.byrne @mgauto @msbrown47 @mdutton @matthew.kaiser 
-                      @michaelmcleroy @barrywoodtetrate @racosta @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @seanthomaswilliams1 @thomas.burton @Ozzie100 @tsiddique1 
-                      @toladipupo @visuth.dy @zdzielinski @micah.nagel @LynnStill @cmcgrath @evan.rush @andrew.scala.hg @jay-rob @david.allen @nick.kammerdiener
+/docs/                @michaelmcleroy @egoode @aaronbeger @aaron.ruse @branden.cobb @shouseba @chuck.laverde @daryndecker @dyoung @iahmad @jcookehg @jasonkrause @jpower_rfed @jkayse @jdale @joshwolf @karchaf @kavitha @kenna81 @kevin.wilder @killian.byrne @mgauto @msbrown47 @mdutton @matthew.kaiser @michaelmcleroy @barrywoodtetrate @racosta @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @seanthomaswilliams1 @thomas.burton @Ozzie100 @tsiddique1 @toladipupo @visuth.dy @zdzielinski @micah.nagel @LynnStill @cmcgrath @evan.rush @andrew.scala.hg @jay-rob @david.allen @nick.kammerdiener
 
 
 ################################################
