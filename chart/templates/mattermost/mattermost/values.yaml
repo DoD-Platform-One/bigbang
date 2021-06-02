@@ -21,6 +21,9 @@ sso:
   user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/api/v4/user" $.Values.sso.oidc.host) }}
 {{- end }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 global:
   imagePullSecrets:
     - name: private-registry
