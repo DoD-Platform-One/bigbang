@@ -3,6 +3,35 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.9.0]
+
+* [!445](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/445): Nexus added to BB
+* [!488](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/488): Authservice support external redis service 
+* [!490](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/490): New monitoring helm tests
+* [!492](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/492): Add new robot account to CI
+* [!495](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/495): Add shanks as maintainers
+* [!497](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/497): CAC CI upgrades
+* [!499](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/499): Mattermost Operator optional network policies
+* [!503](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/503): Sonarqube optional network policies
+* [!504](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/504): Gitlab optional network policies
+* [!509](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/509): feat: Bumping monitoring tag version 
+* [!510](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/510): ECK Operator optional network policies
+* [!511](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/511): Authservice optional network policies
+* [!513](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/513): Monitoring optional network policies
+* [!514](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/514): Cluster Auditor & OPA Gatekeeper constraint-templates and added conditional enforcement
+
+### Upgrade Notices
+This update includes network policies for multiple packages, please refer to each package's individual documentation on implementation.
+
+### Known Issues
+* If the following error is seen on any helm releases ```scheme "" not supported``` try updating flux to latest ib images. A simple way to do this is by adding registry credentials to the flux-system namespace and applying the flux.yaml:
+```bash
+kubectl create secret docker-registry private-registry --docker-server=registry1.dso.mil --docker-username=<Your IronBank Username> --docker-password=<Your IronBank Personal Access Token> --docker-email=<Your E-mail Address> -n flux-system
+curl https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/scripts/deploy/flux.yaml | kubectl apply -f -
+```
+* There is a [known issue](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/329) with Velero ability to restore PersistentVolumes.
+
+
 ## [1.8.0]
 
 * [!447](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/447): Sonarqube upgrade app version 8.7.1 chart version 9.2.6-bb.8
