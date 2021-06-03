@@ -29,6 +29,3 @@ affinity: {}
 
 nodeSelector: {}
   # node-type: operator
-
-networkPolicies:
-  enabled: false
