@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
