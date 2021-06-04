@@ -57,6 +57,8 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | sso.token_url | string | `"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"` | OIDC token URL template string (to be used as default) |
 | sso.auth_url | string | `"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"` | OIDC auth URL template string (to be used as default) |
 | flux | object | `{"install":{"remediation":{"retries":3}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
+| networkPolicies | object | `{"enabled":true}` | Global NetworkPolicies settings |
+| networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled` |
 | istio.enabled | bool | `true` | Toggle deployment of Istio. |
 | istio.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git"` |  |
 | istio.git.path | string | `"./chart"` |  |
@@ -95,14 +97,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | clusterAuditor.enabled | bool | `true` | Toggle deployment of Cluster Auditor. |
 | clusterAuditor.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git"` |  |
 | clusterAuditor.git.path | string | `"./chart"` |  |
-| clusterAuditor.git.tag | string | `"0.1.9-bb.0"` |  |
+| clusterAuditor.git.tag | string | `"0.2.0-bb.2"` |  |
 | clusterAuditor.flux | object | `{}` | Flux reconciliation overrides specifically for the Cluster Auditor Package |
 | clusterAuditor.values | object | `{}` | Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git |
 | clusterAuditor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | gatekeeper.enabled | bool | `true` | Toggle deployment of OPA Gatekeeper. |
 | gatekeeper.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git"` |  |
 | gatekeeper.git.path | string | `"./chart"` |  |
-| gatekeeper.git.tag | string | `"3.3.0-bb.0"` |  |
+| gatekeeper.git.tag | string | `"3.3.0-bb.2"` |  |
 | gatekeeper.flux | object | `{}` | Flux reconciliation overrides specifically for the OPA Gatekeeper Package |
 | gatekeeper.values | object | `{}` | Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git |
 | gatekeeper.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -121,7 +123,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | eckoperator.enabled | bool | `true` | Toggle deployment of ECK Operator. |
 | eckoperator.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git"` |  |
 | eckoperator.git.path | string | `"./chart"` |  |
-| eckoperator.git.tag | string | `"1.4.0-bb.1"` |  |
+| eckoperator.git.tag | string | `"1.4.0-bb.2"` |  |
 | eckoperator.flux | object | `{}` | Flux reconciliation overrides specifically for the ECK Operator Package |
 | eckoperator.values | object | `{}` | Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git |
 | fluentbit.enabled | bool | `true` | Toggle deployment of Fluent-Bit. |
@@ -129,12 +131,12 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | fluentbit.git.path | string | `"./chart"` |  |
 | fluentbit.git.tag | string | `"0.15.8-bb.1"` |  |
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
-| fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git   |
+| fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | monitoring.enabled | bool | `true` | Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager). |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"11.0.0-bb.18"` |  |
+| monitoring.git.tag | string | `"11.0.0-bb.21"` |  |
 | monitoring.flux | object | `{}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
 | monitoring.sso.prometheus.client_id | string | `""` | Prometheus OIDC client ID |
@@ -170,7 +172,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.authservice.enabled | bool | `false` | Toggle deployment of Authservice. if enabling authservice, a filter needs to be provided by either enabling sso for monitoring or istio, or manually adding a filter chain in the values here: values:   chain:     minimal:       callback_uri: "https://somecallback" |
 | addons.authservice.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git"` |  |
 | addons.authservice.git.path | string | `"./chart"` |  |
-| addons.authservice.git.tag | string | `"0.4.0-bb.4"` |  |
+| addons.authservice.git.tag | string | `"0.4.0-bb.5"` |  |
 | addons.authservice.flux | object | `{}` | Flux reconciliation overrides specifically for the Authservice Package |
 | addons.authservice.values | object | `{}` | Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git |
 | addons.authservice.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -196,7 +198,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.hostnames.registry | string | `"registry.bigbang.dev"` |  |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"4.10.3-bb.1"` |  |
+| addons.gitlab.git.tag | string | `"4.10.3-bb.6"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
 | addons.gitlab.sso.client_id | string | `""` | Gitlab OIDC client ID |
@@ -221,13 +223,29 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlabRunner.git.tag | string | `"0.26.0-bb.1"` |  |
 | addons.gitlabRunner.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Runner Package |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git |
+| addons.nexus.enabled | bool | `false` | Toggle deployment of Nexus. |
+| addons.nexus.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git"` |  |
+| addons.nexus.git.path | string | `"./chart"` |  |
+| addons.nexus.git.tag | string | `"29.1.0-bb.0"` |  |
+| addons.nexus.license_key | string | `""` | Base64 encoded license file. |
+| addons.nexus.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599 |
+| addons.nexus.sso.idp_data | object | `{"email":"","firstName":"","groups":"","idpMetadata":"","lastName":"","username":""}` | NXRM SAML SSO Integration data |
+| addons.nexus.sso.idp_data.username | string | `""` | IdP Field Mappings -- NXRM username attribute |
+| addons.nexus.sso.idp_data.firstName | string | `""` | NXRM firstname attribute (optional) |
+| addons.nexus.sso.idp_data.lastName | string | `""` | NXRM lastname attribute (optional) |
+| addons.nexus.sso.idp_data.email | string | `""` | NXRM email attribute (optional) |
+| addons.nexus.sso.idp_data.groups | string | `""` | NXRM groups attribute (optional) |
+| addons.nexus.sso.idp_data.idpMetadata | string | `""` | IDP SAML Metadata XML as a single line string in single quotes -- this information is public and does not require a secret |
+| addons.nexus.sso.role | object | `{"description":"","id":"","name":""}` | NXRM Role |
+| addons.nexus.flux | object | `{}` | Flux reconciliation overrides specifically for the Nexus Repository Manager Package |
+| addons.nexus.values | object | `{}` | Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git |
 | addons.sonarqube.enabled | bool | `false` | Toggle deployment of SonarQube. |
 | addons.sonarqube.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git"` |  |
 | addons.sonarqube.git.path | string | `"./chart"` |  |
-| addons.sonarqube.git.tag | string | `"9.2.6-bb.9"` |  |
+| addons.sonarqube.git.tag | string | `"9.2.6-bb.11"` |  |
 | addons.sonarqube.flux | object | `{}` | Flux reconciliation overrides specifically for the Sonarqube Package |
-| addons.sonarqube.sso.enabled | bool | `false` | Toggle OIDC SSO for SonarQube. Enabling this option will auto-create any required secrets. |
-| addons.sonarqube.sso.client_id | string | `""` | SonarQube OIDC client ID |
+| addons.sonarqube.sso.enabled | bool | `false` | Toggle SAML SSO for SonarQube. Enabling this option will auto-create any required secrets. |
+| addons.sonarqube.sso.client_id | string | `""` | SonarQube SAML client ID |
 | addons.sonarqube.sso.label | string | `""` | SonarQube SSO login button label |
 | addons.sonarqube.sso.certificate | string | `""` | SonarQube plaintext SAML sso certificate. example: MITCAYCBFyIEUjNBkqhkiG9w0BA.... |
 | addons.sonarqube.sso.login | string | `"login"` | SonarQube login sso attribute. |
@@ -275,7 +293,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.mattermostoperator.enabled | bool | `false` |  |
 | addons.mattermostoperator.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git"` |  |
 | addons.mattermostoperator.git.path | string | `"./chart"` |  |
-| addons.mattermostoperator.git.tag | string | `"1.13.0-bb.2"` |  |
+| addons.mattermostoperator.git.tag | string | `"1.13.0-bb.3"` |  |
 | addons.mattermostoperator.flux | object | `{}` | Flux reconciliation overrides specifically for the Mattermost Operator Package |
 | addons.mattermostoperator.values | object | `{}` | Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml |
 | addons.mattermostoperator.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
