@@ -21,7 +21,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 * [!514](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/514): Cluster Auditor & OPA Gatekeeper constraint-templates and added conditional enforcement
 
 ### Upgrade Notices
-This update includes network policies for multiple packages, please refer to each package's individual documentation on implementation.
+- Network polices have been added and are **enabled by default** for Authservice, ECK Operator, Gitlab, Monitoring, and SonarQube. Network policy enforcement for other packages will be added with future BigBang releases
+```
+# -- Global NetworkPolicies settings
+networkPolicies:
+  # -- Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled`
+  enabled: true
+```
 
 ### Known Issues
 * If the following error is seen on any helm releases ```scheme "" not supported``` try updating flux to latest ib images. A simple way to do this is by adding registry credentials to the flux-system namespace and applying the flux.yaml:
