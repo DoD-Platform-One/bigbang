@@ -11,6 +11,9 @@ istio:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 {{- if and .Values.addons.anchore.enterprise.enabled .Values.addons.anchore.enterprise.licenseYaml }}
 enterpriseLicenseYaml: |
   {{ .Values.addons.anchore.enterprise.licenseYaml | nindent 2 }}
