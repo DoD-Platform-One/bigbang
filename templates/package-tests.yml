@@ -138,6 +138,7 @@ package tests:
     - |
       if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then
         istioctl install -y
+        kubectl label ns istio-system app.kubernetes.io/name=istio-controlplane
       fi
 
     # Generate throwaway cert for *.bigbang.dev, NOTE: special case for istio-operator - no cert needed
