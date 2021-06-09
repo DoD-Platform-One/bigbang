@@ -368,7 +368,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.4-bb.0"
+    tag: "0.0.5-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -536,7 +536,7 @@ addons:
     objectStorage:
       # -- Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used.
       # Entering connection info will enable this option and will auto-create any required secrets
-      type: ""         # supported types are "s3" or "minio"
+      type: "" # supported types are "s3" or "minio"
 
       # -- S3 compatible endpoint to use for connection information.
       # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
