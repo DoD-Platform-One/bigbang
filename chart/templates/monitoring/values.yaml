@@ -67,7 +67,13 @@ grafana:
       api_url: {{ .Values.monitoring.sso.grafana.api_url | default (tpl "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/userinfo" .) }}
       allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up | default "True" }}
       role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path | default "Viewer" }}
-      allowed_domains: {{ .Values.monitoring.sso.grafana.allowed_domains }}
+    {{- with .Values.monitoring.sso.grafana }}
+      {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
+    {{- end }}
 
 prometheus-node-exporter:
   serviceAccount:
