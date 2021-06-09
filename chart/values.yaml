@@ -930,7 +930,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
       path: "./chart"
-      tag: "11.0.0-bb.0"
+      tag: "11.0.0-bb.1"
 
     # -- Certificate/Key pair to use as the certificate for exposing Keycloak
     ingress:
