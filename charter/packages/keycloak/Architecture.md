@@ -48,11 +48,75 @@ Due to the sensitivity of Keycloak, Big Bang does not support deploying KeyCloak
 
 The upstream [Keycloak Helm chart](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak) is customized for use in Platform One.  It contains the following modifications from a standard Keycloak deployment:
 
-- DoD Certificate Authorities
-- Customized Platform One registration
-- Customizable Platform One realm, with IL2, IL4, and IL5 isolation (not loaded by default, but [available in the package's git repo](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/blob/main/chart/resources/dev/baby-yoda.json))
-- Redirects for specific keycloak endpoints to work with Platform One deployments
-- A customized image, based on Iron Bank's Keycloak, that adds a plugin to support the above features
+- Customized Platform One registration plugin
+
+Additional customization can be added through values.  For example:
+
+```yaml
+addons:
+  keycloak:
+    # Setup TLS key pair
+    # An alternative to this is to create a secret namged `tlskey` and `tlscert` using Kustomize in the customer template.  Then use the volume and volumemount configuration below to mount the files.  In this case, the `ingress.key` and `ingress.cert` would be left blank.
+    ingress:
+      key: |-
+        {insert keycloak TLS key}
+      cert: |-
+        {insert keycloak TLS cert}
+    values:
+      secrets:
+        # The `env` secret is used to add environmental variables to the keycloak pod
+        env:
+          stringData:
+            # Keycloak will use the `customreg.yaml` for configuring the custom registration process.
+            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
+            # Keycloak will load a custom realm defined in `realm.json`
+            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
+            # Keycloak will load a custom set of certificate authorities
+            X509_CA_BUNDLE: /etc/x509/https/cas.pem
+        # The `certauthority` secret holds the certificate authority keys.
+        # Using the customer template, kustomize could be used to create the secret instead of using the keycloak chart via values
+        certauthority:
+          stringData:
+            cas.pem: |-
+              {insert CAS.PEM content}
+        # The `customreg` secret holds the configuration for customer registration.
+        # Using the customer template, kustomize could be used to create the secret instead of using the keycloak chart via values
+        customreg:
+          stringData:
+            customreg.yaml: |-
+              {insert customreg.yaml content}
+        # The `realm` secret holds the custom realm configuration.
+        # Using the customer template, kustomize could be used to create the secret instead of using the keycloak chart via values
+        realm:
+          stringData:
+            realm.json: |-
+              {insert realm.json content}
+      # Create volumes for each secret above
+      extraVolumes: |-
+        - name: certauthority
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-certauthority
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+      # Volume mount each volume in the appropriate location
+      extraVolumeMounts: |-
+        - name: certauthority
+          mountPath: /etc/x509/https/cas.pem
+          subPath: cas.pem
+          readOnly: true
+        - name: customreg
+          mountPath: /opt/jboss/keycloak/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/jboss/keycloak/realm.json
+          subPath: realm.json
+          readOnly: true
+```
 
 ### Keycloak Admin password
 
@@ -112,8 +176,8 @@ To workaround this situation, you have to isolate the applications by IP, port, 
 ### GUI
 
 Keycloak has two main end point URLs:
-https://keycloak.bigbang.dev for authentication.
-https://keycloak.bigbang.dev/auth/admin for administration.
+[https://keycloak.bigbang.dev](https://keycloak.bigbang.dev) for authentication.
+[https://keycloak.bigbang.dev/auth/admin](https://keycloak.bigbang.dev/auth/admin) for administration.
 
 The `bigbang.dev` domain name can be customized by setting the `hostname` in `values.yaml`
 
@@ -190,6 +254,6 @@ addons:
 
 ## Dependent Packages
 
-- PostgreSQL for in-cluster development/test database
 - Istio for ingress
 - (Optional) Monitoring for metrics
+- PostgreSQL database (development/test only)
