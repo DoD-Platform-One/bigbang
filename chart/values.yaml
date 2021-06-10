@@ -46,7 +46,7 @@ sso:
 # -- End of BigBang Additions
 
 ingress:
-  enabled: true
+  enabled: false
   annotations: {kubernetes.io/ingress.class: nginx}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
@@ -129,7 +129,8 @@ nexus:
   #   hostnames:
   #   - "example.com"
   #   - "www.example.com"
-  imagePullSecrets: []
+  imagePullSecrets:
+    - name: private-registry
 
 nameOverride: ""
 fullnameOverride: ""

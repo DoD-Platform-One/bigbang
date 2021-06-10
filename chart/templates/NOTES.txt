@@ -1,7 +1,7 @@
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostRepo }}{{ . }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostDocker }}{{ . }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostRepo }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostDocker }}
 {{- else if contains "NodePort" .Values.service.serviceType }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "nexus.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
