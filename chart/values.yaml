@@ -6,6 +6,13 @@ istio:
   nexus:
     gateways:
     - "istio-system/main"
+
+networkPolicies:
+  enabled: false
+  ingressLabels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+
 monitoring:
   enabled: false
 license_key: ""

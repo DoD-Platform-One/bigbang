@@ -1,0 +1,24 @@
+{{- if and .Values.networkPolicies.enabled .Values.monitoring.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-scraping
+  namespace: "{{ .Release.Namespace }}"
+spec:
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            app.kubernetes.io/name: monitoring
+        podSelector:
+          matchLabels:
+            app: prometeus
+      ports:
+      - port: {{ .Values.nexus.nexusPort }}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: nexus-repository-manager
+  policyTypes:
+    - Ingress
+{{- end }}
+
