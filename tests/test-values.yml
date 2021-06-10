@@ -4,5 +4,6 @@ istio:
 nexus:
   imagePullSecrets: 
   - name: private-registry-mil
- 
+networkPolicies:
+  enabled: true 
 
