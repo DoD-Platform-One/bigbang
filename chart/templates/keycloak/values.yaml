@@ -22,9 +22,6 @@ monitoring:
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
 
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-
 {{- if .Values.addons.keycloak.database.host }}
 postgresql:
   enabled: false
@@ -33,15 +30,17 @@ postgresql:
 {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
 secrets:
   {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
-  certificates:
+  tlscert:
     stringData:
       tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
+  tlskey:
+    stringData:
       tls.key: {{ .Values.addons.keycloak.ingress.key  | quote }}
   {{- end }}
 
   {{- with .Values.addons.keycloak.database }}
   {{- if .host }}
-  db:
+  env:
     stringData:
       DB_USER: {{ .username | quote }}
       DB_PASSWORD: {{ .password | quote }}
@@ -53,10 +52,24 @@ secrets:
   {{- end }}
 {{- end }}
 
-{{- if .Values.addons.keycloak.database.host }}
-extraEnvFrom: |
-  - secretRef:
-      name: 'keycloak-db'
+{{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+extraVolumesBigBang:
+  - name: tlscert
+    secret:
+      secretName: keycloak-tlscert
+  - name: tlskey
+    secret:
+      secretName: keycloak-tlskey
+
+extraVolumeMountsBigBang:
+  - name: tlscert
+    mountPath: /etc/x509/https/tls.crt
+    subPath: tls.crt
+    readOnly: true
+  - name: tlskey
+    mountPath: /etc/x509/https/tls.key
+    subPath: tls.key
+    readOnly: true
 {{- end }}
 
 {{- end }}
