@@ -67,3 +67,15 @@
 * There are multiple implementations of Helm Charts (Helm repositories, .tgz, and files and folders in a git repo), whenever P1 refers to a helm chart we're always referring to the files and folders in a git repo implementation, which is stored in /chart folder in a git repo.
 * Additional pre-reading materials to develop a better understanding of BigBang before deploying can be found in this understanding_bigbang folder.
 * If you see an issue with docs or packages, please [open an issue against the main BigBang Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues), instead of the individual package repo.
+
+## Note about Snippets of Architecture Diagrams in this folder
+
+* The intent of sharing Architecture Diagrams is to:
+  * Act as a starting point upon which further understanding can be built
+  * Improve a users understanding of how BigBang components fit together, so that if the user needs to modify components or workflows flows to fit their use case they'll have an idea of what the modification might look like
+  * Show potential use cases for some of BigBang's core components
+* These Architecture Diagrams are NOT intended to:
+  * Reflect an accurate default configuration
+  * Prescriptively say you must do things this way
+* These Architecture Diagrams should be taken with a grain of salt:
+  It's difficult to make a generic diagram with high accuracy. BigBang's Helm Values are variables, some values can produce significantly different workflows. Nuances specific to the deployment environment and hardened configurations like SELinux & Istio CNI can slightly effect parts of implementation details.
