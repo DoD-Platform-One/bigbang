@@ -1,9 +1,17 @@
-
-istio: 
+bbtests:
   enabled: true
-nexus:
-  imagePullSecrets: 
-  - name: private-registry-mil
-networkPolicies:
-  enabled: true 
+  cypress:
+    artifacts: true
+    envs:
+      cypress_nexus_url: "http://nexus-nexus-repository-manager:8081"
+      cypress_nexus_user: "admin"
+      cypress_nexus_pass_new: "new_admin_password"
+    secretEnvs:
+      - name: cypress_nexus_pass
+        valueFrom:
+          secretKeyRef:
+            name: nexus-repository-manager-secret
+            key: admin.password
 
+networkPolicies:
+  enabled: true
