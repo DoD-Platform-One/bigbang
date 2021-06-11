@@ -20,9 +20,13 @@ images:
 patches:
   - target:
       kind: Deployment
-      name: ^(helm-controller|kustomize-controller|notification-controller|source-controller)$
     patch: |-
-      - op: add
-        path: /spec/template/spec/imagePullSecrets
-        value: 
-        - name: private-registry
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: whatever
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+            - name: private-registry
