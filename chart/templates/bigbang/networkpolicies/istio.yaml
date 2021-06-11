@@ -1,11 +1,13 @@
-{{ if .Values.networkPolicies.enabled }}
+{{ if and .Values.networkPolicies.enabled .Values.istio.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-to-istio-ingressgateway
+  name: allow-from-istio-ingressgateway
   namespace: {{ .Release.Namespace }}
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: nexus-repository-manager
   policyTypes:
     - Ingress
   ingress:
