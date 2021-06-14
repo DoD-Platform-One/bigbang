@@ -373,9 +373,9 @@ addons:
 
   velero:
     enabled: false
+    plugins:
+    - aws
     values:
-      installCRDs: true
-
       # Set provider name and backup storage location bucket name
       configuration:
         provider: aws
@@ -392,11 +392,7 @@ addons:
       #      bucket: velero
       #      region: us-west-1
 
-      # Default to AWS Plugin, update to others as they are supported
-      plugins:
-        - aws
-
-      #schedules:
+      # schedules:
       #  mybackup:
       #    labels:
       #      myenv: foo
@@ -410,6 +406,9 @@ addons:
       serviceAccount:
         server:
           name: velero
+
+      # This job upgrades the CRDs (disable this to prevent the CI upgrade job from failing).
+      upgradeCRDs: false
 
       # Whether or not to clean up CustomResourceDefintions when deleting a release.
       # Cleaning up CRDs will delete the BackupStorageLocation and VolumeSnapshotLocation instances, which would have to be reconfigured.

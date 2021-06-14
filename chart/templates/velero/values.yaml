@@ -13,4 +13,25 @@ monitoring:
 
 imagePullSecrets:
 - name: private-registry
+
+{{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure" }}{{- end }}
+initContainers:
+{{- range .Values.addons.velero.plugins }}
+{{- if eq . "aws" }}
+  - name: velero-plugin-for-aws
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-aws:v1.2.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+{{- else if eq . "azure" }}
+  - name: velero-plugin-for-azure
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.2.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+{{- end }}
+{{- end }}
+
 {{- end -}}
