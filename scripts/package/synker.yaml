@@ -31,6 +31,7 @@ source:
     - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
     - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.3
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.0.3
+    - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
@@ -44,7 +45,7 @@ source:
     # gitlab-runner-helper image: This image does not get captured from the release deployment
     # the gitlab-runner-helper image only gets pulled when a pipeline runs. So it must be listed here
     - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v13.9.0
-    # Explicily add Keycloak image because Keycloak is not enabled in pipelines so the imaeg does not get pulled
+    # Explicitly add Keycloak image because Keycloak is not enabled in pipelines so the image does not get pulled
     - registry.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/keycloak-ib:13.0.0-1.0.3
     # Don't include until fortify is supported
     #- registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
