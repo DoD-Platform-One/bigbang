@@ -13,6 +13,9 @@ minioRootCreds: minio-root-creds-secret
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 podAnnotations:
   sidecar.istio.io/inject: "true"
   traffic.sidecar.istio.io/includeInboundPorts: "*"
