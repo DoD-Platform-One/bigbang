@@ -36,5 +36,10 @@ spec:
     - name: {{ .Release.Name }}-velero-values
       kind: Secret
       valuesKey: "overlays"
+  {{- if .Values.gatekeeper.enabled }}
+  dependsOn:
+      - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
     
 {{- end }}
