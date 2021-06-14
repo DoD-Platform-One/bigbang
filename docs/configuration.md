@@ -116,7 +116,19 @@ Big Bang deploys four flux resources that can be customized:
 
 In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Helm chart templates](../chart/templates) for the these resources.
 
-Settings for eny of these resources can be overridden by [patching](https://kubectl.docs.kubernetes.io/references/kustomize/patches/) the resource in your environment's kustomization files.  Use Flux's documentation for [GitRepository](https://toolkit.fluxcd.io/components/source/gitrepositories/), [HelmRelease](https://toolkit.fluxcd.io/components/helm/helmreleases/), and [Kustomization](https://toolkit.fluxcd.io/components/kustomize/kustomization/) to find settings for these resources.
+Settings for eny of these resources can be overridden by [patching](https://kubectl.docs.kubernetes.io/references/kustomize/patches/) the resource in your environment's kustomization files.  Use Flux's documentation for [GitRepository](https://toolkit.fluxcd.io/components/source/gitrepositories/), [HelmRelease](https://toolkit.fluxcd.io/components/helm/helmreleases/), and [Kustomization](https://toolkit.fluxcd.io/components/kustomize/kustomization/) to find settings for these resources. The following are examples of commonly reqeusted custom patches covered in the [bigbang template repo]https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#flux-components):
+
+- Updating flux-system component resource usage
+  - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#adjust-resource-allocation-for-a-flux-system-component)
+  - This patch could be used to adjust the resources requested by the `flux-system/helm-controller` resource. A similar patch could be used to adjust the resources required by the other flux components.
+  > NOTE: If flux is under-resourced, occasionally requests can fail in a manner that looks like a network connectivity issue (use with caution)
+- Adding environment variables to flux-system components
+  - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#adjust-resource-allocation-for-a-flux-system-component)
+  - This patch could be used to add AWS credential environment variables into the `flux-system/kustomize-controller` resource to enable SOPS decryption using a KMS key from outside of AWS.
+- Changing the image name / version
+  - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#updating-a-flux-system-component-image-tag)
+  - This patch could be used to update the tag of the flux-system component image to be deployed.
+> NOTE: Multiple patches could be applied within a single kustomization.yaml
 
 ## Big Bang Version
 

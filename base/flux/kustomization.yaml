@@ -1,0 +1,32 @@
+# start with a default flux deployment
+resources:
+- gotk-components.yaml
+
+# update flux components to use ironbank images
+images:
+- name: registry1.dso.mil/ironbank/fluxcd/helm-controller:v0.10.0
+  newName: registry1.dso.mil/ironbank/fluxcd/helm-controller
+  newTag: v0.9.0
+- name: registry1.dso.mil/ironbank/fluxcd/kustomize-controller:v0.12.0
+  newName: registry1.dso.mil/ironbank/fluxcd/kustomize-controller
+  newTag: v0.9.3
+- name: registry1.dso.mil/ironbank/fluxcd/notification-controller:v0.13.0
+  newName: registry1.dso.mil/ironbank/fluxcd/notification-controller
+  newTag: v0.12.0
+- name: registry1.dso.mil/ironbank/fluxcd/source-controller:v0.12.1
+  newName: registry1.dso.mil/ironbank/fluxcd/source-controller
+  newTag: v0.9.1
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: whatever
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+            - name: private-registry

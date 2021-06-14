@@ -9,7 +9,7 @@ set -e
 #
 
 REGISTRY_URL=registry1.dso.mil
-FLUX_MANIFEST=scripts/deploy/flux.yaml
+FLUX_KUSTOMIZATION=base/flux
 FLUX_SECRET=private-registry
 WAIT_TIMEOUT=120
 
@@ -118,8 +118,8 @@ kubectl create secret docker-registry "$FLUX_SECRET" -n flux-system \
   --docker-email="$REGISTRY_EMAIL" \
   --dry-run=client -o yaml | kubectl apply -n flux-system -f -
 
-echo "Installing flux from manifest"
-kubectl apply -f "$FLUX_MANIFEST" 
+echo "Installing flux from kustomization"
+kustomize build "$FLUX_KUSTOMIZATION" | kubectl apply -f -
 
 #
 # verify flux
