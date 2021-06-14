@@ -47,6 +47,10 @@ anchoreGlobal:
   defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
   {{- end }}
   imagePullSecretName: private-registry
+  {{- if or (and (not (hasKey .Values.addons.anchore.values "anchoreGlobal.existingSecret")) (not (hasKey .Values.addons.anchore.values "anchoreGlobal.saml.useExistingSecret"))) (not (hasKey .Values.addons.anchore.values "anchoreGlobal.saml.secret")) }}
+  saml:
+    secret: "{{ b64enc (randAlphaNum 12) }}"
+  {{- end }}
 
 {{- if .Values.addons.anchore.enterprise.enabled }}
 anchore-feeds-db:
@@ -66,7 +70,8 @@ anchore-ui-redis:
   {{- if and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password }}
   enabled: false
   externalEndpoint: "redis://{{ .Values.addons.anchore.redis.username | default "nouser" }}:{{ .Values.addons.anchore.redis.password }}@{{ .Values.addons.anchore.redis.host }}:{{ .Values.addons.anchore.redis.port }}"
-  password: {{ .Values.addons.anchore.redis.password }}
+  auth:
+    password: {{ .Values.addons.anchore.redis.password }}
   {{- end }}
   image:
     pullSecrets:
@@ -74,4 +79,3 @@ anchore-ui-redis:
 {{- end }}
 
 {{- end }}
-
