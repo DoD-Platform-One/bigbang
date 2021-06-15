@@ -11,6 +11,9 @@ elasticsearch:
 imagePullSecrets:
   - name: private-registry
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 {{- if .Values.monitoring.enabled }}
 serviceMonitor:
   enabled: true
