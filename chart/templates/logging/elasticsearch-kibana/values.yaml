@@ -10,6 +10,9 @@ istio:
     hosts:
       - kibana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 {{- with .Values.logging.sso }}
 {{- if .enabled }}
 sso:
