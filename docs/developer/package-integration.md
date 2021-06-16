@@ -4,12 +4,13 @@
 
 1. Create a directory for your package at `chart/templates/<your-package-name>`
 
-1. Inside this folder will be 3 helm template files. You can copy one of the other package folders and tweak the code for your package. Gitlab is a good example to reference because it is one of the more complicated Packages. Note that the Istio VirtualService comes from the Package and is not created in the BigBang chart. The purpose of these helm template files is to create an easy-to-use spec for deploying supported applications. Reasonable and safe defaults are provided and any needed secrets are auto-created. We accept the trade off of easy deployment for complicated template code. More details are in the following steps.
+1. Inside this folder will be various helm template files. The rule is one document per yaml file. You can copy one of the other package folders and tweak the code for your package. Gitlab is a good example to reference because it is one of the more complicated Packages. Note that the Istio VirtualService comes from the Package and is not created in the BigBang chart. The purpose of these helm template files is to create an easy-to-use spec for deploying supported applications. Reasonable and safe defaults are provided and any needed secrets are auto-created. We accept the trade off of easy deployment for complicated template code. More details are in the following steps.
 
    ```shell
    gitrepository.yaml  # Flux GitRepository. Is configured by BigBang chart values.
    helmrelease.yaml    # Flux HelmRelease. Is configured by BigBang chart values.
    namespace.yaml      # Contains the namespace and any needed secrets
+   secret-*.yaml       # various template files that create any needed k8s secrets
    values.yaml         # Implements all the BigBang customizations of the package and passthrough for values.
    ```
 
@@ -47,7 +48,7 @@
 
    ```
 
-1. More details about namespace.yaml: This template is where the code for secrets go. Typically you will see secrets for imagePullSecret, sso, and database. These secrets are a BigBang chart enhancement.  They are created conditionally based on what the user enables in the config.
+1. More details about secret-*.yaml: The secret template is where the code for secrets go. Typically you will see secrets for imagePullSecret, sso, database, and possibly object storage. These secrets are a BigBang chart enhancement. They are created conditionally based on what the user enables in the config.
 
 1. Edit the chart/templates/values.yaml.  Add your Package to the list of Packages.  Just copy one of the others and change the name. This supports adding chart values from a secret. Pay attention to whether this is a core Package or an add-on package, the toYaml values are different for add-ons. This template allows a Package to add chart values that need to be encrypted in a secret.
 
@@ -98,14 +99,15 @@ There are two ways to test BigBang, imperative or GitOps with Flux.  Your initia
 1. **Imperative:** you can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little".  From the root of your local bigbang repo:
 
    ```shell
-   # Deploy with helm while pointing to your test values files
+   # Deploy with helm while pointing to your override values files. 
+   # In this example the files are placed on your workstation at ../overrides/*
    # Bigbang packages should create any needed secrets from the chart values
-   # Ff you have the values file encrypted with sops, temporarily decrypt it
-   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../customers/template/dev/configmap.yaml -f ./chart/ingress-certs.yaml -f ../customers/template/dev/registry-values.enc.yaml
+   # If you have the values file encrypted with sops, temporarily decrypt it
+   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
  
    # Conduct testing
    # If you make code changes you can run another helm upgrade to pick up the new changes
-   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../customers/template/dev/configmap.yaml -f ./chart/ingress-certs.yaml -f ../customers/template/dev/registry-values.enc.yaml
+   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
  
    # Tear down
    helm delete bigbang -n bigbang
