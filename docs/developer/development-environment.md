@@ -32,16 +32,16 @@ Create an Ubuntu EC2 instance using the AWS console with the following attribute
 - User Data (as Text):
 
 ```shell
-    MIME-Version: 1.0
-    Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
     
-    --==MYBOUNDARY==
-    Content-Type: text/x-shellscript; charset="us-ascii"
+--==MYBOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
 
-    #!/bin/bash
-    # Set the vm.max_map_count to 262144. 
-    # Required for Elastic to run correctly without OOM errors.
-    sysctl -w vm.max_map_count=262144
+#!/bin/bash
+# Set the vm.max_map_count to 262144. 
+# Required for Elastic to run correctly without OOM errors.
+sysctl -w vm.max_map_count=262144
 ```
 
 - 50 Gigs of disk space
@@ -107,7 +107,8 @@ k3d cluster create \
     --k3s-server-arg "--disable=metrics-server" \
     --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
     --port 80:80@loadbalancer \
-    --port 443:443@loadbalancer
+    --port 443:443@loadbalancer \
+    --api-port 6443
 ```
 
 **_Optionally_** you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
@@ -140,7 +141,8 @@ k3d cluster create \
     --k3s-server-arg "--disable=metrics-server" \
     --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
     --port 80:80@loadbalancer \
-    --port 443:443@loadbalancer
+    --port 443:443@loadbalancer \
+    --api-port 6443
 ```
 
 Here is an explanation of what we are doing with this command:
@@ -154,6 +156,7 @@ Here is an explanation of what we are doing with this command:
 - `--port 443:443@loadbalancer` Exposes the cluster on the host on port 443
 - `--volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster.
 - `--volume /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
+- `--api-port 6443` port that your k8s api will use. 6443 is the standard default port for k8s api
 
 **STEP 3:**  
 Test the cluster from your local workstation. Copy the contents of the k3d kubeconfig from the EC2 instance to your local workstation. Do it manually with copy and paste.
@@ -201,7 +204,8 @@ k3d cluster create \
     --k3s-server-arg "--disable=metrics-server" \
     --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
     --port 80:80@loadbalancer \
-    --port 443:443@loadbalancer
+    --port 443:443@loadbalancer \
+    --api-port 6443
 ```
 
 Then on your workstation edit the kubeconfig with the EC2 private ip. In a separate terminal window start a tunnel session with sshuttle using the EC2 public IP.
@@ -308,16 +312,16 @@ aws ec2 authorize-security-group-ingress \
 # Create userdata.txt
 # https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
 cat << EOF > userdata.txt
-    MIME-Version: 1.0
-    Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
 
-    --==MYBOUNDARY==
-    Content-Type: text/x-shellscript; charset="us-ascii"
+--==MYBOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
 
-    #!/bin/bash
-    # Set the vm.max_map_count to 262144.
-    # Required for Elastic to run correctly without OOM errors.
-    sysctl -w vm.max_map_count=262144
+#!/bin/bash
+# Set the vm.max_map_count to 262144.
+# Required for Elastic to run correctly without OOM errors.
+sysctl -w vm.max_map_count=262144
 EOF
 
 # Create new instance
