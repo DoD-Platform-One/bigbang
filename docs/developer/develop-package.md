@@ -38,20 +38,6 @@ Package is the term we use for an application that has been prepared to be deplo
    description: GitLab Runner
    ```
 
-1. Some upstream helm charts have a file called "requirements.yaml" that contains internet links to external dependencies. Point all external links to the local file system. Also delete the dependency lock file that was generated during the previous step. Again, BigBang Packages must be able to be installed in an air-gap without any internet connectivity. It will look like this example from Gitlab.
-
-   ```yaml
-   dependencies:
-   - name: gitlab
-     version: '*.*.*'
-     repository: file://./charts/gitlab
-   - name: cert-manager
-     version: 0.10.1
-     repository: file://./charts/cert-manager-v0.10.1.tgz
-     condition: certmanager.install
-     alias: certmanager
-   ```
-
 1. In the values.yaml replace public upstream images with IronBank hardened images. The image version should be compatible with the chart version. Here is a command to identify the images that need to be changed.
 
    ```shell
@@ -74,25 +60,10 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
 
-1. Add a continuous integration (CI) pipeline to the Package. The [pipeline documentation](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) provides a great rundown of how to reference the package pipeline template and handle more complicated situations like dependencies.
+1. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml". The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additionl policies to open traffic as needed. Refer to the other Packages code for examples.
 
-1. Add CI pipeline test values to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. Create a tests directory and a test yaml file at "tests/test-values.yaml".  Set any values that are necessary for this test to pass.  The pipeline automatically creates an image pull secret "private-registry-mil".  All you need to do is reference that secret in your test values. You can view the pipeline status from the Repo1 console. Keep iterating on your Package code and the test code until the pipeline passes. Refer to the test-values.yaml from other Packages to get started. The repo structure must match what the CI pipeline code expects.
+1. Add a continuous integration (CI) pipeline to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library. Instructions are not repeated here.
 
-   ```yaml
-   |-- .gitlab-ci.yml
-   |-- chart
-   |   |-- Chart.yml
-   |   |-- charts
-   |   |-- templates
-   |   `-- values.yml
-   `-- tests
-       |-- cypress
-       |   `-- integration
-       |       `-- health.spec.js
-       |-- cypress.json
-       |-- main-test-gateway.yml
-       `-- test-values.yml
-   ```
 
 1. Documentation for the Package should be included. A "docs" directory would include all detailed documentation. Reference other that Packages for examples.
 
