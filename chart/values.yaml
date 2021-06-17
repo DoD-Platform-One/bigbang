@@ -301,7 +301,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.15.8-bb.3"
+    tag: "0.15.8-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -436,7 +436,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.5"
+      tag: "0.4.0-bb.6"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
