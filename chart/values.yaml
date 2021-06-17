@@ -96,6 +96,10 @@ flux:
 networkPolicies:
   # -- Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled`
   enabled: true
+  # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl cluster-info` to get the value for your cluster
+  # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP)
+  # Used by package NetworkPolicies to allow Kube API access
+  controlPlaneCidr: 0.0.0.0/0
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
@@ -908,7 +912,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
       path: "./chart"
-      tag: "2.21.1-bb.1"
+      tag: "2.21.1-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
