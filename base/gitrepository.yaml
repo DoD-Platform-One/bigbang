@@ -12,3 +12,4 @@ spec:
   url: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
   ref:
     tag: 1.10.0
+    
