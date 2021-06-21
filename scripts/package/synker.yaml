@@ -41,7 +41,8 @@ source:
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/skopeo-bash-git-lfs-kustomize:1.0
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/anchore:0.8.2
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/test:gcc
-    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check616-sonar-scanner45-dotnet-31:052421
+    # Following line removed with 1.10.0 release due to failure to fetch image.  Image not found.
+    # - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check616-sonar-scanner45-dotnet-31:052421
     # gitlab-runner-helper image: This image does not get captured from the release deployment
     # the gitlab-runner-helper image only gets pulled when a pipeline runs. So it must be listed here
     - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v13.9.0
