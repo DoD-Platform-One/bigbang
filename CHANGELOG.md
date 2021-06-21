@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.14.0-bb.2] - 2021-06-21
+### Added
+- Added network policies with a default deny and egress allowed to the API
+
 ## [1.14.0-bb.1] - 2021-06-03
 ### Changed
 - Remove network policies
