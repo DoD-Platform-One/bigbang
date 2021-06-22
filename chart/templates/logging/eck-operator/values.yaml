@@ -15,6 +15,7 @@ podAnnotations:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
 imagePullSecrets:
   - name: private-registry
