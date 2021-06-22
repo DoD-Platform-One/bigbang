@@ -35,4 +35,7 @@ cr:
       namespaces:
         # bigbang watches all!
         exclude: []
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 {{- end -}}
