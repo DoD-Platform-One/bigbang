@@ -1,6 +1,6 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/renovate-runner'
-    file: '/templates/renovate-dind.gitlab-ci.yml'
+    file: '/templates/renovate.gitlab-ci.yml'
     ref: 'main'
 
 renovate:
