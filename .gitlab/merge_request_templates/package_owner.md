@@ -2,14 +2,24 @@
 
 ## Package Changes
 
-What package changes are included with this merge request?
+What package changes are included with this merge request? The more detail here the better! 
 
-The more detail here the better! **Links to the MRs that are included are required**.
+**Links to all MRs that are associated with this change are required**.
 
-Also, include any issues closed with "Closes #123" where 123 is the issue number.
+If the package is set up for releases, also link the package release page for the new tag here.
 
 ## Additional Details
 
 If possible, provide additional details that will help with the merge request.
 
 Known issues or expected conflicts?
+
+Also, include any issues closed with "Closes #ISSUENUMBER". See example:
+
+Closes #123
+
+Add any labels for affected packages so that they are deployed in CI. See example:
+
+/label ~packageX
+
+Once the MR is ready for review also add the `status::review` label.
