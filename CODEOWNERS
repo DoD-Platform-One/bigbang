@@ -55,9 +55,9 @@ chart/values.yaml               @blake.hearn @micah.nagel @jasonkrause
 chart/templates/anchore         @blake.hearn @micah.nagel @jasonkrause
 
 ^[ArgoCD]
-chart/Chart.yaml                @matthew.kaiser @brian.rexrode @brandencobb
-chart/values.yaml               @matthew.kaiser @brian.rexrode @brandencobb
-chart/templates/argocd          @matthew.kaiser @brian.rexrode @brandencobb
+chart/Chart.yaml                @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
+chart/values.yaml               @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
+chart/templates/argocd          @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
 
 ^[Cluster Auditor]              @echuang @egoode @toladipupo @michaelmcleroy
 chart/Chart.yaml                @echuang @egoode @toladipupo @michaelmcleroy
