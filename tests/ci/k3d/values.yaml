@@ -5,6 +5,9 @@ flux:
   rollback:
     cleanupOnFail: false
 
+networkPolicies:
+  controlPlaneCidr: 172.16.0.0/12
+
 logging:
   enabled: true
   values:
