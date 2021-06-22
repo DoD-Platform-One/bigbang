@@ -121,6 +121,15 @@ cr:
         in_cluster_url: "http://jaeger-query.jaeger.svc.cluster.local:16686"
         use_grpc: false
         whitelist_istio_system: ["istio"]
+
+networkPolicies:
+  enabled: false
+  ingressLabels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+  # See `kubectl cluster-info` and then resolve to IP
+  controlPlaneCidr: 0.0.0.0/0
+
 # Taken from https://github.com/kiali/kiali-operator/blob/v1.33/deploy/kiali/kiali_cr.yaml
 ###################################################################
 # kiali_cr.yaml

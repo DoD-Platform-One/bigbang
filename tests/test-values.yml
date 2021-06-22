@@ -7,3 +7,7 @@ bbtests:
     artifacts: true
     envs:
       cypress_url: 'http://kiali:{{ default 20001 .Values.port }}'
+
+networkPolicies:
+  enabled: true
+  controlPlaneCidr: 172.16.0.0/12
