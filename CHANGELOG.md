@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.8.1]
+
+* [!594](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/594): Fixed bug where gitlab PostRenders are passed to GitlabRunners
+
 ## [1.8.0]
 
 * [!447](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/447): Sonarqube upgrade app version 8.7.1 chart version 9.2.6-bb.8
