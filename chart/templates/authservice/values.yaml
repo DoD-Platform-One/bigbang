@@ -30,6 +30,14 @@ global:
   certificate_authority: {{ .Values.sso.certificate_authority  }}
   {{- end }}
 
+  {{- $authserviceValues := .Values.addons.authservice.values | default dict }}
+  {{- $redisValues := $authserviceValues.redis | default dict }}
+  {{- if hasKey $redisValues "enabled" }}
+  {{- if $redisValues.enabled }}
+  redis_server_uri: "tcp://authservice-authservice-redis-bb-master:6379"
+  {{- end }}
+  {{- end }}
+
 chains:
   {{- if .Values.addons.authservice.chains }}
   {{ .Values.addons.authservice.chains | toYaml | nindent 2 }}
