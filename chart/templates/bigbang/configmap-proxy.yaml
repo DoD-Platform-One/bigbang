@@ -1,0 +1,15 @@
+{{- if .Values.proxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nexus.name" . }}-proxy
+  labels: {{- include "nexus.labels" . | nindent 4 }}
+    {{- if .Values.nexus.extraLabels }}
+      {{- with .Values.nexus.extraLabels }}
+        {{ toYaml . | indent 4 }}
+      {{- end }}
+    {{- end }}
+data:
+  proxy: {{ .Values.proxy.request | toJson | quote }}
+{{- end }}
+

@@ -28,6 +28,9 @@ on the pod. However, we are generating a random password via `randAlphaNum` and 
 method allows us to overwrite the generated file containing the Nexus generated random password with a Kubernetes
 secret to enable programmatic ingestion.
 
+If you change the admin user's password via the UI you also must update the secret. Failure to do so will result
+in proxy/saml job failures on subsequent upgrades.
+
 Ensure the following is present to enable the randomized Kubernetes password:
 ```bash
 # values.yaml
@@ -44,9 +47,9 @@ secret:
 ```
 
 ### License
-We expect you to secure your license; the license will be provided as a binary. Encode the binary file as a base64 
+We expect you to secure your license; the license will be provided as a binary. Encode the binary file as a base64
 encoded string, secure with sops, and place in `.Values.addons.nexusRepositoryManager.license_key`. The `_helpers.tpl`
-will create a named template and generate the appropriate secret within the namespace. The chart will reference the 
+will create a named template and generate the appropriate secret within the namespace. The chart will reference the
 license via a secret volumeMount to ensure the application starts licensed.
 
 ### NXRM Dependent Packages

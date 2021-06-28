@@ -1,4 +1,4 @@
-{{- if and .Values.sso.enabled .Values.secret.enabled .Values.license_key }}
+{{- if .Values.proxy.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -6,7 +6,7 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   creationTimestamp: null
-  name: saml
+  name: proxy
 spec:
   template:
     metadata:
@@ -19,7 +19,7 @@ spec:
       {{- end }}
       containers:
       - image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
-        name: saml
+        name: proxy
         command:
           - sh
         args:
@@ -27,27 +27,12 @@ spec:
           - |
             until curl --head localhost:15000; do echo "Waiting for Sidercar"; sleep 10; done; echo "Sidecar available"  &&
             BASE_URL="http://{{ template "nexus.name" . }}.{{ template "nexus.name" . }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
-            # saml metadata
-            curl -X PUT \
-                 -u admin:"$API_CREDENTIALS" \
-                 "$BASE_URL/service/rest/v1/security/saml" \
-                 -H "accept: application/json" \
-                 -H "Content-Type: application/json" \
-                 -d "$IDP_DATA" &&
-            # realm configuration
-            curl -X PUT \
-                 -u admin:"$API_CREDENTIALS" \
-                 "$BASE_URL/service/rest/v1/security/realms/active" \
-                 -H "accept: application/json" \
-                 -H "Content-Type: application/json" \
-                 -d "$REALM" &&
-            # role creation
+            # proxy
             curl -X POST \
                  -u admin:"$API_CREDENTIALS" \
-                 "$BASE_URL/service/rest/v1/security/roles" \
-                 -H "accept: application/json" \
+                 "$BASE_URL/service/extdirect" \
                  -H "Content-Type: application/json" \
-                 -d "$ROLE" &&
+                 -d "$PROXY" &&
             curl -fsI -X POST http://localhost:15020/quitquitquit &&
             exit
         env:
@@ -56,21 +41,11 @@ spec:
             secretKeyRef:
               name: {{ template "nexus.name" . }}-secret
               key: admin.password
-        - name: IDP_DATA
+        - name: PROXY
           valueFrom:
             configMapKeyRef:
-              name: {{ template "nexus.name" . }}-sso
-              key: idp-metadata
-        - name: REALM
-          valueFrom:
-            configMapKeyRef:
-              name: {{ template "nexus.name" . }}-sso
-              key: realm
-        - name: ROLE
-          valueFrom:
-            configMapKeyRef:
-              name: {{ template "nexus.name" . }}-sso
-              key: role
+              name: {{ template "nexus.name" . }}-proxy
+              key: proxy
         resources: {}
       restartPolicy: Never
 status: {}
