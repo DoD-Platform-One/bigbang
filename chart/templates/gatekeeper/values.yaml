@@ -9,6 +9,7 @@ image:
   - name: private-registry
 postInstall:
   labelNamespace:
+    enabled: false
     image:
       pullSecrets:
       - name: private-registry
