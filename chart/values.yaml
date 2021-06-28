@@ -43,6 +43,35 @@ sso:
       - "nx-all"
     roles:
       - "nx-admin"
+proxy:
+  enabled: false
+  request:
+    tid: 1
+    action: coreui_HttpSettings
+    method: update
+    type: rpc
+    data:
+    - userAgentSuffix: ~
+      timeout: ~
+      retries: ~
+      httpEnabled: false
+      httpHost: ~
+      httpPort: ~
+      httpAuthEnabled: ~
+      httpAuthUsername: ~
+      httpAuthPassword: ~
+      httpAuthNtlmHost: ~
+      httpAuthNtlmDomain: ~
+      httpsEnabled: false
+      httpsHost: ~
+      httpsPort: ~
+      httpsAuthEnabled: ~
+      httpsAuthUsername: ~
+      httpsAuthPassword: ~
+      httpsAuthNtlmHost: ~
+      httpsAuthNtlmDomain: ~
+      nonProxyHosts: []
+
 # -- End of BigBang Additions
 
 ingress:
@@ -85,7 +114,7 @@ nexus:
   properties:
     override: true
     data: {}
-    # data: 
+    # data:
     #   nexus.licenseFile: /nexus-data/sonatype-license.override.lic
     #   nexus.scripts.allowCreation: true
     #   See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
@@ -207,7 +236,7 @@ persistence:
 
 tolerations: []
 
-# # Enable configmap and add data in configmap	
+# # Enable configmap and add data in configmap
 config:
   enabled: false
   mountPath: /sonatype-nexus-conf

@@ -56,6 +56,13 @@ sonatype-license.lic: {{ .Values.license_key }}
 {{- end -}}
 
 {{/*
+Return Nexus default admin password
+*/}}
+{{- define "nexus.defaultAdminPassword" -}}
+{{ randAlphaNum 12 }}
+{{- end -}}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "nexus.serviceAccountName" -}}
