@@ -23,4 +23,7 @@ jaeger:
     query:
       labels:
         protect: keycloak
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}        
 {{- end -}}
