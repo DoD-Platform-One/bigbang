@@ -8,7 +8,6 @@
     - privileged
     - dogfood
 
-#
 # In cluster k3s using K3D with the docker daemon as a sidecar
 #
 #   This will connect to a remote docker daemon over tls tcp (defined at installation of gitlab runners) and create
