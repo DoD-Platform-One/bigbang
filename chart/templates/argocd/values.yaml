@@ -19,10 +19,10 @@ dex:
   imagePullSecrets:
     - name: private-registry
 
-redis-ha:
-  enabled: true
 redis-bb:
-  usePassword: false
+  enabled: true
+  auth:
+    enabled: false
 
 istio:
   enabled: {{ .Values.istio.enabled }}
