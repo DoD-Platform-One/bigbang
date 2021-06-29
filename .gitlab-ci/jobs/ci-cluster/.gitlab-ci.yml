@@ -1,5 +1,5 @@
 .k8s-util:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.3
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.5-bb.0
 
 .dind-runner:
   tags:

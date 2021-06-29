@@ -40,7 +40,7 @@ variables:
     - generic
 
 .bigbang:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.6
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.5-bb.0
   extends: .bigbang-dogfood
   after_script:
     - kubectl get all -A
