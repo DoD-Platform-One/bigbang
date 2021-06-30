@@ -1,5 +1,10 @@
 # Changelog
 
+---
+## [29.1.0-bb.5] - 2021-06-30
+### Added
+- Network policy to allow prometheus scraping of istio envoy sidecar
+
 ## [29.1.0-bb.4]
 ### Changed
 - kube-api network policy toggle
