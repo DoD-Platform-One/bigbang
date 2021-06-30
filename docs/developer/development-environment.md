@@ -204,7 +204,7 @@ k3d cluster create \
     --volume /etc/machine-id:/etc/machine-id \
     --k3s-server-arg "--disable=traefik" \
     --k3s-server-arg "--disable=metrics-server" \
-    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
+    --k3s-server-arg "--tls-san=$EC2_PRIVATE_IP" \
     --port 80:80@loadbalancer \
     --port 443:443@loadbalancer \
     --api-port 6443
