@@ -27,6 +27,25 @@ patches:
         name: whatever
       spec:
         template:
+          metadata:
+            annotations:
+              # Required by Kubernetes node autoscaler
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
           spec:
             imagePullSecrets:
             - name: private-registry
+            terminationGracePeriodSeconds: 60
+            # Required by Pod Security Policy
+            securityContext:
+              runAsUser: 10000
+              fsGroup: 1337
+            containers:
+              - name: manager
+                # Required by Pod Security Policy
+                securityContext:
+                  readOnlyRootFilesystem: true
+                  allowPrivilegeEscalation: false
+                  runAsNonRoot: true
+                  capabilities:
+                    drop:
+                      - ALL

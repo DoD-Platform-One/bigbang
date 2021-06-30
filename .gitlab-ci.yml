@@ -76,6 +76,7 @@ pre vars:
     - .gitlab-ci/jobs/**/*
     - scripts/**/*
     - tests/**/*
+    - base/flux/*
 
 .deploy_bigbang: &deploy_bigbang
   - |
