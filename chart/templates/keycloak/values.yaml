@@ -17,6 +17,9 @@ istio:
     hosts:
       - keycloak.{{ .Values.hostname }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 serviceMonitor:

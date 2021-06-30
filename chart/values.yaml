@@ -941,7 +941,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
       path: "./chart"
-      tag: "11.0.0-bb.4"
+      tag: "11.0.1-bb.0"
 
     # -- Certificate/Key pair to use as the certificate for exposing Keycloak
     # Setting the ingress cert here will automatically create the volume and volumemounts in the Keycloak Package chart
