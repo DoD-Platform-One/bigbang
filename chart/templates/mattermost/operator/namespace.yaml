@@ -8,5 +8,4 @@ metadata:
     app.kubernetes.io/name: mattermost-operator
     app.kubernetes.io/component: "collaboration-tools"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: disabled
 {{- end }}
