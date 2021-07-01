@@ -11,6 +11,9 @@ flux:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
 
+minioOperator:
+  enabled: {{ .Values.addons.minioOperator.enabled }}
+  
 istio:
   enabled: {{ .Values.istio.enabled }}
   prometheus:
