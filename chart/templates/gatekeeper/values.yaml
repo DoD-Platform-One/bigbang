@@ -12,4 +12,7 @@ postInstall:
     image:
       pullSecrets:
       - name: private-registry
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}        
 {{- end -}}
