@@ -44,6 +44,10 @@ spec:
         args:
         - "--zap-log-level=info"
         - "--leader-election-id={{ include "kiali-operator.fullname" . }}"
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsNonRoot: true
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
@@ -58,6 +62,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: ALLOW_AD_HOC_KIALI_NAMESPACE
+          value: {{ .Values.allowAdHocKialiNamespace | quote }}
+        - name: ALLOW_AD_HOC_KIALI_IMAGE
+          value: {{ .Values.allowAdHocKialiImage | quote }}
+        - name: PROFILE_TASKS_TASK_OUTPUT_LIMIT
+          value: "100"
         - name: ANSIBLE_DEBUG_LOGS
           value: {{ .Values.debug.enabled | quote }}
         - name: ANSIBLE_VERBOSITY_KIALI_KIALI_IO
