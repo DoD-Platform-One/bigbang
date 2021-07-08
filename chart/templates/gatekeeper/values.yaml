@@ -3,7 +3,6 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gatekeeper" -}}
-disableValidatingWebhook: true
 image:
   pullSecrets:
   - name: private-registry
