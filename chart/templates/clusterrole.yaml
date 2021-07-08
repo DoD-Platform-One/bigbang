@@ -120,7 +120,7 @@ rules:
   - get
   - list
   - watch
-- apiGroups: ["networking.k8s.io"]
+- apiGroups: ["extensions", "networking.k8s.io"]
   resources:
   - ingresses
   verbs:
@@ -177,27 +177,21 @@ rules:
   - patch
   - update
   - watch
-- apiGroups: ["monitoring.kiali.io"]
-  resources:
-  - monitoringdashboards
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
 # The permissions below are for Kiali itself; operator needs these so it can escalate when creating Kiali's roles
 - apiGroups: [""]
   resources:
   - configmaps
   - endpoints
-  - namespaces
-  - nodes
-  - pods
   - pods/log
   - pods/proxy
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
   - replicationcontrollers
   - services
   verbs:
@@ -226,13 +220,6 @@ rules:
   {{- if eq .Values.onlyViewOnlyMode false }}
   - patch
   {{- end }}
-- apiGroups: ["autoscaling"]
-  resources:
-  - horizontalpodautoscalers
-  verbs:
-  - get
-  - list
-  - watch
 - apiGroups: ["batch"]
   resources:
   - cronjobs
@@ -245,9 +232,36 @@ rules:
   - patch
   {{- end }}
 - apiGroups:
+  - config.istio.io
   - networking.istio.io
+  - authentication.istio.io
+  - rbac.istio.io
   - security.istio.io
   resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+  {{- if eq .Values.onlyViewOnlyMode false }}
+  - create
+  - delete
+  - patch
+  {{- end }}
+- apiGroups: ["authentication.maistra.io"]
+  resources:
+  - servicemeshpolicies
+  verbs:
+  - get
+  - list
+  - watch
+  {{- if eq .Values.onlyViewOnlyMode false }}
+  - create
+  - delete
+  - patch
+  {{- end }}
+- apiGroups: ["rbac.maistra.io"]
+  resources:
+  - servicemeshrbacconfigs
   verbs:
   - get
   - list
@@ -277,12 +291,6 @@ rules:
   - routes
   verbs:
   - get
-- apiGroups: ["monitoring.kiali.io"]
-  resources:
-  - monitoringdashboards
-  verbs:
-  - get
-  - list
 - apiGroups: ["iter8.tools"]
   resources:
   - experiments

@@ -1,0 +1,93 @@
+{{- if .Values.svcPatchJob.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-bb-svc-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bb-{{ .Release.Name }}-svc-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-bb-svc-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed,before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: bb-{{ .Release.Name }}-svc-patch
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-bb-svc-patch
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bb-{{ .Release.Name }}-svc-patch
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 480
+  template:
+    metadata:
+      name: bb-{{ .Release.Name }}-svc-patch
+      annotations:
+        sidecar.istio.io/inject: 'false'
+      labels:
+        app.kubernetes.io/name: bigbang-kiali-svc-patch-job
+    spec:
+      serviceAccountName: {{ .Release.Name }}-bb-svc-patch
+      containers:
+        - name: bb-{{ .Release.Name }}-svc-patch
+          image: {{ $.Values.svcPatchJob.image.repository }}:{{ $.Values.svcPatchJob.image.tag }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              if [[ -n $(kubectl get svc kiali -n {{ .Release.Namespace }} -o jsonpath='{.spec.selector.version}') ]]; then
+                echo "Patching selector in Kiali Service"
+                kubectl patch service kiali -n {{ .Release.Namespace }} --type=json -p='[{"op":"remove","path":"/spec/selector/version"}]'
+              else
+                echo "No version key in Kiali Service's selector; no patch necessary :D"
+                exit 0
+              fi
+
+              if [[ -n $(kubectl get svc kiali -n {{ .Release.Namespace }} -o jsonpath='{.spec.selector.app}') ]]; then
+                echo "Patching selector in Kiali Service"
+                kubectl patch service kiali -n {{ .Release.Namespace }} --type=json -p='[{"op":"remove","path":"/spec/selector/app"}]'
+              else
+                echo "No app key in Kiali Service's selector; no patch necessary :D"
+                exit 0
+              fi
+      restartPolicy: OnFailure
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.pullSecrets }}
+      - name: {{ . }}
+      {{- end }}
+      {{- end }}
+{{- end }}
