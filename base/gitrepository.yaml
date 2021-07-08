@@ -11,5 +11,5 @@ spec:
   interval: 10m
   url: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
   ref:
-    tag: 1.10.0
+    tag: 1.10.1
     
