@@ -4,7 +4,7 @@ fullnameOverride: ""
 hostname: bigbang.dev
 
 istio:
-  enabled: true
+  enabled: false
   kiali:
     gateways:
     - "istio-system/main"
