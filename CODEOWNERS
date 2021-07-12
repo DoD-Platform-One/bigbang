@@ -16,8 +16,7 @@
 [Docs Owners]
 # Allow any one of the listed codeowners to approve merges to the documentation 
 # Does not allow the creator of the merge request to be the approver.
-/docs/                          @aaron.ruse @aaronbeger @barrywoodtetrate @brandencobb @cmcgrath @daryndecker @david.allen @dyoung @echuang @egoode @evan.rush @iahmad @jasonkrause @jay-rob @jennifer.kays @jcookehg @jdale @joshwolf @kavitha @kenna81 @kevin.wilder @kottoson @LynnStill @mark.sanchez @matthew.kaiser @mdutton @micah.nagel @michaelmartin @michaelmcleroy @msbrown47 @nick.kammerdiener @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @shouseba @thomas.burton @toladipupo @tsiddique1 @visuth.dy
-
+/docs/                          @aaron.ruse @aaronbeger @barrywoodtetrate @brandencobb @cmcgrath @daryndecker @david.allen @dyoung @echuang @egoode @evan.rush @iahmad @jasonkrause @jay-rob @jennifer.kays @jcookehg @jdale @joshwolf @kavitha @kenna81 @kevin.wilder @kottoson @LynnStill @mark.sanchez @matthew.kaiser @mdutton @micah.nagel @michaelmartin @michaelmcleroy @msbrown47 @nick.kammerdiener @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @shouseba @thomas.burton @toladipupo @tsiddique1 @visuth.dy @ronwebb
 
 ################################################
 # The following entries are for optional approval. 
@@ -38,16 +37,16 @@ hack/                           @toladipupo @michaelmcleroy @egoode
 ^[Charter Owners]
 charter/                        @gabe.scarberry @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
 
-^[Istio and Authservice]
-chart/Chart.yaml                @kenna81 @kavitha @cmcgrath @barrywoodtetrate
-chart/values.yaml               @kenna81 @kavitha @cmcgrath @barrywoodtetrate
-chart/templates/authservice     @kenna81 @kavitha @cmcgrath 
-chart/templates/istio           @kenna81 @kavitha @cmcgrath @barrywoodtetrate
+^[Istio, Istio Operator, and Authservice]
+chart/Chart.yaml                @barrywoodtetrate @joshwolf @kavitha @kenna81 @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
+chart/values.yaml               @barrywoodtetrate @joshwolf @kavitha @kenna81 @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
+chart/templates/authservice     @barrywoodtetrate @joshwolf @kavitha @kenna81 @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
+chart/templates/istio           @barrywoodtetrate @joshwolf @kavitha @kenna81 @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
 
-# ^[HAProxy]
-# chart/Chart.yaml              @blloyd @runyontr @ryan.j.garcia
-# chart/values.yaml             @blloyd @runyontr @ryan.j.garcia
-# chart/templates/haproxy       @blloyd @runyontr @ryan.j.garcia
+^[HAProxy]
+chart/Chart.yaml              @blloyd @runyontr @ryan.j.garcia
+chart/values.yaml             @blloyd @runyontr @ryan.j.garcia
+chart/templates/haproxy       @blloyd @runyontr @ryan.j.garcia
 
 ^[Anchore]
 chart/Chart.yaml                @blake.hearn @micah.nagel @jasonkrause
@@ -64,10 +63,15 @@ chart/Chart.yaml                @echuang @egoode @toladipupo @michaelmcleroy
 chart/values.yaml               @echuang @egoode @toladipupo @michaelmcleroy
 chart/templates/clusterauditor  @echuang @egoode @toladipupo @michaelmcleroy
 
-# ^[Gatekeeper]
+^[Gatekeeper]
 chart/Chart.yaml                @echuang @egoode @toladipupo @michaelmcleroy
 chart/values.yaml               @echuang @egoode @toladipupo @michaelmcleroy   
 chart/templates/gatekeeper      @echuang @egoode @toladipupo @michaelmcleroy
+
+^[Jaeger]
+chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
+chart/values.yaml               @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia  
+chart/templates/jaegar          @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
 
 ^[Logging]
 chart/Chart.yaml                @kavitha @ryan.j.garcia @evan.rush
@@ -99,6 +103,11 @@ chart/Chart.yaml                @megamind @kevin.wilder @michaelmcleroy
 chart/values.yaml               @megamind @kevin.wilder @michaelmcleroy
 chart/templates/keycloak        @megamind @kevin.wilder @michaelmcleroy
 
+^[Kiali]
+chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
+chart/values.yaml               @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
+chart/templates/kiali           @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
+
 ^[Mattermost (and operator)]
 chart/Chart.yaml                @micah.nagel @brandencobb @jasonkrause
 chart/values.yaml               @micah.nagel @brandencobb @jasonkrause
@@ -108,6 +117,11 @@ chart/templates/mattermost      @micah.nagel @brandencobb @jasonkrause
 chart/Chart.yaml                @LynnStill @kevin.wilder @brandencobb
 chart/values.yaml               @LynnStill @kevin.wilder @brandencobb
 chart/templates/minio           @LynnStill @kevin.wilder @brandencobb
+
+^[Nexus]
+chart/Chart.yaml                @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
+chart/values.yaml               @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
+chart/templates/nexus           @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
 
 ^[Velero]
 chart/Chart.yaml                @tunde @adam.toy @micah.nagel @jcarnes
