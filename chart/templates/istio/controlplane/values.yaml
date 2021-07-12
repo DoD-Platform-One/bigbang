@@ -13,6 +13,9 @@ imagePullSecrets:
 
 openshift: {{ .Values.openshift }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 {{- if .Values.addons.keycloak.enabled }}
 extraServers:
 - port:
