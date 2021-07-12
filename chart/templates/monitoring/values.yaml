@@ -36,6 +36,9 @@ istio:
     hosts:
     - grafana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
 
+anchore:
+  enabled: {{ .Values.addons.anchore.enabled }}
+
 global:
   imagePullSecrets:
   - name: private-registry
