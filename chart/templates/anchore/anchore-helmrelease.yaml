@@ -19,6 +19,11 @@ spec:
 
   {{- toYaml $fluxSettingsAnchore | nindent 2 }}
 
+  {{- if .Values.addons.anchore.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.anchore.postRenderers | nindent 4 }}
+  {{- end }}
+
   valuesFrom:
     - name: {{ .Release.Name }}-anchore-values
       kind: Secret
