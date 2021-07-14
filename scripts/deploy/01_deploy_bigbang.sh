@@ -23,6 +23,12 @@ if [ "$(yq e ".addons.keycloak.enabled" "tests/ci/k3d/values.yaml")" == "true" ]
   yq eval-all 'select(fileIndex == 0) * select(filename == "tests/ci/keycloak-certs/keycloak-passthrough-values.yaml")' $CI_VALUES_FILE tests/ci/keycloak-certs/keycloak-passthrough-values.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
 fi
 
+# Set controlPlaneCidr for ci-infra jobs which are RKE2
+if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ /(^|,)test-ci::infra(,|$)/ ]]; then
+  echo "Updating networkPolicies.controlPlaneCidr since Environment is RKE2"
+  yq e '.networkPolicies.controlPlaneCidr = "10.0.0.0/8"' $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+fi
+
 # deploy BigBang using dev sized scaling
 echo "Installing BigBang with the following configurations:"
 cat $CI_VALUES_FILE
