@@ -147,8 +147,8 @@ networkPolicies:
 svcPatchJob:
   enabled: true
   image:
-    repository: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl
-    tag: v1.21.2
+    repository: registry1.dso.mil/ironbank/big-bang/base
+    tag: 8.4
 
 # Taken from https://github.com/kiali/kiali-operator/blob/v1.33/deploy/kiali/kiali_cr.yaml
 ###################################################################
