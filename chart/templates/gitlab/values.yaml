@@ -13,6 +13,7 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   
 {{- if .Values.addons.gitlab.database.host }}
 postgresql:
