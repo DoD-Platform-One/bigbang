@@ -96,7 +96,7 @@ flux:
 networkPolicies:
   # -- Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled`
   enabled: true
-  # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints --namespace default kubernetes` to get the CIDR range needed for your cluster
+  # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster
   # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints)
   # Used by package NetworkPolicies to allow Kube API access
   controlPlaneCidr: 0.0.0.0/0

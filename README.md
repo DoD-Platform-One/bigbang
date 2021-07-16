@@ -59,6 +59,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | flux | object | `{"install":{"remediation":{"retries":3}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
 | networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","enabled":true}` | Global NetworkPolicies settings |
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled` |
+| networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` | Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints) Used by package NetworkPolicies to allow Kube API access |
 | istio.enabled | bool | `true` | Toggle deployment of Istio. |
 | istio.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git"` |  |
 | istio.git.path | string | `"./chart"` |  |
@@ -77,7 +78,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | jaeger.enabled | bool | `true` | Toggle deployment of Jaeger. |
 | jaeger.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git"` |  |
 | jaeger.git.path | string | `"./chart"` |  |
-| jaeger.git.tag | string | `"2.21.4-bb.2"` |  |
+| jaeger.git.tag | string | `"2.22.0-bb.1"` |  |
 | jaeger.flux | object | `{}` | Flux reconciliation overrides specifically for the Jaeger Package |
 | jaeger.sso.enabled | bool | `false` | Toggle SSO for Jaeger on and off |
 | jaeger.sso.client_id | string | `""` | OIDC Client ID to use for Jaeger |
@@ -87,7 +88,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"1.36.0-bb.1"` |  |
+| kiali.git.tag | string | `"1.36.0-bb.2"` |  |
 | kiali.flux | object | `{}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
 | kiali.sso.client_id | string | `""` | OIDC Client ID to use for Kiali |
@@ -129,7 +130,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | fluentbit.enabled | bool | `true` | Toggle deployment of Fluent-Bit. |
 | fluentbit.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git"` |  |
 | fluentbit.git.path | string | `"./chart"` |  |
-| fluentbit.git.tag | string | `"0.15.14-bb.1"` |  |
+| fluentbit.git.tag | string | `"0.15.15-bb.0"` |  |
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
 | fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -160,7 +161,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.argocd.enabled | bool | `false` | Toggle deployment of ArgoCD. |
 | addons.argocd.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git"` |  |
 | addons.argocd.git.path | string | `"./chart"` |  |
-| addons.argocd.git.tag | string | `"3.6.8-bb.3"` |  |
+| addons.argocd.git.tag | string | `"3.6.8-bb.4"` |  |
 | addons.argocd.flux | object | `{}` | Flux reconciliation overrides specifically for the ArgoCD Package |
 | addons.argocd.sso.enabled | bool | `false` | Toggle SSO for ArgoCD on and off |
 | addons.argocd.sso.client_id | string | `""` | ArgoCD OIDC client ID |
@@ -198,7 +199,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.hostnames.registry | string | `"registry.bigbang.dev"` |  |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"4.10.3-bb.13"` |  |
+| addons.gitlab.git.tag | string | `"4.10.3-bb.14"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
 | addons.gitlab.sso.client_id | string | `""` | Gitlab OIDC client ID |
