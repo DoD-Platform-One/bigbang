@@ -915,12 +915,12 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
       path: "./chart"
-      tag: "2.21.1-bb.6"
+      tag: "2.23.3-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
 
-    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure 
+    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi 
     plugins: []
     # - aws
 

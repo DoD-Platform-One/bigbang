@@ -18,7 +18,7 @@ networkPolicies:
 imagePullSecrets:
 - name: private-registry
 
-{{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure" }}{{- end }}
+{{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure, csi" }}{{- end }}
 initContainers:
 {{- range .Values.addons.velero.plugins }}
 {{- if eq . "aws" }}
@@ -28,13 +28,24 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
-{{- else if eq . "azure" }}
+{{- end }}
+{{- if eq . "azure" }}
   - name: velero-plugin-for-azure
     image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.2.0
     imagePullPolicy: IfNotPresent
     volumeMounts:
       - mountPath: /target
         name: plugins
+{{- end }}
+{{- if eq . "csi" }}
+  - name: velero-plugin-for-csi
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.1.2
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+configuration:
+  features: EnableCSI
 {{- end }}
 {{- end }}
 
