@@ -4,8 +4,8 @@ set -ex
 
 CI_VALUES_FILE="tests/ci/k3d/values.yaml"
 
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]]; then
-  echo "On default branch or tag, enabling all addons"
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
+  echo "all-packages label enabled, or on default branch or tag, enabling all addons"
   yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
   yq e ".addons.keycloak.enabled = "false"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 else
