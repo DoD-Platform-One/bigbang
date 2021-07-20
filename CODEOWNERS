@@ -73,11 +73,6 @@ chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel
 chart/values.yaml               @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia  
 chart/templates/jaegar          @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
 
-^[Logging]
-chart/Chart.yaml                @kavitha @ryan.j.garcia @evan.rush
-chart/values.yaml               @kavitha @ryan.j.garcia @evan.rush
-chart/templates/logging         @kavitha @ryan.j.garcia @evan.rush
-
 ^[Monitoring]
 chart/Chart.yaml                @lynnstill @ryan.j.garcia @michaelmartin
 chart/values.yaml               @lynnstill @ryan.j.garcia @michaelmartin
@@ -127,3 +122,18 @@ chart/templates/nexus           @kavitha @kevin.wilder @ariel.shnitzer @grant.du
 chart/Chart.yaml                @tunde @adam.toy @micah.nagel @jcarnes
 chart/values.yaml               @tunde @adam.toy @micah.nagel @jcarnes
 chart/templates/velero          @tunde @adam.toy @micah.nagel @jcarnes
+
+^[fluentbit]
+chart/Chart.yaml                @kavitha @ryan.j.garcia @echuang
+chart/values.yaml               @kavitha @ryan.j.garcia @echuang
+chart/templates/fluentbit       @kavitha @ryan.j.garcia @echuang
+
+^[eck-operator]
+chart/Chart.yaml                @kavitha @ryan.j.garcia @evan.rush @toladipupo
+chart/values.yaml               @kavitha @ryan.j.garcia @evan.rush @toladipupo
+chart/templates/eck-operator    @kavitha @ryan.j.garcia @evan.rush @toladipupo
+
+^[elasticsearch-kibana]
+chart/Chart.yaml                        @kavitha @ryan.j.garcia @evan.rush @ronwebb
+chart/values.yaml                       @kavitha @ryan.j.garcia @evan.rush @ronwebb
+chart/templates/elasticsearch-kibana    @kavitha @ryan.j.garcia @evan.rush @ronwebb
