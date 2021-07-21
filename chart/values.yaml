@@ -230,7 +230,8 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    tag: "3.4.0-bb.16"
+    # tag: "3.4.0-bb.19"
+    branch: "no-host-ns-deny"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux: {}
@@ -322,7 +323,8 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "11.0.0-bb.27"
+    # tag: "11.0.0-bb.29"
+    branch: "no-host-ns-patch"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
