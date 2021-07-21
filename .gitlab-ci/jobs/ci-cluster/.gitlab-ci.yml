@@ -8,7 +8,6 @@
     - privileged
     - dogfood
 
-#
 # In cluster k3s using K3D with the docker daemon as a sidecar
 #
 #   This will connect to a remote docker daemon over tls tcp (defined at installation of gitlab runners) and create
@@ -38,7 +37,6 @@
     - k3d cluster delete ${CI_JOB_ID}
     - docker network rm ${CI_JOB_ID}
 
-#
 # In cluster k3s using k3s as a sidecar
 #
 #   This will spin up k3s as a gitlab ci sidecar
