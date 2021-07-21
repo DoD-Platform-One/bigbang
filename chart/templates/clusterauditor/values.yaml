@@ -7,6 +7,9 @@ elasticsearch:
   imagePullSecrets:
     - name: private-registry
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
