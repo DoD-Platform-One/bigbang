@@ -104,6 +104,9 @@ gatekeeper:
         cpu: 100m
         memory: 256Mi
       limits: {}
+    violations:
+      noHostNamespace:
+        match: {}
 
 twistlock:
   enabled: true
