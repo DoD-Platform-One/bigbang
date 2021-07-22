@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [29.1.0-bb.6] - 2021-06-30
+### Added
+- Add openshift toggle, conditionally add port 5353 egress. Changing "openshift:" to true in values.yaml will enable.
+
 ## [29.1.0-bb.5] - 2021-06-30
 ### Added
 - Network policy to allow prometheus scraping of istio envoy sidecar
