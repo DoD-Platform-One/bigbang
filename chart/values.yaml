@@ -150,7 +150,7 @@ jaeger:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
     path: "./chart"
-    tag: "2.22.0-bb.1"
+    tag: "2.22.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Jaeger Package
   flux: {}
@@ -209,7 +209,7 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "0.3.0-bb.2"
+    tag: "0.3.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -230,8 +230,12 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
+<<<<<<< HEAD
     # tag: "3.4.0-bb.20"
     branch: "no-host-ns-deny"
+=======
+    tag: "3.4.0-bb.17"
+>>>>>>> 829f553b55d4a5c772d14582d4414246cefcc098
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux: {}
