@@ -2,8 +2,6 @@
 
 set -e
 
-# flux install --version=v0.7.7 --registry=registry1.dso.mil/ironbank/fluxcd --image-pull-secret=private-registry --export > flux.yaml
-
 #
 # global defaults
 #
