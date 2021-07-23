@@ -14,4 +14,8 @@ spec:
       ports:
         - port: 53
           protocol: UDP
+        {{- if .Values.openshift }}
+        - port: 5353
+          protocol: UDP
+        {{- end }}
 {{- end }}

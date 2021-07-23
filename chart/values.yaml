@@ -142,6 +142,8 @@ networkPolicies:
   # See `kubectl cluster-info` and then resolve to IP
   controlPlaneCidr: 0.0.0.0/0
 
+openshift: false
+
 # Used in templates/bigbang/svc-patch-job.yaml
 # Needed to cleanly upgrade from app version v1.32.0 to v1.36.0
 svcPatchJob:
