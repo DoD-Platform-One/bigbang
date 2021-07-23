@@ -43,6 +43,7 @@ postgresql:
   {{- end }}
 
 anchoreGlobal:
+  openShiftDeployment: {{ .Values.openshift }}
   {{- if .Values.addons.anchore.adminPassword }}
   defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
   {{- end }}
