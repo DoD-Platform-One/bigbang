@@ -11,6 +11,7 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: gatekeeper-system
+
   chart:
     spec:
       chart: {{ .Values.gatekeeper.git.path }}
