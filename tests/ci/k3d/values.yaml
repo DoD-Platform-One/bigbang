@@ -413,6 +413,8 @@ addons:
 
   keycloak:
     enabled: false
+    ingress:
+      gateway: "public"
     values:
       replicas: 1
       resources:

@@ -20,6 +20,8 @@ npm-debug.log*
 # (used frequently in deployments)
 patch.yaml
 notes
+ignore/*
+chart/*values.yaml
 
 # Visual Studio Code
 .vscode/*

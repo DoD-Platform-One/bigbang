@@ -7,6 +7,9 @@ hostname: {{ .Values.hostname }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  virtualService:  # this key is non-standard and needs to be fixed in the package
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
 
 minioRootCreds: minio-root-creds-secret
 
@@ -15,6 +18,10 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.minio.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 podAnnotations:
   sidecar.istio.io/inject: "true"
