@@ -14,5 +14,35 @@ postInstall:
       - name: private-registry
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}        
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+violations:  # Try to keep this in alpha order to make it easier to find keys
+  {{- if .Values.monitoring.enabled }}
+  hostNetworking:
+    match:
+      excludedNamespaces:
+        - monitoring # Allow node exporter to export metrics. The exporters live in pod monitoring-monitoring-prometheus-node-exporter-XXXX
+  {{- end }}
+
+  {{- if .Values.logging.enabled }}
+  noPrivilegedContainers:
+    match:
+      excludedNamespaces:
+        - kube-system
+        - logging # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
+  {{- end }}
+
+  {{- if .Values.monitoring.enabled }}
+  restrictedTaint:
+    match:
+      excludedNamespaces:
+        - kube-system
+        - monitoring # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
+  {{- end }}
+
+  {{- if .Values.logging.enabled }}
+  selinuxPolicy:
+    match:
+      excludedNamespaces:
+        - logging # FluentBit needs selinux option type spc_t
+  {{- end }}
 {{- end -}}
