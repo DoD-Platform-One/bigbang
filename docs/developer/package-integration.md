@@ -1,4 +1,6 @@
-# Integrate a Package with BigBang helm chart
+# Integrate a Package with Bigbang Helm Chart
+
+[[_TOC_]]
 
 1. Make a branch from the BigBang chart repository master branch. You can automatically create a branch from the Repo1 Gitlab issue. Or, in some cases you might manually create the branch. You should name the branch with your issue number. If your issue number is 9999 then your branch name can be "9999-my-description". It is best practice to make branch names short and simple.
 
@@ -96,51 +98,55 @@
 
 There are two ways to test BigBang, imperative or GitOps with Flux.  Your initial development can start with imperative testing.  But you should finish with GitOps to make sure that your code works with Flux.
 
-1. **Imperative:** you can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little".  From the root of your local bigbang repo:
+### Imperative
 
-   ```shell
-   # Deploy with helm while pointing to your override values files. 
-   # In this example the files are placed on your workstation at ../overrides/*
-   # Bigbang packages should create any needed secrets from the chart values
-   # If you have the values file encrypted with sops, temporarily decrypt it
-   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
- 
-   # Conduct testing
-   # If you make code changes you can run another helm upgrade to pick up the new changes
-   helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
- 
-   # Tear down
-   helm delete bigbang -n bigbang
-   # Helm delete will not delete the bigbang namespace
-   kubectl delete ns bigbang
-   # Istio namespace will be stuck in "finalizing". So run the script to delete it.
-   hack/remove-ns-finalizer.sh istio-system
-   ```
+You can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little".  From the root of your local bigbang repo:
 
-2. **GitOps with Flux:**  You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You can create a branch from one of the other developer's branch or start clean from the master branch. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. This is a public repo so DO NOT commit unencrypted secrets. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run.  This will reveal many errors before you make a commit. Here are the steps you can iterate:
+```shell
+# Deploy with helm while pointing to your override values files. 
+# In this example the files are placed on your workstation at ../overrides/*
+# Bigbang packages should create any needed secrets from the chart values
+# If you have the values file encrypted with sops, temporarily decrypt it
+helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
+
+# Conduct testing
+# If you make code changes you can run another helm upgrade to pick up the new changes
+helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/override-values.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml
+
+# Tear down
+helm delete bigbang -n bigbang
+# Helm delete will not delete the bigbang namespace
+kubectl delete ns bigbang
+# Istio namespace will be stuck in "finalizing". So run the script to delete it.
+hack/remove-ns-finalizer.sh istio-system
+```
+
+### GitOps with Flux
+
+You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You can create a branch from one of the other developer's branch or start clean from the master branch. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. This is a public repo so DO NOT commit unencrypted secrets. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run.  This will reveal many errors before you make a commit. Here are the steps you can iterate:
   
-   ```shell
-   # Verify chart code before committing
-   helm template bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --debug
-   helm install bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --dry-run
-   # Commit and push your code
-   # Deploy your bigbang template
-   kubectl apply -f dev/bigbang.yaml
-   # Monitor rollout
-   watch kubectl get pod,helmrelease -A
-   # Conduct testing
-   # Tear down
-   kubectl delete -f dev/bigbang.yaml
-   # Istio namespace will be stuck in "finalizing". So run the script to delete it. You will need 'jq' installed
-   hack/remove-ns-finalizer.sh istio-system
- 
-   # If you have pushed code changes before the tear down, occasionally the bigbang deployments are not terminated because Flux has not had enough time to reconcile the helmreleases
+```shell
+# Verify chart code before committing
+helm template bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --debug
+helm install bigbang ./chart -n bigbang -f ../customers/template/dev/configmap.yaml --dry-run
+# Commit and push your code
+# Deploy your bigbang template
+kubectl apply -f dev/bigbang.yaml
+# Monitor rollout
+watch kubectl get pod,helmrelease -A
+# Conduct testing
+# Tear down
+kubectl delete -f dev/bigbang.yaml
+# Istio namespace will be stuck in "finalizing". So run the script to delete it. You will need 'jq' installed
+hack/remove-ns-finalizer.sh istio-system
 
-   # Re-deploy bigbang
-   kubectl apply -f dev/bigbang.yaml
-   # Run the sync script.
-   hack/sync.sh
-   # Tear down
-   kubectl delete -f dev/bigbang.yaml
-   hack/remove-ns-finalizer.sh istio-system
-   ```
+# If you have pushed code changes before the tear down, occasionally the bigbang deployments are not terminated because Flux has not had enough time to reconcile the helmreleases
+
+# Re-deploy bigbang
+kubectl apply -f dev/bigbang.yaml
+# Run the sync script.
+hack/sync.sh
+# Tear down
+kubectl delete -f dev/bigbang.yaml
+hack/remove-ns-finalizer.sh istio-system
+```
