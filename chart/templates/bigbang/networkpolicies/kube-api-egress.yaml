@@ -13,6 +13,10 @@ spec:
       protocol: TCP
     - port: 53
       protocol: UDP
+    {{- if .Values.openshift }}
+    - port: 5353
+      protocol: UDP
+    {{- end }}
   podSelector:
     matchLabels:
       app.kubernetes.io/name: nexus-repository-manager

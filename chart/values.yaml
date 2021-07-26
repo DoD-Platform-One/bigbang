@@ -260,3 +260,5 @@ serviceAccount:
 
 psp:
   create: false
+
+openshift: false
