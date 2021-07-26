@@ -150,12 +150,3 @@ PLATFORM ONE MATTERMOST WARNING:
   Make sure to go back and edit your values or ensure you add the license through the mattermost settings page.
 {{- end }}
 {{- end }}
-
-{{ if $.Values.addons.keycloak.enabled }}
-PLATFORM ONE KEYCLOAK WARNING:
-  You have enabled keycloak in the values configuration.
-  Core packages are automatically moved to an `admin` subdomain (e.g. prometheus.admin.bigbang.dev).
-  Addons are not accessible and not supported in the same cluster as Keycloak.
-  Keycloak is still in a BETA status.  This means we don't fully recommend it for production workloads quite yet, but will be rolling out support in the near future to move it to STABLE.
-  Specifically, the way that multiple ingressgateways are created and specified within BigBang will make the automatic `admin` creation of core packages obsolete, and will also allow Keycloak to better function alongside other addons.
-{{- end }}

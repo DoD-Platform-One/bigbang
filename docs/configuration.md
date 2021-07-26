@@ -101,7 +101,12 @@ Each package (e.g. `istio`, `clusterAuditor`) has configuration to control how B
 | `git.branch` | Branch to use for package deployment resources | string | `chart-release` or `release-vx.x.x` |
 | `git.commit` | SHA of specific commit to use in Git for package deployment resources | SHA | null |
 | `git.tag` | Git tag to use for package deployment resources | string | null |
+| `ingress.gateway` | Name of Istio Gateway to use for ingress (if supported) | string | "public" |
+| `sso.*` | Single sign on configuration (if supported) | | |
+| `database.*` | External database connection configuration (if supported) | | |
+| `objectStorage.*` | Object storage configuration (if supported) | | |
 | `values` | Package specific values to configure | List of key/values pairs | {} |
+| `postRenderers` | See [docs/postrenderers.md](./postrenderers.md) | list | [] |
 
 ## Flux Resources
 

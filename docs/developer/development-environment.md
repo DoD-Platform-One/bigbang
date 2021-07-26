@@ -103,7 +103,7 @@ wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bas
 k3d version
 ```
 
-- Start our dev cluster on the EC2 instance using K3D. See addendum for more secure way with only port 22 exposed using private ip and sshuttle.
+- Start our dev cluster on the EC2 instance using K3D. See addendum for more secure way with only port 22 exposed using private ip and sshuttle & section to have support for multi istio ingressgateways with a K3D cluster using MetalLB.
 
 ```shell
 EC2_PUBLIC_IP=$( curl https://ipinfo.io/ip )
@@ -237,6 +237,127 @@ Then on your workstation edit the kubeconfig with the EC2 private ip. In a separ
 ```shell
 sshuttle --dns -vr ec2-user@$EC2_PUBLIC_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your-ec2.pem'
 ```
+
+### Multi Ingress-gateway Support with MetalLB and K3D
+
+1. If you want to utilize BigBang's multi ingress-gateway support for istio, it is possible with K3D but requires some different flags at cluster creation.
+
+```shell
+# ssh to your EC2 instance using the public IP. For Amazon Linux 2 the user is "ec2-user"
+ssh -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP
+
+# set environment variable for private IP
+EC2_PRIVATE_IP=$(hostname -I | awk '{print $1}')
+
+# create the k3d cluster with SAN for private IP
+# Create k3d cluster
+k3d cluster create \
+    --servers 1 \
+    --agents 3 \
+    --volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml \
+    --volume /etc/machine-id:/etc/machine-id \
+    --k3s-server-arg "--disable=traefik" \
+    --k3s-server-arg "--disable=metrics-server" \
+    --k3s-server-arg "--disable=servicelb" \
+    --k3s-server-arg "--tls-san=$EC2_PRIVATE_IP" \
+    --port 80:80@loadbalancer \
+    --port 443:443@loadbalancer \
+    --api-port 6443
+```
+  - This will create a K3D cluster just like before, except we need to ensure the built in "servicelb" add-on is disabled so we can use metallb.
+
+2. Find the Subnet for your k3d cluster's Docker network
+
+```shell
+docker network inspect k3d-k3s-default | jq .[0].IPAM.Config[0]
+```
+
+  - k3d-k3s-default is the name of the default bridge network k3d creates when creating a k3d cluster.
+  - We need the "Subnet": value to populate the correct addresses in the ConfigMap below.
+  - If my output looks like:
+  ```json
+  {
+    "Subnet": "172.21.0.0/16",
+    "Gateway": "172.21.0.1"
+  }
+  ```
+  - Then the addresses I want to input for metallb would be `172.21.1.240-172.21.1.243` so that I can reserve 4 IP addresses within the subnet of the Docker Network.
+
+3. Before installing BigBang we will need to install and configure [metallb](https://metallb.universe.tf/concepts/)
+
+```shell
+kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+cat <<EOF | > metallb-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 172.21.1.240-172.21.1.243
+EOF
+kubectl create -f metallb-config.yaml
+```
+
+  - The commands will create a metallb install and configure it to assign LoadBalancer IPs within the range `172.18.1.240-172.18.1.243` which is within the standard Docker Bridge Network CIDR meaning that the linux network stack will have a route to this network already.
+
+4. Verify LoadBalancers
+
+```shell
+kubectl get svc -n istio-system
+```
+
+  - You should see a result like:
+```
+NAME                         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                                                      AGE
+istiod                       ClusterIP      10.43.59.25    <none>         15010/TCP,15012/TCP,443/TCP,15014/TCP                        151m
+private-ingressgateway       LoadBalancer   10.43.221.12   172.18.1.240   15021:31000/TCP,80:31001/TCP,443:31002/TCP,15443:31003/TCP   150m
+public-ingressgateway        LoadBalancer   10.43.35.202   172.18.1.241   15021:30000/TCP,80:30001/TCP,443:30002/TCP,15443:30003/TCP   150m
+passthrough-ingressgateway   LoadBalancer   10.43.173.31   172.18.1.242   15021:32000/TCP,80:32001/TCP,443:32002/TCP,15443:32003/TCP   119m
+```
+
+  - With the key information here being the assigned `EXTERNAL-IP` sections for the ingressgateways.
+
+5. Update Hosts file on ec2 instance with IPs above
+
+```shell
+sudo vim /etc/hosts
+```
+
+  - Update it with similar entries:
+    - Applications with the following values (eg for Jaeger):
+    ```yaml
+    jaeger:
+      ingress:
+        gateway: "" #(Defaults to public-ingressgateway)
+    ```
+    We will need to set to the EXTERNAL-IP of the public-ingressgateway
+    ```
+    172.18.1.241 jaeger.bigbang.dev
+    ```
+    - Applications with the following values (eg for Logging):
+    ```yaml
+    logging:
+      ingress:
+        gateway: "private"
+    ```
+    We will need to set to the EXTERNAL-IP of the private-ingressgateway
+    ```
+    172.18.1.240 kibana.bigbang.dev
+    ```
+    - Keycloak will need to be set to the External-IP of the passthrough-ingressgateway
+    ```
+    172.18.1.242 keycloak.bigbang.dev
+    ```
+  - With these DNS settings in place you will now be able to reach the external *.bigbang.dev URLs from this EC2 instance.
+
+  - To reach outside the EC2 instance use either SSH or SSHUTTLE commands to specify a local port for Dynamic application-level port forwarding (ssh -D) and utilize Firefox's built in SOCKS proxy configuration to route DNS and web traffic through the application-level port forward from the SSH command.
 
 ### Amazon Linux 2
 
