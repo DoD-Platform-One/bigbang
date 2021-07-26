@@ -381,10 +381,14 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "14.0.0-bb.0"
+    tag: "14.0.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
-  flux: {}
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
 
   # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
