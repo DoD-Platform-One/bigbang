@@ -45,4 +45,16 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       excludedNamespaces:
         - logging # FluentBit needs selinux option type spc_t
   {{- end }}
+  allowedDockerRegistries:
+    match:
+      excludedNamespaces: 
+       {{- if .Values.istio.enabled }}
+        - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+       {{- end }}
+        - kube-system # ignored as the kubernetes distro cannot be controlled
+    {{- if .Values.addons.mattermost.enabled }}
+    parameters:
+      exemptContainers:
+        - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
+    {{- end }}
 {{- end -}}
