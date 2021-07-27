@@ -12,10 +12,24 @@ postInstall:
     image:
       pullSecrets:
       - name: private-registry
+      
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 violations:  # Try to keep this in alpha order to make it easier to find keys
+  allowedDockerRegistries:
+    match:
+      excludedNamespaces: 
+       {{- if .Values.istio.enabled }}
+        - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+       {{- end }}
+        - kube-system # ignored as the kubernetes distro cannot be controlled
+    {{- if .Values.addons.mattermost.enabled }}
+    parameters:
+      exemptContainers:
+        - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
+    {{- end }}
+
   {{- if .Values.monitoring.enabled }}
   hostNetworking:
     match:
@@ -45,16 +59,24 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       excludedNamespaces:
         - logging # FluentBit needs selinux option type spc_t
   {{- end }}
-  allowedDockerRegistries:
+
+  volumeTypes:
     match:
       excludedNamespaces: 
-       {{- if .Values.istio.enabled }}
-        - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+       {{- if .Values.fluentbit.enabled }}
+        # fluent-bit container requires certain host level access to ship logs and for keep track of state
+        # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-kubernetes-filter
+        - logging
        {{- end }}
-        - kube-system # ignored as the kubernetes distro cannot be controlled
-    {{- if .Values.addons.mattermost.enabled }}
-    parameters:
-      exemptContainers:
-        - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
-    {{- end }}
+       {{- if .Values.twistlock.enabled }}
+        # Twistlock requires /dev/log for its syslog daemon. 
+        # https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin-compute/audit/logging.html#
+        - twistlock
+       {{- end }}
+       {{- if .Values.monitoring.enabled }}
+        # Prometheus node exported requires hostpath hardcoded in upstream chart on which monitoring pkg has a direct dependency
+        # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/templates/daemonset.yaml#L150
+        - monitoring
+       {{- end }}
+        - kube-system #local-path_local-path-provisioner helper-pod-create-pvc
 {{- end -}}
