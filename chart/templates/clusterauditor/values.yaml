@@ -16,4 +16,6 @@ networkPolicies:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+
+openshift: {{ .Values.openshift }}
 {{- end -}}
