@@ -11,6 +11,8 @@ istio:
     gateways:
     - istio-system/{{ default "public" .Values.addons.nexus.ingress.gateway }}
 
+openshift: {{ .Values.openshift }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
