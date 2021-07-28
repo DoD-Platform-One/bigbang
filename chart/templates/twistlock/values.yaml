@@ -5,6 +5,8 @@
 {{- define "bigbang.defaults.twistlock" -}}
 hostname: {{ .Values.hostname }}
 
+openshift: {{ .Values.openshift }}
+
 prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
