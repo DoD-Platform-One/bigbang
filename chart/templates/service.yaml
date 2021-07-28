@@ -10,11 +10,11 @@ metadata:
 {{- end }}
   labels:
     {{- include "nexus.labels" . | nindent 4 }}
-    {{- if .Values.nexus.extraLabels }}
-      {{- with .Values.nexus.extraLabels }}
-        {{ toYaml . | indent 4 }}
-      {{- end }}
-    {{- end }}
+{{- if .Values.nexus.extraLabels }}
+  {{- with .Values.nexus.extraLabels }}
+    {{ toYaml . }}
+  {{- end }}
+{{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
