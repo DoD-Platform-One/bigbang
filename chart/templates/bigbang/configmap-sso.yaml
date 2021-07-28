@@ -4,11 +4,11 @@ kind: ConfigMap
 metadata:
   name: {{ template "nexus.name" . }}-sso
   labels: {{- include "nexus.labels" . | nindent 4 }}
-    {{- if .Values.nexus.extraLabels }}
-      {{- with .Values.nexus.extraLabels }}
-        {{ toYaml . | indent 4 }}
-      {{- end }}
-    {{- end }}
+{{- if .Values.nexus.extraLabels }}
+  {{- with .Values.nexus.extraLabels }}
+    {{ toYaml . }}
+  {{- end }}
+{{- end }}
 data:
   idp-metadata: {{ .Values.sso.idp_data | toJson | quote }}
   #realm: {{ .Values.sso.realm | quote }}

@@ -3,9 +3,11 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   labels: {{- include "nexus.labels" . | nindent 4 }}
+{{- if .Values.nexus.extraLabels }}
   {{- with .Values.nexus.extraLabels }}
-    {{ toYaml . | indent 4 }}
+    {{ toYaml . }}
   {{- end }}
+{{- end }}
   name: {{ template "nexus.name" . }}
 spec:
   requiredDropCapabilities:

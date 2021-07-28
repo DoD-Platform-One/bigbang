@@ -4,11 +4,11 @@ kind: ConfigMap
 metadata:
   name: {{ template "nexus.name" . }}-properties
   labels: {{- include "nexus.labels" . | nindent 4 }}
-    {{- if .Values.nexus.extraLabels }}
-      {{- with .Values.nexus.extraLabels }}
-        {{ toYaml . | indent 4 }}
-      {{- end }}
-    {{- end }}
+{{- if .Values.nexus.extraLabels }}
+  {{- with .Values.nexus.extraLabels }}
+    {{ toYaml . }}
+  {{- end }}
+{{- end }}
 data:
   nexus.properties: |
     {{- $data := dict -}}

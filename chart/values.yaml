@@ -100,6 +100,8 @@ image:
   pullPolicy: IfNotPresent
 
 nexus:
+  extraLabels:
+    app: nexus-repository-manager
   docker:
     enabled: false
     registries: []
