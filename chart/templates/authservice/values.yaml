@@ -6,6 +6,8 @@
 imagePullSecrets:
   - name: private-registry
 
+openshift: {{ .Values.openshift }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
