@@ -5,6 +5,8 @@
 {{- define "bigbang.defaults.twistlock" -}}
 hostname: {{ .Values.hostname }}
 
+openshift: {{ .Values.openshift }}
+
 prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
@@ -14,10 +16,15 @@ imagePullSecrets:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.twistlock.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
   console:
-    hosts:
-      - twistlock{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
+    gateways:
+    - istio-system/{{ default "public" .Values.twistlock.ingress.gateway }}
+
 {{- end -}}

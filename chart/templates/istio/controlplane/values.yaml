@@ -13,22 +13,67 @@ imagePullSecrets:
 
 openshift: {{ .Values.openshift }}
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if .Values.addons.keycloak.enabled }}
-extraServers:
-- port:
-    name: https-keycloak
-    protocol: TLS
-    number: 8443
-  hosts:
-    - keycloak.{{ .Values.hostname }}
-  tls:
-    mode: PASSTHROUGH
-
-gateway:
-  hosts:
-    - "*.admin.{{ .Values.hostname }}"
+{{- if .Values.istio.ingressGateways }}
+ingressGateways:
+  istio-ingressgateway:
+    enabled: false
 {{- end }}
-{{- end -}}
+
+{{- range $name, $values := .Values.istio.ingressGateways }}
+  {{ $name | nindent 2 }}:
+    {{- toYaml (merge (dict "k8s" $values.kubernetesResourceSpec) (fromYaml (include "istio.ingressgateway.k8s" $values))) | nindent 4 }}
+{{- end }}
+
+{{- if .Values.istio.gateways }}
+gateways:
+  main: null
+{{- end }}
+{{- range $name, $values := .Values.istio.gateways }}
+  {{ $name | nindent 2 }}:
+    selector:
+      app: {{ $values.ingressGateway }}
+    servers:
+    - hosts:
+      {{ tpl ($values.hosts | default (list) | toYaml) $ | nindent 8 }}
+      port:
+        name: https
+        number: 8443
+        protocol: HTTPS
+      tls:
+        credentialName: {{ $name }}-cert
+        mode: {{ dig "tls" "mode" "SIMPLE" $values }}
+{{- end }}
+{{- end }}
+
+{{- define "istio.ingressgateway.k8s" -}}
+k8s:
+  service:
+    type: {{ .type }}
+    {{- if .nodePortBase }}
+    ports: # Pulled from Istio gateway defaults (https://github.com/istio/istio/blob/master/manifests/charts/gateways/istio-ingress/values.yaml)
+    # Ports default to "protocol: TCP" and "targetPort = port"
+    # AWS ELB will by default perform health checks on the first port on this list. https://github.com/istio/istio/issues/12503
+    - port: 15021
+      name: status-port
+      nodePort: {{ add .nodePortBase 0 }}
+    - port: 80
+      targetPort: 8080
+      name: http2
+      nodePort: {{ add .nodePortBase 1 }}
+    - port: 443
+      targetPort: 8443
+      name: https
+      nodePort: {{ add .nodePortBase 2 }}
+    # SNI Routing port
+    - port: 15443
+      name: tls
+      nodePort: {{ add .nodePortBase 3 }}
+    {{- end }}
+{{- end }}

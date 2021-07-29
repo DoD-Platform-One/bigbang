@@ -12,7 +12,6 @@ metadata:
 spec:
   targetNamespace: nexus-repository-manager
   releaseName: nexus-repository-manager
-  interval: 10m
   chart:
     spec:
       chart: {{ .Values.addons.nexus.git.path }}

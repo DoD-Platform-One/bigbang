@@ -110,16 +110,55 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.8.4-bb.5"
+    tag: "1.8.4-bb.6"
+
+  # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
+  # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
+  # Besides some ports needed by Istio, only ports 80 and 443 are opened
+  # Ingress gateways that require more configuration can be completed using `istio.values`
+  ingressGateways:
+    public-ingressgateway:
+      type: "LoadBalancer" # or "NodePort"
+      kubernetesResourceSpec: {} # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+
+    # private-ingressgateway:
+    #   type: "LoadBalancer" # or "NodePort"
+    #   kubernetesResourceSpec: # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+    #     serviceAnnotations: # Example for AWS internal load balancer
+    #       service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    #       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+    # passthrough-ingressgateway:
+    #   type: "NodePort" # or "LoadBalancer"
+    #   # Node ports are assigned starting from nodePortBase.  The nodePortBase specifies the start of a range of 4 unused node ports.
+    #   # Node port will be assigned as follows: Port 15021 (Status) = nodePortBase, Port 80 = nodePortBase+1, Port 443 = nodePortBase+2, Port 15443 (SNI) = nodePortBase+3
+    #   # Node port base should be in the range from 30000 to 32764
+    #   nodePortBase: 32000  # Alternatively, the kubernetesResourceSpec can be used to configure all port parameters
+
+  gateways:
+    public:
+      ingressGateway: "public-ingressgateway"
+      hosts:
+      - "*.{{ .Values.hostname }}"
+      tls:
+        key: ""
+        cert: ""
+    # private:
+    #   ingressGateway: "private-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.hostname }}"
+    #   tls:
+    #     key: ""
+    #     cert: ""
+    # passthrough:
+    #   ingressGateway: "passthrough-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.hostname }}"
+    #   tls:
+    #     mode: "PASSTHROUGH"
 
   # -- Flux reconciliation overrides specifically for the Istio Package
   flux: {}
-
-  # -- Certificate/Key pair to use as the default certificate for exposing BigBang created applications.
-  # If nothing is provided, applications will expect a valid tls secret to exist in the `istio-system` namespace called `wildcard-cert`.
-  ingress:
-    key: ""
-    cert: ""
 
   # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
   values: {}
@@ -150,10 +189,18 @@ jaeger:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
     path: "./chart"
-    tag: "2.22.0-bb.2"
+    tag: "2.23.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Jaeger Package
-  flux: {}
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   sso:
     # -- Toggle SSO for Jaeger on and off
@@ -177,10 +224,14 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.36.0-bb.2"
+    tag: "1.36.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   sso:
     # -- Toggle SSO for Kiali on and off
@@ -209,7 +260,7 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "0.3.0-bb.3"
+    tag: "0.3.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -230,11 +281,15 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    # tag: "3.5.1-bb.5"
+    # tag: "3.5.1-bb.6"
     branch: "no-host-ns-deny"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
-  flux: {}
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
 
   # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
   values: {}
@@ -257,6 +312,10 @@ logging:
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
     timeout: 20m
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   sso:
     # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
@@ -288,7 +347,7 @@ eckoperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
-    tag: "1.6.0-bb.0"
+    tag: "1.6.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
@@ -323,11 +382,19 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    # tag: "14.0.0-bb.2"
+    # tag: "14.0.0-bb.4"
     branch: "no-host-ns-patch"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
-  flux: {}
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   sso:
     # -- Toggle SSO for monitoring components on and off
@@ -377,10 +444,14 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.6-bb.0"
+    tag: "0.0.6-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
@@ -402,6 +473,10 @@ addons:
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle SSO for ArgoCD on and off
@@ -438,7 +513,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.8"
+      tag: "0.4.0-bb.10"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
@@ -483,6 +558,10 @@ addons:
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
 
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
     # -- Default access key to use for minio.
     accesskey: ""
 
@@ -510,6 +589,10 @@ addons:
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle OIDC SSO for Gitlab on and off.
@@ -594,10 +677,14 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
       path: "./chart"
-      tag: "29.1.0-bb.5"
+      tag: "29.1.0-bb.7"
 
     # -- Base64 encoded license file.
     license_key: ""
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle SAML SSO for NXRM.
@@ -650,6 +737,10 @@ addons:
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle SAML SSO for SonarQube.
@@ -711,6 +802,10 @@ addons:
     # -- Flux reconciliation overrides specifically for the HAProxy Package
     flux: {}
 
+        # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
     # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
     values: {}
 
@@ -723,7 +818,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.13.0-bb.3"
+      tag: "1.13.0-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -742,6 +837,10 @@ addons:
       # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
       licenseYaml: |
         FULL LICENSE
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle OIDC SSO for Anchore on and off.
@@ -836,6 +935,10 @@ addons:
       # This should be the entire contents of the license file from Mattermost (should be one line), example below
       # license: "eyJpZCI6InIxM205bjR3eTdkYjludG95Z3RiOD---REST---IS---HIDDEN
       license: ""
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     sso:
       # -- Toggle OIDC SSO for Mattermost on and off.
@@ -939,17 +1042,13 @@ addons:
   #
   keycloak:
     # -- Toggle deployment of Keycloak.
+    # if you enable Keycloak you should uncomment the istio passthrough configurations above
+      # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
       path: "./chart"
       tag: "11.0.1-bb.0"
-
-    # -- Certificate/Key pair to use as the certificate for exposing Keycloak
-    # Setting the ingress cert here will automatically create the volume and volumemounts in the Keycloak Package chart
-    ingress:
-      key: ""
-      cert: ""
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
@@ -973,6 +1072,15 @@ addons:
 
     # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
     flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      # the istio gateway for keycloak must have tls.mode: PASSTHROUGH
+      gateway: "passthrough"
+      # -- Certificate/Key pair to use as the certificate for exposing Keycloak
+      # Setting the ingress cert here will automatically create the volume and volumemounts in the Keycloak Package chart
+      key: ""
+      cert: ""
 
     # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
     values: {}

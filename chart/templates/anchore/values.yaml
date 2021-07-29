@@ -7,12 +7,22 @@ hostname: {{ .Values.hostname }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  ui:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
+  api:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.anchore.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 {{- if and .Values.addons.anchore.enterprise.enabled .Values.addons.anchore.enterprise.licenseYaml }}
 enterpriseLicenseYaml: |
@@ -43,6 +53,7 @@ postgresql:
   {{- end }}
 
 anchoreGlobal:
+  openShiftDeployment: {{ .Values.openshift }}
   {{- if .Values.addons.anchore.adminPassword }}
   defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
   {{- end }}

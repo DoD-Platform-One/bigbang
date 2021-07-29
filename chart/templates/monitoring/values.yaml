@@ -10,6 +10,10 @@ flux:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 minioOperator:
   enabled: {{ .Values.addons.minioOperator.enabled }}
@@ -23,8 +27,8 @@ istio:
     port: 8080
     namespace: authservice
     {{- end }}
-    hosts:
-    - prometheus{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   alertmanager:
     enabled: true
     {{- if .Values.monitoring.sso.enabled }}
@@ -32,12 +36,12 @@ istio:
     port: 8080
     namespace: authservice
     {{- end }}
-    hosts:
-    - alertmanager{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   grafana:
     enabled: true
-    hosts:
-    - grafana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
 
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
@@ -57,7 +61,7 @@ grafana:
   grafana.ini:
     {{- if .Values.istio.enabled }}
     server:
-      root_url: https://grafana{{ if .Values.addons.keycloak.enabled }}.admin{{ end }}.{{ .Values.hostname }}/
+      root_url: https://grafana.{{ .Values.hostname }}/
     {{- end }}
 
     auth:

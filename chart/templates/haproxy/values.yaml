@@ -5,6 +5,9 @@
 {{- define "bigbang.defaults.haproxy-sso" -}}
 hostname: {{ .Values.hostname }}
 
+istio:
+  gateway: {{ default "public" .Values.addons.haproxy.ingress.gateway }}
+
 podLabels:
   protect: keycloak
 config: |

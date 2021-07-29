@@ -4,7 +4,7 @@
 set -e
 
 # Populate /etc/hosts
-ip=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+ip=$(kubectl -n istio-system get service public-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
 echo "Checking "
 
