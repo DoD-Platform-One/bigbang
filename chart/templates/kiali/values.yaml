@@ -35,6 +35,13 @@ cr:
       {{- else }}
       strategy: token
       {{- end }}
+    external_services:
+      grafana:
+        {{- $grafanaUrls := first (dig "istio" "grafana" "hosts" list .Values.monitoring.values) }}
+        url: {{ tpl ($grafanaUrls | default (printf "%s.%s" "grafana" .Values.hostname)) . | quote }}
+      tracing:
+        {{- $tracingUrls := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
+        url: {{ tpl ($tracingUrls | default (printf "%s.%s" "tracing" .Values.hostname)) . | quote }}
     api:
       namespaces:
         # bigbang watches all!
