@@ -37,14 +37,14 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - monitoring # Allow node exporter to export metrics. The exporters live in pod monitoring-monitoring-prometheus-node-exporter-XXXX
   {{- end }}
 
+  {{- if .Values.addons.mattermost.enabled }}
   httpsOnly:
     match:
       excludedNamespaces: 
-       {{- if .Values.addons.mattermost.enabled }}
         # mattermost currently does not useIngressTLS hence Ingress is created without TLS field by the operator.
         # Adding exemption, pending https://github.com/mattermost/mattermost-operator/issues/235
         - mattermost
-       {{- end }}
+  {{- end }}
 
   {{- if .Values.logging.enabled }}
   noPrivilegedContainers:
