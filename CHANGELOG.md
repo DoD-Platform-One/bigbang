@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.37.0-bb.0] - 2021-08-03
+### Updated
+- Updated kiali-operator helm chart to v1.37.0
+- Updated kiali images to latest in irobank images v1.37.0
+
 ## [1.36.0-bb.3] - 2021-07-21
 - add openshift toggle. conditionally modify networkpolicy for dns
 
