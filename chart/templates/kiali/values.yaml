@@ -38,10 +38,10 @@ cr:
     external_services:
       grafana:
         {{- $grafanaUrls := first (dig "istio" "grafana" "hosts" list .Values.monitoring.values) }}
-        url: {{ tpl ($grafanaUrls | default (printf "%s.%s" "grafana" .Values.hostname)) . | quote }}
+        url: https://{{ tpl ($grafanaUrls | default (printf "%s.%s" "grafana" .Values.hostname)) . }}
       tracing:
         {{- $tracingUrls := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
-        url: {{ tpl ($tracingUrls | default (printf "%s.%s" "tracing" .Values.hostname)) . | quote }}
+        url: https://{{ tpl ($tracingUrls | default (printf "%s.%s" "tracing" .Values.hostname)) . }}
     api:
       namespaces:
         # bigbang watches all!
