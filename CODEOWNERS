@@ -40,7 +40,7 @@ charter/                        @gabe.scarberry @joshwolf @megamind @micah.nagel
 ^[Istio, Istio Operator, and Authservice]
 chart/Chart.yaml                @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
 chart/values.yaml               @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
-chart/templates/authservice     @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
+chart/templates/authservice     @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher @cdevarenne
 chart/templates/istio           @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
 
 ^[HAProxy]
