@@ -14,9 +14,9 @@ If possible, provide additional details that will help with the merge request.
 
 Known issues or expected conflicts?
 
-Also, include any issues closed with "Closes #ISSUENUMBER". See example:
+Also, include any issues closed with "Closes #ISSUE_NUMBER". See example:
 
-Closes #123
+Closes #ISSUE_NUMBER
 
 Add any labels for affected packages so that they are deployed in CI. See example:
 
