@@ -12,14 +12,14 @@ postInstall:
     image:
       pullSecrets:
       - name: private-registry
-      
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 violations:  # Try to keep this in alpha order to make it easier to find keys
   allowedDockerRegistries:
     match:
-      excludedNamespaces: 
+      excludedNamespaces:
        {{- if .Values.istio.enabled }}
         - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
        {{- end }}
@@ -40,7 +40,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   {{- if .Values.addons.mattermost.enabled }}
   httpsOnly:
     match:
-      excludedNamespaces: 
+      excludedNamespaces:
         # mattermost currently does not useIngressTLS hence Ingress is created without TLS field by the operator.
         # Adding exemption, pending https://github.com/mattermost/mattermost-operator/issues/235
         - mattermost
@@ -71,14 +71,14 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
 
   volumeTypes:
     match:
-      excludedNamespaces: 
+      excludedNamespaces:
        {{- if .Values.fluentbit.enabled }}
         # fluent-bit container requires certain host level access to ship logs and for keep track of state
         # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-kubernetes-filter
         - logging
        {{- end }}
        {{- if .Values.twistlock.enabled }}
-        # Twistlock requires /dev/log for its syslog daemon. 
+        # Twistlock requires /dev/log for its syslog daemon.
         # https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin-compute/audit/logging.html#
         - twistlock
        {{- end }}
