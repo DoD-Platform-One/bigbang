@@ -69,7 +69,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - logging # FluentBit needs selinux option type spc_t
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled (or .Values.twistlock.enabled .Values.monitoring.enabled) -}}
+  {{- if or .Values.fluentbit.enabled (or .Values.twistlock.enabled .Values.monitoring.enabled) }}
   volumeTypes:
     match:
       excludedNamespaces:
