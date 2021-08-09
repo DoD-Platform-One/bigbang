@@ -88,7 +88,7 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
 1. Deploy your SOPS private key to a secret named `sops-gpg` in the cluster
 
    ```bash
-   gpg --export-secret-keys --armor <new key fingerprint> | kubectl create secret generic sops-gpg -n bigbang --from-file=bigbangkey=/dev/stdin
+   gpg --export-secret-keys --armor <new key fingerprint> | kubectl create secret generic sops-gpg -n bigbang --from-file=bigbangkey.asc=/dev/stdin
    ```
 
 ### AWS KMS
