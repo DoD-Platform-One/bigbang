@@ -21,7 +21,6 @@ npm-debug.log*
 patch.yaml
 notes
 ignore/*
-chart/*values.yaml
 
 # Visual Studio Code
 .vscode/*
