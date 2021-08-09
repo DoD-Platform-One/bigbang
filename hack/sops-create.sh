@@ -6,7 +6,7 @@
 file=$(realpath `dirname "$0"`)/bigbang-dev.asc
 ns=bigbang
 secret=sops-gpg
-key=bigbangkey
+key=bigbangkey.asc
 
 # Check tools
 check_tool() {
