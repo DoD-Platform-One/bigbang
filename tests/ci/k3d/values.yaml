@@ -56,19 +56,6 @@ clusterAuditor:
 monitoring:
   enabled: true
   values:
-    alertmanager:
-      alertmanagerSpec:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-    prometheusOperator:
-      resources:
-        requests:
-          cpu: 250m
-          memory: 400Mi
-        limits: {}
     prometheus:
       prometheusSpec:
         resources:
@@ -76,19 +63,13 @@ monitoring:
             cpu: 100m
             memory: 200Mi
           limits: {}
-    grafana:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits: {}
-    kubeStateMetrics:
+    kube-state-metrics:
       resources:
         requests:
           cpu: 10m
           memory: 32Mi
         limits: {}
-    nodeExporter:
+    prometheus-node-exporter:
       resources:
         requests:
           cpu: 100m
