@@ -30,13 +30,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
     {{- end }}
 
-  {{- if .Values.monitoring.enabled }}
-  hostNetworking:
-    match:
-      excludedNamespaces:
-        - monitoring # Allow node exporter to export metrics. The exporters live in pod monitoring-monitoring-prometheus-node-exporter-XXXX
-  {{- end }}
-
   {{- if .Values.addons.mattermost.enabled }}
   httpsOnly:
     match:
