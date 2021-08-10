@@ -359,9 +359,9 @@ package:
     # Publish packages to s3 release
     - |
       if [ -z $CI_COMMIT_TAG ]; then
-        aws s3 sync release/ s3://umbrella-bigbang-releases/tests/${CI_COMMIT_SHA}
+        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/tests/${CI_COMMIT_SHA}
       else
-        aws s3 sync release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+        aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
       fi
   after_script: []
 
