@@ -10,6 +10,8 @@ imagePullSecrets:
 
 hostname: {{ .Values.hostname }}
 
+openshift: {{ .Values.openshift }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   keycloak:
