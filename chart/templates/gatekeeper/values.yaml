@@ -30,6 +30,14 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
     {{- end }}
 
+  {{- if .Values.monitoring.enabled}}
+  allowedHostFilesystem:
+    match:
+      excludedNamespaces: 
+        # required for monitoring's prometheus-node-exporter to get node metrics
+        - monitoring
+  {{- end }}
+
   {{- if .Values.monitoring.enabled }}
   hostNetworking:
     match:
