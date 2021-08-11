@@ -238,6 +238,18 @@ Then on your workstation edit the kubeconfig with the EC2 private ip. In a separ
 sshuttle --dns -vr ec2-user@$EC2_PUBLIC_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your-ec2.pem'
 ```
 
+#### A note on DNS forwarding
+
+Mac antivirus tools have been known to interfere with DNS forwarding. In other cases, due to the cluster configuration, the hostnames do resolve, but to 127.0.0.1 (localhost) or to other 127.0.0.0/8 addresses
+
+If the hosts shown in the HOSTS column from `kubectl get vs -A` don't resolve to the host(s) running the cluster (or don't resolve at all), add them to your /etc/hosts file:
+
+```shell
+<IP of the EC2 instance> kibana.bigbang.dev prometheus.bigbang.dev grafana.bigbang.dev alertmanager.bigbang.dev kiali.bigbang.dev tracing.bigbang.dev
+```
+
+It is important to use hostnames when accessing cluster apps in a browser instead of IPs as the hostname sent by the browser in its HTTP GET request is used by the load balancers (see: kubectl get svc -n istio-system) to direct the traffic to the correct app. 
+
 ### Multi Ingress-gateway Support with MetalLB and K3D
 
 1. If you want to utilize BigBang's multi ingress-gateway support for istio, it is possible with K3D but requires some different flags at cluster creation.
