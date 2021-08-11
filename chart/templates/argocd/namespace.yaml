@@ -6,5 +6,6 @@ metadata:
     app.kubernetes.io/name: authservice
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
   name: argocd
 {{- end }}

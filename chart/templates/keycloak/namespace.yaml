@@ -5,7 +5,7 @@ kind: Namespace
 metadata:
   name: {{ $name }}
   labels:
-    istio-injection: disabled-because-keycloak-hates-istio
+    istio-injection: disabled
     app.kubernetes.io/name: {{ $name }}
     app.kubernetes.io/component: "security-tools"
     {{- include "commonLabels" . | nindent 4}}
