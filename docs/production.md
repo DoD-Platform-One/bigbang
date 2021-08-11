@@ -7,8 +7,6 @@ Table of Contents
 
 ## Production Deployment
 
-Note: When deploying to production, istio-system should be removed from `excludedNamespaces` under the `allowedDockerRegistries` violations (see `chart/templates/gatekeeper/values.yaml` for reference). This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. Production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
-
 The gatekeeper `values` section should resemble below when deploying to production.
 ```
 # OPA Gatekeeper

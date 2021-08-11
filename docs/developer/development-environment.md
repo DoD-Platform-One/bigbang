@@ -204,6 +204,18 @@ cd ./bigbang
 ./scripts/install_flux.sh -u your-user-name -p your-pull-secret
 ```
 
+**Note:** When deploying to k3d, istio-system should be added from `excludedNamespaces` under the `allowedDockerRegistries` violations for gatekeeper. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
+
+```yaml
+gatekeeper:
+  values:
+    violations:
+      allowedDockerRegistries:
+        match:
+          excludedNamespaces: 
+            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+```
+
 ## Addendum
 
 ### More secure method with `sshuttle`

@@ -18,18 +18,11 @@ networkPolicies:
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 violations:  # Try to keep this in alpha order to make it easier to find keys
 
-  {{- if or .Values.istio.enabled .Values.addons.mattermost.enabled }}
+  {{- if .Values.addons.mattermost.enabled }}
   allowedDockerRegistries:
-    {{- if .Values.istio.enabled }}
-    match:
-      excludedNamespaces:
-        - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
-    {{- end }}
-    {{- if .Values.addons.mattermost.enabled }}
     parameters:
       exemptContainers:
         - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
-    {{- end }}
   {{- end }}
 
   {{- if .Values.monitoring.enabled}}
