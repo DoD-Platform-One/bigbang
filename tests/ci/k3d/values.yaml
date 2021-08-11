@@ -104,6 +104,11 @@ gatekeeper:
         cpu: 100m
         memory: 256Mi
       limits: {}
+    violations:
+      allowedDockerRegistries:
+        match:
+          excludedNamespaces: 
+            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
 
 twistlock:
   enabled: true

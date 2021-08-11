@@ -1,0 +1,11 @@
+# enables and configures gatekeeper to add an exception for the allowedDockerRegistries violations in the istio-system namespace (when using k3d)
+# this is required for development deployments to allow the istio loadbalancer daemonset to come up with rancher images rather than images from registry1.dso.mil or registry.dso.mil
+
+gatekeeper:
+  enabled: true
+  values:
+    violations:
+      allowedDockerRegistries:
+        match:
+          excludedNamespaces: 
+            - istio-system 
