@@ -29,8 +29,11 @@ source:
     - registry:2
 
     - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
-    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.0.2
-    - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.0.1
+    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.1.0
+    - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.1.0
+    - registry1.dso.mil/ironbank/big-bang/base:8.4
+    - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
+    - registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.2
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
@@ -40,9 +43,12 @@ source:
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/skopeo-bash-git-lfs-kustomize:1.0
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/anchore:0.8.2
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/test:gcc
-    - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check611-sonar-scanner45-dotnet-31:021921
+    # Following line removed with 1.10.0 release due to failure to fetch image.  Image not found.
+    # - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check616-sonar-scanner45-dotnet-31:052421
     # gitlab-runner-helper image: This image does not get captured from the release deployment
     # the gitlab-runner-helper image only gets pulled when a pipeline runs. So it must be listed here
     - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v13.9.0
+    # Explicitly add Keycloak image because Keycloak is not enabled in pipelines so the image does not get pulled
+    - registry.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/keycloak-ib:14.0.0-1.0.4-1
     # Don't include until fortify is supported
     #- registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0

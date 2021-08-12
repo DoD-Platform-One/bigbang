@@ -10,20 +10,4 @@ metadata:
     {{- if .Values.istio.enabled }}
     istio-injection: enabled
     {{- end }}
-
-{{- if ( include "imagePullSecret" . ) }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: velero
-  labels:
-    app.kubernetes.io/name: velero
-    app.kubernetes.io/component: "cluster-utilities"
-    {{- include "commonLabels" . | nindent 4 }}
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
 {{- end }}

@@ -13,7 +13,7 @@ The kind label shows the type of work that needs to be accomplished
 
 #### `kind::bug`
 
-Issues releated to Bigbang not functioning as expected
+Issues related to Bigbang not functioning as expected
 
 #### `kind::chore`
 
@@ -21,11 +21,11 @@ Catch all kind that captures administrative tasking for the BigBang project
 
 #### `kind:ci`
 
-Issues related to the CI/CD, developer workflows and/or the releaes process
+Issues related to the CI/CD, developer workflows and/or the release process
 
 #### `kind::docs`
 
-Issues related to documentaiton
+Issues related to documentation
 
 #### `kind::feature`
 
@@ -33,7 +33,7 @@ Creation of a new capability for BigBang and/or one of its packages
 
 #### `kind::enhancement`
 
-Improvement of an existing capablity to work more efficiently in specific environments
+Improvement of an existing capability to work more efficiently in specific environments
 
 #### `kind::test`
 
@@ -41,17 +41,25 @@ Improvements on testing for individual packages or Big Bang.  Does not change th
 
 ### priority
 
-#### `priority::high`
+#### `priority::1`
 
-`priority::high` issues are causing runtime issues in production enviornments. These issues justify a patch of a release.
+`priority::1` issues are causing runtime issues in production environments. These issues justify a patch of a release.
 
-#### `priority:: medium`
+#### `priority::2`
 
-`priority:: medium` issues are defined by bugs that degrade system performance, but workarounds are available.  
+`priority::2` TBD
 
-#### `priority::low`
+#### `priority::3`
 
-`priority::low` issues are superficial and do not have any impact on the functioning of production systems
+`priority:: 3` issues are defined by bugs that degrade system performance, but workarounds are available.
+
+#### `priority::4`
+
+`priority:: 4` TBD
+
+#### `priority::5`
+
+`priority::5` issues are superficial and do not have any impact on the functioning of production systems
 
 ### Status
 
@@ -75,7 +83,7 @@ This Issue has not been started.
 
 ### Packages
 
-Package labels are identified by their package name and serve two purposes. 
+Package labels are identified by their package name and serve two purposes.
 
 1. Packages owners subscribe to the package labels for their packages and will be notified when a new issue or merge request is created with the label
 
@@ -145,17 +153,25 @@ Epic is blocked by an external dependency that needs to be solved before work ca
 
 ### Priority
 
-#### `priority::low`
+#### `priority::1`
 
-A nice to have, but not needed to advance the product.
+Top of the backlog and should be broken down and worked on when cycles become available.
 
-#### `priority::medium`
+#### `priority::2`
+
+TBD
+
+#### `priority::3`
 
 Medium term delivery providing long term value.
 
-#### `priority::high`
+#### `priority::4`
 
-Top of the backlog and should be broken down and worked on when cycles become available
+TBD
+
+#### `priority::5`
+
+A nice to have, but not needed to advance the product.
 
 ### Size
 
@@ -163,7 +179,7 @@ The `size` label helps identify the scope of work needed as part of the epic
 
 #### `size::small`
 
-Sufficently small enough to be completed by an engineer in a two week period
+Sufficiently small enough to be completed by an engineer in a two week period
 
 #### `size::medium`
 

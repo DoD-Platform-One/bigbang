@@ -4,7 +4,7 @@
 
 Gatekeeper is an auditing tool that allows administrators to see what resources are currently violating any given policy.
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph LR
@@ -37,7 +37,17 @@ Gatekeeper doesn't have a database.
 
 ### Istio Configuration
 
-This package has no specific istio configuration.
+When deploying to k3d, istio-system should be added from `excludedNamespaces` under the `allowedDockerRegistries` violations. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
+
+```yaml
+gatekeeper:
+  values:
+    violations:
+      allowedDockerRegistries:
+        match:
+          excludedNamespaces: 
+            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+```
 
 ## High Availability
 

@@ -9,8 +9,8 @@ All Big Bang Packages shall adhere to the following requirements.  Where possibl
 * The `main` branch should be default in each project
 * Merge Requests should require 1 approver
 * The `main` branch should be protected:
-  * Devs + Maintainers should be allowed to merge.  
-  * No one should be allowed to push and it should allow 
+  * Developers + Maintainers should be allowed to merge.  
+  * No one should be allowed to push and it should allow
   * CODEOWNERs approval should be allowed
 * There should exist a protected tag with the wildcard `*-bb*`
 
@@ -47,7 +47,7 @@ There are two types of third party packages:
 
 These are packages that are supported, updated, and maintained by team members of BigBang. This designation is usually reserved for packages that key customers require, but are missing approved IronBank containers, or blanket approval that allows them to be included with the BigBang product.
 
-These products are labeled with the "BigBang Supported" badge on the repositorys `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
+These products are labeled with the "BigBang Supported" badge on the repository's `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
 
 #### Independent
 
@@ -73,19 +73,11 @@ Forked upstream helm charts will be configured with the appropriate BigBang _add
 
 In the case where an accepted upstream helm chart does not exist, BigBang will create and maintain it's own custom helm chart for the package in question.  The helm chart will be in conformance with the [Package Standards](#pr-x.-package-standards).
 
-## PR-X. Package Versioning Scheme
-
-Big Bang packages follow a standard semantic versioning scheme for both the package tag and the chart version.  The package tag will always be in line with the chart version (not the `appVersion`).  To distinguish between BigBang specific changes within the semantic version of the upstream chart, a suffix of `-bb.#` will be added to _all_ charts and tags.
-
-For example, for the upstream [`istio-operator`](https://github.com/istio/istio/tree/1.7.3/manifests/charts/istio-operator) pinned at version `1.7.3`, the big bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.7.3-bb.0`.  If in the same `istio-operator` release, BigBang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.7.3-bb.1`.
-
-For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`.  Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
-
 ## PR-X. Package Standards
 
 The common components that each package will have are defined in the following folder layout:
 
-```bash
+```shell
 ├── CODEOWNERS              # GitLab Code Owners for Package Owners/Understudies.
 ├── README.md               # top level summary of package
 ├── docs/                   # detailed documentation folder describing package consumption details and assumptions
@@ -101,7 +93,7 @@ The common components that each package will have are defined in the following f
 Each package shall contain a .gitlab-ci.yml file at the top of the package repo.   This file shall reference the pipeline CI/CD infrastructure
 files and include the following contents:
 
-```bash
+```shell
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
     ref: master
@@ -116,20 +108,6 @@ If a Package has a dependency on another Package to function, the dependency sha
 
 Each Package will clearly articulate in documentation any dependent Big Bang Package and versions.
 
-## PR-X Kubernetes Component Requirements
-
-These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices
-
-* Resource Limits and Requests set for cpu and memory and they are [Guaranteed QoS](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed)
-* Containers are not run in privileged mode
-* Read Only Root File System is set to true
-* Containers are not run as root
-* runAsUser > 1000
-* Each deployment/daemonset/statefulset should use its own service account with least privilege permission set
-* HostPath volumes are not allowed
-* All resources contain the [Kubernetes Common Labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/)
-* All containers contain health and liveness checks
-
 ## Branching
 
 Each package will have a default branch of `main`.  Immutable tags will be used to identify releases and will follow a semver versioning scheme.  For more information, see the [versioning](#pr-x.-package-versioning-scheme) section.
@@ -137,21 +115,7 @@ Each package will have a default branch of `main`.  Immutable tags will be used 
 ## Package Standards
 
 * Helm Packages contain one kubernetes object definition
-* Helm charts should have the flexibility to enable istio and defaults to disable
 
-```yaml
-   istio:
-     enabled: false
-```
-
-* Helm charts should have the flexibility to enable service monitors and defaults to disable
-
-```yaml
-   monitoring:
-     enabled: false
-```
-
-* Helm charts should have the flexibility to enable keycloak and defaults to disable
 * Helm dependency manage charts dependencies in Chart.yaml and the dependency chart can be enabled or disabled using condition.
 * All Chart names are lower case letters and numbers, separated with dashes. No dots, uppercase or underscores.
 * Helm Chart values variable names should begin with a lowercase letter and words should be separated with Camel case
@@ -159,5 +123,3 @@ Each package will have a default branch of `main`.  Immutable tags will be used 
     version: ~1.2.3
 * There should be a Helm values file located at `tests/test-values.yaml` used for pipeline testing.
 * Charts should support `affinity` and `nodeSelector` configuration for all components.  If there is only one type of `Pods`, then a single, top level value shall be provided, otherwise there should be `affinity` and `nodeSelector` regions for each component.  See [the Kubernetes Docs](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) for more information
-
-

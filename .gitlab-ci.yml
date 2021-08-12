@@ -40,7 +40,7 @@ variables:
     - generic
 
 .bigbang:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.6
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.3
   extends: .bigbang-dogfood
   after_script:
     - kubectl get all -A
@@ -59,22 +59,6 @@ pre vars:
     reports:
       dotenv: variables.env
   script:
-  # obtain MR and master versions
-  - CHART_MR_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
-  - git fetch && git checkout ${CI_DEFAULT_BRANCH}
-  - CHART_MA_VERSION=$(sed -n -e 's/^version. //p' chart/Chart.yaml)
-  - git fetch && git checkout ${CI_COMMIT_REF_NAME}
-  - echo "CHART_MR_VERSION=$CHART_MR_VERSION" >> variables.env
-  - echo "CHART_MA_VERSION=$CHART_MA_VERSION" >> variables.env
-  - CHART_VERSION_DIFF=$(./scripts/semver_diff.sh $CHART_MR_VERSION $CHART_MA_VERSION)
-  - IFS=. DIFF_ARR=(${CHART_VERSION_DIFF##*-})
-  - echo "CHART_VERSION_DIFF=$CHART_VERSION_DIFF" >> variables.env
-  # detect breaking change (first two version sections in semver diff)
-  - CHART_BREAKING_CHANGE="false"
-  - if (( ${DIFF_ARR[0]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi
-  - if (( ${DIFF_ARR[1]} > 0 )); then CHART_BREAKING_CHANGE="true"; fi
-  # store variables
-  - echo "CHART_BREAKING_CHANGE=$CHART_BREAKING_CHANGE" >> variables.env
   # Create the TF_VAR_env variable
   - echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
   - cat variables.env
@@ -92,12 +76,25 @@ pre vars:
     - .gitlab-ci/jobs/**/*
     - scripts/**/*
     - tests/**/*
+    - base/flux/*
 
 .deploy_bigbang: &deploy_bigbang
-  - find ./scripts/deploy -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
+  - |
+    set -e
+    for deploy_script in $(find ./scripts/deploy -type f -name '*.sh' | sort); do
+      chmod +x ${deploy_script}
+      echo "Executing ${deploy_script}..."
+      ./${deploy_script}
+    done
 
 .test_bigbang: &test_bigbang
-  - find ./tests -type f -name '*.sh' | sort | xargs -r -I {} sh -c 'echo {} && sh {}'
+  - |
+    set -e
+    for test_script in $(find ./tests -type f -name '*.sh' | sort); do
+      chmod +x ${test_script}
+      echo "Executing ${test_script}..."
+      ./${test_script}
+    done
 
 clean install:
   stage: smoke tests
@@ -106,7 +103,7 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master"'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     - *chart_changes
   script:
@@ -131,8 +128,11 @@ upgrade:
   extends:
     - .k3d-ci
   rules:
-    # skip job when MR title starts with 'Breaking Change'
-    - if: '$CI_MERGE_REQUEST_TITLE =~ /^Breaking Change/'
+    # skip job for nightly master and "test-ci::infra" labeled pipelines
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+      when: never
+    # skip job when MR title starts with 'SKIP UPGRADE'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPGRADE/'
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -140,7 +140,6 @@ upgrade:
   variables:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
-    - if $CHART_BREAKING_CHANGE; then echo "Breaking change detected by chart version difference, skipping job"; exit 0; fi
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
     - *deploy_bigbang
@@ -248,13 +247,6 @@ aws/rke2/bigbang up:
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
     # Deploy a default storage class for aws
     - kubectl apply -f ${CI_PROJECT_DIR}/.gitlab-ci/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
-    - echo "Patching default rke2 PSPs to be less restrictive so OPA Gatekeeper can successfully deploy"
-    - |
-      kubectl --kubeconfig rke2.yaml patch psp global-unrestricted-psp  -p '{"metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
-    - |
-      kubectl --kubeconfig rke2.yaml patch psp system-unrestricted-psp  -p '{ "metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
-    - |
-      kubectl --kubeconfig rke2.yaml patch psp global-restricted-psp  -p '{ "metadata": { "annotations": { "seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*" } } }'
 
   script:
     - *deploy_bigbang
@@ -336,7 +328,11 @@ package:
   before_script:
     # Set up auth
     - mkdir -p /root/.docker
-    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+    - |
+      jq -n '{"auths": {"registry.dso.mil": {"auth": $bb_registry_auth}, "registry1.dso.mil": {"auth": $registry1_auth}, "registry.il2.dso.mil": {"auth": $il2_registry_auth} } }' \
+        --arg bb_registry_auth ${BB_REGISTRY_AUTH} \
+        --arg registry1_auth ${REGISTRY1_AUTH} \
+        --arg il2_registry_auth ${IL2_REGISTRY_AUTH} > /root/.docker/config.json
   script:
     - cp ./scripts/package/synker.yaml ./synker.yaml
     # Populate images list in synker config

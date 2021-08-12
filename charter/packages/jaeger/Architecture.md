@@ -4,7 +4,7 @@
 
 [Jaeger](https://www.jaegertracing.io/) is an open source implementation of Zipkin that can be used to collect and visualize traces.
 
-## Big Bang Touchpoints
+## Big Bang Touch Points
 
 ```mermaid
 graph TB
@@ -33,7 +33,7 @@ graph TB
 
 ### Storage
 
-When Jaeger recieves traces, it needs a location to store them.  The default configuration in the Helm Chart is to use in memory storage.  This, of course, doesn't provide High Availability.  To provide storage, the chart uses the deployed Elasticserach instance deployed in the logging namespace.
+When Jaeger receives traces, it needs a location to store them.  The default configuration in the Helm Chart is to use in memory storage.  This, of course, doesn't provide High Availability.  To provide storage, the chart uses the deployed Elasticsearch instance deployed in the logging namespace.
 
 ### Istio Configuration
 
@@ -51,7 +51,7 @@ Istio is configured with knowledge of the jaeger ingest service so istio sidecar
 
 ## High Availability
 
-Jaeger is deployed with HorizonalPodAutoscalers for the collector and the queerying pods.  Use the below yaml to update the `maxReplicas` on the HPA:
+Jaeger is deployed with HorizonalPodAutoscalers for the collector and the querying pods.  Use the below yaml to update the `maxReplicas` on the HPA:
 
 ```yaml
 jaeger:
@@ -64,10 +64,9 @@ jaeger:
           maxReplicas: 5
 ```
 
-
 ## Single Sign on (SSO)
 
-Jaeger does not have built in SSO.  In order to provide SSO, this deployment legerages [Authservice]().
+Jaeger does not have built in SSO.  In order to provide SSO, this deployment leverages [Authservice](https://github.com/istio-ecosystem/authservice).
 
 ```mermaid
 flowchart LR
@@ -89,7 +88,7 @@ ingress --> IP
 
 subgraph "jaeger namespace"
     subgraph "jaeger pod"
-        J["jager"]
+        J["jaeger"]
         IP["istio proxy"] --> A
         IP --> J
     end
@@ -101,10 +100,8 @@ end
 
 Jaeger has no licencing options nor requirements.
 
-## Storage
-
 For production workloads, Jaeger uses Elasticsearch to store and query for traces.  
 
 ## Dependencies
 
-Jaeger can be run without dependencies, but to ensure resilliency of data, it uses Elasticsearch for its span and trace database.
+Jaeger can be run without dependencies, but to ensure resiliency of data, it uses Elasticsearch for its span and trace database.

@@ -4,23 +4,8 @@ kind: Namespace
 metadata:
   name: mattermost-operator
   labels:
-    istio-injection: enabled
+    istio-injection: disabled
     app.kubernetes.io/name: mattermost-operator
     app.kubernetes.io/component: "collaboration-tools"
     {{- include "commonLabels" . | nindent 4}}
-{{- if ( include "imagePullSecret" . ) }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: mattermost-operator
-  labels:
-    app.kubernetes.io/name: mattermost-operator
-    app.kubernetes.io/component: "collaboration-tools"
-    {{- include "commonLabels" . | nindent 4}}
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
 {{- end }}

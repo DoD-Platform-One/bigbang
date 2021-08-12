@@ -8,22 +8,43 @@ hostname: {{ .Values.hostname }}
 flux:
   enabled: true
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+minioOperator:
+  enabled: {{ .Values.addons.minioOperator.enabled }}
+  
 istio:
   enabled: {{ .Values.istio.enabled }}
-  {{- if .Values.monitoring.sso.enabled }}
   prometheus:
     enabled: true
+    {{- if .Values.monitoring.sso.enabled }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
+    {{- end }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   alertmanager:
     enabled: true
+    {{- if .Values.monitoring.sso.enabled }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
+    {{- end }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   grafana:
     enabled: true
-  {{- end }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+
+anchore:
+  enabled: {{ .Values.addons.anchore.enabled }}
 
 global:
   imagePullSecrets:
@@ -56,7 +77,13 @@ grafana:
       api_url: {{ .Values.monitoring.sso.grafana.api_url | default (tpl "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/userinfo" .) }}
       allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up | default "True" }}
       role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path | default "Viewer" }}
-      allowed_domains: {{ .Values.monitoring.sso.grafana.allowed_domains }}
+    {{- with .Values.monitoring.sso.grafana }}
+      {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
+    {{- end }}
 
 prometheus-node-exporter:
   serviceAccount:

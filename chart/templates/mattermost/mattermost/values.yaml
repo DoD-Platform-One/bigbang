@@ -5,8 +5,13 @@
 {{- define "bigbang.defaults.mattermost" -}}
 hostname: {{ .Values.hostname }}
 
+openshift: {{ .Values.openshift }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
+  chat:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.mattermost.ingress.gateway }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -20,6 +25,13 @@ sso:
   token_endpoint: {{ .token_endpoint | default (printf "https://%s/oauth/token" $.Values.sso.oidc.host) }}
   user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/api/v4/user" $.Values.sso.oidc.host) }}
 {{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.mattermost.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 global:
   imagePullSecrets:

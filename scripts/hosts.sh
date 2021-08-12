@@ -1,9 +1,9 @@
-#!/bin/bash   
+#!/bin/bash
 set -e
 
-## Adds all the vs hostnames and LB IP to /etc/hosts   
-## Get the LB Hostname 
-INGRESS_LB_Hostname=$(kubectl get svc -n istio-system istio-ingressgateway -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+## Adds all the vs hostnames and LB IP to /etc/hosts
+## Get the LB Hostname
+INGRESS_LB_Hostname=$(kubectl get svc -n istio-system public-ingressgateway -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 ## Get IP address from Hostname
 INGRESS_LB_IP=$(dig $INGRESS_LB_Hostname +search +short | head -1)
 

@@ -7,19 +7,5 @@ metadata:
     app.kubernetes.io/name: twistlock
     app.kubernetes.io/component: "security"
     {{- include "commonLabels" . | nindent 4}}
----
-{{- if ( include "imagePullSecret" . ) }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: twistlock
-  labels:
-    app.kubernetes.io/name: twistlock
-    app.kubernetes.io/component: "security"
-    {{- include "commonLabels" . | nindent 4}}
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
+    istio-injection: enabled
 {{- end }}

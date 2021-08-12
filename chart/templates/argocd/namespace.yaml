@@ -6,17 +6,6 @@ metadata:
     app.kubernetes.io/name: authservice
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
   name: argocd
-
----
-{{- if ( include "imagePullSecret" . ) }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: argocd
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
 {{- end }}

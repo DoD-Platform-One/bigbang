@@ -3,18 +3,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app: {{ .Release.Name }}-anchore
+    app.kubernetes.io/name: anchore
+    app.kubernetes.io/component: "security"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
   name: anchore
-
----
-{{- if ( include "imagePullSecret" . ) }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: anchore
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
 {{- end }}

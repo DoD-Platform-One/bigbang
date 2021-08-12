@@ -28,7 +28,7 @@
       not used.
 - [ ] Does the upstream chart version deploy the application version used in Iron Bank (or as close as possible)? This will 
       help avoid incompatible configuration settings. 
-- [ ] Have you run helm dep up and added all .tgz file depedencies in chart/charts to the repo?
+- [ ] Have you run helm dep up and added all .tgz file dependencies in chart/charts to the repo?
 - [ ] Have you updated chart/requirements.yaml or chart/Chart.yaml to point to the file://./charts/<file>.tgz dependencies?
 - [ ] If the chart has a web interface, have you added a VirtualService using hostname that is conditionally added if 
       istio.enabled is true?  Verify this works using the web address.
@@ -40,7 +40,7 @@
       pulling from registry.dso.mil?
 - [ ] If the package supports SSO, have you integrated SSO settings? Needs clarification
 - [ ] If the package requires a database, have you integrated external database settings? Needs clarification
-- [ ] If the package requires storage, have you ingegrated external storage (e.g. MinIO) settings?  Needs clarification
+- [ ] If the package requires storage, have you integrated external storage (e.g. MinIO) settings?  Needs clarification
 - [ ] Are all secrets and certificates removed from the repo?  All secrets should be references or randomly generated during 
       deployment.
 
@@ -71,7 +71,7 @@
 Additional details on definition of done need to be added for:
 
 - Database integration
-- Storage (minio) ingegration
+- Storage (minio) integration
 - Certificates?
 - SSO integration
 

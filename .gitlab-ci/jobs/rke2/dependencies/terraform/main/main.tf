@@ -31,7 +31,7 @@ EOF
 }
 
 module "rke2" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v1.1.7"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v1.1.8"
 
   cluster_name          = local.name
   vpc_id                = var.vpc_id
@@ -48,6 +48,12 @@ disable:
   - rke2-ingress-nginx
 EOF
 
+  block_device_mappings = {
+    size = 100
+    encrypted = true
+    type = "gp3"
+  }
+
   enable_ccm = var.enable_ccm
   download   = var.download
 
@@ -57,7 +63,7 @@ EOF
 }
 
 module "generic_agents" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v1.1.7"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v1.1.8"
 
   name                = "generic-agent"
   vpc_id              = var.vpc_id
@@ -75,6 +81,12 @@ module "generic_agents" {
 
   # TODO: These need to be set in pre-baked ami's
   pre_userdata = local.os_prep
+
+  block_device_mappings = {
+    size = 150
+    encrypted = true
+    type = "gp3"
+  }
 
   # Required data for identifying cluster to join
   cluster_data = module.rke2.cluster_data

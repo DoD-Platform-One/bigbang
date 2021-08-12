@@ -7,46 +7,5 @@ metadata:
     app.kubernetes.io/name: istio-controlplane
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-{{- if ( include "imagePullSecret" . ) }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: istio-system
-  labels:
-    app.kubernetes.io/name: istio-controlplane
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- if .Values.openshift }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: kube-system
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
-{{- end }}
-{{- end }}
----
-{{- if and .Values.istio.ingress.key .Values.istio.ingress.cert }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: wildcard-cert
-  namespace: istio-system
-  labels:
-    app.kubernetes.io/name: istio-controlplane
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-type: kubernetes.io/tls
-data:
-  tls.crt: {{ .Values.istio.ingress.cert | b64enc }}
-  tls.key: {{ .Values.istio.ingress.key | b64enc}}
-{{- end }}
+    istio-injection: disabled
 {{- end }}

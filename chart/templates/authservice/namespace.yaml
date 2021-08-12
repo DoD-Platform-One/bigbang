@@ -3,21 +3,12 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: authservice
-  {{- if .Values.istio.enabled }}
   labels:
+    {{- if .Values.istio.enabled }}
     istio-injection: enabled
-  {{- end }}
-
-{{- if ( include "imagePullSecret" . ) }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: private-registry
-  namespace: authservice
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: {{ template "imagePullSecret" . }}
+    {{- end }}
+    app.kubernetes.io/name: authservice
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
 {{- end }}
 
-{{- end }}

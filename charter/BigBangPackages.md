@@ -61,7 +61,6 @@ graph TB
 
 ```
 
-
 ## Core
 
 Core packages are supported Big Bang packages that have to be enabled and are located at [Big Bang Core](https://repo1.dso.mil/platform-one/big-bang/apps/core).  Core packages are platform/admin level packages that are leveraged by other packages.
@@ -110,7 +109,7 @@ Owners:
 
 Understudy:
 
-*  @kavitha
+* @kavitha
 
 ### Service Mesh
 
@@ -150,7 +149,6 @@ Repository:
 
 * [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice)
 
-
 Dependency: None
 
 Owners:
@@ -173,7 +171,8 @@ The logging capability is comprised of:
 * Fluentd
 * Logging Operator
 
-Repository: 
+Repository:
+
 * [Elasticsearch-kibana](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana)
 * [Fluentbit](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit)
 * [Eck-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator)
@@ -260,6 +259,7 @@ Understudy:
 * @kenna81
 
 Repository:
+
 * [Cluster Auditor Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)
 
 ### Twistlock
@@ -282,6 +282,7 @@ Owners:
 * @thomas.burton - iSenpai
 
 ## Addons
+
 Addons are supported Big Bang packages that come disabled by default.
 
 ### Security Tools
@@ -319,7 +320,8 @@ Dependencies:
 Owners:
 
 * @megamind
-* @joshwolf
+* @kevin.wilder
+* @michaelmcleroy
 
 Understudy:
 
@@ -412,6 +414,7 @@ Owners:
 * @LynnStill
 
 Understudies
+
 * @kevin.wilder
 
 #### Sonarqube
@@ -438,11 +441,11 @@ Owners:
 
 #### Fortify
 
-Fortify provides code 
+Fortify provides code
 
 Product:
 
-* 
+*
 
 Repository:
 
@@ -462,7 +465,7 @@ Nexus provides a robust artifact repository, supporting artifacts of multiple pr
 Product:
 
 * [Nexus](https://www.sonatype.com/nexus/repository-pro)
-* Scope: 
+* Scope:
   * The Nexus OSS will not be supported as the licenced pro version is required for [HA and SAML SSO capabilities](https://www.sonatype.com/nexus/repository-oss-vs-pro-features)
   * Only Licended Nexus Repository Pro will be supported
 
@@ -518,7 +521,6 @@ Owners:
 
 * @matt.kaiser
 * @branden.cobb
-
 
 #### Jira
 

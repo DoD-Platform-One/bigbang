@@ -1,0 +1,51 @@
+# start with a default flux deployment
+resources:
+- gotk-components.yaml
+
+# update flux components to use ironbank images
+images:
+- name: ghcr.io/fluxcd/helm-controller
+  newName: registry1.dso.mil/ironbank/fluxcd/helm-controller
+  newTag: v0.11.0
+- name: ghcr.io/fluxcd/kustomize-controller
+  newName: registry1.dso.mil/ironbank/fluxcd/kustomize-controller
+  newTag: v0.13.0
+- name: ghcr.io/fluxcd/notification-controller
+  newName: registry1.dso.mil/ironbank/fluxcd/notification-controller
+  newTag: v0.15.0
+- name: ghcr.io/fluxcd/source-controller
+  newName: registry1.dso.mil/ironbank/fluxcd/source-controller
+  newTag: v0.14.0
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: whatever
+      spec:
+        template:
+          metadata:
+            annotations:
+              # Required by Kubernetes node autoscaler
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+          spec:
+            imagePullSecrets:
+            - name: private-registry
+            terminationGracePeriodSeconds: 60
+            # Required by Pod Security Policy
+            securityContext:
+              runAsUser: 10000
+              fsGroup: 1337
+            containers:
+              - name: manager
+                # Required by Pod Security Policy
+                securityContext:
+                  readOnlyRootFilesystem: true
+                  allowPrivilegeEscalation: false
+                  runAsNonRoot: true
+                  capabilities:
+                    drop:
+                      - ALL

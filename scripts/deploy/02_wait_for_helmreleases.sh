@@ -3,7 +3,7 @@
 set -e
 
 ## This is an array to instantiate the order of wait conditions
-ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab haproxy-sso gitlab-runner minio-operator minio anchore sonarqube mattermost-operator mattermost"
+ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab haproxy-sso gitlab-runner minio-operator minio anchore sonarqube mattermost-operator mattermost keycloak nexus-repository-manager"
 
 ## This is the actual deployed helmrelease objects in the cluster
 DEPLOYED_HELMRELEASES=$(kubectl get hr --no-headers -n bigbang | awk '{ print $1}')
@@ -96,11 +96,17 @@ do
   fi
 done
 
+# Double check everything got waited on...
+kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang --all
+
 echo "Waiting on Secrets Kustomization"
 kubectl wait --for=condition=Ready --timeout 300s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
 # In case some helm releases are marked as ready before all objects are live...
-echo "Waiting on all deployments, statefulsets, and daemonsets"
+echo "Waiting on all jobs, deployments, statefulsets, and daemonsets"
 kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
 wait_sts
 wait_daemonset
+if kubectl get job -A -o jsonpath='{.items[].metadata.name}' &> /dev/null; then
+  kubectl wait --for=condition=complete --timeout 300s -A job --all > /dev/null
+fi

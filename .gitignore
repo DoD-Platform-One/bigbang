@@ -20,6 +20,7 @@ npm-debug.log*
 # (used frequently in deployments)
 patch.yaml
 notes
+ignore/*
 
 # Visual Studio Code
 .vscode/*

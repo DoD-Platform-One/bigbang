@@ -5,6 +5,9 @@ flux:
   rollback:
     cleanupOnFail: false
 
+networkPolicies:
+  controlPlaneCidr: 172.16.0.0/12
+
 logging:
   enabled: true
   values:
@@ -18,13 +21,15 @@ logging:
             cpu: .5
           limits: {}
       data:
-        count: 1
+        count: 2
         persistence:
           size: 5Gi
         resources:
           requests:
             cpu: .5
           limits: {}
+    kibana:
+      count: 1
 
 fluentbit:
   values:
@@ -51,19 +56,6 @@ clusterAuditor:
 monitoring:
   enabled: true
   values:
-    alertmanager:
-      alertmanagerSpec:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-    prometheusOperator:
-      resources:
-        requests:
-          cpu: 250m
-          memory: 400Mi
-        limits: {}
     prometheus:
       prometheusSpec:
         resources:
@@ -71,19 +63,13 @@ monitoring:
             cpu: 100m
             memory: 200Mi
           limits: {}
-    grafana:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits: {}
-    kubeStateMetrics:
+    kube-state-metrics:
       resources:
         requests:
           cpu: 10m
           memory: 32Mi
         limits: {}
-    nodeExporter:
+    prometheus-node-exporter:
       resources:
         requests:
           cpu: 100m
@@ -99,6 +85,11 @@ gatekeeper:
         cpu: 100m
         memory: 256Mi
       limits: {}
+    violations:
+      allowedDockerRegistries:
+        match:
+          excludedNamespaces: 
+            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
 
 twistlock:
   enabled: true
@@ -354,11 +345,27 @@ addons:
           servers: 1
         volumesPerServer: 1
 
-  velero:
+  nexus:
     enabled: false
     values:
-      installCRDs: true
+      persistence:
+        # Do NOT set this below 4Gi, nexus will fail to boot
+        storageSize: 10Gi
+      nexus:
+      # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
+        env:
+          - name: install4jAddVmParams
+            value: "-Xms500M -Xmx500M -XX:MaxDirectMemorySize=500M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 1500Mi
 
+  velero:
+    enabled: false
+    plugins:
+    - aws
+    values:
       # Set provider name and backup storage location bucket name
       configuration:
         provider: aws
@@ -375,11 +382,7 @@ addons:
       #      bucket: velero
       #      region: us-west-1
 
-      # Default to AWS Plugin, update to others as they are supported
-      plugins:
-        - aws
-
-      #schedules:
+      # schedules:
       #  mybackup:
       #    labels:
       #      myenv: foo
@@ -394,8 +397,14 @@ addons:
         server:
           name: velero
 
-      # Whether or not to clean up CustomResourceDefintions when deleting a release.
-      # Cleaning up CRDs will delete the BackupStorageLocation and VolumeSnapshotLocation instances, which would have to be reconfigured.
-      # Backup data in object storage will _not_ be deleted, however Backup instances in the Kubernetes API will.
-      # Always clean up CRDs in CI.
-      cleanUpCRDs: true
+  keycloak:
+    enabled: false
+    ingress:
+      gateway: "public"
+    values:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits: {}
