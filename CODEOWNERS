@@ -119,9 +119,9 @@ chart/values.yaml               @kavitha @kevin.wilder @ariel.shnitzer @grant.du
 chart/templates/nexus           @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
 
 ^[Velero]
-chart/Chart.yaml                @tunde @adam.toy @micah.nagel @jcarnes
-chart/values.yaml               @tunde @adam.toy @micah.nagel @jcarnes
-chart/templates/velero          @tunde @adam.toy @micah.nagel @jcarnes
+chart/Chart.yaml                @tunde @adam.toy @micah.nagel @toladipupo
+chart/values.yaml               @tunde @adam.toy @micah.nagel @toladipupo
+chart/templates/velero          @tunde @adam.toy @micah.nagel @toladipupo
 
 ^[fluentbit]
 chart/Chart.yaml                @kavitha @ryan.j.garcia @echuang
