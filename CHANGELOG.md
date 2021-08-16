@@ -120,6 +120,9 @@ curl https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/scripts/de
 * [!463](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/463): Update CODEOWNERS
 
 ### Upgrade Notice
+
+#### Sonarqube Release Information
+
 This release comes with a new version of Sonarqube which requires a manual database upgrade that can be easily done through the web interface. If you see a message stating Sonarqube is under maintenance go to the following url and click update database:
 ```
 https://sonarqube.your.url/setup
