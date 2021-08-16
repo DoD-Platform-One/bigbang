@@ -583,7 +583,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "4.10.3-bb.14"
+      tag: "4.12.9-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
@@ -658,7 +658,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
       path: "./chart"
-      tag: "0.26.0-bb.3"
+      tag: "0.29.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
