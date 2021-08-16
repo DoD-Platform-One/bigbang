@@ -26,7 +26,13 @@ nodeSelector: {}
 podAnnotations: {}
 env: []
 tolerations: []
-resources: {}
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 100m
+    memory: 256Mi
 affinity: {}
 replicaCount: 1
 priorityClassName: ""
@@ -95,6 +101,14 @@ cr:
       - '**'
       logger:
         log_level: info
+      resources:
+        resuests:
+          cpu: 200m
+          memory: 368Mi
+        limits:
+          cpu: 200m
+          memory: 368Mi
+      
     auth:
       strategy: "anonymous"
     external_services:

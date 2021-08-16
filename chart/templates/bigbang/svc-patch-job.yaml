@@ -83,6 +83,13 @@ spec:
                 echo "No app key in Kiali Service's selector; no patch necessary :D"
                 exit 0
               fi
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 100m
+              memory: 512Mi
       restartPolicy: OnFailure
       {{- if .Values.image.pullSecrets }}
       imagePullSecrets:
