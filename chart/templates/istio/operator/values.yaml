@@ -6,7 +6,7 @@
 createNamespace: false
 
 imagePullSecrets:
-  - name: private-registry
+  - private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
