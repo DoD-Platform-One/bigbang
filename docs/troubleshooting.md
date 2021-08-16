@@ -71,6 +71,12 @@ kubectl get hr -A
 
 # Get the logs
 kubectl get events --field-selector involvedObject.kind=HelmRelease -A
+
+# Describe the HelmRelease to get more information
+kubectl describe hr <NAME> -n bigbang
+
+# Get all logs/events for a specific HelmRelease object
+flux logs --kind=HelmRelease --namespace bigbang --name <NAME>
 ```
 
 | Symptom | Cause | Resolution |
@@ -80,6 +86,8 @@ kubectl get events --field-selector involvedObject.kind=HelmRelease -A
 | `Error: YAML parse error on ...` | Syntax error in helm chart | Use `helm template` to narrow down the problem.  Fix it and commit to Git |
 | `Helm install failed: failed to create resource ... unable to create new content in namespace because it is being terminated` | This seems to happen when a re-deploy of Big Bang occurs to early after a Big Bang delete. |  Try to remove the namespace using `kubectl get ns <stuck namespace> -o json | jq '.spec.finalizers = []' | kubectl replace --raw "/api/v1/namespaces/$NS/finalize" -f`.  If this does not work, a cluster restart may be necessary. |
 | `Error: failed to download ...` | Path to Helm chart is incorrect | Find the HelmRelease configuration and update `spec.path` to the correct path of the helm chart |
+| `Helm uninstall failed: uninstall: Release not loaded: ____: release: not found` | Helm install failed because of an error and a rollback/uninstall is attempted but release has not been installed. | Describe the HelmRelease in question or use flux to get the logs to get more info abut why it failed to install. |
+| `reconciliation failed: Helm rollback failed: an error occurred while cleaning up resources. original rollback error: no XXXX with the name "XXXX" found: unable to cleanup resources: object not found, skipping delete` | This error happens when an upgrade fails and flux attempts a rollback but there are templates that have been renamed/removed. | Describe the HelmRelease in question or use flux to get the logs to get more info abut why exactly the upgrade failed. |
 
 ## Kustomization
 
