@@ -38,10 +38,10 @@ hack/                           @toladipupo @michaelmcleroy @egoode
 charter/                        @gabe.scarberry @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
 
 ^[Istio, Istio Operator, and Authservice]
-chart/Chart.yaml                @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
-chart/values.yaml               @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
-chart/templates/authservice     @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher @cdevarenne
-chart/templates/istio           @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @zackbutcher
+chart/Chart.yaml                @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/values.yaml               @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/templates/authservice     @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/templates/istio           @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
 
 ^[HAProxy]
 chart/Chart.yaml              @blloyd @runyontr @ryan.j.garcia
