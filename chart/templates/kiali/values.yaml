@@ -42,6 +42,22 @@ cr:
       tracing:
         {{- $tracingUrls := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
         url: https://{{ tpl ($tracingUrls | default (printf "%s.%s" "tracing" .Values.hostname)) . }}
+      istio:
+        component_status:
+          components:
+            - app_label: istiod
+              is_core: true
+              is_proxy: false
+            {{- range $name, $values := .Values.istio.ingressGateways }}
+            - app_label: {{ $name }}
+              is_core: true
+              is_proxy: true
+            {{- end }}
+            {{- range $name, $values := .Values.istio.values.ingressGateways }}
+            - app_label: {{ $name }}
+              is_core: true
+              is_proxy: true
+            {{- end }}
     api:
       namespaces:
         # bigbang watches all!
