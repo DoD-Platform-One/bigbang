@@ -33,7 +33,7 @@ global:
   {{- end }}
 
   {{- if .Values.sso.certificate_authority }}
-  certificate_authority: {{ .Values.sso.certificate_authority  }}
+  certificate_authority: {{ .Values.sso.certificate_authority | quote }}
   {{- end }}
 
   {{- $authserviceValues := .Values.addons.authservice.values | default dict }}
