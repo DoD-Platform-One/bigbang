@@ -55,11 +55,11 @@ sso:
     # -- Keycloak realm containing clients
     realm: baby-yoda
 
-  # -- Keycloak's certificate authority (unencoded) used by authservice to support SSO for various packages
-  certificate_authority: ''
+  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see chart/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
+  certificate_authority: ""
 
-  # -- Keycloak realm's json web key uri, obtained through https://<keycloak-server>/auth/realms/<realm>/.well-known/openid-configuration
-  jwks: ""
+  # -- Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs
+  jwks: ''
 
   # -- OIDC client ID used for packages authenticated through authservice
   client_id: ""
@@ -511,7 +511,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.11"
+      tag: "0.4.0-bb.12"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
