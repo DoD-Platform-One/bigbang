@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 1.14.0](https://img.shields.io/badge/Version-1.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.14.1](https://img.shields.io/badge/Version-1.14.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -50,8 +50,8 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | sso | object | `{"auth_url":"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth","certificate_authority":"","client_id":"","client_secret":"","jwks":"","oidc":{"host":"login.dso.mil","realm":"baby-yoda"},"token_url":"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"}` | Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages. |
 | sso.oidc.host | string | `"login.dso.mil"` | Domain for keycloak used for configuring SSO |
 | sso.oidc.realm | string | `"baby-yoda"` | Keycloak realm containing clients |
-| sso.certificate_authority | string | `""` | Keycloak's certificate authority (unencoded) used by authservice to support SSO for various packages |
-| sso.jwks | string | `""` | Keycloak realm's json web key uri, obtained through https://<keycloak-server>/auth/realms/<realm>/.well-known/openid-configuration |
+| sso.certificate_authority | string | `""` | Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see chart/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages |
+| sso.jwks | string | `""` | Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs |
 | sso.client_id | string | `""` | OIDC client ID used for packages authenticated through authservice |
 | sso.client_secret | string | `""` | OIDC client secret used for packages authenticated through authservice |
 | sso.token_url | string | `"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"` | OIDC token URL template string (to be used as default) |
@@ -184,7 +184,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.authservice.enabled | bool | `false` | Toggle deployment of Authservice. if enabling authservice, a filter needs to be provided by either enabling sso for monitoring or istio, or manually adding a filter chain in the values here: values:   chain:     minimal:       callback_uri: "https://somecallback" |
 | addons.authservice.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git"` |  |
 | addons.authservice.git.path | string | `"./chart"` |  |
-| addons.authservice.git.tag | string | `"0.4.0-bb.10"` |  |
+| addons.authservice.git.tag | string | `"0.4.0-bb.13"` |  |
 | addons.authservice.flux | object | `{}` | Flux reconciliation overrides specifically for the Authservice Package |
 | addons.authservice.values | object | `{}` | Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git |
 | addons.authservice.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
