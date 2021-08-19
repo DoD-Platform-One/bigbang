@@ -90,23 +90,22 @@ The Mattermost Operator ships by default with health checks on the address `/api
 
 ## High Availability
 
-**Important Note:** Mattermost by default handles scaling and what it interprets as your needs based upon the users it is configured for. See this note from the Mattermost Operator:
+**To allow for defining replica count and resource requests/limits, `users` is set to `null` by default. Changing this will negate these values and mattermost may not run due to OPA Gatekeeper constraints.**
 
-```plaintext
-Size defines the size of the Mattermost. This is typically
-specified in number of users. This will override replica and resource
-requests/limits appropriately for the provided number of users.
-values of resources. Accepted values are: 100users, 1000users, 5000users,
-10000users, and 250000users. If replicas and resource requests/limits
-are not specified, and Size is not provided the configuration for
-5000users will be applied. Setting ''Replicas'', ''Scheduling.Resources'',
-''FileStore.Replicas'', ''FileStore.Resource'', ''Database.Replicas'',
-or ''Database.Resources'' will override the values set by Size.
-Setting new Size will override previous values regardless if set
-by Size or manually.
+To set a replica count greater than 1 requires an enterprise license, and can be configured like the following example:
+
+```yaml
+addons:
+  mattermost:
+    values:
+      enterprise:
+        enabled: true
+      replicaCount: 3
 ```
 
-To update the "size" (`users` value) for Mattermost, you need to override the default of 100 in your values (note you do not need to include the word `users` since Big Bang handles this for you), as an example to set 1000:
+**Setting a user value is not supported due to OPA constraint issues**
+
+If you want to use Mattermost's user/size value you will need to handle OPA violations and exceptions yourself since this is **not BB supported.** If all of these considerations have been accounted for and you still want to deploy with Mattermost's user sizing it can be done by setting the value as in this example:
 
 ```yaml
 addons:
@@ -115,15 +114,6 @@ addons:
       users: 1000
 ```
 
-To override Mattermost's handling of replicas and explicitly set replicas you can specify this workaround in your values:
-
-```yaml
-addons:
-  mattermost:
-    values:
-      users: null
-      replicaCount: 3
-```
 
 ## Single Sign On (SSO)
 
