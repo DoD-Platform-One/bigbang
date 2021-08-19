@@ -12,6 +12,11 @@ postInstall:
     image:
       pullSecrets:
       - name: private-registry
+postUpgrade:
+  cleanupCRD:
+    image:
+      pullSecrets:
+      - name: private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
