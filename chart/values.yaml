@@ -11,6 +11,14 @@ replicas:
 imagePullSecrets:
 - name: private-registry
 
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 100m
+  limits:
+    memory: 512Mi
+    cpu: 100m
+
 affinity: {}
   # podAntiAffinity:
   #   requiredDuringSchedulingIgnoredDuringExecution:

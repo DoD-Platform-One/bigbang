@@ -32,6 +32,10 @@ spec:
           value: "20"
         - name: REQUEUE_ON_LIMIT_DELAY
           value: 20s
+        {{- with .Values.resources }}
+        resources:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
