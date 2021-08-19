@@ -218,9 +218,30 @@ addons:
   anchore:
     enabled: false
     values:
+      ensureDbJobs:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      sso:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
       postgresql:
-        persistence:
-          size: 20Gi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi 
+          limits: {}       
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
       anchoreAnalyzer:
         resources:
           requests:
@@ -251,14 +272,38 @@ addons:
             cpu: 100m
             memory: 200Mi
           limits: {}
+      anchoreEngineUpgradeJob:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchore-feeds-db:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
       anchoreEnterpriseFeeds:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
+      anchoreEnterpriseFeedsUpgradeJob:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
       anchoreEnterpriseRbac:
-        authResource:
+        authResources:
           resources:
             requests:
               cpu: 100m
@@ -276,11 +321,6 @@ addons:
             cpu: 100m
             memory: 200Mi
           limits: {}
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
       anchoreEnterpriseNotifications:
         resources:
           requests:
@@ -288,6 +328,12 @@ addons:
             memory: 200Mi
           limits: {}
       anchoreEntperpiseUi:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseEngineUpgradeJob:
         resources:
           requests:
             cpu: 100m
