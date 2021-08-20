@@ -23,18 +23,22 @@ networkPolicies:
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 violations:  # Try to keep this in alpha order to make it easier to find keys
 
-  {{- if .Values.addons.mattermost.enabled }}
   allowedDockerRegistries:
     parameters:
+      repos:
+        - registry1.dso.mil
+        - registry.dso.mil
+      {{- if .Values.addons.mattermost.enabled }}
       exemptContainers:
-        - init-check-database # mattermost needs postgres:13 image and cannot override the upstream
-  {{- end }}
+        # Mattermost needs postgres:13 image and cannot override the upstream
+        - init-check-database
+      {{- end }}
 
   {{- if .Values.monitoring.enabled}}
   allowedHostFilesystem:
     match:
-      excludedNamespaces: 
-        # required for monitoring's prometheus-node-exporter to get node metrics
+      excludedNamespaces:
+        # Prometheus-node-exporter needs access to host to get node metrics
         - monitoring
   {{- end }}
 
@@ -42,30 +46,44 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   httpsOnly:
     match:
       excludedNamespaces:
-        # mattermost currently does not useIngressTLS hence Ingress is created without TLS field by the operator.
+        # Mattermost currently does not useIngressTLS hence Ingress is created without TLS field by the operator.
         # Adding exemption, pending https://github.com/mattermost/mattermost-operator/issues/235
         - mattermost
   {{- end }}
+
+  namespacesHaveIstio:
+    enabled: {{ .Values.istio.enabled }}
 
   {{- if .Values.logging.enabled }}
   noPrivilegedContainers:
     match:
       excludedNamespaces:
-        - logging # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
+        # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
+        - logging
   {{- end }}
+
+  podsHaveIstio:
+    enabled: {{ .Values.istio.enabled }}
+    match:
+      excludedNamespaces:
+        # Istio does not inject sidecars in itself
+        - istio-operator
+        - istio-system
 
   {{- if .Values.monitoring.enabled }}
   restrictedTaint:
     match:
       excludedNamespaces:
-        - monitoring # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
+        # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
+        - monitoring
   {{- end }}
 
   {{- if .Values.logging.enabled }}
   selinuxPolicy:
     match:
       excludedNamespaces:
-        - logging # FluentBit needs selinux option type spc_t
+        # FluentBit needs selinux option type spc_t
+        - logging
   {{- end }}
 
   {{- if or .Values.fluentbit.enabled (or .Values.twistlock.enabled .Values.monitoring.enabled) }}
