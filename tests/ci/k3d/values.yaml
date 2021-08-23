@@ -106,32 +106,32 @@ addons:
       controller:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 500m
+            memory: 2Gi
           limits: {}
       dex:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 10m
+            memory: 128Mi
           limits: {}
       redis:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 50m
+            memory: 64Mi
           limits: {}
       server:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 20m
+            memory: 128Mi
           limits: {}
       repoServer:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 50m
+            memory: 128Mi
           limits: {}
 
   authservice:
