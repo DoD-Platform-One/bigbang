@@ -88,8 +88,14 @@ gatekeeper:
     violations:
       allowedDockerRegistries:
         match:
-          excludedNamespaces: 
-            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+          excludedNamespaces:
+          # Allows load balancer images for k3d from public repo
+          - istio-system
+      hostNetworking:
+        match:
+          excludedNamespaces:
+          # Allows load balancer containers to map ports for k3d
+          - istio-system
 
 twistlock:
   enabled: true

@@ -7,5 +7,11 @@ gatekeeper:
     violations:
       allowedDockerRegistries:
         match:
-          excludedNamespaces: 
-            - istio-system 
+          excludedNamespaces:
+          # Allows load balancer images for k3d from public repo
+          - istio-system
+      hostNetworking:
+        match:
+          excludedNamespaces:
+          # Allows load balancer containers to map ports for k3d
+          - istio-system
