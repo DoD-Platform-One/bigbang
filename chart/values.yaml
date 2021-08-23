@@ -260,7 +260,7 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "0.3.0-bb.5"
+    tag: "0.3.0-bb.6"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -281,7 +281,7 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    tag: "3.5.1-bb.13"
+    tag: "3.5.1-bb.15"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
