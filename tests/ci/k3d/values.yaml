@@ -21,8 +21,8 @@ logging:
             cpu: .5
           limits: {}
         heap:
-          min: 2g
-          max: 2g
+          min: 1g
+          max: 1g
       data:
         count: 2
         persistence:
@@ -31,9 +31,9 @@ logging:
           requests:
             cpu: .5
           limits: {}
-        heap:
-          min: 2g
-          max: 2g
+      heap:
+        min: 1Gi
+        max: 1Gi
     kibana:
       count: 1
 
