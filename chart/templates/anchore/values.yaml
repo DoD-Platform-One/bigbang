@@ -58,10 +58,6 @@ anchoreGlobal:
   defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
   {{- end }}
   imagePullSecretName: private-registry
-  {{- if or (and (not (hasKey .Values.addons.anchore.values "anchoreGlobal.existingSecret")) (not (hasKey .Values.addons.anchore.values "anchoreGlobal.saml.useExistingSecret"))) (not (hasKey .Values.addons.anchore.values "anchoreGlobal.saml.secret")) }}
-  saml:
-    secret: "{{ b64enc (randAlphaNum 12) }}"
-  {{- end }}
 
 {{- if .Values.addons.anchore.enterprise.enabled }}
 anchore-feeds-db:
