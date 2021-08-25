@@ -124,7 +124,7 @@ nexus:
   nodeSelector: {}
   #   cloud.google.com/gke-nodepool: default-pool
   affinity: {}
-  resources: {}
+  resources:
     # requests:
       ## Based on https://support.sonatype.com/hc/en-us/articles/115006448847#mem
       ## and https://twitter.com/analytically/status/894592422382063616:
@@ -136,6 +136,12 @@ nexus:
       ##     to use all the available memory.
       # cpu: 250m
       # memory: 4800Mi
+    requests:
+      cpu: 400m # Values for testing and pipeline pursoses. If deploying for production use please modify these values.
+      memory: 3000Mi
+    limits:
+      cpu: 400m
+      memory: 3000Mi
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
 
