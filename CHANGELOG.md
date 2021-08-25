@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [29.1.0-bb.8] - 2021-08-23
+### Added
+- Added resource requests and limits to pods with guaranteed QoS.
+
 ## [29.1.0-bb.7] - 2021-07-27
 ### Fixes
 - Fixed extraLabels indentation in all resources that have it.
