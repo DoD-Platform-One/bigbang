@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.37.0-bb.3] - 2021-08-25
+### Updated
+- Increased resource limits and requests to 512Mi due to OOM errors
+
 ## [1.37.0-bb.2] - 2021-08-20
 ### Updated
 - Increased resource limits and requests for memory on Kiali operator to prevent OOMKilled errors
