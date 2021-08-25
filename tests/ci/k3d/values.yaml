@@ -28,7 +28,9 @@ logging:
           requests:
             cpu: .5
           limits: {}
-      heap:
+        heap:
+          min: 1g
+          max: 1g
         min: 2Gi
         max: 2Gi
     kibana:
