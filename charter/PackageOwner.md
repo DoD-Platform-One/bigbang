@@ -18,7 +18,7 @@ Package owners will be responsible for the following:
 
 Package Owners will be identified by the use of [CODEOWNERS](https://docs.gitlab.com/ee/user/project/code_owners.html) files in the repository.
 
-There must be at least 2 (two) Package owners for each application and they shall be from different companies.
+There must be at least 3 (three) Package owners for each application and they shall be from different companies. Inactive Package owners from different Value Streams or external vendors shall be removed.
 
 ## Package Shadows
 

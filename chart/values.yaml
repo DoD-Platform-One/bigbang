@@ -94,7 +94,7 @@ flux:
 
 # -- Global NetworkPolicies settings
 networkPolicies:
-  # -- Toggle all package NetworkPolicies, can disable specific packages with `package.networkPolicies.enabled`
+  # -- Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled`
   enabled: true
   # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster
   # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints)
@@ -110,7 +110,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.9.7-bb.0"
+    tag: "1.10.3-bb.0"
 
   # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
   # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
@@ -172,7 +172,7 @@ istiooperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
-    tag: "1.9.7-bb.1"
+    tag: "1.10.3-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
@@ -224,7 +224,7 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.37.0-bb.3"
+    tag: "1.39.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -511,7 +511,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.13"
+      tag: "0.4.0-bb.14"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
@@ -675,7 +675,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
       path: "./chart"
-      tag: "29.1.0-bb.7"
+      tag: "29.1.0-bb.8"
 
     # -- Base64 encoded license file.
     license_key: ""
@@ -816,7 +816,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.13.0-bb.6"
+      tag: "1.13.0-bb.7"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
