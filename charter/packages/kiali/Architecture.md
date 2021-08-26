@@ -31,6 +31,8 @@ graph LR
   end
 ```
 
+NOTE: Prometheus is required for Kiali to function properly; Jaeger and Grafana are optional (although all are part of Big Bang Core).
+
 ### Storage
 
 Kiali does not have any persistent storage, all data is accessed live/directly from Jaeger/Monitoring services.
