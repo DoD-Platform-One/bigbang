@@ -60,7 +60,7 @@ Package is the term we use for an application that has been prepared to be deplo
 
 1. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
 
-1. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml". The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additionl policies to open traffic as needed. Refer to the other Packages code for examples.
+1. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml". The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additionl policies to open traffic as needed. Refer to the other Packages code for examples. The [Gitlab package](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/tree/main/chart/templates/bigbang/networkpolicies) is a good/complete example.
 
 1. Add a continuous integration (CI) pipeline to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library. Instructions are not repeated here.
 
@@ -74,9 +74,34 @@ Package is the term we use for an application that has been prepared to be deplo
    CONTRIBUTING.md   <  instructions for how to contribute to the project  
    README.md         <  introduction and high level information  
    ```
+1. Create a top-level tests directory and inside put a test-values.yaml file that includes any special values overrides that are needed for CI pipeline testing. Refer to other packages for examples. But this is specific to what is needed for your package.
+   ```
+   mkdir tests
+   touch test-values.yaml
+   ```
 
-1. The Package structure should look like this when you are finished
-![package-structure](uploads/ab22cc8f1d4295b84ddf9fc80a8fc4bc/package-structure.png)
+1. At a high level, a Package structure should look like this when you are finished  
+   ```text
+   ├── chart/
+      └── templates/
+         └── bigbang/
+            ├── networkpolicies/
+               ├── egress-*.yaml
+               └── ingress-*.yaml
+            └── virtualservice.yaml
+      ├── tests/
+         ├── cypress/
+         └── scripts/
+   ├── docs/
+      ├── documentation-file-1.md
+      └── documentation-file-2.md
+   ├── tests/
+      └── test-values.yaml
+   ├── CHANGELOG.md
+   ├── CODEOWNERS
+   ├── CONTRIBUTING.md
+   └── README.md
+   ```
 
 1. Merging code should require approval from a minimum of 2 codeowners. To setup merge requests to work properly with CODEOWNERS approval change these settings in your project:  
 Under Settings → General → Merge Request Approvals, change "Any eligible user" "Approvals required" to 1. Also ensure that "Require new approvals when new commits are added to an MR" is checked.  
@@ -110,13 +135,19 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
    mc ls minio                   < list the buckets
    ```
 
+   Create a local directory on your workstation where you store your helm values override files. Don't make test changes in the Package values.yaml because they could accidentally be committed. The most convenient location is in a sibling directory next to the Package repo. Here is an example directory structure:
+   ```text
+   ├── PackageRepo/
+   └── overrides/
+         └── override-values.yaml
+   ```
    Here are the dev test steps you can iterate:
 
    ```shell
    # Test that the helm chart templates successfully and examine the output to insure expected results
-   helm template <releasename> ./chart -n <namespace> -f chart/values.yaml
+   helm template <releasename> ./chart -n <namespace> -f ../overrides/override-values.yaml
    # Deploy with helm
-   helm upgrade -i <releasename> ./chart -n <namespace> --create-namespace -f chart/values.yaml
+   helm upgrade -i <releasename> ./chart -n <namespace> --create-namespace -f ../overrides/override-values.yaml
    # Conduct testing
    # Tear down
    helm delete <releasename> -n <namespace>

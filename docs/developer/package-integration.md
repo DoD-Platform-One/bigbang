@@ -88,9 +88,42 @@
 
 1. Add your packages name to the ORDERED_HELMRELEASES list in scripts/deploy/02_wait_for_helmreleases.sh.
 
-1. Verify your Package works when deployed through bigbang. While testing you should use a git branch instead of tag, (i.e. replace tag: "1.2.3-bb.0" with branch: "main").  After you have tested BigBang integration, tag the commit in your Package following the convention of {UpstreamChartVersion}-bb.{BigBangVersion} – example 1.2.3-bb.0.
+1. Create an overrrides directory as a sibling directory next to the bigbang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake and create a local overrides directory. One option is to copy the tests/ci/k3d/values.yaml to make the override-values.yaml and make modifications. The file structure is like this:
+    ```text
+    ├── bigbang/
+    └── overrides/
+        ├── override-values.yaml
+        ├── registry-values.yaml
+        └── any-other-values.yaml
+    ```
+    Make the registry-values yaml like this:
+    ```yaml
+    registryCredentials:
+    - registry: registry1.dso.mil
+      username: your-name
+      password: your-pull-token
+      email: xxx@xxx.xxx
+    ```
+    You will use these files as arguments in your helm commands.
 
-1. Make sure to change the chart/values.yaml file to point to the tag rather than your branch (i.e. tag: "1.2.3-bb.0" in place of branch: "bb-9999").
+1. Verify your Package works when deployed through bigbang. See the instructions below in the ```BigBang Development and Testing Cycle``` for the manual ```imperative``` way to deploy with helm upgrade commands. While testing you should use your package git branch instead of a tag. If you don't null the tag your branch will not get deployed. example:
+    ```yaml
+    addons:
+      app1:
+        git:
+          tag: null
+          branch: "999-your-dev-branch-name"
+    ```
+
+1. After you have tested BigBang integration complete a Package MR and contact the codeowners to create a release tag. Package release tags follow the naming convention of {UpstreamChartVersion}-bb.{BigBangVersion} – example 1.2.3-bb.0.
+
+1. Make sure to change the chart/values.yaml file to point to the new release tag rather than your dev branch (i.e. tag: "1.2.3-bb.0" in place of branch: "999-your-dev-branch-name"). example:
+    ```yaml
+    addons:
+      app1:
+        git:
+          tag: "1.2.3-bb.0"
+    ```
 
 1. When you are done developing the BigBang chart features for your Package make a merge request in "Draft" status and add a label corresponding to your package name (must match the name in `values.yaml`). Also add any labels for dependencies of the package that are NOT core apps. The merge request will start a pipeline and use the labels to determine which addons to deploy. Fix any errors that appear in the pipeline. When the pipeline has pass and the MR is ready take it out of "Draft" and add the `status::review` label. Address any issues raised in the merge request comments.
 
@@ -100,7 +133,7 @@ There are two ways to test BigBang, imperative or GitOps with Flux.  Your initia
 
 ### Imperative
 
-You can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little".  From the root of your local bigbang repo:
+You can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little". You should have previously created the ../overrides directory as described in step #10 above. From the root of your local bigbang repo:
 
 ```shell
 # Deploy with helm while pointing to your override values files. 
@@ -123,7 +156,7 @@ hack/remove-ns-finalizer.sh istio-system
 
 ### GitOps with Flux
 
-You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You can create a branch from one of the other developer's branch or start clean from the master branch. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. This is a public repo so DO NOT commit unencrypted secrets. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run.  This will reveal many errors before you make a commit. Here are the steps you can iterate:
+Using GitOps for development is NOT recommended. Your development iteration cycle time will be slowed down waiting for flux reconciliation. This is not an efficient use of your time. These instructions are included here for informational purposes. You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You must fork or copy this repo to your own private repo. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run. This will reveal many errors before you make a commit. Here are the steps you can iterate:
   
 ```shell
 # Verify chart code before committing
