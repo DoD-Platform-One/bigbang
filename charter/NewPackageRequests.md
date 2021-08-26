@@ -13,4 +13,4 @@ To get into an incubation stage, an package needs the following:
 
 ## Full Membership
 
-Once the package adheres to all [Package Requirements](Package Requirements.md), a final review of implementation details will be presented to the Big Bang Admins.
+Once the package adheres to all [Package Requirements](PackageRequirements.md), a final review of implementation details will be presented to the Big Bang Admins.
