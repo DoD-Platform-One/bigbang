@@ -224,7 +224,7 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.37.0-bb.2"
+    tag: "1.37.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -281,7 +281,7 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    tag: "3.5.1-bb.15"
+    tag: "3.5.1-bb.16"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
@@ -306,7 +306,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.1.19-bb.0"
+    tag: "0.1.20-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -381,7 +381,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "14.0.0-bb.6"
+    tag: "14.0.0-bb.8"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -442,7 +442,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.8-bb.0"
+    tag: "0.0.8-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -534,7 +534,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
-      tag: "4.1.2-bb.2"
+      tag: "4.1.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
@@ -551,7 +551,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "4.1.2-bb.5"
+      tag: "4.1.2-bb.6"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}

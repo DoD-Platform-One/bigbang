@@ -3,6 +3,44 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.15.0]
+
+* [!1.15.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.15.0); List of merge requests in this release.
+
+### Upgrade Notices
+
+#### **MINIO INSTANCE CRITICAL UPGRADE INFORMATION - PLEASE READ BEFORE UPGRADING**
+
+**If you have enabled the Minio Cluster Instance in the 'minio' namespace, this upgrade requires a backup and restore
+of your Minio instance buckets.   Failure to do so will result in data lose during the upgrade.**
+
+By default, the update of the Minio Instance helm chart to V4.1.2 will keep the 2.0.9 instances in place and operational.
+This allow a backup to be performed on the operational Minio Instances.   After the back is complete, an upgrade to the V4.1.2
+instance is required.   This is accomplished by setting the upgrade key/value [in the values file] (show below) to TRUE.
+
+```
+# When true, upgradeTenants enables use of the V4.* Minio Operator CRD for creation of tenants is enabled.
+upgradeTenants:
+  enabled: false
+
+```
+
+After execution of the helm chart with this value set to true, the new V4 instances will be running and you can restore the
+backup data to the new instances.
+
+**NOTE: If you have not enabled the deployment of a Minio Instance before the V4.1.2 release, you must set the above
+mentioned upgradeTenants/enabled value to TRUE or the helm deployment will fail**
+
+One of the easiest ways to backup your Minio instance is to the the Minio MC command line tool  on a different system.
+The MC command line tool can be found here:  https://github.com/minio/mc or you can use the Iron Bank approved container
+located at registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2021-06-08T01-29-37Z.
+
+```
+mc alias set <alais name> HOSTNAME ACCESSKEY SECRETKEY
+mc mirror <alias name>/ <local storage location>
+
+```
+
 ## [1.14.1]
 
 * [!771](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/771): Intermediate update to authservice package to allow for cleaner certificate formatting
