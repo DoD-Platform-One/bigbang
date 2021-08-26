@@ -3,6 +3,80 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.15.0]
+
+* [!1.15.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.15.0); List of merge requests in this release.
+
+## Upgrade Notices
+
+#### **Resources**
+
+Bigbang has begun to implement resoruce requests and limits on pods in preparation of setting OPA constraints to deny. If you notice multiple pod restarts check for `OOMKill` termination errors, and pod limits may need to be increased.
+
+#### **MINIO INSTANCE CRITICAL UPGRADE INFORMATION - PLEASE READ BEFORE UPGRADING**
+
+**If you have enabled the Minio Cluster Instance in the 'minio' namespace, this upgrade requires a backup and restore
+of your Minio instance buckets.   Failure to do so will result in data lose during the upgrade.**
+
+By default, the update of the Minio Instance helm chart to V4.1.2 will keep the 2.0.9 instances in place and operational.
+This allow a backup to be performed on the operational Minio Instances.   After the back is complete, an upgrade to the V4.1.2
+instance is required.   This is accomplished by setting the upgrade key/value [in the values file] (show below) to TRUE.
+
+```
+# When true, upgradeTenants enables use of the V4.* Minio Operator CRD for creation of tenants is enabled.
+upgradeTenants:
+  enabled: false
+
+```
+
+After execution of the helm chart with this value set to true, the new V4 instances will be running and you can restore the
+backup data to the new instances.
+
+**NOTE: If you have not enabled the deployment of a Minio Instance before the V4.1.2 release, you must set the above
+mentioned upgradeTenants/enabled value to TRUE or the helm deployment will fail**
+
+One of the easiest ways to backup your Minio instance is to the the Minio MC command line tool  on a different system.
+The MC command line tool can be found here:  https://github.com/minio/mc or you can use the Iron Bank approved container
+located at registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2021-06-08T01-29-37Z.
+
+```
+mc alias set <alais name> HOSTNAME ACCESSKEY SECRETKEY
+mc mirror <alias name>/ <local storage location>
+
+```
+
+### **Istio upgrade from 1.8 to 1.9**
+
+This release upgrades istio to 1.9.7. Because of this all pods with an istio-proxy sidecar must be restarted to pull in the new version.
+
+### **Mattermost default value change**
+
+To allow for defining replica count and resource requests/limits, `users` is set to `null` by default. Changing this will negate these values and mattermost may not run due to OPA Gatekeeper constraints.
+
+To set a replica count greater than 1 requires an enterprise license, and can be configured like the following example:
+
+```yaml
+addons:
+  mattermost:
+    values:
+      enterprise:
+        enabled: true
+      replicaCount: 3
+```
+
+**Setting a user value is not supported due to OPA constraint issues**
+
+If you want to use Mattermost's user/size value you will need to handle OPA violations and exceptions yourself since this is **not BB supported.** If all of these considerations have been accounted for and you still want to deploy with Mattermost's user sizing it can be done by setting the value as in this example:
+
+```yaml
+addons:
+  mattermost:
+    values:
+      users: null
+      replicaCount: 3
+      users: 1000
+```
+
 ## [1.14.1]
 
 * [!771](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/771): Intermediate update to authservice package to allow for cleaner certificate formatting
