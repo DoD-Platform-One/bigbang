@@ -204,7 +204,7 @@ cd ./bigbang
 ./scripts/install_flux.sh -u your-user-name -p your-pull-secret
 ```
 
-**Note:** When deploying to k3d, istio-system should be added from `excludedNamespaces` under the `allowedDockerRegistries` violations for gatekeeper. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
+**Note1:** When deploying to k3d, istio-system should be added from `excludedNamespaces` under the `allowedDockerRegistries` violations for gatekeeper. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
 
 ```yaml
 gatekeeper:
@@ -212,9 +212,23 @@ gatekeeper:
     violations:
       allowedDockerRegistries:
         match:
-          excludedNamespaces: 
-            - istio-system # allows creation for loadbalancer pods for various ports and various vendor loadbalancers
+          excludedNamespaces:
+            # Allows load balancer images for k3d from public repo
+            - istio-system
+      hostNetworking:
+        match:
+          excludedNamespaces:
+            # Allows load balancer containers to map ports for k3d
+            - istio-system
 ```
+**Note2:** The information in this note is simply to give you awareness in advance. You should create local directory on your workstation where you store your helm values override files. Development changes made in the code for testing could accidentally be committed. That is why you should create a separate local directory to hold your override values for testing. The location can be anywhere on your workstation but it is most convenient to place them in a sibling directory next to the BigBang repos. Below is an example directory structure. The directory names are fake (for example only). Other documents will give more specific detail as needed.
+  ```text
+  ├── BigBangCodeRepo/
+  └── overrides/
+      ├── override-values-1.yaml
+      ├── override-values-2.yaml
+      └── override-values-3.yaml
+  ```
 
 ## Addendum
 
@@ -312,7 +326,7 @@ docker network inspect k3d-k3s-default | jq .[0].IPAM.Config[0]
 ```shell
 kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
 kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
-cat <<EOF | > metallb-config.yaml
+cat << EOF > metallb-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -381,7 +395,21 @@ sudo vim /etc/hosts
     ```
   - With these DNS settings in place you will now be able to reach the external *.bigbang.dev URLs from this EC2 instance.
 
-  - To reach outside the EC2 instance use either SSH or SSHUTTLE commands to specify a local port for Dynamic application-level port forwarding (ssh -D) and utilize Firefox's built in SOCKS proxy configuration to route DNS and web traffic through the application-level port forward from the SSH command.
+  - To reach outside the EC2 instance use either SSH or SSHUTTLE commands to specify a local port for Dynamic application-level port forwarding (ssh -D). Example
+      ```shell
+      sshuttle --dns -vr ubuntu@$EC2_PRIVATE_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your.pem -D 127.0.0.1:12345'
+      ```
+   - and utilize Firefox's built in SOCKS proxy configuration to route DNS and web traffic through the application-level port forward from the SSH command.
+      1. Open Firefox browser
+      1. Click on hamburger menu in upper right corner and select ```Settings```
+      1. At the bottom of ```Settings``` page in the ```Network Settings``` section select ```Settings```
+      1. Select ```Manual proxy configuration``` and the following values
+          ```
+          SOCKS Host:  localhost
+          Port:  12345
+          ```
+          and select SOCKS v5
+      1. Select ```Proxy DNS when using SOCKS v5```
 
 ### Amazon Linux 2
 
