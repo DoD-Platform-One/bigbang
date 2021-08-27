@@ -41,7 +41,7 @@ git:
     # -- HTTP git credentials, both username and password must be provided
     username: ""
     password: ""
-    # -- HTTPS certificate authority file.  It is also possible to specify a caFile for public repositories, in that case the username and password can be omitted.
+    # -- HTTPS certificate authority file.  Required for any repo with self signed certificate
     caFile: ""
     # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
     privateKey: ""
