@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app.kubernetes.io/name: authservice
+    app.kubernetes.io/name: argocd
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
     istio-injection: disabled
