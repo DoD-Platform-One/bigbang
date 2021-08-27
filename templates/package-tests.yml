@@ -34,21 +34,6 @@ variables:
     - dogfood
     - generic
 
-.k3d-ci:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.5
-  tags:
-    - bigbang
-    - privileged
-    - dogfood
-    - packages
-  variables:
-    DOCKER_HOST: tcp://localhost:2376
-    DOCKER_TLS_CERTDIR: "/certs"
-    DOCKER_TLS_VERIFY: 1
-    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
-    DOCKER_DRIVER: overlay2
-
-
 configuration validation:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.5
   stage: configuration validation
@@ -97,16 +82,24 @@ configuration validation:
         fi
       fi
 
-package tests:
-  stage: package tests
-  extends:
-    - .k3d-ci
-
+.k3d-ci:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.5
+  tags:
+    - bigbang
+    - privileged
+    - dogfood
+    - packages
   variables:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_DRIVER: overlay2
     WAIT_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/wait/wait.sh"
     K3D_CONFIG_PATH: "${PIPELINE_REPO_DESTINATION}/jobs/k3d-ci/config.yaml"
 
   before_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:cluster_setup[collapsed=true]\r\e[0KCluster Setup"
     # Clone pipeline repo for waits & k3d config
     - |
       if [ -z ${PIPELINE_REPO_BRANCH} ]; then
@@ -136,87 +129,114 @@ package tests:
       kubectl create namespace ${PACKAGE_NAMESPACE}
       kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
       kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+    - echo -e "\e[0Ksection_end:`date +%s`:cluster_setup\r\e[0K"
 
-    # Check for istio in project name and install it if needed
+  after_script:
     - |
-      if [[ "${CI_PROJECT_NAME}" != *"istio"* ]]; then
-        istioctl install -y
-        kubectl label ns istio-system app.kubernetes.io/name=istio-controlplane
+      if [ -e success ]; then
+        echo -e "\e[0Ksection_start:`date +%s`:cluster_status[collapsed=true]\r\e[0KCluster Status"
+        echo "Job Succeeded, cluster status:"
+        kubectl get all -A
+        echo -e "\e[0Ksection_end:`date +%s`:cluster_status\r\e[0K"
+      else
+        echo "Job Failed, cluster status:"
+        kubectl get all -A
       fi
+    # Delete Cluster
+    - echo -e "\e[0Ksection_start:`date +%s`:cluster_clean[collapsed=true]\r\e[0KCluster Cleanup"
+    - k3d cluster delete ${CI_JOB_ID}
+    - docker network rm ${CI_JOB_ID}
+    - echo -e "\e[0Ksection_end:`date +%s`:cluster_clean\r\e[0K"
 
-    # Generate throwaway cert for *.bigbang.dev, NOTE: special case for istio-operator - no cert needed
-    - |
-      if [[ "${PACKAGE_NAMESPACE}" != "istio-operator" ]]; then
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=*.bigbang.dev"
-        kubectl create -n istio-system secret tls wildcard-cert --key="tls.key" --cert="tls.crt"
-      fi
-    # Apply gateway if it exists (don't always create since istio creates its own)
-    - |
-      if [ -f "tests/main-test-gateway.yaml" ]; then
-        kubectl apply -f tests/main-test-gateway.yaml
-      fi
+  artifacts:
+    when: always
+    paths:
+      - images.txt
+      - tests/cypress/screenshots
+      - tests/cypress/videos
+      - cypress-artifacts
+    expire_in: 3 days
 
-    # Check for dependency repos, set up pull secrets, and helm install with test-values if present default if not
-    - |
-      if [ -f "tests/dependencies.yaml" ]; then
-        yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
-          dep_name=$i
+.dependency_install: &dependency_install
+  - |
+    if [ -f "tests/dependencies.yaml" ]; then
+      yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+        dep_name=$i
 
-          dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+        dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+        if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+          dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
           if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
-            dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
-            if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
-              continue
-            fi
+            continue
           fi
+        fi
 
-          dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
-          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
-            dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
-          fi
+        dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
+        if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+          dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+        fi
 
-          dep_namespace=$(yq e ".${i}.namespace" "tests/dependencies.yaml")
-          if [[ -z ${dep_namespace} || ${dep_namespace} == "null" ]]; then
-            dep_namespace=$dep_name
-          fi
+        dep_namespace=$(yq e ".${i}.namespace" "tests/dependencies.yaml")
+        if [[ -z ${dep_namespace} || ${dep_namespace} == "null" ]]; then
+          dep_namespace=$dep_name
+        fi
 
-          dep_helm_name=$(yq e ".${i}.package-name" "tests/dependencies.yaml")
-          if [[ -z ${dep_helm_name} || ${dep_helm_name} == "null" ]]; then
-            dep_helm_name=$dep_name
-          fi
+        dep_helm_name=$(yq e ".${i}.package-name" "tests/dependencies.yaml")
+        if [[ -z ${dep_helm_name} || ${dep_helm_name} == "null" ]]; then
+          dep_helm_name=$dep_name
+        fi
 
-          if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+        if [[ -d ${dep_branch} || ${dep_branch} == "null" ]]; then
+          if [[ -d "repos/${dep_name}" ]]; then
+            echo "Checking out default branch from ${dep_repo}"
+            cd repos/${dep_name}
+            git reset --hard && git clean -fd
+            git checkout $(git remote show origin | awk '/HEAD branch/ {print $NF}')
+            cd ../../
+          else
             echo "Cloning default branch from ${dep_repo}"
             git clone ${dep_repo} repos/${dep_name}
+          fi
+        else
+          if [[ -d "repos/${dep_name}" ]]; then
+            echo "Checking out ${dep_branch} from ${dep_repo}"
+            cd repos/${dep_name}
+            git reset --hard && git clean -fd
+            git checkout ${dep_branch}
+            cd ../../
           else
-            echo "Cloning tag ${dep_branch} from ${dep_repo}"
+            echo "Cloning ${dep_branch} from ${dep_repo}"
             git clone -b ${dep_branch} ${dep_repo} repos/${dep_name}
           fi
+        fi
 
-          echo "Installing dependency: repos/${dep_name} into ${dep_namespace} namespace"
-          if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
-            kubectl create namespace ${dep_namespace};
-          fi
-          if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
-            kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
-          fi
-          if ! kubectl get secret -n ${dep_namespace} private-registry-mil 2> /dev/null; then
-            kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
-          fi
+        echo "Installing dependency: repos/${dep_name} into ${dep_namespace} namespace"
+        if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
+          kubectl create namespace ${dep_namespace};
+        fi
+        if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+        fi
 
-          if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
-            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yaml for values"
-            helm install --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.y*ml
-          else
-            echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using default values"
-            helm install --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace}
-          fi
-        done
-      fi
+        if ! kubectl get secret -n ${dep_namespace} private-registry-mil 2> /dev/null; then
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+        fi
 
-    - sleep 10
-    - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
-    - |
+        if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+          echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yaml for values"
+          helm upgrade -i --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.y*ml --set istio.enabled=false
+        else
+          echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using default values"
+          helm upgrade -i --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} --set istio.enabled=false
+        fi
+      done
+    fi
+
+.dependency_wait: &dependency_wait
+  - |
+    if [ -f "tests/dependencies.yaml" ]; then
+      sleep 10
+      kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
       if [ -f tests/dependencies.yaml ]; then
         yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
           dep_name=$i
@@ -227,117 +247,156 @@ package tests:
           fi
         done
       fi
-    - wait_sts
-    - wait_daemonset
-    - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
-    - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+      wait_sts
+      wait_daemonset
+      kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+      kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+    fi
 
+.package_install: &package_install
+  - |
+    if [ ! -z ${PROJECT_NAME} ]; then
+      if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
+        PACKAGE_HELM_NAME=${PROJECT_NAME}
+      fi
+    fi
+    if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+      echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
+      helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
+    else
+      echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
+      helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
+    fi
+
+.package_wait: &package_wait
+  - |
+    sleep 10
+    kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+    if [ -f tests/wait.sh ]; then
+      source tests/wait.sh
+      echo "Waiting on project resources..."
+      wait_project
+    fi
+    wait_sts
+    wait_daemonset
+    kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+    kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+
+.package_test: &package_test
+  - |
+    if [ -d "chart/templates/tests" ]; then
+      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
+      echo "***** Start Helm Test Logs *****"
+      kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+      echo "***** End Helm Test Logs *****"
+      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
+        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
+        cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
+        mkdir -p cypress-artifacts
+        tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
+      fi
+      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
+        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
+        cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
+        mkdir -p cypress-artifacts
+        tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
+      fi
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+        exit ${EXIT_CODE}
+      fi
+    fi
+
+# Note: This section is temporarily duplicated to allow upgrade testing to fail if tests were not built to handle subsuquent runs
+# Due to some of the quirks with Gitlab CI "script blocks" this is the easiest solution
+# This block should be removed in the future and line 397 updated to just call `package_test`
+.package_upgrade_test: &package_upgrade_test
+  - |
+    if [ -d "chart/templates/tests" ]; then
+      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
+      echo "***** Start Helm Test Logs *****"
+      kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+      echo "***** End Helm Test Logs *****"
+      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
+        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
+        cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
+        mkdir -p cypress-artifacts
+        tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
+      fi
+      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
+        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
+        cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
+        mkdir -p cypress-artifacts
+        tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
+      fi
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+        echo -e "\e[31mNOTICE to MR creators/reviewers: There were errors on upgrade testing. If this package's tests are expected to fail when run twice in a row, please open a ticket to resolve this for the future.\e[0m"
+        echo -e "\e[31mOtherwise, take note of artifacts and testing results and ensure that the upgrade path is functional before approving/merging.\e[0m"
+      fi
+    fi
+
+clean install:
+  stage: package tests
+  extends:
+    - .k3d-ci
   script:
-    # Place kubernetes package test here
-    - echo "Package install"
-
-    # Override the PACKAGE_HELM_NAME with PROJECT_NAME (backwards compatibility)
-    - |
-      if [ ! -z ${PROJECT_NAME} ]; then
-        if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
-          PACKAGE_HELM_NAME=${PROJECT_NAME}
-        fi
-      fi
-
-    # Check for test values file
-    - |
-      if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
-        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
-        helm install --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml
-      else
-        echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
-        helm install --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE}
-      fi
-
-    # Wait for resources to be created and come alive
-    - sleep 10
-    - kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
-    - |
-      if [ -f tests/wait.sh ]; then
-        source tests/wait.sh
-        echo "Waiting on project resources..."
-        wait_project
-      fi
-    - wait_sts
-    - wait_daemonset
-    - kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
-    - kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
-
-    - echo "Package tests"
-    # If istio-ingressgateway has a loadBalancer IP and ${CI_PROJECT_NAME} namespace has a virtualService hostname add value to /etc/hosts
-    - |
-      if [ ! -z $(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}' &> /dev/null) ] && [ ! -z $(kubectl get vs -A -o jsonpath='{.items[0].spec.hosts[0]}' &> /dev/null) ]; then
-        echo "$(kubectl get services -n istio-system istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}') $(kubectl get vs -A -o jsonpath='{.items[*].spec.hosts[0]}')" >> /etc/hosts
-      fi
-
-    # Run Cypress tests
-    - |
-      if [ -f "tests/cypress.json" ]; then
-        cypress run --project tests --browser chrome --headless
-      fi
-
-    # Run Helm Tests
-    - |
-      if [ -d "chart/templates/tests" ]; then
-        helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
-        echo "***** Start Helm Test Logs *****"
-        kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
-        echo "***** End Helm Test Logs *****"
-        if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
-          kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
-          cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
-          mkdir -p cypress-artifacts
-          tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
-        fi
-        if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
-          kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
-          cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
-          mkdir -p cypress-artifacts
-          tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
-        fi
-        if [[ ${EXIT_CODE} -ne 0 ]]; then
-          exit ${EXIT_CODE}
-        fi
-      fi
-
-    # File to indicate Job succeeded 
+    - echo -e "\e[0Ksection_start:`date +%s`:dependency_clean[collapsed=true]\r\e[0KDependency Install and Wait"
+    - *dependency_install
+    - *dependency_wait
+    - echo -e "\e[0Ksection_end:`date +%s`:dependency_clean\r\e[0K"
+    - *package_install
+    - *package_wait
+    - *package_test
     - touch $CI_PROJECT_DIR/success
-
-  after_script:
-    - |
-        if [ -e success ]; then
-          echo "Job Succeeded"
-        else
-          echo "Job Failed Printing Debug Logs"
-          echo "kubectl get all -A"
-          kubectl get all -A
-        fi
-    # Fetch list of all images run
-    - docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json | jq -r '.images[].repoTags[0] | select(. != null)' > images.txt
-    # Remove istio and rancher upstream images
-    - sed -i '/docker.io\/istio\//d' images.txt
+    - echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KFetch Images"
+    # Fetch list of all images run (retry up to 6x)
+    - images=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
+    - echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
+    # Remove rancher upstream images
     - sed -i '/docker.io\/rancher\//d' images.txt
     - |
       if [ -f tests/images.txt ]; then
         cat tests/images.txt >> images.txt
       fi
-    # Delete Cluster
-    - k3d cluster delete ${CI_JOB_ID}
-    - docker network rm ${CI_JOB_ID}
+    - echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
 
-  artifacts:
-    when: always
-    paths:
-      - images.txt
-      - tests/cypress/screenshots
-      - tests/cypress/videos
-      - cypress-artifacts
-    expire_in: 3 days
+upgrade:
+  stage: package tests
+  extends:
+    - .k3d-ci
+  rules:
+    # skip job when MR title starts with 'SKIP UPGRADE'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPGRADE/'
+      when: never
+    # skip pipeline for branches that start with "docs"
+    - if: '$CI_COMMIT_REF_NAME =~ /^doc*/i'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - echo "Installing ${CI_PROJECT_NAME} from ${CI_DEFAULT_BRANCH}"
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage Checkout"
+    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout1\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:dependency_up1[collapsed=true]\r\e[0KDependency Install and Wait"
+    - *dependency_install
+    - *dependency_wait
+    - echo -e "\e[0Ksection_end:`date +%s`:dependency_up1\r\e[0K"
+    - *package_install
+    - *package_wait
+    - *package_test
+    - echo "Upgrading ${CI_PROJECT_NAME} to ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage Upgrade Checkout"
+    - git reset --hard && git clean -fd
+    - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:dependency_up2[collapsed=true]\r\e[0KDependency Upgrade and Wait"
+    - *dependency_install
+    - *dependency_wait
+    - echo -e "\e[0Ksection_end:`date +%s`:dependency_up2\r\e[0K"
+    - *package_install
+    - *package_wait
+    - *package_upgrade_test
+    - touch $CI_PROJECT_DIR/success
 
 package:
   stage: package

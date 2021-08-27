@@ -4,6 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.2.0]
+### Added
+- Added upgrade testing (note: post-upgrade testing is currently allowed to fail to allow for a transition period and test updates as needed)
+### Changed
+- Refactored code for better reusability across jobs
+### Removed
+- Removed standalone cypress testing
+- Removed upstream istio installation
+
 ## [1.1.5]
 ### Added
 - Label added to istio install
