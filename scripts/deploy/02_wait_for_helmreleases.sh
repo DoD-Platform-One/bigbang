@@ -2,13 +2,19 @@
 
 set -e
 
-## This is an array to instantiate the order of wait conditions
-ORDERED_HELMRELEASES="gatekeeper istio-operator istio monitoring eck-operator ek fluent-bit twistlock cluster-auditor authservice argocd gitlab haproxy-sso gitlab-runner minio-operator minio anchore sonarqube mattermost-operator mattermost keycloak nexus-repository-manager"
+## Array of core HRs
+CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
 
-## This is the actual deployed helmrelease objects in the cluster
-DEPLOYED_HELMRELEASES=$(kubectl get hr --no-headers -n bigbang | awk '{ print $1}')
+## Array of addon HRs
+ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero")
 
-printf "Identified the following deployed helmreleases:\n%s" "${DEPLOYED_HELMRELEASES}"
+## Map of values-keys/labels to HRs: Only needed if HR name =/= label name
+declare -A ADD_ON_HELMRELEASES_MAP
+ADD_ON_HELMRELEASES_MAP["haproxy"]="haproxy-sso"
+ADD_ON_HELMRELEASES_MAP["gitlabRunner"]="gitlab-runner"
+ADD_ON_HELMRELEASES_MAP["minioOperator"]="minio-operator"
+ADD_ON_HELMRELEASES_MAP["mattermostoperator"]="mattermost-operator"
+ADD_ON_HELMRELEASES_MAP["nexus"]="nexus-repository-manager"
 
 ## Function to test an array contains an element
 ## Args:
@@ -27,12 +33,48 @@ function array_contains() {
     return $in
 }
 
-## Function to wait on helmrelease
-## Args:
-## $1: package name
-function wait_on() {
-  echo "Waiting on package $1"
-  kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang $1;
+## Function to check/wait on HR existence
+function check_if_hr_exist() {
+    timeElapsed=0
+    echo "Waiting for $1 HR to exist"
+    until kubectl get hr -n bigbang $1 &> /dev/null; do
+      sleep 5
+      timeElapsed=$(($timeElapsed+5))
+      if [[ $timeElapsed -ge 60 ]]; then
+         echo "Timed out while waiting for $1 HR to exist"
+         exit 1
+      fi
+    done
+}
+
+## Function to wait on all HRs
+function wait_all_hr() {
+    timeElapsed=0
+    while true; do
+        if [[ "$(kubectl get hr -n bigbang -o jsonpath='{.items[*].status.conditions[0].reason}')" =~ Failed ]]; then
+            state=$(kubectl get hr -A -o go-template='{{range $items,$contents := .items}}{{printf "HR %s" $contents.metadata.name}}{{printf " status is %s\n" (index $contents.status.conditions 0).reason}}{{end}}')
+            failed=$(echo "${state}" | grep "Failed")
+            echo "Found failed Helm Release(s). Exiting now."
+            echo "${failed}"
+            failed_hrs=$(echo "{$failed}" | awk  '{print $2}')
+            for hr in $failed_hrs; do
+                kubectl describe hr -n bigbang $hr
+            done
+            exit 1
+        fi
+        if [[ "$(kubectl get hr -n bigbang -o jsonpath='{.items[*].status.conditions[0].status}')" != *Unknown* ]]; then
+            if [[ "$(kubectl get hr -n bigbang -o jsonpath='{.items[*].status.conditions[0].status}')" != *False* ]]; then
+                echo "All HR's deployed"
+                break
+            fi
+        fi
+        sleep 5
+        timeElapsed=$(($timeElapsed+5))
+        if [[ $timeElapsed -ge 1800 ]]; then
+            echo "Timed out while waiting for hr's to be ready."
+            exit 1
+        fi
+    done
 }
 
 ## Function to wait on all statefulsets
@@ -75,29 +117,41 @@ function wait_daemonset(){
    done
 }
 
+## Append all add-ons to hr list if "all-packages" or default branch/tag. Else, add specific ci labels to hr list.
+HELMRELEASES=(${CORE_HELMRELEASES[@]})
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
+    HELMRELEASES+=(${ADD_ON_HELMRELEASES[@]})
+    echo "All helmreleases enabled: all-packages label enabled, or on default branch or tag."
+elif [[ ! -z "$CI_MERGE_REQUEST_LABELS" ]]; then
+    IFS=","
+    for package in $CI_MERGE_REQUEST_LABELS; do
+        # Check if package is in addons
+        if array_contains ADD_ON_HELMRELEASES "$package"; then
+            HELMRELEASES+=("$package")
+        # Check to see if there is a mapping from label -> HR
+        elif [ ${ADD_ON_HELMRELEASES_MAP[$package]+_} ]; then
+            package="${ADD_ON_HELMRELEASES_MAP[$package]}"
+            # Safeguard to doublecheck new package name is valid HR name
+            if array_contains ADD_ON_HELMRELEASES "$package"; then
+                HELMRELEASES+=("$package")
+            fi
+        fi
+    done
+    echo "Found enabled helmreleases: ${HELMRELEASES[@]}"
+fi
 
-for package in $ORDERED_HELMRELEASES;
+echo "Waiting on GitRepositories"
+kubectl wait --for=condition=Ready --timeout 60s gitrepositories -n bigbang --all
+
+for package in "${HELMRELEASES[@]}";
 do
-  if array_contains DEPLOYED_HELMRELEASES "$package";
-  then wait_on "$package"
-  else echo "Expected package: $package, but not found in release. Update the array in this script if this package is no longer needed"
-  fi
+    check_if_hr_exist "$package"
 done
+
+echo "Waiting on helm releases..."
+wait_all_hr
 
 kubectl get helmreleases,kustomizations,gitrepositories -A
-
-for package in $DEPLOYED_HELMRELEASES;
-do
-  if array_contains ORDERED_HELMRELEASES "$package";
-  then echo ""
-  else 
-    echo "Found package: $package, but not found in this script array. Update the array in this script if this package is always needed"
-    wait_on "$package"
-  fi
-done
-
-# Double check everything got waited on...
-kubectl wait --for=condition=Ready --timeout 600s helmrelease -n bigbang --all
 
 echo "Waiting on Secrets Kustomization"
 kubectl wait --for=condition=Ready --timeout 300s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets

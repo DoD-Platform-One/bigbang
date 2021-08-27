@@ -162,6 +162,8 @@ addons:
     enabled: false
     sso:
       enabled: false
+    flux:
+      timeout: 20m
     values:
       global:
         rails:
