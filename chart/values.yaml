@@ -38,6 +38,12 @@ affinity: {}
 nodeSelector: {}
   # node-type: operator
 
+tolerations: {}
+#- key: "key1"
+#  operator: "Equal"
+#  value: "value1"
+#  effect: "NoSchedule"
+
 networkPolicies:
   enabled: false
   # See `kubectl cluster-info` and then resolve to IP
