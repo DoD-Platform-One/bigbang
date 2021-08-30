@@ -141,7 +141,7 @@ elif [[ ! -z "$CI_MERGE_REQUEST_LABELS" ]]; then
 fi
 
 echo "Waiting on GitRepositories"
-kubectl wait --for=condition=Ready --timeout 60s gitrepositories -n bigbang --all
+kubectl wait --for=condition=Ready --timeout 180s gitrepositories -n bigbang --all
 
 for package in "${HELMRELEASES[@]}";
 do
