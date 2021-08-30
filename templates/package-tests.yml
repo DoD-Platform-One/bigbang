@@ -331,6 +331,7 @@ configuration validation:
       if [[ ${EXIT_CODE} -ne 0 ]]; then
         echo -e "\e[31mNOTICE to MR creators/reviewers: There were errors on upgrade testing. If this package's tests are expected to fail when run twice in a row, please open a ticket to resolve this for the future.\e[0m"
         echo -e "\e[31mOtherwise, take note of artifacts and testing results and ensure that the upgrade path is functional before approving/merging.\e[0m"
+        exit 123
       fi
     fi
 
@@ -397,6 +398,8 @@ upgrade:
     - *package_wait
     - *package_upgrade_test
     - touch $CI_PROJECT_DIR/success
+  allow_failure:
+    exit_codes: 123
 
 package:
   stage: package
