@@ -578,13 +578,14 @@ addons:
     enabled: false
 
     hostnames:
-      gitlab: gitlab.bigbang.dev
-      registry: registry.bigbang.dev
+      # host name only without the domain
+      gitlab: gitlab
+      registry: registry
 
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "4.12.9-bb.2"
+      tag: "4.12.9-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}

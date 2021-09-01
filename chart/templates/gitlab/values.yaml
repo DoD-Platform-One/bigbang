@@ -56,10 +56,10 @@ global:
     domain: {{ .Values.hostname }}
 
     gitlab:
-      name: {{ .Values.addons.gitlab.hostnames.gitlab }}
+      name: {{ .Values.addons.gitlab.hostnames.gitlab }}.{{ .Values.hostname }}
 
     registry:
-      name: {{ .Values.addons.gitlab.hostnames.registry }}
+      name: {{ .Values.addons.gitlab.hostnames.registry }}.{{ .Values.hostname }}
 
   {{- if .Values.addons.gitlab.objectStorage.endpoint }}
   minio:
