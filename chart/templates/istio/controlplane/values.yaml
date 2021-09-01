@@ -20,6 +20,11 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
+tag: 1.9.8
+cni:
+  image:
+    tag: 1.9.8
+
 {{- if .Values.istio.ingressGateways }}
 ingressGateways:
   istio-ingressgateway:
