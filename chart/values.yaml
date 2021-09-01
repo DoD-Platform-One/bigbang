@@ -161,7 +161,8 @@ istio:
   flux: {}
 
   # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
-  values: {}
+  values:
+    tag: 1.9.8
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
@@ -178,7 +179,8 @@ istiooperator:
   flux: {}
 
   # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
-  values: {}
+  values:
+    tag: 1.9.8
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
