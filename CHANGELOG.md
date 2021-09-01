@@ -5,10 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [1.15.1]
 
-* https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/834 Update istio to version 1.9.8
-* https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/818 Fix minio istio pass down
-* https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/831 Fix monitoring hostNetwork violation
-* https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/835 Fix fluentbit hostFilesystem violation
+* [!834](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/834): Update istio to version 1.9.8
+* [!818](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/818): Fix minio istio pass down
+* [!831](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/831): Fix monitoring hostNetwork violation
+* [!835](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/835): Fix fluentbit hostFilesystem violation
 
 ## [1.15.0]
 
