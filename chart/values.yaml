@@ -72,6 +72,11 @@ proxy:
       httpsAuthNtlmDomain: ~
       nonProxyHosts: []
 
+job_image:
+  repository: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+  tag: 8.4
+  pullPolicy: IfNotPresent
+
 # -- End of BigBang Additions
 
 ingress:
