@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.15.1]
+
+* [!834](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/834): Update istio to version 1.9.8
+* [!818](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/818): Fix minio istio pass down
+* [!831](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/831): Fix monitoring hostNetwork violation
+* [!835](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/835): Fix fluentbit hostFilesystem violation
+
 ## [1.15.0]
 
 * [!1.15.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.15.0); List of merge requests in this release.
