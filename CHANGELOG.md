@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [29.1.0-bb.9] - 2021-09-01
+### Changed
+- add map to specify image, tag, and policy in values for proxy and saml jobs
+
 ## [29.1.0-bb.8] - 2021-08-23
 ### Added
 - Added resource requests and limits to pods with guaranteed QoS.
