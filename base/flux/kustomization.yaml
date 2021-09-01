@@ -37,12 +37,15 @@ patches:
             terminationGracePeriodSeconds: 60
             # Required by Pod Security Policy
             securityContext:
-              runAsUser: 10000
-              fsGroup: 1337
+              runAsUser: 1000
+              fsGroup: 1000
             containers:
               - name: manager
                 # Required by Pod Security Policy
                 securityContext:
+                  runAsUser: 1000
+                  runAsGroup: 1000
+                  privileged: false
                   readOnlyRootFilesystem: true
                   allowPrivilegeEscalation: false
                   runAsNonRoot: true
