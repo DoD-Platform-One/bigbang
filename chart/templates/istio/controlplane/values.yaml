@@ -23,7 +23,7 @@ networkPolicies:
 tag: 1.9.8
 cni:
   image:
-  tag: 1.9.8
+    tag: 1.9.8
 
 {{- if .Values.istio.ingressGateways }}
 ingressGateways:
