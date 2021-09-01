@@ -36,16 +36,18 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
 
   {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled }}
   allowedHostFilesystem:
+    {{- if .Values.monitoring.enabled }}
     match:
       excludedNamespaces:
-        {{- if .Values.monitoring.enabled }}
         # Prometheus-node-exporter needs access to host to get node metrics
         - monitoring
-        {{- end }}
-        {{- if .Values.fluentbit.enabled }}
+    {{- end }}
+    {{- if .Values.fluentbit.enabled }}
+    parameters:
+      excludedResources:
         # Fluentbit pods need access to host to get log files
-        - logging
-        {{- end }}
+        - logging/logging-fluent-bit-.*
+    {{- end }}
   {{- end }}
 
   {{- if .Values.addons.mattermost.enabled }}
