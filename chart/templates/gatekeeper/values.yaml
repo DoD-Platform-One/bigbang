@@ -1,5 +1,5 @@
 {{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.gatekeeper "name" "gatekeeper" "defaults" (include "bigbang.defaults.gatekeeper" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.gatekeeper" .))) "name" "gatekeeper" "defaults" (include "bigbang.defaults.gatekeeper" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.gatekeeper" -}}
@@ -107,3 +107,31 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
        {{- end }}
   {{- end }}
 {{- end -}}
+
+
+{{- /* This function merges defaults in lists from above into overlays */ -}}
+{{- /* The end user will not have to replicate exclusions/repos from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any constraint to ignore the defaults */ -}}
+{{- define "bigbang.overlays.gatekeeper" }}
+  {{- $defaults := fromYaml (include "bigbang.defaults.gatekeeper" .) }}
+  {{- $overlays := dig "values" dict .Values.gatekeeper }}
+  {{- range $constraint, $default := $defaults.violations }}
+    {{- $overlay := (dig "violations" $constraint dict $overlays) }}
+    # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
+    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+      # Add any default excludedNamespaces to overlay
+      {{- if and (dig "match" "excludedNamespaces" list $default) (dig "match" "excludedNamespaces" list $overlay) }}
+         {{ $_ := set $overlay.match "excludedNamespaces" (concat $default.match.excludedNamespaces $overlay.match.excludedNamespaces) }}
+      {{- end }}
+      # Add any default excludedResources to overlay
+      {{- if and (dig "parameters" "excludedResources" list $default) (dig "parameters" "excludedResources" list $overlay) }}
+         {{ $_ := set $overlay.parameters "excludedResources" (concat $default.parameters.excludedResources $overlay.parameters.excludedResources) }}
+      {{- end }}
+      # Special case to add registries for allowed registries to overlay
+      {{- if and (dig "parameters" "repos" list $default) (dig "parameters" "repos" list $overlay) }}
+         {{ $_ := set $overlay.parameters "repos" (concat $default.parameters.repos $overlay.parameters.repos) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{ toYaml $overlays }}
+{{- end }}
