@@ -16,7 +16,7 @@ spec:
     enable: false
   install:
     remediation:
-      retries: 5
+      retries: -1
   upgrade:
     remediation:
       retries: 5
