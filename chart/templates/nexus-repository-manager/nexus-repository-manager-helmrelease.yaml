@@ -23,6 +23,10 @@ spec:
 
   {{- toYaml $fluxSettingsNexus | nindent 2 }}
 
+  {{- if .Values.addons.nexus.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.nexus.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-nexus-repository-manager-values
       kind: Secret

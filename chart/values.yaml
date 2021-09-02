@@ -727,6 +727,9 @@ addons:
     # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git
     values: {}
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   sonarqube:
     # -- Toggle deployment of SonarQube.
     enabled: false
