@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [33.1.0-bb.0] - 2021-08-27
+### Modified
+- Sync with upstream charts 33.1.0 at https://github.com/sonatype/helm3-charts.git
+- Version bump to 3.33.1
+- Increased default cpu resource request and limits
 ## [29.1.0-bb.9] - 2021-09-01
 ### Changed
 - add map to specify image, tag, and policy in values for proxy and saml jobs
