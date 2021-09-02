@@ -23,6 +23,7 @@ networkPolicies:
 tag: 1.9.8
 cni:
   image:
+    hub: registry1.dso.mil/ironbank/opensource/istio
     tag: 1.9.8
 
 {{- if .Values.istio.ingressGateways }}
