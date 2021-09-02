@@ -101,7 +101,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.29.0-02
+  tag: 3.33.1-01
   pullPolicy: IfNotPresent
 
 nexus:
@@ -142,10 +142,10 @@ nexus:
       # cpu: 250m
       # memory: 4800Mi
     requests:
-      cpu: 400m # Values for testing and pipeline pursoses. If deploying for production use please modify these values.
+      cpu: 1 # Values for testing and pipeline pursoses. If deploying for production use please modify these values.
       memory: 3000Mi
     limits:
-      cpu: 400m
+      cpu: 1
       memory: 3000Mi
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
@@ -171,6 +171,8 @@ nexus:
   #   hostnames:
   #   - "example.com"
   #   - "www.example.com"
+
+
   imagePullSecrets:
     - name: private-registry
 
