@@ -34,6 +34,7 @@ source:
     - registry1.dso.mil/ironbank/big-bang/base:8.4
     - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
     - registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.2
+    - registry1.dso.mil/ironbank/opensource/istio/install-cni:1.10.4
     # Images used by pipeline-templates
     # NOTE: These are __not__ fully inclusive yet, see this issue for updates: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/145
     - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
