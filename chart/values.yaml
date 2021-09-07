@@ -101,7 +101,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.33.1-01
+  tag: 3.34.0-01
   pullPolicy: IfNotPresent
 
 nexus:
@@ -115,7 +115,8 @@ nexus:
     #    secretName: registrySecret
   env:
     - name: install4jAddVmParams
-      value: "-Xms1200M -Xmx1200M -XX:MaxDirectMemorySize=2G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+      # using values based on 8GB of RAM on host -- https://help.sonatype.com/repomanager3/installation/system-requirements
+      value: "-Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "true"
   properties:
@@ -131,22 +132,13 @@ nexus:
   affinity: {}
   resources:
     # requests:
-      ## Based on https://support.sonatype.com/hc/en-us/articles/115006448847#mem
-      ## and https://twitter.com/analytically/status/894592422382063616:
-      ##   Xms == Xmx
-      ##   Xmx <= 4G
-      ##   MaxDirectMemory >= 2G
-      ##   Xmx + MaxDirectMemory <= RAM * 2/3 (hence the request for 4800Mi)
-      ##   MaxRAMFraction=1 is not being set as it would allow the heap
-      ##     to use all the available memory.
-      # cpu: 250m
-      # memory: 4800Mi
+    # Based on https://help.sonatype.com/repomanager3/installation/system-requirements
     requests:
-      cpu: 1 # Values for testing and pipeline pursoses. If deploying for production use please modify these values.
-      memory: 3000Mi
+      cpu: 4
+      memory: 8000Mi
     limits:
-      cpu: 1
-      memory: 3000Mi
+      cpu: 4
+      memory: 8000Mi
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
 
