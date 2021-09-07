@@ -1,15 +1,212 @@
+# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
 hostname: bigbang.dev
 
+# -- (experimental) Toggle sourcing from external repos.
+# All this does right now is toggle GitRepositories, it is _not_ fully functional
+offline: false
+
+# -- Single set of registry credentials used to pull all images deployed by BigBang.
+registryCredentials:
+  registry: registry1.dso.mil
+  username: ""
+  password: ""
+  email: ""
+
+# -- Multiple sets of registry credentials used to pull all images deployed by BigBang.
+# Credentials will only be created when a valid combination exists, registry, username, and password (email is optional)
+# Or a list of registires:
+#  - registry: registry1.dso.mil
+#    username: ""
+#    password: ""
+#    email: ""
+#  - registry: registry.dso.mil
+#    username: ""
+#    password: ""
+#    email: ""
+
+# Openshift Container Platform Feature Toggle
+openshift: false
+
+# -- Git credential settings for accessing private repositories
+# Order of precedence is:
+#   1. existingSecret
+#   2. http credentials (username/password/caFile)
+#   3. ssh credentials (privateKey/publicKey/knownHosts)
+git:
+  # -- Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+  existingSecret: ""
+
+  # -- Chart created secrets with user defined values
+  credentials:
+    # -- HTTP git credentials, both username and password must be provided
+    username: ""
+    password: ""
+    # -- HTTPS certificate authority file.  Required for any repo with a self signed certificate
+    caFile: ""
+    # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+    privateKey: ""
+    publicKey: ""
+    knownHosts: ""
+
+# -- Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages.
+sso:
+  oidc:
+    # -- Domain for keycloak used for configuring SSO
+    host: login.dso.mil
+    # -- Keycloak realm containing clients
+    realm: baby-yoda
+
+  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see chart/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
+  certificate_authority: "-----BEGIN CERTIFICATE-----
+    MIIH0zCCBrugAwIBAgIQHeg1retyhPnWuzryBJeBvTANBgkqhkiG9w0BAQsFADCB
+    ujELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsT
+    H1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAy
+    MDEyIEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEuMCwG
+    A1UEAxMlRW50cnVzdCBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eSAtIEwxSzAeFw0y
+    MDEyMTUwMzE1MDJaFw0yMjAxMTQwMzE1MDJaMHMxCzAJBgNVBAYTAlVTMREwDwYD
+    VQQIEwhDb2xvcmFkbzEZMBcGA1UEBxMQQ29sb3JhZG8gU3ByaW5nczEeMBwGA1UE
+    ChMVRGVwYXJ0bWVudCBvZiBEZWZlbnNlMRYwFAYDVQQDEw1sb2dpbi5kc28ubWls
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAymUXk7STDlepS5HJu0ca
+    B57S5dfLp7zxYmcsGjo10YkHy3m9LASQCTyiioDrlwo2b+n8oZ7esGLv3RgggMwf
+    xvLVyx1+lZDswxdQoXmjArTdbqpcSoq3Y1rvVp33/jGb3slBjQtcMt2QvaFv3fxy
+    cwwINvJFEqsQS7zGUgpolJ3smKdcVpUSGZmzpYposuDlPUGeOJaQRMAACW5arWiT
+    VkDhJD+OVOYEHW8uCQfghD3JJXu6Xp9SwlWe6UNOdxo9cq3s/XE4ZwEgffdLXP2A
+    wuJF/7B7CFdZjIMptmOODyCeatC344iyubU0MiGCOm4W4wn0pQ0XJtAzWeYFKATL
+    9BquNOzPUR6pMSFMvIEiS96zbVFuOYt2XKgPryWEYji3Oky082WWYOcXt0NnqnCj
+    SafVU+2fQi4jQ0att5YXagEEPz83lQZdSKb2+grDeFg78VrEZAe+Y0mVu4/G93he
+    UOqfZ9jdCnFXq8sEMG9bJJFKeOXkb1Da8Y0amfOw4hFd4UslrbvC5ZCUZNh6roOk
+    8kast9QWtWFIGPC3f+Uq3gvx3GBHzIG9QPOq1CjSSAF3tWKuMTxK4zaS33mriJo0
+    Dv1CMX3FCmjT/qG3422guBL02hbGHveDSWk0/saY7ZWFifxnvKEdOi4ItnpMuQhE
+    zx6/+t7FWuzBTPAeVqV1l2sCAwEAAaOCAxkwggMVMAwGA1UdEwEB/wQCMAAwHQYD
+    VR0OBBYEFCLwpnkje7QKLWok+nWIeBEnIGfmMB8GA1UdIwQYMBaAFIKicHTdvFM/
+    z3vU981/p2DGCky/MGgGCCsGAQUFBwEBBFwwWjAjBggrBgEFBQcwAYYXaHR0cDov
+    L29jc3AuZW50cnVzdC5uZXQwMwYIKwYBBQUHMAKGJ2h0dHA6Ly9haWEuZW50cnVz
+    dC5uZXQvbDFrLWNoYWluMjU2LmNlcjAzBgNVHR8ELDAqMCigJqAkhiJodHRwOi8v
+    Y3JsLmVudHJ1c3QubmV0L2xldmVsMWsuY3JsMCcGA1UdEQQgMB6CDWxvZ2luLmRz
+    by5taWyCDWxvZ2luLmRzb3AuaW8wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQG
+    CCsGAQUFBwMBBggrBgEFBQcDAjBMBgNVHSAERTBDMDcGCmCGSAGG+mwKAQUwKTAn
+    BggrBgEFBQcCARYbaHR0cHM6Ly93d3cuZW50cnVzdC5uZXQvcnBhMAgGBmeBDAEC
+    AjCCAX4GCisGAQQB1nkCBAIEggFuBIIBagFoAHUAVhQGmi/XwuzT9eG9RLI+x0Z2
+    ubyZEVzA75SYVdaJ0N0AAAF2ZGTpIwAABAMARjBEAiAK+W9ukx92DJPFV87LexEg
+    /qDFTjtkiLh/z+mLmDtOwQIgUD4YrMuo22sV9MeJ8JmzraCQVdUUIprw4K4HN+eO
+    6W0AdwDfpV6raIJPH2yt7rhfTj5a6s2iEqRqXo47EsAgRFwqcwAAAXZkZOlKAAAE
+    AwBIMEYCIQDRpvbR/GroWSGlCIh1q0RUITb8RfI4skqqBa/FeU811AIhAPlRY4lv
+    DC2u9MFSEiCVeaFYJRU0xvAwmHQMtrl+IE4iAHYARqVV63X6kSAwtaKJafTzfREs
+    QXS+/Um4havy/HD+bUcAAAF2ZGTrYAAABAMARzBFAiEAifP8Y0nXFBykaTyzpWpv
+    E3FDi8NCQeJFRMJqD7loTjMCIHVDio7r+zANTbIdRLRRzHoNzo//xfJ0JUqejNRA
+    aCpZMA0GCSqGSIb3DQEBCwUAA4IBAQB/wtYjDQiPLe99tZq98IyxOSJCli2mtlV9
+    gSC67aj4rgW6g+C8P1bSoB5PamMq6rON5q0SXL3CQiQ7vegxCQnleDh0LWeKPFS2
+    jjSIl3CvrYfBlNBzw4H1uAa/yw+enr0So8oX8kdSTBFGnU4KoK646lFZRXSifFIU
+    zzQ9QYYedmiP0iKs5LDYGAOsB/w/O94+zv6qGKXA1fVzBXAD54MddqGk9mHZTSyL
+    6nsSTx4r8vCGQir7d2QuIGLD48zaYQz0TFcGKnBV3/9CB27RxJkRdMwUbMvNdp3C
+    V+C2+jdR8xA/0qCnvSxHc1lTZgXxVkcu/wpqIBn3af5Ha8ddd0DU
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIFDjCCA/agAwIBAgIMDulMwwAAAABR03eFMA0GCSqGSIb3DQEBCwUAMIG+MQsw
+    CQYDVQQGEwJVUzEWMBQGA1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2Vl
+    IHd3dy5lbnRydXN0Lm5ldC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMDkg
+    RW50cnVzdCwgSW5jLiAtIGZvciBhdXRob3JpemVkIHVzZSBvbmx5MTIwMAYDVQQD
+    EylFbnRydXN0IFJvb3QgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkgLSBHMjAeFw0x
+    NTEwMDUxOTEzNTZaFw0zMDEyMDUxOTQzNTZaMIG6MQswCQYDVQQGEwJVUzEWMBQG
+    A1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2VlIHd3dy5lbnRydXN0Lm5l
+    dC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMTIgRW50cnVzdCwgSW5jLiAt
+    IGZvciBhdXRob3JpemVkIHVzZSBvbmx5MS4wLAYDVQQDEyVFbnRydXN0IENlcnRp
+    ZmljYXRpb24gQXV0aG9yaXR5IC0gTDFLMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+    MIIBCgKCAQEA2j+W0E25L0Tn2zlem1DuXKVh2kFnUwmqAJqOV38pa9vH4SEkqjrQ
+    jUcj0u1yFvCRIdJdt7hLqIOPt5EyaM/OJZMssn2XyP7BtBe6CZ4DkJN7fEmDImiK
+    m95HwzGYei59QAvS7z7Tsoyqj0ip/wDoKVgG97aTWpRzJiatWA7lQrjV6nN5ZGhT
+    JbiEz5R6rgZFDKNrTdDGvuoYpDbwkrK6HIiPOlJ/915tgxyd8B/lw9bdpXiSPbBt
+    LOrJz5RBGXFEaLpHPATpXbo+8DX3Fbae8i4VHj9HyMg4p3NFXU2wO7GOFyk36t0F
+    ASK7lDYqjVs1/lMZLwhGwSqzGmIdTivZGwIDAQABo4IBDDCCAQgwDgYDVR0PAQH/
+    BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQAwMwYIKwYBBQUHAQEEJzAlMCMGCCsG
+    AQUFBzABhhdodHRwOi8vb2NzcC5lbnRydXN0Lm5ldDAwBgNVHR8EKTAnMCWgI6Ah
+    hh9odHRwOi8vY3JsLmVudHJ1c3QubmV0L2cyY2EuY3JsMDsGA1UdIAQ0MDIwMAYE
+    VR0gADAoMCYGCCsGAQUFBwIBFhpodHRwOi8vd3d3LmVudHJ1c3QubmV0L3JwYTAd
+    BgNVHQ4EFgQUgqJwdN28Uz/Pe9T3zX+nYMYKTL8wHwYDVR0jBBgwFoAUanImetAe
+    733nO2lR1GyNn5ASZqswDQYJKoZIhvcNAQELBQADggEBADnVjpiDYcgsY9NwHRkw
+    y/YJrMxp1cncN0HyMg/vdMNY9ngnCTQIlZIv19+4o/0OgemknNM/TWgrFTEKFcxS
+    BJPok1DD2bHi4Wi3Ogl08TRYCj93mEC45mj/XeTIRsXsgdfJghhcg85x2Ly/rJkC
+    k9uUmITSnKa1/ly78EqvIazCP0kkZ9Yujs+szGQVGHLlbHfTUqi53Y2sAEo1GdRv
+    c6N172tkw+CNgxKhiucOhk3YtCAbvmqljEtoZuMrx1gL+1YQ1JH7HdMxWBCMRON1
+    exCdtTix9qrKgWRs6PLigVWXUX/hwidQosk8WwBD9lu51aX8/wdQQGcHsFXwt35u
+    Lcw=
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIEPjCCAyagAwIBAgIESlOMKDANBgkqhkiG9w0BAQsFADCBvjELMAkGA1UEBhMC
+    VVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50
+    cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3Qs
+    IEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVz
+    dCBSb290IENlcnRpZmljYXRpb24gQXV0aG9yaXR5IC0gRzIwHhcNMDkwNzA3MTcy
+    NTU0WhcNMzAxMjA3MTc1NTU0WjCBvjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVu
+    dHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwt
+    dGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0
+    aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVzdCBSb290IENlcnRpZmlj
+    YXRpb24gQXV0aG9yaXR5IC0gRzIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+    AoIBAQC6hLZy254Ma+KZ6TABp3bqMriVQRrJ2mFOWHLP/vaCeb9zYQYKpSfYs1/T
+    RU4cctZOMvJyig/3gxnQaoCAAEUesMfnmr8SVycco2gvCoe9amsOXmXzHHfV1IWN
+    cCG0szLni6LVhjkCsbjSR87kyUnEO6fe+1R9V77w6G7CebI6C1XiUJgWMhNcL3hW
+    wcKUs/Ja5CeanyTXxuzQmyWC48zCxEXFjJd6BmsqEZ+pCm5IO2/b1BEZQvePB7/1
+    U1+cPvQXLOZprE4yTGJ36rfo5bs0vBmLrpxR57d+tVOxMyLlbc9wPBr64ptntoP0
+    jaWvYkxN4FisZDQSA/i2jZRjJKRxAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAP
+    BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRqciZ60B7vfec7aVHUbI2fkBJmqzAN
+    BgkqhkiG9w0BAQsFAAOCAQEAeZ8dlsa2eT8ijYfThwMEYGprmi5ZiXMRrEPR9RP/
+    jTkrwPK9T3CMqS/qF8QLVJ7UG5aYMzyorWKiAHarWWluBh1+xLlEjZivEtRh2woZ
+    Rkfz6/djwUAFQKXSt/S1mja/qYh2iARVBCuch38aNzx+LaUa2NSJXsq9rD1s2G2v
+    1fN2D807iDginWyTmsQ9v4IbZT+mD12q/OWyFcq1rca8PdCE6OoGcrBNOTJ4vz4R
+    nAuknZoh8/CbCzB428Hch0P+vGOaysXCHMnHjf87ElgI5rY97HosTvuDls4MPGmH
+    VHOkc8KT/1EQrBVUAdj8BbGJoX90g5pJ19xOe4pIb4tF9g==
+    -----END CERTIFICATE-----"
+
+  # -- Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs
+  jwks: ''
+
+  # -- OIDC client ID used for packages authenticated through authservice
+  client_id: ""
+
+  # -- OIDC client secret used for packages authenticated through authservice
+  client_secret: ""
+
+  # -- OIDC token URL template string (to be used as default)
+  token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
+
+  # -- OIDC auth URL template string (to be used as default)
+  auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
+
+# -- (Advanced) Flux reconciliation parameters.
+# The default values provided will be sufficient for the majority of workloads.
 flux:
-  interval: 1m
+  timeout: 10m
+  interval: 2m
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+    cleanupOnFail: true
   rollback:
-    cleanupOnFail: false
+    timeout: 10m
+    cleanupOnFail: true
 
+# -- Global NetworkPolicies settings
 networkPolicies:
-  controlPlaneCidr: 172.16.0.0/12
-
-logging:
+  # -- Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled`
   enabled: true
+  # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster
+  # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints)
+  # Used by package NetworkPolicies to allow Kube API access
+  controlPlaneCidr: 0.0.0.0/0
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Istio
+#
+istio:
+  # -- Toggle deployment of Istio.
+  enabled: true
+<<<<<<< HEAD
   values:
     elasticsearch:
       master:
@@ -36,84 +233,359 @@ logging:
           max: 1g
     kibana:
       count: 1
+=======
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+    path: "./chart"
+    tag: "1.10.3-bb.1"
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
+
+  # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
+  # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
+  # Besides some ports needed by Istio, only ports 80 and 443 are opened
+  # Ingress gateways that require more configuration can be completed using `istio.values`
+  ingressGateways:
+    public-ingressgateway:
+      type: "LoadBalancer" # or "NodePort"
+      kubernetesResourceSpec: {} # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+
+    # private-ingressgateway:
+    #   type: "LoadBalancer" # or "NodePort"
+    #   kubernetesResourceSpec: # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+    #     serviceAnnotations: # Example for AWS internal load balancer
+    #       service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    #       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+    # passthrough-ingressgateway:
+    #   type: "NodePort" # or "LoadBalancer"
+    #   # Node ports are assigned starting from nodePortBase.  The nodePortBase specifies the start of a range of 4 unused node ports.
+    #   # Node port will be assigned as follows: Port 15021 (Status) = nodePortBase, Port 80 = nodePortBase+1, Port 443 = nodePortBase+2, Port 15443 (SNI) = nodePortBase+3
+    #   # Node port base should be in the range from 30000 to 32764
+    #   nodePortBase: 32000  # Alternatively, the kubernetesResourceSpec can be used to configure all port parameters
+
+  gateways:
+    public:
+      ingressGateway: "public-ingressgateway"
+      hosts:
+      - "*.{{ .Values.hostname }}"
+      tls:
+        key: ""
+        cert: ""
+    # private:
+    #   ingressGateway: "private-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.hostname }}"
+    #   tls:
+    #     key: ""
+    #     cert: ""
+    # passthrough:
+    #   ingressGateway: "passthrough-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.hostname }}"
+    #   tls:
+    #     mode: "PASSTHROUGH"
+
+  # -- Flux reconciliation overrides specifically for the Istio Package
+  flux: {}
+
+  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+istiooperator:
+  # -- Toggle deployment of Istio Operator.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+    path: "./chart"
+    tag: "1.10.3-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Istio Operator Package
+  flux: {}
+
+  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+jaeger:
+  # -- Toggle deployment of Jaeger.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    path: "./chart"
+    tag: "2.23.0-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Jaeger Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SSO for Jaeger on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Jaeger
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Jaeger
+    client_secret: ""
+
+  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+kiali:
+  # -- Toggle deployment of Kiali.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    path: "./chart"
+    tag: "1.39.0-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Kiali Package
+  flux: {}
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SSO for Kiali on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Kiali
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Kiali
+    client_secret: ""
+
+  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Cluster Auditor
+#
+clusterAuditor:
+  # -- Toggle deployment of Cluster Auditor.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+    path: "./chart"
+    tag: "0.3.0-bb.6"
+
+  # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
+  flux: {}
+
+  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# OPA Gatekeeper
+#
+gatekeeper:
+  # -- Toggle deployment of OPA Gatekeeper.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    path: "./chart"
+    tag: "3.5.2-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Logging
+#
+logging:
+  # -- Toggle deployment of Logging (EFK).
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    path: "./chart"
+    tag: "0.1.20-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
+  flux:
+    timeout: 20m
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
+    # Enabling this option will auto-create any required secrets.
+    enabled: true
+
+    # -- Elasticsearch/Kibana OIDC client ID
+    client_id: ""
+
+    # -- Elasticsearch/Kibana OIDC client secret
+    client_secret: ""
+
+  license:
+    # -- Toggle trial license installation of elasticsearch.  Note that enterprise (non trial) is required for SSO to work.
+    trial: false
+
+    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana#enterprise-license
+    keyJSON: ""
+
+  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+eckoperator:
+  # -- Toggle deployment of ECK Operator.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+    path: "./chart"
+    tag: "1.6.0-bb.2"
+
+  # -- Flux reconciliation overrides specifically for the ECK Operator Package
+  flux: {}
+
+  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+  values: {}
 
 fluentbit:
-  values:
-    securityContext:
-      privileged: true
-
-istio:
+  # -- Toggle deployment of Fluent-Bit.
   enabled: true
-  values:
-    kiali:
-      dashboard:
-        auth:
-          strategy: "anonymous"
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+    path: "./chart"
+    tag: "0.16.5-bb.0"
 
-clusterAuditor:
-  enabled: true
-  values:
-    resources:
-      requests:
-        cpu: 100m
-        memory: .5Gi
-      limits: {}
+  # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
+  flux: {}
 
+  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Monitoring
+#
 monitoring:
+  # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true
-  values:
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+    path: "./chart"
+    tag: "14.0.0-bb.9"
+
+  # -- Flux reconciliation overrides specifically for the Monitoring Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SSO for monitoring components on and off
+    enabled: true
     prometheus:
-      prometheusSpec:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-    kube-state-metrics:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 32Mi
-        limits: {}
-    prometheus-node-exporter:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 30Mi
-        limits: {}
+      # -- Prometheus OIDC client ID
+      client_id: ""
 
-gatekeeper:
-  enabled: true
-  values:
-    replicas: 1
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits: {}
-    violations:
-      allowedDockerRegistries:
-        match:
-          excludedNamespaces:
-          # Allows load balancer images for k3d from public repo
-          - istio-system
-      hostNetworking:
-        match:
-          excludedNamespaces:
-          # Allows load balancer containers to map ports for k3d
-          - istio-system
+      # -- Prometheus OIDC client secret
+      client_secret: ""
 
+    alertmanager:
+      # -- Alertmanager OIDC client ID
+      client_id: ""
+
+      # -- Alertmanager OIDC client secret
+      client_secret: ""
+
+    grafana:
+      # -- Grafana OIDC client ID
+      client_id: ""
+
+      # -- Grafana OIDC client secret
+      client_secret: ""
+
+      # -- Grafana OIDC client scopes, comma separated, see https://grafana.com/docs/grafana/latest/auth/generic-oauth/
+      scopes: ""
+
+      allow_sign_up: "true"
+
+      role_attribute_path: "Viewer"
+      # -- Other options available, see package Documentation.
+
+  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Twistlock
+#
 twistlock:
+  # -- Toggle deployment of Twistlock.
   enabled: true
   values:
     console:
       persistence:
         size: 256Mi
 
-# Explicitly enable all addons for CI
+  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+#
+# ----------------------------------------------------------------------------------------------------------------------
+#
 addons:
   argocd:
+    # -- Toggle deployment of ArgoCD.
     enabled: false
+<<<<<<< HEAD
     values:
       controller:
         resources:
@@ -152,9 +624,93 @@ addons:
             cpu: 50m
             memory: 128Mi
           limits: {}
+=======
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+      path: "./chart"
+      tag: "3.6.8-bb.6"
+
+    # -- Flux reconciliation overrides specifically for the ArgoCD Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SSO for ArgoCD on and off
+      enabled: false
+
+      # -- ArgoCD OIDC client ID
+      client_id: ""
+
+      # -- ArgoCD OIDC client secret
+      client_secret: ""
+
+      # -- ArgoCD SSO login text
+      provider_name: ""
+
+      # -- ArgoCD SSO group roles, see docs for more details: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
+      groups: |
+        g, Impact Level 2 Authorized, role:admin
+
+    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
 
   authservice:
+    # -- Toggle deployment of Authservice.
+    # if enabling authservice, a filter needs to be provided by either enabling
+    # sso for monitoring or istio, or manually adding a filter chain in the values here:
+    # values:
+    #   chain:
+    #     minimal:
+    #       callback_uri: "https://somecallback"
     enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+      path: "./chart"
+      tag: "0.4.0-bb.15"
+
+    # -- Flux reconciliation overrides specifically for the Authservice Package
+    flux: {}
+
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+    # -- Additional authservice chain configurations.
+    chains: {}
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Minio Operator and Instance
+  #
+  minioOperator:
+    # -- Toggle deployment of minio operator and instance.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      path: "./chart"
+      tag: "4.1.2-bb.3"
+
+    # -- Flux reconciliation overrides specifically for the Minio Operator Package
+    flux: {}
+
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  minio:
+    # -- Toggle deployment of minio.
+    enabled: false
+<<<<<<< HEAD
     chains:
       minimal:
         callback_uri: "https://minimal.bigbang.dev"
@@ -171,11 +727,58 @@ addons:
         replica:
           persistence:
             size: 256Mi
+=======
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      path: "./chart"
+      tag: "4.1.2-bb.6"
+
+    # -- Flux reconciliation overrides specifically for the Minio Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Default access key to use for minio.
+    accesskey: ""
+
+    # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
+    secretkey: ""
+
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
 
   gitlab:
+    # -- Toggle deployment of Gitlab.
     enabled: false
+
+    hostnames:
+      # host name only without the domain
+      gitlab: gitlab
+      registry: registry
+
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      path: "./chart"
+      tag: "4.12.9-bb.3"
+
+    # -- Flux reconciliation overrides specifically for the Gitlab Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
     sso:
+      # -- Toggle OIDC SSO for Gitlab on and off.
+      # Enabling this option will auto-create any required secrets.
       enabled: false
+<<<<<<< HEAD
     flux:
       timeout: 20m
     values:
@@ -248,18 +851,85 @@ addons:
         slave:
           persistence:
             size: 256Mi      
+=======
+
+      # -- Gitlab OIDC client ID
+      client_id: ""
+
+      # -- Gitlab OIDC client secret
+      client_secret: ""
+
+      # -- Gitlab SSO login button label
+      label: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Gitlab.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: "" # example: gitlab
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    objectStorage:
+      # -- Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used.
+      # Entering connection info will enable this option and will auto-create any required secrets
+      type: "" # supported types are "s3" or "minio"
+
+      # -- S3 compatible endpoint to use for connection information.
+      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- S3 compatible region to use for connection information.
+      region: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket prefix to use for identifying buckets.
+      # Example: "prod" will produce "prod-gitlab-bucket"
+      bucketPrefix: ""
+
+    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
 
   gitlabRunner:
+    # -- Toggle deployment of Gitlab Runner.
     enabled: false
-    values:
-      resources:
-        requests:
-          memory: 64Mi
-          cpu: 50m
-        limits: {}
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+      path: "./chart"
+      tag: "0.29.0-bb.1"
 
-  anchore:
+    # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
+    flux: {}
+
+    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  nexus:
+    # -- Toggle deployment of Nexus.
     enabled: false
+<<<<<<< HEAD
     values:
       ensureDbJobs:
         resources:
@@ -408,12 +1078,153 @@ addons:
           limits: {}
       tests:
         enabled: false
+=======
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+      path: "./chart"
+      tag: "29.1.0-bb.8"
 
-  minioOperator:
-    enabled: false
+    # -- Base64 encoded license file.
+    license_key: ""
 
-  minio:
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SAML SSO for NXRM.
+      # -- handles SAML SSO, a Client must be configured in Keycloak or IdP
+      # -- to complete setup.
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: false
+
+      # -- NXRM SAML SSO Integration data
+      idp_data:
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: ""
+
+        # -- NXRM firstname attribute (optional)
+        firstName: ""
+
+        # -- NXRM lastname attribute (optional)
+        lastName: ""
+
+        # -- NXRM email attribute (optional)
+        email: ""
+
+        # -- NXRM groups attribute (optional)
+        groups: ""
+
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        idpMetadata: ''
+
+      # -- NXRM Role
+      role:
+        id: ""
+        name: ""
+        description: ""
+
+    # -- Flux reconciliation overrides specifically for the Nexus Repository Manager Package
+    flux: {}
+
+    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  sonarqube:
+    # -- Toggle deployment of SonarQube.
+    enabled: true
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      path: "./chart"
+      tag: "9.2.6-bb.16"
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
+
+    # -- Flux reconciliation overrides specifically for the Sonarqube Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SAML SSO for SonarQube.
+      # Enabling this option will auto-create any required secrets.
+      enabled: true
+
+      # -- SonarQube SAML client ID
+      client_id: ""
+
+      # -- SonarQube SSO login button label
+      label: ""
+
+      # -- SonarQube plaintext SAML sso certificate.
+      # example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
+      certificate: ""
+
+      # -- SonarQube login sso attribute.
+      login: login
+
+      # -- SonarQube name sso attribute.
+      name: name
+
+      # -- SonarQube email sso attribute.
+      email: email
+
+      # -- (optional) SonarQube group sso attribute.
+      group: group
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for SonarQube.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for SonarQube.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  haproxy:
+    # -- Toggle deployment of HAProxy.
     enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
+      path: "./chart"
+      tag: 1.1.2-bb.1
+
+    # -- Flux reconciliation overrides specifically for the HAProxy Package
+    flux: {}
+
+        # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  anchore:
+    # -- Toggle deployment of Anchore.
+    enabled: false
+<<<<<<< HEAD
     values:
       upgradeTenants:
         enabled: true
@@ -425,13 +1236,198 @@ addons:
         - servers: 1
           volumesPerServer: 4
           size: 256Mi
+=======
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      path: "./chart"
+      tag: "1.13.0-bb.7"
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
 
+    # -- Flux reconciliation overrides specifically for the Anchore Package
+    flux:
+      upgrade:
+        disableWait: true
+
+    # -- Initial admin password used to authenticate to Anchore.
+    adminPassword: ""
+
+    # -- Anchore Enterprise functionality.
+    enterprise:
+      # -- Toggle the installation of Anchore Enterprise.  This must be accompanied by a valid license.
+      enabled: false
+
+      # -- License for Anchore Enterprise.
+      # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
+      licenseYaml: |
+        FULL LICENSE
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Anchore on and off.
+      # Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license).
+      enabled: false
+
+      # -- Anchore OIDC client ID
+      client_id: ""
+
+      # -- Anchore OIDC client role attribute
+      role_attribute: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Anchore.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Anchore.
+      port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+      # -- Database name to connect to on host (Note: database name CANNOT contain hyphens).
+      database: ""
+
+      # -- Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens).
+      # Only required for enterprise edition of anchore.
+      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#handling-dependencies
+      feeds_database: ""
+
+    redis:
+      # -- Hostname of a pre-existing Redis to use for Anchore Enterprise.
+      # Entering connection info will enable external redis and will auto-create any required secrets.
+      # Anchore only requires redis for enterprise deployments and will not provision an instance if using external
+      host: ""
+
+      # -- Port of a pre-existing Redis to use for Anchore Enterprise.
+      port: ""
+
+      # -- OPTIONAL: Username to connect to a pre-existing Redis (for password-only auth leave empty)
+      username: ""
+
+      # -- Password to connect to pre-existing Redis.
+      password: ""
+
+    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Mattermost Operator and Instance
+  #
   mattermostoperator:
     enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      path: "./chart"
+      tag: "1.14.0-bb.4"
+
+    # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
+    flux: {}
+
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
 
   mattermost:
+    # -- Toggle deployment of Mattermost.
     enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      path: "./chart"
+      tag: "0.2.0-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Mattermost Package
+    flux: {}
+
+    # -- Mattermost Enterprise functionality.
+    enterprise:
+      # -- Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install.
+      enabled: false
+
+      # -- License for Mattermost.
+      # This should be the entire contents of the license file from Mattermost (should be one line), example below
+      # license: "eyJpZCI6InIxM205bjR3eTdkYjludG95Z3RiOD---REST---IS---HIDDEN
+      license: ""
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Mattermost on and off.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- Mattermost OIDC client ID
+      client_id: ""
+
+      # -- Mattermost OIDC client secret
+      client_secret: ""
+
+      # -- Mattermost OIDC auth endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      auth_endpoint: ""
+
+      # -- Mattermost OIDC token endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      token_endpoint: ""
+
+      # -- Mattermost OIDC user API endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      user_api_endpoint: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Mattermost.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Mattermost.
+      port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- SSL Mode to use when connecting to the database.
+      # Allowable values for this are viewable in the postgres documentation: https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
+      ssl_mode: ""
+
+    objectStorage:
+      # -- S3 compatible endpoint to use for connection information.
+      # Entering connection info will enable this option and will auto-create any required secrets.
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket name to use for Mattermost - will be auto-created.
+      bucket: ""
+
+    # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
+    # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
+    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
     elasticsearch:
+<<<<<<< HEAD
       enabled: true
     values:
       postgresql:
@@ -470,51 +1466,85 @@ addons:
           requests:
             cpu: 100m
             memory: 1500Mi
+=======
+      # -- Toggle interaction with Elastic for optimized search indexing
+      enabled: false
+
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+>>>>>>> 8c300721 (issue 673 changing test to reflect changes)
 
   velero:
+    # -- Toggle deployment of Velero.
     enabled: false
-    plugins:
-    - aws
-    values:
-      # Set provider name and backup storage location bucket name
-      configuration:
-        provider: aws
-        # TODO: Bucket for this
-        backupStorageLocation:
-          bucket: bigbang-dogfood-velero
-          prefix: ci
-      #    config:
-      #      region: us-west-1
-      #      profile: test
-      #  volumeSnapshotLocation:
-      #    provider: aws
-      #    config:
-      #      bucket: velero
-      #      region: us-west-1
 
-      # schedules:
-      #  mybackup:
-      #    labels:
-      #      myenv: foo
-      #    schedule: "0 0 * * *"
-      #    template:
-      #      ttl: "240h"
-      #      includedNamespaces:
-      #        - foo
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+      path: "./chart"
+      tag: "2.23.5-bb.1"
 
-      # Set a service account so that the CRD clean up job has proper permissions to delete CRDs
-      serviceAccount:
-        server:
-          name: velero
+    # -- Flux reconciliation overrides specifically for the Velero Package
+    flux: {}
 
+    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi 
+    plugins: []
+    # - aws
+
+    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+  #
+  # ----------------------------------------------------------------------------------------------------------------------
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Keycloak
+  #
   keycloak:
+    # -- Toggle deployment of Keycloak.
+    # if you enable Keycloak you should uncomment the istio passthrough configurations above
+      # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      path: "./chart"
+      tag: "11.0.1-bb.2"
+
+    database:
+      # -- Hostname of a pre-existing database to use for Keycloak.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Pre-existing database type (e.g. postgres) to use for Keycloak.
+      type: postgres
+
+      # -- Port of a pre-existing database to use for Keycloak.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: "" # example: keycloak
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
-      gateway: "public"
-    values:
-      replicas: 1
-      resources:
-        requests:
-          cpu: 10m
-          memory: 16Mi
-        limits: {}
+      # the istio gateway for keycloak must have tls.mode: PASSTHROUGH
+      gateway: "passthrough"
+      # -- Certificate/Key pair to use as the certificate for exposing Keycloak
+      # Setting the ingress cert here will automatically create the volume and volumemounts in the Keycloak Package chart
+      key: ""
+      cert: ""
+
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+    values: {}
