@@ -754,7 +754,7 @@ addons:
       client_id: ""
 
       # -- SonarQube SSO login button label
-      label: ""
+      provider_name: ""
 
       # -- SonarQube plaintext SAML sso certificate.
       # example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
