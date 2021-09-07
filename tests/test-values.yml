@@ -15,3 +15,16 @@ bbtests:
 
 networkPolicies:
   enabled: true
+  
+nexus:
+  # values matched with bigbang k3d/values.yaml
+  env:
+    - name: install4jAddVmParams
+      value: "-Xms1024M -Xmx1024M -XX:MaxDirectMemorySize=1024G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+  resources:
+    requests:
+      cpu: 1
+      memory: 3000Mi
+    limits:
+      cpu: 1
+      memory: 3000Mi  
