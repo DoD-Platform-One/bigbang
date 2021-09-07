@@ -29,7 +29,7 @@ sonarProperties:
   sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
   sonar.core.serverBaseURL: https://sonarqube.{{ .Values.hostname }}
   sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
-  sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.label }}
+  sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.provider_name | default .Values.addons.sonarqube.sso.label }}
   sonar.auth.saml.providerId: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
   sonar.auth.saml.loginUrl: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml
   sonar.auth.saml.certificate.secured: {{ .Values.addons.sonarqube.sso.certificate }}
