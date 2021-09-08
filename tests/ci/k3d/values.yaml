@@ -15,7 +15,7 @@ logging:
       master:
         count: 1
         persistence:
-          size: 5Gi
+          size: 256Mi
         resources:
           requests:
             cpu: .5
@@ -26,7 +26,7 @@ logging:
       data:
         count: 2
         persistence:
-          size: 5Gi
+          size: 256Mi
         resources:
           requests:
             cpu: .5
@@ -108,7 +108,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 5Gi
+        size: 256Mi
 
 # Explicitly enable all addons for CI
 addons:
@@ -127,6 +127,13 @@ addons:
             cpu: 10m
             memory: 128Mi
           limits: {}
+      redis-bb:
+        master:
+          persistence:
+            size: 256Mi
+        replica:
+          persistence:
+            size: 256Mi
       redis:
         resources:
           requests:
@@ -157,6 +164,13 @@ addons:
           cpu: 100m
           memory: 100Mi
         limits: {}
+      redis:
+        master:
+          persistence:
+            size: 256Mi
+        replica:
+          persistence:
+            size: 256Mi
 
   gitlab:
     enabled: false
@@ -185,6 +199,8 @@ addons:
           minReplicas: 1
           maxReplicas: 1
         gitaly:
+          persistence:
+            size: 256Mi
           resources:
             requests:
               cpu: 50m
@@ -200,6 +216,8 @@ addons:
               cpu: 10m
             limits: {}
         task-runner:
+          persistence:
+            size: 256Mi
           resources:
             requests:
               cpu: 10m
@@ -209,16 +227,27 @@ addons:
           minReplicas: 1
           maxReplicas: 1
       postgresql:
+        persistence:
+          size: 256Mi
         metrics:
           resources:
             requests:
               cpu: 10m
             limits: {}
       minio:
+        persistence:
+          size: 256Mi
         resources:
           requests:
             cpu: 50m
           limits: {}
+      redis:
+        master:
+          persistence:
+            size: 256Mi
+        slave:
+          persistence:
+            size: 256Mi      
 
   gitlabRunner:
     enabled: false
@@ -245,6 +274,8 @@ addons:
             memory: 200Mi
           limits: {}
       postgresql:
+        persistence:
+          size: 256Mi
         resources:
           requests:
             cpu: 100m
@@ -368,6 +399,8 @@ addons:
         enabled: false
         size: 5Gi
       postgresql:
+        persistence:
+          size: 256Mi     
         resources:
           requests:
             cpu: 100m
@@ -387,6 +420,11 @@ addons:
       zones:
         servers: 1
       volumesPerServer: 1
+      tenants:
+        pools:
+        - servers: 1
+          volumesPerServer: 4
+          size: 256Mi
 
   mattermostoperator:
     enabled: false
@@ -396,6 +434,9 @@ addons:
     elasticsearch:
       enabled: true
     values:
+      postgresql:
+        persistence:
+          size: 256Mi
       replicaCount: 1
       resources:
         requests:
@@ -408,13 +449,18 @@ addons:
         zones:
           servers: 1
         volumesPerServer: 1
+        tenants:
+          pools:
+          - servers: 1
+            volumesPerServer: 4
+            size: 256Mi
 
   nexus:
     enabled: false
     values:
       persistence:
         # Do NOT set this below 4Gi, nexus will fail to boot
-        storageSize: 10Gi
+        storageSize: 4Gi
       nexus:
       # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
         env:
