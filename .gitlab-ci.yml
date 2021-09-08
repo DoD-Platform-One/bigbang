@@ -275,7 +275,7 @@ aws/rke2/bigbang up:
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   retry:
-    max: 3
+    max: 2
     when:
       - stuck_or_timeout_failure
       - runner_system_failure
@@ -303,7 +303,7 @@ aws/rke2/bigbang test:
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   retry:
-    max: 3
+    max: 2
     when:
       - stuck_or_timeout_failure
       - runner_system_failure
