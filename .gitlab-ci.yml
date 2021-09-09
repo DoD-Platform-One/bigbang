@@ -206,7 +206,6 @@ aws/network up:
     max: 2
     when:
       - unknown_failure
-      - script_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
@@ -223,7 +222,6 @@ aws/network down:
     max: 2
     when:
       - unknown_failure
-      - script_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
@@ -250,7 +248,6 @@ aws/rke2/cluster up:
     max: 2
     when:
       - unknown_failure
-      - script_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
@@ -346,7 +343,6 @@ aws/rke2/cluster down:
     max: 2
     when:
       - unknown_failure
-      - script_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
