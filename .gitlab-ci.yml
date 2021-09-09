@@ -274,6 +274,7 @@ aws/rke2/bigbang up:
   retry:
     max: 2
     when:
+      - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
@@ -302,6 +303,7 @@ aws/rke2/bigbang test:
   retry:
     max: 2
     when:
+      - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
 
