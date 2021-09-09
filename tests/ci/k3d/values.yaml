@@ -460,7 +460,7 @@ addons:
     values:
       persistence:
         # Do NOT set this below 4Gi, nexus will fail to boot
-        storageSize: 4Gi
+        storageSize: 5Gi
       nexus:
       # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
         env:
