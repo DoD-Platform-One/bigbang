@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.anchore" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
@@ -33,7 +36,7 @@ enterpriseLicenseYaml: |
 sso:
   enabled: {{ .Values.addons.anchore.sso.enabled }}
   spEntityId: {{ .Values.addons.anchore.sso.client_id }}
-  acsUrl: "https://anchore.{{ .Values.hostname }}/service/sso/auth/keycloak"
+  acsUrl: "https://anchore.{{ $domainName }}/service/sso/auth/keycloak"
   idpMetadataUrl: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml/descriptor"
   roleAttribute: {{ .Values.addons.anchore.sso.role_attribute }}
   {{- end }}

@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.argocd" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 createNamespace: false
 

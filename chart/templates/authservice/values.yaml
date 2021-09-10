@@ -3,6 +3,9 @@
 {{- end }}
 
 {{- define "bigbang.defaults.authservice" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+
 imagePullSecrets:
   - name: private-registry
 
@@ -61,7 +64,7 @@ chains:
     callback_uri: https://{{ range .Values.jaeger.values.istio.jaeger.hosts }}{{ tpl . $}}{{ end }}/login
     {{- else }}
       prefix: "tracing"
-    callback_uri: https://tracing.{{ .Values.hostname }}/login
+    callback_uri: https://tracing.{{ $domainName }}/login
     {{- end }}
     client_id: "{{ .Values.jaeger.sso.client_id }}"
     client_secret: "{{ .Values.jaeger.sso.client_secret }}"
@@ -79,7 +82,7 @@ chains:
     callback_uri: https://{{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}/login/generic_oauth
     {{- else }}
       prefix: "prometheus"
-    callback_uri: https://prometheus.{{ .Values.hostname }}/login/generic_oauth
+    callback_uri: https://prometheus.{{ $domainName }}/login/generic_oauth
     {{- end }}
     client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
     client_secret: "{{ .Values.monitoring.sso.prometheus.client_secret }}"
@@ -93,7 +96,7 @@ chains:
     callback_uri: https://{{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}/login/generic_oauth
     {{- else }}
       prefix: "alertmanager"
-    callback_uri: https://alertmanager.{{ .Values.hostname }}/login/generic_oauth
+    callback_uri: https://alertmanager.{{ $domainName }}/login/generic_oauth
     {{- end }}
     client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
     client_secret: "{{ .Values.monitoring.sso.alertmanager.client_secret }}"

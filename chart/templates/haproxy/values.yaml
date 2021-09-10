@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.haproxy-sso" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 istio:
   gateway: {{ default "public" .Values.addons.haproxy.ingress.gateway }}
@@ -75,12 +78,12 @@ config: |
     {{- if hasKey $alertmanagerHostValues "hosts" }}
     acl host_alertmanager hdr(host) -i {{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}
     {{- else }}
-    acl host_alertmanager hdr(host) -i alertmanager.{{ .Values.hostname }}
+    acl host_alertmanager hdr(host) -i alertmanager.{{ $domainName }}
     {{- end }}
     {{- if hasKey $prometheusHostValues "hosts" }}
     acl host_prometheus hdr(host) -i {{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}
     {{- else }}
-    acl host_prometheus hdr(host) -i prometheus.{{ .Values.hostname }}
+    acl host_prometheus hdr(host) -i prometheus.{{ $domainName }}
     {{- end }}
 
     option forwardfor
