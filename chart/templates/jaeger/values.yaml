@@ -5,7 +5,12 @@
 {{- define "bigbang.defaults.jaeger" -}}
 imagePullSecrets:
   - name: private-registry
-hostname: {{ .Values.hostname }}
+
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   jaeger:

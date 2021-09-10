@@ -3,7 +3,6 @@
 {{- end }}
 
 {{- define "bigbang.defaults.velero" -}}
-hostname: {{ .Values.hostname }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}

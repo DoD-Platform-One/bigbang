@@ -150,3 +150,10 @@ PLATFORM ONE MATTERMOST WARNING:
   Make sure to go back and edit your values or ensure you add the license through the mattermost settings page.
 {{- end }}
 {{- end }}
+
+{{- if .Values.hostname }}
+DEPRECATION NOTICE:
+  The top level yaml key "hostname" has been deprecated and replaced with "domain". 
+  Please update your values override to use the "domain" key.
+{{- end }}
+

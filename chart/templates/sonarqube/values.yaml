@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.sonarqube" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
@@ -27,7 +30,7 @@ image:
 {{- if .Values.addons.sonarqube.sso.enabled }}
 sonarProperties:
   sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
-  sonar.core.serverBaseURL: https://sonarqube.{{ .Values.hostname }}
+  sonar.core.serverBaseURL: https://sonarqube.{{ $domainName }}
   sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
   sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.provider_name | default .Values.addons.sonarqube.sso.label }}
   sonar.auth.saml.providerId: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}

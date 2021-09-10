@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kiali" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift}}
 
@@ -39,7 +42,7 @@ cr:
       grafana:
         enabled: {{ dig "grafana" "enabled" true .Values.monitoring.values }}
         {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.monitoring.values) }}
-        url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" .Values.hostname)) . }}
+        url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
         {{- if (dig "grafana" "enabled" true .Values.monitoring.values) }}
         auth:
           {{- if (dig "grafana" "admin" "existingSecret" "" .Values.monitoring.values) }}
@@ -55,7 +58,7 @@ cr:
       tracing:
         enabled: {{ .Values.jaeger.enabled }}
         {{- $tracingUrl := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
-        url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" .Values.hostname)) . }}
+        url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
       istio:
         component_status:
           components:

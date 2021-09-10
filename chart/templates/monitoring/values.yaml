@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.monitoring" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 flux:
   enabled: true
@@ -61,7 +64,7 @@ grafana:
   grafana.ini:
     {{- if .Values.istio.enabled }}
     server:
-      root_url: https://grafana.{{ .Values.hostname }}/
+      root_url: https://grafana.{{ $domainName }}/
     {{- end }}
 
     auth:

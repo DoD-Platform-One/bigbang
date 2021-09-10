@@ -1,5 +1,5 @@
 # -- Domain used for BigBang created exposed services, can be overridden by individual packages.
-hostname: bigbang.dev
+domain: bigbang.dev
 
 # -- (experimental) Toggle sourcing from external repos.
 # All this does right now is toggle GitRepositories, it is _not_ fully functional
@@ -140,21 +140,21 @@ istio:
     public:
       ingressGateway: "public-ingressgateway"
       hosts:
-      - "*.{{ .Values.hostname }}"
+      - "*.{{ .Values.domain }}"
       tls:
         key: ""
         cert: ""
     # private:
     #   ingressGateway: "private-ingressgateway"
     #   hosts:
-    #   - "*.{{ .Values.hostname }}"
+    #   - "*.{{ .Values.domain }}"
     #   tls:
     #     key: ""
     #     cert: ""
     # passthrough:
     #   ingressGateway: "passthrough-ingressgateway"
     #   hosts:
-    #   - "*.{{ .Values.hostname }}"
+    #   - "*.{{ .Values.domain }}"
     #   tls:
     #     mode: "PASSTHROUGH"
 
