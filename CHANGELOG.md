@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.0.0-bb.1] - 2021-09-13
+### Modified
+- Updated values.yaml with examples of auditing/logging containers
+
 ## [34.0.0-bb.0] - 2021-09-03
 ### Modified
 - Sync with upstream charts 34.0.0 at https://github.com/sonatype/helm3-charts.git

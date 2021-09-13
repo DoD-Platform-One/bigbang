@@ -184,13 +184,21 @@ deployment:
   # # Add init containers. e.g. to be used to give specific permissions for nexus-data.
   # # Add your own init container or uncomment and modify the given example.
   initContainers:
-  # - name: fmp-volume-permission
-    # image: busybox
-    # imagePullPolicy: IfNotPresent
-    # command: ['chown','-R', '200', '/nexus-data']
-    # volumeMounts:
-      # - name: nexus-data
-        # mountPath: /nexus-data
+  # supplying the following will enable additional logging for auditing requirements
+  # must be used in conjunction with the request-log and audit-log additionalContainers
+  #  - name: set-log-dir-permissions
+  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
+  #    command: [/bin/sh]
+  #    args:
+  #      - -c
+  #      - >-
+  #        mkdir -p /nexus-data/log/audit &&
+  #        touch -a /nexus-data/log/audit/audit.log &&
+  #        touch -a /nexus-data/log/request.log &&
+  #        chown -R '200:200' /nexus-data
+  #    volumeMounts:
+  #      - name: nexus-repository-manager-data
+  #        mountPath: /nexus-data
   # # Uncomment and modify this to run a command after starting the nexus container.
   postStart:
     command:    # '["/bin/sh", "-c", "ls"]'
@@ -198,6 +206,20 @@ deployment:
     command:    # '["/bin/rm", "-f", "/path/to/lockfile"]'
   terminationGracePeriodSeconds: 120
   additionalContainers:
+  # supplying the following will enable additional logging for auditing requirements
+  # must be used in conjunction with the set-log-dir-permissions initContainer
+  #  - name: request-log
+  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
+  #    args: [/bin/sh, -c, 'tail -n+1 -f /nexus-data/log/request.log']
+  #    volumeMounts:
+  #      - name: nexus-repository-manager-data
+  #        mountPath: /nexus-data
+  #  - name: audit-log
+  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
+  #    args: [/bin/sh, -c, 'tail -n+1 -f /nexus-data/log/audit/audit.log']
+  #    volumeMounts:
+  #      - name: nexus-repository-manager-data
+  #        mountPath: /nexus-data
   additionalVolumes:
   additionalVolumeMounts:
 
