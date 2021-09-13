@@ -27,8 +27,8 @@
 base/                           @michaelmcleroy @micah.nagel @ryan.j.garcia
 
 ^[CI Owners]
-.gitlab-ci/                     @toladipupo @brandencobb
-tests/                          @toladipupo @brandencobb
+.gitlab-ci/                     @toladipupo @brandencobb @evan.rush
+tests/                          @toladipupo @brandencobb @evan.rush
 
 ^[Hack Owners]
 scripts/                        @toladipupo @michaelmcleroy @egoode
@@ -94,9 +94,9 @@ chart/values.yaml               @lynnstill @ryan.j.garcia @kevin.wilder
 chart/templates/gitlab          @lynnstill @ryan.j.garcia @kevin.wilder
 
 ^[KeyCloak]
-chart/Chart.yaml                @megamind @kevin.wilder @michaelmcleroy
-chart/values.yaml               @megamind @kevin.wilder @michaelmcleroy
-chart/templates/keycloak        @megamind @kevin.wilder @michaelmcleroy
+chart/Chart.yaml                @megamind @kevin.wilder @michaelmcleroy @zacw
+chart/values.yaml               @megamind @kevin.wilder @michaelmcleroy @zacw
+chart/templates/keycloak        @megamind @kevin.wilder @michaelmcleroy @zacw
 
 ^[Kiali]
 chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
