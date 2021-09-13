@@ -117,6 +117,33 @@ function wait_daemonset(){
    done
 }
 
+# Check for and run the wait_project function within <repo>/tests/wait.sh to wait for custom resources
+function wait_crd(){
+  set +e
+  yq e '. | keys | .[] | ... comments=""' "chart/values.yaml" | while IFS= read -r package; do
+    if [[ "$(yq e ".${package}.enabled" "chart/values.yaml")" == "true" ]]; then
+      gitrepo=$(yq e ".${package}.git.repo" "chart/values.yaml")
+      version=$(yq e ".${package}.git.tag" "chart/values.yaml")
+      if [[ -z "$version" ]]; then
+        version=$(yq e ".${package}.git.branch" "chart/values.yaml")
+      fi
+      if [[ -z "$version" || "$version" == "null" ]]; then
+        continue
+      fi
+      printf "Checking for tests/wait.sh in %s:%s... " ${package} ${version}
+      if curl -f "${gitrepo%.git}/-/raw/${version}/tests/wait.sh?inline=false" 1>${package}.wait.sh 2>/dev/null; then
+        printf "found, running\n"
+        . ./${package}.wait.sh
+        wait_project
+      else
+        printf "not found\n"
+      fi
+    fi
+  done
+  set -e
+}
+
+
 ## Append all add-ons to hr list if "all-packages" or default branch/tag. Else, add specific ci labels to hr list.
 HELMRELEASES=(${CORE_HELMRELEASES[@]})
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
@@ -150,6 +177,8 @@ done
 
 echo "Waiting on helm releases..."
 wait_all_hr
+echo "Waiting for custom resources..."
+wait_crd
 
 kubectl get helmreleases,kustomizations,gitrepositories -A
 
