@@ -115,7 +115,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.10.4-bb.1"
+    tag: "1.10.4-bb.3"
 
   # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
   # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
@@ -516,7 +516,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.15"
+      tag: "0.4.0-bb.16"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
