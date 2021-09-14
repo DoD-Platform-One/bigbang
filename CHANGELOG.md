@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.15.3]
+
+* [!887](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/887): Twistlock Network Policy & BigBang/Package value `networkPolicies.nodeCidr` for defender to console communication
+
 ## [1.15.2]
 
 * [!846](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/846): Istio-cni hub correction to point to valid repo in registry1 & Add install-cni image to synker.yaml for air-gapped environments
