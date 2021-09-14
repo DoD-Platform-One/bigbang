@@ -102,7 +102,7 @@ cr:
       logger:
         log_level: info
       resources:
-        resuests:
+        requests:
           cpu: 200m
           memory: 368Mi
         limits:
