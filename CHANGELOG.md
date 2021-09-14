@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.15.3]
 
 * [!887](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/887): Twistlock Network Policy & BigBang/Package value `networkPolicies.nodeCidr` for defender to console communication
+* [!852](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/852): Adding violation exceptions to stop Gatekeeper blocking twistlock console deployment
+* [!890](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/890): Adding violation exception for twistlock-defenders to use selinux `spc_t` settings
 
 ## [1.15.2]
 
