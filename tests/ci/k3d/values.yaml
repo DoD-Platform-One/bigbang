@@ -415,8 +415,6 @@ addons:
   minio:
     enabled: false
     values:
-      upgradeTenants:
-        enabled: true
       zones:
         servers: 1
       volumesPerServer: 1
@@ -444,8 +442,6 @@ addons:
           memory: 128Mi
         limits: {}
       minio:
-        upgradeTenants:
-          enabled: true
         zones:
           servers: 1
         volumesPerServer: 1
