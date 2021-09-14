@@ -101,6 +101,10 @@ networkPolicies:
   # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints)
   # Used by package NetworkPolicies to allow Kube API access
   controlPlaneCidr: 0.0.0.0/0
+  # -- Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks.
+  # use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range.
+  # Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs)
+  nodeCidr: ""
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
