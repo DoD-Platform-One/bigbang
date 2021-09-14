@@ -109,12 +109,20 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     {{- end }}
   {{- end }}
 
-  {{- if .Values.logging.enabled }}
+  {{- if or .Values.logging.enabled .Values.twistlock.enabled }}
   selinuxPolicy:
+    {{- if .Values.logging.enabled }}
     match:
       excludedNamespaces:
         # FluentBit needs selinux option type spc_t
         - logging
+    {{- end }}
+    {{- if .Values.twistlock.enabled }}
+    parameters:
+      excludedResources:
+        # Twistlock Defenders need selinux option type spc_t
+        - twistlock/twistlock-defender
+    {{- end }}
   {{- end }}
 
   {{- if or .Values.fluentbit.enabled (or .Values.twistlock.enabled .Values.monitoring.enabled) }}
