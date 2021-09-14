@@ -53,6 +53,24 @@ Authservice provides OIDC Single Sign On capabilities for apps that don't have n
 
 Pods just need to have istio-injection, a single label which by default is `protect=keycloak` applied to the pods, and a corresponding chain to load into authservice.
 
+```yaml
+spec:
+  template:
+    metadata:
+      labels:
+        protect: keycloak
+```
+
+If you need to guarantee that authservice protects everything behind istio-ingressgateway, you can label ingressgateway instead of individual applications.
+
+```yaml
+istio:
+  ingressGateways:
+    public-ingressgateway:
+      extraLabels:
+        protect: keycloak
+```
+
 This label can be adjusted via following values in the Big Bang chart:
 
 ```yaml
