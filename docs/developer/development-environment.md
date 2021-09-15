@@ -315,11 +315,11 @@ docker network inspect k3d-k3s-default | jq .[0].IPAM.Config[0]
   - If my output looks like:
   ```json
   {
-    "Subnet": "172.21.0.0/16",
-    "Gateway": "172.21.0.1"
+    "Subnet": "172.18.0.0/16",
+    "Gateway": "172.18.0.1"
   }
   ```
-  - Then the addresses I want to input for metallb would be `172.21.1.240-172.21.1.243` so that I can reserve 4 IP addresses within the subnet of the Docker Network.
+  - Then the addresses I want to input for metallb would be `172.18.1.240-172.18.1.243` so that I can reserve 4 IP addresses within the subnet of the Docker Network.
 
 3. Before installing BigBang we will need to install and configure [metallb](https://metallb.universe.tf/concepts/)
 
@@ -338,14 +338,16 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 172.21.1.240-172.21.1.243
+      - 172.18.1.240-172.18.1.243
 EOF
 kubectl create -f metallb-config.yaml
 ```
 
   - The commands will create a metallb install and configure it to assign LoadBalancer IPs within the range `172.18.1.240-172.18.1.243` which is within the standard Docker Bridge Network CIDR meaning that the linux network stack will have a route to this network already.
 
-4. Verify LoadBalancers
+4. Deploy BigBang with istio ingress gateways configured.
+
+5. Verify LoadBalancers
 
 ```shell
 kubectl get svc -n istio-system
@@ -362,7 +364,7 @@ passthrough-ingressgateway   LoadBalancer   10.43.173.31   172.18.1.242   15021:
 
   - With the key information here being the assigned `EXTERNAL-IP` sections for the ingressgateways.
 
-5. Update Hosts file on ec2 instance with IPs above
+6. Update Hosts file on ec2 instance with IPs above
 
 ```shell
 sudo vim /etc/hosts
