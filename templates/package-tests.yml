@@ -82,6 +82,43 @@ configuration validation:
         fi
       fi
 
+chart update check:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
+  stage: configuration validation
+  extends:
+    - .bigbang-dogfood
+  rules:
+    # skip job when MR title starts with 'SKIP UPDATE CHECK'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPDATE CHECK/'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage $CI_DEFAULT_BRANCH Checkout"
+    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - cp CHANGELOG.md /tmp/CHANGELOG.md
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout1\r\e[0K"
+    - DEFAULT_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
+    - 'echo "Chart Version: $DEFAULT_BRANCH_VERSION"'
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage MR Checkout"
+    - git reset --hard && git clean -fd
+    - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
+    - MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
+    - 'echo "Chart Version: $MR_BRANCH_VERSION"'
+    - |
+      if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
+        echo -e "\e[31mNOTICE: You need to bump chart version\e[0m"
+        EXIT="true"
+      fi
+      if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ] ;then
+        echo -e "\e[31mNOTICE: You need to update CHANGELOG.md\e[0m"
+        EXIT="true"
+      fi
+      if [ "$EXIT" == "true" ]; then
+        exit 1
+      fi
+
 .k3d-ci:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
   tags:
