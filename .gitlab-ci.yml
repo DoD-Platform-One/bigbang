@@ -1,7 +1,18 @@
+# Bigbang CI pipelines defintiions
+# There are 4 different use-cases/pipelines that are supported by this file:
+#   1) Build and test changes made from a Merge Reuqest using a docker-in-docker (DIND) K3D cluster deployment inside the
+#      gitlab runner.
+#   2) Build and test a commit to the Master branch (default branch) using a AWS created K3S cluster which is deployed
+#       using Terraform
+#   3) Build and test a new release and/or tagged commit using a docker-in-docker (DIND) K3D cluster deployment inside the
+#      gitlab runner.   Once a successful build and test is completed, package the build and perform a release operation.
+#   4) Periodically at a scheduled time, build and test the master branch  using a AWS created K3S cluster which is deployed
+#       using Terraform
+
 # global rules for when pipelines run
 workflow:
   rules:
-    # run pipeline for manual tag events
+    # run pipeline for manual tag events such as a new release
     - if: $CI_COMMIT_TAG
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -10,11 +21,16 @@ workflow:
     # skip pipeline for branches that start with "docs"
     - if: '$CI_COMMIT_REF_NAME =~ /^doc*/i'
       when: never
+    # Enabled CI pipeline testing it commit message contains "test-ci"
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE =~ /.*test-ci.*/i
 
-# include templates
+# Include templates and cluster creation jobs
 include:
   - local: '/.gitlab-ci/templates.yml'
 
+# Pipeline stages
+#  - Smoke tests are executed for all pipelines except scheduled nightly runs.
+#  -
 stages:
   - smoke tests
   - network up
@@ -33,28 +49,15 @@ variables:
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
 
-.bigbang-dogfood:
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-
-.bigbang:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.3
-  extends: .bigbang-dogfood
-  after_script:
-    - kubectl get all -A
-    - kubectl get helmrelease -A
-
 #-----------------------------------------------------------------------------------------------------------------------
-# Pre Stage Jobs
+# Pre Stage Jobs.   This execute before any job is run.
 #
 
 pre vars:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/pre-envs:ubi8.3
   stage: .pre
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
   artifacts:
     reports:
       dotenv: variables.env
@@ -103,6 +106,7 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
+    # Always run a clean installation test unless we are deploying the AWS cluster installation during a scheduled test (nightly master test)
     - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     - *chart_changes
@@ -158,9 +162,7 @@ upgrade:
     when: always
 
 #-----------------------------------------------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Infrastructure: Management Jobs
+# Rules for execution of AWS based K3S cluster deployment:  Infrastructure jobs
 #
 
 # Abstract for job manually triggering infrastructure builds
@@ -189,14 +191,12 @@ upgrade:
       when: always
 
 #-----------------------------------------------------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------------------------------------------------
 # Infrastructure: Networking
 #
 
 aws/network up:
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra fork
     - .network up
   environment:
@@ -211,7 +211,7 @@ aws/network up:
 
 aws/network down:
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra cleanup
     - .network down
   stage: network down
@@ -235,7 +235,7 @@ aws/network down:
 aws/rke2/cluster up:
   stage: cluster up
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra create
     - .rke2 up
   needs:
@@ -255,9 +255,9 @@ aws/rke2/cluster up:
 aws/rke2/bigbang up:
   stage: bigbang up
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra create
-    - .bigbang
+    - .kubectl-output
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -282,9 +282,9 @@ aws/rke2/bigbang up:
 aws/rke2/bigbang test:
   stage: test
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra create
-    - .bigbang
+    - .kubectl-output
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -311,9 +311,9 @@ aws/rke2/bigbang test:
 aws/rke2/bigbang down:
   stage: bigbang down
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra cleanup
-    - .bigbang
+    - .kubectl-output
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -332,7 +332,7 @@ aws/rke2/bigbang down:
 aws/rke2/cluster down:
   stage: cluster down
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
     - .infra cleanup
     - .rke2 down
   needs:
@@ -358,7 +358,7 @@ package:
   stage: package
   image: registry.dso.mil/platform-one/big-bang/bigbang/synker:0.0.3
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
   rules:
     # run job for manual tag events or test-ci::release MRs
     - if: '$CI_COMMIT_TAG || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/'
@@ -406,7 +406,7 @@ release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends:
-    - .bigbang-dogfood
+    - .bigbang-gitlab-runner-tags
   rules:
     # run job for manual tag events or test-ci::release MRs
     - if: '$CI_COMMIT_TAG || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/'

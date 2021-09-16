@@ -8,6 +8,23 @@ include:
   # RKE2 Gitlab CI jobs
   - local: '/.gitlab-ci/jobs/rke2/.gitlab-ci.yml'
 
+#-----------------------------------------------------------------------------------------------------------------------
+# Gitlab Runner tag templates
+#
+
+.bigbang-gitlab-runner-tags:
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+
+.kubectl-output:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.3
+  extends: .bigbang-gitlab-runner-tags
+  after_script:
+    - kubectl get all -A
+    - kubectl get helmrelease -A
+
 .terraformer:
   image:
     name: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/terraform:0.13.5
