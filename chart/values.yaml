@@ -75,7 +75,7 @@ sso:
   auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
 
   # -- Kubernetes Secret containing the sso.certificate_authority value for SSO enabled application namespaces
-  secretName: "tls-ca-sso"
+  secretName: ""
 
 # -- (Advanced) Flux reconciliation parameters.
 # The default values provided will be sufficient for the majority of workloads.
@@ -464,6 +464,7 @@ twistlock:
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
+
 
 #
 # ----------------------------------------------------------------------------------------------------------------------
