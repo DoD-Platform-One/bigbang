@@ -6,6 +6,7 @@
 .rke2 up:
   extends: .rke2 tf
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:rke2_up[collapsed=true]\r\e[0K\e[33;1mRKE2 Up\e[37m"
     # Fetch dependencies
     - apk add bash aws-cli
     # Loop to retry rke2 terraform apply
@@ -23,6 +24,7 @@
         sleep 30
       done
     - mv rke2.yaml ${CI_PROJECT_DIR}/rke2.yaml
+    - echo -e "\e[0Ksection_end:`date +%s`:rke2_up\r\e[0K"
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/rke2.yaml
@@ -32,6 +34,7 @@
     - .rke2 tf
     - .terraform destroy workspace
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:rke2_down[collapsed=true]\r\e[0K\e[33;1mRKE2 Down\e[37m"
     # Loop to retry rke2 terraform destory
     - |
       set -e
@@ -46,3 +49,5 @@
         echo "Attempt failed to destroy will retry in 30 seconds"
         sleep 30
       done
+    - echo -e "\e[0Ksection_end:`date +%s`:rke2_down\r\e[0K"
+

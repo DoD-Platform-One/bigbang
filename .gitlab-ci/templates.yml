@@ -22,8 +22,12 @@ include:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k8s-ci:v1.20.4-bb.3
   extends: .bigbang-gitlab-runner-tags
   after_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:kubectl_get_all[collapsed=true]\r\e[0K\e[33;1mkubectl get all -A\e[37m"
     - kubectl get all -A
+    - echo -e "\e[0Ksection_end:`date +%s`:kubectl_get_all\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:kubectl_get_helmrelease[collapsed=true]\r\e[0K\e[33;1mkubectl get helmrelease -A\e[37m"
     - kubectl get helmrelease -A
+    - echo -e "\e[0Ksection_end:`date +%s`:kubectl_get_helmrelease\r\e[0K"
 
 .terraformer:
   image:
@@ -36,6 +40,7 @@ include:
     TF_IN_AUTOMATION: "1"
     TF_VAR_ci_pipeline_url: $CI_PIPELINE_URL
   before_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:terraform_init[collapsed=true]\r\e[0K\e[33;1mTerraform Init\e[37m"
     - echo "$TF_VAR_env"
     - cd ${CI_PROJECT_DIR}/${TF_ROOT}
     - terraform version
@@ -54,9 +59,11 @@ include:
         sleep 5
       done
     - terraform validate
+    - echo -e "\e[0Ksection_end:`date +%s`:terraform_init\r\e[0K"
 
 .terraform destroy workspace:
   after_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:terraform_destroy_workspace[collapsed=true]\r\e[0K\e[33;1mTerraform Destroy Workspace\e[37m"
     - cd ${CI_PROJECT_DIR}/${TF_ROOT}
     # Loop to retry terraform workspace destory
     - |
@@ -72,3 +79,4 @@ include:
         echo "Attempt failed to destroy workspace will retry in 30 seconds"
         sleep 30
       done
+    - echo -e "\e[0Ksection_end:`date +%s`:terraform_destroy_workspace\r\e[0K"
