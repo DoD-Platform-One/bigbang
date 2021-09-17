@@ -31,7 +31,7 @@ EOF
 }
 
 module "rke2" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v1.1.8"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v1.1.9"
 
   cluster_name          = local.name
   vpc_id                = var.vpc_id
@@ -63,7 +63,7 @@ EOF
 }
 
 module "generic_agents" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v1.1.8"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v1.1.9"
 
   name                = "generic-agent"
   vpc_id              = var.vpc_id
