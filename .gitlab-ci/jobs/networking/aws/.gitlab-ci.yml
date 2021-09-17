@@ -13,6 +13,7 @@
 .network up:
   extends: .network
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:network_up[collapsed=true]\r\e[0K\e[33;1mNetwork Up\e[37m"  
     - *calc_unique_cidr
     - echo "Creating network with cidr range ${TF_VAR_vpc_cidr}"
     # Loop to retry network up terraform apply due to issues locking terraform.state in s3
@@ -29,12 +30,14 @@
         echo "Attempt failed to apply will retry in 30 seconds"
         sleep 30
       done
+    - echo -e "\e[0Ksection_end:`date +%s`:network_up\r\e[0K"    
 
 .network down:
   extends:
     - .network
     - .terraform destroy workspace
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:network_down[collapsed=true]\r\e[0K\e[33;1mNetwork Down\e[37m"
     - *calc_unique_cidr
     - echo "Destroying network"
     # Loop to retry network terraform destory
@@ -51,3 +54,4 @@
         echo "Attempt failed to destroy will retry in 30 seconds"
         sleep 30
       done
+    - echo -e "\e[0Ksection_end:`date +%s`:network_down\r\e[0K"

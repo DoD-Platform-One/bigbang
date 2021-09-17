@@ -86,8 +86,9 @@ pre vars:
     set -e
     for deploy_script in $(find ./tests/deploy -type f -name '*.sh' | sort); do
       chmod +x ${deploy_script}
-      echo "Executing ${deploy_script}..."
+      echo -e "\e[0Ksection_start:`date +%s`:${deploy_script##*/}[collapsed=true]\r\e[0K\e[33;1m${deploy_script##*/}\e[37m"  
       ./${deploy_script}
+      echo -e "\e[0Ksection_end:`date +%s`:${deploy_script##*/}\r\e[0K"
     done
 
 .test_bigbang: &test_bigbang
@@ -95,8 +96,9 @@ pre vars:
     set -e
     for test_script in $(find ./tests/tests -type f -name '*.sh' | sort); do
       chmod +x ${test_script}
-      echo "Executing ${test_script}..."
+      echo -e "\e[0Ksection_start:`date +%s`:${test_script##*/}[collapsed=true]\r\e[0K\e[33;1m${test_script##*/}\e[37m"        
       ./${test_script}
+      echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
     done
 
 clean install:
@@ -115,9 +117,11 @@ clean install:
     - *test_bigbang
 
     # Fetch list of all images ran (retry crictl up to 6x)
+    - echo -e "\e[0Ksection_start:`date +%s`:images_used[collapsed=true]\r\e[0K\e[33;1mImages Used\e[37m"
     - cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
     - images=$(timeout 65 bash -c "until docker exec $cid crictl images -o json; do sleep 10; done;")
     - echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
+    - echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
   artifacts:
     paths:
       - images.txt
@@ -146,12 +150,16 @@ upgrade:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
     - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
+    - echo -e "\e[0Ksection_start:`date +%s`:git_master[collapsed=true]\r\e[0K\e[33;1mGit Fetch Master\e[37m"  
     - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - echo -e "\e[0Ksection_end:`date +%s`:git_master\r\e[0K"
     - *deploy_bigbang
     - *test_bigbang
     - echo "Upgrade Big Bang from ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
+    - echo -e "\e[0Ksection_start:`date +%s`:git_upgrade[collapsed=true]\r\e[0K\e[33;1mGit Upgrade\e[37m"    
     - git reset --hard && git clean -fd
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - echo -e "\e[0Ksection_end:`date +%s`:git_upgrade\r\e[0K"
     - *deploy_bigbang
     - *test_bigbang
   artifacts:
@@ -295,8 +303,10 @@ aws/rke2/bigbang test:
   script:
     ## Move this yum install to the dockerfile for the builder
     ## putting it here now for a quick way to install dig
+    - echo -e "\e[0Ksection_start:`date +%s`:host_setup[collapsed=true]\r\e[0K\e[33;1mHost Setup\e[37m"
     - yum install bind-utils -y
     - ./scripts/hosts.sh
+    - echo -e "\e[0Ksection_end:`date +%s`:host_setup\r\e[0K"
     - *test_bigbang
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -371,6 +381,7 @@ package:
         --arg registry1_auth ${REGISTRY1_AUTH} \
         --arg il2_registry_auth ${IL2_REGISTRY_AUTH} > /root/.docker/config.json
   script:
+    - echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker Pull\e[37m"
     - cp ./scripts/package/synker.yaml ./synker.yaml
     # Populate images list in synker config
     - |
@@ -378,6 +389,7 @@ package:
         yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
       done
     - synker pull -b=1
+    - echo -e "\e[0Ksection_end:`date +%s`:synker_pull\r\e[0K"
     # Create image list from synker, overwrite since ./synker.yaml contains everything at this point
     - yq e '.source.images | .[] | ... comments=""' "./synker.yaml" > images.txt
     # Tar up synker as well?
@@ -385,11 +397,17 @@ package:
     # Grab the registry image
     - crane pull registry:2 registry.tar
     - mv registry.tar /var/lib/registry/
+    - echo -e "\e[0Ksection_start:`date +%s`:package_synker[collapsed=true]\r\e[0K\e[33;1mPackage Images\e[37m"
     - tar -C /var/lib/registry -czvf $IMAGE_PKG .
+    - echo -e "\e[0Ksection_end:`date +%s`:package_synker\r\e[0K"
+    - echo -e "\e[0Ksection_start:`date +%s`:unpack_images[collapsed=true]\r\e[0K\e[33;1mUnpack Images\e[37m"
     - tar -czvf $IMAGE_PKG /var/lib/registry
+    - echo -e "\e[0Ksection_end:`date +%s`:unpack_images\r\e[0K"
     # Package dependent repos
+    - echo -e "\e[0Ksection_start:`date +%s`:package_repos[collapsed=true]\r\e[0K\e[33;1mPackage Repos\e[37m"
     - ./scripts/package/gits.sh
     - tar -czf $REPOS_PKG repos/
+    - echo -e "\e[0Ksection_end:`date +%s`:package_repos\r\e[0K"
     # Prep release
     - mkdir -p release
     - mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
