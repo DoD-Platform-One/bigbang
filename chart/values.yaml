@@ -74,6 +74,9 @@ sso:
   # -- OIDC auth URL template string (to be used as default)
   auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
 
+  # -- Kubernetes Secret containing the sso.certificate_authority value for SSO enabled application namespaces
+  secretName: "tls-ca-sso"
+
 # -- (Advanced) Flux reconciliation parameters.
 # The default values provided will be sufficient for the majority of workloads.
 flux:
@@ -461,6 +464,7 @@ twistlock:
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
+
 
 #
 # ----------------------------------------------------------------------------------------------------------------------
