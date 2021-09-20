@@ -30,9 +30,10 @@
     - echo -e "\e[0Ksection_start:`date +%s`:k3d_up[collapsed=true]\r\e[0K\e[33;1mK3D Cluster Create\e[37m"  
     # Give docker-in-docker time to come alive
     - i=0; while [ "$i" -lt 12 ]; do docker info &>/dev/null && break; sleep 5; i=$(( i + 1 )) ; done
-    - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450"
-    - k3d cluster create ${CI_JOB_ID} --config tests/ci/k3d/config.yaml --network ${CI_JOB_ID}
+    - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.20.0.0/16
+    - chmod +x tests/ci/k3d/deploy_k3d.sh; echo "Executing tests/ci/k3d/deploy_k3d.sh..."; ./tests/ci/k3d/deploy_k3d.sh
     - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
+    - chmod +x tests/ci/k3d/metallb/install_metallb.sh; echo "Executing tests/ci/k3d/metallb/install_metallb.sh..."; ./tests/ci/k3d/metallb/install_metallb.sh
     - kubectl get all -A
     - echo -e "\e[0Ksection_end:`date +%s`:k3d_up\r\e[0K"    
   after_script:

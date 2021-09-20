@@ -115,7 +115,6 @@ clean install:
   script:
     - *deploy_bigbang
     - *test_bigbang
-
     # Fetch list of all images ran (retry crictl up to 6x)
     - echo -e "\e[0Ksection_start:`date +%s`:images_used[collapsed=true]\r\e[0K\e[33;1mImages Used\e[37m"
     - cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
