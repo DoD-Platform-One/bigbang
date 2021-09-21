@@ -25,16 +25,6 @@ global:
   imagePullSecrets:
   - name: private-registry
 
-
-istio:
-  enabled: {{ .Values.istio.enabled }}
-  vault:
-    gateways:
-      - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
-
-imagePullSecrets:
-- name: private-registry
-
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
@@ -42,5 +32,10 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  vault:
+    gateways:
+      - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
 
 {{- end -}}
