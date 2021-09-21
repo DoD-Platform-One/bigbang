@@ -48,6 +48,8 @@ variables:
   IMAGE_LIST: images.txt
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
+  VALUES_FILE: chart/values.yaml
+  CI_VALUES_FILE: tests/ci/k3d/values.yaml
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Pre Stage Jobs.   This execute before any job is run.
