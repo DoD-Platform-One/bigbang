@@ -76,6 +76,7 @@ Build common set of file extensions to include/exclude
     /**/*.md
     /**/*.txt
     /**/*.sh
+    !/chart/tests/scripts/*.sh
 {{- end -}}
 
 {{/*
