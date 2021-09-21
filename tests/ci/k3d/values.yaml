@@ -36,11 +36,45 @@ logging:
           max: 1g
     kibana:
       count: 1
+    bbtests:
+      # TODO: Connection refused on the script test currently
+      # https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/issues/39
+      enabled: false
+      cypress:
+        artifacts: true
+        envs:
+          cypress_kibana_url: "https://kibana.bigbang.dev"
+        secretEnvs:
+          - name: cypress_elastic_password
+            valueFrom:
+              secretKeyRef:
+                name: "logging-ek-es-elastic-user"
+                key: elastic
+      scripts:
+        image: registry1.dso.mil/ironbank/stedolan/jq:1.6
+        envs:
+          elasticsearch_host: "https://{{ .Release.Name }}-es-http.{{ .Release.Namespace }}.svc.cluster.local:9200"
+          desired_version: "{{ .Values.elasticsearch.version }}"
+        secretEnvs:
+          - name: ELASTIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "logging-ek-es-elastic-user"
+                key: elastic
 
 fluentbit:
   values:
     securityContext:
       privileged: true
+    bbtests:
+      # TODO: Connection refused on the test currently
+      # https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/issues/18
+      scripts:
+        # Image commented out to disable the test since the BB Test Lib version being used doesn't have the enabled flag
+        # image: registry1.dso.mil/ironbank/stedolan/jq:1.6
+        envs:
+          fluent_host: "http://{{ include \"fluent-bit.fullname\" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
+          desired_version: "{{ .Values.image.tag }}"
 
 istio:
   enabled: true
@@ -49,6 +83,30 @@ istio:
       dashboard:
         auth:
           strategy: "anonymous"
+
+jaeger:
+  enabled: true
+  values:
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_url: "https://tracing.bigbang.dev"
+
+kiali:
+  enabled: true
+  values:
+    cr:
+      spec:
+        auth:
+          strategy: "anonymous"
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_url: 'https://kiali.bigbang.dev'
 
 clusterAuditor:
   enabled: true
@@ -81,6 +139,17 @@ monitoring:
           cpu: 100m
           memory: 30Mi
         limits: {}
+    grafana:
+      testFramework:
+        enabled: false
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
 
 gatekeeper:
   enabled: true
@@ -102,6 +171,23 @@ gatekeeper:
           excludedNamespaces:
           # Allows load balancer containers to map ports for k3d
           - istio-system
+    bbtests:
+      # TODO: Test will need to be refactored at BB level to properly run since we can't turn everything to deny
+      # https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/-/issues/133
+      enabled: false
+      scripts:
+        image: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.1
+        additionalVolumeMounts:
+          - name: "{{ .Chart.Name }}-test-config"
+            mountPath: /yaml
+          - name: "{{ .Chart.Name }}-kube-cache"
+            mountPath: /.kube/cache
+        additionalVolumes:
+          - name: "{{ .Chart.Name }}-test-config"
+            configMap:
+              name: "{{ .Chart.Name }}-test-config"
+          - name: "{{ .Chart.Name }}-kube-cache"
+            emptyDir: {}
 
 twistlock:
   enabled: true
@@ -109,8 +195,19 @@ twistlock:
     console:
       persistence:
         size: 256Mi
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_baseUrl: "https://twistlock.bigbang.dev"
+      scripts:
+        image: registry1.dso.mil/ironbank/stedolan/jq:1.6
+        envs:
+          twistlock_host: "https://twistlock.bigbang.dev"
+          desired_version: "{{ .Values.console.image.tag }}"
 
-# Explicitly enable all addons for CI
+# Addons are toggled based on labels in CI
 addons:
   argocd:
     enabled: false
@@ -152,6 +249,19 @@ addons:
             cpu: 50m
             memory: 128Mi
           limits: {}
+      configs:
+        secret:
+          argocdServerAdminPassword: '$2a$10$rUDZDckdDZ2TEwk9PDs3QuqjkL58qR1IHE1Kj4MwDx.7/m5dytZJm'
+      bbtests:
+        # TODO: Disabled pending resolution of some "timing?" issues
+        # https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/issues/17
+        enabled: false
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: "https://argocd.bigbang.dev"
+            cypress_user: "admin"
+            cypress_password: "Password123"
 
   authservice:
     enabled: false
@@ -192,6 +302,8 @@ addons:
         webservice:
           minReplicas: 1
           maxReplicas: 1
+          helmTests:
+            enabled: false
         sidekiq:
           minReplicas: 1
           maxReplicas: 1
@@ -248,6 +360,34 @@ addons:
         slave:
           persistence:
             size: 256Mi      
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_baseUrl: https://gitlab.bigbang.dev
+            cypress_gitlab_first_name: "test"
+            cypress_gitlab_last_name: "user"
+            cypress_gitlab_username: "testuser"
+            cypress_gitlab_password: "12345678"
+            cypress_gitlab_email: "testuser@example.com"
+            cypress_gitlab_project: "my-awesome-project"
+          secretEnvs:
+            - name: cypress_adminpassword
+              valueFrom:
+                secretKeyRef:
+                  name: gitlab-gitlab-initial-root-password
+                  key: password
+        scripts:
+          image: "registry.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/bbtests:0.0.3"
+          envs:
+            GITLAB_USER: "testuser"
+            GITLAB_PASS: "12345678"
+            GITLAB_EMAIL: "testuser@example.com"
+            GITLAB_PROJECT: "my-awesome-project"
+            GITLAB_REPOSITORY: https://gitlab.bigbang.dev
+            GITLAB_ORIGIN: https://testuser:12345678@gitlab.bigbang.dev
+            GITLAB_REGISTRY: registry.bigbang.dev
 
   gitlabRunner:
     enabled: false
@@ -257,6 +397,25 @@ addons:
           memory: 64Mi
           cpu: 50m
         limits: {}
+      runners:
+        protected: false
+      bbtests:
+        # TODO: This test runs fine locally with the same values, but fails in CI
+        enabled: false
+        cypress:
+          artifacts: true
+          secretEnvs:
+            - name: cypress_adminpassword
+              valueFrom:
+                secretKeyRef:
+                  name: gitlab-gitlab-initial-root-password
+                  key: password
+          envs:
+            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_gitlab_email: "gitlab@bigbang.dev"
+            cypress_gitlab_user: "gitlab_user"
+            cypress_gitlab_password: "gitlab_pass"
+            cypress_gitlab_project: "hello-world"
 
   anchore:
     enabled: false
@@ -385,6 +544,19 @@ addons:
             cpu: 100m
             memory: 200Mi
           limits: {}
+      bbtests:
+        enabled: true
+        scripts:
+          image: registry1.dso.mil/ironbank/anchore/cli/cli:0.9.1
+          envs:
+            ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
+            ANCHORE_CLI_USER: admin
+          secretEnvs:
+            - name: ANCHORE_CLI_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ template \"anchore-engine.fullname\" . }}-admin-pass"
+                  key: ANCHORE_ADMIN_PASSWORD
 
   sonarqube:
     enabled: false
@@ -409,6 +581,19 @@ addons:
           limits: {}
       tests:
         enabled: false
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: "https://sonarqube.bigbang.dev"
+            cypress_url_setup: "https://sonarqube.bigbang.dev/setup"
+            cypress_user: "admin"
+            cypress_password: "new_admin_password"
+      account:
+        adminPassword: new_admin_password
+        currentAdminPassword: admin
+      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:8.4
 
   minioOperator:
     enabled: false
@@ -424,6 +609,41 @@ addons:
         - servers: 1
           volumesPerServer: 4
           size: 256Mi
+      bbtests:
+        # TODO: Seems like a timing issue with BB CI
+        # https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/issues/7
+        enabled: false
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: 'http://minio.bigbang.dev/login'
+          secretEnvs:
+            - name: cypress_secretkey
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.tenants.secrets.name }}"
+                  key: secretkey
+            - name: cypress_accesskey
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.tenants.secrets.name }}"
+                  key: accesskey
+        scripts:
+          image: registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2021-09-02T09-21-27Z
+          envs:
+            MINIO_PORT: '80'
+            MINIO_HOST: 'http://minio'
+          secretEnvs:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.tenants.secrets.name }}"
+                  key: secretkey
+            - name: ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.tenants.secrets.name }}"
+                  key: accesskey
 
   mattermostoperator:
     enabled: false
@@ -451,6 +671,15 @@ addons:
           - servers: 1
             volumesPerServer: 4
             size: 256Mi
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: https://chat.bigbang.dev
+            cypress_mm_email: "test@bigbang.dev"
+            cypress_mm_user: "bigbang"
+            cypress_mm_password: "Bigbang#123"
 
   nexus:
     enabled: false
@@ -467,42 +696,80 @@ addons:
           requests:
             cpu: 100m
             memory: 1500Mi
+      bbtests:
+        # TODO: Disabled pending resolution of "timing?" issues
+        # https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/issues/9
+        enabled: false
+        cypress:
+          artifacts: true
+          envs:
+            cypress_nexus_url: "https://nexus.bigbang.dev"
+            cypress_nexus_user: "admin"
+            cypress_nexus_pass_new: "new_admin_password"
+          secretEnvs:
+            - name: cypress_nexus_pass
+              valueFrom:
+                secretKeyRef:
+                  name: nexus-repository-manager-secret
+                  key: admin.password
 
   velero:
     enabled: false
     plugins:
     - aws
     values:
-      # Set provider name and backup storage location bucket name
-      configuration:
-        provider: aws
-        # TODO: Bucket for this
-        backupStorageLocation:
-          bucket: bigbang-dogfood-velero
-          prefix: ci
-      #    config:
-      #      region: us-west-1
-      #      profile: test
-      #  volumeSnapshotLocation:
-      #    provider: aws
-      #    config:
-      #      bucket: velero
-      #      region: us-west-1
-
-      # schedules:
-      #  mybackup:
-      #    labels:
-      #      myenv: foo
-      #    schedule: "0 0 * * *"
-      #    template:
-      #      ttl: "240h"
-      #      includedNamespaces:
-      #        - foo
-
-      # Set a service account so that the CRD clean up job has proper permissions to delete CRDs
       serviceAccount:
         server:
           name: velero
+      configuration:
+        # minio uses s3 provider
+        provider: aws
+        backupStorageLocation:
+          bucket: velero
+          config: &minio-config
+            region: velero
+            insecureSkipTLSVerify: "true"
+            s3ForcePathStyle: "true"
+            s3Url: &minio-address https://minio.bigbang.dev
+        volumeSnapshotLocation:
+          provider: aws
+          config:
+            region: velero
+      credentials:
+        useSecret: true
+        secretContents:
+          cloud: |
+            [default]
+            aws_access_key_id = minio
+            aws_secret_access_key = minio123
+      bbtests:
+        # TODO: Velero test is messy and times out running in BB CI
+        # https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/issues/9
+        enabled: false
+        scripts:
+          image: registry1.dso.mil/ironbank/opensource/velero/velero:v1.6.0
+          additionalVolumes:
+            - name: transfer-kubectl
+              emptyDir: {}
+            - name: &yamlVolName yaml-configs
+              configMap:
+                name: "{{ .Chart.Name }}-backup-restore-files-config"
+          additionalVolumeMounts:
+            - name: transfer-kubectl
+              mountPath: /usr/local/bin/kubectl
+              subPath: kubectl
+            - name: *yamlVolName
+              mountPath: &yamlMountPath /yaml
+          envs:
+            MINIO_HOST: *minio-address
+            TEST_YAML_DIR: *yamlMountPath
+            MINIO_USER: minio
+            MINIO_PASS: minio123
+          secretEnvs:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
 
   keycloak:
     enabled: false
@@ -515,3 +782,10 @@ addons:
           cpu: 10m
           memory: 16Mi
         limits: {}
+      bbtests:
+        # TODO: Keycloak in CI not supported yet
+        enabled: false
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: "https://keycloak.bigbang.dev"

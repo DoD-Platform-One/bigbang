@@ -95,9 +95,14 @@ pre vars:
   - |
     set -e
     for test_script in $(find ./tests/tests -type f -name '*.sh' | sort); do
-      chmod +x ${test_script}
       echo -e "\e[0Ksection_start:`date +%s`:${test_script##*/}[collapsed=true]\r\e[0K\e[33;1m${test_script##*/}\e[37m"        
-      ./${test_script}
+      chmod +x ${test_script}
+      echo "Executing ${test_script}..."
+      ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+        echo "${test_script} failed, see log output above and cluster debug."
+        exit ${EXIT_CODE}
+      fi
       echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
     done
 
@@ -124,10 +129,11 @@ clean install:
   artifacts:
     paths:
       - images.txt
-      - "cypress-tests/*/tests/cypress/screenshots"
-      - "cypress-tests/*/tests/cypress/videos"
-    expire_in: 7 days
+      - "test-artifacts/"
+    expire_in: 3 days
     when: always
+  allow_failure:
+    exit_codes: 123
 
 upgrade:
   stage: smoke tests
@@ -163,10 +169,11 @@ upgrade:
     - *test_bigbang
   artifacts:
     paths:
-      - "cypress-tests/*/tests/cypress/screenshots"
-      - "cypress-tests/*/tests/cypress/videos"
-    expire_in: 7 days
+      - "test-artifacts/"
+    expire_in: 3 days
     when: always
+  allow_failure:
+    exit_codes: 123
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Rules for execution of AWS based K3S cluster deployment:  Infrastructure jobs
@@ -309,6 +316,8 @@ aws/rke2/bigbang test:
     - *test_bigbang
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  allow_failure:
+    exit_codes: 123
   retry:
     max: 2
     when:
