@@ -1,5 +1,4 @@
 {{- if and (not .Values.offline) .Values.addons.vault.enabled }}
->>>>>>> f2e7663c (add vault deployment)
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
