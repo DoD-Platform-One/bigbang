@@ -2,8 +2,6 @@
 
 set -ex
 
-CI_VALUES_FILE="tests/ci/k3d/values.yaml"
-
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
   echo "all-packages label enabled, or on default branch or tag, enabling all addons"
   yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
@@ -18,7 +16,7 @@ else
 fi
 
 # if keycloak enabled add ingress passthrough cert to addons.keycloak.ingress
-if [ "$(yq e ".addons.keycloak.enabled" "tests/ci/k3d/values.yaml")" == "true" ]; then
+if [ "$(yq e ".addons.keycloak.enabled" "${CI_VALUES_FILE}")" == "true" ]; then
   yq eval-all 'select(fileIndex == 0) * select(filename == "tests/ci/keycloak-certs/keycloak-passthrough-values.yaml")' $CI_VALUES_FILE tests/ci/keycloak-certs/keycloak-passthrough-values.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
 #if keycloak is enabled add passthrough ingress gateway and gateway to istio.
   yq eval-all 'select(filename == "tests/ci/k3d/values.yaml") * select(filename == "tests/ci/passthrough-gateway.yaml")' $CI_VALUES_FILE tests/ci/passthrough-gateway.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
@@ -52,4 +50,3 @@ else
   # NOTE: $CI_COMMIT_REF_NAME = $CI_COMMIT_TAG when running on a tagged build
   cat tests/ci/shared-secrets.yaml | sed 's|branch: master|tag: '"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
 fi
-
