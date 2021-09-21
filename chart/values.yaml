@@ -543,6 +543,18 @@ addons:
     # -- Additional authservice chain configurations.
     chains: {}
 
+  # ----------------------------------------------------------------------------------------------------------------------  
+  # Vault
+ #
+  vault:
+  # -- Toggle deployment of vault.
+    enabled: true
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      path: "./chart"
+      branch: "deploy-vault"
+  # ----------------------------------------------------------------------------------------------------------------------  
+
   # ----------------------------------------------------------------------------------------------------------------------
   # Minio Operator and Instance
   #
