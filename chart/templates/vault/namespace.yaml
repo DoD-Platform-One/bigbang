@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 {{- if .Values.addons.vault.enabled }}
+=======
+{{- if .Values.twistlock.enabled }}
+>>>>>>> b3d915d2 (add vault deployment)
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -8,4 +12,8 @@ metadata:
     app.kubernetes.io/component: "sandbox"
     {{- include "commonLabels" . | nindent 4}}
     istio-injection: enabled
+<<<<<<< HEAD
 {{- end }}
+=======
+{{- end }}
+>>>>>>> b3d915d2 (add vault deployment)

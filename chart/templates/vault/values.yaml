@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 {{- if .Values.addons.vault.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.vault "name" "vault" "defaults" (include "bigbang.defaults.vault" .)) }}
+=======
+{{- if .Values.vault.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.vault "name" "vault" "defaults" (include "bigbang.defaults.vault" .)) }}
+>>>>>>> b3d915d2 (add vault deployment)
 {{- end }}
 
 {{- define "bigbang.defaults.vault" -}}
@@ -14,6 +19,7 @@ prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
 
+<<<<<<< HEAD
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
@@ -24,6 +30,10 @@ networkPolicies:
 global:
   imagePullSecrets:
   - name: private-registry
+=======
+imagePullSecrets:
+- name: private-registry
+>>>>>>> b3d915d2 (add vault deployment)
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -32,6 +42,7 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+<<<<<<< HEAD
 istio:
   enabled: {{ .Values.istio.enabled }}
   vault:
@@ -51,3 +62,13 @@ networkPolicies:
 
 {{- end -}}
 
+=======
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  console:
+    gateways:
+    - istio-system/{{ default "public" .Values.vault.ingress.gateway }}
+
+{{- end -}}
+>>>>>>> b3d915d2 (add vault deployment)
