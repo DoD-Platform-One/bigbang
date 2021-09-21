@@ -14,6 +14,9 @@ prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
 
+imagePullSecrets:
+- name: private-registry
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
