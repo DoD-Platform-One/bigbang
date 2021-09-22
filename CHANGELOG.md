@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.16.2]
+
+* [!919](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/919): Sonarqube version `9.2.6-bb.17-1` version bump to address erroneous duplicate template definitions for tolerations, nodeSelector & affinity
+
 ## [1.16.1]
 
 * [!887](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/887): Twistlock Network Policy & BigBang/Package value `networkPolicies.nodeCidr` for defender to console communication
