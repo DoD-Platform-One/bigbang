@@ -94,8 +94,8 @@ chart update check:
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
-    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage $CI_DEFAULT_BRANCH Checkout"
-    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage $CI_MERGE_REQUEST_TARGET_BRANCH_NAME Checkout"
+    - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
     - cp CHANGELOG.md /tmp/CHANGELOG.md
     - echo -e "\e[0Ksection_end:`date +%s`:package_checkout1\r\e[0K"
     - DEFAULT_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
@@ -420,9 +420,9 @@ upgrade:
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
-    - echo "Installing ${CI_PROJECT_NAME} from ${CI_DEFAULT_BRANCH}"
+    - echo "Installing ${CI_PROJECT_NAME} from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
     - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage Checkout"
-    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
     - echo -e "\e[0Ksection_end:`date +%s`:package_checkout1\r\e[0K"
     - echo -e "\e[0Ksection_start:`date +%s`:dependency_up1[collapsed=true]\r\e[0KDependency Install and Wait"
     - *dependency_install
