@@ -1,4 +1,4 @@
-{{- if .Values.twistlock.enabled }}
+{{- if .Values.addons.vault.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
