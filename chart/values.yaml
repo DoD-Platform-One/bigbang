@@ -479,6 +479,21 @@ twistlock:
 # ----------------------------------------------------------------------------------------------------------------------
 #
 addons:
+  vault:
+    # -- Toggle deployment of Vault.
+    enabled: true
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      path: "./chart"
+      branch: "deploy-vault"
+    # -- Flux reconciliation overrides specifically for the Twistlock Package
+    flux: {}
+    ingress:
+      gateway: ""
+    values: {}
+    postRenderers: []
+
+
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
@@ -542,18 +557,6 @@ addons:
 
     # -- Additional authservice chain configurations.
     chains: {}
-
-  # ----------------------------------------------------------------------------------------------------------------------  
-  # Vault
- #
-  vault:
-  # -- Toggle deployment of vault.
-    enabled: true
-    git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
-      path: "./chart"
-      branch: "deploy-vault"
-  # ----------------------------------------------------------------------------------------------------------------------  
 
   # ----------------------------------------------------------------------------------------------------------------------
   # Minio Operator and Instance

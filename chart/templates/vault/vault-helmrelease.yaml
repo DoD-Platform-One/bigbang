@@ -1,5 +1,5 @@
-{{- $fluxSettingsVault := merge .Values.vault.flux .Values.flux -}}
-{{- if .Values.vault.enabled }}
+{{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
+{{- if .Values.addons.vault.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -13,7 +13,7 @@ spec:
   targetNamespace: vault
   chart:
     spec:
-      chart: {{ .Values.vault.git.path }}
+      chart: {{ .Values.addons.vault.git.path }}
       interval: 5m
       sourceRef:
         kind: GitRepository
@@ -22,7 +22,7 @@ spec:
 
   {{- toYaml $fluxSettingsVault | nindent 2 }}
   
-  {{- if .Values.vault.postRenderers }}
+  {{- if .Values.addons.vault.postRenderers }}
   postRenderers:
   {{ toYaml .Values.vault.postRenderers | nindent 4 }}
   {{- end }}
