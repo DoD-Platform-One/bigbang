@@ -14,7 +14,6 @@ prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
 
-<<<<<<< HEAD
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
@@ -24,11 +23,13 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+=======
+imagePullSecrets:
+- name: private-registry
 
 istio:
   enabled: {{ .Values.istio.enabled }}
   console:
     gateways:
-    - istio-system/{{ default "public" .Values.vault.ingress.gateway }}
-
+    - istio-system/public
 {{- end -}}
