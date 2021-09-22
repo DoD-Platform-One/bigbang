@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 {{- if .Values.addons.vault.enabled }}
-=======
-{{- if .Values.twistlock.enabled }}
->>>>>>> eb61ff0b (add vault deployment)
 apiVersion: v1
 kind: Namespace
 metadata:
