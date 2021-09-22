@@ -156,9 +156,9 @@ upgrade:
   variables:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
-    - echo "Install Big Bang from ${CI_DEFAULT_BRANCH}"
+    - echo "Install Big Bang from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
     - echo -e "\e[0Ksection_start:`date +%s`:git_master[collapsed=true]\r\e[0K\e[33;1mGit Fetch Master\e[37m"  
-    - git fetch && git checkout ${CI_DEFAULT_BRANCH}
+    - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
     - echo -e "\e[0Ksection_end:`date +%s`:git_master\r\e[0K"
     - *deploy_bigbang
     - *test_bigbang
