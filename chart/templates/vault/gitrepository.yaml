@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 {{- if and (not .Values.offline) .Values.addons.vault.enabled }}
-=======
-{{- if and (not .Values.offline) .Values.vault.enabled }}
->>>>>>> eb61ff0b (add vault deployment)
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
@@ -14,15 +10,9 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-<<<<<<< HEAD
   url: {{ .Values.addons.vault.git.repo }}
   ref:
     {{- include "validRef" .Values.addons.vault.git | nindent 4 }}
-=======
-  url: {{ .Values.vault.git.repo }}
-  ref:
-    {{- include "validRef" .Values.vault.git | nindent 4 }}
->>>>>>> eb61ff0b (add vault deployment)
   {{ include "gitIgnore" . }}
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}
