@@ -189,7 +189,7 @@ istiooperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
-    tag: "1.11.3-bb.0"
+    tag: "1.11.2-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
@@ -492,7 +492,6 @@ addons:
     values: {}
     postRenderers: []
 
-# ----------------------------------------------------------------------------------------------------------------------
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
@@ -556,18 +555,6 @@ addons:
 
     # -- Additional authservice chain configurations.
     chains: {}
-
-  # ----------------------------------------------------------------------------------------------------------------------  
-  # Vault
- #
-  vault:
-  # -- Toggle deployment of vault.
-    enabled: true
-    git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
-      path: "./chart"
-      branch: "deploy-vault"
-  # ----------------------------------------------------------------------------------------------------------------------  
 
   # ----------------------------------------------------------------------------------------------------------------------
   # Minio Operator and Instance
@@ -791,7 +778,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
       path: "./chart"
-      tag: "9.6.3-bb.9"
+      tag: "9.6.3-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
