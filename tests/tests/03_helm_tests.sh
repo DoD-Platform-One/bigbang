@@ -3,8 +3,19 @@
 # exit on error
 set -e
 
-# Get original CoreDNS config
-kubectl get configmap -n kube-system coredns -o jsonpath='{.data.NodeHosts}' > newhosts
+# Check clusterType and get original CoreDNS config
+clusterType="unknown"
+coreDnsName="unknown"
+touch newhosts
+if kubectl get configmap -n kube-system coredns &>/dev/null; then
+  clusterType="k3d"
+  coreDnsName="coredns"
+  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.NodeHosts}' > newhosts
+elif kubectl get configmap -n kube-system rke2-coredns-rke2-coredns &>/dev/null; then
+  clusterType="rke2"
+  coreDnsName="rke2-coredns-rke2-coredns"
+  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
+fi
 
 # Safeguard in case configmap doesn't end with newline
 if [[ $(tail -c 1 newhosts) != "" ]]; then
@@ -18,7 +29,13 @@ for vs in $(kubectl get virtualservice -A -o go-template='{{range .items}}{{.met
   hosts=$(kubectl get virtualservice ${vs_name} -n ${vs_namespace} -o go-template='{{range .spec.hosts}}{{.}}{{" "}}{{end}}')
   gateway=$(kubectl get virtualservice ${vs_name} -n ${vs_namespace} -o jsonpath='{.spec.gateways[0]}' | awk -F/ '{print $2}')
   ingress_gateway=$(kubectl get gateway -n istio-system $gateway -o jsonpath='{.spec.selector.app}')
-  external_ip=$(kubectl get svc -n istio-system $ingress_gateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  external_ip=""
+  if [[ ${clusterType} == "k3d" ]]; then
+    external_ip=$(kubectl get svc -n istio-system $ingress_gateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  elif [[ ${clusterType} == "rke2" ]]; then
+    external_hostname=$(kubectl get svc -n istio-system $ingress_gateway -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+    external_ip=$(dig +short ${external_hostname} | tail -n1)
+  fi
   for host in $hosts; do
     host=$(echo ${host} | xargs)
     # Remove previous entry if on upgrade job
@@ -30,9 +47,23 @@ done
 # Patch CoreDNS and restart pod
 echo "Setting up CoreDNS for VS resolution..."
 hosts=$(cat newhosts) yq e -n '.data.NodeHosts = strenv(hosts)' > patch.yaml
-kubectl patch configmap -n kube-system coredns --patch "$(cat patch.yaml)"
-kubectl rollout restart deployment -n kube-system coredns
-kubectl rollout status deployment -n kube-system coredns --timeout=30s
+# For k3d
+if [[ ${clusterType} == "k3d" ]]; then
+  kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
+  kubectl rollout restart deployment -n kube-system ${coreDnsName}
+  kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=30s
+# For rke2
+elif [[ ${clusterType} == "rke2" ]]; then
+  # Add an entry to the corefile
+  sed -i '/prometheus/i \ \ \ \ hosts /etc/coredns/NodeHosts {\n        ttl 60\n        reload 15s\n        fallthrough\n    }' newcorefile
+  corefile=$(cat newcorefile) yq e -i '.data.Corefile = strenv(corefile)' patch.yaml
+  kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
+  kubectl patch deployment ${coreDnsName} -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"config-volume","configMap":{"items":[{"key":"Corefile","path":"Corefile"},{"key":"NodeHosts","path":"NodeHosts"}],"name":"'${coreDnsName}'"}}]}}}}'
+  kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=30s
+# Add other distros in future as needed, catchall so tests won't error on this
+else
+  echo "No known CoreDNS deployment found, skipping patching."
+fi
 
 # Gather all HRs we should test
 installed_helmreleases=$(helm list -n bigbang -o json | jq '.[].name' | tr -d '"' | grep -v "bigbang")
