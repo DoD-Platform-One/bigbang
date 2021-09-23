@@ -2,7 +2,7 @@
 image: 
   imagePullPolicy: IfNotPresent
   repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
-  tag: v1.14.0
+  tag: v1.15.0
 
 #Mattermost operator desired replicas
 replicas: 
@@ -48,3 +48,11 @@ networkPolicies:
   enabled: false
   # See `kubectl cluster-info` and then resolve to IP
   controlPlaneCidr: 0.0.0.0/0
+
+istio:
+  enabled: false
+
+monitoring:
+  enabled: false
+
+openshift: false
