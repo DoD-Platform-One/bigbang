@@ -147,8 +147,8 @@ upgrade:
     # skip job for nightly master and "test-ci::infra" labeled pipelines
     - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
-    # skip job when MR title starts with 'SKIP UPGRADE'
-    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPGRADE/'
+    # skip job when MR title starts with 'SKIP UPGRADE' 
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
