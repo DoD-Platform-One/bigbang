@@ -25,6 +25,7 @@ spec:
         imagePullPolicy: {{ .Values.image.imagePullPolicy }}
         args:
         - --enable-leader-election
+        - --metrics-addr=0.0.0.0:8383
         command:
         - /mattermost-operator
         env:
@@ -36,6 +37,9 @@ spec:
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+        ports:
+        - containerPort: 8383
+          name: metrics
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

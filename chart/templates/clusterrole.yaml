@@ -13,20 +13,7 @@ rules:
   - ""
   resources:
   - pods
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods
   - services
-  - endpoints
-  - persistentvolumeclaims
-  - events
   - configmaps
   - secrets
   - serviceaccounts
@@ -48,11 +35,34 @@ rules:
   - apps
   resources:
   - deployments
-  - daemonsets
-  - replicasets
-  - statefulsets
   verbs:
   - '*'
+- apiGroups:
+  - apps
+  resourceNames:
+  - mattermost-operator
+  resources:
+  - deployments/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - create
+  - list
+  - delete
+  - watch
+  - update
 - apiGroups:
   - networking.k8s.io
   resources:
@@ -72,26 +82,9 @@ rules:
   - watch
   - update
 - apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - servicemonitors
-  verbs:
-  - get
-  - create
-- apiGroups:
-  - apps
-  resourceNames:
-  - mattermost-operator
-  resources:
-  - deployments/finalizers
-  verbs:
-  - update
-- apiGroups:
   - mattermost.com
   resources:
   - '*'
-  - clusterinstallations
-  - mattermostrestoredbs
   verbs:
   - '*'
 - apiGroups:
@@ -104,17 +97,6 @@ rules:
   - mysql.presslabs.org
   resources:
   - mysqlbackups
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - mysql.presslabs.org
-  resources:
   - mysqlclusters
   - mysqlclusters/status
   verbs:
@@ -128,33 +110,13 @@ rules:
 - apiGroups:
   - miniocontroller.min.io
   resources:
-  - '*'
-  verbs:
-  - '*'
-- apiGroups:
-  - minio.io
-  resources:
-  - '*'
-  verbs:
-  - '*'
-- apiGroups:
-  - batch
-  resources:
-  - jobs
+  - minioinstances
+  - minioinstances/status
   verbs:
   - get
-  - create
   - list
-  - delete
   - watch
-  - update
-- apiGroups:
-  - certificates.k8s.io
-  resources:
-  - certificatesigningrequests
-  - certificatesigningrequests/approval
-  - certificatesigningrequests/status
-  verbs:
-  - update
   - create
-  - get
+  - update
+  - patch
+  - delete
