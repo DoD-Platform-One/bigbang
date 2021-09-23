@@ -88,8 +88,8 @@ chart update check:
   extends:
     - .bigbang-dogfood
   rules:
-    # skip job when MR title starts with 'SKIP UPDATE CHECK'
-    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPDATE CHECK/'
+    # skip job when MR title contains 'SKIP UPDATE CHECK'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPDATE CHECK/'
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -411,8 +411,8 @@ upgrade:
   extends:
     - .k3d-ci
   rules:
-    # skip job when MR title starts with 'SKIP UPGRADE'
-    - if: '$CI_MERGE_REQUEST_TITLE =~ /^SKIP UPGRADE/'
+    # skip job when MR title contains 'SKIP UPGRADE'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
       when: never
     # skip pipeline for branches that start with "docs"
     - if: '$CI_COMMIT_REF_NAME =~ /^doc*/i'
