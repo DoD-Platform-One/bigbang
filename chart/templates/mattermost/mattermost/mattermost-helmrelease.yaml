@@ -42,11 +42,6 @@ spec:
     - name: mattermost-operator
       namespace: {{ .Release.Namespace }}
 
-    {{- if .Values.istio.enabled }}
-    - name: istio
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
-
     {{- with .Values.addons.mattermost.objectStorage }}
     {{- if not (and .endpoint .accessKey .accessSecret .bucket) }}
     - name: minio-operator
