@@ -2,6 +2,7 @@
 
 # exit on error
 set -e
+trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 # Check clusterType and get original CoreDNS config
 clusterType="unknown"
