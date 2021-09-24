@@ -195,14 +195,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.minioOperator.enabled | bool | `false` | Toggle deployment of minio operator and instance. |
 | addons.minioOperator.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git"` |  |
 | addons.minioOperator.git.path | string | `"./chart"` |  |
-| addons.minioOperator.git.tag | string | `"4.2.3-bb.1"` |  |
+| addons.minioOperator.git.tag | string | `"4.1.2-bb.3"` |  |
 | addons.minioOperator.flux | object | `{}` | Flux reconciliation overrides specifically for the Minio Operator Package |
 | addons.minioOperator.values | object | `{}` | Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git |
 | addons.minioOperator.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.minio.enabled | bool | `false` | Toggle deployment of minio. |
 | addons.minio.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git"` |  |
 | addons.minio.git.path | string | `"./chart"` |  |
-| addons.minio.git.tag | string | `"4.2.3-bb.1"` |  |
+| addons.minio.git.tag | string | `"4.1.2-bb.6"` |  |
 | addons.minio.flux | object | `{}` | Flux reconciliation overrides specifically for the Minio Package |
 | addons.minio.ingress.gateway | string | `""` |  |
 | addons.minio.accesskey | string | `""` | Default access key to use for minio. |
@@ -323,7 +323,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.mattermost.enabled | bool | `false` | Toggle deployment of Mattermost. |
 | addons.mattermost.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git"` |  |
 | addons.mattermost.git.path | string | `"./chart"` |  |
-| addons.mattermost.git.tag | string | `"0.2.0-bb.2"` |  |
+| addons.mattermost.git.tag | string | `"0.2.0-bb.1"` |  |
 | addons.mattermost.flux | object | `{}` | Flux reconciliation overrides specifically for the Mattermost Package |
 | addons.mattermost.enterprise | object | `{"enabled":false,"license":""}` | Mattermost Enterprise functionality. |
 | addons.mattermost.enterprise.enabled | bool | `false` | Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install. |
