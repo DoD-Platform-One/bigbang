@@ -499,7 +499,7 @@ addons:
     values: {}
     postRenderers: []
 
-
+# ----------------------------------------------------------------------------------------------------------------------
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
