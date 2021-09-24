@@ -55,7 +55,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   hostNetworking:
     parameters:
       excludedResources:
-        - twistlock/twistlock-defender
+        - twistlock/twistlock-defender-ds-.*
   noHostNamespace:
     parameters:
       excludedResources:
