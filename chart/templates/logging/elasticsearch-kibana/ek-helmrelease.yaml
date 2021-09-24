@@ -46,9 +46,4 @@ spec:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
-
-    {{- if .Values.istio.enabled }}
-    - name: istio
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
 {{- end }}
