@@ -20,7 +20,7 @@ The applications in the table below provide both SSO and built in auth. The tabl
 | Logging (Kibana) | `elastic` | (randomly generated) | Use `kubectl get secrets -n logging logging-ek-es-elastic-user -o go-template='{{.data.elastic \| base64decode}}'` to get the password |
 | Monitoring (Grafana) | `admin` | `prom-operator` | Default password can be overridden with Helm values `monitoring.values.grafana.adminPassword` |
 | Twistlock | N/A | N/A | Prompted to setup an admin account when you first hit the virtual service, no default user |
-| ArgoCD | `admin` | (randomly generated) | Use `kubectl -n argocd get secret argocd-initial-admin-secret -o go-template='{{.data.password \| base64decode}}'` to get the password |
+| ArgoCD | `admin` | (randomly generated) | Use `kubectl -n argocd get secret argocd-initial-admin-secret -o go-template='{{.data.password \| base64decode}}'` to get the password. Note: If the argocd-initial-admin-secret does not exist, you will need to [reset the admin password](https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it). |
 | Minio | `minio` | `minio123` | Access and secret key can be overridden with Helm values `addons.minio.accesskey` and `addons.minio.secretkey` respectively |
 | Gitlab | `root` | (randomly generated) | Use `kubectl -n gitlab get secret gitlab-gitlab-initial-root-password -o go-template='{{.data.password \| base64decode}}'` to get the password |
 | Nexus | `admin` | (randomly generated) | Use `kubectl get secret -n nexus-repository-manager nexus-repository-manager-secret -o go-template='{{index .data "admin.password" \| base64decode}}'` to get the password |
