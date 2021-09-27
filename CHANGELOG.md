@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.2.7]
+### Changed
+- added retries into each package-test stage.
+
 ## [1.2.6]
 ### Changed
 - Updated package-tests.yml to pattern match SKIP UPGRADE and SKIP UPDATE CHECK anywhere in the MR title.

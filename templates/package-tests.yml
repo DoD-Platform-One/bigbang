@@ -81,6 +81,12 @@ configuration validation:
           helm conftest chart --policy tests/policy
         fi
       fi
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 chart update check:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
@@ -118,6 +124,12 @@ chart update check:
       if [ "$EXIT" == "true" ]; then
         exit 1
       fi
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 .k3d-ci:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
@@ -405,6 +417,12 @@ clean install:
         cat tests/images.txt >> images.txt
       fi
     - echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 upgrade:
   stage: package tests
@@ -446,6 +464,12 @@ upgrade:
     - touch $CI_PROJECT_DIR/success
   allow_failure:
     exit_codes: 123
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 package:
   stage: package
@@ -551,6 +575,12 @@ package:
     paths:
       - release_notes.txt
     expire_in: 3 days
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 release:
   stage: release
@@ -580,3 +610,9 @@ release:
           --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
           --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
       fi
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
