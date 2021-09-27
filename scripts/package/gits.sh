@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ex
+trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 mkdir -p repos/
 
