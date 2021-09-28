@@ -2,11 +2,11 @@
 
 [[_TOC_]]
 
-BigBang developers use [k3d](https://k3d.io/), a lightweight wrapper to run [k3s](https://github.com/rancher/k3s) (Rancher Lab’s minimal Kubernetes distribution) in docker.
+BigBang developers use [k3d](https://k3d.io/), a lightweight wrapper to run [k3s](https://github.com/rancher/k3s) (Rancher Lab’s minimal Kubernetes distribution) in docker. K3d is a virtualized kubernetes cluster that is quick to start and tear down for fast development iteration. K3d is sufficient for 90% of BigBang development work. In limited cases developers will use real infrastructure k8s deployments with Rancher, Konvoy, etc. Only k3d is covered here in this document. The others are out of scope.
 
-It is not recommend to run k3d with BigBang on your local computer. BigBang can be quite resource-intensive and it requires a huge download bandwidth for the images. It is best to use a remote k3d cluster running on an AWS EC2 instance. If you do insist on running k3d locally you should disable certain packages before deploying. You can do this in the values.yaml file by setting the package deploy to false. One of the packages that is most resource-intensive is the logging package. And you should create a local image registry cache to minimize the amount of image downloading. A script that shows how to create a local image cache is in the [BigBang Quick Start](https://repo1.dso.mil/platform-one/quick-start/big-bang/)
+It is not recommend to run k3d with BigBang on your local computer. BigBang can be quite resource-intensive and it requires a huge download bandwidth for the images. It is best to use a remote k3d cluster running on an AWS EC2 instance. If you do insist on running k3d locally you should disable certain packages before deploying. You can do this in the values.yaml file by setting the package deploy to false. One of the packages that is most resource-intensive is the logging package. And you should create a local image registry cache to minimize the amount of image downloading.
 
-This page contains the manual steps to create your k3d dev environment. Various persons have automated parts of these steps with scripts and terraform but we recommend that you do it manually so that you understand how it works. Automation is left to each person. It might be helpful to get a live demonstration by someone who already knows how to do it until a good video tutorial is created. We strive to make the documentation as good as possible but it is hard to keep it up-to-date and there are still pitfalls and gotchas.
+This page contains the manual steps to create your k3d dev environment. There is a script [./scripts/k3d-dev.sh](./scripts/k3d-dev.sh) that automates the creation and teardown of a development environment. We recommend that you study the manual steps so that you understand how the script works. It might be helpful to get a live demonstration by someone who already knows how to do it until a good video tutorial is created. We strive to make the documentation as good as possible but it is hard to keep it up-to-date and there are still pitfalls and gotchas.
 
 ## Prerequisites
 
@@ -482,102 +482,4 @@ sudo systemctl restart docker.service
 sudo wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 
 # exit ssh and then reconnect so you can use docker as non-root
-```
-
-### AWS CLI commands to manually create EC2 instance
-
-```shell
-# install aws cli
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-aws --version
-
-# Note: There is an issue with aws configure import, configuration is manual.
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/configure/import.html
-# https://github.com/aws/aws-cli/issues/1201#issuecomment-642131086
-# https://console.amazonaws-us-gov.com/iam/home?region=us-gov-west-1#/security_credentials
-
-# aws configure
-# aws_access_key_id - The AWS access key part of your credentials
-# aws_secret_access_key - The AWS secret access key part of your credentials
-# region - us-gov-west-1
-# output - JSON
-
-# Verify configuration
-aws configure list
-
-# Set variables
-AWSUSERNAME=$( aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/' )
-
-# Disable local pager
-export AWS_PAGER=""
-
-# Recreate key pair
-rm -f $AWSUSERNAME.pem
-aws ec2 delete-key-pair --key-name $AWSUSERNAME
-aws ec2 create-key-pair --key-name $AWSUSERNAME --query 'KeyMaterial' --output text > $AWSUSERNAME.pem
-chmod 400 $AWSUSERNAME.pem
-
-# Verify private key
-openssl rsa -noout -inform PEM -in $AWSUSERNAME.pem
-aws ec2 describe-key-pairs --key-name $AWSUSERNAME
-
-# Get InstanceId
-AWSINSTANCEID=$( aws ec2 describe-instances \
-    --output text \
-    --query "Reservations[].Instances[].InstanceId" \
-    --filters "Name=tag:Owner,Values=$AWSUSERNAME" "Name=tag:env,Values=bigbangdev" )
-
-# Terminate existing instance
-aws ec2 terminate-instances --instance-ids $AWSINSTANCEID
-
-# Delete old Security Group
-aws ec2 delete-security-group --group-name=$AWSUSERNAME
-
-# Get current datetime
-DATETIME=$( date +%Y%m%d%H%M%S )
-
-# Create new Security Group
-# A security group acts as a virtual firewall for your instance to control inbound and outbound traffic.
-aws ec2 create-security-group \
-    --group-name $AWSUSERNAME \
-    --description "Created by $AWSUSERNAME at $DATETIME"
-
-# Get public IP
-YOURLOCALPUBLICIP=$( curl https://checkip.amazonaws.com )
-
-# Add rule to security group
-aws ec2 authorize-security-group-ingress \
-     --group-name $AWSUSERNAME \
-     --protocol tcp \
-     --port 0-65535 \
-     --cidr $YOURLOCALPUBLICIP/32
-
-# Create userdata.txt
-# https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
-cat << EOF > userdata.txt
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
-
---==MYBOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
-
-#!/bin/bash
-# Set the vm.max_map_count to 262144.
-# Required for Elastic to run correctly without OOM errors.
-sysctl -w vm.max_map_count=262144
-EOF
-
-# Create new instance
-aws ec2 run-instances \
-    --image-id ami-84556de5 \
-    --count 1 \
-    --instance-type t2.xlarge \
-    --key-name $AWSUSERNAME \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Owner,Value=$AWSUSERNAME},{Key=env,Value=bigbangdev}]" \
-    --block-device-mappings 'DeviceName=/dev/sda1,Ebs={VolumeSize=50}' \
-    --iam-instance-profile Name="InstanceOpsRole" \
-    --security-groups $AWSUSERNAME \
-    --user-data file://userdata.txt
 ```
