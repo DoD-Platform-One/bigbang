@@ -16,5 +16,11 @@ for host in $hosts; do
   else
     echo "$ip $host" >> /etc/hosts
   fi
+  echo "****************************************"
+  echo "Begin curl $host"
+  echo "****************************************"
   curl -svv https://$host/ > /dev/null
+  echo "****************************************"
+  echo "End curl $host"
+  echo "****************************************"
 done
