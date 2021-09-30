@@ -62,7 +62,7 @@ k3d-dev.sh -b -p -m -d -h
 
       ```
 
-2. If you get a failure from the script study and correct the error. Then run script with "-d" option to clean up resources. Then re-run your original command.
+2. If you get a failure from the script study and correct the error. Then run script with "-d" option to clean up resources. Then re-run your original command. 
 
-3. On a Mac you might experience some pop-up widnows. If that happens just quit the windows by typing the letter 'q'. The script should continue successfully.
+3. Occasionally a ssh command will fail because of connection problems. If this happens the script will fail with "unexpected EOF". Simply try again. Run the script with ```-d``` to clean up resources. Then re-run your original command.
 

@@ -257,8 +257,11 @@ PublicIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids
 # Get the private IP address of our instance
 PrivateIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PrivateIpAddress'`
 
-echo Instance private IP is ${PrivateIP}
-echo Instance at ${PublicIP} is ready.
+echo
+echo "Instance ${InstId} is ready!"
+echo "Instance private IP is ${PrivateIP}"
+echo "Instance public IP is ${PublicIP}"
+echo
 
 # Remove previous keys related to this IP from your SSH known hosts so you don't end up with a conflict
 ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${PublicIP}"
@@ -417,7 +420,8 @@ if [[ "$METAL_LB" == true ]]; then
 	ENDSSH
 fi
 
-
+echo
+echo "====================== DEPLOYMENT FINISHED ====================================="
 # ending instructions
 echo
 echo "ssh to instance:"
@@ -428,14 +432,10 @@ if [[ "$METAL_LB" == true ]]
 then	
 	echo "Start sshuttle:"
 	echo "sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem -D 127.0.0.1:12345'"
-	echo "You must use Firefox browser with with manual SOCKsv5 proxy configuration to localhost with port 12345"
-	echo
-
 elif [[ "$PRIVATE_IP" == true ]]
 then	
 	echo "Start sshuttle:"
 	echo "sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem'"
-	echo
 fi	
 
 echo
@@ -448,8 +448,16 @@ then
 	echo "To access apps from a browser edit your /etc/hosts to add the private IP of your instance with application hostnames. Example:"
 	echo "${PrivateIP}	gitlab.bigbang.dev logging.bigbang.dev kibana.bigbang.dev"
 	echo
+elif [[ "$METAL_LB" == true ]]
+then
+  echo "Do not edit /etc/hosts on your local workstation."
+  echo "To access apps from a browser edit /etc/hosts on the EC2 instance. Sample /etc/host entries have already been added there."
+  echo "The IPs to use come from the istio-system services of type LOADBALANCER EXTERNAL-IP that are created when Istio is deployed."
+ 	echo "You must use Firefox browser with with manual SOCKs v5 proxy configuration to localhost with port 12345"
+  echo
 else   #default is to use the public ip
-	echo "To access apps from a browser edit your /etc/hosts to add the public IP of your instance with application hostnames. Example:"
+	echo "To access apps from a browser edit your /etc/hosts to add the public IP of your instance with application hostnames."
+  echo "Example:"
 	echo "${PublicIP}	gitlab.bigbang.dev logging.bigbang.dev kibana.bigbang.dev"
 	echo
 fi
