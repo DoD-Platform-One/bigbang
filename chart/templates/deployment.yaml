@@ -48,9 +48,15 @@ spec:
           allowPrivilegeEscalation: false
           privileged: false
           runAsNonRoot: true
+          # Added by Big Bang to prevent container from writing to local disk
+          readOnlyRootFilesystem: true
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
+        - mountPath: /tmp
+          name: temp
+        - mountPath: /opt/ansible/.ansible/tmp
+          name: ansible
         env:
         - name: WATCH_NAMESPACE
           value: {{ .Values.watchNamespace | default "\"\""  }}
@@ -90,6 +96,10 @@ spec:
         {{- end }}
       volumes:
       - name: runner
+        emptyDir: {}
+      - name: temp
+        emptyDir: {}
+      - name: ansible
         emptyDir: {}
       affinity:
       {{- toYaml .Values.affinity | nindent 8 }}
