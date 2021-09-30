@@ -26,7 +26,6 @@ global:
   - name: private-registry
 
 
-
 istio:
   enabled: {{ .Values.istio.enabled }}
   vault:
