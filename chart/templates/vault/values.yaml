@@ -14,14 +14,20 @@ prometheus:
   servicemonitor:
     enabled: {{ .Values.monitoring.enabled }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+
 imagePullSecrets:
 - name: private-registry
 
 
-
 istio:
   enabled: {{ .Values.istio.enabled }}
-  console:
-    gateways:
-    - istio-system/public
-{{- end -}}
+  gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+    {{- end -}}
