@@ -88,10 +88,10 @@ patches:
               resources:
                 limits:
                   cpu: 100m
-                  memory: 200Mi
+                  memory: 600Mi
                 requests:
                   cpu: 100m
-                  memory: 200Mi
+                  memory: 600Mi
   - target:
       kind: Deployment
       name: notification-controller
