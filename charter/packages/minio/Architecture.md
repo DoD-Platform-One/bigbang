@@ -15,6 +15,8 @@ The final package is the MinIO console. This is a graphical user interface that 
 
 ![Tenant Architecture](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator/-/raw/main/upstream/operator/docs/images/architecture.png)
 
+Note: The Minio Operator needs to be able to reach out to the minio instances. This is to ensure that on an upgrade all existing pools are shut down before starting new ones. If you run into issues with upgrades ensure that networkPolicies allow ingress to the minio pods in your namespace on port 9000.
+
 ## Big Bang Touchpoints
 
 ### UI
@@ -45,13 +47,31 @@ MinIO server exposes three un-authenticated, healthcheck endpoints [liveness pro
 
 ## High Availability
 
-The default is to run in high availability. The default number of servers is 3, but can be changed by changing the values in the base Big Bang cofiguration.
+The default is to run in high availability. The default number of servers is 4, but can be changed by changing the values in the base Big Bang cofiguration.
 
 ```
-values:
-  zones:
-    servers: 3
+addons:
+  minio:
+    values:
+      tenants:
+        pools:
+        - servers: 8
+          volumesPerServer: 4
+          size: 256Mi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 250m
+              memory: 2Gi
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
 ```
+
+Note that due to the list used for the pool value you may need to include resources, requests, and securityContext so that you don't run into issues.
 
 You can also set things like the number of volumes per server and affinity rules for the MinIO tenant.
 
