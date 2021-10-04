@@ -142,6 +142,32 @@ monitoring:
     grafana:
       testFramework:
         enabled: false
+      dashboards:
+        default:
+          k8s-deployment:
+            gnetId: 741
+            revision: 1
+            datasource: Prometheus
+      downloadDashboards:
+        resources: 
+          limits:
+            cpu: 20m
+            memory: 20Mi
+          requests:
+            cpu: 20m
+            memory: 20Mi
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards
     bbtests:
       enabled: true
       cypress:
