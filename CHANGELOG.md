@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.2.8]
+### Changed
+- added pluto helm deprecation checks in configuration validation stage.
+- added kubent in cluster deprecation checks in package install stage.
+
 ## [1.2.7]
 ### Changed
 - added retries into each package-test stage.

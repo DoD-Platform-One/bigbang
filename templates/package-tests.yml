@@ -35,7 +35,7 @@ variables:
     - generic
 
 configuration validation:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.9
   stage: configuration validation
   extends:
     - .bigbang-dogfood
@@ -53,11 +53,12 @@ configuration validation:
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
   script:
     # Place configuration validation tests here
-    - echo "Directory structure of repository:"
+    - echo -e "\e[0Ksection_start:`date +%s`:package_tree[collapsed=true]\r\e[0KPackage Directory Structure"
     - tree .
-    - echo "Generic configuration validation tests:"
+    - echo -e "\e[0Ksection_end:`date +%s`:package_tree\r\e[0K"
 
     # Global policy tests
+    - echo -e "\e[0Ksection_start:`date +%s`:generic_policy_tests[collapsed=true]\r\e[0KGlobal Policy Tests"
     - |
       if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
         echo "Checking test values..."
@@ -67,8 +68,10 @@ configuration validation:
       else
         helm conftest chart --policy ${GENERIC_POLICY_PATH}
       fi
+    - echo -e "\e[0Ksection_end:`date +%s`:generic_policy_tests\r\e[0K"
 
     # Package specific tests
+    - echo -e "\e[0Ksection_start:`date +%s`:package_specific_tests[collapsed=true]\r\e[0KPackage Specific Tests"
     - |
       if [ -d "tests/policy" ]; then
         echo "App specific configuration validation tests:"
@@ -81,6 +84,26 @@ configuration validation:
           helm conftest chart --policy tests/policy
         fi
       fi
+    - echo -e "\e[0Ksection_end:`date +%s`:package_specific_tests\r\e[0K"
+
+    # Package API Deprecation Check
+    - echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0KPackage API Deprecation Check"
+    - helm template ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set monitoring.enabled=true --set istio.enabled=true --set networkPolicies.enabled=true -f tests/test-values.y*ml | pluto detect -owide - && export EXIT_CODE=$? || export EXIT_CODE=$?
+    - |
+      if [[ ${EXIT_CODE} -eq 2 ]]; then
+        echo -e "\e[31mNOTICE: A deprecated apiVersion has been found.\e[0m"
+        exit ${EXIT_CODE}
+      elif [[ ${EXIT_CODE} -eq 3 ]]; then
+        echo -e "\e[31mNOTICE: A removed apiVersion has been found.\e[0m"
+        exit ${EXIT_CODE}
+      else
+        exit ${EXIT_CODE}
+      fi
+    - echo -e "\e[0Ksection_end:`date +%s`:package_deprecation_check\r\e[0K"
+  allow_failure:
+    exit_codes:
+      - 2
+      - 3
   retry:
     max: 2
     when:
@@ -89,7 +112,7 @@ configuration validation:
       - runner_system_failure
 
 chart update check:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.9
   stage: configuration validation
   extends:
     - .bigbang-dogfood
@@ -132,7 +155,7 @@ chart update check:
       - runner_system_failure
 
 .k3d-ci:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.8
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.9
   tags:
     - bigbang
     - privileged
@@ -384,6 +407,16 @@ chart update check:
       fi
     fi
 
+.deprecation_check: &deprecation_check
+  - echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0KIn Cluster Deprecation Check"
+  - kubent -e || export EXIT_CODE=$?
+  - |
+    if [ $EXIT_CODE -eq 200 ]; then 
+      echo -e "\e[31mNOTICE: API deprecations or removals were found.\e[0m"
+      exit 200
+    fi
+  - echo -e "\e[0Ksection_end:`date +%s`:kubent_check\r\e[0K"
+
 clean install:
   stage: package tests
   extends:
@@ -404,6 +437,7 @@ clean install:
     - images=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
     - echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee full-list.txt
     - *package_test
+    - *deprecation_check
     - touch $CI_PROJECT_DIR/success
     - echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KFetch Images"
     ## Create final images.txt: Remove items from the dependencies list from the full-list.
@@ -417,6 +451,9 @@ clean install:
         cat tests/images.txt >> images.txt
       fi
     - echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
+
+  allow_failure:
+    exit_codes: 200
   retry:
     max: 2
     when:
@@ -461,9 +498,12 @@ upgrade:
     - *package_install
     - *package_wait
     - *package_upgrade_test
+    - *deprecation_check
     - touch $CI_PROJECT_DIR/success
   allow_failure:
-    exit_codes: 123
+    exit_codes: 
+      - 123
+      - 200
   retry:
     max: 2
     when:
