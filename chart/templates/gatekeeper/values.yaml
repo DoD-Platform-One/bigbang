@@ -55,6 +55,10 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   hostNetworking:
     parameters:
       excludedResources:
+        # Twistlock, by default, does its own network monitoring. hostNetworking is enabled by default for this purpose
+        # With hostNetworking enabled, Istio sidecar injection is disabled. If this function is disabled, Twistlock wil
+        # not be able to self monitor. If both Istio sidecar injection and TL monitoring are disabled, a security gap will
+        # be created for network monitoring in Twistlock, so it is  important to make sure at least one is enabled.
         - twistlock/twistlock-defender-ds-.*
   noHostNamespace:
     parameters:
