@@ -16,7 +16,7 @@ imagePullSecrets:
 openshift: {{ .Values.openshift }}
 
 authservice:
-  enabled: {{ .Values.addons.authservice.enabled }}
+  enabled: {{ or .Values.addons.authservice.enabled .Values.monitoring.sso.enabled .Values.jaeger.sso.enabled }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
