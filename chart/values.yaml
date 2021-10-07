@@ -829,7 +829,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.14.7-bb.0"
+      tag: "1.14.7-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1036,7 +1036,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
 
-    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi 
+    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi
     plugins: []
     # - aws
 
