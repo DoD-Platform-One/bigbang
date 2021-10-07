@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.2.10]
+### Added
+- Added additional echo statements around waits to assist with debug
+- Added wait for terminating pods before waiting for ready pods
+
 ## [1.2.9]
 ### Changed
 - Update check now exits with success when no changelog.md or chart/chart.yaml is found in the target branch.

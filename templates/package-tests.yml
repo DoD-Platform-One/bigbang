@@ -326,21 +326,36 @@ chart update check:
   - |
     if [ -f "tests/dependencies.yaml" ]; then
       sleep 10
+      echo -n "Waiting on CRDS ... "
       kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+      echo "done."
       if [ -f tests/dependencies.yaml ]; then
         yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
           dep_name=$i
           if [ -f repos/${dep_name}/tests/wait.sh ]; then
             source repos/${dep_name}/tests/wait.sh
-            echo "Waiting on dependency resources..."
+            echo -n "Waiting on dependency resources ... "
             wait_project
+            echo "done."
           fi
         done
       fi
+      echo -n "Waiting on stateful sets ... "
       wait_sts
+      echo "done."
+      echo -n "Waiting on daemon sets ... "
       wait_daemonset
+      echo "done."
+      echo -n "Waiting on deployments ... "
       kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+      echo "done."
+      echo -n "Waiting on terminating pods ... "
+      readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
+      for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+      echo "done."
+      echo -n "Waiting on running pods to be ready ... "
       kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+      echo "done."
     fi
 
 .package_install: &package_install
@@ -361,16 +376,31 @@ chart update check:
 .package_wait: &package_wait
   - |
     sleep 10
+    echo -n "Waiting on CRDs ... "
     kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+    echo "done."
     if [ -f tests/wait.sh ]; then
       source tests/wait.sh
-      echo "Waiting on project resources..."
+      echo -n "Waiting on project resources ... "
       wait_project
+      echo "done."
     fi
+    echo -n "Waiting on stateful sets ... "
     wait_sts
+    echo "done."
+    echo -n "Waiting on daemon sets ... "
     wait_daemonset
+    echo "done."
+    echo -n "Waiting on deployments ... "
     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+    echo "done."
+    echo -n "Waiting on terminating pods ... "
+    readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
+    for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+    echo "done."
+    echo -n "Waiting on running pods to be ready ... "
     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+    echo "done."
 
 .package_test: &package_test
   - |
