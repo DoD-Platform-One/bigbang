@@ -871,9 +871,59 @@ addons:
           memory: 16Mi
         limits: {}
       bbtests:
-        # TODO: Keycloak in CI not supported yet
-        enabled: false
+        enabled: true
         cypress:
           artifacts: true
           envs:
             cypress_url: "https://keycloak.bigbang.dev"
+            cypress_username: "admin"
+            cypress_password: "password"
+      # Custom dev secret configuration
+      secrets:
+        env:
+          stringData:
+            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
+            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
+            X509_CA_BUNDLE: /etc/x509/https/cas.pem
+        certauthority:
+          stringData:
+            cas.pem: '{{ .Files.Get "resources/dev/dod_cas.pem" }}'
+        customreg:
+          stringData:
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+        realm:
+          stringData:
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+      extraVolumes: |-
+        - name: certauthority
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-certauthority
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+      extraVolumeMounts: |-
+        - name: certauthority
+          mountPath: /etc/x509/https/cas.pem
+          subPath: cas.pem
+          readOnly: true
+        - name: customreg
+          mountPath: /opt/jboss/keycloak/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/jboss/keycloak/realm.json
+          subPath: realm.json
+          readOnly: true
+      
+      extraVolumeMountsBigBang:
+        - name: tlscert
+          mountPath: /etc/x509/https/tls.crt
+          subPath: tls.crt
+          readOnly: true
+        - name: tlskey
+          mountPath: /etc/x509/https/tls.key
+          subPath: tls.key
+          readOnly: true
