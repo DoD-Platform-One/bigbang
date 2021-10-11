@@ -395,6 +395,7 @@ package:
         --arg bb_registry_auth ${BB_REGISTRY_AUTH} \
         --arg registry1_auth ${REGISTRY1_AUTH} \
         --arg il2_registry_auth ${IL2_REGISTRY_AUTH} > /root/.docker/config.json
+    - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker Pull\e[37m"
     - cp ./scripts/package/synker.yaml ./synker.yaml
