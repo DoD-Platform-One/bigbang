@@ -38,6 +38,9 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace \
   --set registryCredentials[0].username='robot$bb-dev-imagepullonly' \
   --set registryCredentials[0].password="${REGISTRY1_PASSWORD}" \
   --set registryCredentials[0].registry=registry1.dso.mil \
+  --set registryCredentials[1].username="${DOCKER_USER}" \
+  --set registryCredentials[1].password="${DOCKER_PASSWORD}" \
+  --set registryCredentials[1].registry=docker.io \
   -f ${CI_VALUES_FILE}
 
 # apply secrets kustomization pointing to current branch or master if an upgrade job
