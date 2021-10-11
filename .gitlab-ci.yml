@@ -391,11 +391,11 @@ package:
     # Set up auth
     - mkdir -p /root/.docker
     - |
-      jq -n '{"auths": {"registry.dso.mil": {"auth": $bb_registry_auth}, "registry1.dso.mil": {"auth": $registry1_auth}, "registry.il2.dso.mil": {"auth": $il2_registry_auth} } }' \
+      jq -n '{"auths": {"registry.dso.mil": {"auth": $bb_registry_auth}, "registry1.dso.mil": {"auth": $registry1_auth}, "registry.il2.dso.mil": {"auth": $il2_registry_auth}, "https://index.docker.io/v1/": {"auth": $bb_docker_auth} } }' \
         --arg bb_registry_auth ${BB_REGISTRY_AUTH} \
         --arg registry1_auth ${REGISTRY1_AUTH} \
-        --arg il2_registry_auth ${IL2_REGISTRY_AUTH} > /root/.docker/config.json
-    - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+        --arg il2_registry_auth ${IL2_REGISTRY_AUTH} \
+        --arg bb_docker_auth ${DOCKER_AUTH} > /root/.docker/config.json
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker Pull\e[37m"
     - cp ./scripts/package/synker.yaml ./synker.yaml
