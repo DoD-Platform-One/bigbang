@@ -75,6 +75,9 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - mattermost/mattermost
   {{- end }}
 
+  imageDigest:
+    enabled: false
+
   namespacesHaveIstio:
     enabled: {{ .Values.istio.enabled }}
 
