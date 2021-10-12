@@ -32,8 +32,12 @@ The instance will automatically terminate in the middle of the night at 08:00 UT
       ```
 
 1. Install jq
-      Follow jq installation instructions for your workstation operating system.
-      <https://stedolan.github.io/jq/download/>
+      Follow jq installation instructions for your workstation operating system.   
+      https://stedolan.github.io/jq/download/
+
+
+1. Mac users will need to install the GNU version of the sed command.   
+   https://medium.com/@bramblexu/install-gnu-sed-on-mac-os-and-set-it-as-default-7c17ef1b8f64
 
 # Usage
 
@@ -54,7 +58,7 @@ k3d-dev.sh -b -p -m -d -h
 
 #  Troubleshooting
 
-1. If you are on a Mac insure that you have GNU sed command installed. Otherwise you will see this error 
+1. If you are on a Mac insure that you have GNU sed command installed. Otherwise you will see this error and the kubeconfig will not be updated with the IP from the instance.
       ```
       copy kubeconfig
       config                         100% 3019    72.9KB/s   00:00    
