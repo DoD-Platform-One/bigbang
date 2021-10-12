@@ -690,9 +690,10 @@ addons:
             fsGroup: 1001
 
       bbtests:
-        # TODO: Seems like a timing issue with BB CI
+        # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
         # https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/issues/7
-        enabled: false
+        # This issue can be reopened if problems reappear.
+        enabled: true
         cypress:
           artifacts: true
           envs:
