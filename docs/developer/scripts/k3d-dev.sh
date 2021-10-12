@@ -151,9 +151,12 @@ InstanceType="${InstSize}"
 VolumeSize=120
 
 # Lookup the image name to find the latest version
-echo -n Retrieving latest image ID matching ${AMIName} ...
-ImageId=$(aws ec2 describe-images --output json --no-cli-pager --filters "Name=name,Values=${AMIName}" --query "reverse(sort_by(Images, &CreationDate))[:1].ImageId" --output text)
-echo done
+# echo -n Retrieving latest image ID matching ${AMIName} ...
+# ImageId=$(aws ec2 describe-images --output json --no-cli-pager --filters "Name=name,Values=${AMIName}" --query "reverse(sort_by(Images, &CreationDate))[:1].ImageId" --output text)
+#echo done
+# Hardcode the latest image instead of searching for it to avoid unexpected changes
+echo Using AMI image id ami-84556de5
+ImageId=ami-84556de5
 
 # Create the launch spec
 echo -n Creating launch_spec.json ...
