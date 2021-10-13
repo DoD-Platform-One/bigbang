@@ -82,34 +82,12 @@ graph TB
   Thanos
   end
   ServiceMesh
-  ArgoCD
   Twistlock
   
   ClusterAuditor --> LoggingECK
   ClusterAuditor --> OPA(Policy Enforcement)
   end      
 ```
-
-### ArgoCD
-
-Product:
-
-* [ArgoCD](https://argoproj.github.io/argo-cd/)
-
-Repository:
-
-* [ArgoCD Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
-
-Dependency: None
-
-Owners:
-
-* @joshwolf - Rancher Federal
-* @karchaf
-
-Understudy:
-
-* @kavitha
 
 ### Service Mesh
 
@@ -126,16 +104,15 @@ Repository:
 
 Dependency: None
 
-Owners:
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator/-/blob/main/CODEOWNERS)
 
-* @runyontr - Runyon Solutions
-* @nick_tetrate - Tetrate
-
-Understudy:
-
-* Chris McGrath
-* @kavitha
-* @kenna81
+@joshwolf 
+@kavitha 
+@michaelmcleroy 
+@micah.nagel 
+@runyontr 
+@ryan.j.garcia 
+@stas
 
 ### Auth Service
 
@@ -153,8 +130,8 @@ Dependency: None
 
 Owners:
 
-* @runyontr - Runyon Solutions
-* @nick_tetrate - Tetrate
+* @runyontr - Defense Unicorns
+* @stas - Tetrate
 * @adam.toy - Rancher Federal
 
 Understudy:
@@ -207,7 +184,7 @@ Dependencies: None
 
 Owners:
 
-* @runyontr - Runyon Solutions
+* @runyontr - Defense Unicorns
 * @karchaf - Cloud Fit Software
 
 Understudy
@@ -251,7 +228,7 @@ Dependencies:
 
 Owners:
 
-* @runyontr - Runyon Solutions
+* @runyontr - Defense Unicorns
 * @thomas.burton - iSenpai
 
 Understudy:
@@ -278,7 +255,7 @@ Dependencies:
 
 Owners:
 
-* @runyontr - Runyon Solutions
+* @runyontr - Defense Unicorns
 * @thomas.burton - iSenpai
 
 ## Addons
@@ -606,7 +583,9 @@ Product:
 
 * [MinIO](https://min.io/)
 
-Repository: TBD
+Repository: 
+
+* [Minio Package](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/)
 
 Dependencies: None
 
@@ -657,12 +636,33 @@ Repository:
 
 Owners:
 
-* @runyontr - Runyon Solutions
+* @runyontr - Defense Unicorns
 * @still - Parsons
 
 ### Cluster Utilities
 
 Packages that provider cluster level utility, such as RWX storage or generic backup capabilities.
+
+#### ArgoCD
+
+Product:
+
+* [ArgoCD](https://argoproj.github.io/argo-cd/)
+
+Repository:
+
+* [ArgoCD Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
+
+Dependency: None
+
+Owners:
+
+* @joshwolf - Rancher Federal
+* @karchaf
+
+Understudy:
+
+* @kavitha
 
 #### Velero
 
@@ -678,6 +678,8 @@ Owners:
 
 * @tunde - Oteemo
 * @adam.toy - Rancher Federal
+* @toladipupo - Oteemo
+* @micah.nagel - Parsons
 
 ### Sandbox
 
