@@ -25,24 +25,22 @@ graph TB
   Thanos
   end
   ServiceMesh
-  ArgoCD
   
   ClusterAuditor --> LoggingECK
   ClusterAuditor --> OPA(Policy Enforcement)
   end      
 
-  subgraph "Package Utilities"
+  subgraph "Application Utilities"
     Postgres
     MinIO(S3 Compatible Storage)
     Redis
-    MySQL
-    MongoDB
   end
 
   subgraph "Security"
   Keycloak --> Postgres
   Anchore(Anchore Enterprise) --> Postgres
   Twistlock
+  Authservice
   end
 
   subgraph "Developer Tools"
@@ -51,12 +49,18 @@ graph TB
     GitLab --> Redis
     GitLab --> Postgres
     Sonarqube --> Postgres
+    Nexus --> Postgres
   end
 
   subgraph "Collaboration Tools"
-    Jira --> Postgres
-    Confluence --> Postgres
+    <!-- Jira --> Postgres
+    Confluence --> Postgres -->
     MatterMost --> MinIO
+  end
+
+  subgraph "Cluster Utilities"
+    ArgoCD
+    Velero
   end
 
 ```
