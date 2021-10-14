@@ -25,7 +25,6 @@ graph TB
   Thanos
   end
   ServiceMesh
-  ArgoCD
   
   ClusterAuditor --> LoggingECK
   ClusterAuditor --> OPA(Policy Enforcement)
@@ -54,8 +53,6 @@ graph TB
   end
 
   subgraph "Collaboration Tools"
-    Jira --> Postgres
-    Confluence --> Postgres
     MatterMost --> MinIO
   end
 
