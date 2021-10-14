@@ -40,8 +40,8 @@ graph TB
   Keycloak --> Postgres
   Anchore(Anchore Enterprise) --> Postgres
   Twistlock
-  end
   Authservice
+  end
 
   subgraph "Developer Tools"
     GitLab --> GitLabRunners(GitLab Runners)
@@ -62,6 +62,7 @@ graph TB
     ArgoCD
     Velero
   end
+
 ```
 
 ## Core
