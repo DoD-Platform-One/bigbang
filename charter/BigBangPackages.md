@@ -605,14 +605,8 @@ Owners:
 
 [Process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process)
 
-#### Graduated
-
 [Graduated](https://repo1.dso.mil/platform-one/big-bang/apps/graduated)
 
-#### Incubating
-
 [Incubating](https://repo1.dso.mil/platform-one/big-bang/apps/incubating)
-
-#### Sandbox
 
 [Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)
