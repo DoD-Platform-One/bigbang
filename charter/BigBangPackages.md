@@ -34,8 +34,6 @@ graph TB
     Postgres
     MinIO(S3 Compatible Storage)
     Redis
-    MySQL
-    MongoDB
   end
 
   subgraph "Security"
