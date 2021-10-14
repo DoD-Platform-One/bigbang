@@ -16,7 +16,7 @@ port: 20001
 image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
   # repo: quay.io/kiali/kiali-operator
-  tag: v1.39.0
+  tag: v1.40.1
   pullPolicy: IfNotPresent
   pullSecrets:
   - private-registry
@@ -57,6 +57,15 @@ watchNamespace: ""
 # Note that this will be overriden to "true" if cr.create is true and cr.spec.deployment.accessible_namespaces is ['**'].
 clusterRoleCreator: true
 
+# Set to a list of secrets in the cluster that the operator will be allowed to read. This is necessary if you want to
+# support Kiali CRs with spec.kiali_feature_flags.certificates_information_indicators.enabled=true.
+# The secrets in this list will be the only ones allowed to be specified in any Kiali CR (in the setting
+# spec.kiali_feature_flags.certificates_information_indicators.secrets).
+# If you set this to an empty list, the operator will not be given permission to read any additional secrets
+# found in the cluster, and thus will only support a value of "false" in the Kiali CR setting
+# spec.kiali_feature_flags.certificates_information_indicators.enabled.
+secretReader: ['cacerts', 'istio-ca-secret']
+
 # Set to true if you want to allow the operator to only be able to install Kiali in view-only-mode.
 # The purpose for this setting is to allow you to restrict the permissions given to the operator itself.
 onlyViewOnlyMode: false
@@ -93,7 +102,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.39.0
+      image_version: v1.40.1
       image_pull_secrets:
       - private-registry
       ingress_enabled: false
@@ -161,7 +170,7 @@ openshift: false
 # Used in templates/bigbang/svc-patch-job.yaml
 # Needed to cleanly upgrade from app version v1.32.0 to v1.36.0
 svcPatchJob:
-  enabled: true
+  enabled: false
   image:
     repository: registry1.dso.mil/ironbank/big-bang/base
     tag: 8.4

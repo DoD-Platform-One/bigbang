@@ -10,8 +10,6 @@ rules:
   resources:
   - configmaps
   - endpoints
-  - events
-  - persistentvolumeclaims
   - pods
   - serviceaccounts
   - services
@@ -38,6 +36,17 @@ rules:
   - create
   - list
   - watch
+{{- if gt (len .Values.secretReader) 0 }}
+- apiGroups: [""]
+  resourceNames:
+  {{- range .Values.secretReader }}
+  - {{ . }}
+  {{- end }}
+  resources:
+  - secrets
+  verbs:
+  - get
+{{- end }}
 - apiGroups: [""]
   resourceNames:
   - kiali-signing-key
