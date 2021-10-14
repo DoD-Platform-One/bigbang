@@ -601,10 +601,11 @@ Owners:
 * [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/CODEOWNERS)
 
 
-### BB TOC 
+### BB Technical Oversight Committee (BB TOC) 
 
 [Process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process)
 
+#### BB TOC Repos
 [Graduated](https://repo1.dso.mil/platform-one/big-bang/apps/graduated)
 
 [Incubating](https://repo1.dso.mil/platform-one/big-bang/apps/incubating)
