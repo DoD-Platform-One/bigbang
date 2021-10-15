@@ -3,10 +3,10 @@ name: nexus-repository-manager
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 34.0.0-bb.1
+version: 34.1-01-bb.0
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 3.34.0
+appVersion: 3.34.1
 
 description: Sonatype Nexus Repository Manager - Universal Binary repository
 

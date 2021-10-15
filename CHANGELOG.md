@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1-01-bb.0] - 2021-09-13
+### Update
+- Updated ironbank container because previous version had issues with non-fips nodes
+
 ## [34.0.0-bb.1] - 2021-09-13
 ### Modified
 - Updated values.yaml with examples of auditing/logging containers
