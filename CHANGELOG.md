@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1-01-bb.1] - 2021-10-12
+### Modified
+- Updated cypress tests and test values to run without errors.
+
 ## [34.1-01-bb.0] - 2021-09-13
 ### Update
 - Updated ironbank container because previous version had issues with non-fips nodes

@@ -5,7 +5,6 @@ bbtests:
     envs:
       cypress_nexus_url: "http://nexus-nexus-repository-manager:8081"
       cypress_nexus_user: "admin"
-      cypress_nexus_pass_new: "new_admin_password"
     secretEnvs:
       - name: cypress_nexus_pass
         valueFrom:
