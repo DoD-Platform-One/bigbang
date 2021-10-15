@@ -25,7 +25,6 @@ graph TB
   Thanos
   end
   ServiceMesh
-  ArgoCD
   
   ClusterAuditor --> LoggingECK
   ClusterAuditor --> OPA(Policy Enforcement)
@@ -35,8 +34,6 @@ graph TB
     Postgres
     MinIO(S3 Compatible Storage)
     Redis
-    MySQL
-    MongoDB
   end
 
   subgraph "Security"
@@ -54,8 +51,6 @@ graph TB
   end
 
   subgraph "Collaboration Tools"
-    Jira --> Postgres
-    Confluence --> Postgres
     MatterMost --> MinIO
   end
 
@@ -82,34 +77,12 @@ graph TB
   Thanos
   end
   ServiceMesh
-  ArgoCD
   Twistlock
   
   ClusterAuditor --> LoggingECK
   ClusterAuditor --> OPA(Policy Enforcement)
   end      
 ```
-
-### ArgoCD
-
-Product:
-
-* [ArgoCD](https://argoproj.github.io/argo-cd/)
-
-Repository:
-
-* [ArgoCD Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
-
-Dependency: None
-
-Owners:
-
-* @joshwolf - Rancher Federal
-* @karchaf
-
-Understudy:
-
-* @kavitha
 
 ### Service Mesh
 
@@ -127,15 +100,7 @@ Repository:
 Dependency: None
 
 Owners:
-
-* @runyontr - Runyon Solutions
-* @nick_tetrate - Tetrate
-
-Understudy:
-
-* Chris McGrath
-* @kavitha
-* @kenna81
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator/-/blob/main/CODEOWNERS)
 
 ### Auth Service
 
@@ -147,17 +112,12 @@ Product:
 
 Repository:
 
-* [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice)
+* [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
 
 Dependency: None
 
 Owners:
-
-* @runyontr - Runyon Solutions
-* @nick_tetrate - Tetrate
-* @adam.toy - Rancher Federal
-
-Understudy:
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/CODEOWNERS)
 
 ### Logging
 
@@ -182,13 +142,9 @@ Dependencies:
 * RWO StorageClass
 
 Owners:
-
-* @kavitha
-* @ryan.j.garcia
-
-Understudy:
-
-* @evan.rush
+* [Elasticsearch-kibana CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/blob/main/CODEOWNERS)
+* [Fluentbit CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/blob/main/CODEOWNERS)
+* [Eck-operator CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator/-/blob/main/CODEOWNERS)
 
 ### Policy Enforcement
 
@@ -207,13 +163,7 @@ Dependencies: None
 
 Owners:
 
-* @runyontr - Runyon Solutions
-* @karchaf - Cloud Fit Software
-
-Understudy
-
-* @agudem
-* @kavitha
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/-/blob/main/CODEOWNERS)
 
 ### Monitoring
 
@@ -233,8 +183,7 @@ Dependencies: None
 
 Owners:
 
-* @lynnStill
-* @ryan.j.garcia
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring/-/blob/main/CODEOWNERS)
 
 ### Cluster Auditor
 
@@ -251,12 +200,7 @@ Dependencies:
 
 Owners:
 
-* @runyontr - Runyon Solutions
-* @thomas.burton - iSenpai
-
-Understudy:
-
-* @kenna81
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor/-/blob/main/CODEOWNERS)
 
 Repository:
 
@@ -278,8 +222,7 @@ Dependencies:
 
 Owners:
 
-* @runyontr - Runyon Solutions
-* @thomas.burton - iSenpai
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/CODEOWNERS)
 
 ## Addons
 
@@ -319,14 +262,7 @@ Dependencies:
 
 Owners:
 
-* @megamind
-* @kevin.wilder
-* @michaelmcleroy
-
-Understudy:
-
-* @agudem
-* @kenna81
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/blob/main/CODEOWNERS)
 
 #### Anchore Enterprise
 
@@ -342,8 +278,7 @@ Dependencies:
 
 Owners:
 
-* @thomas.burton - iSenpai
-* @james.peterson - Anchore
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/CODEOWNERS)
 
 ### Developer Tools
 
@@ -389,8 +324,7 @@ Dependencies:
 
 Owners:
 
-* @ryan.j.garcia
-* @LynnStill
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/blob/main/CODEOWNERS)
 
 #### GitLab Runners
 
@@ -410,12 +344,7 @@ Dependencies:
 
 Owners:
 
-* @ryan.j.garcia
-* @LynnStill
-
-Understudies
-
-* @kevin.wilder
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner/-/blob/main/CODEOWNERS)
 
 #### Sonarqube
 
@@ -436,27 +365,7 @@ Dependencies:
 
 Owners:
 
-* @kevin.wilder
-* @LynnStill
-
-#### Fortify
-
-Fortify provides code
-
-Product:
-
-*
-
-Repository:
-
-* [Fortify Repo](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/fortify)
-
-Dependencies:
-
-Owners:
-
-* @kevin.wilder
-* @LynnStill
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube/-/blob/main/CODEOWNERS)
 
 #### Nexus
 
@@ -471,15 +380,13 @@ Product:
 
 Repository:
 
-* [Nexus](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus)
+* [Nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus)
 
 Dependencies:
 
 Owners:
 
-* @kevin.wilder
-* @ariel.shnitzer
-* @grant.duncklee
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/blob/main/CODEOWNERS)
 
 ### Collaboration Tools
 
@@ -500,7 +407,7 @@ graph TB
 
 ```
 
-#### Confluence
+<!-- #### Confluence
 
 Confluence provides a centralized workspace for collaborating on documentation
 
@@ -542,7 +449,7 @@ Dependencies:
 Owners:
 
 * @matt.kaiser
-* @branden.cobb
+* @branden.cobb -->
 
 #### Mattermost
 
@@ -562,8 +469,7 @@ Dependencies:
 
 Owners:
 
-* @ryan.j.garcia
-* @kevin.wilder
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/CODEOWNERS)
 
 ### Package Utilities
 
@@ -606,14 +512,15 @@ Product:
 
 * [MinIO](https://min.io/)
 
-Repository: TBD
+Repository: 
+
+* [Minio Package](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/)
 
 Dependencies: None
 
 Owners:
 
-* @kevin.wilder - Dark Wolf Solutions
-* @branden.cobb
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/blob/main/CODEOWNERS)
 
 #### MySQL
 
@@ -657,12 +564,27 @@ Repository:
 
 Owners:
 
-* @runyontr - Runyon Solutions
-* @still - Parsons
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/redis/-/blob/main/CODEOWNERS)
 
 ### Cluster Utilities
 
 Packages that provider cluster level utility, such as RWX storage or generic backup capabilities.
+
+#### ArgoCD
+
+Product:
+
+* [ArgoCD](https://argoproj.github.io/argo-cd/)
+
+Repository:
+
+* [ArgoCD Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
+
+Dependency: None
+
+Owners:
+
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/blob/main/CODEOWNERS)
 
 #### Velero
 
@@ -676,13 +598,16 @@ Repository:
 
 Owners:
 
-* @tunde - Oteemo
-* @adam.toy - Rancher Federal
+* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/CODEOWNERS)
 
-### Sandbox
 
-The [Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox) is an area for packages that are currently being or will be worked that do not yet meet the requirements of a supported package.  Due to the fluidity of sandbox apps, they are not tracked in the charter.
+### BB Technical Oversight Committee (BB TOC) 
 
-Note, this is _not_ a place where packages go to die.  If a package is abandoned for whatever reason it will be archived.
+[Process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process)
 
-To graduate from a sandbox package, it must meet the requirements outlined in this charter.
+#### BB TOC Repos
+[Graduated](https://repo1.dso.mil/platform-one/big-bang/apps/graduated)
+
+[Incubating](https://repo1.dso.mil/platform-one/big-bang/apps/incubating)
+
+[Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)

@@ -24,17 +24,9 @@ Each package will work with any cluster under the following criteria.
 
 ## PR-X. Iron Bank Images
 
-Every Big Bang Package shall be configured to use Iron Bank images.  The images used from Iron Bank __must__ be _fully_ approved and _functional_ to be in compliance with the Big Bang baseline security posture.
+Big Bang Package shall be configured to use Iron Bank images.  The images used from Iron Bank __must__ be _fully_ approved and _functional_ to be in compliance with the Big Bang baseline security posture.
 
-Once this prerequisite is met, a package is eligible for inclusion within BigBang in accordance with [New Package Requests](NewPackageRequests.md).
-
-### Out-of-Tree Packages
-
-[Out-of-Tree Packages](https://repo1.dso.mil/platform-one/big-bang/apps/third-party) are third party packages that adhere to all the BigBang package standards.  These packages are predominantly community-maintained packages; however, some packages may be jointly maintained by BigBang and community as indicated by the codeowners. 
-
-### In-Tree Packages
-
-[In-Tree Packages](https://repo1.dso.mil/platform-one/big-bang/apps) are Platform One developer-supported Big Bang Core & add-ons that adhere to all the BigBang package standards. These packages have been adopted as an official Big Bang offering for key customers. As such, they are supported, updated, and maintained by team members of BigBang and are labeled with the "BigBang Supported" badge on the repository's `README.md` page, which indicates active support.  That being said, BigBang reserves the right to deprecate support for these packages.
+Please see [New Package Requests](NewPackageRequests.md) and the [BBTOC process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process) for additional pre-requisites. 
 
 ## PR-X. Packages are Helm Charts
 
@@ -83,7 +75,7 @@ include:
     file: '/templates/package-tests.yaml'
 ```
 
-## PR-X. Dependencies must be Big Bang Package
+## PR-X. Dependencies must be a Big Bang Package
 
 If a Package has a dependency on another Package to function, the dependency shall also be a Big Bang Package
 
