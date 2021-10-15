@@ -21,6 +21,10 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:
   enabled: {{ .Values.logging.enabled }}
+
+sso:
+  enabled: {{ .Values.jaeger.sso.enabled }}
+
 {{- if .Values.jaeger.sso.enabled }}
 jaeger:
   spec:
