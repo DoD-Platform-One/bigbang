@@ -11,8 +11,6 @@ describe('Basic Nexus', function() {
       cy.contains("Next").click({ force: true })
       cy.contains("Disable anonymous access").click({ force: true })
       cy.contains("Next").click({ force: true })
-      cy.contains("No, not interested.").click({ force: true })
-      cy.contains("Next").click({ force: true })
       cy.contains("Finish").click()
       cy.visit(`${Cypress.env('nexus_url')}/#admin/support/status`)
     })        

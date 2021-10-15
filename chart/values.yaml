@@ -101,7 +101,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.34.0-01
+  tag: 3.34.1-01
   pullPolicy: IfNotPresent
 
 nexus:
@@ -114,8 +114,9 @@ nexus:
     #    port: 5000
     #    secretName: registrySecret
   env:
-    - name: install4jAddVmParams
+    - name: INSTALL4J_ADD_VM_PARAMS
       # using values based on 8GB of RAM on host -- https://help.sonatype.com/repomanager3/installation/system-requirements
+      # -Dcom.redhat.fips must be set to true to work on FIPS nodes
       value: "-Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "true"
