@@ -13,6 +13,7 @@ istio:
   sonarqube:
     gateways:
     - istio-system/{{ default "public" .Values.addons.sonarqube.ingress.gateway }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
