@@ -79,9 +79,9 @@ chart/values.yaml               @lynnstill @ryan.j.garcia @michaelmartin
 chart/templates/monitoring      @lynnstill @ryan.j.garcia @michaelmartin
 
 ^[Twistlock]
-chart/Chart.yaml                @thomas.burton @ryan.j.garcia @runyontr @joshwolf
-chart/values.yaml               @thomas.burton @ryan.j.garcia @runyontr @joshwolf
-chart/templates/twistlock       @thomas.burton @ryan.j.garcia @runyontr @joshwolf
+chart/Chart.yaml                @thomas.burton @ryan.j.garcia @runyontr @micah.nagel
+chart/values.yaml               @thomas.burton @ryan.j.garcia @runyontr @micah.nagel
+chart/templates/twistlock       @thomas.burton @ryan.j.garcia @runyontr @micah.nagel
 
 ^[Sonarqube]
 chart/Chart.yaml                @kevin.wilder @lynnstill @brandencobb
