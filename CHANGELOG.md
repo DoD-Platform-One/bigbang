@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1.0-bb.0] - 2021-10-15
+### Modified
+- Fixing chart versioning.
+
 ## [34.1-01-bb.1] - 2021-10-12
 ### Modified
 - Updated cypress tests and test values to run without errors.
