@@ -786,9 +786,7 @@ addons:
             cpu: 100m
             memory: 1500Mi
       bbtests:
-        # TODO: Disabled pending resolution of "timing?" issues
-        # https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/issues/9
-        enabled: false
+        enabled: true
         cypress:
           artifacts: true
           envs:
