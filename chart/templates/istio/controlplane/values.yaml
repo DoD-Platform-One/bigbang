@@ -47,6 +47,8 @@ gateways:
   {{ $name | nindent 2 }}:
     selector:
       app: {{ $values.ingressGateway }}
+    autoHttpRedirect:
+      enabled: {{ dig "autoHttpRedirect" "enabled" "true" $values }}
     servers:
     - hosts:
       {{ tpl ($values.hosts | default (list) | toYaml) $ | nindent 8 }}
