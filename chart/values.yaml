@@ -15,7 +15,6 @@ port: 20001
 
 image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  # repo: quay.io/kiali/kiali-operator
   tag: v1.40.1
   pullPolicy: IfNotPresent
   pullSecrets:
