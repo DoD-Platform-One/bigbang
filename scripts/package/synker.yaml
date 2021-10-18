@@ -48,7 +48,7 @@ source:
     # - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check616-sonar-scanner45-dotnet-31:052421
     # gitlab-runner-helper image: This image does not get captured from the release deployment
     # the gitlab-runner-helper image only gets pulled when a pipeline runs. So it must be listed here
-    - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v13.12.0
+    - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v14.3.1
     # Explicitly add Keycloak image because Keycloak is not enabled in pipelines so the image does not get pulled
     - registry.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/keycloak-ib:14.0.0-1.0.4-1
     # Don't include until fortify is supported

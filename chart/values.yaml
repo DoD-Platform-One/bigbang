@@ -663,12 +663,12 @@ addons:
     postRenderers: []
 
   gitlabRunner:
-    # -- Toggle deployment of Gitlab Runner.
+    # -- Toggle deployment of Gitlab Runner
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
       path: "./chart"
-      tag: "0.32.0-bb.1"
+      tag: "0.33.1-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
