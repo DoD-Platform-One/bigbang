@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: 17a9c316624427587ac197ebfcd368ac89883278
-    repo: https://github.com/Oteemo/charts
-    directory: /charts/sonatype-nexus
-    ref: sonatype-nexus-4.2.0
+    commit: faa51a73a2fc2466a0345f5aefe0fa43bfe05799
+    repo: https://github.com/sonatype/helm3-charts
+    directory: /charts/nexus-repository-manager
+    ref: nexus-repository-manager-34.1.0
