@@ -37,9 +37,7 @@ logging:
     kibana:
       count: 1
     bbtests:
-      # TODO: Connection refused on the script test currently
-      # https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/issues/39
-      enabled: false
+      enabled: true
       cypress:
         artifacts: true
         envs:
