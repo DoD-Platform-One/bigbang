@@ -64,9 +64,16 @@ pre vars:
     reports:
       dotenv: variables.env
   script:
-  # Create the TF_VAR_env variable
-  - echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
-  - cat variables.env
+    # Create the TF_VAR_env variable
+    - echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
+    - cat variables.env
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -136,6 +143,12 @@ clean install:
     when: always
   allow_failure:
     exit_codes: 123
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 upgrade:
   stage: smoke tests
@@ -176,6 +189,12 @@ upgrade:
     when: always
   allow_failure:
     exit_codes: 123
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Rules for execution of AWS based K3S cluster deployment:  Infrastructure jobs
@@ -282,7 +301,6 @@ aws/rke2/bigbang up:
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
     # Deploy a default storage class for aws
     - kubectl apply -f ${CI_PROJECT_DIR}/.gitlab-ci/jobs/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
-
   script:
     - *deploy_bigbang
   environment:
@@ -352,6 +370,12 @@ aws/rke2/bigbang down:
     - sleep 180
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 # Destroy RKE2 cluster on AWS
 aws/rke2/cluster down:
@@ -435,6 +459,12 @@ package:
         aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
       fi
   after_script: []
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 release:
   stage: release
@@ -464,5 +494,11 @@ release:
           --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
           --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
       fi
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 #-----------------------------------------------------------------------------------------------------------------------
