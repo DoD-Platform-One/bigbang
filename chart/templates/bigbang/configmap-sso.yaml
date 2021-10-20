@@ -6,7 +6,7 @@ metadata:
   labels: {{- include "nexus.labels" . | nindent 4 }}
 {{- if .Values.nexus.extraLabels }}
   {{- with .Values.nexus.extraLabels }}
-    {{ toYaml . }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 data:
@@ -15,4 +15,3 @@ data:
   realm: '[{{ join "\",\"" .Values.sso.realm | printf "\"%s\""}}]'
   role: {{ .Values.sso.role | toJson | quote }}
 {{- end }}
-

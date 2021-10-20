@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1.0-bb.2] - 2021-10-20
+### Modified
+- Fixed extraLabels indentation
+
 ## [34.1.0-bb.1] - 2021-10-20
 ### Modified
 - Fixed java environment var
