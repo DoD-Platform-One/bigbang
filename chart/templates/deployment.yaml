@@ -6,7 +6,7 @@ metadata:
 {{ include "nexus.labels" . | indent 4 }}
 {{- if .Values.nexus.extraLabels }}
   {{- with .Values.nexus.extraLabels }}
-    {{ toYaml . }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 {{- if .Values.deployment.annotations }}
@@ -35,7 +35,7 @@ spec:
       labels:
         {{- include "nexus.selectorLabels" . | nindent 8 }}
         {{- with .Values.nexus.extraLabels }}
-        {{ toYaml . }}
+          {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
       serviceAccountName: {{ include "nexus.serviceAccountName" . }}

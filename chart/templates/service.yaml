@@ -12,7 +12,7 @@ metadata:
     {{- include "nexus.labels" . | nindent 4 }}
 {{- if .Values.nexus.extraLabels }}
   {{- with .Values.nexus.extraLabels }}
-    {{ toYaml . }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 spec:
@@ -44,7 +44,7 @@ metadata:
     {{- include "nexus.labels" $ | nindent 4 }}
     {{- if $.Values.nexus.extraLabels }}
       {{- with $.Values.nexus.extraLabels }}
-        {{ toYaml . | indent 4 }}
+        {{- toYaml . | nindent 4 }}
       {{- end }}
     {{- end }}
 spec:
