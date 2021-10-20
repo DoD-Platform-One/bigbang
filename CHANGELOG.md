@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1.0-bb.1] - 2021-10-20
+### Modified
+- Fixed java environment var
+
 ## [34.1.0-bb.0] - 2021-10-15
 ### Modified
 - Fixing chart versioning.
