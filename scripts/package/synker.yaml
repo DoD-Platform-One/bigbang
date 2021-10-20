@@ -53,3 +53,20 @@ source:
     - registry.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/keycloak-ib:14.0.0-1.0.4-1
     # Don't include until fortify is supported
     #- registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
+    # Needed for Gitlab 5.0.5-bb.0 as part of the rolling upgrade to 5.3.1-bb.x
+    - registry.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/postgresql:12.7.0
+    - registry1.dso.mil/ironbank/bitnami/analytics/redis-exporter:1.18.0
+    - registry1.dso.mil/ironbank/gitlab/gitlab/alpine-certificates:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/cfssl-self-sign:1.4.1
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitaly:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-container-registry:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-shell:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-sidekiq:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-task-runner:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-webservice:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-workhorse:14.0.5
+    - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:14.0.5
+    - registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2021-03-23T05-46-11Z
+    - registry1.dso.mil/ironbank/opensource/minio/minio:RELEASE.2021-04-06T23-11-00Z
+    - registry1.dso.mil/ironbank/opensource/redis/redis5:5.0.9
+    - registry1.dso.mil/ironbank/redhat/ubi/ubi8:8.4
