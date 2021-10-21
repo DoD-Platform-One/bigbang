@@ -109,12 +109,19 @@ pre vars:
       echo "Executing ${test_script}..."
       ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
       if [[ ${EXIT_CODE} -ne 0 ]]; then
-        echo "${test_script} failed, see log output above and cluster debug."
-        exit ${EXIT_CODE}
+        if [[ ${EXIT_CODE} -ne 123 ]]; then
+          echo -e "\e[31m${test_script} failed, see log output above and cluster debug.\e[0m"
+          exit ${EXIT_CODE}
+        fi
+        # 123 error codes are allowed to continue
+        echo -e "\e[31m${test_script} failed but was allowed to continue, see log output above and cluster debug.\e[0m"
+        EXIT_FLAG=1
       fi
       echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
     done
-
+    if [[ -n "$EXIT_FLAG" ]]; then
+      echo -e "\e[31mWARNING: One or more BB tests failed but were allowed to continue. See output of scripts above for details.\e[0m"
+    fi
 clean install:
   stage: smoke tests
   extends:
@@ -135,6 +142,10 @@ clean install:
     - echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
     - echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
     - *test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
   artifacts:
     paths:
       - images.txt
@@ -182,6 +193,10 @@ upgrade:
     - echo -e "\e[0Ksection_end:`date +%s`:git_upgrade\r\e[0K"
     - *deploy_bigbang
     - *test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
   artifacts:
     paths:
       - "test-artifacts/"
@@ -334,6 +349,10 @@ aws/rke2/bigbang test:
     - ./scripts/hosts.sh
     - echo -e "\e[0Ksection_end:`date +%s`:host_setup\r\e[0K"
     - *test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   allow_failure:
