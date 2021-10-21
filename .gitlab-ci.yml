@@ -457,11 +457,8 @@ package:
     - crane pull registry:2 registry.tar
     - mv registry.tar /var/lib/registry/
     - echo -e "\e[0Ksection_start:`date +%s`:package_synker[collapsed=true]\r\e[0K\e[33;1mPackage Images\e[37m"
-    - tar -C /var/lib/registry -czvf $IMAGE_PKG .
-    - echo -e "\e[0Ksection_end:`date +%s`:package_synker\r\e[0K"
-    - echo -e "\e[0Ksection_start:`date +%s`:unpack_images[collapsed=true]\r\e[0K\e[33;1mUnpack Images\e[37m"
     - tar -czvf $IMAGE_PKG /var/lib/registry
-    - echo -e "\e[0Ksection_end:`date +%s`:unpack_images\r\e[0K"
+    - echo -e "\e[0Ksection_end:`date +%s`:package_synker\r\e[0K"
     # Package dependent repos
     - echo -e "\e[0Ksection_start:`date +%s`:package_repos[collapsed=true]\r\e[0K\e[33;1mPackage Repos\e[37m"
     - ./scripts/package/gits.sh
