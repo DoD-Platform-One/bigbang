@@ -77,3 +77,18 @@ Once the client has been created and the Client SAML Endpoint has been set, an a
   | Email       | User Property | email     | email         | email               | Basic                     |
   | Groups      | Group list    | groups    | groups        | *N/A*               | Basic                     |
 
+17. FINAL NOTE: If your Keycloak client is already configured but you have a new Nexus deployment you must update the Nexus x509 certificate in the Keycloak client.
+  - get new Nexus x509 cert from Nexus Admin UI after logging in as ```admin``` user  
+      https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+  - copy and paste the single line cert into a text file
+      ```
+      vi nexus-x509.txt
+      -----BEGIN CERTIFICATE-----
+      paste single line Nexus x509 certificate here 
+      -----END CERTIFICATE-----
+      ```
+  - make a valid pem file with proper wrapping at 64 characters per line
+      ```
+      fold -w 64 nexus-x509.txt > nexus.pem
+      ```
+  - in Keycloak Nexus client on the ```Keys``` tab import the nexus.pem file in two places, ```the Signing Key``` and the ```Encryption Key```
