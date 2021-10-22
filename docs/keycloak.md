@@ -69,6 +69,8 @@ Once the client has been created and the Client SAML Endpoint has been set, an a
 15. To map an attribute, select the Mappers tab and then click on 'Create'.
 16. Create a mapper for each of the mappable attributes with the values shown here:
 
+**Note: You must turn off `Full group path` when generating the `groups` mapper.**
+
   | Name        | Mapper Type   | Property  | Friendly Name | SAML Attribute Name | SAML Attribute NameFormat |
   |-------------|---------------|-----------|---------------|---------------------|---------------------------|
   | username    | User Property | username  | username      | username            | Basic                     |
