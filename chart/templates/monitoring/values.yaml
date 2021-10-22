@@ -22,10 +22,11 @@ minioOperator:
   enabled: {{ .Values.addons.minioOperator.enabled }}
   
 istio:
+  {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
   enabled: {{ .Values.istio.enabled }}
   prometheus:
     enabled: true
-    {{- if .Values.monitoring.sso.enabled }}
+    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
@@ -34,7 +35,7 @@ istio:
     - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   alertmanager:
     enabled: true
-    {{- if .Values.monitoring.sso.enabled }}
+    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
     service: authservice-haproxy-sso
     port: 8080
     namespace: authservice
@@ -45,9 +46,30 @@ istio:
     enabled: true
     gateways:
     - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
+
+{{- if .Values.monitoring.sso.enabled }}
+alertmanager:
+  alertmanagerSpec:
+    {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+    {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+    podMetadata:
+      labels:
+        {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
+prometheus:
+  prometheusSpec:
+    {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+    {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+    podMetadata:
+      labels:
+        {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
+{{- end }}
 
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
+
+kiali:
+  enabled: {{ .Values.kiali.enabled }}
 
 global:
   imagePullSecrets:

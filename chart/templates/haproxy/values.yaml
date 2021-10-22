@@ -1,4 +1,5 @@
-{{- if and .Values.istio.enabled .Values.monitoring.sso.enabled }}
+{{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
+{{- if and .Values.istio.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.haproxy "name" "haproxy-sso" "defaults" (include "bigbang.defaults.haproxy-sso" .)) }}
 {{- end }}
 
