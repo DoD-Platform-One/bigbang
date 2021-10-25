@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [34.1.0-bb.3] - 2021-10-21
+### Modified
+- Added multi role feature to Nexus.
+
 ## [34.1.0-bb.2] - 2021-10-20
 ### Modified
 - Fixed extraLabels indentation

@@ -36,13 +36,13 @@ sso:
     - "NexusAuthorizingRealm"
     - "SamlRealm"
   role:
-    id: "nexus"
-    name: "nexus"
-    description: "nexus group"
-    privileges:
-      - "nx-all"
-    roles:
-      - "nx-admin"
+    - id: "nexus"
+      name: "nexus"
+      description: "nexus group"
+      privileges:
+        - "nx-all"
+      roles:
+        - "nx-admin"
 proxy:
   enabled: false
   request:
