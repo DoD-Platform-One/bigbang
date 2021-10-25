@@ -1,4 +1,4 @@
-{{- if and .Values.sso.enabled .Values.secret.enabled .Values.license_key }}
+{{- if and .Values.sso.enabled .Values.secret.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -28,6 +28,8 @@ spec:
           - |
             until curl --head localhost:15000; do echo "Waiting for Sidercar"; sleep 10; done; echo "Sidecar available"  &&
             BASE_URL="http://{{ template "nexus.name" . }}.{{ template "nexus.name" . }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
+            # If there is a license key
+            {{- if .Values.license_key }}
             # saml metadata
             curl -X PUT \
                  -u admin:"$API_CREDENTIALS" \
@@ -42,15 +44,21 @@ spec:
                  -H "accept: application/json" \
                  -H "Content-Type: application/json" \
                  -d "$REALM" &&
+            {{- end }}
             # role creation
+            {{- range .Values.sso.role }}
             curl -X POST \
                  -u admin:"$API_CREDENTIALS" \
                  "$BASE_URL/service/rest/v1/security/roles" \
                  -H "accept: application/json" \
                  -H "Content-Type: application/json" \
-                 -d "$ROLE" &&
+                 -d {{ . | toJson | quote }} &&
+            {{- end }} 
+
+            echo "Created roles"
             curl -fsI -X POST http://localhost:15020/quitquitquit &&
             exit
+        
         env:
         - name: API_CREDENTIALS
           valueFrom:
