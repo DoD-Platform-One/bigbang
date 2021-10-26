@@ -5,7 +5,6 @@
     "dependencyDashboardAutoclose": true,
     "dependencyDashboardHeader": "- [ ] Sync upstream helm chart version with updated dependencies.",
     "dependencyDashboardTitle": "Renovate: Upgrade Kiali Package Dependencies",
-    "dependencyDashboardLabels": ["kiali","renovate","Package Sustainment"],
     "draftPR": true,
     "enabledManagers": ["helm-values","regex"],
     "ignorePaths": ["chart/charts/**"],
