@@ -2,7 +2,7 @@
 
 # exit on error
 set -e
-trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 # Quick check for non iron bank images
 echo "Showing images not from ironbank:"

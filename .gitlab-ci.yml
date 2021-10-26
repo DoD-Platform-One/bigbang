@@ -32,16 +32,16 @@ include:
 #  - Smoke tests are executed for all pipelines except scheduled nightly runs.
 #  -
 stages:
-  - smoke tests
-  - network up
-  - cluster up
-  - bigbang up
-  - test
-  - bigbang down
-  - cluster down
-  - network down
-  - package
-  - release
+  - 🔥 smoke tests
+  - 🔌 network up
+  - ⚓ cluster up
+  - 🌌 bigbang up
+  - 🤞 test
+  - 💣 bigbang down
+  - 💣 cluster down
+  - 💣 network down
+  - 📦 package
+  - 🚀 release
 
 variables:
   RELEASE_BUCKET: umbrella-bigbang-releases
@@ -110,20 +110,20 @@ pre vars:
       ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
       if [[ ${EXIT_CODE} -ne 0 ]]; then
         if [[ ${EXIT_CODE} -ne 123 ]]; then
-          echo -e "\e[31m${test_script} failed, see log output above and cluster debug.\e[0m"
+          echo -e "\e[31m❌ ${test_script} failed, see log output above and cluster debug.\e[0m"
           exit ${EXIT_CODE}
         fi
         # 123 error codes are allowed to continue
-        echo -e "\e[31m${test_script} failed but was allowed to continue, see log output above and cluster debug.\e[0m"
+        echo -e "\e[31m⚠️ ${test_script} failed but was allowed to continue, see log output above and cluster debug.\e[0m"
         EXIT_FLAG=1
       fi
       echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
     done
     if [[ -n "$EXIT_FLAG" ]]; then
-      echo -e "\e[31mWARNING: One or more BB tests failed but were allowed to continue. See output of scripts above for details.\e[0m"
+      echo -e "\e[31m⚠️ WARNING: One or more BB tests failed but were allowed to continue. See output of scripts above for details.\e[0m"
     fi
 clean install:
-  stage: smoke tests
+  stage: 🔥 smoke tests
   extends:
     - .k3d-ci
   variables:
@@ -162,7 +162,7 @@ clean install:
       - runner_system_failure
 
 upgrade:
-  stage: smoke tests
+  stage: 🔥 smoke tests
   dependencies:
     - pre vars
   extends:
@@ -180,13 +180,13 @@ upgrade:
   variables:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
-    - echo "Install Big Bang from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - echo "🌌 Install Big Bang from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
     - echo -e "\e[0Ksection_start:`date +%s`:git_master[collapsed=true]\r\e[0K\e[33;1mGit Fetch Master\e[37m"  
     - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
     - echo -e "\e[0Ksection_end:`date +%s`:git_master\r\e[0K"
     - *deploy_bigbang
     - *test_bigbang
-    - echo "Upgrade Big Bang from ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
+    - echo "🌌 Upgrade Big Bang from ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
     - echo -e "\e[0Ksection_start:`date +%s`:git_upgrade[collapsed=true]\r\e[0K\e[33;1mGit Upgrade\e[37m"    
     - git reset --hard && git clean -fd
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
@@ -217,7 +217,7 @@ upgrade:
 
 # Abstract for job manually triggering infrastructure builds
 .infra fork:
-  stage: network up
+  stage: 🔌 network up
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
     - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
@@ -264,7 +264,7 @@ aws/network down:
     - .bigbang-gitlab-runner-tags
     - .infra cleanup
     - .network down
-  stage: network down
+  stage: 💣 network down
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     action: stop
@@ -283,7 +283,7 @@ aws/network down:
 
 # Create RKE2 cluster on AWS
 aws/rke2/cluster up:
-  stage: cluster up
+  stage: ⚓ cluster up
   extends:
     - .bigbang-gitlab-runner-tags
     - .infra create
@@ -303,7 +303,7 @@ aws/rke2/cluster up:
 
 # Install BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang up:
-  stage: bigbang up
+  stage: 🌌 bigbang up
   extends:
     - .bigbang-gitlab-runner-tags
     - .infra create
@@ -329,7 +329,7 @@ aws/rke2/bigbang up:
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
-  stage: test
+  stage: 🤞 test
   extends:
     - .bigbang-gitlab-runner-tags
     - .infra create
@@ -371,7 +371,7 @@ aws/rke2/bigbang test:
 
 # Uninstall BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang down:
-  stage: bigbang down
+  stage: 💣 bigbang down
   extends:
     - .bigbang-gitlab-runner-tags
     - .infra cleanup
@@ -398,7 +398,7 @@ aws/rke2/bigbang down:
 
 # Destroy RKE2 cluster on AWS
 aws/rke2/cluster down:
-  stage: cluster down
+  stage: 💣 cluster down
   extends:
     - .bigbang-gitlab-runner-tags
     - .infra cleanup
@@ -423,7 +423,7 @@ aws/rke2/cluster down:
 #
 
 package:
-  stage: package
+  stage: 📦 package
   image: registry.dso.mil/platform-one/big-bang/bigbang/synker:0.0.3
   extends:
     - .bigbang-gitlab-runner-tags
@@ -483,7 +483,7 @@ package:
       - runner_system_failure
 
 release:
-  stage: release
+  stage: 🚀 release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   extends:
     - .bigbang-gitlab-runner-tags

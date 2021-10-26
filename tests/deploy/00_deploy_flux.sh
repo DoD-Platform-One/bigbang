@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-set -ex
-trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+set -e
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+set -x
 
 # install flux with the dedicated helper script
 ./scripts/install_flux.sh \

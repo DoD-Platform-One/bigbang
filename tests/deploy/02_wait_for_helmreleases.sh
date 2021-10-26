@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 ## Array of core HRs
 CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
@@ -37,12 +37,12 @@ function array_contains() {
 ## Function to check/wait on HR existence
 function check_if_hr_exist() {
     timeElapsed=0
-    echo "Waiting for $1 HR to exist"
+    echo "⏳ Waiting for $1 HR to exist"
     until kubectl get hr -n bigbang $1 &> /dev/null; do
       sleep 5
       timeElapsed=$(($timeElapsed+5))
       if [[ $timeElapsed -ge 60 ]]; then
-         echo "Timed out while waiting for $1 HR to exist"
+         echo "❌ Timed out while waiting for $1 HR to exist"
          exit 1
       fi
     done
@@ -61,7 +61,7 @@ function wait_all_hr() {
               break
             else
               artifactfailedcounter=$(($artifactfailedcounter+1))
-              echo "Helm Artifact Failed, waiting 5 seconds."
+              echo "⏳ Helm Artifact Failed, waiting 5 seconds."
               sleep 5
               hrstatus=$(kubectl get hr -n bigbang -o jsonpath='{.items[*].status.conditions[0].reason}')
             fi
@@ -70,8 +70,8 @@ function wait_all_hr() {
         if [[ "$hrstatus" =~ Failed ]]; then
             state=$(kubectl get hr -A -o go-template='{{range $items,$contents := .items}}{{printf "HR %s" $contents.metadata.name}}{{printf " status is %s\n" (index $contents.status.conditions 0).reason}}{{end}}')
             failed=$(echo "${state}" | grep "Failed")
-            echo "Found failed Helm Release(s). Exiting now."
-            echo "${failed}"
+            echo "❌ Found failed Helm Release(s). Exiting now."
+            echo "❌ ${failed}"
             failed_hrs=$(echo "{$failed}" | awk  '{print $2}')
             for hr in $failed_hrs; do
                 kubectl describe hr -n bigbang $hr
@@ -80,14 +80,14 @@ function wait_all_hr() {
         fi
         if [[ "$hrready" != *Unknown* ]]; then
             if [[ "$hrready" != *False* ]]; then
-                echo "All HR's deployed"
+                echo "✅ All HR's deployed"
                 break
             fi
         fi
         sleep 5
         timeElapsed=$(($timeElapsed+5))
         if [[ $timeElapsed -ge 1800 ]]; then
-            echo "Timed out while waiting for hr's to be ready."
+            echo "❌ Timed out while waiting for hr's to be ready."
             exit 1
         fi
     done
@@ -107,7 +107,7 @@ function wait_sts() {
       sleep 5
       timeElapsed=$(($timeElapsed+5))
       if [[ $timeElapsed -ge 600 ]]; then
-         echo "Timed out while waiting for stateful sets to be ready."
+         echo "❌ Timed out while waiting for stateful sets to be ready."
          exit 1
       fi
    done
@@ -127,7 +127,7 @@ function wait_daemonset(){
       sleep 5
       timeElapsed=$(($timeElapsed+5))
       if [[ $timeElapsed -ge 600 ]]; then
-         echo "Timed out while waiting for daemon sets to be ready."
+         echo "❌ Timed out while waiting for daemon sets to be ready."
          exit 1
       fi
    done
@@ -162,7 +162,7 @@ function wait_crd(){
 HELMRELEASES=(${CORE_HELMRELEASES[@]})
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
     HELMRELEASES+=(${ADD_ON_HELMRELEASES[@]})
-    echo "All helmreleases enabled: all-packages label enabled, or on default branch or tag."
+    echo "🌌 All helmreleases enabled: all-packages label enabled, or on default branch or tag."
 elif [[ ! -z "$CI_MERGE_REQUEST_LABELS" ]]; then
     IFS=","
     for package in $CI_MERGE_REQUEST_LABELS; do
@@ -178,10 +178,10 @@ elif [[ ! -z "$CI_MERGE_REQUEST_LABELS" ]]; then
             fi
         fi
     done
-    echo "Found enabled helmreleases: ${HELMRELEASES[@]}"
+    echo "✅ Found enabled helmreleases: ${HELMRELEASES[@]}"
 fi
 
-echo "Waiting on GitRepositories"
+echo "⏳ Waiting on GitRepositories"
 kubectl wait --for=condition=Ready --timeout 180s gitrepositories -n bigbang --all
 
 for package in "${HELMRELEASES[@]}";
@@ -189,18 +189,18 @@ do
     check_if_hr_exist "$package"
 done
 
-echo "Waiting on helm releases..."
+echo "⏳ Waiting on helm releases..."
 wait_all_hr
-echo "Waiting for custom resources..."
+echo "⏳ Waiting for custom resources..."
 wait_crd
 
 kubectl get helmreleases,kustomizations,gitrepositories -A
 
-echo "Waiting on Secrets Kustomization"
+echo "⏳ Waiting on Secrets Kustomization"
 kubectl wait --for=condition=Ready --timeout 300s kustomizations.kustomize.toolkit.fluxcd.io -n bigbang secrets
 
 # In case some helm releases are marked as ready before all objects are live...
-echo "Waiting on all jobs, deployments, statefulsets, and daemonsets"
+echo "⏳ Waiting on all jobs, deployments, statefulsets, and daemonsets"
 kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
 wait_sts
 wait_daemonset
