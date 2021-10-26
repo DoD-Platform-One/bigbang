@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-set -ex
-trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+set -e
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+set -x
 
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
-  echo "all-packages label enabled, or on default branch or tag, enabling all addons"
+  echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
   yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 else
   IFS=","
@@ -30,7 +31,7 @@ if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "maste
 fi
 
 # deploy BigBang using dev sized scaling
-echo "Installing BigBang with the following configurations:"
+echo "🚀 Installing BigBang with the following configurations:"
 cat $CI_VALUES_FILE
 
 helm upgrade -i bigbang chart -n bigbang --create-namespace \
@@ -44,16 +45,16 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace \
 
 # apply secrets kustomization pointing to current branch or master if an upgrade job
 if [[ $(git branch --show-current) == "${CI_DEFAULT_BRANCH}" ]]; then
-  echo "Deploying secrets from the ${CI_DEFAULT_BRANCH} branch"
+  echo "🚀 Deploying secrets from the ${CI_DEFAULT_BRANCH} branch"
   kubectl apply -f tests/ci/shared-secrets.yaml
 elif [[ $(git branch --show-current) == "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" ]]; then
-  echo "Deploying secrets from the ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} branch"
+  echo "🚀 Deploying secrets from the ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} branch"
   cat tests/ci/shared-secrets.yaml | sed 's|master|'"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"'|g' | kubectl apply -f -
 elif [ -z "$CI_COMMIT_TAG" ]; then
-  echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
+  echo "🚀 Deploying secrets from the ${CI_COMMIT_REF_NAME} branch"
   cat tests/ci/shared-secrets.yaml | sed 's|master|'"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
 else
-  echo "Deploying secrets from the ${CI_COMMIT_REF_NAME} tag"
+  echo "🚀 Deploying secrets from the ${CI_COMMIT_REF_NAME} tag"
   # NOTE: $CI_COMMIT_REF_NAME = $CI_COMMIT_TAG when running on a tagged build
   cat tests/ci/shared-secrets.yaml | sed 's|branch: master|tag: '"$CI_COMMIT_REF_NAME"'|g' | kubectl apply -f -
 fi

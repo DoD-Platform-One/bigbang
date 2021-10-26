@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-trap 'echo exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 ## Adds all the vs hostnames and LB IP to /etc/hosts
 ## Get the LB Hostname
