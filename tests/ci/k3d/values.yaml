@@ -383,9 +383,16 @@ addons:
           persistence:
             size: 256Mi
           resources:
+            ## values raised to help pass CI after default values for gitaly are fixed then can revert to original request.
+            #requests:
+            #  cpu: 50m
+            #limits: {}
             requests:
-              cpu: 50m
-            limits: {}
+              cpu: 400m
+              memory: 600Mi
+            limits:
+              cpu: 400m
+              memory: 600Mi
         shared-secrets:
           resources:
             requests:
@@ -469,22 +476,23 @@ addons:
       runners:
         protected: false
       bbtests:
-        # TODO: This test runs fine locally with the same values, but fails in CI
-        enabled: false
+        enabled: true
         cypress:
           artifacts: true
+          envs:
+            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_gitlab_first_name: "testrunner"
+            cypress_gitlab_last_name: "userrunner"
+            cypress_gitlab_email: "gitlab@bigbang.dev"
+            cypress_gitlab_username: "gitlabrunner_user"
+            cypress_gitlab_password: "gitlabrunner_pass"
+            cypress_gitlab_project: "runner-hello-world"
           secretEnvs:
             - name: cypress_adminpassword
               valueFrom:
                 secretKeyRef:
                   name: gitlab-gitlab-initial-root-password
                   key: password
-          envs:
-            cypress_baseUrl: "https://gitlab.bigbang.dev"
-            cypress_gitlab_email: "gitlab@bigbang.dev"
-            cypress_gitlab_user: "gitlab_user"
-            cypress_gitlab_password: "gitlab_pass"
-            cypress_gitlab_project: "hello-world"
 
   anchore:
     enabled: false
