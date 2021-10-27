@@ -569,7 +569,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "4.2.3-bb.5"
+      tag: "4.2.3-bb.6"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
