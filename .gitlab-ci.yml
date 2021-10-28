@@ -346,7 +346,6 @@ aws/rke2/bigbang test:
     ## putting it here now for a quick way to install dig
     - echo -e "\e[0Ksection_start:`date +%s`:host_setup[collapsed=true]\r\e[0K\e[33;1mHost Setup\e[37m"
     - yum install bind-utils -y
-    - ./scripts/hosts.sh
     - echo -e "\e[0Ksection_end:`date +%s`:host_setup\r\e[0K"
     - *test_bigbang
     - |
