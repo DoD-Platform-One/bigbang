@@ -146,15 +146,15 @@ chart update check:
     - cp CHANGELOG.md /tmp/CHANGELOG.md
     - echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
     - DEFAULT_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
-    - 'echo "Chart Version: $DEFAULT_BRANCH_VERSION"'
+    - echo "Chart Version:$DEFAULT_BRANCH_VERSION"
     - echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage MR Checkout"
     - git reset --hard && git clean -fd
     - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
     - echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
     - MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
-    - 'echo "Chart Version: $MR_BRANCH_VERSION"'
-    - 'README_BRANCH_VERSION=$(cat README.md | grep "Version: $MR_BRANCH_VERSION")'
-    - 'echo "Chart Version: $README_BRANCH_VERSION"'
+    - echo "Chart Version:$MR_BRANCH_VERSION"
+    - README_BRANCH_VERSION=$(cat README.md | grep "Version:\ $MR_BRANCH_VERSION")
+    - echo "README Version:$README_BRANCH_VERSION"
     - |
       if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
         echo -e "\e[31mNOTICE: You need to bump chart version in Chart.yaml\e[0m"
