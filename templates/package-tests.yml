@@ -160,6 +160,7 @@ chart update check:
       fi
       if [ $(cat README.md | grep "Version: $test") == "$DEFAULT_BRANCH_VERSION" ]; then
         echo -e "\e[31mNOTICE: You need to bump chart version in README.md - for template, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+        EXIT="true"
       fi
       if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ] ;then
         echo -e "\e[31mNOTICE: You need to update CHANGELOG.md\e[0m"
