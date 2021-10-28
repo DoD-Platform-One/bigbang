@@ -27,6 +27,12 @@ networkPolicies:
 nexus:
   imagePullSecrets:
     - name: private-registry
+  {{- if .Values.addons.nexus.license_key }}
+  properties:
+    override: true
+    data: 
+      nexus.licenseFile: /nexus-data/sonatype-license.lic
+  {{- end }}
 
 license_key: "{{ .Values.addons.nexus.license_key }}"
 
@@ -34,12 +40,16 @@ license_key: "{{ .Values.addons.nexus.license_key }}"
 sso:
   enabled: {{ .Values.addons.nexus.sso.enabled }}
   idp_data:
+    {{- if .Values.addons.nexus.sso.idp_data.entityId }}
+    entityId: {{ .Values.addons.nexus.sso.idp_data.entityId }}
+    {{- else }}
     entityId: "https://nexus.{{ $domainName }}/service/rest/v1/security/saml/metadata"
-    usernameAttribute: "{{ .Values.addons.nexus.sso.idp_data.username }}"
-    firstNameAttribute: "{{ .Values.addons.nexus.sso.idp_data.firstName }}"
-    lastNameAttribute: "{{ .Values.addons.nexus.sso.idp_data.lastName }}"
-    emailAttribute: "{{ .Values.addons.nexus.sso.idp_data.email }}"
-    groupsAttribute: "{{ .Values.addons.nexus.sso.idp_data.groups }}"
+    {{- end }}
+    usernameAttribute: "{{ default "username" .Values.addons.nexus.sso.idp_data.username }}"
+    firstNameAttribute: "{{ default "firstName" .Values.addons.nexus.sso.idp_data.firstName }}"
+    lastNameAttribute: "{{ default "lastName" .Values.addons.nexus.sso.idp_data.lastName }}"
+    emailAttribute: "{{ default "email" .Values.addons.nexus.sso.idp_data.email }}"
+    groupsAttribute: "{{ default "groups" .Values.addons.nexus.sso.idp_data.groups }}"
     validateResponseSignature: "true"
     validateAssertionSignature: "true"
     idpMetadata: '{{ .Values.addons.nexus.sso.idp_data.idpMetadata }}'
@@ -48,12 +58,21 @@ sso:
     - "NexusAuthorizingRealm"
     - "SamlRealm"
   role:
-    id: "keycloak"
-    name: "keycloak"
-    description: "all keycloak users as admins"
-    privileges:
-      - "nx-all"
-    roles:
-      - "nx-admin"
+    {{- range .Values.addons.nexus.sso.role }}
+    - id: {{ .id | quote }}
+      name: {{ .name | quote }}
+      description: {{ .description | quote }}
+      privileges: 
+        {{- range .privileges }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+      roles: 
+        {{- range .roles }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+    {{- end }}
+
 {{- end }}
 {{- end -}}
