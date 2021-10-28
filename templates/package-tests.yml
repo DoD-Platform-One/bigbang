@@ -154,6 +154,7 @@ chart update check:
     - MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
     - 'echo "Chart Version: $MR_BRANCH_VERSION"'
     - 'README_BRANCH_VERSION=$(cat README.md | grep "Version: $MR_BRANCH_VERSION")'
+    - 'echo "Chart Version: $README_BRANCH_VERSION"'
     - |
       if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
         echo -e "\e[31mNOTICE: You need to bump chart version in Chart.yaml\e[0m"
