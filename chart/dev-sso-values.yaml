@@ -1,6 +1,9 @@
 # Enables and configures sso for all packages using the test bigbang.dev clients:
 
 sso:
+  # Entrust certificate authority for login.dso.mil
+  # do not use this CA with a Keycloak deployed with a different certificate authority
+  # For example *.bigbang.dev because that certificate is issued by a different CA
   certificate_authority: |
     -----BEGIN CERTIFICATE-----
     MIIH0zCCBrugAwIBAgIQHeg1retyhPnWuzryBJeBvTANBgkqhkiG9w0BAQsFADCB
@@ -102,6 +105,51 @@ sso:
     VHOkc8KT/1EQrBVUAdj8BbGJoX90g5pJ19xOe4pIb4tF9g==
     -----END CERTIFICATE-----
 
+  # # LetsEncrypt certificate authority for keycloak.bigbang.dev
+  # # Use this CA if you deployed Keycloak with *.bigbang.dev certificate using chart/keycloak-dev-values.yaml
+  # certificate_authority: |
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+  #   TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+  #   cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+  #   WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+  #   ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+  #   MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+  #   h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+  #   0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+  #   A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+  #   T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+  #   B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+  #   B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+  #   KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+  #   OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+  #   jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+  #   qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+  #   rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+  #   HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+  #   hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+  #   ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+  #   3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+  #   NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+  #   ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+  #   TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+  #   jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+  #   oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+  #   4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+  #   mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+  #   emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+  #   -----END CERTIFICATE-----
+
+  
+  # The JSON Web Key Set (JWKS) containing the public keys used to verify any JSON Web Token (JWT) issued by the IDP
+  # The jwks is public and does not require a secret
+  # The jwks is used by Istio authservice
+  # Must be updated for every new deployment of Keycloak. Example of where to get the jwks:
+  # https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/certs
+  # must be single quoted and double quotes must be escaped like this \"xxxx\"
+  # This jwks is from login.bigbang.dev
+  jwks: '{\"keys\":[{\"kid\":\"4CK69bW66HE2wph9VuBs0fTc1MaETSTpU1iflEkBHR4\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"hiML1kjw-sw25BgaZI1AyfgcCRBPJKPE-wwttqa7NNxptr_5RCBGuJXqDyo3p1vjcbb8KjdKnXI7kWer8b2Pz_RP1m_QcPrKOxSluk7GZF8ARsc6FPGbzYgi8o8cBVSsaml6HZzpN3ZnH4DFZ27ifM-Ul_PyMxZ2aweohIaizXp-rgF7Rqpav5NXUwmcSyH8LP92NVIuFlD3HYTDGosVbfA_u_H25Z4XCGKW_vLDTNrl8PcA3HqIoD-vNavysdxAq_KNw7iLLc0KLsjFYSdJL_54H7QubsGR0AyIrLLurJbqAtvttGJK38k5XYWKIwYGtu6iiJwjSb7UtonVdPh8Vw\",\"e\":\"AQAB\",\"x5c\":[\"MIICoTCCAYkCBgFyLIEqUjANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjAwNTE5MTAzNDIyWhcNMzAwNTE5MTAzNjAyWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCGIwvWSPD6zDbkGBpkjUDJ+BwJEE8ko8T7DC22prs03Gm2v/lEIEa4leoPKjenW+NxtvwqN0qdcjuRZ6vxvY/P9E/Wb9Bw+so7FKW6TsZkXwBGxzoU8ZvNiCLyjxwFVKxqaXodnOk3dmcfgMVnbuJ8z5SX8/IzFnZrB6iEhqLNen6uAXtGqlq/k1dTCZxLIfws/3Y1Ui4WUPcdhMMaixVt8D+78fblnhcIYpb+8sNM2uXw9wDceoigP681q/Kx3ECr8o3DuIstzQouyMVhJ0kv/ngftC5uwZHQDIissu6sluoC2+20YkrfyTldhYojBga27qKInCNJvtS2idV0+HxXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAIVkoDYkM6ryBcuchdAL5OmyKbmmY4WDrMlatfa3uniK5jvFXrmVaJ3rcu0apdY/NhBeLSOLFVlC5w1QroGUhWm0EjAA4zyuU63Pk0sro0vyHrxztBrGPQrGXI3kjXEssaehZZvYP4b9VtYpus6oGP6bTmaDw94Zu+WrDsWdFs+27VEYwBuU0D6E+ENDGlfR+9ADEW53t6H2M3H0VsOtbArEutYgb4gmQcOIBygC7L1tGJ4IqbnhTYLh9DMKNklU+tq8TMHacps9FxELpeAib3O0J0E5zYXdraQobCCe+ao1Y7sA/wqcGQBCVuoFgty7Y37nNL7LMvygcafgqVDqw5U=\"],\"x5t\":\"mxFIwx7EdgxyC3Y6ODLx8yr8Bx8\",\"x5t#S256\":\"SdT7ScKVOnBW6qs_MuYdTGVtMGwYK_-nmQF9a_8lXco\"}]}'
+
 kiali:
   sso:
     enabled: true
@@ -182,3 +230,52 @@ addons:
       enabled: true
       client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost"
       client_secret: "no-secret"
+  nexus:
+    # Nexus requires manual configuration in Keycloak client and cannot be tested with login.dso.mil
+    # you must test with your own dev deployment.  Example: keycloak.bigbang.dev
+    # See more info in Nexus Package docs /docs/keycloak.md
+    # Nexus SSO is behind a paywall. You must have a valid license to enable SSO
+    # -- Base64 encoded license file.
+    # cat ~/Downloads/sonatype-license-YYYY-MM-ddTnnnnnnZ.lic | base64 -w 0 ; echo
+    license_key: "enter-single-line-base64-encoded-string-here"
+    sso:
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: true
+      idp_data:
+        entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: "username"
+        firstName: "firstName"
+        lastName: "lastName"
+        email: "email"
+        groups: "groups"
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        # curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo
+        idpMetadata: 'enter-single-quoted-single-line-string-here'
+      role:
+        # id is the name of the Keycloak group (case sensitive)
+        - id: "Nexus"
+          name: "Keycloak Nexus Group"
+          description: "unprivilaged users"
+          privileges: []
+          roles: []
+        - id: "Nexus-Admin"
+          name: "Keycloak Nexus Admin Group"
+          description: "keycloak users as admins"
+          privileges:
+            - "nx-all"
+          roles:
+            - "nx-admin"
+    # NexusNotes: |
+    #   Login to Nexus Admin UI and then get the x509 certificate from this path
+    #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+    #   copy and paste the nexus single line certificate into a text file and save it
+    #     vi nexus-x509.txt
+    #     -----BEGIN CERTIFICATE-----
+    #     put-single-line-nexus-x509-certificate-here
+    #     -----END CERTIFICATE-----
+    #   make a valid pem file with proper wrapping at 64 characters per line
+    #     fold -w 64 nexus-x509.txt > nexus.pem
+    #   In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places
