@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.2.13]
+### Changed
+- Updated tests to verify readme updates
+
 ## [1.2.12]
 ### Changed
 - Moved image list to before running package tests
