@@ -481,7 +481,7 @@ twistlock:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-#
+
 # ----------------------------------------------------------------------------------------------------------------------
 #
 addons:
@@ -498,7 +498,7 @@ addons:
       gateway: ""
     values: {}
     postRenderers: []
-
+# ----------------------------------------------------------------------------------------------------------------------  
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
