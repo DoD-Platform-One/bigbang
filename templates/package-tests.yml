@@ -154,7 +154,7 @@ chart update check:
     - MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
     - echo "New Chart Version:$MR_BRANCH_VERSION"
     - 'test="Version: $MR_BRANCH_VERSION"'
-    - README_BRANCH_VERSION=$(grep -E $test 'README.md')
+    - README_BRANCH_VERSION=$(grep -E 'README.md' $test)
     # cat README.md
     # cat README.md | grep -E "Version"
     # cat README.md | grep -E "Version:\s $MR_BRANCH_VERSION"
