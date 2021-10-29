@@ -39,6 +39,9 @@
   after_script:
     - echo -e "\e[0Ksection_start:`date +%s`:k3d_down[collapsed=true]\r\e[0K\e[33;1mK3D Cluster Delete\e[37m"  
     - kubectl get all -A
+    - echo -e "\e[0Ksection_start:`date +%s`:show_event_log[collapsed=true]\r\e[0K\e[33;1mCluster event log:\e[37m"
+    - kubectl get events -A
+    - echo -e "\e[0Ksection_end:`date +%s`:show_event_log\r\e[0K"
     - kubectl get gitrepository,helmrelease,kustomizations -A
     - k3d cluster delete ${CI_JOB_ID}
     - docker network rm ${CI_JOB_ID}
