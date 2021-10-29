@@ -160,7 +160,7 @@ chart update check:
         EXIT="true"
       fi
       if [ -z "$README_BRANCH_MATCH" ]; then
-        echo -e "\e[31mNOTICE: You need to bump chart version in README.md - for template, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
         EXIT="true"
       fi
       if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ] ; then
