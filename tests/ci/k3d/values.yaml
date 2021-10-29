@@ -276,8 +276,6 @@ twistlock:
 
 # Addons are toggled based on labels in CI
 addons:
-  vault:
-    enabled: true
   argocd:
     enabled: false
     values:
