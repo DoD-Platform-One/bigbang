@@ -155,6 +155,7 @@ chart update check:
     - echo "New Chart Version:$MR_BRANCH_VERSION"
     - echo "got here"
     # README_BRANCH_VERSION=$(cat README.md | grep "Version:\ $MR_BRANCH_VERSION")
+    - man grep
     - cat README.md
     - cat README.md | grep Version
     - cat README.md | grep "Version:\ $MR_BRANCH_VERSION"
