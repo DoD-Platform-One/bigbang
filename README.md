@@ -1,3 +1,4 @@
+Version: 34.1.0-bb.4
 # Big Bang Pipeline Templates
 
 This repository provides Gitlab CI templates and additional tools / dependencies to test Big Bang packages.

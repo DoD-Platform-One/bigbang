@@ -153,14 +153,13 @@ chart update check:
     - echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
     - MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
     - echo "New Chart Version:$MR_BRANCH_VERSION"
-    - README_BRANCH_VERSION=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
-    - echo "New README Version:$README_BRANCH_VERSION"
+    - README_BRANCH_MATCH=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
     - |
       if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
         echo -e "\e[31mNOTICE: You need to bump chart version in Chart.yaml\e[0m"
         EXIT="true"
       fi
-      if [ -z "$README_BRANCH_VERSION" ]; then
+      if [ -z "$README_BRANCH_MATCH" ]; then
         echo -e "\e[31mNOTICE: You need to bump chart version in README.md - for template, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
         EXIT="true"
       fi
