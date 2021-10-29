@@ -276,8 +276,6 @@ twistlock:
 
 # Addons are toggled based on labels in CI
 addons:
-  vault:
-    enabled: true
   argocd:
     enabled: false
     values:
@@ -932,3 +930,15 @@ addons:
           mountPath: /etc/x509/https/tls.key
           subPath: tls.key
           readOnly: true
+  vault:
+    enabled: false
+    values:
+      server:
+        dataStorage:
+          enabled: true 
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true 
+          envs:
+            cypress_vault_url: "http://vault.vault.svc:8200"
