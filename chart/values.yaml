@@ -481,23 +481,10 @@ twistlock:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
+#
 # ----------------------------------------------------------------------------------------------------------------------
 #
 addons:
-  vault:
-    # -- Toggle deployment of Vault.
-    enabled: true
-    git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
-      path: "./chart"
-      branch: "deploy-vault"
-    # -- Flux reconciliation overrides specifically for the Twistlock Package
-    flux: {}
-    ingress:
-      gateway: ""
-    values: {}
-    postRenderers: []
-# ----------------------------------------------------------------------------------------------------------------------  
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
@@ -1135,3 +1122,24 @@ addons:
 
     # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
     values: {}
+
+  vault:
+    # -- Toggle deployment of Vault.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      path: "./chart"
+      tag: "0.1.0-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Vault Package
+    flux: {}
+
+    # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
