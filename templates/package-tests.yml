@@ -27,6 +27,7 @@ variables:
   RELEASE_BUCKET: umbrella-bigbang-releases
   PACKAGE_NAMESPACE: ${CI_PROJECT_NAME}
   PACKAGE_HELM_NAME: ${CI_PROJECT_NAME}
+  REGISTRY1_USER: $REGISTRY1_USER
 
 .bigbang-dogfood:
   tags:
@@ -222,8 +223,8 @@ chart update check:
         fi
       fi
       kubectl create namespace ${PACKAGE_NAMESPACE}
-      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
-      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+      kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
     - echo -e "\e[0Ksection_end:`date +%s`:cluster_setup\r\e[0K"
 
   after_script:
@@ -310,11 +311,11 @@ chart update check:
           kubectl create namespace ${dep_namespace};
         fi
         if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
-          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
         fi
 
         if ! kubectl get secret -n ${dep_namespace} private-registry-mil 2> /dev/null; then
-          kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username='robot$bb-dev-imagepullonly' --docker-password="${REGISTRY1_PASSWORD}"
+          kubectl create -n ${dep_namespace} secret docker-registry private-registry-mil --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
         fi
 
         if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
