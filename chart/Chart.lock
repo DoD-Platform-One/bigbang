@@ -1,6 +1,6 @@
 dependencies:
 - name: mattermost-operator-crds
   repository: file://mattermost-operator-crds
-  version: 1.15.0
-digest: sha256:e143b19e4972fb3bf17f7f3faa8fd0bfb26dee198174eed920ca6af2e1208b01
-generated: "2021-09-21T16:47:08.805091-06:00"
+  version: 1.16.0
+digest: sha256:8ce948ac8e57485fdc97ea74a1fa41b0cc68bdbbc05a2cf41db3c9fd8ae75645
+generated: "2021-11-01T10:33:11.606408-06:00"
