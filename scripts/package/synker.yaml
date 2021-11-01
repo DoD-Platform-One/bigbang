@@ -28,7 +28,7 @@ source:
     # Include registry image
     - registry:2
 
-    - registry1.dso.mil/ironbank/twistlock/defender/defender:20.12.531
+    - registry1.dso.mil/ironbank/twistlock/defender/defender:21.08.520
     - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.1.2
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.1.1
     - registry1.dso.mil/ironbank/big-bang/base:8.4
