@@ -1,4 +1,5 @@
 {{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
+
 {{- if .Values.addons.vault.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
