@@ -42,6 +42,12 @@ registry:
     key: registry
 {{- end }}
 
+{{- if .Values.istio.enabled }}
+shared-secrets:
+  annotations:
+    sidecar.istio.io/inject: "false"
+{{- end }}
+
 gitlab:
   {{- if .Values.addons.gitlab.objectStorage.endpoint }}
   task-runner:
@@ -53,8 +59,18 @@ gitlab:
   {{- end }}
   gitlab-exporter:
     enabled: {{ .Values.monitoring.enabled }}
-
+  {{- if .Values.istio.enabled }}
+  migrations:
+    annotations:
+      sidecar.istio.io/inject: "false"
+  {{- end }}
+  
 global:
+
+  # added to help with Gitlab sub-chart configuration
+  istio:
+    enabled: {{ .Values.istio.enabled }}
+
   hosts:
     domain: {{ $domainName }}
 
