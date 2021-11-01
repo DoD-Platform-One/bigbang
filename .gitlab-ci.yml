@@ -50,6 +50,7 @@ variables:
   REPOS_PKG: repositories.tar.gz
   VALUES_FILE: chart/values.yaml
   CI_VALUES_FILE: tests/ci/k3d/values.yaml
+  REGISTRY1_USER: $REGISTRY1_USER
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Pre Stage Jobs.   This execute before any job is run.
