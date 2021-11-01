@@ -34,6 +34,7 @@ networkPolicies:
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
 istio:
   enabled: {{ .Values.istio.enabled }}
-  gateways:
-    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
-    {{- end -}}
+  vault:
+    gateways:
+      - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+{{- end -}}
