@@ -2,12 +2,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: mattermost-operator
-  namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/managed-by: "{{ .Release.Service }}"
-    app.kubernetes.io/instance: "{{ .Release.Name }}"
-    app.kubernetes.io/version: "{{ .Chart.AppVersion }}"
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/managed-by: '{{ .Release.Service }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+    helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version }}'
 rules:
 - apiGroups:
   - ""
@@ -52,6 +51,8 @@ rules:
   verbs:
   - get
   - list
+  - watch
+  - delete
 - apiGroups:
   - batch
   resources:
