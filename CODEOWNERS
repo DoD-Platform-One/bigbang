@@ -1,16 +1,16 @@
 [Project Managers]
 # protect individual files in the root directory such as the CODEOWNERS file
-/*                              @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/*                              @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 # Recursive protection for directories
-/.gitlab-ci/                    @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/.gitlab/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/base/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/chart/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/charter/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/hack/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/scripts/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/tests/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
-/docs/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+/.gitlab-ci/                    @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/.gitlab/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/base/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/chart/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/charter/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/hack/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/scripts/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/tests/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/docs/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 
 
 [Docs Owners]
@@ -24,7 +24,7 @@
 ################################################
 
 ^[Kustomize Base Owners]
-base/                           @michaelmcleroy @micah.nagel @ryan.j.garcia
+base/                           @michaelmcleroy @micah.nagel @ryan.j.garcia @brandencobb
 
 ^[CI Owners]
 .gitlab-ci/                     @toladipupo @brandencobb @evan.rush
@@ -35,7 +35,7 @@ scripts/                        @toladipupo @michaelmcleroy @egoode
 hack/                           @toladipupo @michaelmcleroy @egoode
 
 ^[Charter Owners]
-charter/                        @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia 
+charter/                        @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 
 ^[Istio, Istio Operator, and Authservice]
 chart/Chart.yaml                @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas

@@ -27,6 +27,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | Ryan Garcia | garcia.ryan@solute.us |  |
 | Michael McLeroy | michaelmcleroy@cloudfitsoftware.com |  |
 | Micah Nagel | micah.nagel@parsons.com |  |
+| Branden Cobb | cobb_branden@bah.com |  |
 | Tom Runyon | tom@runyon.dev |  |
 | Josh Wolf | josh@rancherfederal.com |  |
 
