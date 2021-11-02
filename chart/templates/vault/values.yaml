@@ -37,7 +37,6 @@ istio:
   vault:
     gateways:
       - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
-{{- end -}}
 
 imagePullSecrets:
 - name: private-registry
