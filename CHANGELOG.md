@@ -3,6 +3,21 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.0.1]
+### Changed
+- Had to bump the version of bb-ci due to cacheing on the runners
+
+## [2.0.0]
+### Changed
+- Updated k3d-builder and moved version to tag version
+- Cleaned up unused files
+- Added bigbang pipeline /pipelines/bigbang.yaml
+- Added third party pipeline /pipelines/third-party.yaml
+- Added sandbox pipeline /pipelines/sandbox.yaml
+- Moved package pipeline to /pipelines/bigbang-package.yaml
+- Added /infrastructure and /cluster folders and subfolders for each infra and distro
+- Moved script functions to library/templates.sh
+
 ## [1.2.14]
 ### Changed
 - Changed hardcoded reg1_user to ci variable

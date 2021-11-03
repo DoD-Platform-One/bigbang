@@ -1,0 +1,64 @@
+.dind-umbrella-runner:
+  tags:
+    - bigbang
+    - privileged
+    - dogfood
+    - umbrella
+
+.dind-package-runner:
+  tags:
+    - bigbang
+    - privileged
+    - dogfood
+    - packages
+
+# In cluster k3s using K3D with the docker daemon as a sidecar
+#
+#   This will connect to a remote docker daemon over tls tcp (defined at installation of gitlab runners) and create
+#   a k3d cluster in a custom built docker bridge network.
+#
+.k3d-ci:
+  extends:
+    - .util-image
+  #  services:
+  #      # Added in through gitlab ci configuration, left in incase some poor soul needs to come debug this later
+  #    - name: docker:20.10.5-dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2376
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - echo -e "\e[0Ksection_start:`date +%s`:k3d_up[collapsed=true]\r\e[0K\e[33;1mK3D Cluster Create\e[37m"
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    # Give docker-in-docker time to come alive
+    - i=0; while [ "$i" -lt 12 ]; do docker info &>/dev/null && break; sleep 5; i=$(( i + 1 )) ; done
+    - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.20.0.0/16
+    - chmod +x ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh; echo "Executing ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh..."; ./${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh
+    - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
+    - chmod +x ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh; echo "Executing ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh..."; ./${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh
+    - get_all
+    - echo -e "\e[0Ksection_end:`date +%s`:k3d_up\r\e[0K"    
+  after_script:
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - get_all
+    - get_events
+    - bigbang_pipeline
+    - get_debug
+    - k3d cluster delete ${CI_JOB_ID}
+    - docker network rm ${CI_JOB_ID}
+
+#  This has the tags needed for umbrella runners
+.k3d-ci-bb:
+  extends:
+    - .dind-umbrella-runner
+    - .k3d-ci
+
+
+#  This has the tags needed for package runners
+.k3d-ci-pkg:
+  extends:
+    - .dind-package-runner
+    - .k3d-ci

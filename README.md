@@ -1,8 +1,8 @@
 # Big Bang Pipeline Templates
 
-This repository provides Gitlab CI templates and additional tools / dependencies to test Big Bang packages.
+This repository provides Gitlab CI templates and additional tools / dependencies to test Big Bang and its individual packages.
 
-## Package Test CI Pipeline Infrastructure
+## Package CI Pipeline Infrastructure
 
 The package pipeline CI infrastructure files included in this repo can be used within a gitlab CI pipeline
 (via a gitlab runner) for any Big Bang package.
@@ -29,16 +29,18 @@ Tests will automatically be run by the pipeline, but if you wish to run them loc
 package with the test values, then run `helm test {{HELMRELEASE_NAME}} -n {{HELMRELEASE_NAMESPACE}}` replacing the
 variables with the proper values for your package (you can check the helmrelease name and namespace with `helm ls -A`).
 
-#### Including the test library
+#### Including the gluon helm test library
 
-To include the test library, you need to add a dependency to the packages Chart.yaml, with the latest version
-(latest version can be seen in [bb-test-lib/Chart.yaml](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/bb-test-lib/Chart.yaml#L18)):
+These pipelines run helm tests found in each package by means of the bigbang [gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart.
+
+To include the gluon helm test library, you need to add a dependency to the packages Chart.yaml, with the latest version
+(latest version can be seen in [gluon/chart/Chart.yaml](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)):
 
 ```yaml
 dependencies:
-  - name: bb-test-lib
+  - name: gluon
     version: "x.x.x" # See https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/bb-test-lib/Chart.yaml#L18 for latest
-    repository: "oci://registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates"
+    repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon/gluon"
 ```
 
 Then verify your helm version is up to date (OCI features are confirmed working on 3.5.2+). After that run:
@@ -48,261 +50,9 @@ export HELM_EXPERIMENTAL_OCI=1
 helm dependency update chart
 ```
 
-The bb-test-lib will now be pulled into the `chart/charts` folder as an archive.
+The gluon will now be pulled into the `chart/charts` folder as an archive.
 
-#### Cypress
-
-To include the Helm test templates for Cypress you will need to make a file under `chart/templates/tests` which includes
-the content below:
-
-```yaml
-{{- include "bb-test-lib.cypress-configmap.base" .}}
----
-{{- include "bb-test-lib.cypress-runner.base" .}}
-```
-
-This will work for a "base" install, but if you want to override anything (example below shows how to add labels), you
-can include different templates and create package specific templates with the overrides:
-
-```yaml
-{{- include "bb-test-lib.cypress-configmap.overrides" (list . "mattermost-test.cypress-configmap") }}
-{{- define "mattermost-test.cypress-configmap" }}
-metadata:
-  labels:
-    {{ include "mattermost.labels" . | nindent 4 }}
-{{- end }}
----
-{{- include "bb-test-lib.cypress-runner.overrides" (list . "mattermost-test.cypress-runner") -}}
-{{- define "mattermost-test.cypress-runner" -}}
-metadata:
-  labels:
-    {{ include "mattermost.labels" . | nindent 4 }}
-{{- end }}
-```
-
-The second step to implementing these tests will be including values in your `test-values.yaml` file that would be
-needed for the tests. There are 5 main values you will want to consider, all values are optional:
-
-- `bbtests.cypress.artifacts`: This should be set to true in almost all cases so that artifacts are exported from the
-helm test pods and available as artifacts in the pipeline. This also provides them when running locally
-  (a script is at `local-dev/scripts/cypress-artifacts.sh` that will get them in the proper format after helm tests run)
-- `bbtests.cypress.secretEnvs`: This is where you should put any configuration that your tests need from secrets that
-  are created by the helm chart (common examples are passwords) - Helm templating is supported here with proper syntax
-  (braces must be wrapped in quotes, any quotes inside braces must be escaped)
-- `bbtests.cypress.envs`: This is where any configuration that is not in pre-existing secrets should go (common examples
-  are the service name to hit and usernames) - Helm templating is also supported here with the same restrictions of
-  syntax. While you may be able to place ENVs into your `cypress.json`, that will not support Helm templating, which is
-  the major benefit of using values for ENVs.
-- `bbtests.cypress.additionalVolumes`: This defines additional volumes for the cypress testing pod that is not
-  one of the pre-existing testing volumes. This takes normal Kubernetes `volume` configurations as yamls. This supports
-  helm templating for these values.
-- `bbtest.cypress.additionalVolumeMounts`: This defines additional volumes to mount into the main cypress container itself.
-  This takes normal Kubernetes `volumeMount` configuration in `yaml`. This supports `Helm` templating for values.
-
-A sample is included below:
-
-```yaml
-bbtests:
-  cypress:
-    artifacts: true
-    additionalVolumeMounts:
-      - name: "{{ .Chart.Name }}-example"
-        mountPath: /example
-      - name: "{{ .Chart.Name }}-example-config"
-        mountPath: /otherexample
-        subpath: something
-    additionalVolumes:
-      - name: "{{ .Chart.Name }}-example"
-        emptyDir: {}
-      - name: "{{ .Chart.Name }}-example-config"
-        configMap:
-          name: "{{ .Chart.Name }}-example-config"
-    envs:
-      HOST: "{{ .Values.service.port }}"
-      MINIO_HOST: '{{ include "minio.serviceName" . }}'
-      cypress_url: 'http://{{ include "minio.serviceName" . }}:{{ .Values.service.port }}'
-    secretEnvs:
-      - name: cypress_secretkey
-        valueFrom:
-          secretKeyRef:
-            name: "{{ .Values.minioRootCreds }}"
-            key: secretkey
-      - name: cypress_accesskey
-        valueFrom:
-          secretKeyRef:
-            name: "{{ .Values.minioRootCreds }}"
-            key: accesskey
-```
-
-NOTE: ENVs must be prefixed with `cypress_` to be available to Cypress.
-
-Finally, a `cypress.json` file and all `*.spec.js` tests must be placed at the same directory level
-`chart/tests/cypress/`. Your `cypress.json` should follow the traditional cypress format, an example is included below:
-
-```json
-{
-  "pluginsFile": false,
-  "supportFile": false,
-  "fixturesFolder": false,
-  "baseUrl": "http://mattermost.mattermost.svc.cluster.local:8065",
-  "env": {
-    "mm_email": "test@bigbang.dev",
-    "mm_user": "bigbang",
-    "mm_password": "Bigbang#123"
-  }
-}
-```
-
-Any cypress tests should be written following cypress best practices and functionally test the UI components of a package.
-
-Your final directory structure and files should look like this:
-
-```
-|-- chart
-|  |-- Chart.yaml (which includes the library dependency)
-|  |-- tests
-|  |  `-- cypress
-|  |    |-- cypress.json
-|  |    `-- *.spec.js
-|  `-- templates
-|     `-- tests
-|        `-- test.yaml (which uses the library templates)
-`-- tests
-   `-- test-values.yaml (with your bbtests values)
-```
-
-##### Cypress artifacts
-
-Cypress artifacts, if enabled, are tar'd, base64 encoded, and stored in a configmap. This means the max size for them is 1MiB. If your cypress test is failing to save as an artifact in the pipeline due to size you can try lowering the video quality by placing the following line in your cypress.json:
-```json
-  "videoCompression": 35
-```
-``videoCompression`` defaults to 32 and can be set all the way up to 51, though your video will most likely not be watchable at 51 you can increment from 32 until the video fits and is watchable. For more information see [this doc](https://docs.cypress.io/guides/references/configuration#Videos)
-
-#### Scripts
-
-To include the Helm test templates for script based tests you will need to make a file under `chart/templates/tests`
-which includes the content below:
-
-```yaml
-{{- include "bb-test-lib.script-configmap.base" .}}
----
-{{- include "bb-test-lib.script-runner.base" .}}
-```
-
-This will work for a "base" install, but if you want to override anything (example below shows how to add labels), you
-can include different templates and create package specific templates with the overrides:
-
-```yaml
-{{- include "bb-test-lib.script-configmap.overrides" (list . "mattermost-test.script-configmap") }}
-{{- define "mattermost-test.script-configmap" }}
-metadata:
-  labels:
-    {{ include "mattermost.labels" . | nindent 4 }}
-{{- end }}
----
-{{- include "bb-test-lib.script-runner.overrides" (list . "mattermost-test.script-runner") -}}
-{{- define "mattermost-test.script-runner" -}}
-metadata:
-  labels:
-    {{ include "mattermost.labels" . | nindent 4 }}
-{{- end }}
-```
-
-The second step to implementing these tests will be including values in your `test-values.yaml` file that would be
-needed for the tests. There are 3 main values you will want to consider, only the image value is required:
-
-- `bbtests.scripts.image`: REQUIRED, this is the image name that should be used to run your script. This should be a
-  small image with the CLI tools needed (for example, to test Minio you would want an image with Minio CLI). Ironbank
-  images are not required but are preferred if one exists with the CLI tool you need installed. This field supports Helm
-  templating if you want to grab an image being used elsewhere in your values (ex: `image: "{{ .Values.my.spec.to.image }}"`).
-- `bbtests.scripts.secretEnvs`: This is where you should put any configuration that your tests need from secrets that
-  are created by the helm chart (common examples are passwords) - Helm templating is supported here with proper syntax
-  (braces must be wrapped in quotes, any quotes inside braces must be escaped)
-- `bbtests.scripts.envs`: This is where any configuration that is not in pre-existing secrets should go (common examples
-  are the service name to hit and standard usernames) - Helm templating is also supported here with the same
-  restrictions of syntax.
-- `bbtests.scripts.additionalVolumes`: This defines additional volumes for the cypress testing pod that is not
-  one of the pre-existing testing volumes. This takes normal Kubernetes `volume` configurations as yamls. This supports
-  helm templating for these values.
-- `bbtest.scripts.additionalVolumeMounts`: This defines additional volumes to mount into the main cypress container itself.
-  This takes normal Kubernetes `volumeMount` configuration in `yaml`. This supports `Helm` templating for values.
-
-A sample is included below:
-
-```yaml
-bbtests:
-  scripts:
-    image: "{{ .Values.mcImage }}"
-    additionalVolumeMounts:
-      - name: "{{ .Chart.Name }}-example"
-        mountPath: /example
-      - name: "{{ .Chart.Name }}-example-config"
-        mountPath: /otherexample
-        subpath: something
-    additionalVolumes:
-      - name: "{{ .Chart.Name }}-example"
-        emptyDir: {}
-      - name: "{{ .Chart.Name }}-example-config"
-        configMap:
-          name: "{{ .Chart.Name }}-example-config"
-    envs:
-      MINIO_PORT: "{{ .Values.service.port }}"
-      MINIO_HOST: '{{ include "minio.serviceName" . }}'
-    secretEnvs:
-      - name: SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: "{{ .Values.minioRootCreds }}"
-            key: secretkey
-      - name: ACCESS_KEY
-        valueFrom:
-          secretKeyRef:
-            name: "{{ .Values.minioRootCreds }}"
-            key: accesskey
-```
-
-Finally, any script files (the helm template will run any and all files in the scripts folder) must be placed in the
-directory `chart/tests/scripts/`. Your test script(s) should run the CLI tool(s) and perform any other necessary
-operations to functionally test the package. Make sure to call out the proper shell / executable to run your script
-(for example call out that bash should be used with `#!/bin/bash` as the first script line). If you need any additional
-files for running the scripts they should be placed under subfolders so that the pipeline does not try to run them as
-scripts. Scripts can be expected to run in sequential order based on file name (files beginning with 0-9, then A-Z,
-then a-z).
-
-An example is provided below for Minio:
-
-```bash
-#!/bin/bash
-set -ex
-mc config host add bigbang http://${MINIO_HOST}:${MINIO_PORT} ${ACCESS_KEY} ${SECRET_KEY}
-# cleanup from previous runs
-mc rb bigbang/foobar --force || true
-mc mb bigbang/foobar
-mc ls bigbang/foobar
-base64 /dev/urandom | head -c 10000000 > /tmp/file.txt
-md5sum /tmp/file.txt > /tmp/filesig
-mc cp /tmp/file.txt bigbang/foobar/file.txt
-mc ls bigbang/foobar/file.txt
-mc cp bigbang/foobar/file.txt /tmp/file.txt
-mc rb bigbang/foobar --force
-md5sum -c /tmp/filesig
-```
-
-Your final directory structure and files should look like this:
-
-```
-|-- chart
-|  |-- Chart.yaml (which includes the library dependency)
-|  |-- tests
-|  |  `-- scripts
-|  |    `-- mytest.sh
-|  `-- templates
-|     `-- tests
-|        `-- test.yaml (which uses the library templates)
-`-- tests
-   `-- test-values.yaml (with your bbtests values)
-```
+**For more information on how to use this library see the [README](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
 
 ### Release CI
 

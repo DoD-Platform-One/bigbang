@@ -1,4 +1,5 @@
 #!/bin/sh
+# This file and folder can be removed once verson 2.0.0 refactor is out
 wait_sts() {
    timeElapsed=0
    while true; do

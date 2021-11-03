@@ -1,0 +1,7 @@
+include:
+  #- local: '/clusters/capi/templates.yaml'
+  - local: '/clusters/k3d/templates.yaml'
+  #- local: '/clusters/konvoy/templates.yaml'
+  #- local: '/clusters/ocp/templates.yaml'
+  - local: '/clusters/rke2/templates.yaml'
+  #- local: '/clusters/tkg/templates.yaml'

@@ -1,0 +1,740 @@
+#!/bin/sh
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Wait Functions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+wait_sts() {
+   timeElapsed=0
+   while true; do
+      sts=$(kubectl get sts -A -o jsonpath='{.items[*].status.replicas}' | xargs)
+      totalSum=$(echo $sts | awk '{for (i=1; i<=NF; i++) c+=$i} {print c}')
+      readySts=$(kubectl get sts -A -o jsonpath='{.items[*].status.readyReplicas}' | xargs)
+      readySum=$(echo $readySts | awk '{for (i=1; i<=NF; i++) c+=$i} {print c}')
+      if [[ $totalSum -eq $readySum ]]; then
+         break
+      fi
+      sleep 5
+      timeElapsed=$(($timeElapsed+5))
+      if [[ $timeElapsed -ge 600 ]]; then
+         echo "Timed out while waiting for stateful sets to be ready."
+         exit 1
+      fi
+   done
+}
+
+wait_daemonset(){
+   timeElapsed=0
+   while true; do
+      dmnset=$(kubectl get daemonset -A -o jsonpath='{.items[*].status.desiredNumberScheduled}' | xargs)
+      totalSum=$(echo $dmnset | awk '{for (i=1; i<=NF; i++) c+=$i} {print c}')
+      readyDmnset=$(kubectl get daemonset -A -o jsonpath='{.items[*].status.numberReady}' | xargs)
+      readySum=$(echo $readyDmnset | awk '{for (i=1; i<=NF; i++) c+=$i} {print c}')
+      if [[ $totalSum -eq $readySum ]]; then
+         break
+      fi
+      sleep 5
+      timeElapsed=$(($timeElapsed+5))
+      if [[ $timeElapsed -ge 600 ]]; then
+         echo "Timed out while waiting for daemon sets to be ready."
+         exit 1
+      fi
+   done
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Bigbang Functions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+deploy_bigbang() {
+   set -e
+   for deploy_script in $(find ./${PIPELINE_REPO_DESTINATION}/scripts/deploy -type f -name '*.sh' | sort); do
+     chmod +x ${deploy_script}
+     echo -e "\e[0Ksection_start:`date +%s`:${deploy_script##*/}[collapsed=true]\r\e[0K\e[33;1m${deploy_script##*/}\e[37m"  
+     ./${deploy_script}
+     echo -e "\e[0Ksection_end:`date +%s`:${deploy_script##*/}\r\e[0K"
+   done
+}
+
+test_bigbang() {
+   set -e
+   for test_script in $(find ./${PIPELINE_REPO_DESTINATION}/scripts/tests -type f -name '*.sh' | sort); do
+     echo -e "\e[0Ksection_start:`date +%s`:${test_script##*/}[collapsed=true]\r\e[0K\e[33;1m${test_script##*/}\e[37m"        
+     chmod +x ${test_script}
+     echo "Executing ${test_script}..."
+     ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
+     if [[ ${EXIT_CODE} -ne 0 ]]; then
+       if [[ ${EXIT_CODE} -ne 123 ]]; then
+         echo -e "\e[31m❌ ${test_script} failed, see log output above and cluster debug.\e[0m"
+         exit ${EXIT_CODE}
+       fi
+       # 123 error codes are allowed to continue
+       echo -e "\e[31m⚠️ ${test_script} failed but was allowed to continue, see log output above and cluster debug.\e[0m"
+       EXIT_FLAG=1
+     fi
+     echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
+   done
+   if [[ -n "$EXIT_FLAG" ]]; then
+     echo -e "\e[31m⚠️ WARNING: One or more BB tests failed but were allowed to continue. See output of scripts above for details.\e[0m"
+   fi
+}
+
+pre_vars() {
+   # Create the TF_VAR_env variable
+   echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
+   # Calculate a unique cidr range for vpc
+   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]]; then
+     echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
+   fi
+   cat variables.env
+}
+
+bigbang_installed_images() {
+   # Fetch list of all images ran (retry crictl up to 6x)
+   echo -e "\e[0Ksection_start:`date +%s`:images_used[collapsed=true]\r\e[0K\e[33;1mImages Used\e[37m"
+   cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
+   images=$(timeout 65 bash -c "until docker exec $cid crictl images -o json; do sleep 10; done;")
+   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
+   echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
+}
+
+bigbang_synker() {
+   echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker\e[37m"
+   cp ${PIPELINE_REPO_DESTINATION}/synker/bigbang-synker.yaml ./synker.yaml
+   # Populate images list in synker config
+   for image in $(cat images.txt); do
+     yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
+   done
+   synker pull -b=1
+   yq e '.source.images | .[] | ... comments=""' "./synker.yaml" > images.txt
+   # Tar up synker as well?
+   cp /usr/local/bin/synker synker.yaml /var/lib/registry/
+   # Grab the registry image
+   crane pull registry:2 registry.tar
+   mv registry.tar /var/lib/registry/
+   tar -czvf $IMAGE_PKG /var/lib/registry
+   echo -e "\e[0Ksection_end:`date +%s`:synker_pull\r\e[0K"
+}
+
+bigbang_package_repos() {
+   set -e
+   echo -e "\e[0Ksection_start:`date +%s`:package_repos[collapsed=true]\r\e[0K\e[33;1mPackage Repos\e[37m"
+   trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+   mkdir -p repos/
+   # "Package" ourselves
+   # Do it this way on purpose (instead of cp or rsync) to ensure this never includes any unwanted "build" artifacts
+   git -C repos/ clone -b ${CI_COMMIT_REF_NAME} ${CI_PROJECT_URL}
+   # Clone core
+   yq e ".*.git.repo | select(. != null) | path | .[-3] " "${VALUES_FILE}" | while IFS= read -r package; do
+     git -C repos/ clone --no-checkout $(yq e ".${package}.git.repo" "${VALUES_FILE}")
+   done
+   # Clone addons
+   yq e ".addons.*.git.repo | select(. != null) | path | .[-3]" "${VALUES_FILE}" | while IFS= read -r package; do
+     git -C repos/ clone --no-checkout $(yq e ".addons.${package}.git.repo" "${VALUES_FILE}")
+   done
+   tar -czf $REPOS_PKG repos/
+   echo -e "\e[0Ksection_end:`date +%s`:package_repos\r\e[0K"
+}
+
+bigbang_prep(){
+   echo -e "\e[0Ksection_start:`date +%s`:bb_prep[collapsed=true]\r\e[0K\e[33;1mPrep\e[37m"
+   mkdir -p release
+   mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+   echo -e "\e[0Ksection_end:`date +%s`:bb_prep\r\e[0K"
+}
+
+bigbang_publish() {
+   echo -e "\e[0Ksection_start:`date +%s`:bb_publish[collapsed=true]\r\e[0K\e[33;1mPublish\e[37m"
+   if [ -z $CI_COMMIT_TAG ]; then
+     aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/tests/${CI_COMMIT_SHA}
+   else
+     aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:bb_publish\r\e[0K"
+}
+
+bigbang_release() {
+   echo -e "\e[0Ksection_start:`date +%s`:bb_release[collapsed=true]\r\e[0K\e[33;1mRelease\e[37m"
+   if [ -z $CI_COMMIT_TAG ]; then
+     RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_COMMIT_SHA}"
+     printf "Release will run: \n\
+       release-cli create --name \"Big Bang \${CI_COMMIT_TAG}\" --tag-name \${CI_COMMIT_TAG} \n\
+       --description \"Automated release notes are a WIP.\" \n\
+       --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
+       --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
+       --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
+   else
+     release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+       --description "Automated release notes are a WIP." \
+       --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+       --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+       --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:bb_release\r\e[0K"
+}
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Package Functions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+dependency_install() {
+   echo -e "\e[0Ksection_start:`date +%s`:dependency_install[collapsed=true]\r\e[0KDependency Install"
+   if [ -f "tests/dependencies.yaml" ]; then
+     yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+       dep_name=$i
+       dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+       if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+         dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
+         if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+           continue
+         fi
+       fi
+       dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
+       if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+         dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+       fi
+       dep_namespace=$(yq e ".${i}.namespace" "tests/dependencies.yaml")
+       if [[ -z ${dep_namespace} || ${dep_namespace} == "null" ]]; then
+         dep_namespace=$dep_name
+       fi
+       dep_helm_name=$(yq e ".${i}.package-name" "tests/dependencies.yaml")
+       if [[ -z ${dep_helm_name} || ${dep_helm_name} == "null" ]]; then
+         dep_helm_name=$dep_name
+       fi
+       if [[ -d ${dep_branch} || ${dep_branch} == "null" ]]; then
+         if [[ -d "repos/${dep_name}" ]]; then
+           echo "Checking out default branch from ${dep_repo}"
+           cd repos/${dep_name}
+           git reset --hard && git clean -fd
+           git checkout $(git remote show origin | awk '/HEAD branch/ {print $NF}')
+           cd ../../
+         else
+           echo "Cloning default branch from ${dep_repo}"
+           git clone ${dep_repo} repos/${dep_name}
+         fi
+       else
+         if [[ -d "repos/${dep_name}" ]]; then
+           echo "Checking out ${dep_branch} from ${dep_repo}"
+           cd repos/${dep_name}
+           git reset --hard && git clean -fd
+           git checkout ${dep_branch}
+           cd ../../
+         else
+           echo "Cloning ${dep_branch} from ${dep_repo}"
+           git clone -b ${dep_branch} ${dep_repo} repos/${dep_name}
+         fi
+       fi
+       echo "Installing dependency: repos/${dep_name} into ${dep_namespace} namespace"
+       if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
+         kubectl create namespace ${dep_namespace};
+       fi
+       if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
+         kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+       fi
+       if [ $(ls -1 repos/${dep_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+         echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using repos/${dep_name}/tests/test-values.yaml for values"
+         helm upgrade -i --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} -f repos/${dep_name}/tests/test-values.y*ml --set istio.enabled=false
+       else
+         echo "Helm installing repos/${dep_name}/chart into ${dep_namespace} namespace using default values"
+         helm upgrade -i --wait --timeout 600s ${dep_helm_name} repos/${dep_name}/chart -n ${dep_namespace} --set istio.enabled=false
+       fi
+     done
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:dependency_install\r\e[0K"
+}
+
+dependency_wait() {
+   echo -e "\e[0Ksection_start:`date +%s`:dependency_wait[collapsed=true]\r\e[0KDependency Wait"
+   if [ -f "tests/dependencies.yaml" ]; then
+     sleep 10
+     echo -n "Waiting on CRDS ... "
+     kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+     echo "done."
+     if [ -f tests/dependencies.yaml ]; then
+       yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+         dep_name=$i
+         if [ -f repos/${dep_name}/tests/wait.sh ]; then
+           source repos/${dep_name}/tests/wait.sh
+           echo -n "Waiting on dependency resources ... "
+           wait_project
+           echo "done."
+         fi
+       done
+     fi
+     echo -n "Waiting on stateful sets ... "
+     wait_sts
+     echo "done."
+     echo -n "Waiting on daemon sets ... "
+     wait_daemonset
+     echo "done."
+     echo -n "Waiting on deployments ... "
+     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+     echo "done."
+     echo -n "Waiting on terminating pods ... "
+     readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
+     for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+     echo "done."
+     echo -n "Waiting on running pods to be ready ... "
+     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+     echo "done."
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:dependency_wait\r\e[0K"
+}
+
+package_install() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_install[collapsed=true]\r\e[0KPackage Install"
+   if [ ! -z ${PROJECT_NAME} ]; then
+     if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
+       PACKAGE_HELM_NAME=${PROJECT_NAME}
+     fi
+   fi
+   if ! kubectl get namespace ${PACKAGE_NAMESPACE} 2> /dev/null; then
+     kubectl create namespace ${PACKAGE_NAMESPACE};
+   fi
+   if ! kubectl get secret -n ${PACKAGE_NAMESPACE} private-registry 2> /dev/null; then
+     kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+   fi
+   if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
+     helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
+   else
+     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
+     helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_install\r\e[0K"
+}
+
+package_wait() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_wait[collapsed=true]\r\e[0KPackage Wait"
+   sleep 10
+   echo -n "Waiting on CRDs ... "
+   kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+   echo "done."
+   if [ -f tests/wait.sh ]; then
+     source tests/wait.sh
+     echo -n "Waiting on project resources ... "
+     wait_project
+     echo "done."
+   fi
+   echo -n "Waiting on stateful sets ... "
+   wait_sts
+   echo "done."
+   echo -n "Waiting on daemon sets ... "
+   wait_daemonset
+   echo "done."
+   echo -n "Waiting on deployments ... "
+   kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+   echo "done."
+   echo -n "Waiting on terminating pods ... "
+   readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
+   for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+   echo "done."
+   echo -n "Waiting on running pods to be ready ... "
+   kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+   echo "done."
+   echo -e "\e[0Ksection_end:`date +%s`:package_wait\r\e[0K"
+}
+
+package_test() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_test[collapsed=true]\r\e[0KPackage Test"
+   if [ -d "chart/templates/tests" ]; then
+     helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
+     echo "***** Start Helm Test Logs *****"
+     kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+     echo "***** End Helm Test Logs *****"
+     if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
+       kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
+       cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
+       mkdir -p cypress-artifacts
+       tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
+     fi
+     if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
+       kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
+       cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
+       mkdir -p cypress-artifacts
+       tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
+     fi
+     if [[ ${EXIT_CODE} -ne 0 ]]; then
+       exit ${EXIT_CODE}
+     fi
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_test\r\e[0K"
+}
+
+# Note: This section is temporarily duplicated to allow upgrade testing to fail if tests were not built to handle subsuquent runs
+# Due to some of the quirks with Gitlab CI "script blocks" this is the easiest solution
+# This block should be removed in the future and line 397 updated to just call `package_test`
+package_upgrade_test() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_test2[collapsed=true]\r\e[0KPackage Re-Test"
+   if [ -d "chart/templates/tests" ]; then
+     helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
+     echo "***** Start Helm Test Logs *****"
+     kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+     echo "***** End Helm Test Logs *****"
+     if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
+       kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
+       cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
+       mkdir -p cypress-artifacts
+       tar -zxf cypress-screenshots.tar.gz --strip-components=2 -C cypress-artifacts
+     fi
+     if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; then
+       kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos -o jsonpath='{.data.cypress-videos\.tar\.gz\.b64}' > cypress-videos.tar.gz.b64
+       cat cypress-videos.tar.gz.b64 | base64 -d > cypress-videos.tar.gz
+       mkdir -p cypress-artifacts
+       tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
+     fi
+     if [[ ${EXIT_CODE} -ne 0 ]]; then
+       echo -e "\e[31mNOTICE to MR creators/reviewers: There were errors on upgrade testing. If this package's tests are expected to fail when run twice in a row, please open a ticket to resolve this for the future.\e[0m"
+       echo -e "\e[31mOtherwise, take note of artifacts and testing results and ensure that the upgrade path is functional before approving/merging.\e[0m"
+       exit 123
+     fi
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_test2\r\e[0K"
+}
+
+package_structure() {
+    echo -e "\e[0Ksection_start:`date +%s`:package_tree[collapsed=true]\r\e[0KPackage Directory Structure"
+    tree .
+    echo -e "\e[0Ksection_end:`date +%s`:package_tree\r\e[0K"
+}
+
+global_policy_tests() {
+   echo -e "\e[0Ksection_start:`date +%s`:generic_policy_tests[collapsed=true]\r\e[0KGlobal Policy Tests"
+   if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+     echo "Checking test values..."
+     helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.y*ml
+     echo "Checking chart values..."
+     helm conftest chart --policy ${GENERIC_POLICY_PATH}
+   else
+     helm conftest chart --policy ${GENERIC_POLICY_PATH}
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:generic_policy_tests\r\e[0K"
+}
+
+package_policy_tests() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_specific_tests[collapsed=true]\r\e[0KPackage Specific Tests"
+   if [ -d "tests/policy" ]; then
+     echo "App specific configuration validation tests:"
+     if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+       echo "Checking test values..."
+       helm conftest chart --policy tests/policy -f tests/test-values.y*ml
+       echo "Checking chart values..."
+       helm conftest chart --policy tests/policy
+     else
+       helm conftest chart --policy tests/policy
+     fi
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_specific_tests\r\e[0K"
+}
+
+package_deprecation_check() {
+   echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0KPackage API Deprecation Check"
+   helm template ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set monitoring.enabled=true --set istio.enabled=true --set networkPolicies.enabled=true -f tests/test-values.y*ml | pluto detect -owide - && export EXIT_CODE=$? || export EXIT_CODE=$?
+   if [[ ${EXIT_CODE} -eq 2 ]]; then
+     echo -e "\e[31mNOTICE: A deprecated apiVersion has been found.\e[0m"
+     exit ${EXIT_CODE}
+   elif [[ ${EXIT_CODE} -eq 3 ]]; then
+     echo -e "\e[31mNOTICE: A removed apiVersion has been found.\e[0m"
+     exit ${EXIT_CODE}
+   else
+     exit ${EXIT_CODE}
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_deprecation_check\r\e[0K"
+}
+
+chart_update_check() {
+   # change to target branch and check if Chart.yaml or Changelog missing. If so, check source.
+   echo -e "\e[0Ksection_start:`date +%s`:chart_changelog_checks[collapsed=true]\r\e[0KChecking for Chart.yaml/CHANGELOG updates"
+   git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+   if [ ! -f "chart/Chart.yaml" ] || [ ! -f "CHANGELOG.md" ]; then
+     # change to source branch and check if Chart.yaml or Changelog missing. If one or both are missing, fail.
+     git fetch && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+     if [ ! -f "chart/Chart.yaml" ] || [ ! -f "CHANGELOG.md" ]; then
+       echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
+       echo -e "\e[31mFAIL: Package must have chart/Chart.yaml and CHANGELOG.md\e[0m"
+       exit 1
+     else
+       # target branch is missing Chart.yaml or Changelog. Exit with notice.
+       echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
+       echo -e "\e[31mNOTICE: Chart.yaml or Changelog not found in ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}, skipping update check\e[0m"
+       exit 0
+     fi
+     # return to target branch
+     git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+   fi
+   cp CHANGELOG.md /tmp/CHANGELOG.md
+   echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
+   DEFAULT_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
+   echo "Old Chart Version:$DEFAULT_BRANCH_VERSION"
+   echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage MR Checkout"
+   git reset --hard && git clean -fd
+   git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+   echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
+   MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
+   echo "New Chart Version:$MR_BRANCH_VERSION"
+   README_BRANCH_MATCH=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
+   if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
+     echo -e "\e[31mNOTICE: You need to bump chart version in Chart.yaml\e[0m"
+     EXIT="true"
+   fi
+   if [ -z "$README_BRANCH_MATCH" ]; then
+        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+        EXIT="true"
+   fi
+   if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ]; then
+     echo -e "\e[31mNOTICE: You need to update CHANGELOG.md\e[0m"
+     EXIT="true"
+   fi
+   if [ "$EXIT" == "true" ]; then
+     exit 1
+   fi
+}
+
+dependency_images() {
+   echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0KGetting List of Dependency Images"
+   deps=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
+   echo $deps | jq -r '.images[].repoTags[0] | select(. != null)' | tee dependencies.txt
+   echo -e "\e[0Ksection_end:`date +%s`:dep_images\r\e[0K"
+}
+
+installed_images() {
+   echo -e "\e[0Ksection_start:`date +%s`:inst_images[collapsed=true]\r\e[0KGetting List of Installed Images"
+   images=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
+   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee full-list.txt
+   echo -e "\e[0Ksection_end:`date +%s`:inst_images\r\e[0K"
+}
+
+package_images() {
+   echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KPackage Images"
+   grep -Fxvf dependencies.txt full-list.txt | tee images.txt
+   sed -i '/docker.io\/rancher\//d' images.txt
+   if [ -f tests/images.txt ]; then
+     cat tests/images.txt >> images.txt
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
+}
+
+package_synker() {
+   echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0KRunning Synker and Tar"
+   cp ${PIPELINE_REPO_DESTINATION}/synker/package-synker.yaml ./synker.yaml
+   for image in $(cat images.txt); do
+     yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
+   done
+   synker pull -b=1
+   cp /usr/local/bin/synker synker.yaml /var/lib/registry/
+   tar -czvf $IMAGE_PKG /var/lib/registry
+   echo -e "\e[0Ksection_end:`date +%s`:synker\r\e[0K"
+}
+
+package_repos() {
+   echo -e "\e[0Ksection_start:`date +%s`:repos[collapsed=true]\r\e[0KPacking up Repos"
+   mkdir -p repos/
+   if [ -z ${CI_COMMIT_TAG} ]; then
+     git -C repos/ clone -b ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_REPOSITORY_URL}
+   else
+     git -C repos/ clone -b ${CI_COMMIT_TAG} ${CI_REPOSITORY_URL}
+   fi
+   if [ -f tests/dependencies.yaml ]; then
+     yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
+       dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
+       if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+         dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+       fi
+       dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
+       if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+         dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
+         if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
+           continue
+         fi
+       fi
+       if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
+         git -C repos/ clone ${dep_repo}
+       else
+         git -C repos/ clone -b ${dep_branch} ${dep_repo}
+       fi
+     done
+   fi
+   tar -czf $REPOS_PKG repos/
+   echo -e "\e[0Ksection_end:`date +%s`:repos\r\e[0K"
+}
+
+package_prep() {
+   echo -e "\e[0Ksection_start:`date +%s`:prep[collapsed=true]\r\e[0KFinal Prep"
+   mkdir -p release
+   mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+   echo -e "\e[0Ksection_end:`date +%s`:prep\r\e[0K"
+}
+
+package_publish() {
+   echo -e "\e[0Ksection_start:`date +%s`:publish[collapsed=true]\r\e[0KPublishing"
+   if [ -z $CI_COMMIT_TAG ]; then
+     aws configure set aws_region ${TEST_AWS_DEFAULT_REGION}
+     aws configure set aws_access_key_id ${TEST_AWS_ACCESS_KEY_ID}
+     aws configure set aws_secret_access_key ${TEST_AWS_SECRET_ACCESS_KEY}
+     aws s3 cp --quiet release/${IMAGE_LIST} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
+     aws s3 cp --quiet release/${IMAGE_PKG} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
+     aws s3 cp --quiet release/${REPOS_PKG} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
+   else
+     aws s3 sync --quiet release/ s3://${RELEASE_BUCKET}/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:publish\r\e[0K"
+}
+
+package_release_notes() {
+   echo -e "\e[0Ksection_start:`date +%s`:notes[collapsed=true]\r\e[0KGenerating Release Notes"
+   echo "# RELEASE NOTES:" >> release_notes.txt
+   if [ -z $CI_COMMIT_TAG ]; then
+     echo "Please see the repo [documentation](${CI_PROJECT_URL}/-/tree/${CI_COMMIT_SHA}/docs) for additional info on this package." >> release_notes.txt
+   else
+     echo "Please see the repo [documentation](${CI_PROJECT_URL}/-/tree/${CI_COMMIT_TAG}/docs) for additional info on this package." >> release_notes.txt
+   fi
+   release_notes=$(cat CHANGELOG.md | sed  "1,/## \[${CI_COMMIT_TAG}]/d;/## \[/Q")
+   if [[ -z $release_notes ]]; then
+     printf "\n" >> release_notes.txt;
+     echo "NO ENTRY IN CHANGELOG FOR THIS TAG, ADD RELEASE NOTES HERE" >> release_notes.txt;
+   else
+     printf "\n" >> release_notes.txt;
+     echo "${release_notes}" >> release_notes.txt;
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:notes\r\e[0K"
+}
+
+package_release() {
+   echo -e "\e[0Ksection_start:`date +%s`:release[collapsed=true]\r\e[0KCreating Release"
+   if [ -z $CI_COMMIT_TAG ]; then
+     RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${TEST_AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}"
+     printf "Release will run: \n\
+       release-cli create --name \"\${RELEASE_NAME} \${CI_COMMIT_SHA}\" --tag-name \${CI_COMMIT_SHA} \n\
+         --description \"\$(cat release_notes.txt)\" \n\
+         --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
+         --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
+         --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
+   else
+     release-cli create --name "${RELEASE_NAME} ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
+       --description "$(cat release_notes.txt)" \
+       --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+       --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
+       --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:release\r\e[0K"
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Re-Usable Functions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+cluster_deprecation_check() {
+   echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0KIn Cluster Deprecation Check"
+   kubent -e || export EXIT_CODE=$?
+   if [ $EXIT_CODE -eq 200 ]; then 
+     echo -e "\e[31mNOTICE: API deprecations or removals were found.\e[0m"
+     exit 200
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:kubent_check\r\e[0K"
+}
+
+package_auth_setup() {
+   mkdir -p /root/.docker
+   jq -n '{"auths": {"registry.dso.mil": {"auth": $bb_registry_auth}, "registry1.dso.mil": {"auth": $registry1_auth}, "registry.il2.dso.mil": {"auth": $il2_registry_auth}, "docker.io": {"auth": $bb_docker_auth} } }' \
+     --arg bb_registry_auth ${BB_REGISTRY_AUTH} \
+     --arg registry1_auth ${REGISTRY1_AUTH} \
+     --arg il2_registry_auth ${IL2_REGISTRY_AUTH} \
+     --arg bb_docker_auth ${DOCKER_AUTH} > /root/.docker/config.json
+}
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Get kubernetes resources
+#
+#-----------------------------------------------------------------------------------------------------------------------
+get_events() {
+  echo -e "\e[0Ksection_start:`date +%s`:show_event_log[collapsed=true]\r\e[0K\e[33;1mCluster Event Log\e[37m"
+  echo -e "\e[31mNOTICE: Cluster events can be found in artifact events.txt\e[0m"
+  kubectl get events -A --sort-by=.metadata.creationTimestamp > events.txt
+  echo -e "\e[0Ksection_end:`date +%s`:show_event_log\r\e[0K"
+}
+
+get_all() {
+  echo -e "\e[0Ksection_start:`date +%s`:all_resources[collapsed=true]\r\e[0K\e[33;1mAll Cluster Resources\e[37m"
+  kubectl get all -A
+  echo -e "\e[0Ksection_end:`date +%s`:all_resources\r\e[0K"
+}
+
+get_gitrepos() {
+  echo -e "\e[0Ksection_start:`date +%s`:git_repos[collapsed=true]\r\e[0K\e[33;1mGitrepos\e[37m"
+  kubectl get gitrepository -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:git_repos\r\e[0K"
+}
+
+get_hr() {
+  echo -e "\e[0Ksection_start:`date +%s`:hr[collapsed=true]\r\e[0K\e[33;1mHelmreleases\e[37m"
+  kubectl get helmrelease -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:hr\r\e[0K"
+}
+
+get_kustomize() {
+  echo -e "\e[0Ksection_start:`date +%s`:kust[collapsed=true]\r\e[0K\e[33;1mKustomize\e[37m"
+  kubectl get kustomizations -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:kust\r\e[0K"
+}
+
+get_gateways(){
+  echo -e "\e[0Ksection_start:`date +%s`:gateways[collapsed=true]\r\e[0K\e[33;1mIstio Gateways\e[37m"
+  kubectl get gateways -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:gateways\r\e[0K"
+}
+
+get_virtualservices(){
+  echo -e "\e[0Ksection_start:`date +%s`:virtual_services[collapsed=true]\r\e[0K\e[33;1mVirtual Services\e[37m"
+  kubectl get vs -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:virtual_services\r\e[0K"
+}
+
+get_hosts() {
+  echo -e "\e[0Ksection_start:`date +%s`:hosts[collapsed=true]\r\e[0K\e[33;1mHosts File Contents\e[37m"
+  cat /etc/hosts
+  echo -e "\e[0Ksection_end:`date +%s`:hosts\r\e[0K"
+}
+
+get_opa_violations() {
+  echo -e "\e[0Ksection_start:`date +%s`:opa_vio[collapsed=true]\r\e[0K\e[33;1mOPA Violations\e[37m"
+  #kubectl get constraints -o json | jq '.items[] | { "Name" : .metadata.annotations."constraints.gatekeeper/name", "Kind" : .kind, "Description" : .metadata.annotations."constraints.gatekeeper/description", "Version" : .metadata.labels."app.kubernetes.io/version", "Parameters": .spec.parameters, "Source" : .metadata.annotations."constraints.gatekeeper/source", "Docs" : .metadata.annotations."constraints.gatekeeper/docs", "Related" : .metadata.annotations."constraints.gatekeeper/related", "TotalViolations" : .status.totalViolations, "Violations" : .status.violations } | with_entries( select( .value != null ) )' || true
+  for i in $(kubectl get constraint | egrep -v 'NAME|^$' | awk '{print$1}'); do echo $i; kubectl get $i -o yaml | grep -B5 -i violation ; echo ;done || true
+  echo -e "\e[0Ksection_end:`date +%s`:opa_vio\r\e[0K"
+}
+
+get_dns_config() {
+   echo -e "\e[0Ksection_start:`date +%s`:dns[collapsed=true]\r\e[0K\e[33;1mDNS Config\e[37m"
+   if kubectl get configmap -n kube-system coredns &>/dev/null; then
+     kubectl get configmap -n kube-system coredns -o jsonpath='{.data.NodeHosts}'
+   elif kubectl get configmap -n kube-system rke2-coredns-rke2-coredns &>/dev/null; then
+     kubectl get configmap -n kube-system rke2-coredns-rke2-coredns -o jsonpath='{.data.Corefile}'
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:dns\r\e[0K"
+}
+
+get_debug() {
+  if [ $DEBUG_ENABLED == "true" ]; then
+    get_kustomize
+    get_gateways
+    get_virtualservices
+    get_hosts
+    get_dns_config
+  else
+    echo "Debug not enabled, skipping"
+  fi
+}
+
+bigbang_pipeline() {
+  if [ $PIPELINE_TYPE == "BB" ]; then
+    get_gitrepos
+    get_hr
+    get_opa_violations
+  else
+    echo "Pipeline type is not BB, skipping"
+  fi
+}
