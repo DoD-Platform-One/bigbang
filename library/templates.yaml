@@ -1,0 +1,32 @@
+include:
+  # Infrastructure
+  - local: '/infrastructure/templates.yaml'
+
+  # Clusters
+  - local: '/clusters/templates.yaml'
+
+.bigbang-gitlab-runner-tags:
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+
+.util-image:
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:2.0.1
+
+.templates:
+  before_script:
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - package_auth_setup
+
+.kubectl-output:
+  extends: 
+  - .bigbang-gitlab-runner-tags
+  - .util-image
+  after_script:
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - get_all
+    - get_events
+    - bigbang_pipeline
+    - get_debug

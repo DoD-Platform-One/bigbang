@@ -1,3 +1,4 @@
+# This file and folder can be removed once verson 2.0.0 refactor is out
 # global rules for when pipelines run
 workflow:
   rules:

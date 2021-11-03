@@ -1,0 +1,27 @@
+apiVersion: k3d.io/v1alpha3
+kind: Simple
+name: ci
+servers: 1
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+      - arg: --disable=servicelb
+        nodeFilters:
+          - server:*
+  k3d:
+    wait: true
+volumes:
+  - volume: /etc/machine-id:/etc/machine-id
+    nodeFilters:
+      - server:*
+      - agent:*
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
