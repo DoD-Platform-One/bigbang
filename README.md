@@ -1,1 +1,1 @@
-This repo can be deleted or archived.
+Use this for testing package pipline changes.
