@@ -21,12 +21,25 @@ WAIT_TIMEOUT=300
 function help {
   cat << EOF
 usage: $(basename "$0") <arguments>
--h|--help              - print this help message and exit
--r|--registry-url      - (optional, default: registry1.dso.mil) registry url to use for flux installation
--u|--registry-username - (required) registry username to use for flux installation
--p|--registry-password - (required) registry password to use for flux installation
--w|--wait-timeout      - (optional, default: 120) how long to wait; in seconds, for each key flux resource component
+-h|--help                - print this help message and exit
+-r|--registry-url        - (optional, default: registry1.dso.mil) registry url to use for flux installation
+-s|--use-existing-secret - (optional) use existing private-registry secret 
+-u|--registry-username   - (required) registry username to use for flux installation
+-p|--registry-password   - (required) registry password to use for flux installation
+-w|--wait-timeout        - (optional, default: 120) how long to wait; in seconds, for each key flux resource component
 EOF
+}
+
+# script check for existing pull secret
+function check_secrets {
+  if kubectl get secrets/"$FLUX_SECRET" -n flux-system > /dev/null 2>&1;
+  then
+    #the secret exists
+    FLUX_SECRET_EXISTS=0
+  else
+    #the secret does not exist
+    FLUX_SECRET_EXISTS=1
+  fi
 }
 
 #
@@ -90,6 +103,11 @@ while (( "$#" )); do
     -h|--help)
       help; exit 0
       ;;
+    # Check if private-registry secret exists
+    -s|--use-existing-secret)
+      check_secrets;
+      shift
+      ;;
     # unsupported flags
     -*|--*=)
       echo "Error: Unsupported flag $1" >&2
@@ -103,30 +121,32 @@ while (( "$#" )); do
   esac
 done
 
-# check required arguments
-if [ -z "$REGISTRY_USERNAME" ] || [ -z "$REGISTRY_PASSWORD" ]; then
-  help; exit 1
+# check if secret exists
+if [ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 1 ]; then
+
+  # check required arguments
+  if [ -z "$REGISTRY_USERNAME" ] || [ -z "$REGISTRY_PASSWORD" ]; then
+    help; exit 1
+  fi
+
+  # debug print cli args
+  echo "REGISTRY_URL: $REGISTRY_URL"
+  echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
+
+  kubectl create namespace flux-system || true
+
+  echo "Creating secret $FLUX_SECRET in namespace flux-system"
+  kubectl create secret docker-registry "$FLUX_SECRET" -n flux-system \
+    --docker-server="$REGISTRY_URL" \
+    --docker-username="$REGISTRY_USERNAME" \
+    --docker-password="$REGISTRY_PASSWORD" \
+    --docker-email="$REGISTRY_EMAIL" \
+    --dry-run=client -o yaml | kubectl apply -n flux-system -f -
 fi
-
-# debug print cli args
-echo "REGISTRY_URL: $REGISTRY_URL"
-echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
-
 
 #
 # install flux
 #
-
-kubectl create namespace flux-system || true
-
-
-echo "Creating secret $FLUX_SECRET in namespace flux-system"
-kubectl create secret docker-registry "$FLUX_SECRET" -n flux-system \
-  --docker-server="$REGISTRY_URL" \
-  --docker-username="$REGISTRY_USERNAME" \
-  --docker-password="$REGISTRY_PASSWORD" \
-  --docker-email="$REGISTRY_EMAIL" \
-  --dry-run=client -o yaml | kubectl apply -n flux-system -f -
 
 echo "Installing flux from kustomization"
 kustomize build "$FLUX_KUSTOMIZATION" | sed "s/registry1.dso.mil/${REGISTRY_URL}/g" | kubectl apply -f -
