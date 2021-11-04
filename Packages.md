@@ -4,10 +4,10 @@
 
 Columns:
 * Logging - fluentbit configurations for standardized logging
-* Telemetry - Integration with Prometheus and dedicated Grafana dashbaords as appropriate
+* Telemetry - Integration with Prometheus and dedicated Grafana dashboards as appropriate
 * Tracing - Insertion of Tracing data for application traffic
 * Network Policies - Network Policies for L2 connectivity, 
-* mTLS -mTLS for applicatoin traffic, e.g. implemented by Istio
+* mTLS -mTLS for application traffic, e.g. implemented by Istio
 * Behavior Detection - Twistlock Policies for applications
 
 
