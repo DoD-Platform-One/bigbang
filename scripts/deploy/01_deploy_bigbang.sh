@@ -23,6 +23,9 @@ if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "maste
   yq e '.networkPolicies.controlPlaneCidr = "10.0.0.0/8"' $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 fi
 
+# Add ingress certs to test values
+yq eval-all 'select(fileIndex == 0) * select(filename == "chart/ingress-certs.yaml")' $CI_VALUES_FILE chart/ingress-certs.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
+
 # deploy BigBang using dev sized scaling
 echo "🚀 Installing BigBang with the following configurations:"
 cat $CI_VALUES_FILE
