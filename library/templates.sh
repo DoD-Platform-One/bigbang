@@ -102,7 +102,7 @@ bigbang_installed_images() {
 
 bigbang_synker() {
    echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker\e[37m"
-   cp ${PIPELINE_REPO_DESTINATION}/synker/bigbang-synker.yaml ./synker.yaml
+   cp ./scripts/package/synker.yaml ./synker.yaml
    # Populate images list in synker config
    for image in $(cat images.txt); do
      yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
@@ -518,7 +518,7 @@ package_images() {
 
 package_synker() {
    echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0KRunning Synker and Tar"
-   cp ${PIPELINE_REPO_DESTINATION}/synker/package-synker.yaml ./synker.yaml
+   cp ${PIPELINE_REPO_DESTINATION}/synker/synker.yaml ./synker.yaml
    for image in $(cat images.txt); do
      yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
    done
