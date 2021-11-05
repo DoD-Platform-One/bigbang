@@ -13,11 +13,11 @@ The kind label shows the type of work that needs to be accomplished
 
 #### `kind::bug`
 
-Issues related to Bigbang not functioning as expected
+Issues related to Big Bang not functioning as expected
 
 #### `kind::chore`
 
-Catch all kind that captures administrative tasking for the BigBang project
+Catch all kind that captures administrative tasking for the Big Bang project
 
 #### `kind:ci`
 
@@ -29,7 +29,7 @@ Issues related to documentation
 
 #### `kind::feature`
 
-Creation of a new capability for BigBang and/or one of its packages
+Creation of a new capability for Big Bang and/or one of its packages
 
 #### `kind::enhancement`
 
