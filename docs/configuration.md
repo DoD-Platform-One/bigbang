@@ -80,7 +80,7 @@ Registry credentials are used to pull images for Big Bang.  By default, it point
 
 ### `flux`
 
-Flux settings are used to setup the default continuos deployment configuration for Big Bang packages.
+Flux settings are used to setup the default continuous deployment configuration for Big Bang packages.
 
 | Key | Description | Type | Default |
 |--|--|--|--|

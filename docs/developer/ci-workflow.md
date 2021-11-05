@@ -111,7 +111,7 @@ More information on the full set of infrastructure tests are below:
 
 For each cloud, a BigBang owned network will be created that conform with the appropriate set of tests about to be ran.  For example, to validate that Big Bang deploys in a connected environment on AWS, a VPC, subnets, route tables, etc... are created, and the outputs are made available through terraform's remote `data` source.
 
-At this time the infrastructue testing pipeline is only utilizing internet-connect AWS govcloud.
+At this time the infrastructure testing pipeline is only utilizing internet-connect AWS govcloud.
 
 #### Cluster Creation
 
@@ -119,7 +119,7 @@ The infrastructure pipeline is currently setup to standup an `rke2` cluster by d
 
 An `rke2` cluster is created that leverages the upstream [terraform modules](https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform)
 
-It is a hard requriement at this stage that every cluster outputs an admin scoped `kubeconfig` as a gitlab ci artifact.  This artifact will be leveraged in the following stages for interacting with the created cluster.
+It is a hard requirement at this stage that every cluster outputs an admin scoped `kubeconfig` as a gitlab ci artifact.  This artifact will be leveraged in the following stages for interacting with the created cluster.
 
 #### Big Bang Installation
 

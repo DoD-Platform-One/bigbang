@@ -55,12 +55,12 @@ Configure `myvalues.yaml` to suit your needs.
 # Be aware, the internet version is likely newer than the Iron Bank version
 ./hack/flux-install.sh
 
-# Apply a local version of the umbrella chart
+# Apply a local version of the Big Bang chart
 # NOTE: This is the alternative to deploying a HelmRelease and having flux manage it, we use a local copy to avoid having to commit every change
 helm upgrade -i bigbang chart -n bigbang --create-namespace -f myvalues.yaml
 
-# A convenience development script is provided to force fluxv2 to reconcile all helmreleases within the cluster insteading of waiting for the next polling interval.
-hack/sync.sh
+# It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the flux `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the ./hack/sync.sh script.
+./hack/sync.sh
 ```
 
 For more extensive development, use the [Development Guide](docs/c_development.md).
@@ -73,7 +73,7 @@ Follow the [Big Bang documentation](./docs) for testing a full deployment of Big
 
 ## DNS
 
-To ease with local development, the TLD `bigbang.dev` has been purchased with the following CNAME record:
+To ease with local development, the TLD `bigbang.dev` is maintained by the Big Bang team with the CNAME record:
 
 `CNAME: *.bigbang.dev -> 127.0.0.1`
 
