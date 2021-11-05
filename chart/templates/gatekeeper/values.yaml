@@ -28,11 +28,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       repos:
         - registry1.dso.mil
         - registry.dso.mil
-      {{- if .Values.addons.mattermost.enabled }}
-      excludedResources:
-        # Mattermost needs postgres:13 image and cannot override the upstream
-        - mattermost/init-check-database
-      {{- end }}
 
   {{- if or .Values.monitoring.enabled (or .Values.fluentbit.enabled .Values.twistlock.enabled) }}
   allowedHostFilesystem:
@@ -64,15 +59,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     parameters:
       excludedResources:
         - twistlock/twistlock-defender-ds-.*
-  {{- end }}
-
-  {{- if .Values.addons.mattermost.enabled }}
-  httpsOnly:
-    parameters:
-      excludedResources:
-        # Mattermost currently does not useIngressTLS hence Ingress is created without TLS field by the operator.
-        # Adding exemption, pending https://github.com/mattermost/mattermost-operator/issues/235
-        - mattermost/mattermost
   {{- end }}
 
   imageDigest:
