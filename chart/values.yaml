@@ -12,12 +12,12 @@ istio:
     - kiali.{{ .Values.hostname }}
 
 port: 20001
-
-image:
+image: 
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.40.1
+  tag: v1.42.0
+  digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
-  pullSecrets:
+  pullSecrets: 
   - private-registry
 
 # Deployment options for the operator pod.
@@ -101,7 +101,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.40.1
+      image_version: v1.42.0
       image_pull_secrets:
       - private-registry
       ingress_enabled: false

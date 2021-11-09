@@ -1,62 +1,127 @@
-# Kiali
+# kiali-operator
 
-Istio UI, chart.
+![Version: 1.42.0-bb.0](https://img.shields.io/badge/Version-1.42.0--bb.0-informational?style=flat-square) ![AppVersion: 1.42.0](https://img.shields.io/badge/AppVersion-1.42.0-informational?style=flat-square)
 
-Originaly sourced from [upstream](), and minimally modified.
+Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
-## Upstream Changes
+## Upstream References
+* <https://github.com/kiali/kiali-operator>
 
+* <https://github.com/kiali/kiali>
+* <https://github.com/kiali/kiali-ui>
+* <https://github.com/kiali/kiali-operator>
+* <https://github.com/kiali/helm-charts>
 
+## Learn More
+* [Application Overview](docs/overview.md)
+* [Other Documentation](docs/)
 
-## Iron Bank
+## Pre-Requisites
 
-You can `pull` the registry1 image(s) [here](https://registry1.dso.mil/harbor/projects/3/repositories/opensource%2Fistio-1.7%2Foperator-1.7) and view the container approval [here](https://ironbank.dso.mil/ironbank/repomap/opensource/istio-1.7).
+* Kubernetes Cluster deployed
+* Kubernetes config installed in `~/.kube/config`
+* Helm installed
 
-## OpenID Authentication
+Install Helm
 
-You can pass through your OpenID configuration through to kiali via values in Big Bang:
+https://helm.sh/docs/intro/install/
 
-```yaml
-kiali:
-  sso:
-    enabled: true
-    client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-kiali"
-    client_secret: "EXAMPLE_SECRET_HASH"
+## Deployment
+
+* Clone down the repository
+* cd into directory
+```bash
+helm install kiali-operator chart/
 ```
 
-The above configuration will auto complete a Keycloak Endpoint in the Kiali Resource and utilize the provided client_id and client_secret values.
+## Values
 
-### If you would like to use an auth provider other than Keycloak:
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| nameOverride | string | `""` |  |
+| fullnameOverride | string | `""` |  |
+| hostname | string | `"bigbang.dev"` |  |
+| istio.enabled | bool | `false` |  |
+| istio.kiali.gateways[0] | string | `"istio-system/main"` |  |
+| istio.kiali.hosts[0] | string | `"kiali.{{ .Values.hostname }}"` |  |
+| port | int | `20001` |  |
+| image.repo | string | `"registry1.dso.mil/ironbank/opensource/kiali/kiali-operator"` |  |
+| image.tag | string | `"v1.42.0"` |  |
+| image.digest | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.pullSecrets[0] | string | `"private-registry"` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| env | list | `[]` |  |
+| tolerations | list | `[]` |  |
+| resources.requests.cpu | string | `"100m"` |  |
+| resources.requests.memory | string | `"512Mi"` |  |
+| resources.limits.cpu | string | `"100m"` |  |
+| resources.limits.memory | string | `"512Mi"` |  |
+| affinity | object | `{}` |  |
+| replicaCount | int | `1` |  |
+| priorityClassName | string | `""` |  |
+| metrics.enabled | bool | `true` |  |
+| debug.enabled | bool | `true` |  |
+| debug.verbosity | string | `"1"` |  |
+| debug.enableProfiler | bool | `false` |  |
+| watchNamespace | string | `""` |  |
+| clusterRoleCreator | bool | `true` |  |
+| secretReader[0] | string | `"cacerts"` |  |
+| secretReader[1] | string | `"istio-ca-secret"` |  |
+| onlyViewOnlyMode | bool | `false` |  |
+| allowAdHocKialiNamespace | bool | `true` |  |
+| allowAdHocKialiImage | bool | `true` |  |
+| cr.create | bool | `true` |  |
+| cr.name | string | `"kiali"` |  |
+| cr.namespace | string | `""` |  |
+| cr.spec.istio_component_namespaces.grafana | string | `"monitoring"` |  |
+| cr.spec.istio_component_namespaces.prometheus | string | `"monitoring"` |  |
+| cr.spec.istio_component_namespaces.tracing | string | `"jaeger"` |  |
+| cr.spec.istio_namespace | string | `"istio-system"` |  |
+| cr.spec.deployment.image_name | string | `"registry1.dso.mil/ironbank/opensource/kiali/kiali"` |  |
+| cr.spec.deployment.image_version | string | `"v1.42.0"` |  |
+| cr.spec.deployment.image_pull_secrets[0] | string | `"private-registry"` |  |
+| cr.spec.deployment.ingress_enabled | bool | `false` |  |
+| cr.spec.deployment.accessible_namespaces[0] | string | `"**"` |  |
+| cr.spec.deployment.logger.log_level | string | `"info"` |  |
+| cr.spec.deployment.resources.requests.cpu | string | `"200m"` |  |
+| cr.spec.deployment.resources.requests.memory | string | `"368Mi"` |  |
+| cr.spec.deployment.resources.limits.cpu | string | `"200m"` |  |
+| cr.spec.deployment.resources.limits.memory | string | `"368Mi"` |  |
+| cr.spec.auth.strategy | string | `"anonymous"` |  |
+| cr.spec.external_services.custom_dashboards.enabled | bool | `true` |  |
+| cr.spec.external_services.prometheus.url | string | `"http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090"` |  |
+| cr.spec.external_services.grafana.enabled | bool | `true` |  |
+| cr.spec.external_services.grafana.in_cluster_url | string | `"http://monitoring-monitoring-grafana.monitoring.svc.cluster.local:80"` |  |
+| cr.spec.external_services.grafana.url | string | `"https://grafana.bigbang.dev"` |  |
+| cr.spec.external_services.grafana.auth.username | string | `"admin"` |  |
+| cr.spec.external_services.grafana.auth.password | string | `"prom-operator"` |  |
+| cr.spec.external_services.grafana.auth.type | string | `"basic"` |  |
+| cr.spec.external_services.grafana.dashboards[0].name | string | `"Istio Service Dashboard"` |  |
+| cr.spec.external_services.grafana.dashboards[0].variables.namespace | string | `"var-namespace"` |  |
+| cr.spec.external_services.grafana.dashboards[0].variables.service | string | `"var-service"` |  |
+| cr.spec.external_services.grafana.dashboards[1].name | string | `"Istio Workload Dashboard"` |  |
+| cr.spec.external_services.grafana.dashboards[1].variables.namespace | string | `"var-namespace"` |  |
+| cr.spec.external_services.grafana.dashboards[1].variables.workload | string | `"var-workload"` |  |
+| cr.spec.external_services.grafana.dashboards[2].name | string | `"Istio Mesh Dashboard"` |  |
+| cr.spec.external_services.grafana.dashboards[3].name | string | `"Istio Control Plane Dashboard"` |  |
+| cr.spec.external_services.grafana.dashboards[4].name | string | `"Istio Performance Dashboard"` |  |
+| cr.spec.external_services.grafana.dashboards[5].name | string | `"Istio Wasm Extension Dashboard"` |  |
+| cr.spec.external_services.tracing.enabled | bool | `true` |  |
+| cr.spec.external_services.tracing.url | string | `"https://tracing.bigbang.dev"` |  |
+| cr.spec.external_services.tracing.in_cluster_url | string | `"http://jaeger-query.jaeger.svc.cluster.local:16686"` |  |
+| cr.spec.external_services.tracing.use_grpc | bool | `false` |  |
+| cr.spec.external_services.tracing.whitelist_istio_system[0] | string | `"istio"` |  |
+| networkPolicies.enabled | bool | `false` |  |
+| networkPolicies.ingressLabels.app | string | `"istio-ingressgateway"` |  |
+| networkPolicies.ingressLabels.istio | string | `"ingressgateway"` |  |
+| networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` |  |
+| openshift | bool | `false` |  |
+| svcPatchJob.enabled | bool | `false` |  |
+| svcPatchJob.image.repository | string | `"registry1.dso.mil/ironbank/big-bang/base"` |  |
+| svcPatchJob.image.tag | float | `8.4` |  |
 
-```yaml
-kiali:
-  values:
-    cr:
-      spec:
-        auth:
-          strategy: openid
-          openid:
-            client_id: ""
-            issuer_uri: "https://ENDPOINT_URL/AUTH"
-            scopes:
-            - openid
-            - email
-            username_claim: email
-```
+## Contributing
 
-More information about settings for Kiali's OpenID support: https://kiali.io/documentation/latest/configuration/authentication/openid/
-
-### Resolving openid auth cert issues.
-Kiali allows for skipping TLS verification for OpenID Auth communications. They do not have support for mounting or specifying a PEM certificate to the pod or resource.
-
-```yaml
-kiali:
-  values:
-    cr:
-      spec:
-        auth:
-          openid:
-            insecure_skip_verify_tls: true
-```
-
-https://kiali.io/documentation/latest/configuration/authentication/openid/#_using_an_openid_provider_with_a_self_signed_certificate
+Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
