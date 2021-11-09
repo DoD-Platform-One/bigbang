@@ -189,7 +189,7 @@ istiooperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
-    tag: "1.11.3-bb.0"
+    tag: "1.11.3-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
@@ -459,7 +459,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.10-bb.0"
+    tag: "0.0.11-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
