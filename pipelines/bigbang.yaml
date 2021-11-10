@@ -12,16 +12,16 @@
 # global rules for when pipelines run
 workflow:
   rules:
+    # skip pipeline for MRs with docs label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
+      when: never
     # run pipeline for manual tag events such as a new release
     - if: $CI_COMMIT_TAG
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     # run pipeline on commits to default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    # skip pipeline for branches that start with "docs"
-    - if: '$CI_COMMIT_REF_NAME =~ /^doc*/i'
-      when: never
-    # Enabled CI pipeline testing it commit message contains "test-ci"
+    # Enabled CI pipeline testing if commit message contains "test-ci"
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE =~ /.*test-ci.*/i
 
 # Include templates and cluster creation jobs
