@@ -8,8 +8,8 @@ Deployment of mattermost operator using Helm
 * <https://github.com/mattermost/mattermost-operator>
 
 ## Learn More
-- [Application Overview](docs/overview.md)
-- [Other Documentation](docs/)
+* [Application Overview](docs/overview.md) 
+* [Other Documentation](docs/)
 
 ## Pre-Requisites
 
@@ -55,4 +55,4 @@ helm install mattermost-operator chart/
 
 ## Contributing
 
-Please see the [contributing guide](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/CONTRIBUTING.md) if you are interested in contributing to Big Bang.
+Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
