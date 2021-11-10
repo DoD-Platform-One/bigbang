@@ -106,7 +106,7 @@ sso:
     -----END CERTIFICATE-----
 
   # # LetsEncrypt certificate authority for keycloak.bigbang.dev
-  # # Use this CA if you deployed Keycloak with *.bigbang.dev certificate using chart/keycloak-dev-values.yaml
+  # # Use this CA if you deployed Keycloak with *.bigbang.dev certificate using ./docs/example_configs/keycloak-dev-values.yaml
   # certificate_authority: |
   #   -----BEGIN CERTIFICATE-----
   #   MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw

@@ -7,7 +7,6 @@
 /base/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 /chart/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 /charter/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/hack/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 /scripts/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 /tests/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
 /docs/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
@@ -32,7 +31,6 @@ tests/                          @toladipupo @brandencobb @evan.rush
 
 ^[Hack Owners]
 scripts/                        @toladipupo @michaelmcleroy @egoode
-hack/                           @toladipupo @michaelmcleroy @egoode
 
 ^[Charter Owners]
 charter/                        @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb

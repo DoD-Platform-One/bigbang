@@ -4,10 +4,6 @@
 
 [Twistlock Administration Guide](https://docs.paloaltonetworks.com/prisma/prisma-cloud/20-04/prisma-cloud-compute-edition-admin/welcome/getting_started.html)
 
-## Contents
-
-[Developer Guide](docs/developer-guide.md)
-
 ## Big Bang Touch Points
 
 ```mermaid

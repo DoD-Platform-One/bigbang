@@ -5,7 +5,6 @@ Table of Contents
 - [Big Bang Encryption](#big-bang-encryption)
   - [SOPS](#sops)
   - [Create Encryption Keys](#create-encryption-keys)
-    - [Samples](#samples)
   - [Configure SOPS](#configure-sops)
   - [Deploy Private Key](#deploy-private-key)
     - [GPG](#gpg)
@@ -39,23 +38,6 @@ To setup Big Bang with SOPS, a key pair must be created.  The private key is use
 
 > *GPG is not recommended for production use because the private key can be misplaced or compromised too easily
 
-### Samples
-
-If you plan to utilize Big Bang provided samples, either in the template or in this repository, setup the following:
-
-1. Install [gpg](https://gnupg.org/download/)
-1. Import the [Big Bang development key](../hack/bigbang-dev.asc)
-   > Do **NOT** use this key for any deployment.  It is only for demonstration purposes.
-
-   ```bash
-   gpg --import <private key>
-   ```
-
-1. Validate by decrypting and opening a sample file for editing
-
-   ```bash
-   sops <filename.enc.yaml>
-   ```
 
 ## Configure SOPS
 
@@ -88,7 +70,7 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
 1. Deploy your SOPS private key to a secret named `sops-gpg` in the cluster
 
    ```bash
-   gpg --export-secret-keys --armor <new key fingerprint> | kubectl create secret generic sops-gpg -n bigbang --from-file=bigbangkey.asc=/dev/stdin
+   gpg --export-secret-keys --armor <new key fingerprint> | kubectl create secret generic sops-gpg -n bigbang --from-file=yourkey.asc=/dev/stdin
    ```
 
 ### AWS KMS
