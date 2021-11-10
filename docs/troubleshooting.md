@@ -9,7 +9,7 @@
   - [Kustomization](#kustomization)
   - [Packages](#packages)
 
-Big Bang can take a long time to run.  After making changes, it could take 10-15 minutes to take effect.  Use the [sync.sh](../hack/sync.sh) script to speed this up.
+Big Bang can take a long time to run.  After making changes, it could take 10-15 minutes to take effect.  Use the [sync.sh](../scripts/sync.sh) script to speed this up.
 
 Big Bang is configured to retry failed package installations and upgrades.  Before concluding you have a failure, make sure you allow Big Bang to attempt to resolve dependencies and retry.
 
@@ -34,7 +34,7 @@ kubectl get events -n flux-system
 | Symptom | Cause | Resolution |
 |--|--|--|
 | Install script timed and pods are still pulling the image | Slow connection to docker registry | Adjust `--timeout` value in `flux install` to wait longer |
-| Pod status is `ImagePullBackOff` or `ErrImagePull` | Bad registry, version, or credentials | Fix the `--registry`, `--version`, or `--image-pull secret` options or use the `hack/flux-install.sh` script for pulling from Iron Bank |
+| Pod status is `ImagePullBackOff` or `ErrImagePull` | Bad registry, version, or credentials | Fix the `--registry`, `--version`, or `--image-pull secret` options or use the `./scripts/install_flux.sh` script for pulling from Iron Bank |
 
 ## Git Repository
 

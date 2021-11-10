@@ -135,7 +135,7 @@ _Note:_ within Big Bang, logs are captured by fluentbit and shipped to elastic b
 
 ### Monitoring
 
-Anchore Engine and Enterprise expose prometheus metrics in the API of each service if the config.yaml used by that service has the metrics.enabled key set to true. Each service exports its own metrics and is typically scraped by a Prometheus installation to gather the metrics. Anchore does not aggregate or distribute metrics between services. You should configure your Prometheus deployment or integration to check each Anchore service’s api (using the same port it exports), for the /metrics route. For more information, see [Anchore Enterprise Monitoring](https://docs.anchore.com/current/docs/monitoring/#monitoring-in-kubernetes-andor-helm-chart) and [metrics.md](./metrics.md).
+Anchore Engine and Enterprise expose prometheus metrics in the API of each service if the config.yaml used by that service has the metrics.enabled key set to true. Each service exports its own metrics and is typically scraped by a Prometheus installation to gather the metrics. Anchore does not aggregate or distribute metrics between services. You should configure your Prometheus deployment or integration to check each Anchore service’s api (using the same port it exports), for the /metrics route. For more information, see [Anchore Enterprise Monitoring](https://docs.anchore.com/current/docs/monitoring/#monitoring-in-kubernetes-andor-helm-chart).
 
 The Big Bang Anchore Helm chart has been modified to use your `monitoring:` values in Big Bang to automatically toggle metrics on/off.
 

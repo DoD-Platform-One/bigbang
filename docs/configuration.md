@@ -38,7 +38,7 @@ In all four cases, Big Bang reads a single key named `values.yaml` that contains
 Before configuring Big Bang, it is expected that you have already setup:
 
 - A Kubernetes cluster
-- A [SOPS key pair](3_encryption.md)
+- A [SOPS key pair](encryption.md)
 - A Git repository to hold your configuration
   - Pull credentials for the Git repository (if not public)
 - An Iron Bank robot account for production, or a non-robot account for testing. Reference [Iron Bank authentication](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/b_troubleshooting.md#iron-bank-authentication) for additional details.
@@ -51,7 +51,7 @@ At a minimum, the following items must be configured for a default Big Bang depl
 - [Big Bang version](#big-bang-version)
 - [Environment Git repository](#environment-location)
 - [Hostname](#hostname)
-- [SOPS private key reference](3_encryption.md).
+- [SOPS private key reference](encryption.md).
 - [Registry pull credentials](#registry-pull-credentials)
 
 The Big Bang [Environment Template](https://repo1.dso.mil/platform-one/big-bang/customers/template) has placeholders for all of the above.

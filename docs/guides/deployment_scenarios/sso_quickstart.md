@@ -418,7 +418,7 @@ EOF
 
 helm upgrade --install bigbang \$HOME/bigbang/chart \
   --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
-  --values \$HOME/bigbang/chart/dev-k3d-values.yaml \
+  --values \$HOME/bigbang/docs/example_configs/opa-overrides-k3d.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -485,7 +485,7 @@ twistlock:
 EOF
 
 helm upgrade --install bigbang \$HOME/bigbang/chart \
-  --values \$HOME/bigbang/chart/keycloak-dev-values.yaml \
+  --values \$HOME/bigbang/docs/example_configs/keycloak-dev-values.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/keycloak_qs_demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -699,7 +699,7 @@ EOF
 
 helm upgrade --install bigbang \$HOME/bigbang/chart \
   --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
-  --values \$HOME/bigbang/chart/dev-k3d-values.yaml \
+  --values \$HOME/bigbang/docs/example_configs/opa-overrides-k3d.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/demo_values.yaml \
   --values \$HOME/auth_service_demo_values.yaml \

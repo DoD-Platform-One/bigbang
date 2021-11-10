@@ -79,14 +79,14 @@ The diagram below shows a typical deployment of Big Bang into a Kubernetes clust
 
 ### Configuration
 
-1. The user must [setup an encryption key pair](./3_encryption.md) for SOPS and store the private key securely (e.g. KMS).  This should **NOT** be stored in Git.
-1. The user should then [configure Big Bang](./4_configuration.md) values and secrets for the targeted Kubernetes cluster.
+1. The user must [setup an encryption key pair](./encryption.md) for SOPS and store the private key securely (e.g. KMS).  This should **NOT** be stored in Git.
+1. The user should then [configure Big Bang](./configuration.md) values and secrets for the targeted Kubernetes cluster.
 1. All secrets should be encrypted with SOPS to protect them.
 1. Once all of the configuration has been completed, it must be pushed to a Git repository.
 
 ### Deployment
 
-1. With everything in Git, the user can [deploy BigBang](./5_deployment.md) using a Kubernetes manifest.
+1. With everything in Git, the user can [deploy BigBang](./deployment.md) using a Kubernetes manifest.
 1. The manifest holds two Flux resources, one pointing to the Git repository holding the custom environment, and one telling Flux to run Kustomize on a targeted folder within the repo.
    1. The repository is reconciled first, pulling the files from Git.
    1. Next, Kustomize is run on the environment configuration

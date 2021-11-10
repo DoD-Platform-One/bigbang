@@ -84,11 +84,11 @@
        values: {}
    ```
 
-1. Edit tests/ci/k3d/values.yaml. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
+1. Edit `./tests/test-values.yaml`. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
 
 1. Add your packages name to the ORDERED_HELMRELEASES list in scripts/deploy/02_wait_for_helmreleases.sh.
 
-1. Create an overrrides directory as a sibling directory next to the bigbang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake and create a local overrides directory. One option is to copy the tests/ci/k3d/values.yaml to make the override-values.yaml and make modifications. The file structure is like this:
+1. Create an overrrides directory as a sibling directory next to the bigbang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake and create a local overrides directory. One option is to copy the `./tests/test-values.yaml` to make the override-values.yaml and make modifications. The file structure is like this:
     ```text
     ├── bigbang/
     └── overrides/
@@ -151,7 +151,7 @@ helm delete bigbang -n bigbang
 # Helm delete will not delete the bigbang namespace
 kubectl delete ns bigbang
 # Istio namespace will be stuck in "finalizing". So run the script to delete it.
-hack/remove-ns-finalizer.sh istio-system
+./script/remove-ns-finalizer.sh istio-system
 ```
 
 ### GitOps with Flux
@@ -171,15 +171,15 @@ watch kubectl get pod,helmrelease -A
 # Tear down
 kubectl delete -f dev/bigbang.yaml
 # Istio namespace will be stuck in "finalizing". So run the script to delete it. You will need 'jq' installed
-hack/remove-ns-finalizer.sh istio-system
+./scripts/remove-ns-finalizer.sh istio-system
 
 # If you have pushed code changes before the tear down, occasionally the bigbang deployments are not terminated because Flux has not had enough time to reconcile the helmreleases
 
 # Re-deploy bigbang
 kubectl apply -f dev/bigbang.yaml
 # Run the sync script.
-hack/sync.sh
+./scripts/sync.sh
 # Tear down
 kubectl delete -f dev/bigbang.yaml
-hack/remove-ns-finalizer.sh istio-system
+./scripts/remove-ns-finalizer.sh istio-system
 ```
