@@ -12,6 +12,7 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
   gitlab:
     gateways:
     - istio-system/{{ default "public" .Values.addons.gitlab.ingress.gateway }}
@@ -46,12 +47,6 @@ registry:
   {{- end }}
 {{- end }}
 
-{{- if .Values.istio.enabled }}
-shared-secrets:
-  annotations:
-    sidecar.istio.io/inject: "false"
-{{- end }}
-
 gitlab:
   {{- if .Values.addons.gitlab.objectStorage.endpoint }}
   task-runner:
@@ -75,18 +70,13 @@ gitlab:
     annotations: 
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
   {{- end }}
-
-  {{- if .Values.istio.enabled }}
-  migrations:
-    annotations:
-      sidecar.istio.io/inject: "false"
-  {{- end }}
-  
+ 
 global:
 
   # added to help with Gitlab sub-chart configuration
   istio:
     enabled: {{ .Values.istio.enabled }}
+    injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
 
   hosts:
     domain: {{ $domainName }}
