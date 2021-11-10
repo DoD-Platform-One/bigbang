@@ -6,10 +6,10 @@ type: application
 version: "1.16.0-bb.0"
 appVersion: "1.16.0"
 kubeVersion: ">=1.12.0-0"
-keywords: 
+keywords:
   - Mattermost
   - Operator
-maintainers: 
+maintainers:
   - name: Mattermost
     email: info@mattermost.com
 dependencies:
