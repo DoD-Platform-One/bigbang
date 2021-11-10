@@ -4,7 +4,9 @@ set -e
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 ## Array of core HRs
-CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
+CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "twistlock" "jaeger" "kiali")
+EFK_ENGINE_HELMRELEASES=("eck-operator" "fluent-bit" "ek" "cluster-auditor")
+PLG_ENGINE_HELMRELEASES=("loki" "promtail")
 
 ## Array of addon HRs
 ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero")
@@ -135,31 +137,37 @@ function wait_daemonset(){
 
 # Check for and run the wait_project function within <repo>/tests/wait.sh to wait for custom resources
 function wait_crd(){
-  yq e '(.,.addons) | .[] | ... comments="" | (path | join("."))' "${CI_VALUES_FILE}" | while IFS= read -r package; do
-    if [[ "$(yq e ".${package}.enabled" "${CI_VALUES_FILE}")" == "true" ]]; then
-      gitrepo=$(yq e ".${package}.git.repo" "${VALUES_FILE}")
-      version=$(yq e ".${package}.git.tag" "${VALUES_FILE}")
-      if [[ -z "$version" || "$version" == "null" ]]; then
-        version=$(yq e ".${package}.git.branch" "${VALUES_FILE}")
-      fi
-      if [[ -z "$version" || "$version" == "null" ]]; then
-        continue
-      fi
-      printf "Checking for tests/wait.sh in %s:%s... " ${package} ${version}
-      if curl -f "${gitrepo%.git}/-/raw/${version}/tests/wait.sh?inline=false" 1>${package}.wait.sh 2>/dev/null; then
-        printf "found, running\n"
-        . ./${package}.wait.sh
-        wait_project
-      else
-        printf "not found\n"
-      fi
+  IFS=$'\n'
+  for gitrepo in $(kubectl get gitrepository -n bigbang -o name | grep -v secrets); do
+    repourl=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.url}')
+    version=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.ref.tag}')
+    package=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.metadata.name}')
+    if [[ -z "$version" || "$version" == "null" ]]; then
+      version=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.ref.branch}')
+    fi
+    if [[ -z "$version" || "$version" == "null" ]]; then
+      continue
+    fi
+    printf "Checking for tests/wait.sh in %s:%s... " ${package} ${version}
+    if curl -f "${repourl%.git}/-/raw/${version}/tests/wait.sh?inline=false" 1>${package}.wait.sh 2>/dev/null; then
+      printf "found, running\n"
+      . ./${package}.wait.sh
+      wait_project
+    else
+      printf "not found\n"
     fi
   done
+  IFS=","
 }
-
 
 ## Append all add-ons to hr list if "all-packages" or default branch/tag. Else, add specific ci labels to hr list.
 HELMRELEASES=(${CORE_HELMRELEASES[@]})
+#Conditionally set helmrelease list depending on logging engine
+if [[ "$CI_MERGE_REQUEST_LABELS" = *"loki"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"promtail"* ]]; then
+  HELMRELEASES+=(${PLG_ENGINE_HELMRELEASES[@]})
+else
+  HELMRELEASES+=(${EFK_ENGINE_HELMRELEASES[@]})
+fi
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
     HELMRELEASES+=(${ADD_ON_HELMRELEASES[@]})
     echo "🌌 All helmreleases enabled: all-packages label enabled, or on default branch or tag."
