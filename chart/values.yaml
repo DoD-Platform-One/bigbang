@@ -1122,8 +1122,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
       path: "./chart"
-      #tag: "0.1.0-bb.0"
-      branch: "registry1-image-verification"
+      tag: "0.1.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
