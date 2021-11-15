@@ -1,0 +1,27 @@
+{
+    "baseBranches": ["main"],
+    "configWarningReuseIssue": false,
+    "dependencyDashboard": true,
+    "dependencyDashboardHeader": "- [ ] Sync upstream helm chart version with updated dependencies.",
+    "dependencyDashboardTitle": "Renovate: Upgrade Nexus Dependencies",
+    "draftPR": true,
+    "enabledManagers": ["helm-values", "regex"],
+    "ignorePaths": ["chart/charts/**", "chart/examples/**", "chart/scripts/**"],
+    "labels": ["nexus","renovate"],
+    "packageRules": [
+        {
+            "matchDatasources": ["docker"],
+            "groupName": "Ironbank"
+        }
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": ["^chart/values\\.yaml$"],
+            "matchStrings": [
+                "image:[^\\S\\r\\n]+(?<depName>.+)\\s+tag:[^\\S\\r\\n]+(?<currentValue>[\\d\\.]+)"
+            ],
+            "datasourceTemplate": "docker"
+        }
+    ],
+    "separateMajorMinor": false
+}
