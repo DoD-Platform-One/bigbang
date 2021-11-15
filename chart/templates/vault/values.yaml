@@ -21,9 +21,9 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
-
-imagePullSecrets:
-- name: private-registry
+global:
+  imagePullSecrets:
+  - name: private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
