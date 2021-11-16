@@ -834,6 +834,10 @@ addons:
     # -- Flux reconciliation overrides specifically for the HAProxy Package
     flux: {}
 
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
     # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
     values: {}
 
