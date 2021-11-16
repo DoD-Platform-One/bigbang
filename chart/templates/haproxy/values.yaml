@@ -6,12 +6,6 @@
 {{- define "bigbang.defaults.haproxy-sso" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-hostname: {{ $domainName }}
-domain: {{ $domainName }}
-
-istio:
-  gateway: {{ default "public" .Values.addons.haproxy.ingress.gateway }}
-
 {{- $haproxyAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
 {{- $haproxyAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
 podLabels:
