@@ -157,10 +157,17 @@ istio:
     # private:
     #   ingressGateway: "private-ingressgateway"
     #   hosts:
-    #   - "*.{{ .Values.domain }}"
+    #   - "example.bigbang.dev"
+    #   ports:
+    #     - name: tls-2
+    #       number: 1234
+    #       protocol: TCP
+    #     - name: tls
+    #       number: 5678
+    #       protocol: TCP
     #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
     #   autoHttpRedirect:
-    #     enabled: true
+    #     enabled: false
     #   tls:
     #     key: ""
     #     cert: ""
