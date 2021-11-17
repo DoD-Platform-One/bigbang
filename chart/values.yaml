@@ -1140,10 +1140,7 @@ addons:
       gateway: ""
 
     # -- Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
-    values:
-      injector:
-        leaderElector:
-          enabled: false
+    values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
