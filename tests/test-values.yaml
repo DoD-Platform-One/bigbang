@@ -1103,4 +1103,4 @@ addons:
         cypress:
           artifacts: true 
           envs:
-            cypress_vault_url: "http://vault.vault.svc:8200"
+            cypress_vault_url: "http://{{ .Release.Name }}.vault.svc:8200"
