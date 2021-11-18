@@ -1,25 +1,30 @@
-# Package Owner Merge Request
+# Package Merge Request
 
 ## Package Changes
 
-What package changes are included with this merge request? The more detail here the better! 
+(Describe Package changes here)
 
-**Links to all MRs that are associated with this change are required**.
+### Package MR
 
-If the package is set up for releases, also link the package release page for the new tag here.
+(Link to Package MR here)
 
-## Additional Details
+### For Issue
 
-If possible, provide additional details that will help with the merge request.
+Closes (link to issue here)
 
-Known issues or expected conflicts?
 
-Also, include any issues closed with "Closes #ISSUE_NUMBER". See example:
+#### BB Processes
 
-Closes #ISSUE_NUMBER
+Add labels for affected packages so that they are deployed in CI as well as a status label:
 
-Add any labels for affected packages so that they are deployed in CI. See example:
+/label ~packageX ~dependencyx ~status::doing
 
-/label ~packageX
+Be sure to assign to yourself:
 
-Once the MR is ready for review also add the `status::review` label.
+/assign @yourself
+
+Once it is ready for review switch the status and assign reviewers:
+
+/label ~status::review
+
+/reviewer @reviewer1 @reviewer2
