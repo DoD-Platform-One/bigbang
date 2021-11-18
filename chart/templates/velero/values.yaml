@@ -23,7 +23,7 @@ initContainers:
 {{- if eq . "aws" }}
   - name: velero-plugin-for-aws
     image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-aws:v1.2.0
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -38,7 +38,7 @@ initContainers:
 {{- if eq . "azure" }}
   - name: velero-plugin-for-azure
     image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.2.0
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -53,7 +53,7 @@ initContainers:
 {{- if eq . "csi" }}
   - name: velero-plugin-for-csi
     image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.1.2
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
         name: plugins
