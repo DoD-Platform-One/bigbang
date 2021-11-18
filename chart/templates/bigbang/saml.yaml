@@ -26,8 +26,8 @@ spec:
         args:
           - -c
           - |
-            until curl --head localhost:15000; do echo "Waiting for Sidercar"; sleep 10; done; echo "Sidecar available"  &&
-            BASE_URL="http://{{ template "nexus.name" . }}.{{ template "nexus.name" . }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
+            until curl --head localhost:15000; do echo "Waiting for Istio proxy sidecar"; sleep 10; done; echo "Sidecar available"  &&
+            BASE_URL="http://{{ template "nexus.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
             # If there is a license key
             {{- if .Values.license_key }}
             # saml metadata

@@ -26,4 +26,4 @@ nexus:
       memory: 3000Mi
     limits:
       cpu: 1
-      memory: 3000Mi  
+      memory: 3000Mi

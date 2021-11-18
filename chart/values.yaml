@@ -43,6 +43,7 @@ sso:
         - "nx-all"
       roles:
         - "nx-admin"
+
 proxy:
   enabled: false
   request:
@@ -129,6 +130,29 @@ nexus:
     #   nexus.ldap.env.java.naming.security.authentication: simple
   # nodeSelector: {}
   #   cloud.google.com/gke-nodepool: default-pool
+  
+  repository:
+    # Raw format Repositories are currently the only supported format.
+    enabled: false
+    repo:
+      - name: "test-nexus"
+        format: "raw"
+        type: "hosted"
+        repo_data:
+          name: "test-nexus"
+          online: true
+          storage:
+            blobStoreName: "default"
+            strictContentTypeValidation: true
+            writePolicy: "allow_once"
+          cleanup:
+            policyNames:
+              - "string"
+          component:
+            proprietaryComponents: true
+          raw: 
+            contentDisposition: "ATTACHMENT"
+  
   affinity: {}
   resources:
     # requests:
