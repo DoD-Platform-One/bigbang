@@ -1,0 +1,14 @@
+{{- if .Values.nexus.repository.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "nexus.name" . }}-repo
+  labels: {{- include "nexus.labels" . | nindent 4 }}
+{{- if .Values.nexus.extraLabels }}
+  {{- with .Values.nexus.extraLabels }}
+    {{ toYaml . }}
+  {{- end }}
+{{- end }}
+data:
+  repos: {{ .Values.nexus.repository.repo | toJson | quote }}
+{{- end }}

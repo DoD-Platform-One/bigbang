@@ -1,4 +1,4 @@
-{{- if .Values.proxy.enabled }}
+{{- if .Values.nexus.repository.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -6,7 +6,7 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   creationTimestamp: null
-  name: proxy
+  name: repo
 spec:
   template:
     metadata:
@@ -20,7 +20,7 @@ spec:
       containers:
       - image: "{{ .Values.job_image.repository }}:{{ .Values.job_image.tag }}"
         imagePullPolicy: {{ .Values.job_image.pullPolicy }}
-        name: proxy
+        name: repo
         command:
           - sh
         args:
@@ -28,12 +28,18 @@ spec:
           - |
             until curl --head localhost:15000; do echo "Waiting for Istio proxy sidecar"; sleep 10; done; echo "Sidecar available"  &&
             BASE_URL="http://{{ template "nexus.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
-            # proxy
+            
+            # repo creation
+            {{- range .Values.nexus.repository.repo }}
             curl -X POST \
                  -u admin:"$API_CREDENTIALS" \
-                 "$BASE_URL/service/extdirect" \
+                 "$BASE_URL/service/rest/v1/repositories/{{- .format }}/{{- .type }}" \
+                 -H "accept: application/json" \
                  -H "Content-Type: application/json" \
-                 -d "$PROXY" &&
+                 -d {{ .repo_data | toJson | quote }} &&
+            {{- end }} 
+            echo "Created repositories"
+            
             curl -fsI -X POST http://localhost:15020/quitquitquit &&
             exit
         env:
@@ -42,11 +48,6 @@ spec:
             secretKeyRef:
               name: {{ template "nexus.name" . }}-secret
               key: admin.password
-        - name: PROXY
-          valueFrom:
-            configMapKeyRef:
-              name: {{ template "nexus.name" . }}-proxy
-              key: proxy
         resources: {}
       restartPolicy: Never
 status: {}

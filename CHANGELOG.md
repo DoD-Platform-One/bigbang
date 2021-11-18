@@ -1,6 +1,9 @@
 # Changelog
 
 ---
+## [34.1.0-bb.5] - 2021-10-27
+### Modified
+- Added multi raw repo feature to Nexus.
 ## [34.1.0-bb.4] - 2021-10-21
 ### Modified
 - Updated cypress test with timeouts.
