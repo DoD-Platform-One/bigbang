@@ -274,7 +274,11 @@ dependency_wait() {
      echo "done."
      echo -n "Waiting on terminating pods ... "
      readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
-     for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+     for DELPOD in "${DELPODS[@]}"; do
+       if kubectl get pod -n $DELPOD &> /dev/null; then
+         kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null
+       fi
+     done
      echo "done."
      echo -n "Waiting on running pods to be ready ... "
      kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
@@ -329,7 +333,11 @@ package_wait() {
    echo "done."
    echo -n "Waiting on terminating pods ... "
    readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
-   for DELPOD in "${DELPODS[@]}"; do kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null; done
+   for DELPOD in "${DELPODS[@]}"; do
+     if kubectl get pod -n $DELPOD &> /dev/null; then
+       kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null
+     fi
+   done
    echo "done."
    echo -n "Waiting on running pods to be ready ... "
    kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
