@@ -79,6 +79,7 @@ chart update check:
   script:
     # Check for chart.yaml version bump and changelog additions
     - chart_update_check
+    - changelog_format_check
   retry:
     max: 2
     when:
