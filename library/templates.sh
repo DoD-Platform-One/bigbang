@@ -96,7 +96,7 @@ bigbang_installed_images() {
    echo -e "\e[0Ksection_start:`date +%s`:images_used[collapsed=true]\r\e[0K\e[33;1mImages Used\e[37m"
    cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
    images=$(timeout 65 bash -c "until docker exec $cid crictl images -o json; do sleep 10; done;")
-   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee images.txt
+   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | awk '/dso.mil/' | tee images.txt
    echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
 }
 
