@@ -636,26 +636,6 @@ package_repos() {
    else
      git -C repos/ clone -b ${CI_COMMIT_TAG} ${CI_REPOSITORY_URL}
    fi
-   if [ -f tests/dependencies.yaml ]; then
-     yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
-       dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
-       if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
-         dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
-       fi
-       dep_repo=$(yq e ".${i}.git.repo" "tests/dependencies.yaml")
-       if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
-         dep_repo=$(yq e ".${i}.git" "tests/dependencies.yaml")
-         if [[ -z ${dep_repo} || ${dep_repo} == "null" ]]; then
-           continue
-         fi
-       fi
-       if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
-         git -C repos/ clone ${dep_repo}
-       else
-         git -C repos/ clone -b ${dep_branch} ${dep_repo}
-       fi
-     done
-   fi
    tar -czf $REPOS_PKG repos/
    echo -e "\e[0Ksection_end:`date +%s`:repos\r\e[0K"
 }
@@ -698,7 +678,27 @@ package_release_notes() {
      printf "\n" >> release_notes.txt;
      echo "${release_notes}" >> release_notes.txt;
    fi
+   echo -e "\e[31mNOTICE: Release notes saved to artifact release_notes.txt\e[0m"
    echo -e "\e[0Ksection_end:`date +%s`:notes\r\e[0K"
+   echo -e "\e[0Ksection_start:`date +%s`:reqDependencies[collapsed=true]\r\e[0KRequired Dependencies"
+   if [[ -f tests/dependencies.yaml ]]; then
+      printf "\nIf you are using the artifacts from this release, please note that you may need to install some dependencies. It is recommended to check the architecture document for this package under [Big Bang's charter](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/charter/packages) for the most accurate info about what may be required. The dependencies used in CI are:\n" >> release_notes.txt
+      echo "Dependencies found:"
+      keys=$(yq e 'keys' ./tests/dependencies.yaml)
+      while read line; do
+          key=$(echo "$line" | yq e '.[]' -)
+          repo=$(yq e ".$key.git.repo" ./tests/dependencies.yaml)
+          if [[ -z "$repo" ]]; then
+              # in case yaml file doesn't actually have a repo member.
+              repo=$(yq e ".$key.git" ./tests/dependencies.yaml)
+          fi
+          printf "\55 %-20s %20s\n" "$key" "$repo" >> release_notes.txt
+          printf "\55 %-20s %20s\n" "$key" "$repo"
+      done <<< "$keys"
+   else
+    echo "No dependencies to report."
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:reqDependencies\r\e[0K"
 }
 
 package_release() {
