@@ -3,10 +3,6 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-## [2.0.14]
-### Changed
-- Changes to allow loki/promtail to co-exist with efk
-
 ## [2.0.13]
 ### Removed
 - Removed dependency check from package_repos
