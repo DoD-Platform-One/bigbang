@@ -4,12 +4,10 @@ set -e
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 ## Array of core HRs
-CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "twistlock" "jaeger" "kiali")
-EFK_ENGINE_HELMRELEASES=("eck-operator" "fluent-bit" "ek" "cluster-auditor")
-PLG_ENGINE_HELMRELEASES=("loki" "promtail")
+CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
 
 ## Array of addon HRs
-ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero")
+ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "loki" "promtail")
 
 ## Map of values-keys/labels to HRs: Only needed if HR name =/= label name
 declare -A ADD_ON_HELMRELEASES_MAP
@@ -162,12 +160,6 @@ function wait_crd(){
 
 ## Append all add-ons to hr list if "all-packages" or default branch/tag. Else, add specific ci labels to hr list.
 HELMRELEASES=(${CORE_HELMRELEASES[@]})
-#Conditionally set helmrelease list depending on logging engine
-if [[ "$CI_MERGE_REQUEST_LABELS" = *"loki"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"promtail"* ]]; then
-  HELMRELEASES+=(${PLG_ENGINE_HELMRELEASES[@]})
-else
-  HELMRELEASES+=(${EFK_ENGINE_HELMRELEASES[@]})
-fi
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
     HELMRELEASES+=(${ADD_ON_HELMRELEASES[@]})
     echo "🌌 All helmreleases enabled: all-packages label enabled, or on default branch or tag."
