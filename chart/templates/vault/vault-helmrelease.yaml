@@ -25,7 +25,7 @@ spec:
   
   {{- if .Values.addons.vault.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.vault.postRenderers | nindent 4 }}
+  {{ toYaml .Values.addons.vault.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-vault-values
