@@ -1,0 +1,35 @@
+{{- if .Values.addons.vault.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.vault "name" "vault" "defaults" (include "bigbang.defaults.vault" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.vault" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+prometheus:
+  servicemonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+global:
+  imagePullSecrets:
+  - name: private-registry
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.vault.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  vault:
+    gateways:
+      - istio-system/{{ default "public" .Values.addons.vault.ingress.gateway }}
+
+{{- end -}}

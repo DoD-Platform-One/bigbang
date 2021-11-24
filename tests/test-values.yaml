@@ -1043,3 +1043,16 @@ addons:
             cypress_url: "https://keycloak.bigbang.dev"
             cypress_username: "admin"
             cypress_password: "password"
+
+  vault:
+    enabled: false
+    values:
+      server:
+        dataStorage:
+          enabled: true 
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true 
+          envs:
+            cypress_vault_url: "https://vault.bigbang.dev"
