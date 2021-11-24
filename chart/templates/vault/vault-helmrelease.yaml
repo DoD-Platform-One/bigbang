@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: vault
-    app.kubernetes.io/component: "sandbox"
+    app.kubernetes.io/component: "security-tools"
     {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: vault
