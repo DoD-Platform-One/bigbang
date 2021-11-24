@@ -9,7 +9,7 @@ EFK_ENGINE_HELMRELEASES=("eck-operator" "fluent-bit" "ek" "cluster-auditor")
 PLG_ENGINE_HELMRELEASES=("loki" "promtail")
 
 ## Array of addon HRs
-ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero")
+ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "vault")
 
 ## Map of values-keys/labels to HRs: Only needed if HR name =/= label name
 declare -A ADD_ON_HELMRELEASES_MAP
