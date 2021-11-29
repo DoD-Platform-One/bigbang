@@ -1,0 +1,20 @@
+{{- if .Values.promtail.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.promtail "name" "promtail" "defaults" (include "bigbang.defaults.promtail" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.promtail" -}}
+hostname: {{ .Values.hostname }}
+
+openshift: {{ .Values.openshift }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+imagePullSecrets:
+  - name: private-registry
+
+{{- if .Values.loki.enabled }}
+config:
+  lokiAddress: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
+{{- end }}
+{{- end -}}

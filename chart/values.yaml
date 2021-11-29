@@ -394,6 +394,41 @@ fluentbit:
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
+
+# -- BETA support of promtail/loki logging stack
+promtail:
+  # -- Toggle deployment of Promtail.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+    path: "./chart"
+    tag: "3.8.1-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Promtail Package
+  flux: {}
+
+  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+loki:
+  # -- Toggle deployment of Loki.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+    path: "./chart"
+    tag: "2.5.1-bb.2"
+
+  # -- Flux reconciliation overrides specifically for the Loki Package
+  flux: {}
+
+  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -405,7 +440,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "14.0.0-bb.17"
+    tag: "14.0.0-bb.18"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
