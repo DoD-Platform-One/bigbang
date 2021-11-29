@@ -71,6 +71,9 @@ anchore:
 kiali:
   enabled: {{ .Values.kiali.enabled }}
 
+loki:
+  enabled: {{ .Values.loki.enabled }}
+
 global:
   imagePullSecrets:
   - name: private-registry
@@ -82,6 +85,14 @@ grafana:
   image:
     pullSecrets:
     - private-registry
+
+  {{- if .Values.loki.enabled }}
+  additionalDataSources:
+  - name: Loki
+    type: loki
+    url: http://logging-loki.logging.svc.cluster.local:3100
+    access: proxy
+  {{- end }}
 
   grafana.ini:
     {{- if .Values.istio.enabled }}
@@ -109,6 +120,11 @@ grafana:
       {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
+    
+  {{- if .Values.loki.enabled }}
+  plugins:
+    - grafana-piechart-panel
+  {{- end }}
 
 prometheus-node-exporter:
   serviceAccount:
