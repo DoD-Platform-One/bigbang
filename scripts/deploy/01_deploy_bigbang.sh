@@ -18,12 +18,8 @@ else
 fi
 
 #If loki or promtail Labels set, adjust logging engine packages
-if [[ "$CI_MERGE_REQUEST_LABELS" = *"loki"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"promtail"* ]]; then
-  echo "Setting Logging Engine to PLG since loki or promtail are enabled"
-  yq e ".logging.enabled = "false"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-  yq e ".clusterAuditor.enabled = "false"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-  yq e ".eckoperator.enabled = "false"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-  yq e ".fluentbit.enabled = "false"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+if [[ "$CI_MERGE_REQUEST_LABELS" = *"loki"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"promtail"* ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
+  echo "Enabling promtail and loki"
   yq e ".promtail.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
   yq e ".loki.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 fi
