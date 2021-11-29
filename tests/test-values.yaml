@@ -135,6 +135,8 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to pull from public repos
           - istio-system/lb-port-.*
+          # Allow argocd to deploy a test app in its cypress test
+          - argocd/guestbook-ui.*
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -385,15 +387,15 @@ addons:
       redis-bb:
         master:
           persistence:
-            size: 256Mi
+            size: 512Mi
         replica:
           persistence:
-            size: 256Mi
+            size: 512Mi
       redis:
         resources:
           requests:
             cpu: 50m
-            memory: 64Mi
+            memory: 256Mi
           limits: {}
       server:
         resources:
@@ -411,9 +413,7 @@ addons:
         secret:
           argocdServerAdminPassword: '$2a$10$rUDZDckdDZ2TEwk9PDs3QuqjkL58qR1IHE1Kj4MwDx.7/m5dytZJm'
       bbtests:
-        # TODO: Disabled pending resolution of some "timing?" issues
-        # https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/issues/17
-        enabled: false
+        enabled: true
         cypress:
           artifacts: true
           envs:
