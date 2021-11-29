@@ -315,6 +315,10 @@ aws/rke2/bigbang up:
   artifacts:
     paths:
       - events.txt
+      - images.txt
+      - "test-artifacts/"
+    expire_in: 3 days
+    when: always
   retry:
     max: 2
     when:
