@@ -126,53 +126,6 @@ k3d cluster create \
     --api-port 6443
 ```
 
-**_Optionally_** you can set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
-
-```shell
-# Create the directory for the k3s registry config.
-mkdir ~/.k3d/
-
-# Define variables
-YOURUSERNAME="<user_name>"
-YOURCLISECRET="<CLI secret>"
-EC2_PUBLIC_IP=$( curl https://ipinfo.io/ip )
-
-# Create the config file using your registry1 credentials.
-cat << EOF > ~/.k3d/p1-registries.yaml
-configs:
-  "registry1.dso.mil":
-    auth:
-      username: $YOURUSERNAME
-      password: $YOURCLISECRET
-EOF
-
-# Create k3d cluster
-k3d cluster create \
-    --servers 1 \
-    --agents 3 \
-    --volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml \
-    --volume /etc/machine-id:/etc/machine-id \
-    --k3s-server-arg "--disable=traefik" \
-    --k3s-server-arg "--disable=metrics-server" \
-    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
-    --port 80:80@loadbalancer \
-    --port 443:443@loadbalancer \
-    --api-port 6443
-```
-
-Here is an explanation of what we are doing with this command:
-
-- `--servers 1` Creating 1 master/server
-- `--agents 3` Creating 3 agent nodes
-- `--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
-- `--k3s-server-arg "--disable=metrics-server"` Disable default metrics
-- `--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
-- `--port 80:80@loadbalancer` Exposes the cluster on the host on port 80
-- `--port 443:443@loadbalancer` Exposes the cluster on the host on port 443
-- `--volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster.
-- `--volume /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
-- `--api-port 6443` port that your k8s api will use. 6443 is the standard default port for k8s api
-
 ### Step 3
 
 Test the cluster from your local workstation. Copy the contents of the k3d kubeconfig from the EC2 instance to your local workstation. Do it manually with copy and paste.
@@ -487,3 +440,54 @@ sudo wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh 
 
 # exit ssh and then reconnect so you can use docker as non-root
 ```
+
+### Setting an imagePullSecret on the cluster with k3d
+
+
+**_This methodology is not recommended_**
+It is possible to set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
+
+```shell
+# Create the directory for the k3s registry config.
+mkdir ~/.k3d/
+
+# Define variables
+YOURUSERNAME="<user_name>"
+YOURCLISECRET="<CLI secret>"
+EC2_PUBLIC_IP=$( curl https://ipinfo.io/ip )
+
+# Create the config file using your registry1 credentials.
+cat << EOF > ~/.k3d/p1-registries.yaml
+configs:
+  "registry1.dso.mil":
+    auth:
+      username: $YOURUSERNAME
+      password: $YOURCLISECRET
+EOF
+
+# Create k3d cluster
+k3d cluster create \
+    --servers 1 \
+    --agents 3 \
+    --volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml \
+    --volume /etc/machine-id:/etc/machine-id \
+    --k3s-server-arg "--disable=traefik" \
+    --k3s-server-arg "--disable=metrics-server" \
+    --k3s-server-arg "--tls-san=$EC2_PUBLIC_IP" \
+    --port 80:80@loadbalancer \
+    --port 443:443@loadbalancer \
+    --api-port 6443
+```
+
+Here is an explanation of what we are doing with this command:
+
+- `--servers 1` Creating 1 master/server
+- `--agents 3` Creating 3 agent nodes
+- `--k3s-server-arg "--disable=traefik"` Disable the default Traefik Ingress
+- `--k3s-server-arg "--disable=metrics-server"` Disable default metrics
+- `--k3s-server-arg "--tls-san=<your public ec2 ip>"` This adds the public IP to the kubeapi certificate so that you can access it remotely.
+- `--port 80:80@loadbalancer` Exposes the cluster on the host on port 80
+- `--port 443:443@loadbalancer` Exposes the cluster on the host on port 443
+- `--volume ~/.k3d/p1-registries.yaml:/etc/rancher/k3s/registries.yaml` volume mount image pull secret config for k3d cluster.
+- `--volume /etc/machine-id:/etc/machine-id` volume mount so k3d nodes have a file at /etc/machine-id for fluentbit DaemonSet.
+- `--api-port 6443` port that your k8s api will use. 6443 is the standard default port for k8s api
