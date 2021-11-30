@@ -86,7 +86,7 @@ function wait_all_hr() {
         fi
         sleep 5
         timeElapsed=$(($timeElapsed+5))
-        if [[ $timeElapsed -ge 1800 ]]; then
+        if [[ $timeElapsed -ge 3600 ]]; then
             echo "❌ Timed out while waiting for hr's to be ready."
             exit 1
         fi
