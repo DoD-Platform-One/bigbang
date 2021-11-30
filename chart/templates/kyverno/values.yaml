@@ -1,0 +1,21 @@
+{{- if .Values.kyverno.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.kyverno "name" "kyverno" "defaults" (include "bigbang.defaults.kyverno" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kyverno" -}}
+image:
+  pullSecrets:
+  - name: private-registry
+
+openshift: {{ .Values.openshift }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+monitoring:
+  enabled: false #{{ .Values.monitoring.enabled }} To enable this, we need PodMonitor crd
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+{{- end -}}

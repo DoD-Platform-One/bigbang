@@ -1,0 +1,14 @@
+{{- if .Values.kyverno.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    admission.kyverno.sh/ignore: no-self-managing
+    control-plane: controller-manager
+    kyverno.sh/system: "yes"
+    app.kubernetes.io/name: kyverno
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
+  name: kyverno
+{{- end }}
