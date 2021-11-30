@@ -17,6 +17,13 @@ else
   done
 fi
 
+# Enable kyverno
+if [[ "$CI_MERGE_REQUEST_LABELS" = *"kyverno"* ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
+  echo "Enabling kyverno"
+  yq e ".kyverno.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+fi
+
+
 #If loki or promtail Labels set, adjust logging engine packages
 if [[ "$CI_MERGE_REQUEST_LABELS" = *"loki"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"promtail"* ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ $CI_MERGE_REQUEST_LABELS =~ "all-packages" ]]; then
   echo "Enabling promtail and loki"
