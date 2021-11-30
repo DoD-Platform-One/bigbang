@@ -10,7 +10,10 @@ domain: {{ $domainName }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
-  virtualService:  # this key is non-standard and needs to be fixed in the package
+  console:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+  api:
     gateways:
     - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
 
