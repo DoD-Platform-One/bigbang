@@ -6,6 +6,8 @@ istio:
   nexus:
     gateways:
     - "istio-system/main"
+    hosts:
+    - "{{ .Values.hostname }}.{{ .Values.domain }}"
 
 networkPolicies:
   enabled: false
@@ -130,7 +132,7 @@ nexus:
     #   nexus.ldap.env.java.naming.security.authentication: simple
   # nodeSelector: {}
   #   cloud.google.com/gke-nodepool: default-pool
-  
+
   repository:
     # Raw format Repositories are currently the only supported format.
     enabled: false
@@ -150,9 +152,9 @@ nexus:
               - "string"
           component:
             proprietaryComponents: true
-          raw: 
+          raw:
             contentDisposition: "ATTACHMENT"
-  
+
   affinity: {}
   resources:
     # requests:

@@ -18,7 +18,10 @@ spec:
     - {{ . }}
   {{- end }}
   hosts:
-    - "{{ .Values.hostname }}.{{ .Values.domain }}"
+  {{- range .Values.istio.nexus.hosts }}
+    - {{ tpl . $ }}
+  {{- end }}
+
   http:
     - route:
         - destination:
