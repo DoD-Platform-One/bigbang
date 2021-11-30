@@ -1,6 +1,9 @@
 # Changelog
 
 ---
+## [34.1.0-bb.6] - 2021-11-29
+### Modified
+- Added ability to specify VirtualService hosts using ` .Values.istio.nexus.hosts ` and setting default as `{{ .Values.hostname }}.{{ .Values.domain }}` in `values.yaml`
 ## [34.1.0-bb.5] - 2021-10-27
 ### Modified
 - Added multi raw repo feature to Nexus.
@@ -24,13 +27,15 @@
 ### Modified
 - Fixing chart versioning.
 
-## [34.1-01-bb.1] - 2021-10-12
+## [34.1.01-bb.1] - 2021-10-12
 ### Modified
 - Updated cypress tests and test values to run without errors.
+- NOTE: Released as `34.1-01-bb.1`
 
-## [34.1-01-bb.0] - 2021-09-13
+## [34.1.01-bb.0] - 2021-09-13
 ### Update
 - Updated ironbank container because previous version had issues with non-fips nodes
+- NOTE: Released as `34.1-01-bb.0`
 
 ## [34.0.0-bb.1] - 2021-09-13
 ### Modified

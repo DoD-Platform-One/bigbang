@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 34.1.0-bb.5](https://img.shields.io/badge/Version-34.1.0--bb.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.34.1](https://img.shields.io/badge/AppVersion-3.34.1-informational?style=flat-square)
+![Version: 34.1.0-bb.6](https://img.shields.io/badge/Version-34.1.0--bb.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.34.1](https://img.shields.io/badge/AppVersion-3.34.1-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -39,6 +39,7 @@ helm install nexus-repository-manager chart/
 | domain | string | `"bigbang.dev"` |  |
 | istio.enabled | bool | `false` |  |
 | istio.nexus.gateways[0] | string | `"istio-system/main"` |  |
+| istio.nexus.hosts[0] | string | `"{{ .Values.hostname }}.{{ .Values.domain }}"` |  |
 | networkPolicies.enabled | bool | `false` |  |
 | networkPolicies.ingressLabels.app | string | `"istio-ingressgateway"` |  |
 | networkPolicies.ingressLabels.istio | string | `"ingressgateway"` |  |
@@ -177,7 +178,7 @@ helm install nexus-repository-manager chart/
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
 | psp.create | bool | `false` |  |
-| psp.openshift | bool | `false` |  |
+| openshift | bool | `false` |  |
 
 ## Contributing
 
