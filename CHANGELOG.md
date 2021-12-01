@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.0.20]
+### Added
+- New wait on MetalLB so that it is not listed in package image lists
+
 ## [2.0.19]
 ### Fixed
 - Kyverno to addons so it doesn't deploy for every pipeline
