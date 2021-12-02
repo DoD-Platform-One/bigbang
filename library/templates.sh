@@ -141,7 +141,7 @@ bigbang_package_repos() {
 bigbang_prep(){
    echo -e "\e[0Ksection_start:`date +%s`:bb_prep[collapsed=true]\r\e[0K\e[33;1mPrep\e[37m"
    mkdir -p release
-   mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+   mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG $PACKAGE_IMAGE_FILE release/
    echo -e "\e[0Ksection_end:`date +%s`:bb_prep\r\e[0K"
 }
 
@@ -163,12 +163,14 @@ bigbang_release() {
        release-cli create --name \"Big Bang \${CI_COMMIT_TAG}\" --tag-name \${CI_COMMIT_TAG} \n\
        --description \"Automated release notes are a WIP.\" \n\
        --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
+       --assets-link \"{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}\" \n\
        --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
        --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
    else
      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
        --description "Automated release notes are a WIP." \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
+       --assets-link \"{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}\" \n\
        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
    fi
@@ -837,4 +839,65 @@ bigbang_pipeline() {
   else
     echo "Pipeline type is not BB, skipping"
   fi
+}
+
+bigbang_package_images() {
+   echo -e "\e[0Ksection_start:`date +%s`:Package-Image-List[collapsed=true]\r\e[0K\e[33;1mPackage-Image-List\e[37m"
+   # Start output header
+   echo "---" > ${PACKAGE_IMAGE_FILE}
+   echo "package-image-list:" >> ${PACKAGE_IMAGE_FILE}
+
+   # Generate a list of all images in all Big Bang Packages
+   yq e '(.,.addons) | ... comments="" | .[] | (path | join(".")) ' "${VALUES_FILE}" | while IFS= read -r package; do
+       gitrepo=$(yq e ".${package}.git.repo" "${VALUES_FILE}")
+       version=$(yq e ".${package}.git.tag" "${VALUES_FILE}")
+       #echo "Package: $package  Version: $version"
+       # Since keys aren't always packages
+       if [[ -z "$version" || "$version" == "null" ]]; then
+           continue
+       fi
+       # Remove prefix
+       gitrepo=${gitrepo#"https://repo1.dso.mil/"}
+       # Remove suffix
+       gitrepo=${gitrepo%".git"}
+       # Replace `/` with `%2F`
+       gitrepo=${gitrepo//\//%2F}
+       # Curl gitlab API to get project ID
+       projid=$(curl -s https://repo1.dso.mil/api/v4/projects/${gitrepo} | jq '.id')
+       #echo "Project ID: $projid"
+       # Curl gitlab API + S3 file to get images list
+       packageinfo=$(curl -s https://repo1.dso.mil/api/v4/projects/${projid}/releases/${version})
+       if [ -z "${packageinfo}" ] ; then
+         echo "No package info found for ${package}" 1>&2
+         echo "package info = $packageinfo" 1>&2
+         continue
+       fi
+       repoimagelist=$(echo $packageinfo | jq -r '.assets.links[] | select(.name=="images.txt").url') && export EXIT_STATUS=$? || export EXIT_STATUS=$?
+       if [ -z "${repoimagelist}" -o  ${EXIT_STATUS} -ne 0 ] ; then
+         echo "No image list file found in the release for repo ${package}" 1>&2
+         echo "Repo package info = $packageinfo" 1>&2
+         continue
+       fi
+       images=$(curl -s ${repoimagelist})
+       package=${package#"addons."}
+
+       # Generate the output in JSON format
+       header_done=0
+       for image in $images
+       do
+         if [ -n "$(grep ${image} $IMAGE_LIST)" ]
+         then
+           if [ ${header_done} == 0 ] ; then
+             echo "  ${package}: "
+             echo "    version: \"${version}\""
+             echo "    images:"
+             header_done=1
+           fi
+           echo "      - \"${image}\""
+         fi
+       done
+   done >> ${PACKAGE_IMAGE_FILE}
+
+   cat ${PACKAGE_IMAGE_FILE}
+   echo -e "\e[0Ksection_end:`date +%s`:Package-Image-List\r\e[0K"
 }

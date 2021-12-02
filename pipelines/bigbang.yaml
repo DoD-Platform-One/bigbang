@@ -49,6 +49,7 @@ variables:
   PIPELINE_REPO_BRANCH: master
   RELEASE_BUCKET: umbrella-bigbang-releases
   IMAGE_LIST: images.txt
+  PACKAGE_IMAGE_FILE: "package-images.yaml"
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
   VALUES_FILE: chart/values.yaml
@@ -200,6 +201,7 @@ package:
   script:
     - bigbang_synker
     - bigbang_package_repos
+    - bigbang_package_images
     # Prep release
     - bigbang_prep
     # Publish packages to s3 release
