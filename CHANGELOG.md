@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.0.21]
+### Added
+- Generation of image lists per package as an artifact for a release.
+
 ## [2.0.20]
 ### Added
 - New wait on MetalLB so that it is not listed in package image lists
