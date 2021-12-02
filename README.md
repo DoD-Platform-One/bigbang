@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 34.1.0-bb.6](https://img.shields.io/badge/Version-34.1.0--bb.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.34.1](https://img.shields.io/badge/AppVersion-3.34.1-informational?style=flat-square)
+![Version: 36.0.0-bb.0](https://img.shields.io/badge/Version-36.0.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -97,7 +97,7 @@ helm install nexus-repository-manager chart/
 | statefulset.enabled | bool | `false` |  |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.34.1-01"` |  |
+| image.tag | string | `"3.36.0-01"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
 | nexus.docker.enabled | bool | `false` |  |
