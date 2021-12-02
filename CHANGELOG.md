@@ -1,9 +1,15 @@
 # Changelog
 
 ---
+## [36.0.0-bb.0] - 2021-11-30
+### Modified
+- upgrade to app version 3.36.0 chart version 36.0.0
+
 ## [34.1.0-bb.6] - 2021-11-29
 ### Modified
 - Added ability to specify VirtualService hosts using ` .Values.istio.nexus.hosts ` and setting default as `{{ .Values.hostname }}.{{ .Values.domain }}` in `values.yaml`
+- Updating Nexus version.
+
 ## [34.1.0-bb.5] - 2021-10-27
 ### Modified
 - Added multi raw repo feature to Nexus.
