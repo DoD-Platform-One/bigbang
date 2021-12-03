@@ -36,7 +36,7 @@ Columns:
 | [Twistlock](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock) |  ![Twistlock Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/498) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/618) | No |
 | [Anchore Enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise) | ![Anchore Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/505) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/619) | No |
 | [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice) | ![Authservice Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/511) | No | No |
-| BETA [Vault](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault) | ![Vault Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/badges/main/pipeline.svg) |  No | No | No | No | No |
+| ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) [Vault](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault) | ![Vault Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/badges/main/pipeline.svg) |  No | No | No | No | No |
 
 
 ## Development Tools
