@@ -93,7 +93,10 @@ oc -n monitoring create -f NetworkAttachmentDefinition.yaml
 
 ### Konvoy
 * [Prerequistes can be found here](https://repo1.dso.mil/platform-one/distros/d2iq/konvoy/konvoy/-/tree/master/docs/1.5.0#prerequisites)
+* Konvoy clusters need a [Metrics API Endpoint](https://github.com/kubernetes/metrics#resource-metrics-api) available within the cluster to allow Horizontal Pod Autoscalers to correctly fetch pod/deployment metrics.
 * [Different Deployment Scenarios have been documented here](https://repo1.dso.mil/platform-one/distros/d2iq/konvoy/konvoy/-/tree/master/docs/1.4.4/install)
+
+
 
 ### RKE2
 * RKE2 turns PSPs on by default (see above for tips on disabling)
