@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.0.23]
+### Fixed
+- Fixed syntax error in release cli (an extra `/`)
+
 ## [2.0.22]
 ### Fixed
 - Fixed syntax error in release cli
