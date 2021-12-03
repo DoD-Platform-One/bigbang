@@ -24,6 +24,9 @@ Columns:
 | [OPA Gatekeeper](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy) | ![OPA Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/626) | No |No |
 | [Argocd](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd) |![Argo Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/badges/main/pipeline.svg)  |  No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/572) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/620) | No |
 | [Cluster Auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor) | ![Cluster Auditor Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor/badges/main/pipeline.svg)  | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/565) | No | No |
+| BETA [Kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno) | ![Kyverno Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno/badges/main/pipeline.svg) |  No | No | No | No | No |
+| BETA [Promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail) | ![Promtail Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/badges/main/pipeline.svg) |  No | No | No | No | No |
+| BETA [Loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki) | ![Loki Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/badges/main/pipeline.svg) |  No | No | No | No | No |
 
 
 ## Security
@@ -33,6 +36,8 @@ Columns:
 | [Twistlock](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock) |  ![Twistlock Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/498) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/618) | No |
 | [Anchore Enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise) | ![Anchore Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/505) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/619) | No |
 | [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice) | ![Authservice Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/511) | No | No |
+| BETA [Vault](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault) | ![Vault Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/badges/main/pipeline.svg) |  No | No | No | No | No |
+
 
 ## Development Tools
 
