@@ -24,10 +24,9 @@ Columns:
 | [OPA Gatekeeper](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy) | ![OPA Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/626) | No |No |
 | [Argocd](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd) |![Argo Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/badges/main/pipeline.svg)  |  No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/572) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/620) | No |
 | [Cluster Auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor) | ![Cluster Auditor Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor/badges/main/pipeline.svg)  | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/565) | No | No |
-| BETA [Kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno) | ![Kyverno Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno/badges/main/pipeline.svg) |  No | No | No | No | No |
-| BETA [Promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail) | ![Promtail Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/badges/main/pipeline.svg) |  No | No | No | No | No |
-| BETA [Loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki) | ![Loki Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/badges/main/pipeline.svg) |  No | No | No | No | No |
-
+| ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) [Kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno) | ![Kyverno Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno/badges/main/pipeline.svg) |  No | No | No | No | No |
+| ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) [Promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail) | ![Promtail Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/badges/main/pipeline.svg) |  No | No | No | No | No |
+| ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) [Loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki) | ![Loki Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/badges/main/pipeline.svg) |  No | No | No | No | No |
 
 ## Security
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
