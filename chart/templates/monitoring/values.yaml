@@ -83,6 +83,7 @@ sso:
 
 grafana:
   image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
     pullSecrets:
     - private-registry
 
@@ -127,6 +128,8 @@ grafana:
   {{- end }}
 
 prometheus-node-exporter:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
   serviceAccount:
     imagePullSecrets:
     - name: private-registry
@@ -138,6 +141,19 @@ prometheus-node-exporter:
   {{- end }}
 
 kube-state-metrics:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
+
+prometheusOperator:      
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}      
+  admissionWebhooks:        
+    cleanupProxy:          
+      image:            
+        pullPolicy: {{ .Values.imagePullPolicy }}        
+    patch:           
+      image:            
+        pullPolicy: {{ .Values.imagePullPolicy }}
 {{- end -}}

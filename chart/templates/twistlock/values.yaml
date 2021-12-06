@@ -31,4 +31,8 @@ istio:
     gateways:
     - istio-system/{{ default "public" .Values.twistlock.ingress.gateway }}
 
+console:
+  image:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
 {{- end -}}

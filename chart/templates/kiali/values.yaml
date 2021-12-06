@@ -10,6 +10,9 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift}}
 
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   kiali:
@@ -22,6 +25,8 @@ elasticsearch:
   enabled: {{ .Values.logging.enabled }}
 cr:
   spec:
+    deployment:
+      image_pull_policy: {{ .Values.imagePullPolicy }}
     server:
       web_port: "443"
     auth:

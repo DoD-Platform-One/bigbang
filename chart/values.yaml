@@ -109,6 +109,11 @@ networkPolicies:
   # Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs)
   nodeCidr: ""
 
+# -- Global ImagePullPolicy value for all packages
+# Permitted values are: None, Always, IfNotPresent 
+imagePullPolicy: IfNotPresent
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
 #

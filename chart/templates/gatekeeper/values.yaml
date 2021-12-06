@@ -4,17 +4,20 @@
 
 {{- define "bigbang.defaults.gatekeeper" -}}
 image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecrets:
   - name: private-registry
 postInstall:
   labelNamespace:
     enabled: false
     image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
       pullSecrets:
       - name: private-registry
 postUpgrade:
   cleanupCRD:
     image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
       pullSecrets:
       - name: private-registry
 
