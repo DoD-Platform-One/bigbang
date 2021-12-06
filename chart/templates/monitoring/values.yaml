@@ -48,22 +48,38 @@ istio:
     - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
   injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
 
-{{- if .Values.monitoring.sso.enabled }}
 alertmanager:
   alertmanagerSpec:
+    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+    containers:
+      - name: "alertmanager"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - name: "config-reloader"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if .Values.monitoring.sso.enabled }}
     {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
     {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     podMetadata:
       labels:
         {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
+    {{- end }}
 prometheus:
   prometheusSpec:
+    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+    containers:
+      - name: "prometheus"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - name: "config-reloader"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if .Values.monitoring.sso.enabled }}
     {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
     {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     podMetadata:
       labels:
         {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
-{{- end }}
+    {{- end }}
 
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
@@ -86,6 +102,8 @@ grafana:
     pullPolicy: {{ .Values.imagePullPolicy }}
     pullSecrets:
     - private-registry
+  sidecar:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
 
   {{- if .Values.loki.enabled }}
   additionalDataSources:
