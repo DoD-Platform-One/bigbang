@@ -8,6 +8,9 @@ license:
   keyJSON: |
     {{ .Values.logging.license.keyJSON | nindent 4 }}
 
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
 podAnnotations:
   sidecar.istio.io/inject: "true"
   traffic.sidecar.istio.io/includeInboundPorts: "*"

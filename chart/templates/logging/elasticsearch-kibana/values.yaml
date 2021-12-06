@@ -10,6 +10,8 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   kibana:
