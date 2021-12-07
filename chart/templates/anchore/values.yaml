@@ -43,6 +43,7 @@ sso:
   {{- end }}
 
 anchoreEnterpriseGlobal:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
   enabled: {{ .Values.addons.anchore.enterprise.enabled }}
   imagePullSecretName: private-registry
 
@@ -57,6 +58,7 @@ postgresql:
   {{- end }}
 
 anchoreGlobal:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
   openShiftDeployment: {{ .Values.openshift }}
   {{- if .Values.addons.anchore.adminPassword }}
   defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
@@ -75,6 +77,7 @@ anchore-feeds-db:
   {{- end }}
 
 anchoreEnterpriseUi:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecretName: private-registry
 
 anchore-ui-redis:

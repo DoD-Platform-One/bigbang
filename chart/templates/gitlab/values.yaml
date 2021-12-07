@@ -74,6 +74,9 @@ gitlab:
 global:
 
   # added to help with Gitlab sub-chart configuration
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    
   istio:
     enabled: {{ .Values.istio.enabled }}
     injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}

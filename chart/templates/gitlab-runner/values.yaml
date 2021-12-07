@@ -3,6 +3,9 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gitlab-runner" -}}
+
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
 imagePullSecrets:
 - name: private-registry
 

@@ -11,21 +11,37 @@ domain: {{ $domainName }}
 createNamespace: false
 
 global:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
 
 controller:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
 
 dex:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
 
 redis-bb:
+  image: 
+    pullPolicy: {{ .Values.imagePullPolicy }}
   enabled: true
   auth:
     enabled: false
+
+server:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+repoServer:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}

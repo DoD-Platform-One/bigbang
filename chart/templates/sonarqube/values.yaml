@@ -26,6 +26,7 @@ networkPolicies:
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecret: private-registry
 
 {{- if .Values.addons.sonarqube.sso.enabled }}
