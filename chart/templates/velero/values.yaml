@@ -17,6 +17,9 @@ networkPolicies:
 imagePullSecrets:
 - name: private-registry
 
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
 {{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure, csi" }}{{- end }}
 initContainers:
 {{- range .Values.addons.velero.plugins }}

@@ -10,6 +10,9 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  
 istio:
   enabled: {{ .Values.istio.enabled }}
   chat:

@@ -6,6 +6,9 @@
 imagePullSecrets:
   - name: private-registry
 
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
