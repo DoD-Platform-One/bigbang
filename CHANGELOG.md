@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.0.24]
+### Changed
+- Upped RKE2 coredns rollout timeout to 120s
+
 ## [2.0.23]
 ### Fixed
 - Fixed syntax error in release cli (an extra `/`)
