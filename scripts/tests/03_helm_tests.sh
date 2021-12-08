@@ -60,7 +60,7 @@ elif [[ ${clusterType} == "rke2" ]]; then
   corefile=$(cat newcorefile) yq e -i '.data.Corefile = strenv(corefile)' patch.yaml
   kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
   kubectl patch deployment ${coreDnsName} -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"config-volume","configMap":{"items":[{"key":"Corefile","path":"Corefile"},{"key":"NodeHosts","path":"NodeHosts"}],"name":"'${coreDnsName}'"}}]}}}}'
-  kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=30s
+  kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=120s
 # Add other distros in future as needed, catchall so tests won't error on this
 else
   echo "No known CoreDNS deployment found, skipping patching."
