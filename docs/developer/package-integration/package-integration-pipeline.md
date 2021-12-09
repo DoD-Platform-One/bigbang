@@ -49,13 +49,10 @@ Pipelines provide rapid feedback to changes in our Helm chart as we develop and 
      tag: 6.0.0
    ```
 
-1. Add the following to `.gitlab-ci.yml` to call the pipeline.
+1. Update the repo's CI/CD settings to call the pipeline (`Settings > CI/CD > General pipelines > Expand > CI/CD configuration file`).
 
-   ```yaml
-   include:
-     - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-       ref: master
-       file: '/templates/package-tests.yml'
+   ```text
+   pipelines/bigbang-package.yaml@platform-one/big-bang/pipeline-templates/pipeline-templates:master
    ```
 
 1. Add overlay values for testing into `tests/test-values.yaml`.  This will be where you add values needed for running in the pipeline.  For now it can be a blank, placeholder.
