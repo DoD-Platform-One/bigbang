@@ -13,6 +13,7 @@ flux:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
     {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
