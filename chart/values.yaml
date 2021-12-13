@@ -110,7 +110,7 @@ networkPolicies:
   nodeCidr: ""
 
 # -- Global ImagePullPolicy value for all packages
-# Permitted values are: None, Always, IfNotPresent 
+# Permitted values are: None, Always, IfNotPresent
 imagePullPolicy: IfNotPresent
 
 
@@ -1198,7 +1198,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
       path: "./chart"
-      tag: "0.16.1-bb.3"
+      tag: "0.18.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
