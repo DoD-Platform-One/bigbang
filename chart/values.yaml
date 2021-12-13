@@ -7,18 +7,18 @@ istio:
   enabled: false
   kiali:
     gateways:
-    - "istio-system/main"
+      - "istio-system/main"
     hosts:
-    - kiali.{{ .Values.hostname }}
+      - kiali.{{ .Values.hostname }}
 
 port: 20001
-image: 
+image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.42.0
+  tag: v1.44.0
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
-  pullSecrets: 
-  - private-registry
+  pullSecrets:
+    - private-registry
 
 # Deployment options for the operator pod.
 nodeSelector: {}
@@ -63,7 +63,7 @@ clusterRoleCreator: true
 # If you set this to an empty list, the operator will not be given permission to read any additional secrets
 # found in the cluster, and thus will only support a value of "false" in the Kiali CR setting
 # spec.kiali_feature_flags.certificates_information_indicators.enabled.
-secretReader: ['cacerts', 'istio-ca-secret']
+secretReader: ["cacerts", "istio-ca-secret"]
 
 # Set to true if you want to allow the operator to only be able to install Kiali in view-only-mode.
 # The purpose for this setting is to allow you to restrict the permissions given to the operator itself.
@@ -101,12 +101,12 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.42.0
+      image_version: v1.43.0
       image_pull_secrets:
-      - private-registry
+        - private-registry
       ingress_enabled: false
       accessible_namespaces:
-      - '**'
+        - "**"
       logger:
         log_level: info
       resources:
@@ -116,7 +116,7 @@ cr:
         limits:
           cpu: 200m
           memory: 368Mi
-      
+
     auth:
       strategy: "anonymous"
     external_services:
@@ -136,18 +136,18 @@ cr:
           password: "prom-operator"
           type: basic
         dashboards:
-        - name: "Istio Service Dashboard"
-          variables:
-            namespace: "var-namespace"
-            service: "var-service"
-        - name: "Istio Workload Dashboard"
-          variables:
-            namespace: "var-namespace"
-            workload: "var-workload"
-        - name: "Istio Mesh Dashboard"
-        - name: "Istio Control Plane Dashboard"
-        - name: "Istio Performance Dashboard"
-        - name: "Istio Wasm Extension Dashboard"
+          - name: "Istio Service Dashboard"
+            variables:
+              namespace: "var-namespace"
+              service: "var-service"
+          - name: "Istio Workload Dashboard"
+            variables:
+              namespace: "var-namespace"
+              workload: "var-workload"
+          - name: "Istio Mesh Dashboard"
+          - name: "Istio Control Plane Dashboard"
+          - name: "Istio Performance Dashboard"
+          - name: "Istio Wasm Extension Dashboard"
 
       tracing:
         enabled: true
@@ -173,7 +173,6 @@ svcPatchJob:
   image:
     repository: registry1.dso.mil/ironbank/big-bang/base
     tag: 8.4
-
 # Taken from https://github.com/kiali/kiali-operator/blob/v1.33/deploy/kiali/kiali_cr.yaml
 ###################################################################
 # kiali_cr.yaml
