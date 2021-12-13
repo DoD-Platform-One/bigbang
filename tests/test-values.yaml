@@ -290,7 +290,7 @@ monitoring:
   enabled: true
   sso:
     enabled: false
-    prometheus: 
+    prometheus:
       client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-prometheus
     alertmanager:
       client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-alertmanager
@@ -327,7 +327,7 @@ monitoring:
             revision: 1
             datasource: Prometheus
       downloadDashboards:
-        resources: 
+        resources:
           limits:
             cpu: 20m
             memory: 20Mi
@@ -1065,10 +1065,23 @@ addons:
     values:
       server:
         dataStorage:
-          enabled: true 
+          enabled: true
+      injector:
+        affinity: |
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+                      app.kubernetes.io/instance: "{{ .Release.Name }}"
+                      component: webhook
+                  topologyKey: kubernetes.io/hostname
+ 
       bbtests:
         enabled: true
         cypress:
-          artifacts: true 
+          artifacts: true
           envs:
             cypress_vault_url: "https://vault.bigbang.dev"
