@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.44.0-bb.0] - 2021-12-10
+### Updated
+- Update Kiali Operator to v1.44.0
+- Update Kiali Server to v1.43.0 (waiting for IB 1.44)
+
 ## [1.42.0-bb.0] - 2021-11-10
 ### Updated
 - Update Kiali to v1.42.0
@@ -53,6 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Updated kiali images to latest in irobank images v1.37.0
 
 ## [1.36.0-bb.3] - 2021-07-21
+### Updated
 - add openshift toggle. conditionally modify networkpolicy for dns
 
 ## [1.36.0-bb.2]
