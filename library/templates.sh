@@ -352,7 +352,7 @@ package_test() {
    if [ -d "chart/templates/tests" ]; then
      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
      echo "***** Start Helm Test Logs *****"
-     kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+     kubectl logs --all-containers=true --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
      echo "***** End Helm Test Logs *****"
      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
@@ -381,7 +381,7 @@ package_upgrade_test() {
    if [ -d "chart/templates/tests" ]; then
      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
      echo "***** Start Helm Test Logs *****"
-     kubectl logs --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
+     kubectl logs --all-containers=true --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
      echo "***** End Helm Test Logs *****"
      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64

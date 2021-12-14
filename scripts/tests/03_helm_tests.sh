@@ -87,7 +87,7 @@ for hr in $installed_helmreleases; do
         # Only output failed pod logs, not all test pods
         if [[ $(kubectl get pod -n ${namespace} ${pod} -o jsonpath='{.status.phase}' 2>/dev/null | xargs) == "Failed" ]]; then
           echo -e "---\nLogs for ${pod}:\n---"
-          kubectl logs --tail=-1 -n ${namespace} ${pod}
+          kubectl logs --all-containers=true --tail=-1 -n ${namespace} ${pod}
         fi
       done
       echo "---"
@@ -100,7 +100,7 @@ for hr in $installed_helmreleases; do
       if [[ ! "$pod" =~ "cypress" ]]; then
         if kubectl get pod -n ${namespace} ${pod} &>/dev/null; then
           mkdir -p test-artifacts/${hr}/scripts
-          kubectl logs --tail=-1 -n ${namespace} ${pod} >> test-artifacts/${hr}/scripts/pod-logs.txt
+          kubectl logs --all-containers=true --tail=-1 -n ${namespace} ${pod} >> test-artifacts/${hr}/scripts/pod-logs.txt
         fi
       fi
     done
