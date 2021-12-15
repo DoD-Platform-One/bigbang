@@ -1,5 +1,29 @@
 #!/bin/bash
 
+#### Preflight Checks
+# check for tools
+tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl)
+for tooldependency in "${tooldependencies[@]}"
+  do
+    command -v $tooldependency >/dev/null 2>&1 || { echo >&2 " $tooldependency is not installed.";  missingtool=1; }
+  done
+sed_gsed="sed"
+# verify sed version if mac
+uname="$(uname -s)"
+if [[ "${uname}" == "Darwin" ]]; then
+  if [[ $(command -v gsed) ]]; then
+    sed_gsed="gsed"
+  else
+    missingtool=1
+    echo ' gnu-sed is not installed. "brew install gnu-sed"'
+  fi
+fi
+# if tool missing, exit
+if [[ "${missingtool}" == 1 ]]; then
+  echo " Please install required tools. Aborting."
+  exit 1
+fi
+
 # getting AWs user name
 AWSUSERNAME=$( aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/' )
 
@@ -376,7 +400,7 @@ then
 	echo
 	echo "copy kubeconfig"
 	scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
-	sed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
+	$sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 
 elif [[ "$PRIVATE_IP" == true ]]
 then
@@ -387,7 +411,7 @@ then
 	echo
 	echo "copy kubeconfig"
 	scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
-	sed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
+	$sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 
 else # default is public ip
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create  --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id  --k3s-server-arg "--disable=traefik"  --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=${PublicIP}" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
@@ -398,7 +422,7 @@ else # default is public ip
 	echo
 	echo "copy kubeconfig"
 	scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
-	sed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
+	$sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 fi
 
 # add tools
