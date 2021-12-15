@@ -203,18 +203,9 @@ gatekeeper:
 kyverno:
   enabled: false
   values:
-    replicas: 1
+    replicaCount: 1
     bbtests:
       enabled: true
-      scripts:
-        image: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.1
-        additionalVolumeMounts:
-          - name: "{{ .Chart.Name }}-test-config"
-            mountPath: /yaml
-        additionalVolumes:
-          - name: "{{ .Chart.Name }}-test-config"
-            configMap:
-              name: "{{ .Chart.Name }}-test-config"
 
 logging:
   enabled: true
