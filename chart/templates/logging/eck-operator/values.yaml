@@ -10,8 +10,11 @@ license:
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
-
+  
 podAnnotations:
+{{- if .Values.istio.enabled }}
+  {{ include "istioAnnotation" . }}
+{{- end }}
   sidecar.istio.io/inject: "true"
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
