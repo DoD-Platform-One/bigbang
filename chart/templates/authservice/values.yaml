@@ -1,4 +1,4 @@
-{{- if and .Values.istio.enabled ( or .Values.addons.authservice.enabled .Values.monitoring.sso.enabled .Values.jaeger.sso.enabled ) }}
+{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled)) }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
 {{- end }}
 
@@ -55,7 +55,7 @@ chains:
   {{ .Values.addons.authservice.chains | toYaml | nindent 2 }}
   {{- end }}
 
-  {{- if .Values.jaeger.sso.enabled }}
+  {{- if and .Values.jaeger.enabled .Values.jaeger.sso.enabled }}
   jaeger:
     match:
       header: ":authority"
@@ -73,7 +73,7 @@ chains:
     client_secret: "{{ .Values.jaeger.sso.client_secret }}"
   {{- end }}
 
-  {{- if .Values.monitoring.sso.enabled }}
+  {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
   prometheus:
     match:
       header: ":authority"
