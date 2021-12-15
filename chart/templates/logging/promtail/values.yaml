@@ -5,6 +5,13 @@
 {{- define "bigbang.defaults.promtail" -}}
 hostname: {{ .Values.hostname }}
 
+initContainer:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
 openshift: {{ .Values.openshift }}
 
 istio:
