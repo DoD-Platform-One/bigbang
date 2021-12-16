@@ -10,11 +10,11 @@ license:
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
-
+  
 podAnnotations:
-  sidecar.istio.io/inject: "true"
-  traffic.sidecar.istio.io/includeInboundPorts: "*"
-  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+{{- if .Values.istio.enabled }}
+  {{ include "istioAnnotation" . }}
+{{- end }}
 
 openshift: {{ .Values.openshift }}
 
