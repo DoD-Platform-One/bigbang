@@ -335,14 +335,10 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno
     path: "./chart"
-    tag: "2.1.2-bb.0"
+    tag: "2.1.3-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
-  flux:
-    install:
-      crds: CreateReplace
-    upgrade:
-      crds: CreateReplace
+  flux: {}
 
   # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
   values: {}
@@ -361,7 +357,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.2.0-bb.0"
+    tag: "0.3.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -532,7 +528,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.0.12-bb.0"
+    tag: "0.1.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}

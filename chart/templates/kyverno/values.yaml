@@ -3,6 +3,8 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno" -}}
+replicaCount: 3
+
 image:
   pullSecrets:
   - name: private-registry
@@ -13,8 +15,10 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-monitoring:
-  enabled: false #{{ .Values.monitoring.enabled }} To enable this, we need PodMonitor crd
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+  dashboards:
+    namespace: monitoring
 
 istio:
   enabled: {{ .Values.istio.enabled }}
