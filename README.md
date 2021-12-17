@@ -100,7 +100,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"1.44.0-bb.0"` |  |
+| kiali.git.tag | string | `"1.44.0-bb.1"` |  |
 | kiali.flux | object | `{}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress.gateway | string | `""` |  |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
@@ -132,7 +132,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | logging.enabled | bool | `true` | Toggle deployment of Logging (EFK). |
 | logging.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git"` |  |
 | logging.git.path | string | `"./chart"` |  |
-| logging.git.tag | string | `"0.2.0-bb.0"` |  |
+| logging.git.tag | string | `"0.3.0-bb.0"` |  |
 | logging.flux | object | `{"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | logging.ingress.gateway | string | `""` |  |
 | logging.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -170,7 +170,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | monitoring.enabled | bool | `true` | Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager). |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"23.1.6-bb.0"` |  |
+| monitoring.git.tag | string | `"23.1.6-bb.1"` |  |
 | monitoring.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress.gateway | string | `""` |  |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
@@ -267,7 +267,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.nexus.enabled | bool | `false` | Toggle deployment of Nexus. |
 | addons.nexus.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git"` |  |
 | addons.nexus.git.path | string | `"./chart"` |  |
-| addons.nexus.git.tag | string | `"36.0.0-bb.0"` |  |
+| addons.nexus.git.tag | string | `"34.1.0-bb.6"` |  |
 | addons.nexus.license_key | string | `""` | Base64 encoded license file. |
 | addons.nexus.ingress.gateway | string | `""` |  |
 | addons.nexus.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599 |
