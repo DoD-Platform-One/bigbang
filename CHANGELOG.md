@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.0.26]
+### Changed
+- Fixed pipeline failure when no images are installed as part of the main application
+
 ## [2.0.25]
 ### Changed
 - Added `--all-containers=true` to `kubectl logs` to cover pods with multiple containers
