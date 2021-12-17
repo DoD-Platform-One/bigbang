@@ -610,7 +610,7 @@ installed_images() {
 
 package_images() {
    echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KPackage Images"
-   grep -Fxvf dependencies.txt full-list.txt | tee images.txt
+   (grep -Fxvf dependencies.txt full-list.txt || true) | tee images.txt
    sed -i '/docker.io\/rancher\//d' images.txt
    if [ -f tests/images.txt ]; then
      cat tests/images.txt >> images.txt
