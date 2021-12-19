@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 1.22.0](https://img.shields.io/badge/Version-1.22.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.23.0](https://img.shields.io/badge/Version-1.23.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -64,6 +64,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled` |
 | networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` | Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints) Used by package NetworkPolicies to allow Kube API access |
 | networkPolicies.nodeCidr | string | `""` | Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks. use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range. Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs) |
+| imagePullPolicy | string | `"IfNotPresent"` | Global ImagePullPolicy value for all packages Permitted values are: None, Always, IfNotPresent |
 | istio.enabled | bool | `true` | Toggle deployment of Istio. |
 | istio.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git"` |  |
 | istio.git.path | string | `"./chart"` |  |
@@ -88,7 +89,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | jaeger.enabled | bool | `true` | Toggle deployment of Jaeger. |
 | jaeger.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git"` |  |
 | jaeger.git.path | string | `"./chart"` |  |
-| jaeger.git.tag | string | `"2.26.0-bb.0"` |  |
+| jaeger.git.tag | string | `"2.27.0-bb.0"` |  |
 | jaeger.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Jaeger Package |
 | jaeger.ingress.gateway | string | `""` |  |
 | jaeger.sso.enabled | bool | `false` | Toggle SSO for Jaeger on and off |
@@ -99,7 +100,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"1.42.0-bb.0"` |  |
+| kiali.git.tag | string | `"1.44.0-bb.1"` |  |
 | kiali.flux | object | `{}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress.gateway | string | `""` |  |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
@@ -131,7 +132,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | logging.enabled | bool | `true` | Toggle deployment of Logging (EFK). |
 | logging.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git"` |  |
 | logging.git.path | string | `"./chart"` |  |
-| logging.git.tag | string | `"0.1.23-bb.0"` |  |
+| logging.git.tag | string | `"0.3.0-bb.0"` |  |
 | logging.flux | object | `{"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | logging.ingress.gateway | string | `""` |  |
 | logging.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -150,7 +151,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | fluentbit.enabled | bool | `true` | Toggle deployment of Fluent-Bit. |
 | fluentbit.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git"` |  |
 | fluentbit.git.path | string | `"./chart"` |  |
-| fluentbit.git.tag | string | `"0.19.3-bb.0"` |  |
+| fluentbit.git.tag | string | `"0.19.9-bb.0"` |  |
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
 | fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -169,7 +170,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | monitoring.enabled | bool | `true` | Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager). |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"14.0.0-bb.18"` |  |
+| monitoring.git.tag | string | `"23.1.6-bb.1"` |  |
 | monitoring.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress.gateway | string | `""` |  |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
@@ -195,7 +196,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.argocd.enabled | bool | `false` | Toggle deployment of ArgoCD. |
 | addons.argocd.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git"` |  |
 | addons.argocd.git.path | string | `"./chart"` |  |
-| addons.argocd.git.tag | string | `"3.6.8-bb.12"` |  |
+| addons.argocd.git.tag | string | `"3.27.1-bb.0"` |  |
 | addons.argocd.flux | object | `{}` | Flux reconciliation overrides specifically for the ArgoCD Package |
 | addons.argocd.ingress.gateway | string | `""` |  |
 | addons.argocd.sso.enabled | bool | `false` | Toggle SSO for ArgoCD on and off |
@@ -266,7 +267,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.nexus.enabled | bool | `false` | Toggle deployment of Nexus. |
 | addons.nexus.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git"` |  |
 | addons.nexus.git.path | string | `"./chart"` |  |
-| addons.nexus.git.tag | string | `"34.1.0-bb.5"` |  |
+| addons.nexus.git.tag | string | `"34.1.0-bb.6"` |  |
 | addons.nexus.license_key | string | `""` | Base64 encoded license file. |
 | addons.nexus.ingress.gateway | string | `""` |  |
 | addons.nexus.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599 |
@@ -284,7 +285,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.sonarqube.enabled | bool | `false` | Toggle deployment of SonarQube. |
 | addons.sonarqube.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git"` |  |
 | addons.sonarqube.git.path | string | `"./chart"` |  |
-| addons.sonarqube.git.tag | string | `"9.6.3-bb.10"` |  |
+| addons.sonarqube.git.tag | string | `"9.6.3-bb.11"` |  |
 | addons.sonarqube.flux | object | `{}` | Flux reconciliation overrides specifically for the Sonarqube Package |
 | addons.sonarqube.ingress.gateway | string | `""` |  |
 | addons.sonarqube.sso.enabled | bool | `false` | Toggle SAML SSO for SonarQube. Enabling this option will auto-create any required secrets. |
@@ -345,7 +346,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.mattermost.enabled | bool | `false` | Toggle deployment of Mattermost. |
 | addons.mattermost.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git"` |  |
 | addons.mattermost.git.path | string | `"./chart"` |  |
-| addons.mattermost.git.tag | string | `"0.2.4-bb.0"` |  |
+| addons.mattermost.git.tag | string | `"0.3.0-bb.0"` |  |
 | addons.mattermost.flux | object | `{}` | Flux reconciliation overrides specifically for the Mattermost Package |
 | addons.mattermost.enterprise | object | `{"enabled":false,"license":""}` | Mattermost Enterprise functionality. |
 | addons.mattermost.enterprise.enabled | bool | `false` | Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install. |
@@ -397,7 +398,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.vault.enabled | bool | `false` | Toggle deployment of Vault. |
 | addons.vault.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git"` |  |
 | addons.vault.git.path | string | `"./chart"` |  |
-| addons.vault.git.tag | string | `"0.16.1-bb.2"` |  |
+| addons.vault.git.tag | string | `"0.18.0-bb.0"` |  |
 | addons.vault.flux | object | `{}` | Flux reconciliation overrides specifically for the Vault Package |
 | addons.vault.ingress.gateway | string | `""` |  |
 | addons.vault.values | object | `{}` | Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git |
