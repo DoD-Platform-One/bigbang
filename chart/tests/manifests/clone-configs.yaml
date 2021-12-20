@@ -1,0 +1,36 @@
+# Test 1: ConfigMap is cloned into new namespaces
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clone-configs-1
+  annotations:
+    kyverno-policies-bbtest/type: generate
+    kyverno-policies-bbtest/expected: generate
+    kyverno-policies-bbtest/kind: ConfigMap
+    kyverno-policies-bbtest/name: clone-configs-1
+    kyverno-policies-bbtest/namespace: clone-configs
+data:
+  key: value
+---
+# Test 2: Secret is cloned into new namespaces
+apiVersion: v1
+kind: Secret
+metadata:
+  name: clone-configs-2
+  annotations:
+    kyverno-policies-bbtest/type: generate
+    kyverno-policies-bbtest/expected: generate
+    kyverno-policies-bbtest/kind: Secret
+    kyverno-policies-bbtest/name: clone-configs-2
+    kyverno-policies-bbtest/namespace: clone-configs
+type: Opaque
+data:
+  key: dmFsdWUK
+---
+# Trigger
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: clone-configs
+  annotations:
+    kyverno-policies-bbtest/type: ignore

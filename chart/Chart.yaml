@@ -1,0 +1,20 @@
+apiVersion: v1
+name: kyverno-policies
+version: v1.0.0-bb.0
+icon: https://github.com/kyverno/kyverno/raw/main/img/logo.png
+description: Collection of Kyverno security and best-practice policies for Kyverno
+keywords:
+  - kubernetes
+  - nirmata
+  - policy agent
+  - validating webhook
+  - admissions controller
+home: https://kyverno.io/policies/
+sources:
+  - https://github.com/kyverno/policies
+engine: gotpl
+kubeVersion: ">=1.10.0-0"
+dependencies:
+  - name: gluon
+    version: 0.2.4
+    repository: oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon

@@ -1,0 +1,44 @@
+{{- if dig "bbtests" "enabled" false (merge .Values dict) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "kyverno-policies.name" . }}-bbtest-clusterrole
+  labels:
+    {{- include "kyverno-policies.test-labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+rules:
+- apiGroups:
+  - "kyverno.io"
+  resources:
+  - clusterpolicies
+  - policies
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - "wgpolicyk8s.io"
+  resources:
+  - clusterpolicyreports
+  - policyreports
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - secrets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+{{- end }}
