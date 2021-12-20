@@ -1,0 +1,20 @@
+{{- if dig "bbtests" "enabled" false (merge .Values dict) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kyverno-policies.name" . }}-bbtest-manifests
+  labels:
+    {{- include "kyverno-policies.test-labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+data:
+  {{- /* Only include manifests that match enabled policies */ -}}
+  {{- range $k, $v := .Values.policies }}
+    {{- if $v.enabled }}
+      {{- $glob := $.Files.Glob (printf "tests/manifests/%s*" $k) }}
+      {{- if $glob }}
+        {{- ($glob).AsConfig | nindent 2 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

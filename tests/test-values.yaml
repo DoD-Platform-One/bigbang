@@ -1,0 +1,25 @@
+bbtests:
+  enabled: true
+policies:
+  clone-configs:
+    enabled: true
+    parameters:
+      sourceObjects:
+        clone-configs-1:
+          kind: ConfigMap
+          namespace: kyverno-policies-bbtest
+        clone-configs-2:
+          kind: Secret
+          namespace: kyverno-policies-bbtest
+  disallow-deprecated-apis:
+    validationFailureAction: audit
+  replace-image-registry:
+    enabled: true
+    parameters:
+      replacements:
+      - old: "replace.image.registry"
+        new: "registry1.dso.mil"
+  restrict-capabilities:
+    validationFailureAction: audit
+    parameters:
+      allowedCapabilities: ["allowed"]

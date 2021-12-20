@@ -1,0 +1,22 @@
+{{- range $name, $values := .Values.additionalPolicies }}
+{{- if and $.Values.enabled $values.enabled }}
+{{- if not (has $values.kind (list "ClusterPolicy" "Policy")) }}
+{{- fail (printf "Invalid kind (%s) for policy named %s." $values.kind $name) }}
+{{- end }}
+---
+apiVersion: kyverno.io/v1
+kind: {{ $values.kind }}
+metadata:
+  name: {{ $name }}
+  {{- if (eq $values.kind "Policy") }}
+    {{- if $values.namespace  }}
+  namespace: {{ $values.namespace }}
+    {{- else }}
+      {{- fail (printf "Policy named %s requires a namespace." $name) }}
+    {{- end }}
+  {{- end }}
+  annotations: {{- toYaml (default dict $values.annotations) | nindent 4 }}
+  labels: {{- include "kyverno-policies.labels" $ | nindent 4 }}
+spec: {{- toYaml $values.spec | nindent 2 }}
+{{- end }}
+{{- end }}

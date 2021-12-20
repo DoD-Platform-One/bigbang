@@ -1,0 +1,43 @@
+{{- $name := "replace-image-registry" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Replace Image Registry
+    policies.kyverno.io/category: Best Practice
+    policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.3.6
+    policies.kyverno.io/description: >-
+      It is common practice to pull images from a local proxy or approved registry.  This
+      policy will mutate the existing registry so pulls are directed to the approved registry.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  background: false
+  rules:
+  {{- range $v := (dig $name "parameters" "replacements" nil .Values.policies) }}
+  - name: replace-{{ $v.old }}-containers
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    mutate:
+      patchStrategicMerge:
+        spec:
+          containers:
+          - (name): "*"
+            image: |-
+              {{ "{{" }} regex_replace_all('{{ $v.old }}', '{{"{{"}}@{{"}}"}}', '{{ $v.new }}') {{ "}}" }}
+  - name: replace-{{ $v.old }}-initcontainers
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    mutate:
+      patchStrategicMerge:
+        spec:
+          initContainers:
+          - (name): "*"
+            image: |-
+              {{ "{{" }} regex_replace_all('{{ $v.old }}', '{{"{{"}}@{{"}}"}}', '{{ $v.new }}') {{ "}}" }}
+  {{- end }}
+{{- end -}}

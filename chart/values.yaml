@@ -1,0 +1,350 @@
+# Overrides for all policies.  Blank values indicate to use the policy-specific value or the default value
+
+# -- Enable policy deployments
+enabled: true
+
+# -- Override all policies' validation failure action with "audit" or "enforce".  If blank, uses policy setting.
+validationFailureAction: ""
+
+# -- Override all policies' time to wait for admission webhook to respond.  If blank, uses policy setting or default (10).
+webhookTimeoutSeconds: ""
+
+# -- Adds an exclusion to all policies.  This is merged with any policy-specific excludes.
+exclude: {}
+
+# -- Additional labels to apply to all policies.
+customLabels: {}
+
+# webhookTimeoutSecond: can be added to any policy to override the timeout for that policy
+# match: can be added to any policy to completely override selection of resources by the policy
+# exclude: can be added to any policy to add specific exclusions to the policy
+# See https://kyverno.io/docs/writing-policies/match-exclude on how to format match/exclude
+
+# -- Policies
+policies:
+  # Keep policies in alphabetical order and name them the same as the .yaml file to help with configuration and troubleshooting
+
+  # -- Sample policy showing values that can be added to any policy
+  sample:
+    # -- Controls policy deployment
+    enabled: false
+    # -- Controls if a validation policy rule failure should disallow (enforce) or allow (audit) the admission
+    validationFailureAction: audit # or enforce
+    # -- Specifies the maximum time in seconds allowed to apply this policy. Default is 10. Range is 1 to 30.
+    webhookTimeoutSeconds: ""
+    # -- Defines when this policy's rules should be applied.  This completely overrides any default matches.
+    match: {}
+    # -- Defines when this policy's rules should not be applied.  This completely overrides any default excludes.
+    exclude: {}
+    # -- Policy specific parameters that are added to the configMap for the policy rules
+    parameters: {}
+
+  # -- Clone existing configMap or secret in new Namespaces
+  clone-configs:
+    enabled: false
+    parameters:
+      # -- ConfigMap or Secrets that should be cloned
+      sourceObjects: {}
+        # # -- Name of the resource
+        # sample:
+        #   # -- Kind of the resource (ConfigMap or Secret)
+        #   kind: ConfigMap
+        #   # -- Namespace to find the resource
+        #   namespace: default
+
+  # -- Mitigates log4j2 vulnerability (CVE-2021-44228) for library versions >= 2.10
+  cve-2021-44228:
+    enabled: false  # See https://github.com/kyverno/kyverno/issues/2865
+
+  # -- NEW:
+  disallow-cri-sock-mount:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- NEW:
+  disallow-default-namespaces:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Checks for resource APIs in use that will be removed in Kubernetes 1.22 or 1.25
+  disallow-deprecated-apis:
+    enabled: true
+    validationFailureAction: audit
+
+  # -- NEW:
+  disallow-helm-tiller:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Disallow use of the host namespace (PID, IPC, Network) by pods
+  disallow-host-namespaces:
+    enabled: false
+    validationFailureAction: enforce
+
+  # -- Disallow volumes that mount host paths
+  disallow-host-path:
+    enabled: false
+    validationFailureAction: enforce
+
+  # -- Disallow containers using host ports
+  disallow-host-ports:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedPorts: []
+
+  # -- Disallow container images using the "latest" tag
+  disallow-latest-tags:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # disallowedTags: ["latest"]
+
+  # -- NEW:
+  disallow-localhost-services:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Disallow containers that run as privileged
+  disallow-privileged-containers:
+    enabled: false
+    validationFailureAction: enforce
+
+  # -- Disallows pods that allow privilege escalation
+  disallow-privilege-escalation:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Disallow containers that use 'unmasked' for procMount
+  disallow-proc-mount:
+    enabled: false
+    validationFailureAction: enforce
+
+  # -- NEW:
+  disallow-secrets-form-env-vars:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Disallow the use of any SELinux options
+  disallow-selinux:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedOptions: []
+
+  # -- NEW:
+  ensure-readonly-hostpath:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- NEW:
+  limit-hostpath-vols:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Enforce guaranteed quality of service by requiring pods to set CPU and memory requests equal to limits
+  memory-requests-equal-limits:
+    enabled: false
+    validationFailureAction: audit
+    #TODO: add CPU to policy
+
+  # -- Replaces an existing image registry with a new registry in containers (e.g. proxy)
+  replace-image-registry:
+    enabled: false
+    parameters:
+      # -- List of registries to replace
+      replacements: []
+      # - old: "registry.to.replace"
+      #   new: "new.registry.to.use"
+
+  # -- Requires all containers to drop all Linux capabilities
+  require-drop-all:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Require specified labels to be on all pods
+  require-labels:
+    enabled: false
+    validationFailureAction: audit
+    parameters: {}
+    # requiredLabels: ["app.kubernetes.io/name", "app.kubernetes.io/version"] (check required labels with Helm/K8S)
+
+  # -- Require all pods have CPU and memory requests and limits specified
+  require-pod-requests-limits:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Require specified probes and probe types on pods
+  require-probes:
+    enabled: false
+    validationFailureAction: audit
+    parameters: {}
+    # requiredProbes: ["readinessProbe", "livenessProbe"]
+    # requiredProbeTypes: ["tcpSocket","httpGet","exec"]
+    # TODO: Maybe drop probe types?
+
+  # -- Require containers set root filesystem to readonly
+  require-ro-rootfs:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Disallow containers that attempt to run as root
+  require-run-as-nonroot:
+    enabled: false
+    validationFailureAction: audit
+    #TODO: Update policy to allow either runAsNonRoot=true OR runAsUser != 0
+
+  # -- Retricts pods that use AppArmor to specified profiles
+  # Iron Bank containers are either distroless or RHEL UBI.  Neither of these uses AppArmor
+  restrict-apparmor-profiles:
+    enabled: false
+    validationFailureAction: audit
+    parameters: {}
+    # allowedProfiles: ["runtime/default"]
+
+  # -- Disallow pods from automatically mounting the default service account
+  restrict-automount-sa-token:
+    enabled: false
+    validationFailureAction: audit
+    #TODO: Should this be a mutate?
+    #TODO: Replace with disallowing addition of privileges to default service account so it remains least privileged
+
+  # -- Disallow containers adding capabilities that are not specified
+  restrict-capabilities:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- List of capabilities that are allowed to be added
+      allowedCapabilities: []
+
+  # -- NEW
+  restrict-controlplane-scheduling:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Restricts container images to specified registries
+  restrict-image-registries:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedRegistries: ["registry1.dso.mil"]
+
+  # -- Disallow services that use NodePorts
+  restrict-node-port:
+    enabled: false
+    validationFailureAction: audit
+
+  # -- Restrict the seccomp profiles that containers can use
+  restrict-seccomp:
+    enabled: false
+    validationFailureAction: audit
+    parameters: {}
+    # allowedProfiles: ["runtime/default"]
+
+  # -- Restrict services to use specified external IPs
+  restrict-service-external-ips:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedIPs: []
+
+  # -- Restrict allowed sysctls to only those specified
+  restrict-sysctls:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedSysctls: []
+
+  # -- Limit allowed IDs for users and groups in containers
+  restrict-usergroup-fsgroup-id:
+    enabled: false
+    validationFailureAction: audit
+    parameters: {}
+    # allowedUsers:
+    #   min: 1000
+    #   max: 65535
+    # allowedGroups:
+    #   min: 1000
+    #   max: 65535
+    # allowedFilesystemGroups:
+    # allowedSupplementalGroups:
+    #TODO: Add supplemental groups to policy
+    # See policy on require-non-root-groups
+
+  # -- Restrict the volume types allowd in containers
+  restrict-volume-types:
+    enabled: false
+    validationFailureAction: enforce
+    parameters: {}
+    # allowedTypes: ["configMap", "emptyDir", "projected", "secret", "downwardAPI", "persistentVolumeClaim"]
+
+  # -- NEW:
+  verify-image:
+    enabled: false
+    validationFailureAction: audit
+
+#TODO: Add Flex Volume policy
+#TODO: Add restricted taints policy
+#TODO: Add Namespaces have Istio policy
+#TODO: Add annotation check for pods for "sidecar.istio.io/inject: false"
+#TODO: Add No Big Containers policy
+#TODO: HTTPS only ingress for istio
+#TODO: Add policy to make sure ingress hosts are unique for Istio (or maybe not since its ok to overlap if you are using different ingress gateways)
+
+
+# -- Adds custom policies.  See https://kyverno.io/docs/writing-policies/.
+additionalPolicies:
+  # -- Name of the policy.  Addtional policies can be added by adding a key.
+  samplePolicy:
+    # -- Controls policy deployment
+    enabled: false
+    # -- Kind of policy.  Currently, "ClusterPolicy" and "Policy" are supported.
+    kind: ClusterPolicy
+    # -- If kind is "Policy", which namespace to target.  The namespace must already exist.
+    namespace: ""
+    # -- Policy annotations to add
+    annotations:
+      # -- Human readable name of policy
+      policies.kyverno.io/title: Sample Policy
+      # -- Category of policy.  Arbitrary.
+      policies.kyverno.io/category: Examples
+      # -- Severity of policy if a violation occurs.  Choose "critical", "high", "medium", "low".
+      policies.kyverno.io/severity: low
+      # -- Type of resource policy applies to (e.g. Pod, Service, Namespace)
+      policies.kyverno.io/subject: Pod
+      # -- Description of what the policy does, why it is important, and what items are allowed or unallowed.
+      policies.kyverno.io/description: >-
+        This sample policy blocks pods from deploying into the 'default' namespace.
+    # -- Policy specification.  See `kubectl explain clusterpolicies.spec`
+    spec:
+      # -- Policy rules.  At least one is required
+      rules:
+      - name: sample-rule
+        match:
+          any:
+          - resources:
+              kinds:
+              - Pods
+        validate:
+          message: "Using 'default' namespace is not allowed."
+          pattern:
+            metadata:
+              namespace: "!default"
+
+bbtests:
+  enabled: false
+  scripts:
+    image: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.5
+    envs:
+      ENABLED_POLICIES: '{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join " " $p }}'
+    additionalVolumeMounts:
+      - name: "kyverno-policies-bbtest-manifests"
+        mountPath: /yaml
+      - name: "kyverno-policies-bbtest-kube-cache"
+        mountPath: /.kube/cache
+    additionalVolumes:
+      - name: "kyverno-policies-bbtest-manifests"
+        configMap:
+          name: "kyverno-policies-bbtest-manifests"
+      - name: "kyverno-policies-bbtest-kube-cache"
+        emptyDir: {}
