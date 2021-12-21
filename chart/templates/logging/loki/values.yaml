@@ -12,7 +12,10 @@ istio:
 
 imagePullSecrets:
   - name: private-registry
-  
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}  
   
