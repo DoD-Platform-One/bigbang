@@ -18,6 +18,18 @@ global:
   imagePullSecrets:
   - name: private-registry
 
+injector:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+server:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+csi:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
