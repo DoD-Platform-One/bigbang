@@ -29,8 +29,8 @@ source:
     - registry:2
 
     - registry1.dso.mil/ironbank/twistlock/defender/defender:21.08.520
-    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.1.2
-    - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.1.1
+    - registry1.dso.mil/ironbank/anchore/enterprise/enterprise:3.2.1
+    - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.2.1
     - registry1.dso.mil/ironbank/big-bang/base:8.4
     - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
     - registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.2
