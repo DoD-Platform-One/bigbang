@@ -1,4 +1,4 @@
-{{- if and (not .Values.loki.enabled) (not .Values.promtail.enabled) (or .Values.logging.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (not .Values.loki.enabled) (not .Values.promtail.enabled) (or .Values.logging.enabled .Values.fluentbit.enabled .Values.clusterAuditor.enabled) }}
 {{- /* Default to istio being turned on, but disable if user sets istio to disable in the custom passthrough values.
 We have to do it this way because ownership of "istio.enabled" is owned by the chart but also BigBang.  Sourcing values from the passthrough values also means
   we get to simplify the api space of BigBang just a little bit more.

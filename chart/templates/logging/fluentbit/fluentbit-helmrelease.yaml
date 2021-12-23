@@ -37,11 +37,14 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
+  {{/* To support a "standalone" fluentbit for shipping to central location we conditionally depend on logging enabled */}}
+  {{- if or .Values.logging.enabled .Values.gatekeeper.enabled .Values.istio.enabled .Values.monitoring.enabled }}
   dependsOn:
+    {{- if .Values.logging.enabled }}
     - name: ek
       namespace: {{ .Release.Namespace }}
-    {{- if  .Values.gatekeeper.enabled }}
+    {{- end }}
+    {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
@@ -54,3 +57,4 @@ spec:
       namespace: {{ .Release.Namespace }}
     {{- end }}
   {{- end }}
+{{- end }}
