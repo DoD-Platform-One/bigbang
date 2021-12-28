@@ -19,6 +19,11 @@ istio:
     gateways:
     - istio-system/{{ default "public" .Values.kiali.ingress.gateway }}
 
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:
@@ -27,6 +32,10 @@ cr:
   spec:
     deployment:
       image_pull_policy: {{ .Values.imagePullPolicy }}
+      {{- if .Values.istio.enabled }}
+      pod_annotations:
+        {{ include "istioAnnotation" . }}
+      {{- end }}
     server:
       web_port: "443"
     auth:
