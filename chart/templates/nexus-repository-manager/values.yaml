@@ -33,6 +33,10 @@ networkPolicies:
 nexus:
   imagePullSecrets:
     - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   {{- if .Values.addons.nexus.license_key }}
   properties:
     override: true
