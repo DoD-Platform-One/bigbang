@@ -38,7 +38,7 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.monitoring.sso.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -46,10 +46,6 @@ spec:
   {{- end }}
   {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
-      namespace: {{ .Release.Namespace }}
-  {{- end }}
-  {{- if .Values.monitoring.sso.enabled }}
-    - name: authservice
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- end }}
