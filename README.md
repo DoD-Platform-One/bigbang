@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 1.23.0](https://img.shields.io/badge/Version-1.23.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.24.0](https://img.shields.io/badge/Version-1.24.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -125,14 +125,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kyverno.enabled | bool | `false` | Toggle deployment of Kyverno. |
 | kyverno.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno"` |  |
 | kyverno.git.path | string | `"./chart"` |  |
-| kyverno.git.tag | string | `"2.1.2-bb.0"` |  |
-| kyverno.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Kyverno Package |
+| kyverno.git.tag | string | `"2.1.3-bb.3"` |  |
+| kyverno.flux | object | `{}` | Flux reconciliation overrides specifically for the Kyverno Package |
 | kyverno.values | object | `{}` | Values to passthrough to the kyverno chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git |
 | kyverno.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | logging.enabled | bool | `true` | Toggle deployment of Logging (EFK). |
 | logging.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git"` |  |
 | logging.git.path | string | `"./chart"` |  |
-| logging.git.tag | string | `"0.3.0-bb.0"` |  |
+| logging.git.tag | string | `"0.4.0-bb.0"` |  |
 | logging.flux | object | `{"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | logging.ingress.gateway | string | `""` |  |
 | logging.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -188,7 +188,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | twistlock.enabled | bool | `true` | Toggle deployment of Twistlock. |
 | twistlock.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git"` |  |
 | twistlock.git.path | string | `"./chart"` |  |
-| twistlock.git.tag | string | `"0.0.12-bb.0"` |  |
+| twistlock.git.tag | string | `"0.1.0-bb.0"` |  |
 | twistlock.flux | object | `{}` | Flux reconciliation overrides specifically for the Twistlock Package |
 | twistlock.ingress.gateway | string | `""` |  |
 | twistlock.values | object | `{}` | Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git |
@@ -236,7 +236,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.hostnames.registry | string | `"registry"` |  |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"5.3.1-bb.9"` |  |
+| addons.gitlab.git.tag | string | `"5.3.1-bb.10"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress.gateway | string | `""` |  |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
@@ -285,7 +285,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.sonarqube.enabled | bool | `false` | Toggle deployment of SonarQube. |
 | addons.sonarqube.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git"` |  |
 | addons.sonarqube.git.path | string | `"./chart"` |  |
-| addons.sonarqube.git.tag | string | `"9.6.3-bb.11"` |  |
+| addons.sonarqube.git.tag | string | `"9.6.3-bb.12"` |  |
 | addons.sonarqube.flux | object | `{}` | Flux reconciliation overrides specifically for the Sonarqube Package |
 | addons.sonarqube.ingress.gateway | string | `""` |  |
 | addons.sonarqube.sso.enabled | bool | `false` | Toggle SAML SSO for SonarQube. Enabling this option will auto-create any required secrets. |
@@ -314,7 +314,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.anchore.enabled | bool | `false` | Toggle deployment of Anchore. |
 | addons.anchore.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git"` |  |
 | addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"1.14.7-bb.1"` |  |
+| addons.anchore.git.tag | string | `"1.15.0-bb.0"` |  |
 | addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchore.enterprise | object | `{"enabled":false,"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
@@ -398,7 +398,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.vault.enabled | bool | `false` | Toggle deployment of Vault. |
 | addons.vault.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git"` |  |
 | addons.vault.git.path | string | `"./chart"` |  |
-| addons.vault.git.tag | string | `"0.18.0-bb.0"` |  |
+| addons.vault.git.tag | string | `"0.18.0-bb.1"` |  |
 | addons.vault.flux | object | `{}` | Flux reconciliation overrides specifically for the Vault Package |
 | addons.vault.ingress.gateway | string | `""` |  |
 | addons.vault.values | object | `{}` | Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git |
