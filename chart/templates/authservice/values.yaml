@@ -17,12 +17,30 @@ podAnnotations:
 
 openshift: {{ .Values.openshift }}
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.haproxy.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+{{- if and (dig "redis" "enabled" false .Values.addons.authservice.values) .Values.monitoring.enabled }}
+redis-bb:
+  metrics:
+    enabled: true 
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: authservice
+      selector: 
+        app.kubernetes.io/name: redis-bb
+        app.kubernetes.io/instance: authservice-authservice
+{{- end }}
 
 global:
   oidc:
