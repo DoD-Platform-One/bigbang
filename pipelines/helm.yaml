@@ -27,13 +27,14 @@ helm library release:
     variables: 
       - $CI_COMMIT_TAG
   script:
-    # Get Chart version
+    # Get Chart version and name
     - export CHART_VERSION=$(yq e ".version" "chart/Chart.yaml")
+    - export CHART_NAME=$(yq e ".name" "chart/Chart.yaml")
     # Enable experimental helm features
     - export HELM_EXPERIMENTAL_OCI=1
     # Save off the chart
-    - helm chart save chart ${CI_REGISTRY_IMAGE}/gluon:${CHART_VERSION}
+    - helm package chart
     # Login to the repo registry
     - echo ${CI_REGISTRY_PASSWORD} | helm registry login ${CI_REGISTRY_IMAGE} -u ${CI_REGISTRY_USER} --password-stdin
     # Push to the repo registry
-    - helm chart push ${CI_REGISTRY_IMAGE}/gluon:${CHART_VERSION}
+    - helm push ${CHART_NAME}-${CHART_VERSION}.tgz oci://${CI_REGISTRY_IMAGE}
