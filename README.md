@@ -1,6 +1,6 @@
 # mattermost-operator
 
-![Version: 1.16.0-bb.0](https://img.shields.io/badge/Version-1.16.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 1.17.0-bb.0](https://img.shields.io/badge/Version-1.17.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.17.0](https://img.shields.io/badge/AppVersion-1.17.0-informational?style=flat-square)
 
 Deployment of mattermost operator using Helm
 
@@ -8,7 +8,7 @@ Deployment of mattermost operator using Helm
 * <https://github.com/mattermost/mattermost-operator>
 
 ## Learn More
-* [Application Overview](docs/overview.md) 
+* [Application Overview](docs/overview.md)
 * [Other Documentation](docs/)
 
 ## Pre-Requisites
@@ -37,7 +37,7 @@ helm install mattermost-operator chart/
 |-----|------|---------|-------------|
 | image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"` |  |
-| image.tag | string | `"v1.16.0"` |  |
+| image.tag | string | `"v1.17.0"` |  |
 | replicas.count | int | `1` |  |
 | imagePullSecrets[0].name | string | `"private-registry"` |  |
 | resources.requests.memory | string | `"512Mi"` |  |

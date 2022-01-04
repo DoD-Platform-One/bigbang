@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.17.0-bb.0] - 2022-01-03
+### Changed
+- Updated to latest IB image 1.17
+
 ## [1.16.0-bb.0] - 2021-11-01
 ### Changed
 - Updated to latest IB image 1.16
@@ -40,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Basic network policies to deny all ingress, allow egress only within cluster
 
 ## [1.13.0-bb.2] - 2021-04-05
+### Added
 - Modified pod affinity spec and values, documentation
 
 ## [1.13.0-bb.1] - 2021-03-30

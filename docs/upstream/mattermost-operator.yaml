@@ -3220,6 +3220,28 @@ spec:
                 additionalProperties:
                   type: string
                 type: object
+              resourcePatch:
+                description: "ResourcePatch specifies JSON patches that can be applied
+                  to resources created by Mattermost Operator. \n WARNING: ResourcePatch
+                  is highly experimental and subject to change. Some patches may be
+                  impossible to perform or may impact the stability of Mattermost
+                  server. \n Use at your own risk when no other options are available."
+                properties:
+                  deployment:
+                    properties:
+                      disable:
+                        type: boolean
+                      patch:
+                        type: string
+                    type: object
+                  service:
+                    properties:
+                      disable:
+                        type: boolean
+                      patch:
+                        type: string
+                    type: object
+                type: object
               scheduling:
                 description: Scheduling defines the configuration related to scheduling
                   of the Mattermost pods as well as resource constraints. These settings
@@ -5427,6 +5449,10 @@ spec:
               endpoint:
                 description: The endpoint to access the Mattermost instance
                 type: string
+              error:
+                description: The last observed error in the deployment of this Mattermost
+                  instance
+                type: string
               image:
                 description: The image running on the pods in the Mattermost instance
                 type: string
@@ -5440,6 +5466,26 @@ spec:
                   Mattermost deployment
                 format: int32
                 type: integer
+              resourcePatch:
+                description: Status of specified resource patches.
+                properties:
+                  deploymentPatch:
+                    description: PatchStatus represents status of particular patch.
+                    properties:
+                      applied:
+                        type: boolean
+                      error:
+                        type: string
+                    type: object
+                  servicePatch:
+                    description: PatchStatus represents status of particular patch.
+                    properties:
+                      applied:
+                        type: boolean
+                      error:
+                        type: string
+                    type: object
+                type: object
               state:
                 description: Represents the running state of the Mattermost instance
                 type: string
@@ -5650,7 +5696,7 @@ spec:
           value: "20"
         - name: REQUEUE_ON_LIMIT_DELAY
           value: 20s
-        image: mattermost/mattermost-operator:v1.16.0
+        image: mattermost/mattermost-operator:v1.17.0
         imagePullPolicy: IfNotPresent
         name: mattermost-operator
         ports:

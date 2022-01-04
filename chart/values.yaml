@@ -1,11 +1,11 @@
 # Repo and image tag 
-image: 
+image:
   imagePullPolicy: IfNotPresent
   repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
-  tag: v1.16.0
+  tag: v1.17.0
 
 #Mattermost operator desired replicas
-replicas: 
+replicas:
   count: 1
 
 imagePullSecrets:
