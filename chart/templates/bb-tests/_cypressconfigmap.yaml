@@ -1,0 +1,28 @@
+{{- define "gluon.tests.cypress-configmap.base" }}
+{{- if .Values.bbtests }}
+{{- if .Values.bbtests.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-cypress-config"
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+  namespace: {{ .Release.Namespace }}
+data:
+  {{ (.Files.Glob "tests/cypress/*").AsConfig | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "gluon.tests.cypress-configmap.overrides" }}
+{{- $values := (first .) }}
+{{- if $values.Values.bbtests }}
+{{- if $values.Values.bbtests.enabled }}
+{{- include "gluon.util.merge" (append . "gluon.tests.cypress-configmap.base") }}
+{{- end }}
+{{- end }}
+{{- end }}

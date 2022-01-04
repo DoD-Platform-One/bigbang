@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: master
-    file: '/pipelines/bigbang-package.yaml' 
+    ref: helm-update
+    file: '/pipelines/helm.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: master
+  PIPELINE_REPO_BRANCH: helm-update
   DEBUG_ENABLED: "true"

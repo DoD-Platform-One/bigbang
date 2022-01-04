@@ -1,0 +1,181 @@
+{{- define "gluon.tests.cypress-runner.tpl" }}
+kind: Pod
+apiVersion: v1
+metadata:
+  name: "{{ .Chart.Name }}-cypress-test"
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+spec:
+  {{- if .Values.bbtests }}
+  {{- if .Values.bbtests.cypress }}
+  {{- if or .Values.bbtests.cypress.artifacts .Values.bbtests.cypress.exports }}
+  serviceAccountName: {{ .Chart.Name }}-cypress-sa
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if hasKey .Values "istio" }}
+  {{- if and .Values.bbtests .Values.istio.enabled }}
+  {{- $ingressGateway := (lookup "v1" "Service" "istio-system" "istio-ingressgateway") -}}
+  {{- $igStatus := $ingressGateway.status | default dict }}
+  {{- $igLoadBalancer := $igStatus.loadBalancer | default dict }}
+  {{- $igIngress := $igLoadBalancer.ingress | default list }}
+  {{- $igFirst := first $igIngress | default dict }}
+  {{- if and (hasKey $igFirst "ip") .Values.bbtests.istio }}
+  hostAliases:
+  - ip: "{{ $igFirst.ip }}"
+    hostnames:
+    {{- range .Values.bbtests.istio.hosts }}
+      - {{ tpl . $ }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  containers:
+    - name: {{ .Chart.Name }}-cypress-test
+      {{- if .Values.bbtests }}
+      {{- if .Values.bbtests.cypress }}
+      image: {{ .Values.bbtests.cypress.image | default "registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/cypress/kubectl:8.3.1" }}
+      {{- end }}
+      {{- end }}
+      imagePullPolicy: IfNotPresent
+      workingDir: /test
+      command:
+      - "/bin/bash"
+      - "-c"
+      - |
+        set -e
+        if [[ -d /src && -n "$(ls /src/* 2>/dev/null)" ]]; then
+          cp /src/cypress.json /test/
+          mkdir -p /test/cypress/integration/
+          cp /src/*.js /test/cypress/integration/
+          mkdir -p exports
+          (cypress run --browser chrome --headless --spec "/test/cypress/integration/*[!plugins].js" && export EXIT_CODE=$?) || export EXIT_CODE=$?
+          {{- if .Values.bbtests }}
+          {{- if .Values.bbtests.cypress }}
+          {{- if .Values.bbtests.cypress.exports }}
+          if kubectl get configmap -n {{ .Release.Namespace }} cypress-exports &>/dev/null; then
+            kubectl delete configmap -n {{ .Release.Namespace }} cypress-exports
+          fi
+          kubectl create configmap -n {{ .Release.Namespace }} cypress-exports --from-file exports/
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.bbtests }}
+          {{- if .Values.bbtests.cypress }}
+          {{- if .Values.bbtests.cypress.artifacts }}
+          if [ -d /test/cypress/screenshots ]; then
+            tar -I 'gzip -9' -cf cypress-screenshots.tar.gz /test/cypress/screenshots
+            cat cypress-screenshots.tar.gz | base64 > cypress-screenshots.tar.gz.b64
+            if kubectl get configmap -n {{ .Release.Namespace }} cypress-screenshots &>/dev/null; then
+              kubectl delete configmap -n {{ .Release.Namespace }} cypress-screenshots
+            fi
+            kubectl create configmap -n {{ .Release.Namespace }} cypress-screenshots --from-file cypress-screenshots.tar.gz.b64
+          fi
+          if [ -d /test/cypress/videos ]; then
+            tar -I 'gzip -9' -cf cypress-videos.tar.gz /test/cypress/videos
+            cat cypress-videos.tar.gz | base64 > cypress-videos.tar.gz.b64
+            if kubectl get configmap -n {{ .Release.Namespace }} cypress-videos &>/dev/null; then
+              kubectl delete configmap -n {{ .Release.Namespace }} cypress-videos
+            fi
+            kubectl create configmap -n {{ .Release.Namespace }} cypress-videos --from-file cypress-videos.tar.gz.b64
+          fi
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          exit ${EXIT_CODE}
+        fi
+      volumeMounts:
+        - name: cypress-tests
+          mountPath: /src
+        - name: workdir
+          mountPath: /test
+        {{- if .Values.bbtests }}
+        {{- if .Values.bbtests.cypress }}
+        {{- with .Values.bbtests.cypress.additionalVolumeMounts }}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      {{- if .Values.bbtests }}
+      {{- if .Values.bbtests.cypress }}
+      {{- if or .Values.bbtests.cypress.envs .Values.bbtests.cypress.secretEnvs }}
+      env:
+      {{- range $k, $v := .Values.bbtests.cypress.envs }}
+        - name: {{ tpl $k $ }}
+          value: {{ tpl $v $ | quote }}
+      {{- end }}
+      {{- range .Values.bbtests.cypress.secretEnvs }}
+        - {{ tpl (toYaml .) $ | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      resources:
+      {{- if .Values.bbtests.cypress.resources }}
+        requests:
+          cpu: {{ .Values.bbtests.cypress.resources.requests.cpu | quote }}
+          memory: {{ .Values.bbtests.cypress.resources.requests.memory | quote }}
+        limits:
+          cpu: {{ .Values.bbtests.cypress.resources.requests.cpu | quote }}
+          memory: {{ .Values.bbtests.cypress.resources.requests.memory | quote }}
+      {{- else }}
+        requests:
+          cpu: "1"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+      {{- end }}
+  restartPolicy: Never
+  volumes:
+    - name: cypress-tests
+      configMap:
+        name: "{{ .Chart.Name }}-cypress-config"
+    - name: workdir
+      emptyDir: {}
+      {{- if .Values.bbtests }}
+      {{- if .Values.bbtests.cypress }}
+      {{- with .Values.bbtests.cypress.additionalVolumes }}
+        {{- tpl (toYaml .) $ | nindent 4 }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+  imagePullSecrets:
+    - name: private-registry
+{{- end }}
+
+{{- define "gluon.tests.cypress-runner.base" }}
+{{- if .Values.bbtests }}
+{{- if .Values.bbtests.enabled }}
+
+{{- if .Values.bbtests.cypress }}
+{{- if or .Values.bbtests.cypress.artifacts .Values.bbtests.cypress.exports }}
+{{- include "gluon.tests.cypress-rbac" . }}
+---
+{{- end }}
+{{- end }}
+
+{{- include "gluon.tests.cypress-runner.tpl" . }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "gluon.tests.cypress-runner.overrides" }}
+{{- $values := (first .) }}
+{{- if $values.Values.bbtests }}
+{{- if $values.Values.bbtests.enabled }}
+{{- if $values.Values.bbtests.cypress }}
+{{- if or $values.Values.bbtests.cypress.artifacts $values.Values.bbtests.cypress.exports }}
+{{- include "gluon.tests.cypress-rbac" $values }}
+---
+{{- end }}
+{{- end }}
+{{- include "gluon.util.merge" (append . "gluon.tests.cypress-runner.tpl") }}
+{{- end }}
+{{- end }}
+{{- end }}

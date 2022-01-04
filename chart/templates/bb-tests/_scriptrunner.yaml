@@ -1,0 +1,154 @@
+{{- define "gluon.tests.script-runner.base" -}}
+{{- if .Values.bbtests }}
+{{- if and .Values.bbtests.scripts .Values.bbtests.enabled }}
+{{- if .Values.bbtests.scripts.image }}
+kind: Pod
+apiVersion: v1
+metadata:
+  name: "{{ .Chart.Name }}-script-test"
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "10"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+spec:
+  {{- if hasKey .Values "istio" }}
+  {{- if and .Values.bbtests .Values.istio.enabled }}
+  {{- $ingressGateway := (lookup "v1" "Service" "istio-system" "istio-ingressgateway") -}}
+  {{- $igStatus := $ingressGateway.status | default dict }}
+  {{- $igLoadBalancer := $igStatus.loadBalancer | default dict }}
+  {{- $igIngress := $igLoadBalancer.ingress | default list }}
+  {{- $igFirst := first $igIngress | default dict }}
+  {{- if and (hasKey $igFirst "ip") .Values.bbtests.istio }}
+  hostAliases:
+  - ip: "{{ $igFirst.ip }}"
+    hostnames:
+    {{- range .Values.bbtests.istio.hosts }}
+      - {{ tpl . $ }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  containers:
+    - name: {{ .Chart.Name }}-script-test
+      image: {{ tpl .Values.bbtests.scripts.image $ }}
+      imagePullPolicy: IfNotPresent
+      workingDir: /test
+      command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          set -e
+          if [[ -d /src && -n "$(ls /src/* 2>/dev/null)" ]]; then
+            cp /src/* /test/
+          fi
+          {{- if .Values.bbtests }}
+          {{- if .Values.bbtests.cypress }}
+          {{- if .Values.bbtests.cypress.exports }}
+          if [[ -d /exports && -n "$(ls /exports/* 2>/dev/null)" ]]; then
+            mkdir exports
+            cp /exports/* exports/
+          fi
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          if [[ -n "$(ls . 2>/dev/null)" ]]; then
+            for script in *; do
+              if [[ -d ${script} ]]; then
+                continue;
+              fi
+              chmod +x ${script}
+              echo "---"
+              echo "Running ${script}..."
+              echo "---"
+              ./${script}
+            done
+          fi
+      volumeMounts:
+        - name: script-tests
+          mountPath: /src
+        {{- if .Values.bbtests }}
+        {{- if .Values.bbtests.cypress }}
+        {{- if .Values.bbtests.cypress.exports }}
+        - name: cypress-exports
+          mountPath: /exports
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        - name: workdir
+          mountPath: /test
+        {{- if .Values.bbtests }}
+        {{- if .Values.bbtests.scripts }}
+        {{- with .Values.bbtests.scripts.additionalVolumeMounts }}
+          {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      {{- if or .Values.bbtests.scripts.envs .Values.bbtests.scripts.secretEnvs }}
+      env:
+      {{- range $k, $v := .Values.bbtests.scripts.envs }}
+        - name: {{ tpl $k $ }}
+          value: {{ tpl $v $ | quote }}
+      {{- end }}
+      {{- range .Values.bbtests.scripts.secretEnvs }}
+        - {{ tpl (toYaml .) $ | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      resources:
+      {{- if .Values.bbtests.scripts.resources }}
+        requests:
+          cpu: {{ .Values.bbtests.scripts.resources.requests.cpu | quote }}
+          memory: {{ .Values.bbtests.scripts.resources.requests.memory | quote }}
+        limits:
+          cpu: {{ .Values.bbtests.scripts.resources.requests.cpu | quote }}
+          memory: {{ .Values.bbtests.scripts.resources.requests.memory | quote }}
+      {{- else }}
+        requests:
+          cpu: "1"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+      {{- end }}
+  restartPolicy: Never
+  volumes:
+    - name: script-tests
+      configMap:
+        name: "{{ .Chart.Name }}-script-config"
+    {{- if .Values.bbtests }}
+    {{- if .Values.bbtests.cypress }}
+    {{- if .Values.bbtests.cypress.exports }}
+    - name: cypress-exports
+      configMap:
+        name: "cypress-exports"
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    - name: workdir
+      emptyDir: {}
+    {{- if .Values.bbtests }}
+    {{- if .Values.bbtests.scripts }}
+    {{- with .Values.bbtests.scripts.additionalVolumes }}
+      {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  imagePullSecrets:
+    - name: private-registry
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "gluon.tests.script-runner.overrides" -}}
+{{- $values := (first .) }}
+{{- if $values.Values.bbtests }}
+{{- if and $values.Values.bbtests.scripts $values.Values.bbtests.enabled }}
+{{- if $values.Values.bbtests.scripts.image }}
+{{- include "gluon.util.merge" (append . "gluon.tests.script-runner.base") -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
