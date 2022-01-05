@@ -90,6 +90,19 @@ anchore-ui-redis:
   image:
     pullSecrets:
       - private-registry
+  {{- if and .Values.monitoring.enabled (not (and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password)) }}
+  metrics:
+    enabled: true
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: anchore
+      selector:
+        app.kubernetes.io/name: anchore-ui-redis
+        app.kubernetes.io/instance: anchore
+  {{- end }}
 {{- end }}
 
 {{- end }}

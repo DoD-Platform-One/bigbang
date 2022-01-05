@@ -691,17 +691,15 @@ addons:
           limits: {}
       anchoreEnterpriseRbac:
         authResources:
-          resources:
-            requests:
-              cpu: 100m
-              memory: 200Mi
-            limits: {}
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
         managerResources:
-          resources:
-            requests:
-              cpu: 100m
-              memory: 200Mi
-            limits: {}
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
       anchoreEnterpriseReports:
         resources:
           requests:

@@ -34,6 +34,19 @@ redis-bb:
   enabled: true
   auth:
     enabled: false
+  {{- if .Values.monitoring.enabled }}
+  metrics:
+    enabled: true
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: argocd
+      selector:
+        app.kubernetes.io/name: redis-bb
+        app.kubernetes.io/instance: argocd-argocd
+  {{- end }}
 
 server:
   image: 
