@@ -31,6 +31,14 @@ networkPolicies:
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
+{{- if and .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
+redis:
+  metrics:
+    serviceMonitor:
+      enabled: true
+      namespace: gitlab
+{{- end }}
+
 {{- if .Values.addons.gitlab.database.host }}
 postgresql:
   install: false
