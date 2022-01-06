@@ -54,7 +54,7 @@ while [ -n "$1" ]; do # while loop starts
       BIG_INSTANCE=true
   ;;
 
-  -p) echo "-p option passed to cretate k3d cluster with private ip" 
+  -p) echo "-p option passed to create k3d cluster with private ip" 
       PRIVATE_IP=true
   ;;
 
@@ -70,7 +70,14 @@ while [ -n "$1" ]; do # while loop starts
       # If instance exists then terminate it 
       if [[ ! -z "${AWSINSTANCEIDs}" ]]; then 
         echo "aws instances being terminated: ${AWSINSTANCEIDs}"
-        # TODO: should we add a user confirmation prompt here for safety?
+        
+        read -p "Are you sure you want to delete these instances (y/n)? " -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]
+        then
+          echo
+          exit 1
+        fi
+
         aws ec2 terminate-instances --instance-ids ${AWSINSTANCEIDs} &>/dev/null
         echo -n "waiting for instance termination..."
         aws ec2 wait instance-terminated --instance-ids ${AWSINSTANCEIDs} &> /dev/null
@@ -295,7 +302,10 @@ ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${PublicIP}"
 
 echo "ssh init"
 # this is a do-nothing remote ssh command just to initialize ssh and make sure that the connection is working
-ssh -i ~/.ssh/${KeyName}.pem -o ConnectionAttempts=10 -o StrictHostKeyChecking=no ubuntu@${publicIP} "hostname"
+until ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "hostname"; do
+  sleep 5
+  echo "Retry ssh command.."
+done
 echo
 
 ##### Configure Instance
@@ -349,7 +359,7 @@ echo
 echo
 # install k3d on instance
 echo "Installing k3d on instance"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v4.4.7 bash"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.2.2 bash"
 echo
 echo "k3d version"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d version"
@@ -364,7 +374,7 @@ then
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16"
 
 	# create k3d cluster
-	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create  --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id  --k3s-server-arg "--disable=traefik"  --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=${PrivateIP}" --k3s-server-arg "--disable=servicelb" --network k3d-network --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
+	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PrivateIP}@server:0" --k3s-arg "--disable=servicelb@server:0" --network k3d-network --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
 
@@ -404,7 +414,7 @@ then
 
 elif [[ "$PRIVATE_IP" == true ]]
 then
-	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create  --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id  --k3s-server-arg "--disable=traefik"  --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=${PrivateIP}" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
+	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PrivateIP}@server:0" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
 	echo
@@ -414,7 +424,7 @@ then
 	$sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 
 else # default is public ip
-	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create  --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id  --k3s-server-arg "--disable=traefik"  --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=${PublicIP}" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
+	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PublicIP}@server:0" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
 	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
 
