@@ -1,0 +1,37 @@
+{{- $name := "restrict-proc-mount" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict Proc Mount
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      The default /proc masks are set up to reduce the attack surface and should be required. This policy
+      ensures nothing but the specified procMount can be used.  By default only "Default" is allowed.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: check-proc-mount
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Changing the proc mount from the default is not allowed. The fields
+        spec.containers[*].securityContext.procMount and
+        spec.initContainers[*].securityContext.procMount must not be changed
+        from `Default`.
+      pattern:
+        spec:
+          =(initContainers):
+            - =(securityContext):
+                =(procMount): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          containers:
+            - =(securityContext):
+                =(procMount): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+{{- end -}}

@@ -12,9 +12,7 @@ spec:
   containers:
   - name: c1
     image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args:
-    - "sleep"
-    - "infinity"
+    args: ["sleep", "infinity"]
 ---
 # Test 2: Init containers with the image registry are mutated
 apiVersion: v1
@@ -30,9 +28,7 @@ spec:
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args:
-    - "sleep"
-    - "infinity"
+    args: ["sleep", "infinity"]
   initContainers:
   - name: i1
     image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal:8.5

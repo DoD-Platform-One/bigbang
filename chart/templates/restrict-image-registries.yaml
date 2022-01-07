@@ -1,0 +1,34 @@
+{{- $name := "restrict-image-registries" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict Image Registries
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/minversion: 1.3.0
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Images from unknown, public registries can be of dubious quality and may not be
+      scanned and secured, representing a high degree of risk. Requiring use of known, approved
+      registries helps reduce threat exposure by ensuring image pulls only come from them. This
+      policy validates that all images originate from a registry in the approved list.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: validate-registries
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: "Image registry is not in the approved list"
+      pattern:
+        spec:
+          containers:
+          - image: "{{ join "* | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}*"
+          =(initContainers):
+          - image: "{{ join "* | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}*"
+{{- end -}}

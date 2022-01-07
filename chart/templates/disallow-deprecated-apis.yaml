@@ -7,6 +7,7 @@ metadata:
   annotations:
     policies.kyverno.io/title: Disallow Deprecated APIs
     policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Kubernetes APIs
     policies.kyverno.io/description: >-
       Kubernetes APIs are sometimes deprecated and removed after a few releases.
@@ -18,7 +19,6 @@ metadata:
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
-  background: true
   rules:
   - name: validate-v1-22-removals
     {{- include "kyverno-policies.context" (merge (dict "name" $name) .) | indent 4 }}

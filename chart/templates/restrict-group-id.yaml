@@ -1,0 +1,66 @@
+{{- $name := "restrict-group-id" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict Group IDs
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Processes inside a pod can be given group permissions by setting `runAsGroup` or `supplementalGroups`.
+      Volume mounts can be mounted as a specific group using `fsGroup`.  Group IDs below 1000 are generally
+      reserved for system accounts, services, and special accounts.  This policy will restrict IDs to the
+      allowed list of values.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: validate-runasgroup
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting runAsGroup to an ID outside of the allowed ranges is not allowed.
+        spec.securityContext.runAsGroup, spec.containers[*].securityContext.runAsGroup, and
+        spec.initContainers[*].securityContext.runAsGroup must either be undefined or set to an
+        allowed value.
+      pattern:
+        spec:
+          =(securityContext):
+            =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(initContainers):
+            - =(securityContext):
+                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          containers:
+            - =(securityContext):
+                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+  - name: validate-fsgroup
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting fsGroup to an ID outside of the allowed ranges is not allowed.
+        spec.securityContext.fsGroup must either be undefined or set to an
+        allowed value.
+      pattern:
+        spec:
+          =(securityContext):
+            =(fsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+  - name: validate-supplementalgroup
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting supplementalGroups to an ID outside of the allowed ranges is not allowed.
+        spec.securityContext.supplementalGroups[*] must either be undefined or set to an
+        allowed value.
+      pattern:
+        spec:
+          =(securityContext):
+            =(supplementalGroups):
+            - "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+{{- end -}}

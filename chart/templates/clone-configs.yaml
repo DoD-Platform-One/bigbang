@@ -5,8 +5,9 @@ kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Clone Configs
-    policies.kyverno.io/category: Custom
+    policies.kyverno.io/title: Clone ConfigMaps and Secrets
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: ConfigMap,Secret
     policies.kyverno.io/description: >-
       Configuration held in ConfigMaps or Secrets, like registry credentials,

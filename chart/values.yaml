@@ -53,17 +53,25 @@ policies:
         #   namespace: default
 
   # -- Mitigates log4j2 vulnerability (CVE-2021-44228) for library versions >= 2.10
-  cve-2021-44228:
+  cve-add-lo4j2-mitigation:
     enabled: false  # See https://github.com/kyverno/kyverno/issues/2865
 
-  # -- NEW:
+  # -- Mitigates Services with External IPs vulnerability (CVE-2020-8554)
+  cve-restrict-external-ips:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of external IPs allowed in services
+      allowedValues: []
+
+  # -- *NEW:
   disallow-cri-sock-mount:
     enabled: false
     validationFailureAction: audit
 
-  # -- NEW:
-  disallow-default-namespaces:
-    enabled: false
+  # -- Prevents deployment of pods into the default namespace
+  disallow-default-namespace:
+    enabled: true
     validationFailureAction: audit
 
   # -- Checks for resource APIs in use that will be removed in Kubernetes 1.22 or 1.25
@@ -71,78 +79,57 @@ policies:
     enabled: true
     validationFailureAction: audit
 
-  # -- NEW:
+  # -- *NEW:
   disallow-helm-tiller:
     enabled: false
     validationFailureAction: audit
 
   # -- Disallow use of the host namespace (PID, IPC, Network) by pods
   disallow-host-namespaces:
-    enabled: false
+    enabled: true
     validationFailureAction: enforce
 
-  # -- Disallow volumes that mount host paths
+  # -- *Disallow volumes that mount host paths
   disallow-host-path:
     enabled: false
     validationFailureAction: enforce
 
-  # -- Disallow containers using host ports
-  disallow-host-ports:
-    enabled: false
-    validationFailureAction: enforce
-    parameters: {}
-    # allowedPorts: []
-
-  # -- Disallow container images using the "latest" tag
-  disallow-latest-tags:
-    enabled: false
-    validationFailureAction: enforce
-    parameters: {}
-    # disallowedTags: ["latest"]
-
-  # -- NEW:
+  # -- *NEW:
   disallow-localhost-services:
     enabled: false
     validationFailureAction: audit
 
-  # -- Disallow containers that run as privileged
-  disallow-privileged-containers:
-    enabled: false
-    validationFailureAction: enforce
-
   # -- Disallows pods that allow privilege escalation
   disallow-privilege-escalation:
-    enabled: false
+    enabled: true
     validationFailureAction: audit
 
-  # -- Disallow containers that use 'unmasked' for procMount
-  disallow-proc-mount:
-    enabled: false
+  # -- Disallow containers that run as privileged
+  disallow-privileged-containers:
+    enabled: true
     validationFailureAction: enforce
 
-  # -- NEW:
+  # -- *NEW:
   disallow-secrets-form-env-vars:
     enabled: false
     validationFailureAction: audit
 
   # -- Disallow the use of any SELinux options
   disallow-selinux:
-    enabled: false
+    enabled: true
     validationFailureAction: enforce
-    parameters: {}
-    # allowedOptions: []
 
-  # -- NEW:
+  # -- *NEW:
   ensure-readonly-hostpath:
     enabled: false
     validationFailureAction: audit
 
-  # -- NEW:
+  # -- *NEW:
   limit-hostpath-vols:
     enabled: false
     validationFailureAction: audit
 
-  # -- Enforce guaranteed quality of service by requiring pods to set CPU and memory requests equal to limits
+  # -- *Enforce guaranteed quality of service by requiring pods to set CPU and memory requests equal to limits
   memory-requests-equal-limits:
     enabled: false
     validationFailureAction: audit
@@ -157,24 +144,24 @@ policies:
       # - old: "registry.to.replace"
       #   new: "new.registry.to.use"
 
-  # -- Requires all containers to drop all Linux capabilities
+  # -- *Requires all containers to drop all Linux capabilities
   require-drop-all:
     enabled: false
     validationFailureAction: audit
 
-  # -- Require specified labels to be on all pods
+  # -- *Require specified labels to be on all pods
   require-labels:
     enabled: false
     validationFailureAction: audit
     parameters: {}
     # requiredLabels: ["app.kubernetes.io/name", "app.kubernetes.io/version"] (check required labels with Helm/K8S)
 
-  # -- Require all pods have CPU and memory requests and limits specified
+  # -- *Require all pods have CPU and memory requests and limits specified
   require-pod-requests-limits:
     enabled: false
     validationFailureAction: audit
 
-  # -- Require specified probes and probe types on pods
+  # -- *Require specified probes and probe types on pods
   require-probes:
     enabled: false
     validationFailureAction: audit
@@ -183,107 +170,145 @@ policies:
     # requiredProbeTypes: ["tcpSocket","httpGet","exec"]
     # TODO: Maybe drop probe types?
 
-  # -- Require containers set root filesystem to readonly
+  # -- Require containers set root filesystem to read-only
   require-ro-rootfs:
-    enabled: false
+    enabled: true
     validationFailureAction: audit
 
-  # -- Disallow containers that attempt to run as root
-  require-run-as-nonroot:
-    enabled: false
+  # -- Require containers to run with non root group
+  require-non-root-group:
+    enabled: true
     validationFailureAction: audit
-    #TODO: Update policy to allow either runAsNonRoot=true OR runAsUser != 0
 
-  # -- Retricts pods that use AppArmor to specified profiles
+  # -- Require containers to run as non root user
+  require-non-root-user:
+    enabled: true
+    validationFailureAction: audit
+
+  # -- Restricts pods that use AppArmor to specified profiles
   # Iron Bank containers are either distroless or RHEL UBI.  Neither of these uses AppArmor
-  restrict-apparmor-profiles:
-    enabled: false
+  restrict-apparmor:
+    enabled: true
     validationFailureAction: audit
-    parameters: {}
-    # allowedProfiles: ["runtime/default"]
+    parameters:
+      # -- List of allowed AppArmor profiles
+      allowedValues: ["runtime/default"]
 
-  # -- Disallow pods from automatically mounting the default service account
+  # -- *Disallow pods from automatically mounting the default service account
   restrict-automount-sa-token:
     enabled: false
     validationFailureAction: audit
     #TODO: Should this be a mutate?
     #TODO: Replace with disallowing addition of privileges to default service account so it remains least privileged
 
-  # -- Disallow containers adding capabilities that are not specified
+  # -- *Disallow containers adding capabilities that are not specified
   restrict-capabilities:
     enabled: true
     validationFailureAction: audit
     parameters:
       # -- List of capabilities that are allowed to be added
-      allowedCapabilities: []
+      allowedValues: []
 
-  # -- NEW
+  # -- *NEW
   restrict-controlplane-scheduling:
     enabled: false
     validationFailureAction: audit
 
-  # -- Restricts container images to specified registries
-  restrict-image-registries:
-    enabled: false
-    validationFailureAction: enforce
-    parameters: {}
-    # allowedRegistries: ["registry1.dso.mil"]
+  # -- Restrict container group IDs to allowed ranges
+  # NOTE: Using require-non-root-group will force runAsGroup to be defined
+  restrict-group-id:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
+      # For a lower and upper limit, use ">=min & <=max"
+      allowedValues: [">=1000"]
 
-  # -- Disallow services that use NodePorts
+  # -- Restrict containers using host ports to the allowed list
+  restrict-host-ports:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of allowed host ports
+      allowedValues: []
+
+  # -- Restricts container images to registries in approved list
+  restrict-image-registries:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of allowed registries that images may use
+      allowedValues: ["registry1.dso.mil"]
+
+  # -- Restricts container image tags based on blacklist
+  restrict-image-tags:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      disallowedValues: ["latest"]
+
+  # -- *Disallow services that use NodePorts
   restrict-node-port:
     enabled: false
     validationFailureAction: audit
 
-  # -- Restrict the seccomp profiles that containers can use
+  # -- Restrict container's use of procMount to the allowed list
+  restrict-proc-mount:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      allowedValues: ["Default"]
+
+  # -- Restrict the seccomp profiles that containers can use to the allowed list
   restrict-seccomp:
-    enabled: false
+    enabled: true
     validationFailureAction: audit
-    parameters: {}
-    # allowedProfiles: ["runtime/default"]
+    parameters:
+      # -- List of allowed seccomp profiles
+      allowedValues: ["RuntimeDefault"]
 
-  # -- Restrict services to use specified external IPs
-  restrict-service-external-ips:
-    enabled: false
-    validationFailureAction: enforce
-    parameters: {}
-    # allowedIPs: []
-
-  # -- Restrict allowed sysctls to only those specified
+  # -- Restrict allowed sysctls to only items in the allowed list
   restrict-sysctls:
-    enabled: false
+    enabled: true
     validationFailureAction: enforce
-    parameters: {}
-    # allowedSysctls: []
+    parameters:
+      # -- List of allowed sysctls.  Defaults pulled from https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/#enabling-unsafe-sysctls
+      allowedValues:
+      - kernel.shm_rmid_forced
+      - net.ipv4.ip_local_port_range
+      - net.ipv4.tcp_syncookies
+      - net.ipv4.ping_group_range
+      - net.ipv4.ip_unprivileged_port_start
 
-  # -- Limit allowed IDs for users and groups in containers
-  restrict-usergroup-fsgroup-id:
-    enabled: false
+  # -- Restrict container user IDs to allowed ranges
+  # NOTE: Using require-non-root-user will force runAsUser to be defined
+  restrict-user-id:
+    enabled: true
     validationFailureAction: audit
-    parameters: {}
-    # allowedUsers:
-    #   min: 1000
-    #   max: 65535
-    # allowedGroups:
-    #   min: 1000
-    #   max: 65535
-    # allowedFilesystemGroups:
-    # allowedSupplementalGroups:
-    #TODO: Add supplemental groups to policy
-    # See policy on require-non-root-groups
+    parameters:
+      # -- Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
+      # For a lower and upper limit, use ">=min & <=max"
+      allowedValues: [">=1000"]
 
-  # -- Restrict the volume types allowd in containers
+  # -- Restrict the volume types allowed in containers
   restrict-volume-types:
-    enabled: false
+    enabled: true
     validationFailureAction: enforce
-    parameters: {}
-    # allowedTypes: ["configMap", "emptyDir", "projected", "secret", "downwardAPI", "persistentVolumeClaim"]
+    parameters:
+      # -- List of allowed Volume types
+      allowedValues:
+      - "configMap"
+      - "downwardAPI"
+      - "emptyDir"
+      - "persistentVolumeClaim"
+      - "projected"
+      - "secret"
 
-  # -- NEW:
+  # -- *NEW:
   verify-image:
     enabled: false
     validationFailureAction: audit
 
-#TODO: Add Flex Volume policy
 #TODO: Add restricted taints policy
 #TODO: Add Namespaces have Istio policy
 #TODO: Add annotation check for pods for "sidecar.istio.io/inject: false"
@@ -337,6 +362,7 @@ bbtests:
     image: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.5
     envs:
       ENABLED_POLICIES: '{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join " " $p }}'
+      IMAGE_PULL_SECRET: '{{ .Values.bbtests.imagePullSecret }}'
     additionalVolumeMounts:
       - name: "kyverno-policies-bbtest-manifests"
         mountPath: /yaml
@@ -348,3 +374,4 @@ bbtests:
           name: "kyverno-policies-bbtest-manifests"
       - name: "kyverno-policies-bbtest-kube-cache"
         emptyDir: {}
+  imagePullSecret: private-registry

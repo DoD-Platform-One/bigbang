@@ -1,8 +1,25 @@
-# Test 1: Containers adding non-approved capabilites should not be allowed
+# Ranges: 1000, 2000-2999, 4000+
+# Test 1: Pods using a non-approved user id should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-1
+  name: restrict-user-id-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 999
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 2: Containers using a non-approved user id should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -12,14 +29,13 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      runAsUser: 1001
 ---
-# Test 2: Init containers adding non-approved capabilities should not be allowed
+# Test 3: Init containers using a non-approved user id should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-2
+  name: restrict-user-id-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -32,14 +48,29 @@ spec:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      runAsUser: 3000
 ---
-# Test 3: Containers or init containers that add whitelisted capabilities or no capabilities should be allowed
+# Test 4: Pods matching a valid user id are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-3
+  name: restrict-user-id-4
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 5: Containers and init containers matching a valid user id are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-5
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -48,37 +79,15 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 2000
   - name: c2
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      privileged: false
-  - name: c3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: c4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      runAsUser: 2999
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-  - name: i2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      privileged: false
-  - name: i3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: i4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      runAsUser: 4000

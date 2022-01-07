@@ -1,8 +1,22 @@
-# Test 1: Containers adding non-approved capabilites should not be allowed
+# Test 1: Pod + Containers without a security context are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-1
+  name: require-ro-rootfs-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pod + Init containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -12,14 +26,16 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      readOnlyRootFilesystem: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
 ---
-# Test 2: Init containers adding non-approved capabilities should not be allowed
+# Test 3: Containers that set readOnlyRootFilesystem to false are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-2
+  name: require-ro-rootfs-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -28,18 +44,35 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: false
+---
+# Test 4: Init Containers that set readOnlyRootFilesystem to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-4
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: true
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      readOnlyRootFilesystem: false
 ---
-# Test 3: Containers or init containers that add whitelisted capabilities or no capabilities should be allowed
+# Test 5: Containers / init containers with read-only root filesystems are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-3
+  name: require-ro-rootfs-5
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -48,37 +81,10 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-  - name: c2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
     securityContext:
-      privileged: false
-  - name: c3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: c4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      readOnlyRootFilesystem: true
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-  - name: i2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      privileged: false
-  - name: i3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: i4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      readOnlyRootFilesystem: true

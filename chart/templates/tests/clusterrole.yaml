@@ -25,20 +25,21 @@ rules:
   - get
   - list
 - apiGroups:
-  - ""
+  - "*"
   resources:
   - configmaps
-  - secrets
-  verbs:
-  - get
-  - list
-- apiGroups:
-  - ""
-  resources:
+  - cronjobs
+  - deployments
+  - leases
   - namespaces
+  - pods
+  - secrets
+  - serviceaccounts
+  - services
   verbs:
   - create
   - delete
   - get
   - list
+  - patch
 {{- end }}

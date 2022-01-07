@@ -1,0 +1,48 @@
+{{- $name := "restrict-seccomp" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict Seccomp
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      The seccomp profile should not be explicitly set to Unconfined. This policy,
+      requiring Kubernetes v1.19 or later, ensures that seccomp is restricted to only
+      the values in the allowed list.  By default, this is `RuntimeDefault` or `Localhost`.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: {{ $name }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        The seccomp profile used is disallowed.  The fields spec.securityContext.seccompProfile.type,
+        spec.containers[*].securityContext.seccompProfile.type,
+        spec.initContainers[*].securityContext.seccompProfile.type, and
+        spec.ephemeralContainers[*].securityContext.seccompProfile.type
+        must not be set to a value outside of the approved list.
+      pattern:
+       spec:
+        =(securityContext):
+          =(seccompProfile):
+            type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+        containers:
+        - =(securityContext):
+            =(seccompProfile):
+              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+        =(initContainers):
+        - =(securityContext):
+            =(seccompProfile):
+              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+        =(ephemeralContainers):
+        - =(securityContext):
+            =(seccompProfile):
+              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+{{- end -}}

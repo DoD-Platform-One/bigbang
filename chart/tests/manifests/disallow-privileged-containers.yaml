@@ -1,8 +1,8 @@
-# Test 1: Containers adding non-approved capabilites should not be allowed
+# Test 1: Containers running as privileged should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-1
+  name: disallow-privileged-containers-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -12,14 +12,13 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      privileged: true
 ---
-# Test 2: Init containers adding non-approved capabilities should not be allowed
+# Test 2: Init containers running as privileged should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-2
+  name: disallow-privileged-containers-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -32,14 +31,13 @@ spec:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      privileged: true
 ---
-# Test 3: Containers or init containers that add whitelisted capabilities or no capabilities should be allowed
+# Test 3: Containers and init containers that do not define privileged or set privileged to false are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-3
+  name: disallow-privileged-containers-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -53,18 +51,6 @@ spec:
     args: ["sleep", "infinity"]
     securityContext:
       privileged: false
-  - name: c3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: c4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        add: ["allowed"]
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
@@ -72,13 +58,3 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
       privileged: false
-  - name: i3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: i4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        add: ["allowed"]

@@ -1,0 +1,64 @@
+# For mounting a configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restrict-volume-types
+  annotations:
+    kyverno-policies-bbtest/type: ignore
+data:
+  key: value
+---
+# Test 1: Volume types that are not in the allowed list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-volume-types-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    configMap:
+      name: "restrict-volume-types"
+---
+# Test 2: Volume types that are in the allowed list are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-volume-types-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 3: Pods without volumes are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-volume-types-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
