@@ -1,0 +1,64 @@
+{{- $name := "require-non-root-group" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Reqire Non-root Group
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers are required to run with non-root groups. This policy ensures
+      the container is running with groups > 0.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: run-as-group
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        runAsGroup must be set to an id > 0 in either spec.securityContext.runAsGroup or
+        (spec.containers[*].securityContext.runAsGroup and spec.initContainers[*].securityContext.runAsGroup)
+      anyPattern:
+      - spec:
+          securityContext:
+            runAsGroup: ">0"
+          containers:
+          - =(securityContext):
+              =(runAsGroup): ">0"
+          =(initContainers):
+          - =(securityContext):
+              =(runAsGroup): ">0"
+      - spec:
+          containers:
+          - securityContext:
+              runAsGroup: ">0"
+          =(initContainers):
+          - securityContext:
+              runAsGroup: ">0"
+  - name: fs-group
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 6 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        fsGroup must be empty or set to an id > 0 in spec.securityContextChanging.
+      pattern:
+        spec:
+          =(securityContext):
+            =(fsGroup): ">0"
+  - name: supplemental-groups
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 6 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Supplemental group ids must be empty or > 0 in spec.securityContext.supplementalGroups[*].
+      pattern:
+        spec:
+          =(securityContext):
+            =(supplementalGroups): ">0"
+{{- end -}}

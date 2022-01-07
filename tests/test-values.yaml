@@ -7,11 +7,25 @@ policies:
       sourceObjects:
         clone-configs-1:
           kind: ConfigMap
-          namespace: kyverno-policies-bbtest
+          namespace: kyverno-policies
         clone-configs-2:
           kind: Secret
-          namespace: kyverno-policies-bbtest
+          namespace: kyverno-policies
+  cve-restrict-external-ips:
+    validationFailureAction: audit
+    parameters:
+      allowedValues: ["192.168.1.1", "192.168.0.1"]
+  disallow-default-namespace:
+    validationFailureAction: audit
   disallow-deprecated-apis:
+    validationFailureAction: audit
+  disallow-host-namespaces:
+    validationFailureAction: audit
+  disallow-privilege-escalation:
+    validationFailureAction: audit
+  disallow-privileged-containers:
+    validationFailureAction: audit
+  disallow-selinux:
     validationFailureAction: audit
   replace-image-registry:
     enabled: true
@@ -19,7 +33,51 @@ policies:
       replacements:
       - old: "replace.image.registry"
         new: "registry1.dso.mil"
+  require-non-root-group:
+    validationFailureAction: audit
+  require-non-root-user:
+    validationFailureAction: audit
+  require-ro-rootfs:
+    validationFailureAction: audit
+  restrict-apparmor:
+    validationFailureAction: audit
   restrict-capabilities:
     validationFailureAction: audit
     parameters:
-      allowedCapabilities: ["allowed"]
+      allowedValues: ["allowed"]
+  restrict-group-id:
+    validationFailureAction: audit
+    parameters:
+      # Ranges: 1000, 2000-2999, 4000+
+      allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
+  restrict-host-ports:
+    validationFailureAction: audit
+    parameters:
+      allowedValues: ["63999", ">= 64000 & < 65000", "> 65000"]
+  restrict-image-registries:
+    validationFailureAction: audit
+    parameters:
+      allowedValues: ["allowed", "registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"]
+  restrict-image-tags:
+    validationFailureAction: audit
+    parameters:
+      disallowedValues: ["disallowed", "latest"]
+  restrict-proc-mount:
+    validationFailureAction: audit
+  restrict-seccomp:
+    validationFailureAction: audit
+    parameters:
+      disallowedValues: ["allowed", "RuntimeDefault"]
+  restrict-sysctls:
+    validationFailureAction: audit
+    parametes:
+      allowedValues: ["kernel.shm_rmid_forced", "net.ipv4.ip_local_port_range"]
+  restrict-user-id:
+    validationFailureAction: audit
+    parameters:
+      # Ranges: 1000, 2000-2999, 4000+
+      allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
+  restrict-volume-types:
+    validationFailureAction: audit
+    parameters:
+      allowedValues: ["emptyDir", "projected"]

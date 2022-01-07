@@ -1,0 +1,55 @@
+# Test 1: Pods adding non-approved sysctls should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-sysctls-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    sysctls:
+    - name: "kernel.shm_rmid_forced"
+      value: "0"
+    - name: "net.ipv4.tcp_syncookies"
+      value: "1"
+    - name: "net.ipv4.ip_local_port_range"
+      value: "1024 4999"
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods that add whitelisted sysctls should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-sysctls-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    sysctls:
+    - name: "kernel.shm_rmid_forced"
+      value: "0"
+    - name: "net.ipv4.ip_local_port_range"
+      value: "1024 4999"
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 3: Pods that add no sysctls should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-sysctls-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]

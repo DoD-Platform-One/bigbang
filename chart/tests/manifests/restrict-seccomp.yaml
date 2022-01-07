@@ -1,8 +1,8 @@
-# Test 1: Containers adding non-approved capabilites should not be allowed
+# Test 1: Containers adding non-approved seccomp profiles should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-1
+  name: restrict-seccomp-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -12,14 +12,14 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      seccompProfile:
+        type: Unconfined
 ---
-# Test 2: Init containers adding non-approved capabilities should not be allowed
+# Test 2: Init containers adding non-approved seccomp profiles should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-2
+  name: restrict-seccomp-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -32,14 +32,14 @@ spec:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      capabilities:
-        add: ["disallowed"]
+      seccompProfile:
+        type: Unconfined
 ---
-# Test 3: Containers or init containers that add whitelisted capabilities or no capabilities should be allowed
+# Test 3: Containers or init containers that add whitelisted seccomp profiles or no seccomp profile should be allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-capabilities-3
+  name: restrict-seccomp-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -57,14 +57,8 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
     securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: c4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      seccompProfile:
+        type: RuntimeDefault
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
@@ -75,10 +69,5 @@ spec:
   - name: i3
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     securityContext:
-      capabilities:
-        drop: ["all"]
-  - name: i4
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      capabilities:
-        add: ["allowed"]
+      seccompProfile:
+        type: RuntimeDefault

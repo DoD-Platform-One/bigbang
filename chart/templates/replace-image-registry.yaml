@@ -32,6 +32,16 @@ spec:
   - name: replace-{{ $v.old }}-initcontainers
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    preconditions:
+      all:
+      - key: "{{"{{"}}request.operation{{"}}"}}"
+        operator: In
+        value:
+        - CREATE
+        - UPDATE
+      - key: "{{"{{"}} not_null(request.object.spec.initContainers[], '') | length(@) {{"}}"}}"
+        operator: GreaterThanOrEquals
+        value: 1
     mutate:
       patchStrategicMerge:
         spec:

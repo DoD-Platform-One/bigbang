@@ -1,0 +1,68 @@
+{{- $name := "require-non-root-user" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Reqire Non-root User
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers are required to run as non-root users. This policy ensures
+      the container has runAsNonRoot set and runAsUser > 0.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: run-as-non-root
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        runAsNonRoot must be set to true in either spec.securityContext.runAsNonRoot or
+        (spec.containers[*].securityContext.runAsNonRoot and spec.initContainers[*].securityContext.runAsNonRoot)
+      anyPattern:
+      - spec:
+          securityContext:
+            runAsNonRoot: true
+          containers:
+          - =(securityContext):
+              =(runAsNonRoot): true
+          =(initContainers):
+          - =(securityContext):
+              =(runAsNonRoot): true
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true
+  - name: run-as-user
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        runAsUser must be set to an id > 0 in either spec.securityContext.runAsUser or
+        (spec.containers[*].securityContext.runAsUser and spec.initContainers[*].securityContext.runAsUser)
+      anyPattern:
+      - spec:
+          securityContext:
+            runAsUser: ">0"
+          containers:
+          - =(securityContext):
+              =(runAsUser): ">0"
+          =(initContainers):
+          - =(securityContext):
+              =(runAsUser): ">0"
+      - spec:
+          containers:
+          - securityContext:
+              runAsUser: ">0"
+          =(initContainers):
+          - securityContext:
+              runAsUser: ">0"
+{{- end -}}

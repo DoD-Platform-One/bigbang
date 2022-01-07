@@ -1,0 +1,44 @@
+# Test 1: Containers pulling images from unapproved registries are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-image-registries-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi7-minimal:7.9
+    args: ["sleep", "infinity"]
+---
+# Test 2: Init containers pulling images from unapproved registries are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-image-registries-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi7-minimal
+---
+# Test 3: Pulling images from approved registries is allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-image-registries-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
