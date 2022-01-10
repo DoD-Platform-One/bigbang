@@ -46,6 +46,9 @@ redis-bb:
       selector:
         app.kubernetes.io/name: redis-bb
         app.kubernetes.io/instance: argocd-argocd
+    prometheusRule:
+      enabled: true
+      namespace: monitoring
   {{- end }}
 
 server:
