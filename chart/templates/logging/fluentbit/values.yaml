@@ -42,6 +42,8 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
+openshift: {{ .Values.openshift }}
+
 {{- if .Values.openshift }}
 podSecurityContext:
   seLinuxOptions:
