@@ -21,4 +21,9 @@ networkPolicies:
   
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}   
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
 {{- end -}}
