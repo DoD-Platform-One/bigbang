@@ -12,7 +12,7 @@ spec:
             app.kubernetes.io/name: monitoring
         podSelector:
           matchLabels:
-            app: prometeus
+            app: prometheus
       ports:
       - port: {{ .Values.nexus.nexusPort }}
   podSelector:

@@ -117,9 +117,12 @@ nexus:
     #    port: 5000
     #    secretName: registrySecret
   env:
-    - name: install4jAddVmParams
-      # using values based on 8GB of RAM on host -- https://help.sonatype.com/repomanager3/installation/system-requirements
-      value: "-Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+    # the correct env variable name is all caps with underscores: https://github.com/sonatype/helm3-charts/pull/81
+    # the upstream values file has wrong env name
+    - name: INSTALL4J_ADD_VM_PARAMS
+      # using values based on 8GB of RAM on host: https://help.sonatype.com/repomanager3/installation/system-requirements
+      # info about fips option: https://access.redhat.com/documentation/en-us/openjdk/8/pdf/configuring_openjdk_8_on_rhel_with_fips/openjdk-8-configuring_openjdk_8_on_rhel_with_fips-en-us.pdf
+      value: "-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "true"
   properties:

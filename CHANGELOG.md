@@ -1,6 +1,14 @@
 # Changelog
 
 ---
+## [36.0.0-bb.1] - 2022-01-05
+### Added
+- Added saml-egress-dns.yaml for saml job DNS egress access
+- Added environment variable option to fix deployment on FIPS enabled nodes
+### Modified
+- Fixed typo in monitoring.yaml on label name
+- Fixed name of environment variable for java JVM options
+
 ## [36.0.0-bb.0] - 2021-11-30
 ### Modified
 - upgrade to app version 3.36.0 chart version 36.0.0
