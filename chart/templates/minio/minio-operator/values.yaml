@@ -22,7 +22,11 @@ networkPolicies:
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
-
 {{- end -}}
