@@ -146,3 +146,8 @@ wait_project() {
    done
 }
 ```
+## Sandbox Pipeline Template
+
+The sandbox pipeline template is a simple pipeline that allows the pipeline to run to completion even if there are
+failures at any stage of the pipeline.   This allows for quicker debugging of issues with new packages.
+

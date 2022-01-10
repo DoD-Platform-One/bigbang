@@ -1,0 +1,179 @@
+# global rules for when pipelines run
+workflow:
+  rules:
+    # skip pipeline for MRs with docs label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
+      when: never
+    # run pipeline for manual tag events
+    - if: $CI_COMMIT_TAG
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # run pipeline on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Include templates and cluster creation jobs
+include:
+  - local: '/library/templates.yaml'
+
+stages:
+  - ⚙️ configuration validation
+  - 🤞 package tests
+
+variables:
+  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO_DESTINATION: "../pipeline-repo"
+  PIPELINE_REPO_BRANCH: master
+  PACKAGE_NAMESPACE: ${CI_PROJECT_NAME}
+  PACKAGE_HELM_NAME: ${CI_PROJECT_NAME}
+  REGISTRY1_USER: $REGISTRY1_USER
+  PIPELINE_TYPE: "PKG"
+  DEBUG_ENABLED: "false"
+
+configuration validation:
+  stage: ⚙️ configuration validation
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  variables:
+    GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
+  script:
+    # Print Package Directory Structure
+    - package_structure
+    # Global policy tests
+    - global_policy_tests
+    # Package specific tests
+    - package_policy_tests
+    # Package API Deprecation Check
+    - package_deprecation_check
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+chart update check:
+  stage: ⚙️ configuration validation
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # skip job when MR title contains 'SKIP UPDATE CHECK'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPDATE CHECK/'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    # Check for chart.yaml version bump and changelog additions
+    - chart_update_check
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+clean install:
+  stage: 🤞 package tests
+  extends:
+    - .k3d-ci-pkg
+  script:
+    # Install and wait for dependencies
+    - dependency_install
+    - dependency_wait
+    # Pull initial list of image dependencies that we will want to remove from the final images.txt
+    - dependency_images
+    # Install and wait for package
+    - package_install
+    - package_wait
+    # Once package installed, pull another list of images. List will include dependencies and package images.
+    - installed_images
+    ## Create final images.txt: Remove items from the dependencies list from the full-list.
+    # Remove rancher upstream images. The k3d cluster will inject images for various purposes like load balancers, PVCs, etc. 
+    # If we don't explicitly filter those out there's the potential that they sneak in
+    - package_images
+    # Run package helm tests
+    - package_test
+    # Run tests for API deprecations in cluster
+    - cluster_deprecation_check
+    - touch $CI_PROJECT_DIR/success
+  artifacts:
+    when: always
+    paths:
+      - events.txt
+      - images.txt
+      - tests/cypress/screenshots
+      - tests/cypress/videos
+      - cypress-artifacts
+    expire_in: 3 days
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+upgrade:
+  stage: 🤞 package tests
+  extends:
+    - .k3d-ci-pkg
+  rules:
+    # skip job when MR title contains 'SKIP UPGRADE'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
+      when: never
+    # skip pipeline for branches that start with "docs"
+    - if: '$CI_COMMIT_REF_NAME =~ /^doc*/i'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - echo "Installing ${CI_PROJECT_NAME} from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout1[collapsed=true]\r\e[0KPackage Checkout"
+    # Get MR target branch
+    - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout1\r\e[0K"
+    # Install and wait for dependencies
+    - dependency_install
+    - dependency_wait
+    # Install and wait for package
+    - package_install
+    - package_wait
+    # Run package helm tests
+    - package_test
+    - echo "Upgrading ${CI_PROJECT_NAME} to ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
+    - echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage Upgrade Checkout"
+    # Get MR source branch
+    - git reset --hard && git clean -fd
+    - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
+    # Upgrade and wait for dependencies
+    - dependency_install
+    - dependency_wait
+    # Upgrade and wait for Package
+    - package_install
+    - package_wait
+    # Re-run package helm tests
+    - package_upgrade_test
+    - cluster_deprecation_check
+    - touch $CI_PROJECT_DIR/success
+  artifacts:
+    when: always
+    paths:
+      - events.txt
+      - images.txt
+      - tests/cypress/screenshots
+      - tests/cypress/videos
+      - cypress-artifacts
+    expire_in: 3 days
+  allow_failure: true
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
