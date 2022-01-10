@@ -7,6 +7,11 @@
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
