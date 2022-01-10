@@ -7,6 +7,9 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
+# Define variables to help with conditionals later
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") .Values.istio.enabled) }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   sonarqube:
@@ -27,6 +30,11 @@ networkPolicies:
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecret: private-registry
+
+{{- if $istioInjection }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
 
 {{- if .Values.addons.sonarqube.sso.enabled }}
 sonarProperties:
@@ -58,6 +66,14 @@ postgresql:
   service:
     port: {{ .port }}
   {{- else }}
+  {{- if $istioInjection }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" $ }}
+  slave:
+    podAnnotations:
+      {{ include "istioAnnotation" $ }}
+  {{- end }}
   # Use internal database, defaults are fine
   enabled: true
   {{- end }}
