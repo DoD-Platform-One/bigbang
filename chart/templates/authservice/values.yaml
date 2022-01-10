@@ -40,6 +40,9 @@ redis-bb:
       selector: 
         app.kubernetes.io/name: redis-bb
         app.kubernetes.io/instance: authservice-authservice
+    prometheusRule:
+      enabled: true 
+      namespace: monitoring
 {{- end }}
 
 global:

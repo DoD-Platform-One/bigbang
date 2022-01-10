@@ -467,7 +467,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "23.1.6-bb.3"
+    tag: "23.1.6-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -597,7 +597,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
       path: "./chart"
-      tag: "0.4.0-bb.19"
+      tag: "0.4.0-bb.20"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
