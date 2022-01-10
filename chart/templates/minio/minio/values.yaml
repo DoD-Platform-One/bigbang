@@ -17,6 +17,11 @@ istio:
     gateways:
     - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
 
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 minioRootCreds: minio-root-creds-secret
 
 monitoring:
