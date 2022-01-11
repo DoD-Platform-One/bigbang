@@ -102,6 +102,9 @@ anchore-ui-redis:
       selector:
         app.kubernetes.io/name: anchore-ui-redis
         app.kubernetes.io/instance: anchore
+    prometheusRule:
+      enabled: true
+      namespace: monitoring        
   {{- end }}
 {{- end }}
 
