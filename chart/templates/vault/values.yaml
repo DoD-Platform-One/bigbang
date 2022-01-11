@@ -19,10 +19,18 @@ global:
   - name: private-registry
 
 injector:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
 
 server:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
 
@@ -45,5 +53,4 @@ istio:
   vault:
     gateways:
       - istio-system/{{ default "public" .Values.addons.vault.ingress.gateway }}
-
 {{- end -}}
