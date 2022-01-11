@@ -738,6 +738,7 @@ addons:
           envs:
             ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
             ANCHORE_CLI_USER: admin
+            ANCHORE_SCAN_IMAGE: registry.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/centos:latest
           secretEnvs:
             - name: ANCHORE_CLI_PASS
               valueFrom:
