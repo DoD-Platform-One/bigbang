@@ -108,6 +108,11 @@ networkPolicies:
   # use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range.
   # Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs)
   nodeCidr: ""
+  # -- VPC CIDR, defaults to 0.0.0.0/0
+  # In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3. 
+  # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
+  # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
+  vpcCidr: 0.0.0.0/0
 
 # -- Global ImagePullPolicy value for all packages
 # Permitted values are: None, Always, IfNotPresent
@@ -1194,7 +1199,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
       path: "./chart"
-      tag: "0.18.0-bb.1"
+      tag: "0.18.0-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
