@@ -14,4 +14,11 @@ networkPolicies:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+
+# When istio injected, add an annotation with the istio version to the manager pods only
+{{- if (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") .Values.istio.enabled) }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 {{- end -}}
