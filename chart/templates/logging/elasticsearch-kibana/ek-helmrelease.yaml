@@ -1,5 +1,5 @@
 {{- $fluxSettingsEk := merge .Values.logging.flux .Values.flux -}}
-{{- if or .Values.logging.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.logging.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

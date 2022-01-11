@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
-  targetNamespace: logging
+  targetNamespace: cluster-auditor
   chart:
     spec:
       chart: {{ .Values.clusterAuditor.git.path }}
@@ -41,10 +41,9 @@ spec:
     elasticsearch:
       imagePullSecrets:
       - name: private-registry
-
+  {{- if .Values.monitoring.enabled }}
   dependsOn:
-  - name: ek
-    namespace: {{ .Release.Namespace }}
-  - name: gatekeeper
+  - name: monitoring
     namespace: {{ .Release.Namespace}}
+  {{- end }}
 {{- end }}

@@ -1,0 +1,13 @@
+{{- if .Values.clusterAuditor.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    meta.helm.sh/release-namespace: bigbang
+    meta.helm.sh/release-name: bigbang
+    app.kubernetes.io/name: cluster-auditor
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+  name: cluster-auditor
+{{- end }}
