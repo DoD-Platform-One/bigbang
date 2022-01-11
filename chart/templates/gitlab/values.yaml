@@ -8,6 +8,10 @@
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
+# Define variables to help with conditionals later
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") .Values.istio.enabled) }}
+{{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") .Values.addons.gitlab.objectStorage.endpoint) }}
+
 openshift: {{ .Values.openshift }}
 
 istio:
@@ -31,56 +35,127 @@ networkPolicies:
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if and .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
+{{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
 redis:
+  {{- if .Values.monitoring.enabled }}
   metrics:
     serviceMonitor:
       enabled: true
       namespace: gitlab
+  {{- end }}
+  {{- if $istioInjection }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  slave:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
 {{- end }}
 
-{{- if .Values.addons.gitlab.database.host }}
+{{- if or .Values.addons.gitlab.database.host $istioInjection }}
 postgresql:
+  {{- if .Values.addons.gitlab.database.host }}
   install: false
+  {{- end }}
+  {{- if $istioInjection }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  slave:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
 {{- end }}
 
-{{- if .Values.addons.gitlab.objectStorage.endpoint }}
+{{- if or .Values.addons.gitlab.objectStorage.endpoint $istioInjection }}
 registry:
+  {{- if .Values.addons.gitlab.objectStorage.endpoint }}
   storage:
     secret: gitlab-object-storage
     key: registry
-  {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
+  {{- end }}
+  {{- if or $iamProfile $istioInjection }}
   annotations: 
+    {{- if $iamProfile }}
     iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+    {{- end }}
+    {{- if $istioInjection }}
+    {{ include "istioAnnotation" . }}
+    {{- end }}
   {{- end }}
 {{- end }}
 
 gitlab:
-  {{- if .Values.addons.gitlab.objectStorage.endpoint }}
+  {{- if or .Values.addons.gitlab.objectStorage.endpoint $istioInjection }}
   task-runner:
+    {{- if .Values.addons.gitlab.objectStorage.endpoint }}
     backups:
       objectStorage:
         config:
           secret: gitlab-object-storage
           key: backups
-    {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
-    annotations: 
+    {{- end }}
+    {{- if or $iamProfile $istioInjection }}
+    annotations:
+      {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+      {{- end }}
+      {{- if $istioInjection }}
+      {{ include "istioAnnotation" . }}
+      {{- end }}
     {{- end }}
   {{- end }}
   gitlab-exporter:
     enabled: {{ .Values.monitoring.enabled }}
-  {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
+    {{- if $istioInjection }}
+    metrics:
+      annotations:
+        {{ include "istioAnnotation" . }}
+    {{- end }}
+  {{- if or $iamProfile $istioInjection }}
   webservice:
     annotations: 
+      {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+      {{- end }}
+      {{- if $istioInjection }}
+      {{ include "istioAnnotation" . }}
+      {{- end }}
   sidekiq:
     annotations: 
+      {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+      {{- end }}
+      {{- if $istioInjection }}
+      {{ include "istioAnnotation" . }}
+      {{- end }}
   {{- end }}
- 
-global:
+{{- if $istioInjection }}
+  migrations:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  gitaly:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  gitlab-shell:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  praefect:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  gitlab-grafana:
+    annotations:
+      {{ include "istioAnnotation" . }}
+shared-secrets:
+  annotations:
+    {{ include "istioAnnotation" . }}
+minio:
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
 
+global:
   # added to help with Gitlab sub-chart configuration
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
