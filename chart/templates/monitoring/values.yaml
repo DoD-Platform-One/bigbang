@@ -8,6 +8,8 @@
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled") .Values.istio.enabled) }}
+
 flux:
   enabled: true
 
@@ -61,7 +63,7 @@ alertmanager:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or .Values.monitoring.sso.enabled .Values.istio.enabled }}
+    {{- if or .Values.monitoring.sso.enabled $istioInjection }}
     podMetadata:
       {{- if .Values.monitoring.sso.enabled }}
       {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
@@ -69,7 +71,7 @@ alertmanager:
       labels:
         {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
       {{- end }}
-      {{- if .Values.istio.enabled }}
+      {{- if $istioInjection }}
       annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
@@ -83,7 +85,7 @@ prometheus:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or .Values.monitoring.sso.enabled .Values.istio.enabled }}
+    {{- if or .Values.monitoring.sso.enabled $istioInjection }}
     podMetadata:
       {{- if .Values.monitoring.sso.enabled }}
       {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
@@ -91,7 +93,7 @@ prometheus:
       labels:
         {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
       {{- end }}
-      {{- if .Values.istio.enabled }}
+      {{- if $istioInjection }}
       annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
@@ -121,7 +123,7 @@ grafana:
   sidecar:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-  {{- if .Values.istio.enabled }}
+  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -178,7 +180,7 @@ prometheus-node-exporter:
     imagePullSecrets:
     - name: private-registry
 
-  {{- if .Values.istio.enabled }}
+  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -195,7 +197,7 @@ kube-state-metrics:
   imagePullSecrets:
   - name: private-registry
 
-  {{- if .Values.istio.enabled }}
+  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -211,7 +213,7 @@ prometheusOperator:
       image:            
         pullPolicy: {{ .Values.imagePullPolicy }}
 
-  {{- if .Values.istio.enabled }}
+  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
