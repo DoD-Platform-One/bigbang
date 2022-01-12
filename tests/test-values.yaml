@@ -508,7 +508,7 @@ addons:
             requests:
               cpu: 10m
             limits: {}
-        task-runner:
+        toolbox:
           persistence:
             size: 256Mi
           resources:
