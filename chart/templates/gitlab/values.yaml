@@ -88,7 +88,7 @@ registry:
 
 gitlab:
   {{- if or .Values.addons.gitlab.objectStorage.endpoint $istioInjection }}
-  task-runner:
+  toolbox:
     {{- if .Values.addons.gitlab.objectStorage.endpoint }}
     backups:
       objectStorage:
