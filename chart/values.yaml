@@ -44,6 +44,9 @@ tolerations: {}
 #  value: "value1"
 #  effect: "NoSchedule"
 
+podAnnotations: {}
+#e.g. bigbang.dev/istioVersion: 1.10.3
+
 networkPolicies:
   enabled: false
   # See `kubectl cluster-info` and then resolve to IP

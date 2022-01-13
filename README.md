@@ -1,6 +1,6 @@
 # mattermost-operator
 
-![Version: 1.17.0-bb.0](https://img.shields.io/badge/Version-1.17.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.17.0](https://img.shields.io/badge/AppVersion-1.17.0-informational?style=flat-square)
+![Version: 1.17.0-bb.1](https://img.shields.io/badge/Version-1.17.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.17.0](https://img.shields.io/badge/AppVersion-1.17.0-informational?style=flat-square)
 
 Deployment of mattermost operator using Helm
 
@@ -47,6 +47,7 @@ helm install mattermost-operator chart/
 | affinity | object | `{}` |  |
 | nodeSelector | object | `{}` |  |
 | tolerations | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
 | networkPolicies.enabled | bool | `false` |  |
 | networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` |  |
 | istio.enabled | bool | `false` |  |
