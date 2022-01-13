@@ -9,6 +9,11 @@ imagePullSecrets:
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end}}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
