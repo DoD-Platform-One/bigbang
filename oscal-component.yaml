@@ -1,0 +1,46 @@
+component-definition:
+  uuid: 96D90418-4CF5-40F1-9AB3-777F81B39C7E
+  metadata: 
+    title: Kiali Component
+    last-modified: '2021-10-19T12:00:00Z'
+    version: 20211019
+    oscal-version: 1.0.0
+    parties:
+      # Should be consistent across all of the packages, but where is ground truth?
+    - uuid: 72134592-08C2-4A77-ABAD-C880F109367A 
+      type: organization
+      name: Platform One
+      links:
+      - href: <https://p1.dso.mil>
+        rel: website
+  components:
+  - uuid: A97D1364-BA7F-46AA-ADE6-1998E846E125
+    type: software
+    title: Kiali
+    description: |
+      A management console for Istio Service Mesh
+    purpose: Observibility into Istio Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A # matches parties entry for p1
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description:
+        Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 6EC9C476-9C9D-4EF6-854B-A5B799D8AED1
+        control-id: si-4.10
+        description: >-
+          Kiali provides visibility into mTLS settings of all Istio traffic in the cluster.
+      
+  back-matter: 
+    resources:
+    - uuid: BFF74303-1E06-469E-ADCF-338E6DDB8876
+      title: Github Repo - Kiali
+      rlinks:
+      - href: https://github.com/kiali/kiali
+    - uuid: FF8AA056-BD14-4862-9614-04A2A8C4A26F
+      title: Big Bang Kiali package
+      rlinks:
+        - href: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
