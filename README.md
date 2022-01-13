@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 36.0.0-bb.1](https://img.shields.io/badge/Version-36.0.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
+![Version: 36.0.0-bb.2](https://img.shields.io/badge/Version-36.0.0--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 

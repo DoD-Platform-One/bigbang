@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [36.0.0-bb.2] - 2022-01-13
+### Fixed
+- Username key in service monitor
+
 ## [36.0.0-bb.1] - 2022-01-05
 ### Added
 - Added saml-egress-dns.yaml for saml job DNS egress access

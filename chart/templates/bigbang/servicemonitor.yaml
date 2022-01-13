@@ -24,6 +24,6 @@ spec:
           key: admin.password
         username:
           name: {{ template "nexus.name" . }}-secret
-          key: admin.user
+          key: admin.username
   jobLabel: {{ template "nexus.fullname" . }}-metrics
 {{- end }}
