@@ -48,6 +48,10 @@ anchoreEnterpriseGlobal:
   imagePullSecretName: private-registry
 
 postgresql:
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end}}
   imagePullSecrets: private-registry
   {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.database }}
   enabled: false
@@ -58,6 +62,10 @@ postgresql:
   {{- end }}
 
 anchoreGlobal:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}
   openShiftDeployment: {{ .Values.openshift }}
   {{- if .Values.addons.anchore.adminPassword }}
@@ -67,6 +75,10 @@ anchoreGlobal:
 
 {{- if .Values.addons.anchore.enterprise.enabled }}
 anchore-feeds-db:
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   imagePullSecrets: private-registry
   {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.feeds_database }}
   enabled: false
@@ -86,6 +98,14 @@ anchore-ui-redis:
   externalEndpoint: "redis://{{ .Values.addons.anchore.redis.username | default "nouser" }}:{{ .Values.addons.anchore.redis.password }}@{{ .Values.addons.anchore.redis.host }}:{{ .Values.addons.anchore.redis.port }}"
   auth:
     password: {{ .Values.addons.anchore.redis.password }}
+  {{- end }}
+  {{- if .Values.istio.enabled }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}  
+  replica:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
   {{- end }}
   image:
     pullSecrets:
