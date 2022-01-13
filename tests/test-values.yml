@@ -1,0 +1,7 @@
+istio:
+  enabled: true
+
+serviceAccount:
+  enabled: true
+  imagePullSecrets:
+  - name: private-registry

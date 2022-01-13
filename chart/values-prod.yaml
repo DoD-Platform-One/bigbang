@@ -1,13 +1,13 @@
-# Default values for podinfo.
+# Production values for podinfo.
+# Includes Redis deployment and memory limits.
 
 replicaCount: 1
 logLevel: info
-host: #0.0.0.0
 backend: #http://backend-podinfo:9898/echo
 backends: []
 
 image:
-  repository: registry.dso.mil/platform-one/big-bang/apps/sandbox/podinfo/podinfo
+  repository: ghcr.io/stefanprodan/podinfo
   tag: 6.0.0
   pullPolicy: IfNotPresent
 
@@ -36,10 +36,6 @@ service:
   grpcPort: 9999
   grpcService: podinfo
   nodePort: 31198
-  # the port used to bind the http port to the host
-  # NOTE: requires privileged container with NET_BIND_SERVICE capability -- this is useful for testing
-  # in local clusters such as kind without port forwarding
-  hostPort:
 
 # enable h2c protocol (non-TLS version of HTTP/2)
 h2c:
@@ -72,10 +68,10 @@ certificate:
 
 # metrics-server add-on required
 hpa:
-  enabled: false
-  maxReplicas: 10
+  enabled: true
+  maxReplicas: 5
   # average total CPU usage per pod (1-100)
-  cpu:
+  cpu: 99
   # average memory usage per pod (100Mi-1Gi)
   memory:
   # average http requests per second per pod (k8s-prometheus-adapter)
@@ -85,7 +81,7 @@ hpa:
 cache: ""
 # Redis deployment
 redis:
-  enabled: false
+  enabled: true
   repository: redis
   tag: 6.0.8
 
@@ -95,8 +91,6 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
-  # Added by Big Bang
-  imagePullSecrets: []
 
 # set container security context
 securityContext: {}
@@ -126,18 +120,13 @@ serviceMonitor:
   enabled: false
   interval: 15s
   additionalLabels: {}
-  ## Added by Big Bang
-  dashboards:
-    # Namespace to put .json ConfigMap so Grafana sidecar will find it
-    namespace: ""
-    # Label to apply to dashboard so Grafana sidecar will find it
-    label: grafana_dashboard
 
 resources:
   limits:
+    memory: 256Mi
   requests:
-    cpu: 1m
-    memory: 16Mi
+    cpu: 100m
+    memory: 64Mi
 
 nodeSelector: {}
 
@@ -146,14 +135,3 @@ tolerations: []
 affinity: {}
 
 podAnnotations: {}
-
-# Big Bang Values
-domain: bigbang.dev
-istio:
-  enabled: false
-  podinfo:
-    enabled: true
-    gateways:
-      - istio-system/public
-    hosts:
-      - podinfo.{{ .Values.domain }}

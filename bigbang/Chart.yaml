@@ -1,0 +1,7 @@
+apiVersion: v2
+name: flux-podinfo
+description: Flux compatible Helm chart for podinfo
+type: application
+version: 0.1.0
+# Replace with version of application
+appVersion: "6.0.0"

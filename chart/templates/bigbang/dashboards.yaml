@@ -1,0 +1,23 @@
+{{- $pkg := "podinfo" }}
+{{- $files := .Files.Glob "dashboards/*.json" }}
+{{- if and .Values.serviceMonitor.enabled $files }}
+apiVersion: v1
+kind: ConfigMapList
+items:
+{{- range $path, $fileContents := $files }}
+{{- $dashboardName := regexReplaceAll "(^.*/)(.*)\\.json$" $path "${2}" }}
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: {{ printf "%s-%s" $pkg $dashboardName | trunc 63 | trimSuffix "-" }}
+    namespace: {{ default $.Release.Namespace $.Values.serviceMonitor.dashboards.namespace }}
+    labels:
+      {{- if $.Values.serviceMonitor.dashboards.label }}
+      {{ $.Values.serviceMonitor.dashboards.label }}: "1"
+      {{- end }}
+      app: {{ $pkg }}-grafana
+      {{- include (printf "%s.labels" $pkg) $ | nindent 6 }}
+  data:
+    {{ $dashboardName }}.json: {{ $.Files.Get $path | toJson }}
+{{- end }}
+{{- end }}

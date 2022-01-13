@@ -1,0 +1,35 @@
+podinfo:
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/podinfo
+    tag:  6.0.0-bb.1
+    path: chart
+  flux: {}
+  ingress:
+    gateway: ""
+
+# Network Policies
+networkPolicies:
+  enabled: false
+
+# Gatekeeper
+gatekeeper:
+  enabled: false
+clusterAuditor:
+  enabled: false
+
+# Logging
+eckoperator:
+  enabled: false
+logging:
+  enabled: false
+fluentbit:
+  enabled: false
+
+# Other Tools
+jaeger:
+  enabled: false
+kiali:
+  enabled: false
+twistlock:
+  enabled: false

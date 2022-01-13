@@ -1,0 +1,21 @@
+{{- $pkg := "podinfo" }}
+{{- $component := "sandbox" }}
+{{- define "bigbang.defaults.podinfo" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+domain: {{ default .Values.domain .Values.hostname }}
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  podinfo:
+    gateways:
+    - istio-system/{{ default "public" .Values.podinfo.ingress.gateway }}
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+  dashboards:
+    namespace: monitoring
+    label: {{ dig "values" "grafana" "sidecar" "dashboards" "label" "grafana_dashboard" .Values.monitoring }}
+{{- end }}
+
+{{- /* Create secret */ -}}
+{{- if (get .Values $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- end }}

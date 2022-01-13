@@ -1,0 +1,15 @@
+{{- $pkg := "podinfo" }}
+{{- $component := "sandbox" }}
+{{- if (get .Values $pkg).enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $pkg }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    app.kubernetes.io/component: {{ $component | quote }}
+    {{- include "commonLabels" . | nindent 4}}
+    {{- if .Values.istio.enabled }}
+    istio-injection: "enabled"
+    {{- end }}
+{{- end }}

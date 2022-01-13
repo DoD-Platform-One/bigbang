@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "podinfo.fullname" . }}-grpc-test-{{ randAlphaNum 5 | lower }}
+  labels:
+    {{- include "podinfo.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    sidecar.istio.io/inject: "false"
+    linkerd.io/inject: disabled
+    appmesh.k8s.aws/sidecarInjectorWebhook: disabled
+spec:
+  {{- /* Added by Big Bang */ -}}
+  {{- if .Values.serviceAccount.enabled }}
+  serviceAccountName: {{ template "podinfo.serviceAccountName" . }}
+  {{- end }}
+  containers:
+    - name: grpc-health-probe
+      image: registry.dso.mil/platform-one/big-bang/apps/sandbox/podinfo/grpc_health_probe:v0.3.0
+      command: ['grpc_health_probe']
+      args:  ['-addr={{ template "podinfo.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.grpcPort }}']
+  restartPolicy: Never
