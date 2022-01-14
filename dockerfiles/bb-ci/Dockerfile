@@ -1,7 +1,11 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.0.1
+# @Version bb-ci:2.1.0
+#
+# docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
+# docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
+# Update library/templates.yaml -> .util-image -> image with the latest image
 
 FROM golang:1.13 AS builder
 
@@ -62,7 +66,7 @@ ADD https://github.com/argoproj/argo-cd/releases/download/v${ARGO_VERSION}/argoc
 RUN chmod +x /usr/local/bin/argocd
 
 # Install fluxcd
-ENV FLUX_VERSION='0.20.0'
+ENV FLUX_VERSION='0.24.0'
 ADD https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_amd64.tar.gz /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /flux_${FLUX_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/flux && rm -rf /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 

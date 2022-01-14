@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.1.0]
+### Changed
+- Updated flux cli in utility image to 0.24.0
+
 ## [2.0.28]
 ### Added
 - Added sandox pipeline
