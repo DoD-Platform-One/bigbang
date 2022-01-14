@@ -84,7 +84,6 @@ jaeger:
     bbtests:
       enabled: true
       cypress:
-        artifacts: true
         envs:
           cypress_url: "https://tracing.bigbang.dev"
 
