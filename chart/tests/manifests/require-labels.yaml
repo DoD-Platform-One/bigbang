@@ -1,0 +1,31 @@
+# Test 1: Pods without the required labels are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-labels-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods with the required labels are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-labels-2
+  labels:
+    app.kubernetes.io/name: require-labels
+    app.kubernetes.io/instance: require-labels
+    app.kubernetes.io/version: 0.0.0
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]

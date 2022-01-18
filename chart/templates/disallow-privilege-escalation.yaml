@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Disallow Privilege Escalation
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -24,13 +24,17 @@ spec:
     validate:
       message: >-
         Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation,
-        and spec.initContainers[*].securityContext.allowPrivilegeEscalation must be undefined or set to `false`.
+        spec.initContainers[*].securityContext.allowPrivilegeEscalation, and
+        spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be undefined or set to `false`.
       pattern:
         spec:
           =(initContainers):
           - =(securityContext):
               =(allowPrivilegeEscalation): "false"
           containers:
+          - =(securityContext):
+              =(allowPrivilegeEscalation): "false"
+          =(ephemeralContainers):
           - =(securityContext):
               =(allowPrivilegeEscalation): "false"
 {{- end -}}

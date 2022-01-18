@@ -16,6 +16,7 @@ rules:
   verbs:
   - get
   - list
+  - patch
 - apiGroups:
   - "wgpolicyk8s.io"
   resources:
@@ -24,6 +25,7 @@ rules:
   verbs:
   - get
   - list
+  - delete
 - apiGroups:
   - "*"
   resources:
@@ -36,6 +38,18 @@ rules:
   - secrets
   - serviceaccounts
   - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+- apiGroups:
+  - "rbac.authorization.k8s.io"
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - rolebindings
   verbs:
   - create
   - delete

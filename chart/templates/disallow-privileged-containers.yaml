@@ -22,14 +22,18 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-
-        Privileged mode is not allowed. The fields spec.containers[*].securityContext.privileged
-        and spec.initContainers[*].securityContext.privileged must be undefined or set to false.
+        Privileged mode is not allowed. The fields spec.containers[*].securityContext.privileged,
+        spec.initContainers[*].securityContext.privileged, and
+        spec.ephemeralContainers[*].securityContext.privileged must be undefined or set to false.
       pattern:
         spec:
           =(initContainers):
             - =(securityContext):
                 =(privileged): "false"
           containers:
+            - =(securityContext):
+                =(privileged): "false"
+          =(ephemeralContainers):
             - =(securityContext):
                 =(privileged): "false"
 {{- end -}}

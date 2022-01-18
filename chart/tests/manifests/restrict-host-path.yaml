@@ -1,0 +1,43 @@
+# Test 1: Host Path volume paths that are not in the allowed list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+---
+# Test 2: Host Path volume paths that are in the allowed list are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/allowed
+      type: DirectoryOrCreate

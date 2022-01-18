@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Reqire Non-root Group
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -23,7 +23,8 @@ spec:
     validate:
       message: >-
         runAsGroup must be set to an id > 0 in either spec.securityContext.runAsGroup or
-        (spec.containers[*].securityContext.runAsGroup and spec.initContainers[*].securityContext.runAsGroup)
+        (spec.containers[*].securityContext.runAsGroup, spec.initContainers[*].securityContext.runAsGroup,
+        and spec.ephemeralContainers[*].securityContext.runAsGroup)
       anyPattern:
       - spec:
           securityContext:
@@ -34,11 +35,17 @@ spec:
           =(initContainers):
           - =(securityContext):
               =(runAsGroup): ">0"
+          =(ephemeralContainers):
+          - =(securityContext):
+              =(runAsGroup): ">0"
       - spec:
           containers:
           - securityContext:
               runAsGroup: ">0"
           =(initContainers):
+          - securityContext:
+              runAsGroup: ">0"
+          =(ephemeralContainers):
           - securityContext:
               runAsGroup: ">0"
   - name: fs-group

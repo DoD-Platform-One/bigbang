@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Restrict Proc Mount
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -23,8 +23,9 @@ spec:
     validate:
       message: >-
         Changing the proc mount from the default is not allowed. The fields
-        spec.containers[*].securityContext.procMount and
-        spec.initContainers[*].securityContext.procMount must not be changed
+        spec.containers[*].securityContext.procMount,
+        spec.initContainers[*].securityContext.procMount, and
+        spec.ephemeralContainers[*].securityContext.procMount must not be changed
         from `Default`.
       pattern:
         spec:
@@ -32,6 +33,9 @@ spec:
             - =(securityContext):
                 =(procMount): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
           containers:
+            - =(securityContext):
+                =(procMount): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(ephemeralContainers):
             - =(securityContext):
                 =(procMount): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
 {{- end -}}

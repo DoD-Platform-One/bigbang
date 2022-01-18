@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Restrict Host Ports
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -17,22 +17,24 @@ metadata:
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
-  background: true
   rules:
   - name: host-ports
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-
-        The host port used is not allowed. The fields spec.containers[*].ports[*].hostPort
-        and spec.initContainers[*].ports[*].hostPort must only include ports from the
-        allowed list.
+        The host port used is not allowed. The fields spec.containers[*].ports[*].hostPort,
+        spec.initContainers[*].ports[*].hostPort, and spec.ephemeralContainers[*].ports[*].hostPort
+        must only include ports from the allowed list.
       pattern:
         spec:
           =(initContainers):
             - =(ports):
               - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
           containers:
+            - =(ports):
+              - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(ephemeralContainers):
             - =(ports):
               - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
 {{- end -}}

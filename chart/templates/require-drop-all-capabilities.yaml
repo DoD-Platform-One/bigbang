@@ -1,43 +1,47 @@
-{{- $name := "restrict-volume-types" }}
+{{- $name := "require-drop-all-capabilities" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Restrict Volume Types
+    policies.kyverno.io/title: Drop All Capabilities
     policies.kyverno.io/category: Pod Security Standards (Restricted)
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/minversion: 1.5.0
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      This policy restricts use of volume types to the allowed list.  By default, the allowed list
-      consists of non-core volume types defined through PersistentVolumes.
+      Capabilities permit privileged actions without giving full root access. All
+      capabilities should be dropped from a Pod, with only those required added back.
+      This policy ensures that all containers explicitly specify `drop: ["ALL"]`.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   background: false
   rules:
-  - name: restrict-volume-types
+  - name: drop-all-capabilities
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     preconditions:
       all:
-      - key: "{{"{{"}}request.operation{{"}}"}}"
+      - key: "{{ "{{" }}request.operation{{ "}}" }}"
         operator: In
         value:
         - CREATE
         - UPDATE
-      - key: "{{"{{"}} not_null(request.object.spec.volumes[], '') | length(@) {{"}}"}}"
-        operator: GreaterThanOrEquals
-        value: 1
     validate:
       message: >-
-        One or more volume types used in the pod is not in the allowed list.
+        Containers must drop all Linux capabilities by setting the fields
+        spec.containers[*].securityContext.capabilities.drop,
+        spec.initContainers[*].securityContext.capabilities.drop, and
+        spec.ephemeralContainers[*].securityContext.capabilities.drop to `ALL`.
       foreach:
-      - list: "request.object.spec.volumes"
-        anyPattern:
-        {{- range $v := (dig $name "parameters" "allowedValues" nil .Values.policies) }}
-        - {{ $v }}: "*"
-        {{- end }}
+      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+        deny:
+          conditions:
+            any:
+            - key: "{{ "{{" }} not_null(element.securityContext.capabilities.drop, '[]') | contains(@, 'ALL') {{ "}}" }}"
+              operator: Equals
+              value: false
 {{- end -}}
