@@ -1,24 +1,8 @@
-# Test 1: Pods that use SELinux options are not allowed
+# Test 1: Containers without a readiness probe are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: disallow-selinux-1
-  annotations:
-    kyverno-policies-bbtest/type: validate
-    kyverno-policies-bbtest/expected: fail
-spec:
-  securityContext:
-    seLinuxOptions: {}
-  containers:
-  - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
----
-# Test 2: Containers that use SELinux options are not allowed
-apiVersion: v1
-kind: Pod
-metadata:
-  name: disallow-selinux-2
+  name: require-probes-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -27,14 +11,16 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-    securityContext:
-      seLinuxOptions: {}
+    livenessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
 ---
-# Test 3: Init containers that use SELinux options are not allowed
+# Test 2: Containers without a liveness probe are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: disallow-selinux-3
+  name: require-probes-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -43,17 +29,17 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-  initContainers:
-  - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    securityContext:
-      seLinuxOptions: {}
+    readinessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
 ---
-# Test 4: Pods, containers, and init containers that do not use SELinux options are allowed
+# NOTE: Cannot test periodSeconds=0.  Kubernetes will auto change the periodSeconds to 10
+# Test 3: Containers with a liveness and readiness probe are allowed.  In addition, init containers are allowed without probes
 apiVersion: v1
 kind: Pod
 metadata:
-  name: disallow-selinux-4
+  name: require-probes-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -62,6 +48,14 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
+    readinessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
+    livenessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5

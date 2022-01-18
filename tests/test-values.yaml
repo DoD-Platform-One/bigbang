@@ -1,5 +1,9 @@
 bbtests:
   enabled: true
+validationFailureAction: audit
+waitforready:
+  imagePullSecrets:
+  - name: private-registry
 policies:
   clone-configs:
     enabled: true
@@ -12,72 +16,98 @@ policies:
           kind: Secret
           namespace: kyverno-policies
   cve-restrict-external-ips:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       allowedValues: ["192.168.1.1", "192.168.0.1"]
+  cve-restrict-external-names:
+    enabled: true
+    parameters:
+      allowedValues: ["dso.mil", "allowed"]
   disallow-default-namespace:
-    validationFailureAction: audit
+    enabled: true
   disallow-deprecated-apis:
-    validationFailureAction: audit
+    enabled: true
   disallow-host-namespaces:
-    validationFailureAction: audit
+    enabled: true
+  disallow-host-path:
+    enabled: true
+  disallow-nodeport-services:
+    enabled: true
   disallow-privilege-escalation:
-    validationFailureAction: audit
+    enabled: true
   disallow-privileged-containers:
-    validationFailureAction: audit
-  disallow-selinux:
-    validationFailureAction: audit
+    enabled: true
+  disallow-rbac-on-default-serviceaccounts:
+    enabled: true
   replace-image-registry:
     enabled: true
     parameters:
       replacements:
       - old: "replace.image.registry"
         new: "registry1.dso.mil"
+  require-drop-all-capabilities:
+    enabled: true
+  require-labels:
+    enabled: true
   require-non-root-group:
-    validationFailureAction: audit
+    enabled: true
   require-non-root-user:
-    validationFailureAction: audit
+    enabled: true
+  require-probes:
+    enabled: true
+  require-requests-equal-limits:
+    enabled: true
+  require-resource-limits:
+    enabled: true
+  require-ro-host-path:
+    enabled: true
   require-ro-rootfs:
-    validationFailureAction: audit
+    enabled: true
   restrict-apparmor:
-    validationFailureAction: audit
+    enabled: true
   restrict-capabilities:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       allowedValues: ["allowed"]
   restrict-group-id:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       # Ranges: 1000, 2000-2999, 4000+
       allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
+  restrict-host-path:
+    enabled: true
+    parameters:
+      allowedValues: ["/proc/urandom", "/tmp/allowed"]
   restrict-host-ports:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       allowedValues: ["63999", ">= 64000 & < 65000", "> 65000"]
   restrict-image-registries:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       allowedValues: ["allowed", "registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"]
   restrict-image-tags:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       disallowedValues: ["disallowed", "latest"]
   restrict-proc-mount:
-    validationFailureAction: audit
+    enabled: true
   restrict-seccomp:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       disallowedValues: ["allowed", "RuntimeDefault"]
+  restrict-selinux:
+    enabled: true
   restrict-sysctls:
-    validationFailureAction: audit
+    enabled: true
     parametes:
       allowedValues: ["kernel.shm_rmid_forced", "net.ipv4.ip_local_port_range"]
   restrict-user-id:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       # Ranges: 1000, 2000-2999, 4000+
       allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
   restrict-volume-types:
-    validationFailureAction: audit
+    enabled: true
     parameters:
       allowedValues: ["emptyDir", "projected"]

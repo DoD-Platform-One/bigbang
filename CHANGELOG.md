@@ -2,6 +2,27 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.2] - 2022-01-14
+
+### Added
+
+- cve-restrict-external-names policy
+- disallow-host-path policy
+- disallow-nodeport-services policy
+- disallow-rbac-on-default-serviceaccounts policy
+- require-drop-all-capabilities policy
+- require-labels policy
+- require-probes policy
+- require-requests-equal-limits policy
+- require-resource-limits policy
+- require-ro-host-path policy
+- restrict-host-path policy
+
+### Changed
+
+- Simplified restrict-capabilities policy
+- Updated disallow-selinux to restrict-selinux in accordance with Pod Security Standards
+
 ## [1.0.0-bb.1] - 2021-12-20
 
 ### Added

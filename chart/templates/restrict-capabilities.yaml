@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Restrict Capabilities
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -18,26 +18,27 @@ spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-    - name: capabilities
-      {{- include "kyverno-policies.context" (merge (dict "name" $name) .) | indent 6 }}
-      {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 6 }}
-      {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 6 }}
-      validate:
-        message: >-
-          Adding of additional capabilities beyond the allowed set is not allowed.
-          The fields spec.containers[*].securityContext.capabilities.add and
-          spec.initContainers[*].securityContext.capabilities.add must be in the allowedValues list.
-        pattern:
-          spec:
-            containers:
-              - =(securityContext):
-                  =(capabilities):
-                    =(add): "{{ "{{" }}configmap.data.allowedValues{{ "}}" }}"
-            =(initContainers):
-              - =(securityContext):
-                  =(capabilities):
-                    =(add): "{{ "{{" }}configmap.data.allowedValues{{ "}}" }}"
-
----
-{{ include "kyverno-policies.configmap" (merge (dict "name" $name) .) }}
+  - name: capabilities
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Adding of additional capabilities beyond the allowed set is not allowed.
+        The fields spec.containers[*].securityContext.capabilities.add,
+        spec.initContainers[*].securityContext.capabilities.add, and
+        spec.ephemeralContainers[*].securityContext.capabilities.add must be in the allowedValues list.
+      pattern:
+        spec:
+          containers:
+            - =(securityContext):
+                =(capabilities):
+                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(initContainers):
+            - =(securityContext):
+                =(capabilities):
+                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(ephemeralContainers):
+            - =(securityContext):
+                =(capabilities):
+                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
 {{- end -}}
