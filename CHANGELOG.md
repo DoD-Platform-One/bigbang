@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [36.0.0-bb.3] - 2022-01-14
+### Added
+- Added network policy for egress for por 443
+
 ## [36.0.0-bb.2] - 2022-01-13
 ### Fixed
 - Username key in service monitor

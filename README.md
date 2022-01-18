@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 36.0.0-bb.2](https://img.shields.io/badge/Version-36.0.0--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
+![Version: 36.0.0-bb.3](https://img.shields.io/badge/Version-36.0.0--bb.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -102,8 +102,8 @@ helm install nexus-repository-manager chart/
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
 | nexus.docker.enabled | bool | `false` |  |
 | nexus.docker.registries | list | `[]` |  |
-| nexus.env[0].name | string | `"install4jAddVmParams"` |  |
-| nexus.env[0].value | string | `"-Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703G -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"` |  |
+| nexus.env[0].name | string | `"INSTALL4J_ADD_VM_PARAMS"` |  |
+| nexus.env[0].value | string | `"-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
 | nexus.env[1].name | string | `"NEXUS_SECURITY_RANDOMPASSWORD"` |  |
 | nexus.env[1].value | string | `"true"` |  |
 | nexus.properties.override | bool | `false` |  |
