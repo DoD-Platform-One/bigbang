@@ -768,12 +768,12 @@ addons:
     postRenderers: []
 
   nexus:
-    # -- Toggle deployment of Nexus.
+    # -- Toggle deployment of Nexus. 
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
       path: "./chart"
-      tag: "36.0.0-bb.1"
+      tag: "36.0.0-bb.3"
 
     # -- Base64 encoded license file.
     license_key: ""
