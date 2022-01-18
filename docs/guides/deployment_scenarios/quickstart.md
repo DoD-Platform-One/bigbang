@@ -421,14 +421,13 @@ cd ~
 git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
 cd ~/bigbang
 
-# Checkout version 1.17.0 of Big Bang
-# (Pinning to specific version to improve reproducibility)
-git checkout tags/1.17.0
+# Checkout version latest stable version of Big Bang
+git checkout tags/$(grep 'tag:' base/gitrepository.yaml | awk '{print $2}')
 git status
 ```
 
 ```console
-HEAD detached at 1.17.0
+HEAD detached at (latest version)
 ```
 
 > HEAD is git speak for current context within a tree of commits
@@ -601,10 +600,10 @@ Explanation of flags used in the imperative helm install command:
     # The above errors could be seen if you run the command too early
     # Give Big Bang some time to finish installing, then run the following command to check it's status
 
-    k get po -A
+    kubectl get po -A
     ```
 
-* If after running `k get po -A` (which is the shorthand of `kubectl get pods --all-namespaces`) you see something like the following, then you need to wait longer
+* If after running `kubectl get po -A` (which is the shorthand of `kubectl get pods --all-namespaces`) you see something like the following, then you need to wait longer
 
     ```console
     NAMESPACE           NAME                                                READY   STATUS              RESTARTS   AGE
@@ -629,23 +628,23 @@ Explanation of flags used in the imperative helm install command:
     logging             logging-ek-es-master-0                              0/2     Init:0/2            0          37s
     ```
 
-* Wait up to 10 minutes then re-run `k get po -A`, until all pods show STATUS Running
+* Wait up to 10 minutes then re-run `kubectl get po -A`, until all pods show STATUS Running
 
 * `helm list -n=bigbang` should also show STATUS deployed
 
     ```console
-    NAME                         	NAMESPACE        	REVISION	UPDATED                                	STATUS  	CHART                             	APP VERSION
-    bigbang                      	bigbang          	1       	2021-10-07 19:16:13.990755769 +0000 UTC	deployed	bigbang-1.17.0
-    eck-operator-eck-operator    	eck-operator     	1       	2021-10-07 19:16:18.300583454 +0000 UTC	deployed	eck-operator-1.6.0-bb.2           	1.6.0
-    gatekeeper-system-gatekeeper 	gatekeeper-system	1       	2021-10-07 19:16:20.783813062 +0000 UTC	deployed	gatekeeper-3.5.2-bb.1             	v3.5.2
-    istio-operator-istio-operator	istio-operator   	1       	2021-10-07 19:16:20.564511742 +0000 UTC	deployed	istio-operator-1.10.4-bb.1
-    istio-system-istio           	istio-system     	1       	2021-10-07 19:17:18.267592579 +0000 UTC	deployed	istio-1.10.4-bb.3
-    jaeger-jaeger                	jaeger           	1       	2021-10-07 19:29:15.866513597 +0000 UTC	deployed	jaeger-operator-2.23.0-bb.2       	1.24.0
-    kiali-kiali                  	kiali            	1       	2021-10-07 19:29:14.362710144 +0000 UTC	deployed	kiali-operator-1.39.0-bb.2        	1.39.0
-    logging-cluster-auditor      	logging          	1       	2021-10-07 19:20:55.145508137 +0000 UTC	deployed	cluster-auditor-0.3.0-bb.7        	1.16.0
-    logging-ek                   	logging          	1       	2021-10-07 19:17:50.022767703 +0000 UTC	deployed	logging-0.1.21-bb.0               	7.13.4
-    logging-fluent-bit           	logging          	1       	2021-10-07 19:29:42.290601582 +0000 UTC	deployed	fluent-bit-0.16.6-bb.0            	1.8.6
-    monitoring-monitoring        	monitoring       	1       	2021-10-07 19:18:02.816162712 +0000 UTC	deployed	kube-prometheus-stack-14.0.0-bb.10	0.46.0
+  NAME                           	NAMESPACE        	REVISION	UPDATED                                	STATUS  	CHART                            	APP VERSION
+  bigbang                        	bigbang          	1       	2022-01-18 10:37:02.088839018 -0500 EST	deployed	bigbang-1.25.0                   	           
+  cluster-auditor-cluster-auditor	cluster-auditor  	1       	2022-01-18 15:39:35.161101094 +0000 UTC	deployed	cluster-auditor-1.0.2-bb.0       	0.0.3      
+  eck-operator-eck-operator      	eck-operator     	1       	2022-01-18 15:38:03.79179921 +0000 UTC 	deployed	eck-operator-1.9.1-bb.0          	1.9.1      
+  gatekeeper-system-gatekeeper   	gatekeeper-system	1       	2022-01-18 15:37:06.758450515 +0000 UTC	deployed	gatekeeper-3.6.0-bb.2            	v3.6.0     
+  istio-operator-istio-operator  	istio-operator   	1       	2022-01-18 15:37:07.432751828 +0000 UTC	deployed	istio-operator-1.11.3-bb.2       	           
+  istio-system-istio             	istio-system     	1       	2022-01-18 15:37:33.973068788 +0000 UTC	deployed	istio-1.11.3-bb.1                	           
+  jaeger-jaeger                  	jaeger           	1       	2022-01-18 15:39:37.911181302 +0000 UTC	deployed	jaeger-operator-2.27.0-bb.2      	1.28.0     
+  kiali-kiali                    	kiali            	1       	2022-01-18 15:39:36.829012053 +0000 UTC	deployed	kiali-operator-1.44.0-bb.1       	1.44.0     
+  logging-ek                     	logging          	1       	2022-01-18 15:38:34.802230733 +0000 UTC	deployed	logging-0.5.0-bb.0               	7.16.1     
+  logging-fluent-bit             	logging          	1       	2022-01-18 15:39:34.462639648 +0000 UTC	deployed	fluent-bit-0.19.16-bb.0          	1.8.11     
+  monitoring-monitoring          	monitoring       	1       	2022-01-18 15:38:08.044148943 +0000 UTC	deployed	kube-prometheus-stack-23.1.6-bb.5	0.52.1 
     ```
 
 ## Step 12: Edit your workstation's Hosts file to access the web pages hosted on the Big Bang Cluster
@@ -653,7 +652,7 @@ Explanation of flags used in the imperative helm install command:
 Run the following command, which is the short hand equivalent of `kubectl get virtualservices --all-namespaces` to see a list of websites you'll need to add to your hosts file
 
 ```shell
-k get vs -A
+kubectl get vs -A
 ```
 
 ```console
@@ -696,7 +695,7 @@ x.x.x.x  argocd.bigbang.dev
 
 ## Step 13: Visit a webpage
 
-In a browser, visit one of the sites listed using the `k get vs -A` command
+In a browser, visit one of the sites listed using the `kubectl get vs -A` command
 
 ## Step 14: Play
 
@@ -722,10 +721,10 @@ helm upgrade --install bigbang $HOME/bigbang/chart \
 
 # NOTE: There may be a ~1 minute delay for the change to apply
 
-k get vs -A
+kubectl get vs -A
 # Now ArgoCD should show up, if it doesn't wait a minute and rerun the command
 
-k get po -n=argocd
+kubectl get po -n=argocd
 # Once these are all Running you can visit argocd's webpage
 ```
 
