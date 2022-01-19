@@ -344,14 +344,11 @@ twistlock:
     bbtests:
       enabled: true
       cypress:
-        artifacts: true
         envs:
           cypress_baseUrl: "https://twistlock.bigbang.dev"
       scripts:
-        image: registry1.dso.mil/ironbank/stedolan/jq:1.6
         envs:
           twistlock_host: "https://twistlock.bigbang.dev"
-          desired_version: "{{ .Values.console.image.tag }}"
 
 # Addons are toggled based on labels in CI
 addons:
