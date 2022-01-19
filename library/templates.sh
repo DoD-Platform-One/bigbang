@@ -176,6 +176,20 @@ bigbang_release() {
    fi
    echo -e "\e[0Ksection_end:`date +%s`:bb_release\r\e[0K"
 }
+
+clone_bigbang_and_merge_templates() {
+   echo -e "\e[0Ksection_start:`date +%s`:clone_and_checkout_bigbang[collapsed=true]\r\e[0K\e[33;1mClone and Checkout Big Bang Repo\e[37m"
+   git clone ${BB_REPO} ${BB_REPO_DESTINATION}
+   cd ${BB_REPO_DESTINATION}
+   if [[ $BB_VERSION != "latest" ]]; then
+     git checkout ${BB_VERSION}
+   else
+     git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+   fi
+   cp -r ../bigbang/templates/* ./chart/templates/
+   PIPELINE_REPO_DESTINATION="../pipeline-repo"
+   echo -e "\e[0Ksection_end:`date +%s`:clone_and_checkout_bigbang\r\e[0K"
+}
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Package Functions
