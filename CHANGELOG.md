@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.25.1]
+
+- [!1256](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1256): Gitlab version bump to `5.6.2-bb.0` app version `14.6.2`
+
 ## [1.25.0]
 
 - [!1.25.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.25.0); List of merge requests in this release.
