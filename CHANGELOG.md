@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [2.1.1]
+### Added
+- Created `clone_bigbang_and_merge_templates` function in library/templates.sh
+- Added optional integration stage to sandbox pipeline: stands up a full bigbang deployment w/ sandbox app
+
 ## [2.1.0]
 ### Changed
 - Updated flux cli in utility image to 0.24.0
