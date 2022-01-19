@@ -989,24 +989,6 @@ addons:
         # https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/issues/9
         enabled: false
         scripts:
-          image: registry1.dso.mil/ironbank/opensource/velero/velero:v1.6.0
-          additionalVolumes:
-            - name: transfer-kubectl
-              emptyDir: {}
-            - name: &yamlVolName yaml-configs
-              configMap:
-                name: "{{ .Chart.Name }}-backup-restore-files-config"
-          additionalVolumeMounts:
-            - name: transfer-kubectl
-              mountPath: /usr/local/bin/kubectl
-              subPath: kubectl
-            - name: *yamlVolName
-              mountPath: &yamlMountPath /yaml
-          envs:
-            MINIO_HOST: *minio-address
-            TEST_YAML_DIR: *yamlMountPath
-            MINIO_USER: minio
-            MINIO_PASS: minio123
           secretEnvs:
             - name: NAMESPACE
               valueFrom:
