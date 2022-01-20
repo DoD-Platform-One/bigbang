@@ -798,36 +798,12 @@ addons:
         # This issue can be reopened if problems reappear.
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_url: 'https://minio.bigbang.dev/login'
-          secretEnvs:
-            - name: cypress_secretkey
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Values.tenants.secrets.name }}"
-                  key: secretkey
-            - name: cypress_accesskey
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Values.tenants.secrets.name }}"
-                  key: accesskey
         scripts:
-          image: registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2021-09-02T09-21-27Z
           envs:
             MINIO_PORT: ''
             MINIO_HOST: 'https://minio-api.bigbang.dev'
-          secretEnvs:
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Values.tenants.secrets.name }}"
-                  key: secretkey
-            - name: ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Values.tenants.secrets.name }}"
-                  key: accesskey
 
   mattermostoperator:
     enabled: false
