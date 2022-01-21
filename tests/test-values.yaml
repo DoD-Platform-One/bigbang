@@ -405,11 +405,8 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_url: "https://argocd.bigbang.dev"
-            cypress_user: "admin"
-            cypress_password: "Password123"
 
   authservice:
     enabled: false
