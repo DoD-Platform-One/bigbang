@@ -15,6 +15,11 @@ global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") .Values.istio.enabled) }}
+{{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
 
 controller:
   image: 
@@ -50,6 +55,14 @@ redis-bb:
       enabled: true
       namespace: monitoring
   {{- end }}
+{{- if $istioInjection }}  
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  replica:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+{{- end }}
 
 server:
   image: 
