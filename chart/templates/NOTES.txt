@@ -126,7 +126,7 @@ PLATFORM ONE LOGGING WARNING:
   {{- end }}
 {{- end }}
 
-{{- if and (or $.Values.promtail.enabled $.Values.loki.enabled) (or .Values.logging.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (or $.Values.promtail.enabled $.Values.loki.enabled) .Values.logging.enabled }}
 PLATFORM ONE LOGGING WARNING:
   You have enabled both promtail/loki and efk logging.  This is permitted during beta testing of promtail/loki.
   After the beta period, only one logging stack will be supported at one time, with the PLG stack becoming the default supported stack. 
