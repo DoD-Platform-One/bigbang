@@ -17,6 +17,10 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
 imagePullSecrets:
   - name: private-registry
 
