@@ -733,12 +733,9 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_url: "https://sonarqube.bigbang.dev"
             cypress_url_setup: "https://sonarqube.bigbang.dev/setup"
-            cypress_user: "admin"
-            cypress_password: "new_admin_password"
       account:
         adminPassword: new_admin_password
         currentAdminPassword: admin
