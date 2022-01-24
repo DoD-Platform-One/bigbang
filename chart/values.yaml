@@ -109,7 +109,7 @@ networkPolicies:
   # Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs)
   nodeCidr: ""
   # -- VPC CIDR, defaults to 0.0.0.0/0
-  # In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3. 
+  # In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3.
   # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
   # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
   vpcCidr: 0.0.0.0/0
@@ -117,7 +117,6 @@ networkPolicies:
 # -- Global ImagePullPolicy value for all packages
 # Permitted values are: None, Always, IfNotPresent
 imagePullPolicy: IfNotPresent
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
@@ -157,7 +156,7 @@ istio:
     public:
       ingressGateway: "public-ingressgateway"
       hosts:
-      - "*.{{ .Values.domain }}"
+        - "*.{{ .Values.domain }}"
       # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
       autoHttpRedirect:
         enabled: true
@@ -351,7 +350,6 @@ kyverno:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Logging
@@ -768,7 +766,7 @@ addons:
     postRenderers: []
 
   nexus:
-    # -- Toggle deployment of Nexus. 
+    # -- Toggle deployment of Nexus.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
@@ -1148,7 +1146,7 @@ addons:
   keycloak:
     # -- Toggle deployment of Keycloak.
     # if you enable Keycloak you should uncomment the istio passthrough configurations above
-      # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
+    # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
@@ -1190,9 +1188,9 @@ addons:
     # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
     values: {}
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Vault
-#
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Vault
+  #
   vault:
     # -- Toggle deployment of Vault.
     enabled: false
