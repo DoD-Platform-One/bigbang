@@ -1150,7 +1150,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
       path: "./chart"
-      tag: "11.0.1-bb.9"
+      tag: "16.0.6-bb.0"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
