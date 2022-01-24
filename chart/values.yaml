@@ -894,9 +894,8 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
+  # -- Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
   haproxy:
-    # -- Toggle deployment of HAProxy.
-    enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
       path: "./chart"
