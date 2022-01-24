@@ -188,19 +188,6 @@ gatekeeper:
           - istio-system/lb-port-.*
     bbtests:
       enabled: true
-      scripts:
-        image: registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.1
-        additionalVolumeMounts:
-          - name: "{{ .Chart.Name }}-test-config"
-            mountPath: /yaml
-          - name: "{{ .Chart.Name }}-kube-cache"
-            mountPath: /.kube/cache
-        additionalVolumes:
-          - name: "{{ .Chart.Name }}-test-config"
-            configMap:
-              name: "{{ .Chart.Name }}-test-config"
-          - name: "{{ .Chart.Name }}-kube-cache"
-            emptyDir: {}
 
 kyverno:
   enabled: false
