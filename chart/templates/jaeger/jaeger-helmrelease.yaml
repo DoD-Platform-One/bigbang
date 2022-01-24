@@ -22,6 +22,10 @@ spec:
 
   {{- toYaml $fluxSettingsJaeger | nindent 2 }}
 
+  {{- if .Values.jaeger.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.jaeger.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-jaeger-values
       kind: Secret

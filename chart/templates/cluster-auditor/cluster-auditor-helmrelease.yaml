@@ -37,13 +37,12 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  values:
-    elasticsearch:
-      imagePullSecrets:
-      - name: private-registry
-  {{- if .Values.monitoring.enabled }}
+  # CA always depends on Gatekeeper so we can assume it exists here
   dependsOn:
+  - name: gatekeeper
+    namespace: {{ .Release.Namespace }}
+  {{- if .Values.monitoring.enabled }}
   - name: monitoring
-    namespace: {{ .Release.Namespace}}
+    namespace: {{ .Release.Namespace }}
   {{- end }}
 {{- end }}
