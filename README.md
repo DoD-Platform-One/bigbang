@@ -65,7 +65,7 @@ label. The pipeline will run both stages, uploading to a "timed-disposal" S3 buc
 ### Using the infrastructure in your package CI gitlab pipeline
 
 The Package Pipeline template is used to execute a conformance (linting) stage and a functional test phase for
-a package (application). This template (located in templates/package-tests.yml) is intended to be included in the
+a package (application). This template (located in /pipelines/bigbang-package.yaml) is intended to be included in the
 gitlab-ci.yml file of a package repo. The following code example can be placed in the gitlab-ci.yml file to include
 the package pipeline template.
 
@@ -78,7 +78,7 @@ always be found in the [CHANGELOG](./CHANGELOG.md).
 include:
   - project: "platform-one/big-bang/pipeline-templates/pipeline-templates"
     ref: "master"
-    file: "/templates/package-tests.yml"
+    file: "/pipelines/bigbang-package.yaml"
 # Optional
 variables:
   RELEASE_NAME: "Pick a name for the package to release as, default is the repo name"
