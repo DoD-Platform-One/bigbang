@@ -18,8 +18,10 @@ include:
 stages:
   - ⚙️ configuration validation
   - 🤞 package tests
+  - 🤝 integration test
 
 variables:
+  BB_VERSION: "latest"
   PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
   PIPELINE_REPO_BRANCH: master
@@ -177,6 +179,49 @@ upgrade:
     exit_codes: 
       - 123
       - 200
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+integration:
+  stage: 🤝 integration test
+  extends:
+    - .k3d-ci-bb
+  rules:
+    # only run if the /bigbang/values.yaml exists
+    - exists:
+        - bigbang/values.yaml
+    # skip job when MR title contains 'SKIP INTEGRATION'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP INTEGRATION/'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  variables:
+    BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+    BB_REPO_DESTINATION: "./bigbang-repo"
+    CI_VALUES_FILE: "../bigbang/values.yaml"
+    PIPELINE_REPO_DESTINATION: "pipeline-repo"
+    PIPELINE_TYPE: "BB"
+  script:
+    - clone_bigbang_and_merge_templates
+    - deploy_bigbang
+    - test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
+  artifacts:
+    paths:
+      - events.txt
+      - images.txt
+      - "bigbang-repo/test-artifacts/"
+    expire_in: 3 days
+    when: always
+  allow_failure:
+    exit_codes: 123
   retry:
     max: 2
     when:
