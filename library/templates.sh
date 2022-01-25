@@ -48,6 +48,66 @@ wait_daemonset(){
 # Bigbang Functions
 #
 #-----------------------------------------------------------------------------------------------------------------------
+label_check() {
+   set -e
+   echo -e "\e[0Ksection_start:`date +%s`:label_check[collapsed=true]\r\e[0K\e[33;1mLabel Check\e[37m"
+   ## Show current labels
+   OLD_IFS=$IFS
+   IFS=","
+   if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "all-packages" ]]; then
+      echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
+      LABEL_CHECK_DEPLOY_LABELS=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+   else
+      LABEL_CHECK_DEPLOY_LABELS=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      echo "Initial MR labels: ${LABEL_CHECK_DEPLOY_LABELS[*]} "
+      echo "Evaluating package dependencies..."
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermost" ]]; then
+         echo "  Checking mattermost"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermostoperator" ]]; then
+            echo "    mattermostoperator already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("mattermostoperator")
+            echo "    Added mattermostoperator"
+         fi
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
+            echo "    minioOperator already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
+            echo "    Added minioOperator"
+         fi
+      fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
+         echo "  Checking minio"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
+            echo "    minioOperator already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
+            echo "    Added minioOperator"
+         fi
+      fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "velero" ]]; then
+         echo "  Checking velero"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
+            echo "    minio already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("minio")
+            echo "    Added minio"
+         fi
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
+            echo "    minioOperator already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
+            echo "    Added minioOperator"
+         fi
+      fi
+   fi
+   echo "CI_DEPLOY_LABELS=${LABEL_CHECK_DEPLOY_LABELS[*]}" >> variables.env
+   CI_TEMP_OUT=( "${LABEL_CHECK_DEPLOY_LABELS[*]}" )
+   IFS=$OLD_IFS
+   echo "Labels after check: ${CI_TEMP_OUT[*]}"
+   echo -e "\e[0Ksection_end:`date +%s`:label_check\r\e[0K"
+}
+
 deploy_bigbang() {
    set -e
    for deploy_script in $(find ./${PIPELINE_REPO_DESTINATION}/scripts/deploy -type f -name '*.sh' | sort); do

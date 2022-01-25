@@ -72,6 +72,8 @@ pre vars:
   script:
     # Create the TF_VAR_env variable
     - pre_vars
+    - label_check
+
   artifacts:
     reports:
       dotenv: variables.env
@@ -99,6 +101,9 @@ pre vars:
 
 clean install:
   stage: 🔥 smoke tests
+  needs:
+    - job: pre vars
+      artifacts: true
   extends:
     - .k3d-ci-bb
   variables:
@@ -135,8 +140,9 @@ clean install:
 
 upgrade:
   stage: 🔥 smoke tests
-  dependencies:
-    - pre vars
+  needs:
+    - job: pre vars
+      artifacts: true
   extends:
     - .k3d-ci-bb
   rules:
