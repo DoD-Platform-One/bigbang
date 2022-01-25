@@ -178,7 +178,7 @@ bigbang_release() {
 }
 
 clone_bigbang_and_merge_templates() {
-   echo -e "\e[0Ksection_start:`date +%s`:clone_and_checkout_bigbang[collapsed=true]\r\e[0K\e[33;1mClone and Checkout Big Bang Repo\e[37m"
+   echo -e "\e[0Ksection_start:`date +%s`:clone_and_checkout_bigbang[collapsed=true]\r\e[0K\e[33;1mClone Big Bang and Merge\e[37m"
    git clone ${BB_REPO} ${BB_REPO_DESTINATION}
    cd ${BB_REPO_DESTINATION}
    if [[ $BB_VERSION != "latest" ]]; then
@@ -190,6 +190,7 @@ clone_bigbang_and_merge_templates() {
    PIPELINE_REPO_DESTINATION="../pipeline-repo"
    echo -e "\e[0Ksection_end:`date +%s`:clone_and_checkout_bigbang\r\e[0K"
 }
+
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Package Functions
@@ -359,6 +360,114 @@ package_wait() {
    kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
    echo "done."
    echo -e "\e[0Ksection_end:`date +%s`:package_wait\r\e[0K"
+}
+
+post_install_packages() {
+   echo -e "\e[0Ksection_start:`date +%s`:post_install_packages[collapsed=true]\r\e[0KPost Install Packages"
+   if [ -f "tests/post-install-packages.yaml" ]; then
+     yq e ".*.git | path | .[-2]" "tests/post-install-packages.yaml" | while IFS= read -r i; do
+       post_name=$i
+       post_repo=$(yq e ".${i}.git.repo" "tests/post-install-packages.yaml")
+       if [[ -z ${post_repo} || ${post_repo} == "null" ]]; then
+         post_repo=$(yq e ".${i}.git" "tests/post-install-packages.yaml")
+         if [[ -z ${post_repo} || ${post_repo} == "null" ]]; then
+           continue
+         fi
+       fi
+       post_branch=$(yq e ".${i}.git.tag" "tests/post-install-packages.yaml")
+       if [[ -z ${post_branch} || ${post_branch} == "null" ]]; then
+         post_branch=$(yq e ".${i}.branch" "tests/post-install-packages.yaml")
+       fi
+       post_namespace=$(yq e ".${i}.namespace" "tests/post-install-packages.yaml")
+       if [[ -z ${post_namespace} || ${post_namespace} == "null" ]]; then
+         post_namespace=$post_name
+       fi
+       post_helm_name=$(yq e ".${i}.package-name" "tests/post-install-packages.yaml")
+       if [[ -z ${post_helm_name} || ${post_helm_name} == "null" ]]; then
+         post_helm_name=$post_name
+       fi
+       if [[ -d ${post_branch} || ${post_branch} == "null" ]]; then
+         if [[ -d "repos/${post_name}" ]]; then
+           echo "Checking out default branch from ${post_repo}"
+           cd repos/${post_name}
+           git reset --hard && git clean -fd
+           git checkout $(git remote show origin | awk '/HEAD branch/ {print $NF}')
+           cd ../../
+         else
+           echo "Cloning default branch from ${post_repo}"
+           git clone ${post_repo} repos/${post_name}
+         fi
+       else
+         if [[ -d "repos/${post_name}" ]]; then
+           echo "Checking out ${post_branch} from ${post_repo}"
+           cd repos/${post_name}
+           git reset --hard && git clean -fd
+           git checkout ${post_branch}
+           cd ../../
+         else
+           echo "Cloning ${post_branch} from ${post_repo}"
+           git clone -b ${post_branch} ${post_repo} repos/${post_name}
+         fi
+       fi
+       echo "Installing post install package: repos/${post_name} into ${post_namespace} namespace"
+       if ! kubectl get namespace ${post_namespace} 2> /dev/null; then
+         kubectl create namespace ${post_namespace};
+       fi
+       if ! kubectl get secret -n ${post_namespace} private-registry 2> /dev/null; then
+         kubectl create -n ${post_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+       fi
+       if [ $(ls -1 repos/${post_name}/tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+         echo "Helm installing repos/${post_name}/chart into ${post_namespace} namespace using repos/${post_name}/tests/test-values.yaml for values"
+         helm upgrade -i --wait --timeout 600s ${post_helm_name} repos/${post_name}/chart -n ${post_namespace} -f repos/${post_name}/tests/test-values.y*ml --set istio.enabled=false
+       else
+         echo "Helm installing repos/${post_name}/chart into ${post_namespace} namespace using default values"
+         helm upgrade -i --wait --timeout 600s ${post_helm_name} repos/${post_name}/chart -n ${post_namespace} --set istio.enabled=false
+       fi
+     done
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:post_install_packages\r\e[0K"
+}
+
+post_install_wait() {
+   echo -e "\e[0Ksection_start:`date +%s`:post_install_wait[collapsed=true]\r\e[0KPost Install Wait"
+   if [ -f "tests/post-install-packages.yaml" ]; then
+     sleep 10
+     echo -n "Waiting on CRDS ... "
+     kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
+     echo "done."
+     if [ -f tests/post-install-packages.yaml ]; then
+       yq e ".*.git | path | .[-2]" "tests/post-install-packages.yaml" | while IFS= read -r i; do
+         post_name=$i
+         if [ -f repos/${post_name}/tests/wait.sh ]; then
+           source repos/${post_name}/tests/wait.sh
+           echo -n "Waiting on post install resources ... "
+           wait_project
+           echo "done."
+         fi
+       done
+     fi
+     echo -n "Waiting on stateful sets ... "
+     wait_sts
+     echo "done."
+     echo -n "Waiting on daemon sets ... "
+     wait_daemonset
+     echo "done."
+     echo -n "Waiting on deployments ... "
+     kubectl wait --for=condition=available --timeout 600s -A deployment --all > /dev/null
+     echo "done."
+     echo -n "Waiting on terminating pods ... "
+     readarray -t DELPODS < <(kubectl get pods -A -o jsonpath='{range .items[?(@.metadata.deletionTimestamp)]}{@.metadata.namespace}{" "}{@.metadata.name}{"\n"}{end}')
+     for DELPOD in "${DELPODS[@]}"; do
+       if kubectl get pod -n $DELPOD &> /dev/null; then
+         kubectl wait --for=delete --timeout 60s pod -n $DELPOD > /dev/null
+       fi
+     done
+     echo "done."
+     echo -n "Waiting on running pods to be ready ... "
+     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+     echo "done."
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:post_install_wait\r\e[0K"
 }
 
 package_test() {
@@ -745,7 +854,7 @@ package_release() {
 cluster_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0KIn Cluster Deprecation Check"
    kubent -e || export EXIT_CODE=$?
-   if [ $EXIT_CODE -eq 200 ]; then 
+   if [ "$EXIT_CODE" == "200" ]; then 
      echo -e "\e[31mNOTICE: API deprecations or removals were found.\e[0m"
      exit 200
    fi
