@@ -1,0 +1,51 @@
+{{- $fluxSettingsTempo := merge .Values.tempo.flux .Values.flux -}}
+{{- if .Values.tempo.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tempo
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: tempo
+  chart:
+    spec:
+      chart: {{ .Values.tempo.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: tempo
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsTempo | nindent 2 }}
+
+  {{- if .Values.tempo.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.tempo.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-tempo-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-tempo-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-tempo-values
+      kind: Secret
+      valuesKey: "overlays"
+  {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
+  dependsOn:
+    {{- if  .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

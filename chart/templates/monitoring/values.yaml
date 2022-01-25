@@ -23,7 +23,7 @@ networkPolicies:
 
 minioOperator:
   enabled: {{ .Values.addons.minioOperator.enabled }}
-  
+
 gitlabRunner:
   enabled: {{ .Values.addons.gitlabRunner.enabled }}
 
@@ -128,12 +128,33 @@ grafana:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
-  {{- if .Values.loki.enabled }}
+  {{- if or .Values.loki.enabled .Values.tempo.enabled }}
   additionalDataSources:
+  {{- if .Values.loki.enabled }}
   - name: Loki
     type: loki
     url: http://logging-loki.logging.svc.cluster.local:3100
     access: proxy
+  {{- end }}
+  {{- if and .Values.loki.enabled .Values.tempo.enabled }}
+    jsonData:
+      derivedFields:
+        - datasourceName: Tempo
+          matcherRegex: "traceID=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+          datasourceUid: tempo
+  {{- end }}
+  {{- if .Values.tempo.enabled }}
+  - name: Tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    uid: tempo
+    url: http://tempo-tempo.tempo.svc:3100
+    isDefault: false
+    editable: true
+  {{- end }}
   {{- end }}
 
   grafana.ini:
@@ -162,13 +183,13 @@ grafana:
       {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
-    
+
   {{- if or .Values.loki.enabled .Values.addons.gitlabRunner.enabled }}
   plugins:
-  {{- if .Values.loki.enabled }}  
+  {{- if .Values.loki.enabled }}
     - grafana-piechart-panel
   {{- end }}
-  {{- if .Values.addons.gitlabRunner.enabled }}  
+  {{- if .Values.addons.gitlabRunner.enabled }}
     - grafana-polystat-panel
   {{- end }}
   {{- end }}
@@ -202,15 +223,15 @@ kube-state-metrics:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
-prometheusOperator:      
+prometheusOperator:
   image:
-    pullPolicy: {{ .Values.imagePullPolicy }}      
-  admissionWebhooks:        
-    cleanupProxy:          
-      image:            
-        pullPolicy: {{ .Values.imagePullPolicy }}        
-    patch:           
-      image:            
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  admissionWebhooks:
+    cleanupProxy:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+    patch:
+      image:
         pullPolicy: {{ .Values.imagePullPolicy }}
 
   {{- if $istioInjection }}
