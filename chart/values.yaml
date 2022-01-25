@@ -173,6 +173,14 @@ svcPatchJob:
   image:
     repository: registry1.dso.mil/ironbank/big-bang/base
     tag: 8.4
+
+bbtests:
+  enabled: false
+  cypress:
+    artifacts: true
+    envs:
+      cypress_url: 'http://kiali:{{ default 20001 .Values.port }}'
+
 # Taken from https://github.com/kiali/kiali-operator/blob/v1.33/deploy/kiali/kiali_cr.yaml
 ###################################################################
 # kiali_cr.yaml
