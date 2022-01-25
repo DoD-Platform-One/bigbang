@@ -1,6 +1,6 @@
 # kiali-operator
 
-![Version: 1.44.0-bb.2](https://img.shields.io/badge/Version-1.44.0--bb.2-informational?style=flat-square) ![AppVersion: 1.44.0](https://img.shields.io/badge/AppVersion-1.44.0-informational?style=flat-square)
+![Version: 1.44.0-bb.3](https://img.shields.io/badge/Version-1.44.0--bb.3-informational?style=flat-square) ![AppVersion: 1.44.0](https://img.shields.io/badge/AppVersion-1.44.0-informational?style=flat-square)
 
 Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
@@ -121,6 +121,9 @@ helm install kiali-operator chart/
 | svcPatchJob.enabled | bool | `false` |  |
 | svcPatchJob.image.repository | string | `"registry1.dso.mil/ironbank/big-bang/base"` |  |
 | svcPatchJob.image.tag | float | `8.4` |  |
+| bbtests.enabled | bool | `false` |  |
+| bbtests.cypress.artifacts | bool | `true` |  |
+| bbtests.cypress.envs.cypress_url | string | `"http://kiali:{{ default 20001 .Values.port }}"` |  |
 
 ## Contributing
 
