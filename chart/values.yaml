@@ -462,6 +462,27 @@ loki:
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+tempo:
+  # -- Toggle deployment of Tempo.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+    path: "./chart"
+    tag: "0.12.2-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Tempo Package
+  flux: {}
+
+  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 # Monitoring
 #
 monitoring:

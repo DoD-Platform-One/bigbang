@@ -1,0 +1,11 @@
+{{- if .Values.tempo.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tempo
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+{{- end }}

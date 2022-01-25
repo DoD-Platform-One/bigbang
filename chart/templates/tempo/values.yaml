@@ -1,0 +1,34 @@
+{{- if .Values.tempo.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.tempo "name" "tempo" "defaults" (include "bigbang.defaults.tempo" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.tempo" -}}
+
+tempo:
+  imagePullSecrets:
+  - name: private-registry
+
+opentelemetryCollector:
+  enabled: {{ .Values.istio.enabled }}
+  imagePullSecrets:
+  - name: private-registry
+
+tempo:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+tempoQuery:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- end -}}
