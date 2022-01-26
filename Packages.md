@@ -27,7 +27,9 @@ Columns:
 | [Kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Kyverno Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno/badges/main/pipeline.svg) |  No | No | No | Yes | No | No |
 | [Promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Promtail Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/badges/main/pipeline.svg) |  No | No | No | Yes | No | No |
 | [Loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Loki Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/badges/main/pipeline.svg) |  No | No | No | Yes | No | No |
-| [Tempo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Tempo Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo/badges/main/pipeline.svg) | No | Yes | Yes | No | No | No |
+| [Tempo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Tempo Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo/-/merge_requests/2) | No | No |
+
+
 
 ## Security
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
