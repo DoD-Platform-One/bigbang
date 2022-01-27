@@ -4,7 +4,7 @@ set -e
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 set -x
 
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
   echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
   yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 else
@@ -37,7 +37,7 @@ if [[ "${CI_DEPLOY_LABELS[*]}" =~ "loki" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "p
 fi
 
 # Set controlPlaneCidr for ci-infra jobs which are RKE2
-if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "$CI_DEPLOY_LABELS" = *"test-ci::infra"* ]]; then
+if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "test-ci::infra" ]]; then
   echo "Updating networkPolicies.controlPlaneCidr since Environment is RKE2"
   yq e '.networkPolicies.controlPlaneCidr = "10.0.0.0/8"' $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 fi

@@ -160,7 +160,7 @@ function wait_crd(){
 
 ## Append all add-ons to hr list if "all-packages" or default branch/tag. Else, add specific ci labels to hr list.
 HELMRELEASES=(${CORE_HELMRELEASES[@]})
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
     HELMRELEASES+=(${ADD_ON_HELMRELEASES[@]})
     echo "🌌 All helmreleases enabled: all-packages label enabled, or on default branch or tag."
 elif [[ ! -z "$CI_DEPLOY_LABELS" ]]; then
