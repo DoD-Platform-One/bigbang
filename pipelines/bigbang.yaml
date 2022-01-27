@@ -312,6 +312,8 @@ aws/rke2/bigbang up:
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
+    - job: pre vars
+      artifacts: true
   script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
