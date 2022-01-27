@@ -12,8 +12,12 @@ imagePullSecrets:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
 
-monitoring:
+# no longer necessary to directly pass through .Values.monitoring.enabled
+# the package chart uses: .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" to toggle monitoring
+metrics:
   enabled: {{ .Values.monitoring.enabled }}
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
 
 # When istio injected, add an annotation with the istio version to the manager pods only
 {{- if (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") .Values.istio.enabled) }}
