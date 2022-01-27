@@ -243,11 +243,6 @@ fluentbit:
       privileged: true
     bbtests:
       enabled: true
-      scripts:
-        image: registry1.dso.mil/ironbank/stedolan/jq:1.6
-        envs:
-          fluent_host: "http://{{ include \"fluent-bit.fullname\" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}"
-          desired_version: "{{ .Values.image.tag }}"
 
 monitoring:
   enabled: true
