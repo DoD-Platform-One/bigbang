@@ -1,0 +1,31 @@
+{{- $name := "remove-token-automount" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Remove Token Automount on Default Service Accounts
+    policies.kyverno.io/category: Security Best Practices
+    policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: ServiceAccount
+    policies.kyverno.io/description: >-
+      Kubernetes automatically mounts API credentials in each Pod using the service account.
+      Under the least privilege best practice, the default service account should not have
+      access to the Kuberenetes API.  This helps to prevent exploitation of API vulnerabilities.
+      This policy will add configuration to pods so that the service account token is not
+      automatically mounted.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: remove-automount
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "ServiceAccount")) $) | nindent 4 }}
+    mutate:
+      patchStrategicMerge:
+        metadata:
+          (name): default
+        automountServiceAccountToken: false
+{{- end -}}

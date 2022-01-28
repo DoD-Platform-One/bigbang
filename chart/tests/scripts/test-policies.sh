@@ -14,36 +14,9 @@ FAIL=0
 # test-values.yaml sets ENABLED_POLICIES as an environmental variable
 POLICIES=($ENABLED_POLICIES)
 
-# Setup namespaces
-echo -e "${CYN}Setup: Creating namespaces and pull secrets${NC}"
-
-# Find existing pull secret in any namespace (IMAGE_PULL_SECRET is passed in as an ENV variable)
-PSNAMESPACE=$(kubectl get secret -A -o custom-columns=NAMESPACE:.metadata.namespace,NAME:.metadata.name | grep -m 1 -oP ".*(?=$IMAGE_PULL_SECRET)" | tr -d ' ')
-# Duplicate pull secret into current namespace
-kubectl get secret $IMAGE_PULL_SECRET -n $PSNAMESPACE -o yaml | sed "s/resourceVersion: .*//" | sed "s/uid: .*//" | sed "s/namespace: $PSNAMESPACE//" | kubectl apply -f -
-# Patch the default service account with the pull secret
-kubectl patch serviceaccount default -p "{\"imagePullSecrets\": [{\"name\": \"$IMAGE_PULL_SECRET\"}]}"
-
-# Get list of unique namespaces that will be used
-NAMESPACES=( $(grep --no-filename -oP "(?<=  namespace: ).*" /yaml/* | sort -u) )
-for NAMESPACE in "${NAMESPACES[@]}"; do
-  # Ignore error if it already exists
-  kubectl create ns $NAMESPACE 2>/dev/null
-
-  # Duplicate pull secret into namespace
-  kubectl get secret $IMAGE_PULL_SECRET -n $PSNAMESPACE -o yaml | sed "s/resourceVersion: .*//" | sed "s/uid: .*//" | sed "s/namespace: $PSNAMESPACE/namespace: $NAMESPACE/" | kubectl apply -f -
-
-  # Patch the default service account with the pull secret
-  kubectl patch serviceaccount default -n $NAMESPACE -p "{\"imagePullSecrets\": [{\"name\": \"$IMAGE_PULL_SECRET\"}]}"
-done
-
-# Force a fresh audit
-kubectl delete cpolr,polr -A --all --force > /dev/null 2>&1
-
 #######################################
 
 # Test for disabled cluster policies
-echo ---
 echo -e "${CYN}Test: Disabled cluster policies are not deployed${NC}"
 echo -n "- enabled policies >= deployed policies: "
 DEPLOYED_POLICIES=( $(kubectl get cpol --no-headers -o custom-columns=":metadata.name") )
@@ -97,14 +70,15 @@ for POLICY in "${POLICIES[@]}"; do
 
   # Verify policy is ready
   echo -n "- Policy deployed and ready: "
-  while [ "$ATTEMPT" -le 120 ] && ! echo $READY | grep $POLICY > /dev/null; do
+  while [ "$ATTEMPT" -le 240 ] && ! echo $READY | grep $POLICY > /dev/null; do
     ((ATTEMPT+=1))
     sleep 1
     READY=$(kubectl get cpol -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
   done
-  if [ "$ATTEMPT" -gt 120 ]; then
+  if [ "$ATTEMPT" -gt 240 ]; then
     echo -e "${RED}FAIL${NC}"
     ((FAIL+=1))
+    kubectl get cpol $POLICY
   else
     echo -e "${GRN}PASS${NC}"
     ((PASS+=1))
@@ -115,7 +89,7 @@ for POLICY in "${POLICIES[@]}"; do
   DEPLOYS=$(kubectl apply -f /yaml/$POLICY.yaml 2>&1)
 
   # Verify resources were deployed
-  NUM_DEPLOYS=$(echo $DEPLOYS | grep -oP "created|blocked" | wc -l)
+  NUM_DEPLOYS=$(echo $DEPLOYS | grep -oP "created$|configured$|blocked" | wc -l)
   if [ "${#EXPECTED_RESULTS[@]}" -eq "$NUM_DEPLOYS" ]; then
     echo -e "${GRN}PASS${NC}"
     ((PASS+=1))
@@ -139,9 +113,10 @@ for POLICY in "${POLICIES[@]}"; do
 
   for EXPECTED_RESULT in "${EXPECTED_RESULTS[@]}"; do
     # Split the values
+    unset NSOPT
     IFS=';' read KIND NAMESPACE MANIFEST TESTTYPE EXPECTED <<< $EXPECTED_RESULT
-    if [ ! -z $NAMESPACE ]; then
-      NAMESPACE="-n $NAMESPACE"
+    if [ -n "$NAMESPACE" ]; then
+      NSOPT="-n"
     fi
     if [ "$TESTTYPE" != "ignore" ]; then
       echo -n "- Test vector $MANIFEST ($TESTTYPE): "
@@ -158,7 +133,7 @@ for POLICY in "${POLICIES[@]}"; do
           echo -e "${GRN}PASS${NC}"
           ((PASS+=1))
         else
-          echo -n -e "${RED}FAIL${NC} (Expected to be allowed, but was blocked)"
+          echo -e "${RED}FAIL${NC} (Expected allowed, but was blocked)"
           ((FAIL+=1))
         fi
       elif [ "$EXPECTED" == "fail" ]; then
@@ -167,7 +142,7 @@ for POLICY in "${POLICIES[@]}"; do
           echo -e "${GRN}PASS${NC}"
           ((PASS+=1))
         else
-          echo -e "${RED}FAIL${NC} (Expected to be blocked, but was allowed)"
+          echo -e "${RED}FAIL${NC} (Expected blocked, but was allowed)"
           ((FAIL+=1))
         fi
       fi
@@ -176,7 +151,7 @@ for POLICY in "${POLICIES[@]}"; do
     ##### Generate Test
     elif [ "$TESTTYPE" == "generate" ]; then
       # Get more information from the test annotations
-      TARGET=$(kubectl get $KIND $MANIFEST $NAMESPACE -o jsonpath='{range .metadata.annotations}{@.kyverno-policies-bbtest/kind};{@.kyverno-policies-bbtest/name};{@.kyverno-policies-bbtest/namespace}{end}')
+      TARGET=$(kubectl get $KIND $MANIFEST $NSOPT $NAMESPACE -o jsonpath='{range .metadata.annotations}{@.kyverno-policies-bbtest/kind};{@.kyverno-policies-bbtest/name};{@.kyverno-policies-bbtest/namespace}{end}')
       IFS=';' read TARGKIND TARGNAME TARGNS <<< $TARGET
 
       ATTEMPT=0
@@ -212,15 +187,21 @@ for POLICY in "${POLICIES[@]}"; do
     ##### Mutate Test
     elif [ "$TESTTYPE" == "mutate" ]; then
       # Get more information from the test annotations
-      TARGET=$(kubectl get $KIND $MANIFEST $NAMESPACE -o jsonpath='{range .metadata.annotations}{@.kyverno-policies-bbtest/key};{@.kyverno-policies-bbtest/value}{end}')
-      IFS=';' read TARGKEY TARGVALUE <<< $TARGET
+      TARGET=$(kubectl get $KIND $MANIFEST $NSOPT $NAMESPACE -o jsonpath='{range .metadata.annotations}{@.kyverno-policies-bbtest/key};{@.kyverno-policies-bbtest/value};{@.kyverno-policies-bbtest/kind};{@.kyverno-policies-bbtest/name};{@.kyverno-policies-bbtest/namespace}{end}')
+      IFS=';' read TARGKEY TARGVALUE TARGKIND TARGNAME TARGNS <<< $TARGET
 
+      # Override default target if annotations defined a different one
+      if [ -n "$TARGKIND" ]; then KIND=$TARGKIND; fi
+      if [ -n "$TARGNAME" ]; then MANIFEST=$TARGNAME; fi
+      if [ -n "$TARGNS" ]; then NAMESPACE=$TARGNS; NSOPT="-n"; fi
+
+      # Retrieve values to check if they are mutated
       ATTEMPT=0
-      ACTUAL=$(kubectl get $KIND $MANIFEST $NAMESPACE -o jsonpath="{$TARGKEY}")
+      ACTUAL=$(kubectl get $KIND $MANIFEST $NSOPT $NAMESPACE -o jsonpath="{$TARGKEY}")
       while [ -z "$ACTUAL" ] && [ "$ATTEMPT" -le 60 ]; do
         ((ATTEMPT+=1))
         sleep 1
-        ACTUAL=$(kubectl get $KIND $MANIFEST $NAMESPACE -o jsonpath="{$TARGKEY}")
+        ACTUAL=$(kubectl get $KIND $MANIFEST $NSOPT $NAMESPACE -o jsonpath="{$TARGKEY}")
       done
 
       # Key not found
@@ -269,15 +250,7 @@ for POLICY in "${POLICIES[@]}"; do
   fi
 
   echo "Cleaning up Test Resources"
-  kubectl delete -f /yaml/$POLICY.yaml --force=true 2>/dev/null
-done
-
-for NAMESPACE in "${NAMESPACES[@]}"; do
-  if [ "$NAMESPACE" != "default" ] && [ "$NAMESPACE" != "kyverno-policies" ]; then
-    kubectl delete ns $NAMESPACE 2>/dev/null
-    echo "Waiting on namespace $NAMESPACE deletion to finish."
-    timeout 1m kubectl wait ns $NAMESPACE --for=delete 2>/dev/null
-  fi
+  kubectl delete -f /yaml/$POLICY.yaml --force 2>/dev/null
 done
 
 #######################################

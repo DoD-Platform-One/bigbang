@@ -10,8 +10,8 @@ metadata:
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Containers are required to run with non-root groups. This policy ensures
-      the container is running with groups > 0.
+      Following the least privilege principle, access to the root group ID should be forbidden
+      in containers. This policy ensures containers are running with groups > 0.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}

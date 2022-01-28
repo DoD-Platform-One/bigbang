@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       SELinux options can be used to escalate privileges. This policy ensures that the `seLinuxOptions`
-      type field is restricted to the allowed list and the `seLinuxOptions` user and role fields are undefined.
+      type field is undefined or restricted to the allowed list and the `seLinuxOptions` user and role fields are undefined.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}

@@ -5,6 +5,10 @@ waitforready:
   imagePullSecrets:
   - name: private-registry
 policies:
+  update-image-pull-policy:
+    enabled: true
+    parameters:
+      addValue: Always
   clone-configs:
     enabled: true
     parameters:
@@ -15,6 +19,8 @@ policies:
         clone-configs-2:
           kind: Secret
           namespace: kyverno-policies
+  cve-disallow-subpath-volumes:
+    enabled: true
   cve-restrict-external-ips:
     enabled: true
     parameters:
@@ -39,16 +45,38 @@ policies:
     enabled: true
   disallow-rbac-on-default-serviceaccounts:
     enabled: true
+  remove-token-automount:
+    enabled: true
   replace-image-registry:
     enabled: true
     parameters:
       replacements:
       - old: "replace.image.registry"
         new: "registry1.dso.mil"
+  require-annotations:
+    enabled: true
+    parameters:
+      requiredValues: ["kyverno-policies-bbtest/test: required", "kyverno-policies-bbtest/required"]
   require-drop-all-capabilities:
+    enabled: true
+  require-image-signature:
+    enabled: false # Problems with Test Case #3
+    parameters:
+      requiredValues:
+      - image: "ghcr.io/kyverno/test-verify-image:*"
+        key: |-
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+          5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+          -----END PUBLIC KEY-----
+  require-istio-on-namespaces:
+    enabled: true
+  require-istio-on-pods:
     enabled: true
   require-labels:
     enabled: true
+    parameters:
+      requiredValues: ["kyverno-policies-bbtest/test: required", "kyverno-policies-bbtest/required"]
   require-non-root-group:
     enabled: true
   require-non-root-user:
@@ -57,18 +85,24 @@ policies:
     enabled: true
   require-requests-equal-limits:
     enabled: true
-  require-resource-limits:
-    enabled: true
   require-ro-host-path:
     enabled: true
   require-ro-rootfs:
     enabled: true
+  restrict-annotations:
+    enabled: true
+    parameters:
+      disallowedValues: ["kyverno-policies-bbtest/test: disallowed", "kyverno-policies-bbtest/disallowed"]
   restrict-apparmor:
     enabled: true
   restrict-capabilities:
     enabled: true
     parameters:
       allowedValues: ["allowed"]
+  restrict-cpu-limit:
+    enabled: true
+    parameters:
+      allowedValues: ["<1000m"]
   restrict-group-id:
     enabled: true
     parameters:
@@ -90,6 +124,16 @@ policies:
     enabled: true
     parameters:
       disallowedValues: ["disallowed", "latest"]
+  restrict-labels:
+    enabled: true
+    parameters:
+      disallowedValues: ["kyverno-policies-bbtest/test: disallowed", "kyverno-policies-bbtest/disallowed"]
+  restrict-memory-limit:
+    enabled: true
+    parameters:
+      allowedValues: ["<1Gi"]
+  restrict-pod-exec:
+    enabled: false  # Tested manually as this does not fit into the test framework.
   restrict-proc-mount:
     enabled: true
   restrict-seccomp:
@@ -102,6 +146,16 @@ policies:
     enabled: true
     parametes:
       allowedValues: ["kernel.shm_rmid_forced", "net.ipv4.ip_local_port_range"]
+  restrict-tolerations:
+    enabled: true
+    parameters:
+      disallowedValues:
+      - key: "notallowed"
+        value: "false"
+        effect: "NoSchedule"
+      - key: "disa??owed"
+        value: "true"
+        effect: "*NoSchedule"
   restrict-user-id:
     enabled: true
     parameters:

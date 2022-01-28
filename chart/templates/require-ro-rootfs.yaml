@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Require Read-Only Root Filesystem
-    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -33,6 +33,9 @@ spec:
           - securityContext:
               readOnlyRootFilesystem: true
           =(initContainers):
+          - securityContext:
+              readOnlyRootFilesystem: true
+          =(ephemeralContainers):
           - securityContext:
               readOnlyRootFilesystem: true
 {{- end -}}

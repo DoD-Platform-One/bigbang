@@ -79,7 +79,7 @@ Annotations are required for the script to know how to test each policy:
 - `kyverno-policies-bbtest/expected`: The expected action that Kyverno will take with the manifest.  Use `generate` to indicate a resource should be generated or `ignore` for no action.
 - `kyverno-policies-bbtest/kind`: The kind of the generated resource to check
 - `kyverno-policies-bbtest/name`: The name of the generated resource to check
-- `kyverno-policies-bbtest/namespace`: The namespace to find the generated resource.
+- `kyverno-policies-bbtest/namespace`: If the generation is in a different namespace than the annotated resource, the namespace to find the generated resource.
 
 > If `expected` is set to `ignore`, `kind`, `name` and `namespace` will still be used to validate that the resource was **NOT** generated.
 
@@ -88,5 +88,8 @@ Annotations are required for the script to know how to test each policy:
 - `kyverno-policies-bbtest/expected`: The expected action that Kyverno will take with the manifest.  Use `mutate` to indicate the manifest should be mutated or `ignore` for no action.
 - `kyverno-policies-bbtest/key`: The JMES path to the key that should be mutated.  The syntax should work with kubectl's `--jsonpath` option
 - `kyverno-policies-bbtest/value`: The expected value of the key after mutation.
+- `kyverno-policies-bbtest/kind`: If the mutation is not on the annotated resource, the kind of the mutated resource to check
+- `kyverno-policies-bbtest/name`: If the mutation is not on the annotated resource, the name of the mutated resource to check
+- `kyverno-policies-bbtest/namespace`: If the mutation is not on the annotated resource and the mutated resource is in a different namespace than the annotated resource, the namespace to find the mutated resource.
 
 > If `expected` is set to `ignore`, `key` and `value` will still be used to validate the result.  The test will check that `key` does **NOT** exist or that the key's value does **NOT** match `value`.  Leaving `key` blank will result in a failure.

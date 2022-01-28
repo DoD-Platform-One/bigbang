@@ -4,18 +4,20 @@ Policy files and resources should be named according to the nomenclature below s
 
 The following items should be named the same:
 
-- `chart/templates/<name>.yaml`
-  - `<ClusterPolicy>.metadata.name: <name>`
-- `tests/manifests/<name>.yaml`
-  - `<TestResource>.metadata.name: <name>-#`
+- ClusterPolicy:
+  - `chart/templates/<name>.yaml`
+    - `.metadata.name: <name>`
+- Test Resource:
+  - `chart/tests/manifests/<name>.yaml`
+    - `.metadata.name: <name>-#`
 
 ## Validate Policies
 
 Validate policy names should start with one of the following:
 
-- `disallow-`: for policies that prevent a setting
-- `require-`: for policies that require a specific setting
-- `restrict-`: for policies that only allow a setting based on a whitelist
+- `allow-`: policies that permit resources if a setting matches the allowed list or is undefined.
+- `deny-`: policies that permit resources if a setting does **not** match the deny list or is undefined
+- `require-`: policies that permit resources if a setting is defined and matches the required list
 
 ## Generate Policies
 
@@ -28,12 +30,8 @@ Generate policy names should start with one of the following:
 
 Mutate policy names should start with one of the following:
 
-- `add-`: for policies that add missing settings
-- `remove-`: for policies that remove existing settings
-- `replace-` for policies that modify or replace a setting
+- `update-`: policies that adds or updates a setting
 
 ## Special Policies
 
-CVE related policies should be named after the CVE unique identifier:
-
-- `cve-xxxx-xxxxx.yaml`
+Vulnerability related policies should contain `cve` in the name, preferably as a suffix.

@@ -12,6 +12,5 @@ rules:
   - clusterpolicies
   - policies
   verbs:
-  - get
   - list
 {{- end }}

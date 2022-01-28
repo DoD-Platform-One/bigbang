@@ -2,12 +2,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ template "kyverno-policies.name" . }}-wait-for-ready
+  name: {{ template "kyverno-policies.name" . }}-wait-for-ready-{{ now | date "20060102150405" }}
   labels:
     {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   activeDeadlineSeconds: 900
-  ttlSecondsAfterFinished: 30
+  ttlSecondsAfterFinished: 15
   template:
     metadata:
       labels: {{- include "kyverno-policies.labels" . | nindent 8 }}
