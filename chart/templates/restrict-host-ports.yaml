@@ -34,6 +34,7 @@ spec:
           containers:
             - =(ports):
               - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          # Ports are not allowed for ephemeral containers, but included here in case it changes
           =(ephemeralContainers):
             - =(ports):
               - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"

@@ -1,0 +1,66 @@
+{{- $name := "restrict-tolerations" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict Tolerations
+    policies.kyverno.io/category: Security Best Practices
+    policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Taints and tolerations provide one mechanism to allow fine-grained control of the
+      placement of pods on a specific set of nodes.  To permit the Kubernetes scheduler
+      to place a pod on a node with a taint, you can add a toleration to the pod's
+      specification.  If a taint is used to restrict a node to critical pods only,
+      tolerations that match the taint should not be allowed in unauthorized pods.  This
+      policy will block pods with tolerations, including global, that match the disallowed
+      taint list.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  # Create a different rule for each disallowed value
+  {{- $index := 0 }}
+  {{- range $v := (dig $name "parameters" "disallowedValues" nil .Values.policies) }}
+  {{- $index = add1 $index }}
+  - name: {{ printf "%s-pod-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    validate:
+      message: >-
+        Pod tolerations that match the taint {{ $v.key }}={{ $v.value }}:{{ $v.effect }} are not allowed.
+      foreach:
+      - list: "request.object.spec.tolerations"
+        anyPattern:
+          {{- if $v.key }}
+          - key: "!{{ $v.key }}"
+          {{- end }}
+          {{- if $v.value }}
+          - value: "!{{ $v.value }}"
+          {{- end }}
+          {{- if $v.effect }}
+          - effect: "!{{ $v.effect }}"
+          {{- end }}
+  - name: {{ printf "%s-runtime-class-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "RuntimeClass")) $) | nindent 4 }}
+    validate:
+      message: >-
+        RuntimeClaass tolerations that match the taint {{ $v.key }}={{ $v.value }}:{{ $v.effect }} are not allowed.
+      foreach:
+      - list: "request.object.scheduling.tolerations"
+        anyPattern:
+          {{- if $v.key }}
+          - key: "!{{ $v.key }}"
+          {{- end }}
+          {{- if $v.value }}
+          - value: "!{{ $v.value }}"
+          {{- end }}
+          {{- if $v.effect }}
+          - effect: "!{{ $v.effect }}"
+          {{- end }}
+  {{- end }}
+{{- end -}}

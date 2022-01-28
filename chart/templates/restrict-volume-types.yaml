@@ -10,8 +10,8 @@ metadata:
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      This policy restricts use of volume types to the allowed list.  By default, the allowed list
-      consists of non-core volume types defined through PersistentVolumes.
+      Volume types, beyond the core set, should be restricted to limit exposure to potential vulnerabilities
+      in Container Storage Interface (CSI) drivers.  This policy restricts use of volume types to the allowed list.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}

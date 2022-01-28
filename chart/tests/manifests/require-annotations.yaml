@@ -1,47 +1,44 @@
-# Test 1: Pods without the required labels are not allowed
+# Test 1: Pods without the required annotations are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-labels-1
-  labels:
-    kyverno-policies-bbtest/test: required
+  name: require-annotations-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/test: required
 spec:
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
 ---
-# Test 2: Pods without the required label values are not allowed
+# Test 2: Pods without the required annotation value are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-labels-2
-  labels:
+  name: require-annotations-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/required: test
     kyverno-policies-bbtest/test: notrequired
-    kyverno-policies-bbtest/required: test
-  annotations:
-    kyverno-policies-bbtest/type: validate
-    kyverno-policies-bbtest/expected: fail
 spec:
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
 ---
-# Test 3: Pods with the required labels are allowed
+# Test 3: Pods with the required annotations are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-labels-3
-  labels:
-    kyverno-policies-bbtest/test: required
-    kyverno-policies-bbtest/required: test
+  name: require-annotations-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
+    kyverno-policies-bbtest/required: test
+    kyverno-policies-bbtest/test: required
 spec:
   containers:
   - name: c1

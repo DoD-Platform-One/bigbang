@@ -30,6 +30,8 @@ spec:
           - image: "*:*"
           =(initContainers):
           - image: "*:*"
+          =(ephemeralContainers):
+          - image: "*:*"
   - name: validate-image-tag
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
@@ -40,5 +42,7 @@ spec:
           containers:
           - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
           =(initContainers):
+          - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
+          =(ephemeralContainers):
           - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
 {{- end -}}

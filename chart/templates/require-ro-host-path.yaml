@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Require Read-only hostPath Volumes
-    policies.kyverno.io/category: Security
+    policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/minversion: 1.5.0
     policies.kyverno.io/subject: Pod

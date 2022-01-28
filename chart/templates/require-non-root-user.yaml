@@ -10,8 +10,8 @@ metadata:
     policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Containers are required to run as non-root users. This policy ensures
-      the container has runAsNonRoot set and runAsUser > 0.
+      Following the least privilege principle, containers should not be run as root. This policy ensures
+      containers have `runAsNonRoot` set to `true` and `runAsUser` > 0.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}

@@ -5,8 +5,8 @@ kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Memory Requests Equal Limits
-    policies.kyverno.io/category: Sample
+    policies.kyverno.io/title: Resource Requests Equal Limits
+    policies.kyverno.io/category: Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/minversion: 1.3.6
@@ -16,7 +16,7 @@ metadata:
       only to nodes which have enough resources to fulfil their CPU and memory requests.  In addition,
       Guaranteed pods are the last to be evicted when a node is running low on resources.  This policy
       checks that all containers have memory requests equal to limits to get a Guaranteed QoS class.
-      This policy should only be assigned to critical cluster services.
+      This policy should only be assigned to critical resources.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
@@ -36,6 +36,7 @@ spec:
     validate:
       message: "CPU/memory requests must be equal to limits"
       foreach:
+      # Resources  are not allowed for ephemeral containers, but included here in case it changes
       - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
         deny:
           conditions:

@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Disallow Default Namespace
-    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-

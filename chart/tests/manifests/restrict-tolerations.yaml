@@ -1,0 +1,283 @@
+# Test 1: Tolerations that match the effect (global) are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - operator: "Exists"
+    effect: "PreferNoSchedule"
+---
+# Test 2: Tolerations that match the disallowed key are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "disallowed"
+    operator: "Exists"
+---
+# Test 3: Tolerations that match the disallowed value are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+---
+# Test 4: Tolerations that match all fields are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-4
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+---
+# Test 5: Global tolerations that don't match effect are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-5
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - operator: "Exists"
+    effect: "NoExecute"
+---
+# Test 6: Tolerations that don't match key are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-6
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "allowed"
+    operator: "Exists"
+---
+# Test 7: Tolerations that don't match value are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-7
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "false"
+---
+# Test 8: Tolerations that don't match effect are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-8
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+    effect: "NoExecute"
+---
+# Test 9: Pods without tolerations are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-tolerations-9
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 11: Runtime class tolerations that match the effect (global) are not allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-11
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - operator: "Exists"
+    effect: "PreferNoSchedule"
+---
+# Test 12: Runtime class tolerations that match the disallowed key are not allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-12
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "disallowed"
+    operator: "Exists"
+---
+# Test 13: Runtime class tolerations that match the disallowed value are not allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-13
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+---
+# Test 14: Runtime class tolerations that match all fields are not allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-14
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+---
+# Test 15: Runtime class global tolerations that don't match effect are allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-15
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - operator: "Exists"
+    effect: "NoExecute"
+---
+# Test 16: Runtime class tolerations that don't match key are allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-16
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "allowed"
+    operator: "Exists"
+---
+# Test 17: Runtime class tolerations that don't match value are allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-17
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "false"
+---
+# Test 18: Runtime class tolerations that don't match effect are allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-18
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+handler: restrict-tolerations
+scheduling:
+  tolerations:
+  - key: "disallowed"
+    operator: "Equal"
+    value: "true"
+    effect: "NoExecute"
+---
+# Test 19: Runtime classes without tolerations are allowed
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: restrict-tolerations-19
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+handler: restrict-tolerations

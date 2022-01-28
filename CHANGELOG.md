@@ -2,6 +2,35 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.3] - 2022-01-28
+
+### Added
+
+- update-image-pull-policy policy
+- cve-disallow-subpath-volumes policy
+- remove-token-automount policy
+- require-annotations policy
+- require-image-signature
+- require-istio-on-namespaces policy
+- require-istio-on-pods policy
+- require-labels policy
+- restrict-annotations policy
+- restrict-labels policy
+- restrict-pod-exec policy
+- restrict-tolerations policy
+- max. on cpu and memory limits in restrict-cpu-limits and restrict-memory-limits policies
+- Gatekeeper policy vs. Kyverno policy documentation
+- Policy description documentation
+
+### Changed
+
+- require-resource-limits split into restrict-cpu-limits and restrict-memory-limits policies
+- Added timestamp to wait-for-ready job so upgrades do not try to change immutable job.
+
+### Removed
+
+- cve-add-log4j2-mitigation policy (Mitigation proved to be insufficient)
+
 ## [1.0.0-bb.2] - 2022-01-14
 
 ### Added

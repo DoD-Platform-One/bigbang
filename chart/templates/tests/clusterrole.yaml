@@ -18,15 +18,6 @@ rules:
   - list
   - patch
 - apiGroups:
-  - "wgpolicyk8s.io"
-  resources:
-  - clusterpolicyreports
-  - policyreports
-  verbs:
-  - get
-  - list
-  - delete
-- apiGroups:
   - "*"
   resources:
   - configmaps
@@ -42,8 +33,6 @@ rules:
   - create
   - delete
   - get
-  - list
-  - patch
 - apiGroups:
   - "rbac.authorization.k8s.io"
   resources:
@@ -54,6 +43,12 @@ rules:
   - create
   - delete
   - get
-  - list
-  - patch
+- apiGroups:
+  - "node.k8s.io"
+  resources:
+  - runtimeclasses
+  verbs:
+  - create
+  - delete
+  - get
 {{- end }}

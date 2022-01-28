@@ -1,0 +1,29 @@
+{{- $name := "require-image-signature" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Require Image Signature
+    policies.kyverno.io/category: Best Practice (Security)
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.4.2
+    policies.kyverno.io/description: >-
+      Using the Cosign project, OCI images may be signed to ensure supply chain
+      security is maintained. Those signatures can be verified before pulling into
+      a cluster. This policy checks the signature to ensure it has been signed by verifying
+      its signature against the public key.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: verify-image
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    verifyImages:
+    {{- toYaml (dig $name "parameters" "requiredValues" nil .Values.policies) | nindent 4 }}
+{{- end -}}
