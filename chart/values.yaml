@@ -337,9 +337,9 @@ kyverno:
   # -- Toggle deployment of Kyverno.
   enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
     path: "./chart"
-    tag: "2.1.3-bb.3"
+    tag: "2.1.7-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
