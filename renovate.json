@@ -21,6 +21,15 @@
                 "(repo|image_name)\\S*:\\s*(?<depName>\\S+).*\n\\s+(tag|image_version):\\s*(?<currentValue>.+)"
             ],
             "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^chart/Chart\\.yaml$"],
+            "matchStrings": [
+                "- Kiali:\\s*(?<currentValue>.+)"
+            ],
+            "depNameTemplate": "ironbank/opensource/kiali/kiali-operator",
+            "datasourceTemplate": "docker",
+            "registryUrlTemplate": "https://registry1.dso.mil"
         }
     ],
     "separateMajorMinor": false

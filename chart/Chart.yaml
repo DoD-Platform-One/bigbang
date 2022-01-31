@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kiali-operator
 description: Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
-version: 1.45.0-bb.0
+version: 1.45.0-bb.1
 appVersion: 1.45.0
 home: https://github.com/kiali/kiali-operator
 maintainers:
@@ -23,3 +23,6 @@ dependencies:
   - name: bb-test-lib
     version: "0.4.0"
     repository: "oci://registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates"
+annotations:
+  bigbang.dev/applicationVersions: |
+    - Kiali: 1.45.0
