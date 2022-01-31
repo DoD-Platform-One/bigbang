@@ -11,7 +11,6 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: kyverno
-
   chart:
     spec:
       chart: {{ .Values.kyverno.git.path }}
