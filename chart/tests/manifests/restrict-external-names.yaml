@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cve-restrict-external-names-1
+  name: restrict-external-names-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
   type: ExternalName
   selector:
-    app: cve-restrict-external-names
+    app: restrict-external-names
   ports:
   - port: 80
   externalName: disallowed
@@ -18,14 +18,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cve-restrict-external-names-2
+  name: restrict-external-names-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
 spec:
   type: ExternalName
   selector:
-    app: cve-restrict-external-names
+    app: restrict-external-names
   ports:
     - port: 80
   externalName: allowed

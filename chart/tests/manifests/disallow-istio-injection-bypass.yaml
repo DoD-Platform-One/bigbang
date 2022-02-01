@@ -1,10 +1,10 @@
-# Test 1: Pods with a disallowed label key are not allowed
+# Test 1: Pods that have sidecar.istio.io/inject set to false are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-labels-1
+  name: disallow-istio-injection-bypass-1
   labels:
-    kyverno-policies-bbtest/disallowed: test
+    sidecar.istio.io/inject: "false"
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -14,29 +14,13 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
 ---
-# Test 2: Pods with a disallowed label value are not allowed
+# Test 2: Pods that have sidecar.istio.io/inject set to true are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-labels-2
+  name: disallow-istio-injection-bypass-2
   labels:
-    kyverno-policies-bbtest/test: disallowed
-  annotations:
-    kyverno-policies-bbtest/type: validate
-    kyverno-policies-bbtest/expected: fail
-spec:
-  containers:
-  - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
----
-# Test 3: Pods with allowed label keys/values are allowed
-apiVersion: v1
-kind: Pod
-metadata:
-  name: restrict-labels-3
-  labels:
-    kyverno-policies-bbtest/test: allowed
+    sidecar.istio.io/inject: "true"
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -46,11 +30,27 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
 ---
-# Test 4: Pods with no labels are allowed
+# Test 3: Pods that don't have the sidecar.istio.io/inject label are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-labels-4
+  name: disallow-istio-injection-bypass-3
+  labels:
+    disallow-istio-injection-bypass: "false"
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+---
+# Test 4: Pods that don't have any labels are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-istio-injection-bypass-4
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

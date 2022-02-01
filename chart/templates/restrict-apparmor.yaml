@@ -30,5 +30,5 @@ spec:
       pattern:
         metadata:
           =(annotations):
-            =(container.apparmor.security.beta.kubernetes.io/*): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            =(container.apparmor.security.beta.kubernetes.io/*): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

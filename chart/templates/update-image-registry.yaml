@@ -1,4 +1,4 @@
-{{- $name := "replace-image-registry" }}
+{{- $name := "update-image-registry" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -16,10 +16,11 @@ metadata:
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
-  background: false
   rules:
-  {{- range $v := (dig $name "parameters" "replacements" nil .Values.policies) }}
-  - name: replace-{{ $v.old }}-containers
+  {{- $index := 0 }}
+  {{- range $v := (dig $name "parameters" "update" nil .Values.policies) }}
+  {{- $index = add1 $index }}
+  - name: {{ printf "%s-containers-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     mutate:
@@ -28,17 +29,12 @@ spec:
           containers:
           - (name): "*"
             image: |-
-              {{ "{{" }} regex_replace_all('{{ $v.old }}', '{{"{{"}}@{{"}}"}}', '{{ $v.new }}') {{ "}}" }}
-  - name: replace-{{ $v.old }}-initcontainers
+              {{ "{{" }} regex_replace_all('{{ $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-initcontainers-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     preconditions:
       all:
-      - key: "{{"{{"}}request.operation{{"}}"}}"
-        operator: In
-        value:
-        - CREATE
-        - UPDATE
       - key: "{{"{{"}} not_null(request.object.spec.initContainers[], '') | length(@) {{"}}"}}"
         operator: GreaterThanOrEquals
         value: 1
@@ -48,17 +44,12 @@ spec:
           initContainers:
           - (name): "*"
             image: |-
-              {{ "{{" }} regex_replace_all('{{ $v.old }}', '{{"{{"}}@{{"}}"}}', '{{ $v.new }}') {{ "}}" }}
-  - name: replace-{{ $v.old }}-ephemeralcontainers
+              {{ "{{" }} regex_replace_all('{{ $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-ephemeralcontainers-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     preconditions:
       all:
-      - key: "{{"{{"}}request.operation{{"}}"}}"
-        operator: In
-        value:
-        - CREATE
-        - UPDATE
       - key: "{{"{{"}} not_null(request.object.spec.ephemeralContainers[], '') | length(@) {{"}}"}}"
         operator: GreaterThanOrEquals
         value: 1
@@ -68,6 +59,6 @@ spec:
           ephemeralContainers:
           - (name): "*"
             image: |-
-              {{ "{{" }} regex_replace_all('{{ $v.old }}', '{{"{{"}}@{{"}}"}}', '{{ $v.new }}') {{ "}}" }}
+              {{ "{{" }} regex_replace_all('{{ $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
   {{- end }}
 {{- end -}}

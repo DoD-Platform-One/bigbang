@@ -35,7 +35,7 @@ spec:
       capabilities:
         add: ["disallowed"]
 ---
-# Test 3: Containers or init containers that add whitelisted capabilities or no capabilities should be allowed
+# Test 3: Containers or init containers that add allowed capabilities or no capabilities should be allowed
 apiVersion: v1
 kind: Pod
 metadata:

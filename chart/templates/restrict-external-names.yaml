@@ -1,11 +1,11 @@
-{{- $name := "cve-restrict-external-names" }}
+{{- $name := "restrict-external-names" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: CVE-2020-8554 - Restrict External Names
+    policies.kyverno.io/title: Restrict External Names (CVE-2020-8554)
     policies.kyverno.io/category: Vulnerability
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Service
@@ -26,5 +26,5 @@ spec:
       pattern:
         spec:
           (type): ExternalName
-          externalName: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          externalName: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

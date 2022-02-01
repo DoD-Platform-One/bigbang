@@ -30,5 +30,5 @@ spec:
         spec:
           volumes:
           - =(hostPath):
-              path: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              path: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

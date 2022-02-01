@@ -1,11 +1,11 @@
-{{- $name := "cve-restrict-external-ips" }}
+{{- $name := "restrict-external-ips" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: CVE-2020-8554 - Restrict External IPs
+    policies.kyverno.io/title: Restrict External IPs (CVE-2020-8554)
     policies.kyverno.io/category: Vulnerability
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Service
@@ -24,5 +24,5 @@ spec:
       message: "Only externalIPs in the approved list are allowed."
       pattern:
         spec:
-          =(externalIPs): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+          =(externalIPs): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

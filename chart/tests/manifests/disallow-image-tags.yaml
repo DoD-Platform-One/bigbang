@@ -1,0 +1,78 @@
+# Test 1: Containers using the disallowed tag are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-1
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
+    args: ["sleep", "infinity"]
+---
+# Test 2: Init containers using the disallowed tag are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-2
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
+---
+# Test 3: Containers without a tag are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 4: Init containers without a tag are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-4
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 5: Containers and init containers with immutable tags are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-5
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5

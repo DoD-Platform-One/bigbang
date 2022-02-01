@@ -1,11 +1,11 @@
-{{- $name := "restrict-tolerations" }}
+{{- $name := "disallow-tolerations" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Restrict Tolerations
+    policies.kyverno.io/title: Disallow Tolerations
     policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
@@ -24,7 +24,7 @@ spec:
   rules:
   # Create a different rule for each disallowed value
   {{- $index := 0 }}
-  {{- range $v := (dig $name "parameters" "disallowedValues" nil .Values.policies) }}
+  {{- range $v := (dig $name "parameters" "disallow" nil .Values.policies) }}
   {{- $index = add1 $index }}
   - name: {{ printf "%s-pod-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}

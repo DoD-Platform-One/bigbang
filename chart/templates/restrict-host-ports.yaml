@@ -30,12 +30,12 @@ spec:
         spec:
           =(initContainers):
             - =(ports):
-              - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              - =(hostPort): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           containers:
             - =(ports):
-              - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              - =(hostPort): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           # Ports are not allowed for ephemeral containers, but included here in case it changes
           =(ephemeralContainers):
             - =(ports):
-              - =(hostPort): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              - =(hostPort): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

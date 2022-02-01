@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-1
+  name: disallow-tolerations-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-2
+  name: disallow-tolerations-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-3
+  name: disallow-tolerations-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -54,7 +54,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-4
+  name: disallow-tolerations-4
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -73,7 +73,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-5
+  name: disallow-tolerations-5
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -90,7 +90,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-6
+  name: disallow-tolerations-6
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -107,7 +107,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-7
+  name: disallow-tolerations-7
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -125,7 +125,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-8
+  name: disallow-tolerations-8
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -144,7 +144,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-tolerations-9
+  name: disallow-tolerations-9
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -158,11 +158,11 @@ spec:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-11
+  name: disallow-tolerations-11
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - operator: "Exists"
@@ -172,11 +172,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-12
+  name: disallow-tolerations-12
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "disallowed"
@@ -186,11 +186,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-13
+  name: disallow-tolerations-13
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "disallowed"
@@ -201,11 +201,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-14
+  name: disallow-tolerations-14
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "disallowed"
@@ -217,11 +217,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-15
+  name: disallow-tolerations-15
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - operator: "Exists"
@@ -231,11 +231,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-16
+  name: disallow-tolerations-16
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "allowed"
@@ -245,11 +245,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-17
+  name: disallow-tolerations-17
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "disallowed"
@@ -260,11 +260,11 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-18
+  name: disallow-tolerations-18
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
-handler: restrict-tolerations
+handler: disallow-tolerations
 scheduling:
   tolerations:
   - key: "disallowed"
@@ -276,8 +276,8 @@ scheduling:
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
-  name: restrict-tolerations-19
+  name: disallow-tolerations-19
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
-handler: restrict-tolerations
+handler: disallow-tolerations

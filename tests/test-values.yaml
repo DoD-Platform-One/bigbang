@@ -5,30 +5,22 @@ waitforready:
   imagePullSecrets:
   - name: private-registry
 policies:
-  update-image-pull-policy:
-    enabled: true
-    parameters:
-      addValue: Always
   clone-configs:
     enabled: true
     parameters:
-      sourceObjects:
-        clone-configs-1:
-          kind: ConfigMap
-          namespace: kyverno-policies
-        clone-configs-2:
-          kind: Secret
-          namespace: kyverno-policies
-  cve-disallow-subpath-volumes:
-    enabled: true
-  cve-restrict-external-ips:
+      clone:
+      - name: clone-configs-1
+        kind: ConfigMap
+        namespace: kyverno-policies
+      - name: clone-configs-2
+        kind: Secret
+        namespace: kyverno-policies
+  disallow-annotations:
     enabled: true
     parameters:
-      allowedValues: ["192.168.1.1", "192.168.0.1"]
-  cve-restrict-external-names:
-    enabled: true
-    parameters:
-      allowedValues: ["dso.mil", "allowed"]
+      disallow:
+        - 'kyverno-policies-bbtest/test: disallowed'
+        - kyverno-policies-bbtest/disallowed
   disallow-default-namespace:
     enabled: true
   disallow-deprecated-apis:
@@ -37,46 +29,78 @@ policies:
     enabled: true
   disallow-host-path:
     enabled: true
+  disallow-image-tags:
+    enabled: true
+    parameters:
+      disallow:
+        - disallowed
+        - latest
+  disallow-istio-injection-bypass:
+    enabled: true
+  disallow-labels:
+    enabled: true
+    parameters:
+      disallow:
+        - 'kyverno-policies-bbtest/test: disallowed'
+        - kyverno-policies-bbtest/disallowed
   disallow-nodeport-services:
     enabled: true
+  disallow-pod-exec:
+    enabled: false
   disallow-privilege-escalation:
     enabled: true
   disallow-privileged-containers:
     enabled: true
   disallow-rbac-on-default-serviceaccounts:
     enabled: true
-  remove-token-automount:
+  disallow-subpath-volumes:
     enabled: true
-  replace-image-registry:
+  disallow-tolerations:
     enabled: true
     parameters:
-      replacements:
-      - old: "replace.image.registry"
-        new: "registry1.dso.mil"
+      disallow:
+        - effect: NoSchedule
+          key: notallowed
+          value: 'false'
+        - effect: '*NoSchedule'
+          key: disa??owed
+          value: 'true'
   require-annotations:
     enabled: true
     parameters:
-      requiredValues: ["kyverno-policies-bbtest/test: required", "kyverno-policies-bbtest/required"]
+      require:
+        - 'kyverno-policies-bbtest/test: required'
+        - kyverno-policies-bbtest/required
+  require-cpu-limit:
+    enabled: true
+    parameters:
+      require:
+        - <1000m
   require-drop-all-capabilities:
     enabled: true
   require-image-signature:
-    enabled: false # Problems with Test Case #3
+    enabled: false
     parameters:
-      requiredValues:
-      - image: "ghcr.io/kyverno/test-verify-image:*"
-        key: |-
-          -----BEGIN PUBLIC KEY-----
-          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
-          5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
-          -----END PUBLIC KEY-----
+      require:
+        - image: ghcr.io/kyverno/test-verify-image:*
+          key: |-
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+            5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+            -----END PUBLIC KEY-----
   require-istio-on-namespaces:
-    enabled: true
-  require-istio-on-pods:
     enabled: true
   require-labels:
     enabled: true
     parameters:
-      requiredValues: ["kyverno-policies-bbtest/test: required", "kyverno-policies-bbtest/required"]
+      require:
+        - 'kyverno-policies-bbtest/test: required'
+        - kyverno-policies-bbtest/required
+  require-memory-limit:
+    enabled: true
+    parameters:
+      require:
+        - <1Gi
   require-non-root-group:
     enabled: true
   require-non-root-user:
@@ -89,79 +113,90 @@ policies:
     enabled: true
   require-ro-rootfs:
     enabled: true
-  restrict-annotations:
-    enabled: true
-    parameters:
-      disallowedValues: ["kyverno-policies-bbtest/test: disallowed", "kyverno-policies-bbtest/disallowed"]
   restrict-apparmor:
     enabled: true
   restrict-capabilities:
     enabled: true
     parameters:
-      allowedValues: ["allowed"]
-  restrict-cpu-limit:
+      allow:
+        - allowed
+  restrict-external-ips:
     enabled: true
     parameters:
-      allowedValues: ["<1000m"]
+      allow:
+        - 192.168.1.1
+        - 192.168.0.1
+  restrict-external-names:
+    enabled: true
+    parameters:
+      allow:
+        - dso.mil
+        - allowed
   restrict-group-id:
     enabled: true
     parameters:
-      # Ranges: 1000, 2000-2999, 4000+
-      allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
+      allow:
+        - '1000'
+        - '>=2000 & <3000'
+        - '>=4000'
   restrict-host-path:
     enabled: true
     parameters:
-      allowedValues: ["/proc/urandom", "/tmp/allowed"]
+      allow:
+        - /proc/urandom
+        - /tmp/allowed
   restrict-host-ports:
     enabled: true
     parameters:
-      allowedValues: ["63999", ">= 64000 & < 65000", "> 65000"]
+      allow:
+        - '63999'
+        - '>= 64000 & < 65000'
+        - '> 65000'
   restrict-image-registries:
     enabled: true
     parameters:
-      allowedValues: ["allowed", "registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"]
-  restrict-image-tags:
-    enabled: true
-    parameters:
-      disallowedValues: ["disallowed", "latest"]
-  restrict-labels:
-    enabled: true
-    parameters:
-      disallowedValues: ["kyverno-policies-bbtest/test: disallowed", "kyverno-policies-bbtest/disallowed"]
-  restrict-memory-limit:
-    enabled: true
-    parameters:
-      allowedValues: ["<1Gi"]
-  restrict-pod-exec:
-    enabled: false  # Tested manually as this does not fit into the test framework.
+      allow:
+        - allowed
+        - registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
   restrict-proc-mount:
     enabled: true
   restrict-seccomp:
     enabled: true
     parameters:
-      disallowedValues: ["allowed", "RuntimeDefault"]
-  restrict-selinux:
+      disallow:
+        - allowed
+        - RuntimeDefault
+  restrict-selinux-type:
     enabled: true
   restrict-sysctls:
     enabled: true
     parametes:
-      allowedValues: ["kernel.shm_rmid_forced", "net.ipv4.ip_local_port_range"]
-  restrict-tolerations:
-    enabled: true
-    parameters:
-      disallowedValues:
-      - key: "notallowed"
-        value: "false"
-        effect: "NoSchedule"
-      - key: "disa??owed"
-        value: "true"
-        effect: "*NoSchedule"
+      allow:
+        - kernel.shm_rmid_forced
+        - net.ipv4.ip_local_port_range
   restrict-user-id:
     enabled: true
     parameters:
-      # Ranges: 1000, 2000-2999, 4000+
-      allowedValues: ["1000", ">=2000 & <3000", ">=4000"]
+      allow:
+        - '1000'
+        - '>=2000 & <3000'
+        - '>=4000'
   restrict-volume-types:
     enabled: true
     parameters:
-      allowedValues: ["emptyDir", "projected"]
+      allow:
+        - emptyDir
+        - projected
+  update-image-pull-policy:
+    enabled: true
+    parameters:
+      update:
+        - to: Always
+  update-image-registry:
+    enabled: true
+    parameters:
+      update:
+        - from: replace.image.registry
+          to: registry1.dso.mil
+  update-token-automount:
+    enabled: true

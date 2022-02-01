@@ -20,7 +20,7 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
 ---
-# Test 2: Pods that add whitelisted sysctls should be allowed
+# Test 2: Pods that add allowed sysctls should be allowed
 apiVersion: v1
 kind: Pod
 metadata:

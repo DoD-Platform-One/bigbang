@@ -24,7 +24,8 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-
-        The seccomp profile used is disallowed.  The fields spec.securityContext.seccompProfile.type,
+        The seccomp profile used is not in the allowed list.  The fields
+        spec.securityContext.seccompProfile.type,
         spec.containers[*].securityContext.seccompProfile.type,
         spec.initContainers[*].securityContext.seccompProfile.type, and
         spec.ephemeralContainers[*].securityContext.seccompProfile.type
@@ -33,17 +34,17 @@ spec:
        spec:
         =(securityContext):
           =(seccompProfile):
-            type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            type: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
         containers:
         - =(securityContext):
             =(seccompProfile):
-              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              type: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
         =(initContainers):
         - =(securityContext):
             =(seccompProfile):
-              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              type: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
         =(ephemeralContainers):
         - =(securityContext):
             =(seccompProfile):
-              type: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+              type: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

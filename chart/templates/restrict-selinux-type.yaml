@@ -1,0 +1,45 @@
+{{- $name := "restrict-selinux-type" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Restrict SELinux Type
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      SELinux options can be used to escalate privileges. This policy ensures that the `seLinuxOptions`
+      type field is undefined or restricted to the allowed list.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: selinux-options-type
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting SELinux type is restricted.  The values from spec.securityContext.seLinuxOptions.type,
+        spec.containers[*].securityContext.seLinuxOptions.type, spec.initContainers[*].securityContext.seLinuxOptions.type,
+        and spec.ephemeralContainers[*].securityContext.seLinuxOptions.type must be in the allowed list.
+      pattern:
+        spec:
+          =(securityContext):
+            =(seLinuxOptions):
+              =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+          =(initContainers):
+            - =(securityContext):
+                =(seLinuxOptions):
+                  =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+          containers:
+            - =(securityContext):
+                =(seLinuxOptions):
+                  =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+          =(ephemeralContainers):
+            - =(securityContext):
+                =(seLinuxOptions):
+                  =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+{{- end -}}

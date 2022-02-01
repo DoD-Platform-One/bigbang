@@ -11,7 +11,7 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       Sysctl can disable security mechanisms or affect all containers on a
-      host, and should be disallowed except for an allowed "safe" subset. A
+      host, and should be restricted to an allowed "safe" subset. A
       sysctl is considered safe if it is namespaced and is isolated from other
       Pods and processes on the same Node.  This policy ensures that all sysctls are
       in the allowed list.
@@ -31,6 +31,6 @@ spec:
         spec:
           =(securityContext):
             =(sysctls):
-              - name: "{{ join " | " (dig $name "parametes" "allowedValues" nil .Values.policies) }}"
+              - name: "{{ join " | " (dig $name "parametes" "allow" nil .Values.policies) }}"
                 value: "?*"
 {{- end -}}

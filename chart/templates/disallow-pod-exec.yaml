@@ -1,11 +1,11 @@
-{{- $name := "restrict-pod-exec" }}
+{{- $name := "disallow-pod-exec" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Restrict Pod Exec
+    policies.kyverno.io/title: Disallow Pod Exec
     policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/minversion: 1.4.2
@@ -13,14 +13,13 @@ metadata:
     policies.kyverno.io/description: >-
       The `exec` and `attach` command may be used to gain shell access, or run other commands, in a
       container. While this can be useful for troubleshooting purposes, it could represent an attack
-      vector and is discouraged.  This policy only allows Pod exec and attach commands to Pods in
-      the allowed list of namespaces.
+      vector and is discouraged.  This policy prevents pod exec and attach.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: restrict-exec
+  - name: disallow-exec
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "PodExecOptions" "PodAttachOptions")) .) | nindent 4 }}
     preconditions:
@@ -28,10 +27,6 @@ spec:
       operator: Equals
       value: CONNECT
     validate:
-      message: Cannot exec or attach to pods in this namespace.
-      deny:
-        conditions:
-          - key: "{{ "{{" }}request.namespace{{ "}}" }}"
-            operator: NotEquals
-            value: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+      message: Cannot exec or attach to pods.
+      deny: {}
 {{- end -}}
