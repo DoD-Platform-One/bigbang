@@ -21,6 +21,15 @@
                 "image:[^\\S\\r\\n]+(?<depName>.+)\\s+tag:[^\\S\\r\\n]+(?<currentValue>[\\d\\.]+)"
             ],
             "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^chart/Chart\\.yaml$"],
+            "matchStrings": [
+                "- Nexus:\\s+(?<currentValue>.+)"
+            ],
+            "registryUrlTemplate": "https://registry1.dso.mil",
+            "depNameTemplate": "ironbank/sonatype/nexus/nexus",
+            "datasourceTemplate": "docker"
         }
     ],
     "separateMajorMinor": false

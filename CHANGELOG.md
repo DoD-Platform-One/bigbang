@@ -1,6 +1,12 @@
 # Changelog
 
 ---
+
+## [36.0.0-bb.4] - 2022-01-31
+### Added
+- Update Chart.yaml to follow new standardization for release automation
+- Added renovate check to update new standardization
+
 ## [36.0.0-bb.3] - 2022-01-14
 ### Added
 - Added network policy for egress for por 443
