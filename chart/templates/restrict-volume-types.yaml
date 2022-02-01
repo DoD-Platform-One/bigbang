@@ -37,7 +37,7 @@ spec:
       foreach:
       - list: "request.object.spec.volumes"
         anyPattern:
-        {{- range $v := (dig $name "parameters" "allowedValues" nil .Values.policies) }}
+        {{- range $v := (dig $name "parameters" "allow" nil .Values.policies) }}
         - {{ $v }}: "*"
         {{- end }}
 {{- end -}}

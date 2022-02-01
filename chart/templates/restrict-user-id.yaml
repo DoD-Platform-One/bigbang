@@ -26,14 +26,14 @@ spec:
       pattern:
         spec:
           =(securityContext):
-            =(runAsUser): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            =(runAsUser): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(initContainers):
             - =(securityContext):
-                =(runAsUser): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsUser): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           containers:
             - =(securityContext):
-                =(runAsUser): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsUser): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(ephemeralContainers):
             - =(securityContext):
-                =(runAsUser): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsUser): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

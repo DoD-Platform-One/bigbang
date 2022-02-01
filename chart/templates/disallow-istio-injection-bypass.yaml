@@ -1,11 +1,11 @@
-{{- $name := "require-istio-on-pods" }}
+{{- $name := "disallow-istio-injection-bypass" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Require Istio Sidecar Injection on Pods
+    policies.kyverno.io/title: Disallow Istio Injection Bypass
     policies.kyverno.io/category: Security Best Practice
     policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pods

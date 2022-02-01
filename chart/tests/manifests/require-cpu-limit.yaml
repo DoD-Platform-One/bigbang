@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-cpu-limit-1
+  name: require-cpu-limit-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-cpu-limit-2
+  name: require-cpu-limit-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -39,7 +39,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-cpu-limit-3
+  name: require-cpu-limit-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -56,7 +56,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-cpu-limit-4
+  name: require-cpu-limit-4
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -79,7 +79,7 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-cpu-limit-5
+  name: require-cpu-limit-5
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

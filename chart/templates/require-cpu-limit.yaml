@@ -1,22 +1,22 @@
-{{- $name := "restrict-memory-limit" }}
+{{- $name := "require-cpu-limit" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Restrict Memory Limits
+    policies.kyverno.io/title: Require CPU Limits
     policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      As application workloads share cluster resources, it is important to limit memory resources
+      As application workloads share cluster resources, it is important to limit CPU resources
       in containers to prevent resource exhaustion and denial-of-service.  Each container should have a
-      memory limit defined and that limit should be below a maximum allowed value.  Kubernetes
+      CPU limit defined and that limit should be below a maximum value.  Kubernetes
       will automatically assign resource requests to limits if they are left undefined. If a Namespace
       level limit is specified, defaults will automatically be applied to each Pod based on the LimitRange
-      configuration.  This policy validates that all containers have memory limits defined and the value is
-      in the allowed range.
+      configuration.  This policy validates that all containers have CPU limits defined and the value is
+      within the specified range.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
@@ -26,20 +26,20 @@ spec:
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
-      message: "Memory limits are required to be defined and below the maximum."
+      message: "CPU limits are required to be defined and below the maximum."
       pattern:
         spec:
           containers:
           - resources:
               limits:
-                memory: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                cpu: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
           =(initContainers):
           - resources:
               limits:
-                memory: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                cpu: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
           # Resources are not allowed for ephemeral containers, but included here in case it changes
           =(ephemeralContainers):
           - resources:
               limits:
-                memory: "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                cpu: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
 {{- end -}}

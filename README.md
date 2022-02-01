@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.0-bb.3](https://img.shields.io/badge/Version-1.0.0--bb.3-informational?style=flat-square)
+![Version: 1.0.0-bb.4](https://img.shields.io/badge/Version-1.0.0--bb.4-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -52,79 +52,80 @@ helm install kyverno-policies chart/
 | policies.sample.match | object | `{}` | Defines when this policy's rules should be applied.  This completely overrides any default matches. |
 | policies.sample.exclude | object | `{}` | Defines when this policy's rules should not be applied.  This completely overrides any default excludes. |
 | policies.sample.parameters | object | `{}` | Policy specific parameters that are added to the configMap for the policy rules |
-| policies.update-image-pull-policy | object | `{"enabled":false,"parameters":{"addValue":"Always"}}` | Adds an image pull policy to containers |
-| policies.update-image-pull-policy.parameters.addValue | string | `"Always"` | Value to set imagePullPolicy to (Always, Never, IfNotPresent) |
-| policies.clone-configs | object | `{"enabled":false,"parameters":{"sourceObjects":{}}}` | Clone existing configMap or secret in new Namespaces |
-| policies.clone-configs.parameters.sourceObjects | object | `{}` | ConfigMap or Secrets that should be cloned |
-| policies.cve-disallow-subpath-volumes | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Mitigates subpath volume vulnerability (CVE-2021-25741) |
-| policies.cve-restrict-external-ips | object | `{"enabled":true,"parameters":{"allowedValues":[]},"validationFailureAction":"enforce"}` | Mitigates Services with External IPs vulnerability (CVE-2020-8554) |
-| policies.cve-restrict-external-ips.parameters.allowedValues | list | `[]` | List of external IPs allowed in services |
-| policies.cve-restrict-external-names | object | `{"enabled":true,"parameters":{"allowedValues":[]},"validationFailureAction":"enforce"}` | Mitigates Services with External Names vulnerability (CVE-2020-8554) |
-| policies.cve-restrict-external-names.parameters.allowedValues | list | `[]` | List of external names allowed in services.  Must be a lowercase FRC-1123 hostname. |
-| policies.disallow-default-namespace | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevents deployment of pods into the default namespace |
-| policies.disallow-deprecated-apis | object | `{"enabled":true,"validationFailureAction":"audit"}` | Checks for resource APIs in use that will be removed in Kubernetes 1.22 or 1.25 |
-| policies.disallow-host-namespaces | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Disallow use of the host namespace (PID, IPC, Network) by pods |
-| policies.disallow-host-path | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Disallow hostpath volumes |
-| policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"audit"}` | Disallow services of type NodePort |
-| policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Disallows pods that allow privilege escalation |
-| policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Disallow containers that run as privileged |
-| policies.disallow-rbac-on-default-serviceaccounts | object | `{"enabled":true,"validationFailureAction":"audit"}` | Disallow additional permissions on default service accounts |
-| policies.remove-token-automount | object | `{"enabled":false}` | Remove automount token from default service accounts |
-| policies.replace-image-registry | object | `{"enabled":false,"parameters":{"replacements":[]}}` | Replaces an existing image registry with a new registry in containers (e.g. proxy) |
-| policies.replace-image-registry.parameters.replacements | list | `[]` | List of registries to replace |
-| policies.require-annotations | object | `{"enabled":false,"parameters":{"requiredValues":[]},"validationFailureAction":"audit"}` | Require specified annotations to be on all pods |
-| policies.require-annotations.parameters.requiredValues | list | `[]` | List of annotations required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
+| policies.clone-configs | object | `{"enabled":false,"parameters":{"clone":[]}}` | Clone existing configMap or secret in new Namespaces |
+| policies.clone-configs.parameters.clone | list | `[]` | ConfigMap or Secrets that should be cloned |
+| policies.disallow-annotations | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified annotations on pods |
+| policies.disallow-annotations.parameters.disallow | list | `[]` | List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
+| policies.disallow-default-namespace | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent pods from using the default namespace |
+| policies.disallow-deprecated-apis | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent resources that use deprecated or removed APIs (through Kubernetes 1.25) |
+| policies.disallow-host-namespaces | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent use of the host namespace (PID, IPC, Network) by pods |
+| policies.disallow-host-path | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent volumes that use hostpath |
+| policies.disallow-image-tags | object | `{"enabled":true,"parameters":{"disallow":["latest"]},"validationFailureAction":"audit"}` | Prevent container images with specified tags.  Also, requires images to have a tag. |
+| policies.disallow-istio-injection-bypass | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent the `sidecar.istio.io/inject: false` label on pods. |
+| policies.disallow-labels | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified labels on pods |
+| policies.disallow-labels.parameters.disallow | list | `[]` | List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
+| policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent services of the type NodePort |
+| policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"attach"}` | Prevent the use of `exec` or `attach` on pods |
+| policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent privilege escalation on pods |
+| policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers that run as privileged |
+| policies.disallow-selinux-options | object | `{"enabled":true,"parameters":{"disallow":["user","role"]},"validationFailureAction":"enforce"}` | Prevent specified SELinux options from being used on pods. |
+| policies.disallow-selinux-options.parameters.disallow | list | `["user","role"]` | List of selinux options that are not allowed Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
+| policies.disallow-subpath-volumes | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent volumes with subpaths (CVE-2021-25741) |
+| policies.disallow-tolerations | object | `{"enabled":true,"parameters":{"disallow":[{"key":"node-role.kubernetes.io/master"}]},"validationFailureAction":"audit"}` | Prevent tolerations that bypass specified taints |
+| policies.disallow-tolerations.parameters.disallow | list | `[{"key":"node-role.kubernetes.io/master"}]` | List of taints to protect from toleration.  Each entry can have key, value, and/or effect.  Wildcards '*' and '?' can be used If key, value, or effect are not defined, they are ignored in the policy rule |
+| policies.disallow-rbac-on-default-serviceaccounts | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent additional RBAC permissions on default service accounts |
+| policies.require-annotations | object | `{"enabled":false,"parameters":{"require":[]},"validationFailureAction":"audit"}` | Require specified annotations on all pods |
+| policies.require-annotations.parameters.require | list | `[]` | List of annotations required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
+| policies.require-cpu-limit | object | `{"enabled":true,"parameters":{"require":["<10"]},"validationFailureAction":"audit"}` | Require containers have CPU limits defined and within the specified range |
+| policies.require-cpu-limit.parameters.require | list | `["<10"]` | CPU limitations (only one needs to be met) |
 | policies.require-drop-all-capabilities | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Requires containers to drop all Linux capabilities |
-| policies.require-image-signature | object | `{"enabled":false,"parameters":{"requiredSignatures":[]},"validationFailureAction":"audit"}` | Require images matching the specfied list to be signed and verified |
-| policies.require-image-signature.parameters.requiredSignatures | list | `[]` | List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields. |
-| policies.require-istio-on-namespaces | object | `{"enabled":true,"validationFailureAction":"audit"}` | Require namespaces to enable Istio sidecar injection by setting the label `istio-injection` to `enabled`. |
-| policies.require-istio-on-pods | object | `{"enabled":true,"validationFailureAction":"audit"}` | Require pods allow Istio sidecar injection by not having the `sidecar.istio.io/inject` label set to "false". |
-| policies.require-labels | object | `{"enabled":false,"parameters":{"requiredValues":["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]},"validationFailureAction":"audit"}` | Require specified labels to be on all pods |
-| policies.require-labels.parameters.requiredValues | list | `["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]` | List of labels required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. See https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels See https://helm.sh/docs/chart_best_practices/labels/#standard-labels |
-| policies.require-non-root-group | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run with non root group |
-| policies.require-non-root-user | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run as non root user |
-| policies.require-probes | object | `{"enabled":false,"parameters":{"requiredValues":["readinessProbe","livenessProbe"]},"validationFailureAction":"audit"}` | Require specified probes on pods |
-| policies.require-probes.parameters.requiredValues | list | `["readinessProbe","livenessProbe"]` | List of probes that are required on pods |
-| policies.require-requests-equal-limits | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require CPU and memory requests to equal limits so guaranteed quality of service is applied |
+| policies.require-image-signature | object | `{"enabled":false,"parameters":{"require":[]},"validationFailureAction":"audit"}` | Require specified images to be signed and verified |
+| policies.require-image-signature.parameters.require | list | `[]` | List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields. |
+| policies.require-istio-on-namespaces | object | `{"enabled":true,"validationFailureAction":"audit"}` | Require Istio sidecar injection label on namespaces |
+| policies.require-labels | object | `{"enabled":false,"parameters":{"require":["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]},"validationFailureAction":"audit"}` | Require specified labels to be on all pods |
+| policies.require-labels.parameters.require | list | `["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]` | List of labels required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. See https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels See https://helm.sh/docs/chart_best_practices/labels/#standard-labels |
+| policies.require-memory-limit | object | `{"enabled":true,"parameters":{"require":["<64Gi"]},"validationFailureAction":"audit"}` | Require containers have memory limits defined and within the specified range |
+| policies.require-memory-limit.parameters.require | list | `["<64Gi"]` | Memory limitations (only one needs to be met) |
+| policies.require-non-root-group | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run with non-root group |
+| policies.require-non-root-user | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run as non-root user |
+| policies.require-probes | object | `{"enabled":false,"parameters":{"require":["readinessProbe","livenessProbe"]},"validationFailureAction":"audit"}` | Require specified probes on pods |
+| policies.require-probes.parameters.require | list | `["readinessProbe","livenessProbe"]` | List of probes that are required on pods |
+| policies.require-requests-equal-limits | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require CPU and memory requests equal limits for guaranteed quality of service |
 | policies.require-ro-host-path | object | `{"enabled":true,"validationFailureAction":"audit"}` | Require containers mount hostPath volumes as read-only.  HostPath volumes are normally disallowed.  But, if exceptions are made, the volume should be mounted as read-only. |
 | policies.require-ro-rootfs | object | `{"enabled":true,"validationFailureAction":"audit"}` | Require containers set root filesystem to read-only |
-| policies.restrict-annotations | object | `{"enabled":false,"parameters":{"disallowedValues":[]},"validationFailureAction":"audit"}` | Prevent annotations matching the disallowed list on pods |
-| policies.restrict-annotations.parameters.disallowedValues | list | `[]` | List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.restrict-apparmor | object | `{"enabled":true,"parameters":{"allowedValues":["runtime/default"]},"validationFailureAction":"enforce"}` | Restricts pods that use AppArmor to specified profiles Iron Bank containers are either distroless or RHEL UBI.  Neither of these uses AppArmor |
-| policies.restrict-apparmor.parameters.allowedValues | list | `["runtime/default"]` | List of allowed AppArmor profiles |
-| policies.restrict-capabilities | object | `{"enabled":true,"parameters":{"allowedValues":["NET_BIND_SERVICE"]},"validationFailureAction":"enfrce"}` | Restrict Linux capabilities that are allowed to be added in containers |
-| policies.restrict-capabilities.parameters.allowedValues | list | `["NET_BIND_SERVICE"]` | List of capabilities that are allowed to be added Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
-| policies.restrict-cpu-limit | object | `{"enabled":true,"parameters":{"allowedValues":["<10"]},"validationFailureAction":"audit"}` | Require containers have CPU limits defined and restrict the value to the allowed range |
-| policies.restrict-cpu-limit.parameters.allowedValues | list | `["<10"]` | CPU limitations (only one needs to be met) |
-| policies.restrict-group-id | object | `{"enabled":true,"parameters":{"allowedValues":[">=1000"]},"validationFailureAction":"audit"}` | Restrict container group IDs to allowed ranges NOTE: Using require-non-root-group will force runAsGroup to be defined |
-| policies.restrict-group-id.parameters.allowedValues | list | `[">=1000"]` | Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
-| policies.restrict-host-path | object | `{"enabled":true,"parameters":{"allowedValues":[]},"validationFailureAction":"audit"}` | Restrict hostPath volume paths to the allowed list.  HostPath volumes are normally disallowed.  But, if exceptions are made, the path should be restricted. |
-| policies.restrict-host-path.parameters.allowedValues | list | `[]` | List of allowed paths for hostPath volumes |
-| policies.restrict-host-ports | object | `{"enabled":true,"parameters":{"allowedValues":[]},"validationFailureAction":"enforce"}` | Restrict containers using host ports to the allowed list |
-| policies.restrict-host-ports.parameters.allowedValues | list | `[]` | List of allowed host ports |
-| policies.restrict-image-registries | object | `{"enabled":true,"parameters":{"allowedValues":["registry1.dso.mil"]},"validationFailureAction":"audit"}` | Restricts container images to registries in approved list |
-| policies.restrict-image-registries.parameters.allowedValues | list | `["registry1.dso.mil"]` | List of allowed registries that images may use |
-| policies.restrict-image-tags | object | `{"enabled":true,"parameters":{"disallowedValues":["latest"]},"validationFailureAction":"audit"}` | Restricts container image tags based on disallowed list |
-| policies.restrict-labels | object | `{"enabled":false,"parameters":{"disallowedValues":[]},"validationFailureAction":"audit"}` | Prevent labels matching the disallowed list on pods |
-| policies.restrict-labels.parameters.disallowedValues | list | `[]` | List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.restrict-memory-limit | object | `{"enabled":true,"parameters":{"allowedValues":["<64Gi"]},"validationFailureAction":"audit"}` | Require containers have memory limits defined and restrict the value to the allowed range |
-| policies.restrict-memory-limit.parameters.allowedValues | list | `["<64Gi"]` | Memory limitations (only one needs to be met) |
-| policies.restrict-pod-exec | object | `{"enabled":false,"parameters":{"allowedValues":[]},"validationFailureAction":"attach"}` | Restrict pod exec/attach to only allowed namespaces |
-| policies.restrict-pod-exec.parameters.allowedValues | list | `[]` | List of namespaces that exec and attach are allowed |
-| policies.restrict-proc-mount | object | `{"enabled":true,"parameters":{"allowedValues":["Default"]},"validationFailureAction":"enforce"}` | Restrict container's use of procMount to the allowed list |
-| policies.restrict-proc-mount.parameters.allowedValues | list | `["Default"]` | List of allowed proc mount values Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-seccomp | object | `{"enabled":true,"parameters":{"allowedValues":["RuntimeDefault","Localhost"]},"validationFailureAction":"audit"}` | Restrict the seccomp profiles that containers can use to the allowed list |
-| policies.restrict-seccomp.parameters.allowedValues | list | `["RuntimeDefault","Localhost"]` | List of allowed seccomp profiles Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
-| policies.restrict-selinux | object | `{"enabled":true,"parameters":{"allowedValues":["container_t","container_init_t","container_kvm_t"]},"validationFailureAction":"enforce"}` | Restrict the use of any SELinux options.  Only `level` and `type` are allowed.  `Type` must be in the allowed list |
-| policies.restrict-selinux.parameters.allowedValues | list | `["container_t","container_init_t","container_kvm_t"]` | List of allowed values for the `type` field Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-sysctls | object | `{"enabled":true,"parameters":{"allowedValues":["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]},"validationFailureAction":"enforce"}` | Restrict allowed sysctls to only items in the allowed list |
-| policies.restrict-sysctls.parameters.allowedValues | list | `["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]` | List of allowed sysctls. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-tolerations | object | `{"enabled":true,"parameters":{"disallowedValues":[{"key":"node-role.kubernetes.io/master"}]},"validationFailureAction":"audit"}` | Restrict use of tolerations that bypass important taints |
-| policies.restrict-tolerations.parameters.disallowedValues | list | `[{"key":"node-role.kubernetes.io/master"}]` | List of taints to protect from toleration.  Each entry can have key, value, and/or effect.  Wildcards '*' and '?' can be used If key, value, or effect are not defined, they are ignored in the policy rule |
-| policies.restrict-user-id | object | `{"enabled":true,"parameters":{"allowedValues":[">=1000"]},"validationFailureAction":"audit"}` | Restrict container user IDs to allowed ranges NOTE: Using require-non-root-user will force runAsUser to be defined |
-| policies.restrict-user-id.parameters.allowedValues | list | `[">=1000"]` | Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
-| policies.restrict-volume-types | object | `{"enabled":true,"parameters":{"allowedValues":["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]},"validationFailureAction":"enforce"}` | Restrict the volume types allowed in containers |
-| policies.restrict-volume-types.parameters.allowedValues | list | `["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]` | List of allowed Volume types Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
+| policies.restrict-apparmor | object | `{"enabled":true,"parameters":{"allow":["runtime/default"]},"validationFailureAction":"enforce"}` | Restricts pods that use AppArmor to specified profiles |
+| policies.restrict-apparmor.parameters.allow | list | `["runtime/default"]` | List of allowed AppArmor profiles |
+| policies.restrict-external-ips | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict services with External IPs to a specified list (CVE-2020-8554) |
+| policies.restrict-external-ips.parameters.allow | list | `[]` | List of external IPs allowed in services |
+| policies.restrict-external-names | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict services with External Names to a specified list (CVE-2020-8554) |
+| policies.restrict-external-names.parameters.allow | list | `[]` | List of external names allowed in services.  Must be a lowercase FRC-1123 hostname. |
+| policies.restrict-capabilities | object | `{"enabled":true,"parameters":{"allow":["NET_BIND_SERVICE"]},"validationFailureAction":"enfrce"}` | Restrict Linux capabilities added to containers to the specified list |
+| policies.restrict-capabilities.parameters.allow | list | `["NET_BIND_SERVICE"]` | List of capabilities that are allowed to be added Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
+| policies.restrict-group-id | object | `{"enabled":true,"parameters":{"allow":[">=1000"]},"validationFailureAction":"audit"}` | Restrict container group IDs to specified ranges NOTE: Using require-non-root-group will force runAsGroup to be defined |
+| policies.restrict-group-id.parameters.allow | list | `[">=1000"]` | Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
+| policies.restrict-host-path | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"audit"}` | Restrict hostPath volume paths to the allowed list.  HostPath volumes are normally disallowed.  But, if exceptions are made, the path should be restricted. |
+| policies.restrict-host-path.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes |
+| policies.restrict-host-ports | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict host ports in containers to the specified list |
+| policies.restrict-host-ports.parameters.allow | list | `[]` | List of allowed host ports |
+| policies.restrict-image-registries | object | `{"enabled":true,"parameters":{"allow":["registry1.dso.mil"]},"validationFailureAction":"audit"}` | Restricts container images to registries in the specified list |
+| policies.restrict-image-registries.parameters.allow | list | `["registry1.dso.mil"]` | List of allowed registries that images may use |
+| policies.restrict-proc-mount | object | `{"enabled":true,"parameters":{"allow":["Default"]},"validationFailureAction":"enforce"}` | Restrict mounting /proc to the specified mask |
+| policies.restrict-proc-mount.parameters.allow | list | `["Default"]` | List of allowed proc mount values Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
+| policies.restrict-seccomp | object | `{"enabled":true,"parameters":{"allow":["RuntimeDefault","Localhost"]},"validationFailureAction":"audit"}` | Restrict seccomp profiles to the specified list |
+| policies.restrict-seccomp.parameters.allow | list | `["RuntimeDefault","Localhost"]` | List of allowed seccomp profiles Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
+| policies.restrict-selinux-type | object | `{"enabled":true,"parameters":{"allow":["container_t","container_init_t","container_kvm_t"]},"validationFailureAction":"enforce"}` | Restrict SELinux types to the specified list. |
+| policies.restrict-selinux-type.parameters.allow | list | `["container_t","container_init_t","container_kvm_t"]` | List of allowed values for the `type` field Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
+| policies.restrict-sysctls | object | `{"enabled":true,"parameters":{"allow":["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]},"validationFailureAction":"enforce"}` | Restrict sysctls to the specified list |
+| policies.restrict-sysctls.parameters.allow | list | `["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]` | List of allowed sysctls. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
+| policies.restrict-user-id | object | `{"enabled":true,"parameters":{"allow":[">=1000"]},"validationFailureAction":"audit"}` | Restrict user IDs to the specified ranges NOTE: Using require-non-root-user will force runAsUser to be defined |
+| policies.restrict-user-id.parameters.allow | list | `[">=1000"]` | Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
+| policies.restrict-volume-types | object | `{"enabled":true,"parameters":{"allow":["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]},"validationFailureAction":"enforce"}` | Restrict the volume types to the specified list |
+| policies.restrict-volume-types.parameters.allow | list | `["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]` | List of allowed Volume types Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
+| policies.update-image-pull-policy | object | `{"enabled":false,"parameters":{"update":[{"to":"Always"}]}}` | Updates the image pull policy on containers |
+| policies.update-image-pull-policy.parameters.update | list | `[{"to":"Always"}]` | List of image pull policy updates.  `from` contains the pull policy value to replace.  If `from` is blank, it matches everything.  `to` contains the new pull policy to use.  Must be one of Always, Never, or IfNotPresent. |
+| policies.update-image-registry | object | `{"enabled":false,"parameters":{"update":[]}}` | Updates an existing image registry with a new registry in containers (e.g. proxy) |
+| policies.update-image-registry.parameters.update | list | `[]` | List of registry updates.  `from` contains the registry to replace. `to` contains the new registry to use. |
+| policies.update-token-automount | object | `{"enabled":false}` | Updates automount token on default service accounts to false |
 | additionalPolicies | object | `{"samplePolicy":{"annotations":{"policies.kyverno.io/category":"Examples","policies.kyverno.io/description":"This sample policy blocks pods from deploying into the 'default' namespace.","policies.kyverno.io/severity":"low","policies.kyverno.io/subject":"Pod","policies.kyverno.io/title":"Sample Policy"},"enabled":false,"kind":"ClusterPolicy","namespace":"","spec":{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}}}` | Adds custom policies.  See https://kyverno.io/docs/writing-policies/. |
 | additionalPolicies.samplePolicy | object | `{"annotations":{"policies.kyverno.io/category":"Examples","policies.kyverno.io/description":"This sample policy blocks pods from deploying into the 'default' namespace.","policies.kyverno.io/severity":"low","policies.kyverno.io/subject":"Pod","policies.kyverno.io/title":"Sample Policy"},"enabled":false,"kind":"ClusterPolicy","namespace":"","spec":{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}}` | Name of the policy.  Addtional policies can be added by adding a key. |
 | additionalPolicies.samplePolicy.enabled | bool | `false` | Controls policy deployment |

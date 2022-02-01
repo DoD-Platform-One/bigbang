@@ -19,19 +19,48 @@ spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: mutate-imagepullpolicy
-    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
-    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+  {{- $index := 0 }}
+  {{- range $v := (dig $name "parameters" "update" nil .Values.policies) }}
+  {{- $index = add1 $index }}
+  - name: {{ printf "%s-containers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     mutate:
       patchStrategicMerge:
         spec:
           containers:
             - (image): "!*@*"
-              imagePullPolicy: "{{ (dig $name "parameters" "addValue" nil .Values.policies) }}"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-initcontainers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    preconditions:
+      all:
+      - key: "{{"{{"}} not_null(request.object.spec.initContainers[], '') | length(@) {{"}}"}}"
+        operator: GreaterThanOrEquals
+        value: 1
+    mutate:
+      patchStrategicMerge:
+        spec:
           initContainers:
             - (image): "!*@*"
-              imagePullPolicy: "{{ (dig $name "parameters" "addValue" nil .Values.policies) }}"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-ephemeralcontainers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    preconditions:
+      all:
+      - key: "{{"{{"}} not_null(request.object.spec.ephemeralContainers[], '') | length(@) {{"}}"}}"
+        operator: GreaterThanOrEquals
+        value: 1
+    mutate:
+      patchStrategicMerge:
+        spec:
           ephemeralContainers:
             - (image): "!*@*"
-              imagePullPolicy: "{{ (dig $name "parameters" "addValue" nil .Values.policies) }}"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  {{- end }}
 {{- end -}}

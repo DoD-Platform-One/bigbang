@@ -35,7 +35,7 @@ spec:
       seccompProfile:
         type: Unconfined
 ---
-# Test 3: Containers or init containers that add whitelisted seccomp profiles or no seccomp profile should be allowed
+# Test 3: Containers or init containers that add allowed seccomp profiles or no seccomp profile should be allowed
 apiVersion: v1
 kind: Pod
 metadata:

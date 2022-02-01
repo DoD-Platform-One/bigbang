@@ -1,11 +1,11 @@
-{{- $name := "remove-token-automount" }}
+{{- $name := "update-token-automount" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Remove Token Automount on Default Service Accounts
+    policies.kyverno.io/title: Update Token Automount to False on Default Service Accounts
     policies.kyverno.io/category: Security Best Practices
     policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: ServiceAccount

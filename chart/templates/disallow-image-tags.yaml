@@ -1,11 +1,11 @@
-{{- $name := "restrict-image-tags" }}
+{{- $name := "disallow-image-tags" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: {{ $name }}
   annotations:
-    policies.kyverno.io/title: Restrict Image Tags
+    policies.kyverno.io/title: Disallow Image Tags
     policies.kyverno.io/category: Best Practices
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
@@ -23,7 +23,7 @@ spec:
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
-      message: "An image tag is required."
+      message: "Images without tags are mutable and not allowed."
       pattern:
         spec:
           containers:
@@ -40,9 +40,9 @@ spec:
       pattern:
         spec:
           containers:
-          - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
+          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
           =(initContainers):
-          - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
+          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
           =(ephemeralContainers):
-          - image: "!*:{{ (dig $name "parameters" "disallowedValues" nil .Values.policies) | join " & !*:" }}"
+          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
 {{- end -}}

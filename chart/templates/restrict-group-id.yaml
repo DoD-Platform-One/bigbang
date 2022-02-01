@@ -31,16 +31,16 @@ spec:
       pattern:
         spec:
           =(securityContext):
-            =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(initContainers):
             - =(securityContext):
-                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           containers:
             - =(securityContext):
-                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(ephemeralContainers):
             - =(securityContext):
-                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
   - name: validate-fsgroup
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
@@ -52,7 +52,7 @@ spec:
       pattern:
         spec:
           =(securityContext):
-            =(fsGroup): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            =(fsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
   - name: validate-supplementalgroup
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
@@ -65,5 +65,5 @@ spec:
         spec:
           =(securityContext):
             =(supplementalGroups):
-            - "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+            - "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

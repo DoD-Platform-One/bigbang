@@ -28,9 +28,9 @@ spec:
       pattern:
         spec:
           containers:
-          - image: "{{ join "* | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}*"
+          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
           =(initContainers):
-          - image: "{{ join "* | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}*"
+          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
           =(ephemeralContainers):
-          - image: "{{ join "* | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}*"
+          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
 {{- end -}}

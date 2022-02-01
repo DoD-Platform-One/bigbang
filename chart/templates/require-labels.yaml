@@ -27,7 +27,7 @@ spec:
       pattern:
         metadata:
           labels:
-          {{- range $v := (dig $name "parameters" "requiredValues" nil .Values.policies) -}}
+          {{- range $v := (dig $name "parameters" "require" nil .Values.policies) -}}
             {{- $t := split ":" $v }}
             {{- if $t._1 }}
               {{- $t._0 | nindent 12 }}: "{{ $t._1 | trim }}"

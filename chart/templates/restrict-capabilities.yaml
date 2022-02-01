@@ -26,19 +26,19 @@ spec:
         Adding of additional capabilities beyond the allowed set is not allowed.
         The fields spec.containers[*].securityContext.capabilities.add,
         spec.initContainers[*].securityContext.capabilities.add, and
-        spec.ephemeralContainers[*].securityContext.capabilities.add must be in the allowedValues list.
+        spec.ephemeralContainers[*].securityContext.capabilities.add must be in the allowed list.
       pattern:
         spec:
           containers:
             - =(securityContext):
                 =(capabilities):
-                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                  =(add): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(initContainers):
             - =(securityContext):
                 =(capabilities):
-                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                  =(add): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
           =(ephemeralContainers):
             - =(securityContext):
                 =(capabilities):
-                  =(add): "{{ join " | " (dig $name "parameters" "allowedValues" nil .Values.policies) }}"
+                  =(add): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

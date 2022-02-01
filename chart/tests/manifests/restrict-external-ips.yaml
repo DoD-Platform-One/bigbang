@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: cve-restrict-external-ips-1
+  name: restrict-external-ips-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
   selector:
-    app: cve-restrict-external-ips
+    app: restrict-external-ips
   ports:
   - port: 80
   externalIPs:
@@ -18,13 +18,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cve-restrict-external-ips-2
+  name: restrict-external-ips-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
 spec:
   selector:
-    app: cve-restrict-external-ips
+    app: restrict-external-ips
   ports:
     - port: 80
   externalIPs:
@@ -34,12 +34,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cve-restrict-external-ips-3
+  name: restrict-external-ips-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
 spec:
   selector:
-    app: cve-restrict-external-ips
+    app: restrict-external-ips
   ports:
     - port: 80

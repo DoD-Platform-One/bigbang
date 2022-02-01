@@ -49,120 +49,158 @@ policies:
     # -- Policy specific parameters that are added to the configMap for the policy rules
     parameters: {}
 
-  # -- Adds an image pull policy to containers
-  update-image-pull-policy:
-    enabled: false
-    parameters:
-      # -- Value to set imagePullPolicy to (Always, Never, IfNotPresent)
-      addValue: Always
-
   # -- Clone existing configMap or secret in new Namespaces
   clone-configs:
     enabled: false
     parameters:
       # -- ConfigMap or Secrets that should be cloned
-      sourceObjects: {}
-        # # -- Name of the resource
-        # sample:
-        #   # -- Kind of the resource (ConfigMap or Secret)
+      clone: []
+        #   # -- Name of the ConfigMap/Secret
+        # - name: sample
+        #   # -- Kind of the resource: ConfigMap or Secret
         #   kind: ConfigMap
-        #   # -- Namespace to find the resource
+        #   # -- Namespace to find the ConfigMap/Secret
         #   namespace: default
 
-  # -- Mitigates subpath volume vulnerability (CVE-2021-25741)
-  cve-disallow-subpath-volumes:
-    enabled: true
-    validationFailureAction: enforce
-
-  # -- Mitigates Services with External IPs vulnerability (CVE-2020-8554)
-  cve-restrict-external-ips:
-    enabled: true
-    validationFailureAction: enforce
+  # -- Prevent specified annotations on pods
+  disallow-annotations:
+    enabled: false
+    validationFailureAction: audit
     parameters:
-      # -- List of external IPs allowed in services
-      allowedValues: []
+      # -- List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
+      disallow: []
 
-  # -- Mitigates Services with External Names vulnerability (CVE-2020-8554)
-  cve-restrict-external-names:
-    enabled: true
-    validationFailureAction: enforce
-    parameters:
-      # -- List of external names allowed in services.  Must be a lowercase FRC-1123 hostname.
-      allowedValues: []
-
-  # -- Prevents deployment of pods into the default namespace
+  # -- Prevent pods from using the default namespace
   disallow-default-namespace:
     enabled: true
     validationFailureAction: audit
 
-  # -- Checks for resource APIs in use that will be removed in Kubernetes 1.22 or 1.25
+  # -- Prevent resources that use deprecated or removed APIs (through Kubernetes 1.25)
   disallow-deprecated-apis:
     enabled: true
     validationFailureAction: audit
 
-  # -- Disallow use of the host namespace (PID, IPC, Network) by pods
+  # -- Prevent use of the host namespace (PID, IPC, Network) by pods
   disallow-host-namespaces:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Disallow hostpath volumes
+  # -- Prevent volumes that use hostpath
   disallow-host-path:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Disallow services of type NodePort
+  # -- Prevent container images with specified tags.  Also, requires images to have a tag.
+  disallow-image-tags:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      disallow:
+      - latest
+
+  # -- Prevent the `sidecar.istio.io/inject: false` label on pods.
+  disallow-istio-injection-bypass:
+    enabled: true
+    validationFailureAction: audit
+
+  # -- Prevent specified labels on pods
+  disallow-labels:
+    enabled: false
+    validationFailureAction: audit
+    parameters:
+      # -- List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
+      disallow: []
+
+  # -- Prevent services of the type NodePort
   disallow-nodeport-services:
     enabled: true
     validationFailureAction: audit
 
-  # -- Disallows pods that allow privilege escalation
+  # -- Prevent the use of `exec` or `attach` on pods
+  disallow-pod-exec:
+    enabled: false
+    validationFailureAction: attach
+
+  # -- Prevent privilege escalation on pods
   disallow-privilege-escalation:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Disallow containers that run as privileged
+  # -- Prevent containers that run as privileged
   disallow-privileged-containers:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Disallow additional permissions on default service accounts
+  # -- Prevent specified SELinux options from being used on pods.
+  disallow-selinux-options:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of selinux options that are not allowed
+      # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
+      disallow:
+      - user
+      - role
+
+  # -- Prevent volumes with subpaths (CVE-2021-25741)
+  disallow-subpath-volumes:
+    enabled: true
+    validationFailureAction: enforce
+
+  # -- Prevent tolerations that bypass specified taints
+  disallow-tolerations:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- List of taints to protect from toleration.  Each entry can have key, value, and/or effect.  Wildcards '*' and '?' can be used
+      # If key, value, or effect are not defined, they are ignored in the policy rule
+      disallow:
+      # Prevent scheduling of pods on control plane nodes
+      - key: node-role.kubernetes.io/master
+
+      # The following example would prevent tolerations that match a taint of "Critical*Only=true:*NoSchedule" where '*' is zero or more characters.
+      # - key: "Critical*Only"
+      #   value: "true"
+      #   effect: "*NoSchedule"
+      # This would include tolerations with
+      #  - key=null && effect=(NoSchedule || PreferNoSchedule)
+      #  - key=Critical*Only && operator=Exists && effect=(null || NoSchedule || PreferNoSchedule)
+      #  - key=Critical*Only && operator=Equal && value=true && effect=(null || NoSchedule || PreferNoSchedule)
+
+  # -- Prevent additional RBAC permissions on default service accounts
   disallow-rbac-on-default-serviceaccounts:
     enabled: true
     validationFailureAction: audit
 
-  # -- Remove automount token from default service accounts
-  remove-token-automount:
-    enabled: false
-
-  # -- Replaces an existing image registry with a new registry in containers (e.g. proxy)
-  replace-image-registry:
-    enabled: false
-    parameters:
-      # -- List of registries to replace
-      replacements: []
-      # - old: "registry.to.replace"
-      #   new: "new.registry.to.use"
-
-  # -- Require specified annotations to be on all pods
+  # -- Require specified annotations on all pods
   require-annotations:
     enabled: false
     validationFailureAction: audit
     parameters:
       # -- List of annotations required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
-      requiredValues: []
+      require: []
+
+  # -- Require containers have CPU limits defined and within the specified range
+  require-cpu-limit:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- CPU limitations (only one needs to be met)
+      require:
+      - <10
 
   # -- Requires containers to drop all Linux capabilities
   require-drop-all-capabilities:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Require images matching the specfied list to be signed and verified
+  # -- Require specified images to be signed and verified
   require-image-signature:
     enabled: false
     validationFailureAction: audit
     parameters:
       # -- List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields.
-      requiredSignatures: []
+      require: []
       # Example
       # - image: "ghcr.io/kyverno/test-verify-image:*"
       #   key: |-
@@ -171,13 +209,8 @@ policies:
       #     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
       #     -----END PUBLIC KEY-----
 
-  # -- Require namespaces to enable Istio sidecar injection by setting the label `istio-injection` to `enabled`.
+  # -- Require Istio sidecar injection label on namespaces
   require-istio-on-namespaces:
-    enabled: true
-    validationFailureAction: audit
-
-  # -- Require pods allow Istio sidecar injection by not having the `sidecar.istio.io/inject` label set to "false".
-  require-istio-on-pods:
     enabled: true
     validationFailureAction: audit
 
@@ -189,17 +222,26 @@ policies:
       # -- List of labels required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
       # See https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels
       # See https://helm.sh/docs/chart_best_practices/labels/#standard-labels
-      requiredValues:
+      require:
       - app.kubernetes.io/name
       - app.kubernetes.io/instance
       - app.kubernetes.io/version
 
-  # -- Require containers to run with non root group
+  # -- Require containers have memory limits defined and within the specified range
+  require-memory-limit:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- Memory limitations (only one needs to be met)
+      require:
+      - <64Gi
+
+  # -- Require containers to run with non-root group
   require-non-root-group:
     enabled: true
     validationFailureAction: enforce
 
-  # -- Require containers to run as non root user
+  # -- Require containers to run as non-root user
   require-non-root-user:
     enabled: true
     validationFailureAction: enforce
@@ -210,9 +252,11 @@ policies:
     validationFailureAction: audit
     parameters:
       # -- List of probes that are required on pods
-      requiredValues: ["readinessProbe", "livenessProbe"]
+      require:
+      - readinessProbe
+      - livenessProbe
 
-  # -- Require CPU and memory requests to equal limits so guaranteed quality of service is applied
+  # -- Require CPU and memory requests equal limits for guaranteed quality of service
   require-requests-equal-limits:
     enabled: false
     validationFailureAction: audit
@@ -227,41 +271,42 @@ policies:
     enabled: true
     validationFailureAction: audit
 
-  # -- Prevent annotations matching the disallowed list on pods
-  restrict-annotations:
-    enabled: false
-    validationFailureAction: audit
-    parameters:
-      # -- List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
-      disallowedValues: []
-
   # -- Restricts pods that use AppArmor to specified profiles
-  # Iron Bank containers are either distroless or RHEL UBI.  Neither of these uses AppArmor
   restrict-apparmor:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed AppArmor profiles
-      allowedValues: ["runtime/default"]
+      allow:
+      - runtime/default
 
-  # -- Restrict Linux capabilities that are allowed to be added in containers
+  # -- Restrict services with External IPs to a specified list (CVE-2020-8554)
+  restrict-external-ips:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of external IPs allowed in services
+      allow: []
+
+  # -- Restrict services with External Names to a specified list (CVE-2020-8554)
+  restrict-external-names:
+    enabled: true
+    validationFailureAction: enforce
+    parameters:
+      # -- List of external names allowed in services.  Must be a lowercase FRC-1123 hostname.
+      allow: []
+
+  # -- Restrict Linux capabilities added to containers to the specified list
   restrict-capabilities:
     enabled: true
     validationFailureAction: enfrce
     parameters:
       # -- List of capabilities that are allowed to be added
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
-      allowedValues: ["NET_BIND_SERVICE"]
+      allow:
+      - NET_BIND_SERVICE
 
-  # -- Require containers have CPU limits defined and restrict the value to the allowed range
-  restrict-cpu-limit:
-    enabled: true
-    validationFailureAction: audit
-    parameters:
-      # -- CPU limitations (only one needs to be met)
-      allowedValues: ["<10"]
-
-  # -- Restrict container group IDs to allowed ranges
+  # -- Restrict container group IDs to specified ranges
   # NOTE: Using require-non-root-group will force runAsGroup to be defined
   restrict-group-id:
     enabled: true
@@ -269,7 +314,8 @@ policies:
     parameters:
       # -- Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
       # For a lower and upper limit, use ">=min & <=max"
-      allowedValues: [">=1000"]
+      allow:
+      - ">=1000"
 
   # -- Restrict hostPath volume paths to the allowed list.  HostPath volumes are normally disallowed.  But, if exceptions are made, the path should be restricted.
   restrict-host-path:
@@ -277,122 +323,73 @@ policies:
     validationFailureAction: audit
     parameters:
       # -- List of allowed paths for hostPath volumes
-      allowedValues: []
+      allow: []
 
-  # -- Restrict containers using host ports to the allowed list
+  # -- Restrict host ports in containers to the specified list
   restrict-host-ports:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed host ports
-      allowedValues: []
+      allow: []
 
-  # -- Restricts container images to registries in approved list
+  # -- Restricts container images to registries in the specified list
   restrict-image-registries:
     enabled: true
     validationFailureAction: audit
     parameters:
       # -- List of allowed registries that images may use
-      allowedValues: ["registry1.dso.mil"]
+      allow:
+      - registry1.dso.mil
 
-  # -- Restricts container image tags based on disallowed list
-  restrict-image-tags:
-    enabled: true
-    validationFailureAction: audit
-    parameters:
-      disallowedValues: ["latest"]
-
-  # -- Prevent labels matching the disallowed list on pods
-  restrict-labels:
-    enabled: false
-    validationFailureAction: audit
-    parameters:
-      # -- List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
-      disallowedValues: []
-
-  # -- Require containers have memory limits defined and restrict the value to the allowed range
-  restrict-memory-limit:
-    enabled: true
-    validationFailureAction: audit
-    parameters:
-      # -- Memory limitations (only one needs to be met)
-      allowedValues: ["<64Gi"]
-
-  # -- Restrict pod exec/attach to only allowed namespaces
-  restrict-pod-exec:
-    enabled: false
-    validationFailureAction: attach
-    parameters:
-      # -- List of namespaces that exec and attach are allowed
-      allowedValues: []
-
-  # -- Restrict container's use of procMount to the allowed list
+  # -- Restrict mounting /proc to the specified mask
   restrict-proc-mount:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed proc mount values
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
-      allowedValues: ["Default"]
+      allow:
+      - Default
 
-  # -- Restrict the seccomp profiles that containers can use to the allowed list
+  # -- Restrict seccomp profiles to the specified list
   restrict-seccomp:
     enabled: true
     validationFailureAction: audit
     parameters:
       # -- List of allowed seccomp profiles
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
-      allowedValues:
+      allow:
       - RuntimeDefault
       - Localhost
 
-  # -- Restrict the use of any SELinux options.  Only `level` and `type` are allowed.  `Type` must be in the allowed list
-  restrict-selinux:
+  # -- Restrict SELinux types to the specified list.
+  restrict-selinux-type:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed values for the `type` field
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
-      allowedValues:
+      allow:
       - container_t
       - container_init_t
       - container_kvm_t
 
-  # -- Restrict allowed sysctls to only items in the allowed list
+  # -- Restrict sysctls to the specified list
   restrict-sysctls:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed sysctls.
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
-      allowedValues:
+      allow:
       - kernel.shm_rmid_forced
       - net.ipv4.ip_local_port_range
       - net.ipv4.ip_unprivileged_port_start
       - net.ipv4.tcp_syncookies
       - net.ipv4.ping_group_range
 
-  # -- Restrict use of tolerations that bypass important taints
-  restrict-tolerations:
-    enabled: true
-    validationFailureAction: audit
-    parameters:
-      # -- List of taints to protect from toleration.  Each entry can have key, value, and/or effect.  Wildcards '*' and '?' can be used
-      # If key, value, or effect are not defined, they are ignored in the policy rule
-      disallowedValues:
-      # Prevent scheduling of pods on control plane nodes
-      - key: node-role.kubernetes.io/master
-
-      # The following example would prevent tolerations that match a taint of "Critical*Only=true:*NoSchedule" where '*' is zero or more characters.
-      # - key: "Critical*Only"
-      #   value: "true"
-      #   effect: "*NoSchedule"
-      # This would include tolerations with
-      #  - key=null && effect=(NoSchedule || PreferNoSchedule)
-      #  - key=Critical*Only && operator=Exists && effect=(null || NoSchedule || PreferNoSchedule)
-      #  - key=Critical*Only && operator=Equal && value=true && effect=(null || NoSchedule || PreferNoSchedule)
-
-  # -- Restrict container user IDs to allowed ranges
+  # -- Restrict user IDs to the specified ranges
   # NOTE: Using require-non-root-user will force runAsUser to be defined
   restrict-user-id:
     enabled: true
@@ -400,16 +397,17 @@ policies:
     parameters:
       # -- Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
       # For a lower and upper limit, use ">=min & <=max"
-      allowedValues: [">=1000"]
+      allow:
+      - ">=1000"
 
-  # -- Restrict the volume types allowed in containers
+  # -- Restrict the volume types to the specified list
   restrict-volume-types:
     enabled: true
     validationFailureAction: enforce
     parameters:
       # -- List of allowed Volume types
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
-      allowedValues:
+      allow:
       - "configMap"
       - "csi"
       - "downwardAPI"
@@ -418,6 +416,27 @@ policies:
       - "persistentVolumeClaim"
       - "projected"
       - "secret"
+
+  # -- Updates the image pull policy on containers
+  update-image-pull-policy:
+    enabled: false
+    parameters:
+      # -- List of image pull policy updates.  `from` contains the pull policy value to replace.  If `from` is blank, it matches everything.  `to` contains the new pull policy to use.  Must be one of Always, Never, or IfNotPresent.
+      update:
+      - to: Always
+
+  # -- Updates an existing image registry with a new registry in containers (e.g. proxy)
+  update-image-registry:
+    enabled: false
+    parameters:
+      # -- List of registry updates.  `from` contains the registry to replace. `to` contains the new registry to use.
+      update: []
+      # - from: "registry.to.replace"
+      #   to: "new.registry.to.use"
+
+  # -- Updates automount token on default service accounts to false
+  update-token-automount:
+    enabled: false
 
 # -- Adds custom policies.  See https://kyverno.io/docs/writing-policies/.
 additionalPolicies:

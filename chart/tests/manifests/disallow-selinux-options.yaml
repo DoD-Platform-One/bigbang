@@ -1,25 +1,25 @@
-# Test 1: Containers without memory limits are not allowed
+# Test 1: Pods that use the SELinux options on the disallowed list are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-memory-limit-1
+  name: disallow-selinux-options-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
+  securityContext:
+    seLinuxOptions:
+      user: disallowed
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-    resources:
-      requests:
-        memory: 4Mi
 ---
-# Test 2: Init containers without memory limits are not allowed
+# Test 2: Containers that use SELinux options on the disallowed list are not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-memory-limit-2
+  name: disallow-selinux-options-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -28,58 +28,35 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-    resources:
-      limits:
-        memory: 4Mi
+    securityContext:
+      seLinuxOptions:
+        role: disallowed
+---
+# Test 3: Init containers that use SELinux options on the disallowed list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-selinux-options-3
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    securityContext:
+      seLinuxOptions:
+        user: disallowed
 ---
-# Test 3: Containers with memory limits above the maximum are not allowed
+# Test 4: Pods, containers, and init containers that do not use SELinux options are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: restrict-memory-limit-3
-  annotations:
-    kyverno-policies-bbtest/type: validate
-    kyverno-policies-bbtest/expected: fail
-spec:
-  containers:
-  - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    resources:
-      limits:
-        memory: 2Gi
----
-# Test 4: Init containers with memory limits above the maximum are not allowed
-apiVersion: v1
-kind: Pod
-metadata:
-  name: restrict-memory-limit-4
-  annotations:
-    kyverno-policies-bbtest/type: validate
-    kyverno-policies-bbtest/expected: fail
-spec:
-  containers:
-  - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    args: ["sleep", "infinity"]
-    resources:
-      limits:
-        memory: 4Mi
-  initContainers:
-  - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    resources:
-      limits:
-        memory: 2000Mi
----
-# Test 5: Containers with memory limits below the maximum are allowed
-apiVersion: v1
-kind: Pod
-metadata:
-  name: restrict-memory-limit-5
+  name: disallow-selinux-options-4
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -88,12 +65,35 @@ spec:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
     args: ["sleep", "infinity"]
-    resources:
-      limits:
-        memory: 4Mi
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
-    resources:
-      limits:
-        memory: 4Mi
+---
+# Test 5: Pods, containers, and init containers that use allowed SELinux options are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-selinux-options-5
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    seLinuxOptions:
+      type: container_kvm_t
+      level: s0
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    args: ["sleep", "infinity"]
+    securityContext:
+      seLinuxOptions:
+        type: container_t
+        level: s0
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    securityContext:
+      seLinuxOptions:
+        type: container_init_t
+        level: s0
