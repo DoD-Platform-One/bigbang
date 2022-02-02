@@ -5,6 +5,7 @@ hostname: bigbang.dev
 
 istio:
   enabled: false
+  mtls: true
   kiali:
     gateways:
       - "istio-system/main"
