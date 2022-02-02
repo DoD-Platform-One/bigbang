@@ -5,7 +5,6 @@
 {{- define "bigbang.defaults.anchore" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 istio:
@@ -102,7 +101,7 @@ anchore-ui-redis:
   {{- if .Values.istio.enabled }}
   master:
     podAnnotations:
-      {{ include "istioAnnotation" . }}  
+      {{ include "istioAnnotation" . }}
   replica:
     podAnnotations:
       {{ include "istioAnnotation" . }}
@@ -124,7 +123,7 @@ anchore-ui-redis:
         app.kubernetes.io/instance: anchore
     prometheusRule:
       enabled: true
-      namespace: monitoring        
+      namespace: monitoring
   {{- end }}
 {{- end }}
 
