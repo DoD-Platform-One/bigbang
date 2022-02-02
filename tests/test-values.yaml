@@ -947,11 +947,8 @@ addons:
       bbtests:
         enabled: false
         cypress:
-          artifacts: true
           envs:
             cypress_url: "https://keycloak.bigbang.dev"
-            cypress_username: "admin"
-            cypress_password: "password"
 
   vault:
     enabled: false
