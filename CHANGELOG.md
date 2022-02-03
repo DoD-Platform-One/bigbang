@@ -2,6 +2,13 @@
 
 > Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [6.0.0-bb.4] - 2022-01-18
+
+### Changed
+
+- Fixed typo in helm release dependencies in bigbang
+- Fixed helpers template file to include istio annotations
+
 ## [6.0.0-bb.3] - 2021-12-02
 
 ### Changed

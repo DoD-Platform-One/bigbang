@@ -1,6 +1,49 @@
+# flux-podinfo
+
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
+
+Flux compatible Helm chart for podinfo
+
+## Learn More
+* [Application Overview](docs/overview.md)
+* [Other Documentation](docs/)
+
+## Pre-Requisites
+
+* Kubernetes Cluster deployed
+* Kubernetes config installed in `~/.kube/config`
+* Helm installed
+
+Install Helm
+
+https://helm.sh/docs/intro/install/
+
+## Deployment
+
+* Clone down the repository
+* cd into directory
+```bash
+helm install flux-podinfo chart/
+```
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| podinfo.enabled | bool | `true` |  |
+| podinfo.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/podinfo"` |  |
+| podinfo.git.tag | string | `"6.0.0-bb.1"` |  |
+| podinfo.git.path | string | `"chart"` |  |
+| podinfo.flux | object | `{}` |  |
+| podinfo.ingress.gateway | string | `""` |  |
+| networkPolicies.enabled | bool | `false` |  |
+
+## Contributing
+
+Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
 # podinfo
 
-![Version: 6.0.0-bb.3](https://img.shields.io/badge/Version-6.0.0--bb.3-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
+![Version: 6.0.0-bb.4](https://img.shields.io/badge/Version-6.0.0--bb.4-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
 
 Podinfo Helm chart for Kubernetes
 

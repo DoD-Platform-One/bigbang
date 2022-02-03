@@ -11,25 +11,3 @@ podinfo:
 # Network Policies
 networkPolicies:
   enabled: false
-
-# Gatekeeper
-gatekeeper:
-  enabled: false
-clusterAuditor:
-  enabled: false
-
-# Logging
-eckoperator:
-  enabled: false
-logging:
-  enabled: false
-fluentbit:
-  enabled: false
-
-# Other Tools
-jaeger:
-  enabled: false
-kiali:
-  enabled: false
-twistlock:
-  enabled: false
