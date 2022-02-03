@@ -7,11 +7,11 @@ metadata:
     kyverno-policies-bbtest/type: mutate
     kyverno-policies-bbtest/expected: mutate
     kyverno-policies-bbtest/key: .spec.containers[0].image
-    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
 spec:
   containers:
   - name: c1
-    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 2: Init containers with the image registry are mutated
@@ -23,12 +23,12 @@ metadata:
     kyverno-policies-bbtest/type: mutate
     kyverno-policies-bbtest/expected: mutate
     kyverno-policies-bbtest/key: .spec.initContainers[0].image
-    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   initContainers:
   - name: i1
-    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal

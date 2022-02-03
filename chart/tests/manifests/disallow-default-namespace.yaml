@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 2: Deploying a pod without a namespaces is not allowed
@@ -33,5 +33,5 @@ spec:
     spec:
       containers:
       - name: c1
-        image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+        image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
         args: ["sleep", "infinity"]
