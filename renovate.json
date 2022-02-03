@@ -1,0 +1,33 @@
+{
+    "baseBranches": ["master"],
+    "configWarningReuseIssue": false,
+    "dependencyDashboard": true,
+    "dependencyDashboardHeader": "- [ ] If there are Flux updates: Update [Flux manifests](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/base/flux/gotk-components.yaml) to latest version based off available image versions.",
+    "dependencyDashboardTitle": "Renovate: Update Dependencies",
+    "draftPR": true,
+    "enabledManagers": ["helm-values","regex"],
+    "labels": ["renovate","kind::chore"],
+    "packageRules": [
+        {
+            "matchDatasources": ["docker"],
+            "groupName": "Ironbank",
+            "registryUrls": ["https://registry1.dso.mil"]
+        },
+        {
+            "matchPackagePatterns": ["flux"],
+            "additionalBranchPrefix": "flux-",
+            "addLabels": ["flux"],
+            "groupName": "Flux"
+        }
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": ["^base/flux/kustomization\\.yaml"],
+            "matchStrings": [
+                "newName\\S*:\\s*(?<depName>\\S+).*\n\\s+newTag:\\s*(?<currentValue>.+)"
+              ],
+            "datasourceTemplate": "docker"
+        }
+    ],
+    "separateMajorMinor": false
+}
