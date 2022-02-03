@@ -105,7 +105,7 @@ spec:
 {{- end }}
 ```
 
-The `GitRepository` Helm template above requires the following values to be added to `flx/values.yaml`:
+The `GitRepository` Helm template above requires the following values to be added to `bigbang/values.yaml`:
 
 ```yaml
 podinfo:
