@@ -339,7 +339,7 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
     path: "./chart"
-    tag: "2.1.7-bb.2"
+    tag: "2.1.10-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
