@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi7-minimal:7.9
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi7-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 2: Init containers pulling images from unapproved registries are not allowed
@@ -23,7 +23,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   initContainers:
   - name: i1
@@ -40,5 +40,5 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]

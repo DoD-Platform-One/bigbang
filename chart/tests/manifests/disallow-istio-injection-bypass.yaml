@@ -11,7 +11,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 2: Pods that have sidecar.istio.io/inject set to true are allowed
@@ -27,7 +27,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 3: Pods that don't have the sidecar.istio.io/inject label are allowed
@@ -43,7 +43,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 4: Pods that don't have any labels are allowed
@@ -57,5 +57,5 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]

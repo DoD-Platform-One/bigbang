@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 2: Pods without the required annotation value are not allowed
@@ -26,7 +26,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
 ---
 # Test 3: Pods with the required annotations are allowed
@@ -42,5 +42,5 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]

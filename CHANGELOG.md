@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.5] - 2022-02-03
+
+### Changed
+
+- Updated kubectl to 1.22
+- Removed version from UBI image in most test resources (latest is ok)
+
 ## [1.0.0-bb.4] - 2022-01-31
 
 ### Changed

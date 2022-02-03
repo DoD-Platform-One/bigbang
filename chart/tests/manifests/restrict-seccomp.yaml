@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     securityContext:
       seccompProfile:
@@ -26,11 +26,11 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   initContainers:
   - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     securityContext:
       seccompProfile:
         type: Unconfined
@@ -46,28 +46,28 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   - name: c2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     securityContext:
       privileged: false
   - name: c3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     securityContext:
       seccompProfile:
         type: RuntimeDefault
   initContainers:
   - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
   - name: i2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     securityContext:
       privileged: false
   - name: i3
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     securityContext:
       seccompProfile:
         type: RuntimeDefault

@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     ports:
       - hostPort: 65000
@@ -26,11 +26,11 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   initContainers:
   - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     ports:
       - hostPort: 65000
         containerPort: 65000
@@ -46,19 +46,19 @@ metadata:
 spec:
   containers:
   - name: c1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     ports:
       - hostPort: 64000
         containerPort: 64000
   - name: c2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
   initContainers:
   - name: i1
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     ports:
       - hostPort: 64000
         containerPort: 64000
   - name: i2
-    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.5
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal

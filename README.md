@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.0-bb.4](https://img.shields.io/badge/Version-1.0.0--bb.4-informational?style=flat-square)
+![Version: 1.0.0-bb.5](https://img.shields.io/badge/Version-1.0.0--bb.5-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -43,7 +43,7 @@ helm install kyverno-policies chart/
 | exclude | object | `{}` | Adds an exclusion to all policies.  This is merged with any policy-specific excludes. |
 | customLabels | object | `{}` | Additional labels to apply to all policies. |
 | waitforready.enabled | bool | `true` | Controls wait for ready deployment |
-| waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl","tag":"v1.21.5"}` | Image to use in wait for ready job.  This must contain kubectl. |
+| waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl","tag":"v1.22.2"}` | Image to use in wait for ready job.  This must contain kubectl. |
 | waitforready.imagePullSecrets | list | `[]` | Pull secret for wait for ready job |
 | policies.sample | object | `{"enabled":false,"exclude":{},"match":{},"parameters":{},"validationFailureAction":"audit","webhookTimeoutSeconds":""}` | Sample policy showing values that can be added to any policy |
 | policies.sample.enabled | bool | `false` | Controls policy deployment |
@@ -140,7 +140,7 @@ helm install kyverno-policies chart/
 | additionalPolicies.samplePolicy.spec | object | `{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}` | Policy specification.  See `kubectl explain clusterpolicies.spec` |
 | additionalPolicies.samplePolicy.spec.rules | list | `[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]` | Policy rules.  At least one is required |
 | bbtests.enabled | bool | `false` |  |
-| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.5"` |  |
+| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.22.2"` |  |
 | bbtests.scripts.envs.ENABLED_POLICIES | string | `"{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join \" \" $p }}"` |  |
 | bbtests.scripts.envs.IMAGE_PULL_SECRET | string | `"{{ .Values.bbtests.imagePullSecret }}"` |  |
 | bbtests.scripts.additionalVolumeMounts[0].name | string | `"kyverno-policies-bbtest-manifests"` |  |
