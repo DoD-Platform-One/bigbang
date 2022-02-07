@@ -24,7 +24,7 @@ if [[ "${CI_DEPLOY_LABELS[*]}" =~ "kyverno" ]] || [[ "${CI_COMMIT_BRANCH}" == "$
 fi
 
 # Enable tempo
-if [[ "${CI_DEPLOY_LABELS[*]}" = "tempo" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+if [[ "${CI_DEPLOY_LABELS[*]}" =~ "tempo" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
   echo "Enabling tempo"
   yq e ".tempo.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
 fi
