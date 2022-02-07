@@ -202,7 +202,7 @@ integration:
   variables:
     BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
     BB_REPO_DESTINATION: "./bigbang-repo"
-    CI_VALUES_FILE: "../bigbang/values.yaml"
+    CI_VALUES_FILE: "./tests/test-values.yaml"
     PIPELINE_REPO_DESTINATION: "pipeline-repo"
     PIPELINE_TYPE: "BB"
   script:
