@@ -4,6 +4,11 @@
 
 {{- define "bigbang.defaults.tempo" -}}
 
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
 tempo:
   imagePullSecrets:
   - name: private-registry
