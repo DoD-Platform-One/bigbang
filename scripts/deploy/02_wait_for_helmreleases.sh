@@ -37,15 +37,29 @@ function array_contains() {
 ## Function to check/wait on HR existence
 function check_if_hr_exist() {
     timeElapsed=0
-    echo "⏳ Waiting for $1 HR to exist"
-    until kubectl get hr -n bigbang $1 &> /dev/null; do
-      sleep 5
-      timeElapsed=$(($timeElapsed+5))
-      if [[ $timeElapsed -ge 60 ]]; then
-         echo "❌ Timed out while waiting for $1 HR to exist"
-         exit 1
-      fi
-    done
+    if [ $1 == "ek" ]; then
+      check_package="logging"
+    elif [ $1 == "fluent-bit" ]; then
+      check_package="fluentbit"
+    elif [ $1 == "cluster-auditor" ]; then
+      check_package="clusterAuditor"
+    else
+      check_package=$1
+    fi
+    echo "⏳ Checking if $1 HR is enabled"
+    if [[ "$(yq e ".${check_package}.enabled" $CI_VALUES_FILE)" == "false" ]] || [[ "$(yq e ".addons.${check_package}.enabled" $CI_VALUES_FILE)" == "false" ]]; then
+      echo "$1 HR not enabled, skipping..."
+    else
+      echo "$1 HR is enabled, waiting..."
+      until kubectl get hr -n bigbang $1 &> /dev/null; do
+        sleep 5
+        timeElapsed=$(($timeElapsed+5))
+        if [[ $timeElapsed -ge 60 ]]; then
+           echo "❌ Timed out while waiting for $1 HR to exist"
+           exit 1
+        fi
+      done
+    fi
 }
 
 ## Function to wait on all HRs
