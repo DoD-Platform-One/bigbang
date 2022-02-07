@@ -244,6 +244,41 @@ fluentbit:
     bbtests:
       enabled: true
 
+tempo:
+  enabled: false
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+
+  persistence:
+    enabled: true
+    # storageClassName: local-path
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+
+  tempoQuery:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 200m
+        memory: 128Mi
+
+  opentelemetryCollector:
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 200m
+        memory: 128Mi
+
 monitoring:
   enabled: true
   sso:
@@ -689,7 +724,7 @@ addons:
         scripts:
           envs:
             ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
- 
+
   sonarqube:
     enabled: false
     sso:
@@ -968,7 +1003,7 @@ addons:
                       app.kubernetes.io/instance: "{{ .Release.Name }}"
                       component: webhook
                   topologyKey: kubernetes.io/hostname
- 
+
       bbtests:
         enabled: true
         cypress:
