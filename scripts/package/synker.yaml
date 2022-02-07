@@ -35,7 +35,7 @@ source:
     - registry1.dso.mil/ironbank/big-bang/base:1.0.0
     - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
     - registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.2
-    - registry1.dso.mil/ironbank/opensource/istio/install-cni:1.11.3
+    - registry1.dso.mil/ironbank/opensource/istio/install-cni:1.11.5
     # NOTE: We use the velero AWS plugin in CI so it isn't listed here
     - registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.1.2
     - registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.3.1
