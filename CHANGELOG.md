@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.2.4]
+### Fixed
+- Tempo enable conditional improperly using `=` instead of `=~`
+
 ## [2.2.3]
 ### Fixed
 - Integration stage merge bigbang test values into packages bigbang values
