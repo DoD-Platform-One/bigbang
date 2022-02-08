@@ -39,11 +39,16 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if .Values.istio.enabled }}
+  {{- if or .Values.istio.enabled (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
   dependsOn:
     {{- if .Values.istio.enabled }}
     - name: istio
       namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if (dig "values" "minio" "enabled" false .Values.addons.vault) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}      
     {{- end }}
   {{- end }}
 {{- end }}
