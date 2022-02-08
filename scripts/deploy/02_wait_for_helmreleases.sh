@@ -43,6 +43,16 @@ function check_if_hr_exist() {
       check_package="fluentbit"
     elif [ $1 == "cluster-auditor" ]; then
       check_package="clusterAuditor"
+    elif [ $1 == "eck-operator" ]; then
+      check_package="eckoperator"
+    elif [ $1 == "gitlab-runner" ]; then
+      check_package="gitlabRunner"
+    elif [ $1 == "minio-operator" ]; then
+      check_package="minioOperator"
+    elif [ $1 == "mattermost-operator" ]; then
+      check_package="mattermostoperator"
+    elif [ $1 == "nexus-repository-manager" ]; then
+      check_package="nexus"
     else
       check_package=$1
     fi

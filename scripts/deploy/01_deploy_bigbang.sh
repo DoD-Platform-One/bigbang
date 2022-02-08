@@ -4,36 +4,38 @@ set -e
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 set -x
 
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
-  echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
-  yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-else
-  IFS=","
-  for package in $CI_DEPLOY_LABELS; do
-    if [ "$(yq e ".addons.${package}.enabled" $CI_VALUES_FILE 2>/dev/null)" == "false" ]; then
-      echo "Identified \"$package\" from labels"
-      yq e ".addons.${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-    fi
-  done
-fi
-
-# Enable kyverno
-if [[ "${CI_DEPLOY_LABELS[*]}" =~ "kyverno" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
-  echo "Enabling kyverno"
-  yq e ".kyverno.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-fi
-
-# Enable tempo
-if [[ "${CI_DEPLOY_LABELS[*]}" =~ "tempo" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
-  echo "Enabling tempo"
-  yq e ".tempo.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-fi
-
-#If loki or promtail Labels set, adjust logging engine packages
-if [[ "${CI_DEPLOY_LABELS[*]}" =~ "loki" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "promtail" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
-  echo "Enabling promtail and loki"
-  yq e ".promtail.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
-  yq e ".loki.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+if [ ! -f ../bigbang/values.yaml ]; then
+  if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
+    echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
+    yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+  else
+    IFS=","
+    for package in $CI_DEPLOY_LABELS; do
+      if [ "$(yq e ".addons.${package}.enabled" $CI_VALUES_FILE 2>/dev/null)" == "false" ]; then
+        echo "Identified \"$package\" from labels"
+        yq e ".addons.${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+      fi
+    done
+  fi
+  
+  # Enable kyverno
+  if [[ "${CI_DEPLOY_LABELS[*]}" =~ "kyverno" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+    echo "Enabling kyverno"
+    yq e ".kyverno.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+  fi
+  
+  # Enable tempo
+  if [[ "${CI_DEPLOY_LABELS[*]}" =~ "tempo" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+    echo "Enabling tempo"
+    yq e ".tempo.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+  fi
+  
+  #If loki or promtail Labels set, adjust logging engine packages
+  if [[ "${CI_DEPLOY_LABELS[*]}" =~ "loki" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "promtail" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
+    echo "Enabling promtail and loki"
+    yq e ".promtail.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+    yq e ".loki.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+  fi
 fi
 
 # Set controlPlaneCidr for ci-infra jobs which are RKE2
