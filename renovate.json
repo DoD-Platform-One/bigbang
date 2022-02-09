@@ -2,7 +2,7 @@
     "baseBranches": ["master"],
     "configWarningReuseIssue": false,
     "dependencyDashboard": true,
-    "dependencyDashboardHeader": "- [ ] If there are Flux updates: Update [Flux manifests](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/base/flux/gotk-components.yaml) to latest version based off available image versions.",
+    "dependencyDashboardHeader": "- [ ] If there are Flux updates: Update your Flux CLI to the latest version possible based on available IB images, then from the root of the bigbang repository, run `flux install --components source-controller,kustomize-controller,helm-controller,notification-controller --export > base/flux/gotk-components.yaml` to generate the latest manifests",
     "dependencyDashboardTitle": "Renovate: Update Dependencies",
     "draftPR": true,
     "enabledManagers": ["helm-values","regex"],
