@@ -52,6 +52,7 @@ patches:
                   capabilities:
                     drop:
                       - ALL
+                  $patch: replace
   - target:
       kind: Deployment
       name: helm-controller
