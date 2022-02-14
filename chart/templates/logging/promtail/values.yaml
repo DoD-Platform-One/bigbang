@@ -17,6 +17,12 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
 {{- if .Values.istio.enabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
