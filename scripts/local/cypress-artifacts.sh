@@ -1,3 +1,4 @@
+#### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
 PACKAGE_NAMESPACE=$1
 
 if [ ! ${PACKAGE_NAMESPACE} ]; then
@@ -19,3 +20,5 @@ if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-videos &>/dev/null; the
     tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
     rm -rf cypress-videos.tar.gz cypress-videos.tar.gz.b64
 fi
+
+#### End backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####

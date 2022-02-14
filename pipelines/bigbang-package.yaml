@@ -119,8 +119,6 @@ clean install:
     paths:
       - events.txt
       - images.txt
-      - tests/cypress/screenshots
-      - tests/cypress/videos
       - cypress-artifacts
     expire_in: 3 days
   allow_failure:
@@ -186,8 +184,6 @@ upgrade:
     paths:
       - events.txt
       - images.txt
-      - tests/cypress/screenshots
-      - tests/cypress/videos
       - cypress-artifacts
     expire_in: 3 days
   allow_failure:
