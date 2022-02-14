@@ -127,7 +127,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.11.5-bb.1"
+    tag: "1.11.5-bb.2"
 
   # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
   # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
