@@ -105,7 +105,16 @@ for hr in $installed_helmreleases; do
       fi
     done
 
-    # Always save off the artifacts if they exist
+    if [[ -n `ls /cypress/screenshots/${namespace}/* 2>/dev/null` ]]; then
+      mkdir -p test-artifacts/${hr}/cypress/screenshots
+      mv /cypress/screenshots/${namespace}/* ./test-artifacts/${hr}/cypress/screenshots
+    fi
+    if [[ -n `ls /cypress/videos/${namespace}/* 2>/dev/null` ]]; then
+      mkdir -p test-artifacts/${hr}/cypress/videos
+      mv /cypress/videos/${namespace}/* ./test-artifacts/${hr}/cypress/videos
+    fi
+
+    #### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
     if kubectl get configmap -n ${namespace} cypress-screenshots &>/dev/null; then
       mkdir -p test-artifacts/${hr}/cypress
       kubectl get configmap -n ${namespace} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
@@ -122,6 +131,7 @@ for hr in $installed_helmreleases; do
       rm -rf cypress-videos.tar.gz.b64 cypress-videos.tar.gz
       kubectl delete configmap -n ${namespace} cypress-videos &>/dev/null
     fi
+    #### End backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
   else
     echo "😞 No tests found for ${hr}"
   fi

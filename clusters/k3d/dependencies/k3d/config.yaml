@@ -27,6 +27,10 @@ volumes:
     nodeFilters:
       - server:*
       - agent:*
+  - volume: /cypress:/cypress
+    nodeFilters:
+      - server:*
+      - agent:*
 ports:
   - port: 80:80
     nodeFilters:

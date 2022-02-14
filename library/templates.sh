@@ -538,6 +538,15 @@ package_test() {
      echo "***** Start Helm Test Logs *****"
      kubectl logs --all-containers=true --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
      echo "***** End Helm Test Logs *****"
+     if [[ -n `ls /cypress/screenshots/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
+       mkdir -p cypress-artifacts/screenshots
+       mv /cypress/screenshots/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/screenshots
+     fi
+     if [[ -n `ls /cypress/videos/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
+       mkdir -p cypress-artifacts/videos
+       mv /cypress/videos/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/videos
+     fi
+     #### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
        cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
@@ -550,6 +559,7 @@ package_test() {
        mkdir -p cypress-artifacts
        tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
      fi
+     #### End backwards compatibility for configmap videos  (gluon 0.2.5 and earlier) ####
      if [[ ${EXIT_CODE} -ne 0 ]]; then
        exit ${EXIT_CODE}
      fi
@@ -567,6 +577,16 @@ package_upgrade_test() {
      echo "***** Start Helm Test Logs *****"
      kubectl logs --all-containers=true --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
      echo "***** End Helm Test Logs *****"
+     if [[ -n `ls /cypress/screenshots/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
+       mkdir -p cypress-artifacts/screenshots
+       cp /cypress/screenshots/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/screenshots
+     fi
+     if [[ -n `ls /cypress/videos/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
+       mkdir -p cypress-artifacts/videos
+       cp /cypress/videos/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/videos
+     fi
+
+     #### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
      if kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots &>/dev/null; then
        kubectl get configmap -n ${PACKAGE_NAMESPACE} cypress-screenshots -o jsonpath='{.data.cypress-screenshots\.tar\.gz\.b64}' > cypress-screenshots.tar.gz.b64
        cat cypress-screenshots.tar.gz.b64 | base64 -d > cypress-screenshots.tar.gz
@@ -579,6 +599,8 @@ package_upgrade_test() {
        mkdir -p cypress-artifacts
        tar -zxf cypress-videos.tar.gz --strip-components=2 -C cypress-artifacts
      fi
+     #### End backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
+
      if [[ ${EXIT_CODE} -ne 0 ]]; then
        echo -e "\e[31mNOTICE to MR creators/reviewers: There were errors on upgrade testing. If this package's tests are expected to fail when run twice in a row, please open a ticket to resolve this for the future.\e[0m"
        echo -e "\e[31mOtherwise, take note of artifacts and testing results and ensure that the upgrade path is functional before approving/merging.\e[0m"
