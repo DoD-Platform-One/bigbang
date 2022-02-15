@@ -1025,6 +1025,21 @@ get_dns_config() {
    echo -e "\e[0Ksection_end:`date +%s`:dns\r\e[0K"
 }
 
+get_log_dump(){
+  echo -e "\e[0Ksection_start:`date +%s`:log_dump[collapsed=true]\r\e[0K\e[33;1mLog Dump\e[37m"
+  echo -e "\e[31mNOTICE: Logs can be found in artifacts pod_logs/<namespace>/<pod_name>.txt\e[0m"
+  mkdir -p pod_logs
+  pods=$(kubectl get pods -A --template '{{range .items}}{{.metadata.namespace}} {{.metadata.name}}{{"\n"}}{{end}}')
+  echo "$pods" | while read -r line; do
+      namespace=$(echo "$line" | awk '{print $1}')
+      pod=$(echo "$line" | awk '{print $2}')
+      mkdir -p "pod_logs/$namespace"
+      kubectl -n "$namespace" logs --all-containers=true --prefix=true --previous=true --ignore-errors=true "$pod" > "pod_logs/$namespace/$pod.txt"
+      kubectl -n "$namespace" logs --all-containers=true --prefix=true "$pod" >> "pod_logs/$namespace/$pod.txt"
+  done
+  echo -e "\e[0Ksection_end:`date +%s`:log_dump\r\e[0K"
+}
+
 get_debug() {
   if [ $DEBUG_ENABLED == "true" ]; then
     get_kustomize
@@ -1032,6 +1047,7 @@ get_debug() {
     get_virtualservices
     get_hosts
     get_dns_config
+    get_log_dump
   else
     echo "Debug not enabled, skipping"
   fi

@@ -126,6 +126,7 @@ clean install:
     paths:
       - events.txt
       - images.txt
+      - pod_logs
       - "test-artifacts/"
     expire_in: 3 days
     when: always
@@ -178,6 +179,7 @@ upgrade:
   artifacts:
     paths:
       - events.txt
+      - pod_logs
       - "test-artifacts/"
     expire_in: 3 days
     when: always
@@ -326,6 +328,7 @@ aws/rke2/bigbang up:
     paths:
       - events.txt
       - images.txt
+      - pod_logs
       - "test-artifacts/"
     expire_in: 3 days
     when: always
@@ -371,6 +374,7 @@ aws/rke2/bigbang test:
   artifacts:
     paths:
       - events.txt
+      - pod_logs
       - "test-artifacts/"
     expire_in: 3 days
     when: always
@@ -398,6 +402,7 @@ aws/rke2/bigbang down:
   artifacts:
     paths:
       - events.txt
+      - pod_logs
   retry:
     max: 2
     when:

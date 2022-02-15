@@ -56,7 +56,6 @@
     - .dind-umbrella-runner
     - .k3d-ci
 
-
 #  This has the tags needed for package runners
 .k3d-ci-pkg:
   extends:
