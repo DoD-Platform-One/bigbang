@@ -108,6 +108,7 @@ clean install:
     paths:
       - events.txt
       - images.txt
+      - pod_logs
       - tests/cypress/screenshots
       - tests/cypress/videos
       - cypress-artifacts
@@ -165,6 +166,7 @@ upgrade:
     paths:
       - events.txt
       - images.txt
+      - pod_logs
       - tests/cypress/screenshots
       - tests/cypress/videos
       - cypress-artifacts
@@ -208,6 +210,7 @@ integration:
     paths:
       - events.txt
       - images.txt
+      - pod_logs
       - "bigbang-repo/test-artifacts/"
     expire_in: 3 days
     when: always
