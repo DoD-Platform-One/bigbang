@@ -77,7 +77,7 @@ proxy:
 
 job_image:
   repository: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
-  tag: 8.4
+  tag: 8.5
   pullPolicy: IfNotPresent
 
 # -- End of BigBang Additions
@@ -104,7 +104,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.36.0-01
+  tag: 3.37.3-02
   pullPolicy: IfNotPresent
 
 nexus:
@@ -128,13 +128,21 @@ nexus:
   properties:
     override: false
     data: {}
-    # data:
     #   nexus.licenseFile: /nexus-data/sonatype-license.override.lic
     #   nexus.scripts.allowCreation: true
     #   See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
     #   nexus.ldap.env.java.naming.security.authentication: simple
-  # nodeSelector: {}
+  # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
+  resources:
+    # requests:
+    # Based on https://help.sonatype.com/repomanager3/installation/system-requirements
+    requests:
+      cpu: 4
+      memory: 8000Mi
+    limits:
+      cpu: 4
+      memory: 8000Mi
 
   repository:
     # Raw format Repositories are currently the only supported format.
@@ -159,15 +167,6 @@ nexus:
             contentDisposition: "ATTACHMENT"
 
   affinity: {}
-  resources:
-    # requests:
-    # Based on https://help.sonatype.com/repomanager3/installation/system-requirements
-    requests:
-      cpu: 4
-      memory: 8000Mi
-    limits:
-      cpu: 4
-      memory: 8000Mi
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
 
@@ -206,21 +205,13 @@ deployment:
   # # Add init containers. e.g. to be used to give specific permissions for nexus-data.
   # # Add your own init container or uncomment and modify the given example.
   initContainers:
-  # supplying the following will enable additional logging for auditing requirements
-  # must be used in conjunction with the request-log and audit-log additionalContainers
-  #  - name: set-log-dir-permissions
-  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
-  #    command: [/bin/sh]
-  #    args:
-  #      - -c
-  #      - >-
-  #        mkdir -p /nexus-data/log/audit &&
-  #        touch -a /nexus-data/log/audit/audit.log &&
-  #        touch -a /nexus-data/log/request.log &&
-  #        chown -R '200:200' /nexus-data
-  #    volumeMounts:
-  #      - name: nexus-repository-manager-data
-  #        mountPath: /nexus-data
+  # - name: fmp-volume-permission
+    # image: busybox
+    # imagePullPolicy: IfNotPresent
+    # command: ['chown','-R', '200', '/nexus-data']
+    # volumeMounts:
+      # - name: nexus-data
+        # mountPath: /nexus-data
   # # Uncomment and modify this to run a command after starting the nexus container.
   postStart:
     command:    # '["/bin/sh", "-c", "ls"]'
@@ -228,22 +219,24 @@ deployment:
     command:    # '["/bin/rm", "-f", "/path/to/lockfile"]'
   terminationGracePeriodSeconds: 120
   additionalContainers:
-  # supplying the following will enable additional logging for auditing requirements
-  # must be used in conjunction with the set-log-dir-permissions initContainer
-  #  - name: request-log
-  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
-  #    args: [/bin/sh, -c, 'tail -n+1 -f /nexus-data/log/request.log']
-  #    volumeMounts:
-  #      - name: nexus-repository-manager-data
-  #        mountPath: /nexus-data
-  #  - name: audit-log
-  #    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.3
-  #    args: [/bin/sh, -c, 'tail -n+1 -f /nexus-data/log/audit/audit.log']
-  #    volumeMounts:
-  #      - name: nexus-repository-manager-data
-  #        mountPath: /nexus-data
   additionalVolumes:
   additionalVolumeMounts:
+
+
+ingress:
+  enabled: false
+  annotations: {kubernetes.io/ingress.class: nginx}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostPath: /
+  hostRepo: repo.demo
+  tls: []
+    # - secretName: nexus-local-tls
+    #   hosts:
+    #     - nexus.local
+    #     - nexus-docker.local
+    #     - nexus-docker-hosted.local
+
 
 service:
   name: nexus3

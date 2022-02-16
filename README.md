@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 36.0.0-bb.4](https://img.shields.io/badge/Version-36.0.0--bb.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.36.0](https://img.shields.io/badge/AppVersion-3.36.0-informational?style=flat-square)
+![Version: 37.3.0-bb.0](https://img.shields.io/badge/Version-37.3.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.37.3](https://img.shields.io/badge/AppVersion-3.37.3-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -91,13 +91,13 @@ helm install nexus-repository-manager chart/
 | proxy.request.data[0].httpsAuthNtlmDomain | string | `nil` |  |
 | proxy.request.data[0].nonProxyHosts | list | `[]` |  |
 | job_image.repository | string | `"registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"` |  |
-| job_image.tag | float | `8.4` |  |
+| job_image.tag | float | `8.5` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
 | ingress | object | `{"annotations":{"kubernetes.io/ingress.class":"nginx"},"enabled":false,"hostPath":"/","hostRepo":"repo.demo","tls":[]}` | End of BigBang Additions |
 | statefulset.enabled | bool | `false` |  |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.36.0-01"` |  |
+| image.tag | string | `"3.37.3-02"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
 | nexus.docker.enabled | bool | `false` |  |
@@ -108,6 +108,10 @@ helm install nexus-repository-manager chart/
 | nexus.env[1].value | string | `"true"` |  |
 | nexus.properties.override | bool | `false` |  |
 | nexus.properties.data | object | `{}` |  |
+| nexus.resources.requests.cpu | int | `4` |  |
+| nexus.resources.requests.memory | string | `"8000Mi"` |  |
+| nexus.resources.limits.cpu | int | `4` |  |
+| nexus.resources.limits.memory | string | `"8000Mi"` |  |
 | nexus.repository.enabled | bool | `false` |  |
 | nexus.repository.repo[0].name | string | `"test-nexus"` |  |
 | nexus.repository.repo[0].format | string | `"raw"` |  |
@@ -121,10 +125,6 @@ helm install nexus-repository-manager chart/
 | nexus.repository.repo[0].repo_data.component.proprietaryComponents | bool | `true` |  |
 | nexus.repository.repo[0].repo_data.raw.contentDisposition | string | `"ATTACHMENT"` |  |
 | nexus.affinity | object | `{}` |  |
-| nexus.resources.requests.cpu | int | `4` |  |
-| nexus.resources.requests.memory | string | `"8000Mi"` |  |
-| nexus.resources.limits.cpu | int | `4` |  |
-| nexus.resources.limits.memory | string | `"8000Mi"` |  |
 | nexus.nexusPort | int | `8081` |  |
 | nexus.securityContext.fsGroup | int | `2000` |  |
 | nexus.podAnnotations | object | `{}` |  |
@@ -150,6 +150,11 @@ helm install nexus-repository-manager chart/
 | deployment.additionalContainers | string | `nil` |  |
 | deployment.additionalVolumes | string | `nil` |  |
 | deployment.additionalVolumeMounts | string | `nil` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| ingress.hostPath | string | `"/"` |  |
+| ingress.hostRepo | string | `"repo.demo"` |  |
+| ingress.tls | list | `[]` |  |
 | service.name | string | `"nexus3"` |  |
 | service.enabled | bool | `true` |  |
 | service.labels | object | `{}` |  |

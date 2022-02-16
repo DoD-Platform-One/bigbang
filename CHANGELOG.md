@@ -2,6 +2,11 @@
 
 ---
 
+## [37.3.0-bb.0] - 2022-02-16
+### Changed
+- Updated chart to version: 37.3.0-bb.0 | appVersion: 3.37.3
+- Updated gluon dependency to 0.2.7
+
 ## [36.0.0-bb.4] - 2022-01-31
 ### Added
 - Update Chart.yaml to follow new standardization for release automation
