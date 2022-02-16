@@ -5,12 +5,16 @@ hostname: bigbang.dev
 
 istio:
   enabled: false
-  mtls: true
   kiali:
     gateways:
       - "istio-system/main"
     hosts:
       - kiali.{{ .Values.hostname }}
+  # Default kiali peer authentication
+  mtls:
+    # STRICT = Allow only mutual TLS traffic
+    # PERMISSIVE = Allow both plain text and mutual TLS traffic
+    mode: STRICT
 
 port: 20001
 image:

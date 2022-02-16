@@ -1,0 +1,10 @@
+{{- if .Values.istio.enabled }}
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-kiali
+  namespace: {{ .Release.Namespace }}
+spec:
+  mtls:
+    mode: {{ .Values.istio.mtls.mode }}
+{{- end }}
