@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: f018502b0b3dd51ad4eeccd0a06f1e0a2e38070a
+    commit: 35ae7973f188d3a276cbf7f931d47f4a2c08811b
     repo: https://github.com/sonatype/helm3-charts
     directory: /charts/nexus-repository-manager
-    ref: nexus-repository-manager-36.0.0
+    ref: nexus-repository-manager-37.3.0
