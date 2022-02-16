@@ -4,15 +4,17 @@
 
 BigBang developers use [k3d](https://k3d.io/), a lightweight wrapper to run [k3s](https://github.com/rancher/k3s) (Rancher Lab’s minimal Kubernetes distribution) in docker. K3d is a virtualized kubernetes cluster that is quick to start and tear down for fast development iteration. K3d is sufficient for 90% of BigBang development work. In limited cases developers will use real infrastructure k8s deployments with Rancher, Konvoy, etc. Only k3d is covered here in this document. The others are out of scope.
 
-It is not recommend to run k3d with BigBang on your local computer. BigBang can be quite resource-intensive and it requires a huge download bandwidth for the images. It is best to use a remote k3d cluster running on an AWS EC2 instance. If you do insist on running k3d locally you should disable certain packages before deploying. You can do this in the values.yaml file by setting the package deploy to false. One of the packages that is most resource-intensive is the logging package. And you should create a local image registry cache to minimize the amount of image downloading.
+It is not recommend to run k3d with BigBang on your local computer. Instead use a remote k3d cluster running on an EC2 instance to shift the compute and network load to the cloud. BigBang can be quite resource-intensive and it requires a huge download bandwidth for the images. If you do insist on running k3d locally you should disable certain packages before deploying. You can do this in the values.yaml file by setting the package deploy to false. One of the packages that is most resource-intensive is the logging package. And you should create a local image registry cache to minimize the amount of image downloading.
 
-This page contains the manual steps to create your k3d dev environment. There is a script [./scripts/k3d-dev.sh](./scripts/k3d-dev.sh) that automates the creation and teardown of a development environment. We recommend that you study the manual steps so that you understand how the script works. It might be helpful to get a live demonstration by someone who already knows how to do it until a good video tutorial is created. We strive to make the documentation as good as possible but it is hard to keep it up-to-date and there are still pitfalls and gotchas.
+There is a script [./scripts/k3d-dev.sh](./scripts/k3d-dev.sh) that automates the creation and teardown of a development environment. It might be helpful to get a live demonstration by someone who already knows how to do it until a good video tutorial is created. We strive to make the documentation as good as possible but it is hard to keep it up-to-date and there are still pitfalls and gotchas.
+
+The manual steps included below are no longer maintained. The manual steps are only included for reference as a study guide to understand how the script works. 
 
 ## Prerequisites
 
 ### Required Access
 
-- [AWS GovCloud "coder" account](https://927962728993.signin.amazonaws-us-gov.com/console)
+- AWS GovCloud "coder" account - talk to your team lead for access
 - [BigBang repository](https://repo1.dso.mil/platform-one/big-bang/bigbang)
 - [Iron Bank registry](https://registry1.dso.mil/)
 
@@ -24,7 +26,7 @@ This page contains the manual steps to create your k3d dev environment. There is
 
 > For additional installation details, see [Software Installation and Verification Commands to run from Bash](https://repo1.dso.mil/platform-one/onboarding/big-bang/engineering-cohort/-/blob/master/lab_guides/01-Preflight-Access-Checks/A-software-check.md)
 
-## Manual Creation of a Development Environment
+## DEPRECATED AND UNMAINTAINED: Manual Creation of a Development Environment
 
 This section will cover the creation of an environment manually. This is a good place to start because it creates an understanding of everything that the automated method does for you and uses far less cloud resources.
 
