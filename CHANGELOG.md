@@ -2,6 +2,13 @@
 
 ---
 
+## [37.3.0-bb.1] - 2022-02-17
+### Removed
+- Removed duplicate ingress block from values.yaml
+
+### Changed
+- Changed the bigbang.dev/applicationVersions version to 3.37.3-02
+
 ## [37.3.0-bb.0] - 2022-02-16
 ### Changed
 - Updated chart to version: 37.3.0-bb.0 | appVersion: 3.37.3

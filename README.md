@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 37.3.0-bb.0](https://img.shields.io/badge/Version-37.3.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.37.3](https://img.shields.io/badge/AppVersion-3.37.3-informational?style=flat-square)
+![Version: 37.3.0-bb.1](https://img.shields.io/badge/Version-37.3.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.37.3](https://img.shields.io/badge/AppVersion-3.37.3-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -93,8 +93,7 @@ helm install nexus-repository-manager chart/
 | job_image.repository | string | `"registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"` |  |
 | job_image.tag | float | `8.5` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
-| ingress | object | `{"annotations":{"kubernetes.io/ingress.class":"nginx"},"enabled":false,"hostPath":"/","hostRepo":"repo.demo","tls":[]}` | End of BigBang Additions |
-| statefulset.enabled | bool | `false` |  |
+| statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
 | image.tag | string | `"3.37.3-02"` |  |
