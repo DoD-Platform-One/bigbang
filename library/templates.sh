@@ -1041,7 +1041,7 @@ get_log_dump(){
 }
 
 get_debug() {
-  if [ $DEBUG_ENABLED == "true" ]; then
+  if [[ $DEBUG_ENABLED == "true" ]] || [[ "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"* ]] ; then
     get_kustomize
     get_gateways
     get_virtualservices
