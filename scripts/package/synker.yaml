@@ -33,7 +33,8 @@ source:
     - registry1.dso.mil/ironbank/anchore/enterpriseui/enterpriseui:3.2.1
     - registry1.dso.mil/ironbank/big-bang/base:8.4
     - registry1.dso.mil/ironbank/big-bang/base:1.0.0
-    - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:13.9.0
+    - registry1.dso.mil/ironbank/gitlab/gitlab/kubectl:14.6.2
+    - registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-exporter:14.6.2
     - registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.2
     - registry1.dso.mil/ironbank/opensource/istio/install-cni:1.11.5
     # NOTE: We use the velero AWS plugin in CI so it isn't listed here
@@ -52,6 +53,6 @@ source:
     # - registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dependency-check616-sonar-scanner45-dotnet-31:052421
     # gitlab-runner-helper image: This image does not get captured from the release deployment
     # the gitlab-runner-helper image only gets pulled when a pipeline runs. So it must be listed here
-    - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v14.3.1
+    - registry1.dso.mil/ironbank/gitlab/gitlab-runner/gitlab-runner-helper:v14.4.0
     # Don't include until fortify is supported
     #- registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/dotnet-fortify:20.2.0
