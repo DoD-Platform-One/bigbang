@@ -3,7 +3,7 @@ name: nexus-repository-manager
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 37.3.0-bb.0
+version: 37.3.0-bb.1
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
 appVersion: 3.37.3
@@ -44,4 +44,4 @@ dependencies:
     repository: oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon
 annotations:
   bigbang.dev/applicationVersions: |
-    - Nexus: 3.37.1-01
+    - Nexus: 3.37.3-02
