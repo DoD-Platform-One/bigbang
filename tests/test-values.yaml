@@ -140,6 +140,10 @@ gatekeeper:
           - istio-system/lb-port-.*
           # Allow argocd to deploy a test app in its cypress test
           - argocd/guestbook-ui.*
+      allowedHostFilesystem:
+        parameters:
+          excludedResources:
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -185,6 +189,10 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to not have readiness/liveness probes
           - istio-system/lb-port-.*
+      volumeTypes:
+        parameters:
+          excludedResources:
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
     bbtests:
       enabled: true
 
