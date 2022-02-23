@@ -117,6 +117,7 @@ clean install:
     - deploy_bigbang
     # Fetch list of all images ran (retry crictl up to 6x)
     - bigbang_installed_images
+    - bigbang_additional_images
     - test_bigbang
     - |
       if [[ $EXIT_FLAG -eq 1 ]]; then
