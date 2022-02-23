@@ -1085,7 +1085,7 @@ describe_resources() {
   echo -e "\e[31mNOTICE: Cluster resource describes can be found in artifacts kubectl_describes\e[0m"
   echo -e "Running 'kubectl describe' on all resources..."
 
-  default_resources=$(kubectl get all -A --template '{{range .items}} {{.kind}}{{"\n"}}{{end}}')
+  default_resources=$(kubectl get all -A --template '{{range .items}} {{.kind}}{{"\n"}}{{end}}' | uniq)
   custom_resources=$(kubectl get crds --template '{{range .items}} {{.status.acceptedNames.plural}} {{.spec.scope}}{{"\n"}}{{end}}')
 
   echo "$default_resources" | while read -r line; do
