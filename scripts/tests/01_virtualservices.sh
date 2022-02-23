@@ -2,7 +2,7 @@
 
 # exit on error
 set -e
-trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 
 # Populate /etc/hosts
 if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "test-ci::infra" ]]; then
