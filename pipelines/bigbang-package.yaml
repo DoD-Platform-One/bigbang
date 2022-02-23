@@ -120,6 +120,7 @@ clean install:
       - events.txt
       - images.txt
       - pod_logs
+      - kubectl_describes
       - cypress-artifacts
     expire_in: 3 days
   allow_failure:
@@ -186,6 +187,7 @@ upgrade:
       - events.txt
       - images.txt
       - pod_logs
+      - kubectl_describes
       - cypress-artifacts
     expire_in: 3 days
   allow_failure:

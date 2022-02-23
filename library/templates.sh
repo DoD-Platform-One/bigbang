@@ -1056,6 +1056,43 @@ get_log_dump(){
       kubectl -n "$namespace" logs --all-containers=true --prefix=true "$pod" >> "pod_logs/$namespace/$pod.txt"
   done
   echo -e "\e[0Ksection_end:`date +%s`:log_dump\r\e[0K"
+}  
+      
+describe_resources() {
+  echo -e "\e[0Ksection_start:`date +%s`:describe_resources[collapsed=true]\r\e[0K\e[33;1mDescribe Cluster Resources\e[37m"
+  echo -e "\e[31mNOTICE: Cluster resource describes can be found in artifacts kubectl_describes\e[0m"
+  echo -e "Running 'kubectl describe' on all resources..."
+
+  default_resources=$(kubectl get all -A --template '{{range .items}} {{.kind}}{{"\n"}}{{end}}')
+  custom_resources=$(kubectl get crds --template '{{range .items}} {{.status.acceptedNames.plural}} {{.spec.scope}}{{"\n"}}{{end}}')
+
+  echo "$default_resources" | while read -r line; do
+        default_resource=$(echo "$line" | awk '{print $1}')
+        namespaces=$(kubectl get $default_resource -A --template '{{range .items}} {{.metadata.namespace}}{{"\n"}}{{end}}' | sort -u)
+        for namespace in ${namespaces}; do
+          mkdir -p "kubectl_describes/namespaces/$namespace"
+          kubectl -n $namespace describe $default_resource 2>/dev/null | sed '/^$/d;/^Name:.*/i ---' > "kubectl_describes/namespaces/$namespace/"$default_resource"s.yaml"
+        done 
+  done
+
+  echo "$custom_resources" | while read -r line; do
+        crd=$(echo "$line" | awk '{print $1}')
+        crd_scope=$(echo "$line" | awk '{print $2}')
+        crd_namespaces=$(kubectl get $crd -A --template '{{range .items}}{{.metadata.namespace}}{{"\n"}}{{end}}' | sort -u)
+        if [[ "$crd_scope" = "Cluster" ]]; then
+             mkdir -p "kubectl_describes/cluster_resources"
+             kubectl describe $crd 2>/dev/null | sed '/^$/d;/^Name:.*/i ---' > "kubectl_describes/cluster_resources/$crd.yaml"
+        elif [[ "$crd_scope" = "Namespaced" ]]; then
+             for namespace in ${crd_namespaces}; do
+                mkdir -p "kubectl_describes/namespaces/$namespace"
+                kubectl -n $namespace describe $crd 2>/dev/null | sed '/^$/d;/^Name:.*/i ---' > "kubectl_describes/namespaces/$namespace/$crd.yaml"
+             done
+        fi 
+  done 
+
+  find kubectl_describes/ -empty -delete
+
+  echo -e "\e[0Ksection_end:`date +%s`:describe_resources\r\e[0K"
 }
 
 get_debug() {
@@ -1066,6 +1103,7 @@ get_debug() {
     get_hosts
     get_dns_config
     get_log_dump
+    describe_resources
   else
     echo "Debug not enabled, skipping"
   fi
