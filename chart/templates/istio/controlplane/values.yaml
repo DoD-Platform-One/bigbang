@@ -69,8 +69,24 @@ gateways:
     autoHttpRedirect:
       enabled: {{ dig "autoHttpRedirect" "enabled" "true" $values }}
     servers:
-      {{- if ($values.ports) }}
-        {{- range $values.ports }}
+    {{- if $values.servers }}
+      {{- range $index, $servervalues := $values.servers}}
+    - hosts:
+      {{- tpl ( $servervalues.hosts | default (list) | toYaml) $ | nindent 8 }}
+      port:
+      {{- if $servervalues.port }}
+      {{- tpl ( $servervalues.port | default (dict) | toYaml) $ | nindent 8 }}
+      {{- else }}
+        name: https
+        number: 8443
+        protocol: HTTPS
+      {{- end }}
+      tls:
+        credentialName: {{ $index }}-{{ $name }}-cert
+        mode: {{ dig "tls" "mode" "SIMPLE" $servervalues }}
+      {{- end }}
+    {{- else if ($values.ports) }}
+    {{- range $values.ports }}
     - hosts:
       {{- tpl ($values.hosts | default (list) | toYaml) $ | nindent 8 }}
       port:
@@ -78,8 +94,8 @@ gateways:
       tls:
         credentialName: {{ $name }}-cert
         mode: {{ dig "tls" "mode" "SIMPLE" $values }}
-        {{- end }}
-      {{ else }}
+    {{- end }}
+    {{- else }}
     - hosts:
       {{- tpl ($values.hosts | default (list) | toYaml) $ | nindent 8 }}
       port:
@@ -89,8 +105,9 @@ gateways:
       tls:
         credentialName: {{ $name }}-cert
         mode: {{ dig "tls" "mode" "SIMPLE" $values }}
-      {{- end }}
-{{- end }}
+    {{- end }}
+    {{- end }}
+
 {{- end }}
 
 {{- define "istio.ingressgateway.k8s" -}}
