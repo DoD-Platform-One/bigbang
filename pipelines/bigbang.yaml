@@ -126,6 +126,7 @@ clean install:
   artifacts:
     paths:
       - events.txt
+      - cluster_info_dump.txt
       - images.txt
       - pod_logs
       - kubectl_describes
@@ -181,6 +182,7 @@ upgrade:
   artifacts:
     paths:
       - events.txt
+      - cluster_info_dump.txt
       - pod_logs
       - kubectl_describes
       - "test-artifacts/"
@@ -330,6 +332,7 @@ aws/rke2/bigbang up:
   artifacts:
     paths:
       - events.txt
+      - cluster_info_dump.txt
       - images.txt
       - pod_logs
       - kubectl_describes
@@ -378,6 +381,7 @@ aws/rke2/bigbang test:
   artifacts:
     paths:
       - events.txt
+      - cluster_info_dump.txt
       - pod_logs
       - kubectl_describes
       - "test-artifacts/"
@@ -407,6 +411,7 @@ aws/rke2/bigbang down:
   artifacts:
     paths:
       - events.txt
+      - cluster_info_dump.txt
       - pod_logs
       - kubectl_describes
   retry:

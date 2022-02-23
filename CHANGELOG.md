@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.2.14]
+### Added
+- Added cluster_info_dump debug function to output cluster-info dump to artifact cluster_info_dump.txt
+
 ## [2.2.13]
 ### Added
 - Added `describe_resources` function to debug output which will save all resources out to artifacts in kubectl_describes/

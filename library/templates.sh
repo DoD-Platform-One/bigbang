@@ -1095,6 +1095,13 @@ describe_resources() {
   echo -e "\e[0Ksection_end:`date +%s`:describe_resources\r\e[0K"
 }
 
+get_cluster_info_dump() {
+  echo -e "\e[0Ksection_start:`date +%s`:cluster_info_dump[collapsed=true]\r\e[0K\e[33;1mCluster Info Dump\e[37m"
+  echo -e "\e[31mNOTICE: cluster-info can be found in artifact cluster_info_dump.txt\e[0m"
+  kubectl cluster-info dump > cluster_info_dump.txt
+  echo -e "\e[0Ksection_end:`date +%s`:cluster_info_dump\r\e[0K"
+}
+
 get_debug() {
   if [[ $DEBUG_ENABLED == "true" ]] || [[ "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"* ]] ; then
     get_kustomize
@@ -1103,6 +1110,7 @@ get_debug() {
     get_hosts
     get_dns_config
     get_log_dump
+    get_cluster_info_dump
     describe_resources
   else
     echo "Debug not enabled, skipping"
