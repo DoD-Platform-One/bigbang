@@ -1,8 +1,8 @@
-Thank you for supporting PlatformOne! 
+Thank you for supporting PlatformOne!
 
 {{ if $.Values.addons.gitlab.enabled }}
 Gitlab is enabled.
-Please follow the Gitlab online documentation for proper configuration. 
+Please follow the Gitlab online documentation for proper configuration.
 This BigBang chart provides convenient enhancements to the Gitlab Package helm chart.
 If you enable these features certain settings will be defaulted for you and any required secrets will be automatically created.
 You should point to your cloud provider's RDS and object storage.
@@ -35,7 +35,7 @@ addons:
       bucketPrefix: prod
 
 {{ if $.Values.addons.gitlab.objectStorage.endpoint }}
-GITLAB: You have enabled Gitlab external object storage. 
+GITLAB: You have enabled Gitlab external object storage.
 Here is the list of buckets that you must provision in your s3 service:
 {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
 {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-registry
@@ -74,7 +74,7 @@ PLATFORM ONE GITLAB WARNING:
 
 {{ if $.Values.addons.gitlab.objectStorage.endpoint }}
 {{ else }}
-PLATFORM ONE GITLAB WARNING: 
+PLATFORM ONE GITLAB WARNING:
   You have enabled a MinIO internal service in the BigBang configuration.
   PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
   This option should only be used for development or CI pipelines.
@@ -129,8 +129,8 @@ PLATFORM ONE LOGGING WARNING:
 {{- if and (or $.Values.promtail.enabled $.Values.loki.enabled) .Values.logging.enabled }}
 PLATFORM ONE LOGGING WARNING:
   You have enabled both promtail/loki and efk logging.  This is permitted during beta testing of promtail/loki.
-  After the beta period, only one logging stack will be supported at one time, with the PLG stack becoming the default supported stack. 
-{{- end }}  
+  After the beta period, only one logging stack will be supported at one time, with the PLG stack becoming the default supported stack.
+{{- end }}
 
 {{- if $.Values.addons.mattermost.enabled }}
 Mattermost is enabled.
@@ -159,7 +159,7 @@ PLATFORM ONE MATTERMOST WARNING:
 
 {{- if .Values.hostname }}
 DEPRECATION NOTICE:
-  The top level yaml key "hostname" has been deprecated and replaced with "domain". 
+  The top level yaml key "hostname" has been deprecated and replaced with "domain".
   Please update your values override to use the "domain" key.
 {{- end }}
 
