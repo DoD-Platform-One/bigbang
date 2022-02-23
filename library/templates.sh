@@ -1,10 +1,32 @@
 #!/bin/sh
+# 
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Shell environment settings for verbosity and debugging
+#
+#-----------------------------------------------------------------------------------------------------------------------
+
+# prevent it from being run standalone, which would do nothing
+if [[ $BASH_SOURCE == $0 ]]; then
+  echo "$0 is used to set env variables in the current shell and must be sourced to work"
+  echo "examples: . $0" 
+  echo "          source $0"
+  exit 1 
+fi
+
+if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+  echo "DEBUG_ENABLED is set to true, setting -x in bash"
+  set -x
+fi
+
+trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Wait Functions
 #
 #-----------------------------------------------------------------------------------------------------------------------
+
 wait_sts() {
    timeElapsed=0
    while true; do
@@ -1103,7 +1125,7 @@ get_cluster_info_dump() {
 }
 
 get_debug() {
-  if [[ $DEBUG_ENABLED == "true" ]] || [[ "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"* ]] ; then
+  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"* ]]; then
     get_kustomize
     get_gateways
     get_virtualservices

@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
-set -x
+source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 
 if [ ! -f ../bigbang/values.yaml ]; then
   if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then

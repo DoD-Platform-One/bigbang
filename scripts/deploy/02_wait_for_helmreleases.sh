@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
+source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 
 ## Array of core HRs
 CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
