@@ -109,6 +109,7 @@ clean install:
       - events.txt
       - images.txt
       - pod_logs
+      - cluster_info_dump.txt
       - kubectl_describes
       - tests/cypress/screenshots
       - tests/cypress/videos
@@ -168,6 +169,7 @@ upgrade:
       - events.txt
       - images.txt
       - pod_logs
+      - cluster_info_dump.txt
       - kubectl_describes
       - tests/cypress/screenshots
       - tests/cypress/videos
@@ -214,6 +216,7 @@ integration:
       - images.txt
       - kubectl_describes
       - pod_logs
+      - cluster_info_dump.txt
       - "bigbang-repo/test-artifacts/"
     expire_in: 3 days
     when: always
