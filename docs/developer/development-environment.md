@@ -6,9 +6,9 @@ BigBang developers use [k3d](https://k3d.io/), a lightweight wrapper to run [k3s
 
 It is not recommend to run k3d with BigBang on your local computer. Instead use a remote k3d cluster running on an EC2 instance to shift the compute and network load to the cloud. BigBang can be quite resource-intensive and it requires a huge download bandwidth for the images. If you do insist on running k3d locally you should disable certain packages before deploying. You can do this in the values.yaml file by setting the package deploy to false. One of the packages that is most resource-intensive is the logging package. And you should create a local image registry cache to minimize the amount of image downloading.
 
-There is a script [./scripts/k3d-dev.sh](./scripts/k3d-dev.sh) that automates the creation and teardown of a development environment. It might be helpful to get a live demonstration by someone who already knows how to do it until a good video tutorial is created. We strive to make the documentation as good as possible but it is hard to keep it up-to-date and there are still pitfalls and gotchas.
+There is a script in the [/docs/developer/scripts/](./scripts/) directory that automates the creation and teardown of a development environment. There is a video tutorial in the PlatformOne IL2 Confluence. Search for "T3" and click the link to the page. The video is #57 on 22-February-2022.
 
-The manual steps included below are no longer maintained. The manual steps are only included for reference as a study guide to understand how the script works. 
+The manual steps included below are no longer maintained. The manual steps are only included for historical reference as a study guide to understand how the script works. The script is the singular focus for development environments. 
 
 ## Prerequisites
 
