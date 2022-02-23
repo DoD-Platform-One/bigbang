@@ -160,6 +160,24 @@ bigbang_installed_images() {
    echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
 }
 
+bigbang_additional_images() {
+   # Fetch list of all package level images in `tests/images.txt`
+    for gitrepo in $(kubectl get gitrepository -n bigbang -o name | grep -v secrets); do
+      repourl=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.url}')
+      version=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.ref.tag}')
+      package=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.metadata.name}')
+      if [[ -z "$version" || "$version" == "null" ]]; then
+        version=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.ref.branch}')
+      fi
+      if [[ -z "$version" || "$version" == "null" ]]; then
+        continue
+      fi
+      if curl -f "${repourl%.git}/-/raw/${version}/tests/images.txt?inline=false" 1>${package}.images.txt 2>/dev/null; then
+        cat ${package}.images.txt >> images.txt
+      fi
+    done
+}
+
 bigbang_synker() {
    echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker\e[37m"
    cp ./scripts/package/synker.yaml ./synker.yaml
