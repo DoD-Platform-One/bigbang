@@ -619,11 +619,11 @@ package_upgrade_test() {
      echo "***** End Helm Test Logs *****"
      if [[ -n `ls /cypress/screenshots/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
        mkdir -p cypress-artifacts/screenshots
-       cp /cypress/screenshots/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/screenshots
+       mv /cypress/screenshots/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/screenshots
      fi
      if [[ -n `ls /cypress/videos/${PACKAGE_NAMESPACE}/* 2>/dev/null` ]]; then
        mkdir -p cypress-artifacts/videos
-       cp /cypress/videos/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/videos
+       mv /cypress/videos/${PACKAGE_NAMESPACE}/* ./cypress-artifacts/videos
      fi
 
      #### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
