@@ -43,6 +43,7 @@
     - echo -e "\e[0Ksection_end:`date +%s`:k3d_up\r\e[0K"    
   after_script:
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - get_ns
     - get_all
     - get_events
     - bigbang_pipeline
