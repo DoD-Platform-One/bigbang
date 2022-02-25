@@ -27,6 +27,13 @@
                 "newName\\S*:\\s*(?<depName>\\S+).*\n\\s+newTag:\\s*(?<currentValue>.+)"
               ],
             "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^tests/images\\.txt$"],
+            "matchStrings": [
+              "s*(?<depName>.+):(?<currentValue>.+)"
+            ],
+            "datasourceTemplate": "docker"
         }
     ],
     "separateMajorMinor": false
