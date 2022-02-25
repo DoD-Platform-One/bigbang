@@ -503,7 +503,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "0.12.2-bb.3"
+    tag: "0.14.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Tempo Package
   flux: {}
