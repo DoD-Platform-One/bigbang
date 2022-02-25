@@ -144,6 +144,8 @@ gatekeeper:
         parameters:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -193,6 +195,8 @@ gatekeeper:
         parameters:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
     bbtests:
       enabled: true
 
