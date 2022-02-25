@@ -18,6 +18,18 @@ sudo sysctl -w vm.max_map_count=262144      #(ECK crash loops without this)
 
 More information can be found from elasticsearch's documentation [here](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html#k8s-virtual-memory)
 
+### AKS Configuration 
+
+Ensure this block is present in the terraform configuration for the `azurerm_kubernetes_cluster_node_pool` resource section for your AKS cluster:
+
+```yaml
+linux_os_config {
+  sysctl_config {
+    vm_max_map_count = 262144
+  }
+}
+```
+
 
 ## SELinux specific configuration:
 * If SELinux is enabled and the OS hasn't received additional pre-configuration, then users will see istio init-container crash loop.
