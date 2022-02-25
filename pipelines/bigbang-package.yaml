@@ -105,7 +105,7 @@ clean install:
     ## Create final images.txt: Remove items from the dependencies list from the full-list.
     # Remove rancher upstream images. The k3d cluster will inject images for various purposes like load balancers, PVCs, etc.
     # If we don't explicitly filter those out there's the potential that they sneak in
-    - package_images
+    - image_list_creation
     # Install and wait for pos-install packages
     - post_install_packages
     - post_install_wait
@@ -215,7 +215,7 @@ package:
   script:
     # Populate images list in synker config
     # Tar up synker as well
-    - package_synker
+    - synker_pull
     # Package repos
     - package_repos
     # Prep release

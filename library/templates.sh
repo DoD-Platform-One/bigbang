@@ -173,17 +173,9 @@ pre_vars() {
    cat variables.env
 }
 
-bigbang_installed_images() {
-   # Fetch list of all images ran (retry crictl up to 6x)
-   echo -e "\e[0Ksection_start:`date +%s`:images_used[collapsed=true]\r\e[0K\e[33;1mImages Used\e[37m"
-   cid=$(docker ps -aqf "name=k3d-${CI_JOB_ID}-server-0")
-   images=$(timeout 65 bash -c "until docker exec $cid crictl images -o json; do sleep 10; done;")
-   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | awk '/dso.mil/' | tee images.txt
-   echo -e "\e[0Ksection_end:`date +%s`:images_used\r\e[0K"
-}
-
 bigbang_additional_images() {
-   # Fetch list of all package level images in `tests/images.txt`
+    echo -e "\e[0Ksection_start:`date +%s`:additional_images[collapsed=true]\r\e[0K\e[33;1mAdditional Images from Packages\e[37m"
+    # Fetch list of all package level images in `tests/images.txt`
     for gitrepo in $(kubectl get gitrepository -n bigbang -o name | grep -v secrets); do
       repourl=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.url}')
       version=$(kubectl get $gitrepo -n bigbang -o jsonpath='{.spec.ref.tag}')
@@ -198,24 +190,8 @@ bigbang_additional_images() {
         cat ${package}.images.txt >> images.txt
       fi
     done
-}
-
-bigbang_synker() {
-   echo -e "\e[0Ksection_start:`date +%s`:synker_pull[collapsed=true]\r\e[0K\e[33;1mSynker\e[37m"
-   cp ./scripts/package/synker.yaml ./synker.yaml
-   # Populate images list in synker config
-   for image in $(cat images.txt); do
-     yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
-   done
-   synker pull -b=1
-   yq e '.source.images | .[] | ... comments=""' "./synker.yaml" > images.txt
-   # Tar up synker as well?
-   cp /usr/local/bin/synker synker.yaml /var/lib/registry/
-   # Grab the registry image
-   crane pull registry:2 registry.tar
-   mv registry.tar /var/lib/registry/
-   tar -czvf $IMAGE_PKG /var/lib/registry
-   echo -e "\e[0Ksection_end:`date +%s`:synker_pull\r\e[0K"
+    sort -u -o images.txt images.txt
+    echo -e "\e[0Ksection_end:`date +%s`:additional_images\r\e[0K"
 }
 
 bigbang_package_repos() {
@@ -854,8 +830,8 @@ installed_images() {
    echo -e "\e[0Ksection_end:`date +%s`:inst_images\r\e[0K"
 }
 
-package_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KPackage Images"
+image_list_creation() {
+   echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KImage List Creation"
    (grep -Fxvf dependencies.txt full-list.txt || true) | tee images.txt
    sed -i '/docker.io\/rancher\//d' images.txt
    if [ -f tests/images.txt ]; then
@@ -864,7 +840,7 @@ package_images() {
    echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
 }
 
-package_synker() {
+synker_pull() {
    echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0KRunning Synker and Tar"
    cp ${PIPELINE_REPO_DESTINATION}/synker/synker.yaml ./synker.yaml
    for image in $(cat images.txt); do
