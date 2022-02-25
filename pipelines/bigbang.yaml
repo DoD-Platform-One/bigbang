@@ -114,9 +114,11 @@ clean install:
       when: never
     - *chart_changes
   script:
+    - dependency_images
     - deploy_bigbang
     # Fetch list of all images ran (retry crictl up to 6x)
-    - bigbang_installed_images
+    - installed_images
+    - image_list_creation
     - bigbang_additional_images
     - test_bigbang
     - |
@@ -212,7 +214,7 @@ package:
     # run job for manual tag events or test-ci::release MRs
     - if: '$CI_COMMIT_TAG || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/'
   script:
-    - bigbang_synker
+    - synker_pull
     - bigbang_package_repos
     - bigbang_package_images
     # Prep release
