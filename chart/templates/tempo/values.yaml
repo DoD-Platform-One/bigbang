@@ -13,11 +13,6 @@ tempo:
   imagePullSecrets:
   - name: private-registry
 
-opentelemetryCollector:
-  enabled: {{ .Values.istio.enabled }}
-  imagePullSecrets:
-  - name: private-registry
-
 tempo:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
