@@ -297,6 +297,10 @@ dependency_install() {
        if [[ -z ${dep_helm_name} || ${dep_helm_name} == "null" ]]; then
          dep_helm_name=$dep_name
        fi
+       dep_ns_label=$(yq e ".${i}.namespace-label" "tests/dependencies.yaml")
+       if [[ -z ${dep_ns_label} || ${dep_ns_label} == "null" ]]; then
+         dep_ns_label=$dep_helm_name
+       fi
        if [[ -d ${dep_branch} || ${dep_branch} == "null" ]]; then
          if [[ -d "repos/${dep_name}" ]]; then
            echo "Checking out default branch from ${dep_repo}"
@@ -322,7 +326,8 @@ dependency_install() {
        fi
        echo "Installing dependency: repos/${dep_name} into ${dep_namespace} namespace"
        if ! kubectl get namespace ${dep_namespace} 2> /dev/null; then
-         kubectl create namespace ${dep_namespace};
+         kubectl create namespace ${dep_namespace}
+         kubectl label namespace ${dep_namespace} app.kubernetes.io/name=${dep_ns_label} --overwrite=true
        fi
        if ! kubectl get secret -n ${dep_namespace} private-registry 2> /dev/null; then
          kubectl create -n ${dep_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
@@ -382,26 +387,31 @@ dependency_wait() {
 }
 
 package_install() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_install[collapsed=true]\r\e[0KPackage Install"
-   if [ ! -z ${PROJECT_NAME} ]; then
-     if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
-       PACKAGE_HELM_NAME=${PROJECT_NAME}
-     fi
-   fi
-   if ! kubectl get namespace ${PACKAGE_NAMESPACE} 2> /dev/null; then
-     kubectl create namespace ${PACKAGE_NAMESPACE};
-   fi
-   if ! kubectl get secret -n ${PACKAGE_NAMESPACE} private-registry 2> /dev/null; then
-     kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
-   fi
-   if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
-     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
-     helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
-   else
-     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
-     helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
-   fi
-   echo -e "\e[0Ksection_end:`date +%s`:package_install\r\e[0K"
+  echo -e "\e[0Ksection_start:`date +%s`:package_install[collapsed=true]\r\e[0KPackage Install"
+  if [ ! -z ${PROJECT_NAME} ]; then
+    if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
+      PACKAGE_HELM_NAME=${PROJECT_NAME}
+    fi
+  fi
+  if ! kubectl get namespace ${PACKAGE_NAMESPACE} 2> /dev/null; then
+    kubectl create namespace ${PACKAGE_NAMESPACE}
+    if [ ! -z ${PACKAGE_NS_LABEL} ]; then
+      kubectl label namespace ${PACKAGE_NAMESPACE} app.kubernetes.io/name=${PACKAGE_NS_LABEL} --overwrite=true
+    else
+      kubectl label namespace ${PACKAGE_NAMESPACE} app.kubernetes.io/name=${PACKAGE_HELM_NAME} --overwrite=true
+    fi
+  fi
+  if ! kubectl get secret -n ${PACKAGE_NAMESPACE} private-registry 2> /dev/null; then
+    kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
+  fi
+  if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+    echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
+    helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
+  else
+    echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
+    helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
+  fi
+  echo -e "\e[0Ksection_end:`date +%s`:package_install\r\e[0K"
 }
 
 package_wait() {
@@ -463,6 +473,10 @@ post_install_packages() {
        if [[ -z ${post_helm_name} || ${post_helm_name} == "null" ]]; then
          post_helm_name=$post_name
        fi
+       post_ns_label=$(yq e ".${i}.namespace-label" "tests/post-install-packages.yaml")
+       if [[ -z ${post_ns_label} || ${post_ns_label} == "null" ]]; then
+         post_ns_label=$post_helm_name
+       fi
        if [[ -d ${post_branch} || ${post_branch} == "null" ]]; then
          if [[ -d "repos/${post_name}" ]]; then
            echo "Checking out default branch from ${post_repo}"
@@ -488,7 +502,8 @@ post_install_packages() {
        fi
        echo "Installing post install package: repos/${post_name} into ${post_namespace} namespace"
        if ! kubectl get namespace ${post_namespace} 2> /dev/null; then
-         kubectl create namespace ${post_namespace};
+         kubectl create namespace ${post_namespace}
+         kubectl label namespace ${post_namespace} app.kubernetes.io/name=${post_ns_label} --overwrite=true
        fi
        if ! kubectl get secret -n ${post_namespace} private-registry 2> /dev/null; then
          kubectl create -n ${post_namespace} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
@@ -980,6 +995,12 @@ get_events() {
   echo -e "\e[31mNOTICE: Cluster events can be found in artifact events.txt\e[0m"
   kubectl get events -A --sort-by=.metadata.creationTimestamp > events.txt
   echo -e "\e[0Ksection_end:`date +%s`:show_event_log\r\e[0K"
+}
+
+get_ns() {
+  echo -e "\e[0Ksection_start:`date +%s`:namespaces[collapsed=true]\r\e[0K\e[33;1mNamespaces\e[37m"
+  kubectl get namespace --show-labels
+  echo -e "\e[0Ksection_end:`date +%s`:namespaces\r\e[0K"
 }
 
 get_all() {
