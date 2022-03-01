@@ -1,4 +1,3 @@
-{{- include "bb-test-lib.cypress-configmap.base" . }}
+{{- include "gluon.tests.cypress-configmap.base" . }}
 ---
-{{- include "bb-test-lib.cypress-runner.base" . }}
-
+{{- include "gluon.tests.cypress-runner.base" . }}
