@@ -1,21 +1,21 @@
 [Project Managers]
 # protect individual files in the root directory such as the CODEOWNERS file
-/*                              @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/*                              @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
 # Recursive protection for directories
-/.gitlab-ci/                    @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/.gitlab/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/base/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/chart/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/charter/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/scripts/                       @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/tests/                         @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
-/docs/                          @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+/.gitlab-ci/                    @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/.gitlab/                       @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/base/                          @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/chart/                         @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/charter/                       @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/scripts/                       @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/tests/                         @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
+/docs/                          @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb @joshwolf
 
 
 [Docs Owners]
 # Allow any one of the listed codeowners to approve merges to the documentation 
 # Does not allow the creator of the merge request to be the approver.
-/docs/                          @aaron.ruse @aaronbeger @brandencobb @cmcgrath @daryndecker @david.allen @dyoung @echuang @egoode @evan.rush @iahmad @jasonkrause @jay-rob @jennifer.kays @jcookehg @jdale @joshwolf @kavitha @kenna81 @kevin.wilder @kottoson @LynnStill @mark.sanchez @matthew.kaiser @mdutton @micah.nagel @michaelmartin @michaelmcleroy @msbrown47 @nick.kammerdiener @rkernick @runyontr @ryan.j.garcia @sean.deprefontaine @shouseba @thomas.burton @toladipupo @tsiddique1 @visuth.dy @ronwebb
+/docs/                          @brandencobb @cmcgrath @echuang @evan.rush @jasonkrause @joshwolf @kenna81 @kevin.wilder @LynnStill @micah.nagel @michaelmartin @michaelmcleroy @rkernick @runyontr @ryan.j.garcia @shouseba @toladipupo @tsiddique1 @ronwebb @ryan.thompson.44 @gabe
 
 ################################################
 # The following entries are for optional approval. 
@@ -30,16 +30,15 @@ base/                           @michaelmcleroy @micah.nagel @ryan.j.garcia @bra
 tests/                          @toladipupo @brandencobb @evan.rush
 
 ^[Hack Owners]
-scripts/                        @toladipupo @michaelmcleroy @egoode
-
+scripts/                        @toladipupo @michaelmcleroy 
 ^[Charter Owners]
-charter/                        @gabe @joshwolf @megamind @micah.nagel @michaelmcleroy @phillip.record @runyontr @ryan.j.garcia @brandencobb
+charter/                        @gabe @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia @brandencobb
 
 ^[Istio, Istio Operator, and Authservice]
-chart/Chart.yaml                @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
-chart/values.yaml               @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
-chart/templates/authservice     @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
-chart/templates/istio           @joshwolf @kavitha @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/Chart.yaml                @joshwolf @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/values.yaml               @joshwolf @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/templates/authservice     @joshwolf @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
+chart/templates/istio           @joshwolf @michaelmcleroy @micah.nagel @runyontr @ryan.j.garcia @stas
 
 ^[HAProxy]
 chart/Chart.yaml              @blloyd @runyontr @ryan.j.garcia
@@ -47,24 +46,24 @@ chart/values.yaml             @blloyd @runyontr @ryan.j.garcia
 chart/templates/haproxy       @blloyd @runyontr @ryan.j.garcia
 
 ^[Anchore]
-chart/Chart.yaml                @blake.hearn @micah.nagel @jasonkrause
-chart/values.yaml               @blake.hearn @micah.nagel @jasonkrause
-chart/templates/anchore         @blake.hearn @micah.nagel @jasonkrause
+chart/Chart.yaml                @trkdashin @micah.nagel @jasonkrause
+chart/values.yaml               @trkdashin @micah.nagel @jasonkrause
+chart/templates/anchore         @trkdashin @micah.nagel @jasonkrause
 
 ^[ArgoCD]
-chart/Chart.yaml                @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
-chart/values.yaml               @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
-chart/templates/argocd          @matthew.kaiser @brian.rexrode @brandencobb @evan.rush
+chart/Chart.yaml                @matthew.kaiser @brandencobb @evan.rush
+chart/values.yaml               @matthew.kaiser @brandencobb @evan.rush
+chart/templates/argocd          @matthew.kaiser @brandencobb @evan.rush
 
-^[Cluster Auditor]              @echuang @egoode @toladipupo @michaelmcleroy
-chart/Chart.yaml                @echuang @egoode @toladipupo @michaelmcleroy
-chart/values.yaml               @echuang @egoode @toladipupo @michaelmcleroy
-chart/templates/clusterauditor  @echuang @egoode @toladipupo @michaelmcleroy
+^[Cluster Auditor]              @echuang @toladipupo @michaelmcleroy
+chart/Chart.yaml                @echuang @toladipupo @michaelmcleroy
+chart/values.yaml               @echuang @toladipupo @michaelmcleroy
+chart/templates/clusterauditor  @echuang @toladipupo @michaelmcleroy
 
 ^[Gatekeeper]
-chart/Chart.yaml                @echuang @egoode @toladipupo @michaelmcleroy
-chart/values.yaml               @echuang @egoode @toladipupo @michaelmcleroy   
-chart/templates/gatekeeper      @echuang @egoode @toladipupo @michaelmcleroy
+chart/Chart.yaml                @echuang @toladipupo @michaelmcleroy
+chart/values.yaml               @echuang @toladipupo @michaelmcleroy   
+chart/templates/gatekeeper      @echuang @toladipupo @michaelmcleroy
 
 ^[Jaeger]
 chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
@@ -92,9 +91,9 @@ chart/values.yaml               @lynnstill @ryan.j.garcia @kevin.wilder
 chart/templates/gitlab          @lynnstill @ryan.j.garcia @kevin.wilder
 
 ^[KeyCloak]
-chart/Chart.yaml                @megamind @kevin.wilder @michaelmcleroy @zacw
-chart/values.yaml               @megamind @kevin.wilder @michaelmcleroy @zacw
-chart/templates/keycloak        @megamind @kevin.wilder @michaelmcleroy @zacw
+chart/Chart.yaml                @kevin.wilder @michaelmcleroy @zacw
+chart/values.yaml               @kevin.wilder @michaelmcleroy @zacw
+chart/templates/keycloak        @kevin.wilder @michaelmcleroy @zacw
 
 ^[Kiali]
 chart/Chart.yaml                @runyontr @joshwolf @michaelmcleroy @micah.nagel @ryan.j.garcia
@@ -112,9 +111,9 @@ chart/values.yaml               @LynnStill @kevin.wilder @brandencobb
 chart/templates/minio           @LynnStill @kevin.wilder @brandencobb
 
 ^[Nexus]
-chart/Chart.yaml                @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
-chart/values.yaml               @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
-chart/templates/nexus           @kavitha @kevin.wilder @ariel.shnitzer @grant.duncklee
+chart/Chart.yaml                @kevin.wilder @ariel.shnitzer @grant.duncklee
+chart/values.yaml               @kevin.wilder @ariel.shnitzer @grant.duncklee
+chart/templates/nexus           @kevin.wilder @ariel.shnitzer @grant.duncklee
 
 ^[Velero]
 chart/Chart.yaml                @tunde @adam.toy @micah.nagel @toladipupo
@@ -122,16 +121,16 @@ chart/values.yaml               @tunde @adam.toy @micah.nagel @toladipupo
 chart/templates/velero          @tunde @adam.toy @micah.nagel @toladipupo
 
 ^[fluentbit]
-chart/Chart.yaml                @kavitha @ryan.j.garcia @echuang
-chart/values.yaml               @kavitha @ryan.j.garcia @echuang
-chart/templates/fluentbit       @kavitha @ryan.j.garcia @echuang
+chart/Chart.yaml                @ryan.j.garcia @echuang
+chart/values.yaml               @ryan.j.garcia @echuang
+chart/templates/fluentbit       @ryan.j.garcia @echuang
 
 ^[eck-operator]
-chart/Chart.yaml                @kavitha @ryan.j.garcia @evan.rush @toladipupo
-chart/values.yaml               @kavitha @ryan.j.garcia @evan.rush @toladipupo
-chart/templates/eck-operator    @kavitha @ryan.j.garcia @evan.rush @toladipupo
+chart/Chart.yaml                @ryan.j.garcia @evan.rush @toladipupo
+chart/values.yaml               @ryan.j.garcia @evan.rush @toladipupo
+chart/templates/eck-operator    @ryan.j.garcia @evan.rush @toladipupo
 
 ^[elasticsearch-kibana]
-chart/Chart.yaml                        @kavitha @ryan.j.garcia @evan.rush @ronwebb
-chart/values.yaml                       @kavitha @ryan.j.garcia @evan.rush @ronwebb
-chart/templates/elasticsearch-kibana    @kavitha @ryan.j.garcia @evan.rush @ronwebb
+chart/Chart.yaml                        @ryan.j.garcia @evan.rush @ronwebb
+chart/values.yaml                       @ryan.j.garcia @evan.rush @ronwebb
+chart/templates/elasticsearch-kibana    @ryan.j.garcia @evan.rush @ronwebb
