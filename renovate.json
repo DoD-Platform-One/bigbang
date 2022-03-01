@@ -27,9 +27,8 @@
             "matchStrings": [
                 "- Kiali:\\s*(?<currentValue>.+)"
             ],
-            "depNameTemplate": "ironbank/opensource/kiali/kiali-operator",
-            "datasourceTemplate": "docker",
-            "registryUrlTemplate": "https://registry1.dso.mil"
+            "depNameTemplate": "registry1.dso.mil/ironbank/opensource/kiali/kiali-operator",
+            "datasourceTemplate": "docker"
         }
     ],
     "separateMajorMinor": false
