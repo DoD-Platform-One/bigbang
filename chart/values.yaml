@@ -751,6 +751,18 @@ addons:
       # -- Gitlab SSO login button label
       label: ""
 
+      # -- Gitlab SSO Scopes, default is ["Gitlab"]
+      scopes:
+      - Gitlab
+
+      # -- GitLab SSO URIs
+      # Only needed if your SSO is non-Keycloak
+      #issuer_uri:
+      #end_session_uri:
+
+      # -- Gitlab SSO UID field
+      uid_field: preferred_username
+
     database:
       # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
       # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
