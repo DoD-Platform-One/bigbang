@@ -102,6 +102,7 @@ kiali:
       cypress:
         envs:
           cypress_url: 'https://kiali.bigbang.dev'
+          cypress_check_data: 'true'
 
 clusterAuditor:
   enabled: true
@@ -146,6 +147,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
+          - kiali/kiali-operator-cypress-test
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -197,6 +199,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
+          - kiali/kiali-operator-cypress-test
     bbtests:
       enabled: true
 
