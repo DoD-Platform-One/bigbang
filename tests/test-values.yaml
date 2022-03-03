@@ -536,6 +536,9 @@ addons:
             requests:
               cpu: 10m
             limits: {}
+        # Required for RKE2 nightly CI cluster with FIPS since Gitlab 14.7.X
+        postgresqlExtendedConf:
+          passwordEncryption: "scram-sha-256"
       minio:
         persistence:
           size: 256Mi
