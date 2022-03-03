@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Disallow Pod Exec
-    policies.kyverno.io/category: Security Best Practices
+    policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/minversion: 1.4.2
     policies.kyverno.io/subject: PodExecOptions

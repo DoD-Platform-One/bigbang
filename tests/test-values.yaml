@@ -27,8 +27,6 @@ policies:
     enabled: true
   disallow-host-namespaces:
     enabled: true
-  disallow-host-path:
-    enabled: true
   disallow-image-tags:
     enabled: true
     parameters:
@@ -53,7 +51,7 @@ policies:
     enabled: true
   disallow-rbac-on-default-serviceaccounts:
     enabled: true
-  disallow-subpath-volumes:
+  disallow-shared-subpath-volume-writes:
     enabled: true
   disallow-tolerations:
     enabled: true
@@ -109,8 +107,6 @@ policies:
     enabled: true
   require-requests-equal-limits:
     enabled: true
-  require-ro-host-path:
-    enabled: true
   require-ro-rootfs:
     enabled: true
   restrict-apparmor:
@@ -139,7 +135,13 @@ policies:
         - '1000'
         - '>=2000 & <3000'
         - '>=4000'
-  restrict-host-path:
+  restrict-host-path-mount:
+    enabled: true
+    parameters:
+      allow:
+        - /proc/urandom
+        - /tmp/allowed
+  restrict-host-path-write:
     enabled: true
     parameters:
       allow:

@@ -49,7 +49,7 @@ spec:
           - securityContext:
               runAsGroup: ">0"
   - name: fs-group
-    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 6 }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-
@@ -59,7 +59,7 @@ spec:
           =(securityContext):
             =(fsGroup): ">0"
   - name: supplemental-groups
-    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 6 }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-

@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Disallow Tolerations
-    policies.kyverno.io/category: Security Best Practices
+    policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
@@ -17,6 +17,9 @@ metadata:
       tolerations that match the taint should not be allowed in unauthorized pods.  This
       policy will block pods with tolerations, including global, that match the disallowed
       taint list.
+    # One of the rules matches "RuntimeClass", which prevents us from running autogen
+    # Instead, we manually create rules below for the pod controllers
+    pod-policies.kyverno.io/autogen-controllers: none
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
@@ -31,7 +34,7 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     validate:
       message: >-
-        Pod tolerations that match the taint {{ $v.key }}={{ $v.value }}:{{ $v.effect }} are not allowed.
+        Pod tolerations that match the taint "{{ default "*" $v.key }}={{ default "*" $v.value }}:{{ default "*" $v.effect }}"' are not allowed.
       foreach:
       - list: "request.object.spec.tolerations"
         anyPattern:
@@ -44,12 +47,48 @@ spec:
           {{- if $v.effect }}
           - effect: "!{{ $v.effect }}"
           {{- end }}
-  - name: {{ printf "%s-runtime-class-%d" $name $index }}
+  - name: {{ printf "%s-controller-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "DaemonSet" "Deployment" "Job" "StatefulSet")) $) | nindent 4 }}
+    validate:
+      message: >-
+        Tolerations that match the taint "{{ default "*" $v.key }}={{ default "*" $v.value }}:{{ default "*" $v.effect }}"' are not allowed.
+      foreach:
+      - list: "request.object.spec.template.spec.tolerations"
+        anyPattern:
+          {{- if $v.key }}
+          - key: "!{{ $v.key }}"
+          {{- end }}
+          {{- if $v.value }}
+          - value: "!{{ $v.value }}"
+          {{- end }}
+          {{- if $v.effect }}
+          - effect: "!{{ $v.effect }}"
+          {{- end }}
+  - name: {{ printf "%s-cronjob-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "CronJob")) $) | nindent 4 }}
+    validate:
+      message: >-
+        Tolerations that match the taint "{{ default "*" $v.key }}={{ default "*" $v.value }}:{{ default "*" $v.effect }}"' are not allowed.
+      foreach:
+      - list: "request.object.spec.jobTemplate.spec.template.spec.tolerations"
+        anyPattern:
+          {{- if $v.key }}
+          - key: "!{{ $v.key }}"
+          {{- end }}
+          {{- if $v.value }}
+          - value: "!{{ $v.value }}"
+          {{- end }}
+          {{- if $v.effect }}
+          - effect: "!{{ $v.effect }}"
+          {{- end }}
+  - name: {{ printf "%s-runtimeclass-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "RuntimeClass")) $) | nindent 4 }}
     validate:
       message: >-
-        RuntimeClaass tolerations that match the taint {{ $v.key }}={{ $v.value }}:{{ $v.effect }} are not allowed.
+        RuntimeClaass tolerations that match the taint "{{ default "*" $v.key }}={{ default "*" $v.value }}:{{ default "*" $v.effect }}"' are not allowed.
       foreach:
       - list: "request.object.scheduling.tolerations"
         anyPattern:

@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Update Token Automount to False on Default Service Accounts
-    policies.kyverno.io/category: Security Best Practices
+    policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: ServiceAccount
     policies.kyverno.io/description: >-

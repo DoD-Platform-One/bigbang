@@ -1,8 +1,0 @@
-{{- $pkg := "kyvernopolicies" }}
-{{- define "bigbang.defaults.kyvernopolicies" -}}
-
-{{- end }}
-
-{{- if (get .Values $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
-{{- end }}

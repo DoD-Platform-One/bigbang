@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-ro-host-path-1
+  name: restrict-host-path-write-1
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -17,14 +17,14 @@ spec:
   volumes:
   - name: vol1
     hostPath:
-      path: /tmp/allowed
+      path: /tmp/disallowed
       type: DirectoryOrCreate
 ---
 # Test 2: Init containers mounting a hostPath volume as read/write is not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-ro-host-path-2
+  name: restrict-host-path-write-2
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -42,14 +42,14 @@ spec:
   volumes:
   - name: vol1
     hostPath:
-      path: /tmp/allowed
+      path: /tmp/disallowed
       type: DirectoryOrCreate
 ---
 # Test 3: Containers mounting a hostPath volume explicitly as readOnly=false is not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-ro-host-path-3
+  name: restrict-host-path-write-3
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -65,14 +65,14 @@ spec:
   volumes:
   - name: vol1
     hostPath:
-      path: /tmp/allowed
+      path: /tmp/disallowed
       type: DirectoryOrCreate
 ---
 # Test 4: Init containers mounting a hostPath volume explicitly as readOnly=false is not allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-ro-host-path-4
+  name: restrict-host-path-write-4
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -91,14 +91,14 @@ spec:
   volumes:
   - name: vol1
     hostPath:
-      path: /tmp/allowed
+      path: /tmp/disallowed
       type: DirectoryOrCreate
 ---
 # Test 5: Containers and init containers mounting a hostPath volume as read only or other volumes as read/write are allowed
 apiVersion: v1
 kind: Pod
 metadata:
-  name: require-ro-host-path-5
+  name: restrict-host-path-write-5
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -129,3 +129,44 @@ spec:
       type: DirectoryOrCreate
   - name: vol2
     emptyDir: {}
+---
+# Test 6: Containers and init containers mounting a hostPath volume as read/write and in the allowed list are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-6
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: false
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: false
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/allowed
+      type: DirectoryOrCreate
