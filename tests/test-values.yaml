@@ -799,7 +799,7 @@ addons:
     values:
       tenants:
         pools:
-        - servers: 1
+        - servers: 2
           volumesPerServer: 4
           size: 256Mi
           resources:
@@ -813,7 +813,7 @@ addons:
             runAsUser: 1001
             runAsGroup: 1001
             fsGroup: 1001
-
+            runAsNonRoot: true
       bbtests:
         # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
         # https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/issues/7
