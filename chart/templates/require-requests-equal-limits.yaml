@@ -36,15 +36,27 @@ spec:
     validate:
       message: "CPU/memory requests must be equal to limits"
       foreach:
-      # Resources  are not allowed for ephemeral containers, but included here in case it changes
+      # Resources are not allowed for ephemeral containers, but included here in case it changes
       - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
         deny:
           conditions:
             any:
-            - key: "{{ "{{" }} not_null(element.resources.requests.cpu, '-1') {{ "}}" }}"
+            - key: "{{ "{{" }} not_null(element.resources.requests.cpu, '') {{ "}}" }}"
+              operator: Equals
+              value: ""
+            - key: "{{ "{{" }} not_null(element.resources.limits.cpu, '') {{ "}}" }}"
+              operator: Equals
+              value: ""
+            - key: "{{ "{{" }} not_null(element.resources.requests.cpu, '') {{ "}}" }}"
               operator: NotEquals
               value: "{{ "{{" }} not_null(element.resources.limits.cpu, '') {{ "}}" }}"
-            - key: "{{ "{{" }} not_null(element.resources.requests.memory, '-1') {{ "}}" }}"
+            - key: "{{ "{{" }} not_null(element.resources.requests.memory, '') {{ "}}" }}"
+              operator: Equals
+              value: ""
+            - key: "{{ "{{" }} not_null(element.resources.limits.memory, '') {{ "}}" }}"
+              operator: Equals
+              value: ""
+            - key: "{{ "{{" }} not_null(element.resources.requests.memory, '') {{ "}}" }}"
               operator: NotEquals
               value: "{{ "{{" }} not_null(element.resources.limits.memory, '') {{ "}}" }}"
 {{- end -}}

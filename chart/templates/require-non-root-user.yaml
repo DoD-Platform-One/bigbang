@@ -11,20 +11,20 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
       Following the least privilege principle, containers should not be run as root. This policy ensures
-      containers have `runAsNonRoot` set to `true` and `runAsUser` > 0.
+      containers either have `runAsNonRoot` set to `true` or `runAsUser` > 0.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: run-as-non-root
+  - name: non-root-user
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     validate:
       message: >-
-        runAsNonRoot must be set to true in either spec.securityContext.runAsNonRoot or
-        (spec.containers[*].securityContext.runAsNonRoot, spec.initContainers[*].securityContext.runAsNonRoot,
-        and spec.ephemeralContainers[*].securityContext.runAsNonRoot)
+        Either `runAsNonRoot` must be set to true or `runAsUser` must be > 0 in
+        spec.securityContext or (spec.containers[*].securityContext,
+        spec.initContainers[*].securityContext, and spec.ephemeralContainers[*].securityContext)
       anyPattern:
       - spec:
           securityContext:
@@ -39,25 +39,6 @@ spec:
           - =(securityContext):
               =(runAsNonRoot): true
       - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
-          =(initContainers):
-          - securityContext:
-              runAsNonRoot: true
-          =(ephemeralContainers):
-          - securityContext:
-              runAsNonRoot: true
-  - name: run-as-user
-    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
-    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
-    validate:
-      message: >-
-        runAsUser must be set to an id > 0 in either spec.securityContext.runAsUser or
-        (spec.containers[*].securityContext.runAsUser, spec.initContainers[*].securityContext.runAsUser,
-        and spec.ephemeralContainers[*].securityContext.runAsUser)
-      anyPattern:
-      - spec:
           securityContext:
             runAsUser: ">0"
           containers:
@@ -69,6 +50,76 @@ spec:
           =(ephemeralContainers):
           - =(securityContext):
               =(runAsUser): ">0"
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: true
+      - spec:
+          containers:
+          - securityContext:
+              runAsUser: ">0"
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: true
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsUser: ">0"
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: true
+      - spec:
+          containers:
+          - securityContext:
+              runAsUser: ">0"
+          =(initContainers):
+          - securityContext:
+              runAsUser: ">0"
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: true
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true
+          =(ephemeralContainers):
+          - securityContext:
+              runAsUser: ">0"
+      - spec:
+          containers:
+          - securityContext:
+              runAsUser: ">0"
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: true
+          =(ephemeralContainers):
+          - securityContext:
+              runAsUser: ">0"
+      - spec:
+          containers:
+          - securityContext:
+              runAsNonRoot: true
+          =(initContainers):
+          - securityContext:
+              runAsUser: ">0"
+          =(ephemeralContainers):
+          - securityContext:
+              runAsUser: ">0"
       - spec:
           containers:
           - securityContext:

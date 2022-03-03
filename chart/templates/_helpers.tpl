@@ -45,40 +45,57 @@ webhookTimeoutSeconds: {{ $webhookTimeoutSeconds }}
 
 {{/* Match key/value.  Expects name of policy in .name and default kind in .kind as a list */}}
 {{- define "kyverno-policies.match" -}}
-{{- $policyMatch := (dig .name "match" nil .Values.policies) -}}
+  {{- $policyMatch := (dig .name "match" nil .Values.policies) -}}
+  {{- if not (kindIs "map" $policyMatch) -}}
+    {{- $policyMatch = (dict "any" $policyMatch) -}}
+  {{- end -}}
 match:
-  {{- if $policyMatch -}}
-    {{- toYaml $policyMatch | nindent 2 -}}
-  {{- else }}
-  any:
+  all:
   - resources:
       kinds:
       {{- toYaml .kinds | nindent 6 -}}
-  {{- end -}}
+  {{- if $policyMatch }}
+    {{- if $policyMatch.all }}
+      {{- toYaml $policyMatch.all | nindent 2 }}
+    {{- end }}
+    {{- if $policyMatch.any }}
+  any:
+      {{- toYaml $policyMatch.any | nindent 2 }}
+    {{- end }}
+  {{- end }}
 {{- end -}}
 
 {{/* Exclude key/value.  Expects name of policy in .name */}}
 {{- define "kyverno-policies.exclude" -}}
-{{- $globalExclude := .Values.exclude -}}
-{{- $policyExclude := (dig .name "exclude" nil .Values.policies) -}}
-{{- if or $globalExclude $policyExclude }}
+  {{- $globalExclude := .Values.exclude -}}
+  {{- if not (kindIs "map" $globalExclude) -}}
+    {{- $globalExclude = (dict "any" $globalExclude) -}}
+  {{- end -}}
+  {{- $policyExclude := (dig .name "exclude" nil .Values.policies) -}}
+  {{- if not (kindIs "map" $policyExclude) -}}
+    {{- $policyExclude := (dict "any" $policyExclude) -}}
+  {{- end -}}
+  {{- if or $globalExclude $policyExclude }}
 exclude:
+    {{- if or $globalExclude.all $policyExclude.all }}
+  all:
+      {{- if $globalExclude.all }}
+        {{- toYaml $globalExclude.all | nindent 2 }}
+      {{- end }}
+      {{- if $policyExclude.all }}
+        {{- toYaml $policyExclude.all | nindent 2 }}
+      {{- end }}
+    {{- end }}
+    {{- if or $globalExclude.any $policyExclude.any }}
   any:
-  {{- if $globalExclude -}}
-    {{- if kindIs "map" $globalExclude -}}
-      {{- toYaml $globalExclude.any | nindent 2 -}}
-    {{- else -}}
-      {{- toYaml $globalExclude | nindent 2 -}}
-    {{- end -}}
+      {{- if $globalExclude.any }}
+        {{- toYaml $globalExclude.any | nindent 2 }}
+      {{- end }}
+      {{- if $policyExclude.any }}
+        {{- toYaml $policyExclude.any | nindent 2 }}
+      {{- end }}
+    {{- end }}
   {{- end -}}
-  {{- if $policyExclude -}}
-    {{- if kindIs "map" $policyExclude -}}
-        {{- toYaml $policyExclude.any | nindent 2 -}}
-    {{- else -}}
-        {{- toYaml $policyExclude | nindent 2 -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
 {{- end -}}
 
 {{/* Add context for configMap to rule.  Expects name of policy in .name */}}

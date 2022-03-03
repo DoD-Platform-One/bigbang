@@ -1,0 +1,59 @@
+{{- $name := "disallow-shared-subpath-volume-writes" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Disallow SubPath Volumes (CVE-2021-25741)
+    policies.kyverno.io/category: Vulnerability
+    policies.kyverno.io/severity: {{ default "high" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      A security issue was discovered in Kubernetes where a user may be able to create a container with
+      subpath volume mounts to access files and directories outside of the volume, including on the host
+      filesystem.  This policy denies containers that share a volume between containers where at least
+      one has write access and at least one is using a subpath.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: deny-shared-writable-volumes-with-subpaths
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    preconditions:
+      all:
+      - key: "{{ "{{" }}request.operation{{ "}}" }}"
+        operator: In
+        value:
+        - CREATE
+        - UPDATE
+    validate:
+      message: >-
+        Having two containers share a writable volume and using a subPath is not allowed due to CVE-2021-25741.
+        See https://security.googleblog.com/2021/12/exploring-container-security-storage.html
+      foreach:
+      # Check each volume in the Pod
+      - list: "request.object.spec.volumes"
+        deny:
+          conditions:
+            all:
+            # The vulnerabiltity requires at least two containers using the same volume
+            - key: "{{ "{{" }} request.object.spec.[containers[?volumeMounts[?name == '{{ "{{" }}element.name{{ "}}" }}']], initContainers[?volumeMounts[?name == '{{ "{{" }}element.name{{ "}}" }}']], ephemeralContainers[?volumeMounts[?name == '{{ "{{" }}element.name{{ "}}" }}']]][] | length(@) {{ "}}" }}"
+              operator: GreaterThanOrEquals
+              value: 2
+            # The vulnerability requires a container that can write to the volume
+            - key: "{{ "{{" }} request.object.spec.[containers, initContainers, ephemeralContainers][].volumeMounts[?name == '{{ "{{" }}element.name{{ "}}" }}' && !readOnly][] | length(@) {{ "}}" }}"
+              operator: GreaterThanOrEquals
+              value: 1
+            # The vulnerability requires a subpath or subpathexpr to be used
+            - key: "{{ "{{" }} request.object.spec.[containers, initContainers, ephemeralContainers][].volumeMounts[?name == '{{ "{{" }}element.name{{ "}}" }}' && (subPath || subPathExpr)][] | length(@) {{ "}}" }}"
+              operator: GreaterThanOrEquals
+              value: 1
+            # Volumes types of secret, configMap, downwardAPI, and projected are always read-only (even if you set `readOnly: false`)
+            # See https://github.com/kubernetes/kubernetes/issues/60814 for details on why these are read-only
+            - key: "{{ "{{" }} element.[configMap, secret, downwardAPI, projected][] | length(@) {{ "}}" }}"
+              operator: Equals
+              value: 0
+{{- end -}}

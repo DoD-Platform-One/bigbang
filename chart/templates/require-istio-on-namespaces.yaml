@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   annotations:
     policies.kyverno.io/title: Require Istio Sidecar Injection on Namespace
-    policies.kyverno.io/category: Security Best Practice
+    policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/subject: Namespace
     policies.kyverno.io/description: >-

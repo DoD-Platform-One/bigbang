@@ -7,9 +7,9 @@ enabled: true
 validationFailureAction: ""
 
 # -- Override all policies' time to wait for admission webhook to respond.  If blank, uses policy setting or default (10).  Range is 1 to 30.
-webhookTimeoutSeconds: ""
+webhookTimeoutSeconds: 30
 
-# -- Adds an exclusion to all policies.  This is merged with any policy-specific excludes.
+# -- Adds an exclusion to all policies.  This is merged with any policy-specific excludes.  See https://kyverno.io/docs/writing-policies/match-exclude for fields.
 exclude: {}
 
 # -- Additional labels to apply to all policies.
@@ -53,7 +53,7 @@ policies:
   clone-configs:
     enabled: false
     parameters:
-      # -- ConfigMap or Secrets that should be cloned
+      # -- ConfigMap or Secrets that should be cloned.  Each item requres the kind, name, and namespace of the resource to clone
       clone: []
         #   # -- Name of the ConfigMap/Secret
         # - name: sample
@@ -75,18 +75,13 @@ policies:
     enabled: true
     validationFailureAction: audit
 
-  # -- Prevent resources that use deprecated or removed APIs (through Kubernetes 1.25)
+  # -- Prevent resources that use deprecated or removed APIs (through Kubernetes 1.26)
   disallow-deprecated-apis:
     enabled: true
     validationFailureAction: audit
 
   # -- Prevent use of the host namespace (PID, IPC, Network) by pods
   disallow-host-namespaces:
-    enabled: true
-    validationFailureAction: enforce
-
-  # -- Prevent volumes that use hostpath
-  disallow-host-path:
     enabled: true
     validationFailureAction: enforce
 
@@ -136,14 +131,14 @@ policies:
     enabled: true
     validationFailureAction: enforce
     parameters:
-      # -- List of selinux options that are not allowed
+      # -- List of selinux options that are not allowed.  Valid values include `level`, `role`, `type`, and `user`.
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
       disallow:
       - user
       - role
 
-  # -- Prevent volumes with subpaths (CVE-2021-25741)
-  disallow-subpath-volumes:
+  # -- Prevent containers from mounting the same volume as writable and with a subpath (CVE-2021-25741)
+  disallow-shared-subpath-volume-writes:
     enabled: true
     validationFailureAction: enforce
 
@@ -152,7 +147,7 @@ policies:
     enabled: true
     validationFailureAction: audit
     parameters:
-      # -- List of taints to protect from toleration.  Each entry can have key, value, and/or effect.  Wildcards '*' and '?' can be used
+      # -- List of taints to protect from toleration.  Each entry can have `key`, `value`, and/or `effect`.  Wildcards '*' and '?' can be used
       # If key, value, or effect are not defined, they are ignored in the policy rule
       disallow:
       # Prevent scheduling of pods on control plane nodes
@@ -162,7 +157,7 @@ policies:
       # - key: "Critical*Only"
       #   value: "true"
       #   effect: "*NoSchedule"
-      # This would include tolerations with
+      # This would block tolerations with
       #  - key=null && effect=(NoSchedule || PreferNoSchedule)
       #  - key=Critical*Only && operator=Exists && effect=(null || NoSchedule || PreferNoSchedule)
       #  - key=Critical*Only && operator=Equal && value=true && effect=(null || NoSchedule || PreferNoSchedule)
@@ -171,6 +166,12 @@ policies:
   disallow-rbac-on-default-serviceaccounts:
     enabled: true
     validationFailureAction: audit
+    exclude:
+      any:
+      - resources:
+          # Clusters allow all service accounts access to the service account issuer discovery documents
+          # See https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#service-account-issuer-discovery
+          name: system:service-account-issuer-discovery
 
   # -- Require specified annotations on all pods
   require-annotations:
@@ -185,7 +186,7 @@ policies:
     enabled: true
     validationFailureAction: audit
     parameters:
-      # -- CPU limitations (only one needs to be met)
+      # -- CPU limitations (only one required condition needs to be met).  The following operators are valid: >, <, >=, <=, !, |, &.
       require:
       - <10
 
@@ -232,7 +233,7 @@ policies:
     enabled: true
     validationFailureAction: audit
     parameters:
-      # -- Memory limitations (only one needs to be met)
+      # -- Memory limitations (only one required condition needs to be met).  Can use standard Kubernetes resource units (e.g. Mi, Gi).  The following operators are valid: >, <, >=, <=, !, |, &.
       require:
       - <64Gi
 
@@ -251,7 +252,7 @@ policies:
     enabled: false
     validationFailureAction: audit
     parameters:
-      # -- List of probes that are required on pods
+      # -- List of probes that are required on pods.  Valid values are `readinessProbe`, `livenessProbe`, and `startupProbe`.
       require:
       - readinessProbe
       - livenessProbe
@@ -259,11 +260,6 @@ policies:
   # -- Require CPU and memory requests equal limits for guaranteed quality of service
   require-requests-equal-limits:
     enabled: false
-    validationFailureAction: audit
-
-  # -- Require containers mount hostPath volumes as read-only.  HostPath volumes are normally disallowed.  But, if exceptions are made, the volume should be mounted as read-only.
-  require-ro-host-path:
-    enabled: true
     validationFailureAction: audit
 
   # -- Require containers set root filesystem to read-only
@@ -277,15 +273,17 @@ policies:
     validationFailureAction: enforce
     parameters:
       # -- List of allowed AppArmor profiles
+      # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline
       allow:
       - runtime/default
+      - localhost/*
 
   # -- Restrict services with External IPs to a specified list (CVE-2020-8554)
   restrict-external-ips:
     enabled: true
     validationFailureAction: enforce
     parameters:
-      # -- List of external IPs allowed in services
+      # -- List of external IPs allowed in services.  Must be an IP address.  Use the wildcard `?*` to support subnets (e.g. `192.168.0.?*`)
       allow: []
 
   # -- Restrict services with External Names to a specified list (CVE-2020-8554)
@@ -293,16 +291,17 @@ policies:
     enabled: true
     validationFailureAction: enforce
     parameters:
-      # -- List of external names allowed in services.  Must be a lowercase FRC-1123 hostname.
+      # -- List of external names allowed in services.  Must be a lowercase RFC-1123 hostname.
       allow: []
 
   # -- Restrict Linux capabilities added to containers to the specified list
   restrict-capabilities:
     enabled: true
-    validationFailureAction: enfrce
+    validationFailureAction: enforce
     parameters:
       # -- List of capabilities that are allowed to be added
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
+      # See https://man7.org/linux/man-pages/man7/capabilities.7.html for list of capabilities.  The `CAP_` prefix is removed in Kubernetes names.
       allow:
       - NET_BIND_SERVICE
 
@@ -317,12 +316,20 @@ policies:
       allow:
       - ">=1000"
 
-  # -- Restrict hostPath volume paths to the allowed list.  HostPath volumes are normally disallowed.  But, if exceptions are made, the path should be restricted.
-  restrict-host-path:
+  # -- Restrict the paths that can be mounted by hostPath volumes to the allowed list.  HostPath volumes are normally disallowed.  If exceptions are made, the path(s) should be restricted.
+  restrict-host-path-mount:
     enabled: true
     validationFailureAction: audit
     parameters:
-      # -- List of allowed paths for hostPath volumes
+      # -- List of allowed paths for hostPath volumes to mount
+      allow: []
+
+  # -- Restrict the paths that can be mounted as read/write by hostPath volumes to the allowed list.  HostPath volumes, if allowed, should normally be mounted as read-only.  If exceptions are made, the path(s) should be restricted.
+  restrict-host-path-write:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- List of allowed paths for hostPath volumes to mount as read/write
       allow: []
 
   # -- Restrict host ports in containers to the specified list
@@ -347,7 +354,7 @@ policies:
     enabled: true
     validationFailureAction: enforce
     parameters:
-      # -- List of allowed proc mount values
+      # -- List of allowed proc mount values.  Valid values are `Default` and `Unmasked`.
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards
       allow:
       - Default
@@ -355,9 +362,9 @@ policies:
   # -- Restrict seccomp profiles to the specified list
   restrict-seccomp:
     enabled: true
-    validationFailureAction: audit
+    validationFailureAction: enforce
     parameters:
-      # -- List of allowed seccomp profiles
+      # -- List of allowed seccomp profiles.  Valid values are `Localhost`, `RuntimeDefault`, and `Unconfined`
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
       allow:
       - RuntimeDefault
@@ -405,7 +412,7 @@ policies:
     enabled: true
     validationFailureAction: enforce
     parameters:
-      # -- List of allowed Volume types
+      # -- List of allowed Volume types.  Valid values are the volume types listed here: https://kubernetes.io/docs/concepts/storage/volumes/#volume-types
       # Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
       allow:
       - "configMap"
@@ -421,7 +428,7 @@ policies:
   update-image-pull-policy:
     enabled: false
     parameters:
-      # -- List of image pull policy updates.  `from` contains the pull policy value to replace.  If `from` is blank, it matches everything.  `to` contains the new pull policy to use.  Must be one of Always, Never, or IfNotPresent.
+      # -- List of image pull policy updates.  `from` contains the pull policy value to replace.  If `from` is blank, it matches everything.  `to` contains the new pull policy to use.  Must be one of `Always`, `Never`, or `IfNotPresent`.
       update:
       - to: Always
 
@@ -477,6 +484,7 @@ additionalPolicies:
             metadata:
               namespace: "!default"
 
+# -- Reserved values for Big Bang test automation
 bbtests:
   enabled: false
   scripts:

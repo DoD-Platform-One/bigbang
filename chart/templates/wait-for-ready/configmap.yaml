@@ -8,12 +8,12 @@ metadata:
 data:
   wait-for-ready.sh: |-
     POLICIES=($ENABLED_POLICIES)
-    READY=$(kubectl get cpol -n kyverno-policies -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
+    READY=$(kubectl get cpol -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
     for POLICY in "${POLICIES[@]}"; do
       echo "$POLICY:"
       until echo $READY | grep $POLICY > /dev/null; do
         sleep 1
-        READY=$(kubectl get cpol -n kyverno-policies -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
+        READY=$(kubectl get cpol -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
       done
       echo "  Ready"
     done

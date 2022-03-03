@@ -2,6 +2,38 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.6] - 2022-03-02
+
+### Changed
+
+- Added `localhost/*` as another acceptable default AppArmor profile
+- Updated metadata in `Chart.yaml`
+- Fixed typo for `restrict-capabilities` action in `values.yaml`
+- Fixed `disallow-default-namespace` to allow blank namespace in pod controller template, but require pod controller to have a namespace.
+- Fixed `restrict-host-path` to ignore pods with no volumes
+- Fixed `require-non-root-group` exclusions indentions
+- Fixed `disallow-deprecated-apis` matching to work with exclusions
+- Updated `disallow-deprecated-apis` with Kubernetes 1.26 deprecations
+- Updated `require-requests-equal-limits` to work with Kyverno 1.6.0
+- Add `system:service-account-issuer-discovery` to the exclusion list for `disallow-rbac-on-default-serviceaccounts`.  Clusters allow service accounts access to discovery.
+- Fixed `disallow-rbac-on-default-serviceaccounts` to ignore role bindings without a subject.
+- Fixed `require-non-root-user` to allow either `runAsNonRoot: true` or `runAsUser: >0`.
+- Fixed `disallow-tolerations` to check pod controllers
+- Renamed `require-ro-host-path` to `restrict-host-path-write` and added an `allow` list for paths
+- Renamed `restrict-host-path` to `restrict-host-path-mount` to distinguish from `restrict-host-path-write`
+- Increased memory allocation for `wait-for-ready` job to avoid OOM errors
+- Renamed `disallow-subpath-volumes` to `disallow-shared-subpath-volume-writes` to clarify functionality.
+- Fixed `disallow-shared-subpath-volume-writes` to narrow conditions specific to vulnerability
+- Fixed `helpers.tpl` match and exclusion to handle `any` and `all` permutations
+
+### Added
+
+- `wait.sh` added to pipeline to wait for all policies to be ready before running helm test
+
+### Removed
+
+- `disallow-host-path` policy overlapped `restrict-volume-types` policy and was removed
+
 ## [1.0.0-bb.5] - 2022-02-03
 
 ### Changed
