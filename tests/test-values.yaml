@@ -958,15 +958,13 @@ addons:
         server:
           name: velero
       configuration:
-        # minio uses s3 provider
         provider: aws
         backupStorageLocation:
           bucket: velero
-          config: &minio-config
+          config:
             region: velero
-            insecureSkipTLSVerify: "true"
             s3ForcePathStyle: "true"
-            s3Url: &minio-address https://minio.bigbang.dev
+            s3Url: https://minio-api.bigbang.dev
         volumeSnapshotLocation:
           provider: aws
           config:
@@ -978,16 +976,12 @@ addons:
             [default]
             aws_access_key_id = minio
             aws_secret_access_key = minio123
+      cleanUpCRDs: true
       bbtests:
-        # TODO: Velero test is messy and times out running in BB CI
-        # https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/issues/9
-        enabled: false
+        enabled: true
         scripts:
-          secretEnvs:
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+          envs:
+            MINIO_HOST: https://minio-api.bigbang.dev
 
   keycloak:
     enabled: false
