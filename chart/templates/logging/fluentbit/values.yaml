@@ -3,10 +3,61 @@
 {{- end }}
 
 {{- define "bigbang.defaults.fluentbit" -}}
-elasticsearch:
-  host: "logging-ek-es-http"
-  password:
-    secret: "logging-ek-es-elastic-user"
+{{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
+
+{{- if and (not $disableDefault) .Values.logging.enabled }}
+env:
+  - name: FLUENT_ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: logging-ek-es-elastic-user
+        key: elastic
+
+extraVolumes:
+  - hostPath:
+      path: /var/log/flb-storage/
+      type: DirectoryOrCreate
+    name: flb-storage
+  - secret:
+      secretName: logging-ek-es-http-certs-public
+    name: elasticsearch-certs
+
+extraVolumeMounts:
+  - mountPath: /var/log/flb-storage/
+    name: flb-storage
+  - mountPath: /etc/elasticsearch/certs/
+    name: elasticsearch-certs
+
+config:
+  outputs: |
+    [OUTPUT]
+        Name es
+        Match kube.*
+        Host {{ dig "elasticsearch" "name" "logging-ek" .Values.fluentbit.values }}-es-http
+        HTTP_User elastic
+        HTTP_Passwd ${FLUENT_ELASTICSEARCH_PASSWORD}
+        Logstash_Format On
+        Retry_Limit False
+        Replace_Dots On
+        tls On
+        tls.verify On
+        tls.ca_file /etc/elasticsearch/certs/ca.crt
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+
+    [OUTPUT]
+        Name es
+        Match host.*
+        Host {{ dig "elasticsearch" "name" "logging-ek" .Values.fluentbit.values }}-es-http
+        HTTP_User elastic
+        HTTP_Passwd ${FLUENT_ELASTICSEARCH_PASSWORD}
+        Logstash_Format On
+        Logstash_Prefix node
+        Retry_Limit False
+        tls On
+        tls.verify On
+        tls.ca_file /etc/elasticsearch/certs/ca.crt
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+{{- end }}
 
 imagePullSecrets:
   - name: private-registry
@@ -17,7 +68,6 @@ image:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-
 
 istio:
   enabled: {{ .Values.istio.enabled }}
