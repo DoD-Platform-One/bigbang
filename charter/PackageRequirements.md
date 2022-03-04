@@ -4,7 +4,7 @@ All Big Bang Packages shall adhere to the following requirements.  Where possibl
 
 [[_TOC_]]
 
-## Gitlab Project Settings
+## GitLab Project Settings
 
 * The `main` branch should be default in each project
 * Merge Requests should require 1 approver
