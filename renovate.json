@@ -5,7 +5,7 @@
   "dependencyDashboardHeader": "- [ ] Sync upstream helm chart version with updated dependencies.",
   "dependencyDashboardTitle": "Renovate: Upgrade Mattermost-Operator Package Dependencies",
   "draftPR": true,
-  "labels": ["mattermostoperator","Package Sustainment","kind::chore"],
+  "labels": ["mattermostoperator","Package Sustainment","kind::maintenance"],
   "packageRules": [
     {
       "matchDatasources": ["docker"],
