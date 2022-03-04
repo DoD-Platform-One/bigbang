@@ -1131,6 +1131,7 @@ get_debug() {
     get_log_dump
     get_cluster_info_dump
     describe_resources
+    get_cpumem
   else
     echo "Debug not enabled, skipping"
   fi
@@ -1205,4 +1206,11 @@ bigbang_package_images() {
 
    cat ${PACKAGE_IMAGE_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:Package-Image-List\r\e[0K"
+}
+
+get_cpumem(){
+  echo -e "\e[0Ksection_start:`date +%s`:get_cpumem[collapsed=true]\r\e[0K\e[33;1mCPU and Memory usage\e[37m"
+  echo -e "\e[31mNOTICE: Logs can be found in artifacts get_cpumem.txt\e[0m"
+  kubectl top pods --all-namespaces --use-protocol-buffers | tee get_cpumem.txt
+  echo -e "\e[0Ksection_end:`date +%s`:get_cpumem\r\e[0K"
 }
