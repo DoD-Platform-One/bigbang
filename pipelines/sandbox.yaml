@@ -107,6 +107,7 @@ clean install:
     when: always
     paths:
       - events.txt
+      - get_cpumem.txt
       - images.txt
       - pod_logs
       - cluster_info_dump.txt
@@ -167,6 +168,7 @@ upgrade:
     when: always
     paths:
       - events.txt
+      - get_cpumem.txt
       - images.txt
       - pod_logs
       - cluster_info_dump.txt
@@ -213,6 +215,7 @@ integration:
   artifacts:
     paths:
       - events.txt
+      - get_cpumem.txt
       - images.txt
       - kubectl_describes
       - pod_logs
