@@ -325,7 +325,7 @@ aws/rke2/bigbang up:
       artifacts: true
   script:
     - mkdir -p ~/.kube
-    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
     # Deploy a default storage class for aws
     - kubectl apply -f ${PIPELINE_REPO_DESTINATION}/clusters/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
     - deploy_bigbang
@@ -364,7 +364,7 @@ aws/rke2/bigbang test:
       artifacts: true
   script:
     - mkdir -p ~/.kube
-    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
     - test_bigbang
     - |
       if [[ $EXIT_FLAG -eq 1 ]]; then
@@ -404,7 +404,7 @@ aws/rke2/bigbang down:
     - job: aws/rke2/bigbang test
   script:
     - mkdir -p ~/.kube
-    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config
+    - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
     - helm un -n bigbang bigbang
     # TODO: Smarter wait
     - sleep 180
