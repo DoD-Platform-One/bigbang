@@ -2,7 +2,7 @@
 
 Each Big Bang Package is present in the [Big Bang Package](https://repo1.dso.mil/platform-one/big-bang/apps) repository and broken up into several sub-groupings.
 
-Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [here](PackageOwner.md).
+Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [here](ApplicationOwners.md).
 
 [[_TOC_]]
 
@@ -12,9 +12,9 @@ Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [he
 graph TB
   subgraph "Core"
   subgraph "Logging"
-  LoggingElastic(Elasticsearch)
-  LoggingKibana(Kibana)
-  LoggingECK(ECK)
+  LoggingElastic[Elasticsearch]
+  LoggingKibana[Kibana]
+  LoggingECK[ECK]
   LoggingElastic  --> LoggingECK
   LoggingKibana  --> LoggingECK
   LoggingKibana --> LoggingElastic
@@ -27,23 +27,23 @@ graph TB
   ServiceMesh
   
   ClusterAuditor --> LoggingECK
-  ClusterAuditor --> OPA(Policy Enforcement)
+  ClusterAuditor --> OPA[Policy Enforcement]
   end      
 
   subgraph "Package Utilities"
-    Postgres
-    MinIO(S3 Compatible Storage)
-    Redis
+    Postgres[DB]
+    MinIO[S3 Compatible Storage]
+    Redis[Cache Server]
   end
 
   subgraph "Security"
   Keycloak --> Postgres
-  Anchore(Anchore Enterprise) --> Postgres
+  Anchore[Anchore Enterprise] --> Postgres
   Twistlock
   end
 
   subgraph "Developer Tools"
-    GitLab --> GitLabRunners(GitLab Runners)
+    GitLab --> GitLabRunners[GitLab Runners]
     GitLab --> MinIO
     GitLab --> Redis
     GitLab --> Postgres
@@ -64,9 +64,9 @@ Core packages are supported Big Bang packages that have to be enabled and are lo
 graph TB
   subgraph "Core"
   subgraph "Logging"
-  LoggingElastic(Elasticsearch)
-  LoggingKibana(Kibana)
-  LoggingECK(ECK)
+  LoggingElastic[Elasticsearch]
+  LoggingKibana[Kibana]
+  LoggingECK[ECK]
   LoggingElastic  --> LoggingECK
   LoggingKibana  --> LoggingECK
   LoggingKibana --> LoggingElastic
@@ -80,7 +80,7 @@ graph TB
   Twistlock
   
   ClusterAuditor --> LoggingECK
-  ClusterAuditor --> OPA(Policy Enforcement)
+  ClusterAuditor --> OPA[Policy Enforcement]
   end      
 ```
 
@@ -100,6 +100,7 @@ Repository:
 Dependency: None
 
 Owners:
+
 * [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator/-/blob/main/CODEOWNERS)
 
 ### Auth Service
@@ -117,6 +118,7 @@ Repository:
 Dependency: None
 
 Owners:
+
 * [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/CODEOWNERS)
 
 ### Logging
@@ -142,6 +144,7 @@ Dependencies:
 * RWO StorageClass
 
 Owners:
+
 * [Elasticsearch-kibana CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/blob/main/CODEOWNERS)
 * [Fluentbit CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/blob/main/CODEOWNERS)
 * [Eck-operator CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator/-/blob/main/CODEOWNERS)
@@ -236,12 +239,12 @@ Security Tools are hosted here: [Security Tools](https://repo1.dso.mil/platform-
 graph TB  
 
   subgraph "Package Utilities"
-    Postgres
+    Postgres(DB)
   end
 
   subgraph "Security"
   Keycloak --> Postgres
-  Anchore(Anchore Enterprise) --> Postgres
+  Anchore[Anchore Enterprise] --> Postgres
   end
 ```
 
@@ -288,14 +291,14 @@ Developer Tools are hosted here: [Developer Tools](https://repo1.dso.mil/platfor
 graph TB
 
   subgraph "Application Utilities"
-    Postgres
-    MinIO(S3 Compatible Storage)
-    Redis
+    Postgres[DB]
+    MinIO[S3 Compatible Storage]
+    Redis[Cache Server]
   end
 
 
   subgraph "Package Tools"
-    GitLab --> GitLabRunners(GitLab Runners)
+    GitLab --> GitLabRunners[GitLab Runners]
     GitLab --> MinIO
     GitLab --> Redis
     GitLab --> Postgres
@@ -395,13 +398,11 @@ Collaboration tools are hosted here: [Collaboration Tools](https://repo1.dso.mil
 ```mermaid
 graph TB
   subgraph "Package Utilities"
-    Postgres
-    MinIO(S3 Compatible Storage)
+    Postgres[DB]
+    MinIO[S3 Compatible Storage]
   end
 
   subgraph "Collaboration Tools"
-    Jira --> Postgres
-    Confluence --> Postgres
     MatterMost --> MinIO
   end
 
@@ -480,29 +481,12 @@ A clear an obvious example of this is PostgreSQL.
 ```mermaid
 graph TB
   subgraph "Package Utilities"
-    Postgres
-    MinIO(S3 Compatible Storage)
-    Redis
-    MySQL
-    MongoDB
+    Postgres[DB]
+    MinIO[S3 Compatible Storage]
+    Redis[Cache Server]
   end
 
 ```
-
-#### PostgreSQL
-
-Product:
-
-* [PostgreSQL](https://www.postgresql.org/)
-
-Repository:
-
-* TBD
-
-Owners:
-
-* TBD
-* TBD
 
 #### Minio
 
@@ -512,7 +496,7 @@ Product:
 
 * [MinIO](https://min.io/)
 
-Repository: 
+Repository:
 
 * [Minio Package](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/)
 
@@ -521,50 +505,6 @@ Dependencies: None
 Owners:
 
 * [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/blob/main/CODEOWNERS)
-
-#### MySQL
-
-Product:
-
-* [MySQL](https://www.mysql.com/)
-
-Repository:
-
-* TBD
-
-Owners:
-
-* TBD
-* TBD
-
-#### MongoDB
-
-Product:
-
-* [MongoDB](https://www.mongodb.com/)
-
-Repository:
-
-* TBD
-
-Owners:
-
-* TBD
-* TBD
-
-#### Redis
-
-Redis is an open source, in-memory data structure store, used as a database, cache, and message broker.
-
-* [Redis](https://redis.io/)
-
-Repository:
-
-* [Redis Package](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/redis)
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/redis/-/blob/main/CODEOWNERS)
 
 ### Cluster Utilities
 
@@ -600,14 +540,6 @@ Owners:
 
 * [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/CODEOWNERS)
 
-
-### BB Technical Oversight Committee (BB TOC) 
+### BB Technical Oversight Committee (BB TOC)
 
 [Process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process)
-
-#### BB TOC Repos
-[Graduated](https://repo1.dso.mil/platform-one/big-bang/apps/graduated)
-
-[Incubating](https://repo1.dso.mil/platform-one/big-bang/apps/incubating)
-
-[Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)

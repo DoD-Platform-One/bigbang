@@ -1,81 +1,66 @@
-#New Epic Checklist Template
+# New Epic Checklist Template
 
 # Feature Request
 
 ## Why
 
-*insert the purpose of the Epic or sub-epic here*
+> Insert the purpose of the Epic or sub-epic here*
 
 ## Proposed Solution
 
-*insert proposed solution, with relevant links here*
+> Insert proposed solution, with relevant links here*
 
 ## Definition of Done Checklist
 
 **Package:**
+
 - [ ] Do you have a 'main' branch that is default and protected?
-- [ ] Are all other branches merged or deleted?  For master and dev branches, tag the branch commit before deleting the branch 
-    so we can retrieve it if necessary.  Exception: branches labeled release
+- [ ] Are all other branches merged or deleted?  For master and dev branches, tag the branch commit before deleting the branch so we can retrieve it if necessary. Exception: branches labeled release
 - [ ] Does the repo contain only the following directories: chart, docs, tests?  All other directories should be deleted.
-- [ ] Is there a CODEOWNERS file containing some code owners?
-- [ ] Is there a CHANGELOG.md file with initial changes?
-- [ ] Is there a README.md file documenting basic use?
-- [ ] Is there a CONTRIBUTING.md file outlining how a new person can contribute?
-- [ ] Is there a .gitlab-ci.yml pipeline setup pointing to a pipeline template?
-- [ ] Is there a tests/test-values.yaml file setup to provide default values for the pipeline?  This must include image pull 
-      secret references.
-- [ ] Is there a chart/Kptfile that points to the upstream chart used in the repo? Exception: Not needed if upstream chart is 
-      not used.
-- [ ] Does the upstream chart version deploy the application version used in Iron Bank (or as close as possible)? This will 
-      help avoid incompatible configuration settings. 
-- [ ] Have you run helm dep up and added all .tgz file dependencies in chart/charts to the repo?
-- [ ] Have you updated chart/requirements.yaml or chart/Chart.yaml to point to the file://./charts/<file>.tgz dependencies?
-- [ ] If the chart has a web interface, have you added a VirtualService using hostname that is conditionally added if 
-      istio.enabled is true?  Verify this works using the web address.
-- [ ] If the chart integrates with Prometheus monitoring, have you added a Service and ServiceMonitor that are conditionally 
-      added if monitoring.enabled is true? Verify this using Prometheus to check targets.
+- [ ] Is there a 'CODEOWNERS' file containing some code owners?
+- [ ] Is there a 'CHANGELOG.md' file with initial changes?
+- [ ] Is there a 'README.md' file documenting basic use?
+- [ ] Is there a 'CONTRIBUTING.md' file outlining how a new person can contribute?
+- [ ] Is there a '.gitlab-ci.yml' pipeline setup pointing to a pipeline template?
+- [ ] Is there a 'tests/test-values.yaml' file setup to provide default values for the pipeline?  This must include image pull secret references.
+- [ ] Is there a 'chart/Kptfile' that points to the upstream chart used in the repo? Exception: Not needed if upstream chart is not used.
+- [ ] Does the upstream chart version deploy the application version used in Iron Bank (or as close as possible)? This will help avoid incompatible configuration settings. 
+- [ ] Have you run helm dep up and added all .tgz file dependencies in 'chart/charts' to the repo?
+- [ ] Have you updated 'chart/requirements.yaml' or 'chart/Chart.yaml' to point to the 'file://./charts/<file>.tgz' dependencies?
+- [ ] If the chart has a web interface, have you added a VirtualService using hostname that is conditionally added if istio.enabled is true?  Verify this works using the web address.
+- [ ] If the chart integrates with Prometheus monitoring, have you added a Service and ServiceMonitor that are conditionally added if monitoring.enabled is true? Verify this using Prometheus to check targets.
 - [ ] Does your package have resource requests and limits set and equal to each other?
 - [ ] Do you have a tag on your main branch for the Big Bang release version of the package?
-- [ ] Have all of your images been updated to pull from registry1.dso.mil.  Exception: If there is no Iron Bank image, are you 
-      pulling from registry.dso.mil?
+- [ ] Have all of your images been updated to pull from registry1.dso.mil. Exception: If there is no Iron Bank image, are you pulling from registry.dso.mil?
 - [ ] If the package supports SSO, have you integrated SSO settings? Needs clarification
 - [ ] If the package requires a database, have you integrated external database settings? Needs clarification
 - [ ] If the package requires storage, have you integrated external storage (e.g. MinIO) settings?  Needs clarification
-- [ ] Are all secrets and certificates removed from the repo?  All secrets should be references or randomly generated during 
-      deployment.
+- [ ] Are all secrets and certificates removed from the repo?  All secrets should be references or randomly generated during deployment.
 
 **Big Bang:**
-- [ ] Have you added a namespace.yaml in chart/templates that sets up the package's namespace
-- [ ] Have you added pull secret creation to a resource?  This may be in the namespace.yaml file.
-- [ ] Have you added a gitrepository.yaml in chart/templates that sets up a flux GitRepository resource pointing to the 
-      package's git repository?
-- [ ] Have you added a helmrelease.yaml in chart/templates that sets up a flux HelmRelease resource pointing to the package's 
-      helm chart?
-- [ ] Have you added default values to the HelmRelease that need to be passed downstream to the package?  For example: 
-      hostname, istio.enabled, monitoring.enabled.
+
+- [ ] Have you added a 'namespace.yaml' in 'chart/template's that sets up the package's namespace
+- [ ] Have you added pull secret creation to a resource?  This may be in the 'namespace.yaml' file.
+- [ ] Have you added a 'gitrepository.yaml' in 'chart/templates' that sets up a flux GitRepository resource pointing to the package's git repository?
+- [ ] Have you added a 'helmrelease.yaml' in 'chart/templates' that sets up a flux HelmRelease resource pointing to the package's helm chart?
+- [ ] Have you added default values to the HelmRelease that need to be passed downstream to the package?  For example: hostname, istio.enabled, monitoring.enabled.
 - [ ] Have you added image pull secret references to the HelmRelease to be passed downstream to the package?
 - [ ] Have you added other package dependencies to the HelmRelease to insure deployment order?
-- [ ] Have you added a key for <package>.yaml into chart/templates/values.yaml so override values can be passed downstream to 
-      the package? 
-- [ ] Have you added a valuesFrom configuration in the HelmRelease pointing to the values secret with a valuesKey equal to 
-      <package>.yaml?
-- [ ] Have you added the package into chart/values.yaml under addons? Exception: core apps do not go under addons.
-- [ ] Have you added enabled: false to your chart/values.yaml and conditional statements on enabled: true for your namespace, 
-      pull secret, git repository, and helm release?
-- [ ] Have you added git repo configuration to chart/values.yaml pointing to the packages git repo, helm chart path, and tag.
-- [ ] Have you added a values: {} placeholder for you package in chart/values.yaml?
-- [ ] Have you added any applicable default values from Fences and Party Bus to the package?  Exception: Infrastructure 
-      specific implementations (e.g. AWS)
-- [ ] Have you verified that
-
-Additional details on definition of done need to be added for:
-
+- [ ] Have you added a key for '<package>.yaml' into 'chart/templates/values.yaml' so override values can be passed downstream to the package? 
+- [ ] Have you added a valuesFrom configuration in the HelmRelease pointing to the values secret with a valuesKey equal to '<package>.yaml'?
+- [ ] Have you added the package into 'chart/values.yaml' under addons? Exception: core apps do not go under addons.
+- [ ] Have you added enabled: false to your 'chart/values.yaml' and conditional statements on enabled: true for your namespace, pull secret, git repository, and helm release?
+- [ ] Have you added git repo configuration to 'chart/values.yaml' pointing to the packages git repo, helm chart path, and tag.
+- [ ] Have you added a values: {} placeholder for you package in 'chart/values.yaml'?
+- [ ] Have you added any applicable default values from Fences and Party Bus to the package? Exception: Infrastructure specific implementations (e.g. AWS)
+- [ ] Have you verified that additional details on definition of done need to be added for:
 - Database integration
 - Storage (minio) integration
 - Certificates?
 - SSO integration
 
 **Testing:**
+
 - [ ] Have you verified the CI/CD pipeline passes?
 - [ ] Have you verified the application is available via web URL (if applicable)?
 - [ ] Have you verified you can login via SSO with your Platform One account (if applicable)?

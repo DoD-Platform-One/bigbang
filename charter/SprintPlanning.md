@@ -6,13 +6,13 @@ Responsible for building the COMMON Big Bang product.
 
 ### Normal Rhythm
 
-* One week sprints ( Tuesday noon to Tuesday noon )
+* Two week sprints starting on a Tuesday
 * Continue to improve planning every week
 * All team members who have capacity to work on the PRODUCT backlog should attend the planning session
 
 ### Work Breakdown
 
-* The Big Bang PRODUCT work will be continuously updated within Jira by the BB PMs, Anchors, and Epic Leads
+* The Big Bang PRODUCT work will be continuously updated within GitLab by the Big Bang Product Manager, Anchors, and Anchor Shanks
 * The pre-planning activity will execute the following planning steps:
 
 1. Review current team objectives

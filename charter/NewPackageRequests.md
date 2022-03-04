@@ -1,6 +1,6 @@
 # New Big Bang Packages
 
-This is the process for adding a new package into Big Bang
+This is the process for adding a package into Big Bang.
 
 ## Submit New Big Bang Package Proposal to the BB Technical Oversite Committee
 

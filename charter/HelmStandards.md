@@ -10,13 +10,13 @@ For example, for the upstream [`istio-operator`](https://github.com/istio/istio/
 
 For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`.  Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
 
-
 ## Big Bang Values File
 
 * In the values.yaml file [here](../chart/values.yaml), each package should have its own region at `.package_name` if its in Core or `.addons.package_name`.
 * User Interface:
-  * If there exists need for ingress traffic into the package, the package should create a VirtualService conditional on the existance of `istio.enabled` being set to true.  This value should default to false.  The BigBang chart should set this true for all packages
+  * If there exists need for ingress traffic into the package, the package should create a VirtualService conditional on the existence of `istio.enabled` being set to true.  This value should default to false.  The BigBang chart should set this true for all packages
   * There should be a region under the package for configuring SSO that looks like this when there are multiple packages
+
     ```yaml
       sso:
         enabled: false
@@ -27,17 +27,21 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
             client_id: jaeger
             client_secret: "change_me"
     ```
+
     or like this if there is a single user interface:
+
     ```yaml
       sso:
         enabled: false
         client_id: twistlock_id
         client_secret: "change_me"
     ```
+
    * If sso is enabled and a value is not provided in the SSO configuration of the package, it should default to the top level SSO configuration
 * Database Connections:
     * The BigBang chart should prevent the use of a database bundled as part of the package chart by default, and warn if an end user uses one anyways.
     * There should be a database section under the package configuration that matches the following section
+
     ```yaml
     database:
       # Entering connection info will enable external database and will auto-create any required secrets.
@@ -48,6 +52,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
       database: ""
       type: "" # Optional. One of mysql, mssql, postgres, mongo if ther
     ```
+
 * Monitoring
     * Charts should expect a value `monitoring.enabled` to be set by the BigBang chart to conditionally create monitoring components (`ServiceMonitors`, `PodMonitors`, etc).  This value should default to false
 
@@ -91,7 +96,6 @@ commonLabels:
 ```
 
 ## Kubernetes Objects
-
 
 These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices
 
