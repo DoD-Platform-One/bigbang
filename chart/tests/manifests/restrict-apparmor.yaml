@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-apparmor-1
+  namespace: default
   annotations:
     container.apparmor.security.beta.kubernetes.io/c1: unconfined
     kyverno-policies-bbtest/type: validate
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-apparmor-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

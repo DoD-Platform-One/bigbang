@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-labels-1
+  namespace: default
   labels:
     kyverno-policies-bbtest/test: required
   annotations:
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-labels-2
+  namespace: default
   labels:
     kyverno-policies-bbtest/test: notrequired
     kyverno-policies-bbtest/required: test
@@ -36,6 +38,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-labels-3
+  namespace: default
   labels:
     kyverno-policies-bbtest/test: required
     kyverno-policies-bbtest/required: test

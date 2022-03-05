@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-selinux-type-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -20,6 +21,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-selinux-type-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -37,6 +39,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-selinux-type-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -57,6 +60,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-selinux-type-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -74,6 +78,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-selinux-type-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

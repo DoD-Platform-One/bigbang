@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-privileged-containers-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-privileged-containers-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -38,6 +40,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-privileged-containers-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

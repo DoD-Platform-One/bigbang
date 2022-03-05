@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -20,6 +21,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -44,6 +46,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -61,6 +64,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -85,6 +89,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -105,6 +110,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-6
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -132,6 +138,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-7
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -152,6 +159,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-8
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -179,6 +187,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-requests-equal-limits-9
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

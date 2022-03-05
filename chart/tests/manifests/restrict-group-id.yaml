@@ -1,9 +1,9 @@
-# Ranges: 1000, 2000-2999, 4000+
 # Test 1: Pods running as a non-approved group id should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -21,6 +21,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -30,13 +31,14 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     args: ["sleep", "infinity"]
     securityContext:
-      runAsGroup: 1001
+      runAsGroup: 0
 ---
 # Test 3: Init containers running as a non-approved group id should not be allowed
 apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -49,13 +51,14 @@ spec:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     securityContext:
-      runAsGroup: 3000
+      runAsGroup: 500
 ---
 # Test 4: Pods running with approved group ids are allowed
 apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -73,6 +76,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -99,12 +103,13 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-6
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
   securityContext:
-    fsGroup: 999
+    fsGroup: 0
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
@@ -115,6 +120,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-7
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -131,12 +137,13 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-8
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
   securityContext:
-    supplementalGroups: [1000,999]
+    supplementalGroups: [1000,500]
   containers:
   - name: c1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
@@ -147,6 +154,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-group-id-9
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
