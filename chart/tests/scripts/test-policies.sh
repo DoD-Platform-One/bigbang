@@ -33,6 +33,23 @@ fi
 
 #######################################
 
+# Set all policies to audit so we can test them one at a time
+echo ---
+echo -e "${CYN}Setup: Set all policies to audit${NC}"
+POLICY_FAILACTIONS=()
+for POLICY in "${POLICIES[@]}"; do
+
+  # Save current validation failure action for restoring
+  POLICY_FAILACTIONS+=($(kubectl get cpol $POLICY -o jsonpath="{.spec.validationFailureAction}"))
+
+  # Patch policy validation failure action
+  if [ "${POLICY_FAILACTIONS[-1]}" != "audit" ]; then
+    kubectl patch cpol $POLICY -p '{"spec":{"validationFailureAction":"audit"}}' --type=merge
+  fi
+done
+
+#######################################
+
 # Get initial status of deployed policies
 READY=$(kubectl get cpol -o jsonpath='{.items[?(.status.ready==true)].metadata.name}')
 
@@ -251,6 +268,22 @@ for POLICY in "${POLICIES[@]}"; do
 
   echo "Cleaning up Test Resources"
   kubectl delete -f /yaml/$POLICY.yaml --force 2>/dev/null
+done
+
+#######################################
+
+# Restore policy settings
+echo ---
+echo -e "${CYN}Cleanup: Restore policy's validation failure action${NC}"
+for POLICY in "${POLICIES[@]}"; do
+
+  # Patch policy validation failure action
+  if [ "${POLICY_FAILACTIONS[0]}" != "audit" ]; then
+    kubectl patch cpol $POLICY -p "{\"spec\":{\"validationFailureAction\":\"${POLICY_FAILACTIONS[0]}\"}}" --type=merge
+  fi
+
+  # Remove first element from array
+  POLICY_FAILACTIONS=("${POLICY_FAILACTIONS[@]:1}")
 done
 
 #######################################

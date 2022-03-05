@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-ro-rootfs-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -17,6 +18,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-ro-rootfs-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -36,6 +38,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-ro-rootfs-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -52,6 +55,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-ro-rootfs-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -73,6 +77,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-ro-rootfs-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

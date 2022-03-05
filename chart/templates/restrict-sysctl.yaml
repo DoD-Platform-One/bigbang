@@ -31,6 +31,6 @@ spec:
         spec:
           =(securityContext):
             =(sysctls):
-              - name: "{{ join " | " (dig $name "parametes" "allow" nil .Values.policies) }}"
+              - name: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
                 value: "?*"
 {{- end -}}

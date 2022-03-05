@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-host-path-mount-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -25,6 +26,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: restrict-host-path-mount-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.0-bb.6](https://img.shields.io/badge/Version-1.0.0--bb.6-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.0-bb.7](https://img.shields.io/badge/Version-1.0.0--bb.7-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -54,13 +54,14 @@ helm install kyverno-policies chart/
 | policies.clone-configs.parameters.clone | list | `[]` | ConfigMap or Secrets that should be cloned.  Each item requres the kind, name, and namespace of the resource to clone |
 | policies.disallow-annotations | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified annotations on pods |
 | policies.disallow-annotations.parameters.disallow | list | `[]` | List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.disallow-default-namespace | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent pods from using the default namespace |
 | policies.disallow-deprecated-apis | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent resources that use deprecated or removed APIs (through Kubernetes 1.26) |
 | policies.disallow-host-namespaces | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent use of the host namespace (PID, IPC, Network) by pods |
 | policies.disallow-image-tags | object | `{"enabled":true,"parameters":{"disallow":["latest"]},"validationFailureAction":"audit"}` | Prevent container images with specified tags.  Also, requires images to have a tag. |
 | policies.disallow-istio-injection-bypass | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent the `sidecar.istio.io/inject: false` label on pods. |
 | policies.disallow-labels | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified labels on pods |
 | policies.disallow-labels.parameters.disallow | list | `[]` | List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
+| policies.disallow-namespaces | object | `{"enabled":true,"parameters":{"disallow":["default"]},"validationFailureAction":"audit"}` | Prevent pods from using the listed namespaces |
+| policies.disallow-namespaces.parameters.disallow | list | `["default"]` | List of namespaces to deny pod deployment |
 | policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent services of the type NodePort |
 | policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"attach"}` | Prevent the use of `exec` or `attach` on pods |
 | policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent privilege escalation on pods |

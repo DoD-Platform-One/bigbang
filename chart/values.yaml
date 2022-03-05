@@ -59,8 +59,8 @@ policies:
         # - name: sample
         #   # -- Kind of the resource: ConfigMap or Secret
         #   kind: ConfigMap
-        #   # -- Namespace to find the ConfigMap/Secret
-        #   namespace: default
+        #   # -- Namespace to find the ConfigMap/Secret.  This can be templated.
+        #   namespace: "{{ .Release.Namespace }}"
 
   # -- Prevent specified annotations on pods
   disallow-annotations:
@@ -69,11 +69,6 @@ policies:
     parameters:
       # -- List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
       disallow: []
-
-  # -- Prevent pods from using the default namespace
-  disallow-default-namespace:
-    enabled: true
-    validationFailureAction: audit
 
   # -- Prevent resources that use deprecated or removed APIs (through Kubernetes 1.26)
   disallow-deprecated-apis:
@@ -105,6 +100,15 @@ policies:
     parameters:
       # -- List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported.
       disallow: []
+
+  # -- Prevent pods from using the listed namespaces
+  disallow-namespaces:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- List of namespaces to deny pod deployment
+      disallow:
+      - default
 
   # -- Prevent services of the type NodePort
   disallow-nodeport-services:

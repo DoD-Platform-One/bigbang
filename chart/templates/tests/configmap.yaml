@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "kyverno-policies.name" . }}-bbtest-manifests
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kyverno-policies.test-labels" . | nindent 4 }}
   annotations:

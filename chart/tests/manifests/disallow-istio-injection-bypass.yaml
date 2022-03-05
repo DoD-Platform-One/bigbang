@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-istio-injection-bypass-1
+  namespace: default
   labels:
     sidecar.istio.io/inject: "false"
   annotations:
@@ -19,6 +20,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-istio-injection-bypass-2
+  namespace: default
   labels:
     sidecar.istio.io/inject: "true"
   annotations:
@@ -35,6 +37,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-istio-injection-bypass-3
+  namespace: default
   labels:
     disallow-istio-injection-bypass: "false"
   annotations:
@@ -51,6 +54,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-istio-injection-bypass-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

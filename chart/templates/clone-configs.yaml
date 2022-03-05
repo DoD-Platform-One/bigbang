@@ -20,7 +20,7 @@ spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   rules:
   {{- range $v := (dig $name "parameters" "clone" nil .Values.policies) }}
-  - name: {{ printf "%s-%s-%s" $v.namespace $v.name $v.kind }}
+  - name: {{ printf "%s-%s-%s" (tpl $v.namespace $) $v.name $v.kind }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Namespace")) $) | nindent 4 }}
     generate:
@@ -29,7 +29,7 @@ spec:
       namespace: "{{ "{{" }}request.object.metadata.name{{ "}}" }}"
       synchronize: true
       clone:
-        namespace: {{ $v.namespace }}
+        namespace: {{ tpl $v.namespace $ }}
         name: {{ $v.name }}
   {{- end }}
 {{- end -}}

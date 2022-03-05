@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-image-signature-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -17,6 +18,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-image-signature-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -31,6 +33,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-image-signature-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -45,6 +48,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-image-signature-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

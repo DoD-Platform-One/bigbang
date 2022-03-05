@@ -1,4 +1,4 @@
-{{- $name := "disallow-default-namespace" }}
+{{- $name := "disallow-namespaces" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -26,10 +26,11 @@ spec:
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod" "Deployment" "StatefulSet" "DaemonSet" "Job" "CronJob")) .) | nindent 4 }}
     validate:
-      message: "Using 'default' namespace is not allowed."
+      message: "The namespace used for this resource is not allowed."
       pattern:
         metadata:
-          namespace: "!default"
+          namespace: "!{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !" }}"
+  {{- if has "default" (dig $name "parameters" "disallow" nil .Values.policies) }}
   - name: require-namespace
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod" "Deployment" "StatefulSet" "DaemonSet" "Job" "CronJob")) .) | nindent 4 }}
@@ -38,4 +39,5 @@ spec:
       pattern:
         metadata:
           namespace: "?*"
+  {{- end }}
 {{- end -}}

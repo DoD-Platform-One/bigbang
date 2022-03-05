@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: require-istio-on-namespaces-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -12,6 +13,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: require-istio-on-namespaces-2
+  namespace: default
   labels:
     istio-injection: disabled
   annotations:
@@ -23,6 +25,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: require-istio-on-namespaces-3
+  namespace: default
   labels:
     istio-injection: enabled
   annotations:

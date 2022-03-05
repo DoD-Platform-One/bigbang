@@ -2,6 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.7] - 2022-03-03
+
+### Changed
+
+- Renamed `disallow-default-namespace` to `disallow-namespaces`.  Parameterized list of disallowed namespaces, with `default` as the default.
+- Decoupled testing from namespace
+- Used default namespace for testing
+- Updated test script to set policy action automatically
+
 ## [1.0.0-bb.6] - 2022-03-02
 
 ### Changed

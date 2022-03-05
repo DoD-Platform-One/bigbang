@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-image-tags-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -17,6 +18,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-image-tags-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -34,6 +36,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-image-tags-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -48,6 +51,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-image-tags-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -65,6 +69,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-image-tags-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

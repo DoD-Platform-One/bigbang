@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: disallow-default-namespace-1
+  name: disallow-namespaces-1
   namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
@@ -17,7 +17,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: disallow-default-namespace-2
+  name: disallow-namespaces-2
   namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate

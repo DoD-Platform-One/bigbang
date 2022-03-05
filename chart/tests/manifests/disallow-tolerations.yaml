@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -20,6 +21,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -37,6 +39,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -55,6 +58,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -74,6 +78,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -91,6 +96,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-6
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -108,6 +114,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-7
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -126,6 +133,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-8
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -145,6 +153,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: disallow-tolerations-9
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -159,6 +168,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-11
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -173,6 +183,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-12
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -187,6 +198,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-13
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -202,6 +214,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-14
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -218,6 +231,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-15
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -232,6 +246,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-16
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -246,6 +261,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-17
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -261,6 +277,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-18
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
@@ -277,6 +294,7 @@ apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
   name: disallow-tolerations-19
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass

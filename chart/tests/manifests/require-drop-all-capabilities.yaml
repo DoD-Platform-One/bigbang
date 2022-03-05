@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-drop-all-capabilities-1
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -20,6 +21,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-drop-all-capabilities-2
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -43,6 +45,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-drop-all-capabilities-3
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -60,6 +63,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-drop-all-capabilities-4
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
@@ -83,6 +87,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: require-drop-all-capabilities-5
+  namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
