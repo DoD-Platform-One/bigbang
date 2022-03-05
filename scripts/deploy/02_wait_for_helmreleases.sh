@@ -7,7 +7,7 @@ source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
 
 ## Array of addon HRs
-ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "keycloak" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "vault" "loki" "promtail" "kyverno" "tempo")
+ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "keycloak" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "vault" "loki" "promtail" "kyverno" "kyvernopolicies" "tempo")
 
 ## Map of values-keys/labels to HRs: Only needed if HR name =/= label name
 declare -A ADD_ON_HELMRELEASES_MAP
