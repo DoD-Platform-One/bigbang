@@ -149,6 +149,15 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
           - mattermost/mattermost-cypress-test
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-host-path-mount-.?
+          - default/restrict-host-path-write-.?
+          - default/restrict-volume-types-.?
+      allowedIPs:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-external-ips-.?
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -159,6 +168,12 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to run as any user/group
           - istio-system/lb-port-.*
+      bannedImageTags:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       containerRatio:
         parameters:
           excludedResources:
@@ -169,6 +184,9 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to mount host ports
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       noBigContainers:
         parameters:
           excludedResources:
@@ -179,6 +197,11 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to have undefined security context
           - istio-system/lb-port-.*
+      noSysctls:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-sysctls-.?
       readOnlyRoot:
         parameters:
           excludedResources:
@@ -194,6 +217,19 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to not have readiness/liveness probes
           - istio-system/lb-port-.*
+      restrictedTaint:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/disallow-tolerations-.?
+      selinuxPolicy:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
+          - default/disallow-selinux-options-.?
+          - default/restrict-selinux-type-.?
       volumeTypes:
         parameters:
           excludedResources:
@@ -202,6 +238,10 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
           - mattermost/mattermost-cypress-test
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-host-path-mount-.?
+          - default/restrict-host-path-write-.?
+          - default/restrict-volume-types-.?
     bbtests:
       enabled: true
 
@@ -211,6 +251,149 @@ kyverno:
     replicaCount: 1
     bbtests:
       enabled: true
+
+kyvernopolicies:
+  enabled: false
+  values:
+    bbtests:
+      enabled: true
+    exclude:
+      any:
+      # Allows k3d load balancer to bypass policies.
+      - resources:
+          namespaces:
+          - istio-system
+          names:
+          - svclb-*
+      # Exclude gatekeeper test resources so Helm tests will work
+      - resources:
+          namespaces:
+          - default
+          names:
+          - bad-test*
+          - good-test*
+    # Parameters are copied from kyverno policies for test vectors
+    # Exclusions are for allowing other helm tests to function
+    policies:
+      clone-configs:
+        parameters:
+          clone:
+          - name: clone-configs-1
+            kind: ConfigMap
+            namespace: "{{ .Release.Namespace }}"
+          - name: clone-configs-2
+            kind: Secret
+            namespace: "{{ .Release.Namespace }}"
+      disallow-annotations:
+        parameters:
+          disallow:
+          - 'kyverno-policies-bbtest/test: disallowed'
+          - kyverno-policies-bbtest/disallowed
+      disallow-labels:
+        parameters:
+          disallow:
+          - 'kyverno-policies-bbtest/test: disallowed'
+          - kyverno-policies-bbtest/disallowed
+      disallow-tolerations:
+        parameters:
+          disallow:
+          - effect: NoSchedule
+            key: notallowed
+            value: 'false'
+          - effect: '*NoSchedule'
+            key: disa??owed
+            value: 'true'
+      require-annotations:
+        parameters:
+          require:
+          - 'kyverno-policies-bbtest/test: required'
+          - kyverno-policies-bbtest/required
+      require-image-signature:
+        parameters:
+          require:
+          - image: ghcr.io/kyverno/test-verify-image:*
+            key: |-
+              -----BEGIN PUBLIC KEY-----
+              MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+              5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+              -----END PUBLIC KEY-----
+      require-labels:
+        parameters:
+          require:
+          - 'kyverno-policies-bbtest/test: required'
+          - kyverno-policies-bbtest/required
+      restrict-external-ips:
+        parameters:
+          allow:
+          - 192.168.0.1
+      restrict-external-names:
+        enabled: true
+        parameters:
+          allow:
+          - allowed
+      restrict-host-path-mount:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - mattermost
+              - nexus-repository-manager
+              names:
+              - "*-cypress-test*"
+        parameters:
+          allow:
+          - /tmp/allowed
+      restrict-host-path-write:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - mattermost
+              - nexus-repository-manager
+              names:
+              - "*-cypress-test*"
+        parameters:
+          allow:
+          - /tmp/allowed
+      restrict-host-ports:
+        parameters:
+          allow:
+          - '63999'
+          - '>= 64000 & < 65000'
+          - '> 65000'
+      restrict-image-registries:
+        exclude:
+          any:
+          # ArgoCD deploys a test app as part of its Cypress test
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui*
+      restrict-volume-types:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - mattermost
+              - nexus-repository-manager
+              names:
+              - "*-cypress-test*"
+      update-image-pull-policy:
+        parameters:
+          update:
+          - to: Always
+      update-image-registry:
+        parameters:
+          update:
+          - from: replace.image.registry
+            to: registry1.dso.mil
 
 logging:
   enabled: true
@@ -1019,7 +1202,7 @@ addons:
         realm:
           stringData:
             realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
-      extraVolumes: |-              
+      extraVolumes: |-
         - name: certauthority
           secret:
             secretName: {{ include "keycloak.fullname" . }}-certauthority

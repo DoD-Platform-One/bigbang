@@ -1,4 +1,4 @@
-{{- if .Values.kyverno.enabled }}
+{{- if or .Values.kyverno.enabled .Values.kyvernopolicies.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.kyverno "name" "kyverno" "defaults" (include "bigbang.defaults.kyverno" .)) }}
 {{- end }}
 

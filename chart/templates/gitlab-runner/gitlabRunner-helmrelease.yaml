@@ -34,10 +34,14 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.gatekeeper.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}

@@ -40,9 +40,12 @@ spec:
   dependsOn:
     - name: istio-operator
       namespace: {{ .Release.Namespace }}
-
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
       namespace: {{ .Release.Namespace }}
     {{- end }}
 {{- end }}

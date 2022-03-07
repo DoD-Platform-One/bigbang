@@ -1,5 +1,5 @@
 {{- $fluxSettingskyverno := merge .Values.kyverno.flux .Values.flux -}}
-{{- if .Values.kyverno.enabled }}
+{{- if or .Values.kyverno.enabled .Values.kyvernopolicies.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

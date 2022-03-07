@@ -1,0 +1,42 @@
+{{- $pkg := "kyvernopolicies" }}
+{{- $fluxSettings := merge (get .Values $pkg).flux .Values.flux -}}
+{{- if (get .Values $pkg).enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ $pkg }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: kyverno
+  chart:
+    spec:
+      chart: {{ (get .Values $pkg).git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: {{ $pkg }}
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettings | nindent 2 }}
+
+  {{- if (get .Values $pkg).postRenderers }}
+  postRenderers:
+  {{ toYaml (get .Values $pkg).postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-{{ $pkg }}-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-{{ $pkg }}-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-{{ $pkg }}-values
+      kind: Secret
+      valuesKey: "overlays"
+  dependsOn:
+    - name: kyverno
+      namespace: {{ .Release.Namespace }}
+{{- end }}
