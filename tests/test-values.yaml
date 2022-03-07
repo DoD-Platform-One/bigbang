@@ -148,6 +148,7 @@ gatekeeper:
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
+          - mattermost/mattermost-cypress-test
       allowedSecCompProfiles:
         parameters:
           excludedResources:
@@ -200,6 +201,7 @@ gatekeeper:
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
+          - mattermost/mattermost-cypress-test
     bbtests:
       enabled: true
 
