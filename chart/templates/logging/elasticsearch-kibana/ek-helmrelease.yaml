@@ -46,4 +46,8 @@ spec:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
 {{- end }}

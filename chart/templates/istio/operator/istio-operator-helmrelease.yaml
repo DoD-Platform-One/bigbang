@@ -37,9 +37,15 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if .Values.gatekeeper.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernopolicies.enabled }}
   dependsOn:
+    {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
   {{- end }}
 {{- end }}
