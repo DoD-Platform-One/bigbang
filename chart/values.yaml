@@ -630,7 +630,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "3.33.5-bb.5"
+      tag: "3.33.5-bb.6"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -638,6 +638,14 @@ addons:
     # Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
       gateway: ""
+
+    redis:
+      # -- Hostname of a pre-existing Redis to use for ArgoCD.
+      # Entering connection info will enable external Redis and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing Redis to use for ArgoCD.
+      port: ""
 
     sso:
       # -- Toggle SSO for ArgoCD on and off
