@@ -1,0 +1,62 @@
+image: registry1.dso.mil/ironbank/opensource/python/python38:3.8
+
+variables:
+# So long as the token permissions are the same, we are going to use the renovate token for the bb-bot. 
+# If the bb-bot needs different permissions than renovate, we'll need to generate a token specifically for that function.
+# - @gabe.scarberry
+  gitlab_access_token: $RENOVATE_TOKEN
+  readonly_gitlab_access_token: $RO_RENOVATE_TOKEN
+  gitlab_group_id: $BB_BOT_GROUP
+
+# workflow:
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages:
+  - test
+  - dry_run
+  - scheduled
+
+before_script:
+  - python --version  # For debugging
+  - python -m venv ./venv
+  - source venv/bin/activate
+  - python -m pip install -r requirements.txt
+
+bb-bot:on-schedule:
+  stage: scheduled
+  only:
+    - schedules
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+  artifacts:
+    when: always
+    expire_in: 2 weeks
+    paths:
+      - "*.log"
+  script:
+    - python bigbang_bot.py --no-dry-run --url https://repo1.dso.mil --token "$gitlab_access_token" --group "$gitlab_group_id" run-all-modules
+
+bb-bot:
+  stage: dry_run
+  except:
+    - schedules
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - "*.log"
+  script:
+    - python bigbang_bot.py --url https://repo1.dso.mil --token "$readonly_gitlab_access_token" --group "$gitlab_group_id" run-all-modules
+
+test:
+  stage: test
+  script:
+    - python -m pip install -r requirements-test.txt
+    - pytest . 
