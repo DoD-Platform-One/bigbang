@@ -139,6 +139,9 @@ grafana:
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
+    {{- if $gitlabRedis }}
+    checksum/gitlabRedisPassword: {{ sha256sum .Values.addons.gitlab.redis.password }}
+    {{- end }}    
   {{- end }}
 
   {{- if or .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
