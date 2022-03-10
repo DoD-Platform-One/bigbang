@@ -33,12 +33,11 @@ dex:
   imagePullSecrets:
     - name: private-registry
 
-
+{{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
 redis:
-  {{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
   externalEndpoint: {{ .Values.addons.argocd.redis.host }}:{{ .Values.addons.argocd.redis.port }}
   enabled: false
-  {{- end }}
+{{- end }}
 
 redis-bb:
   {{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
