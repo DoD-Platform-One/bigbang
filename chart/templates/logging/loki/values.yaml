@@ -20,7 +20,10 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}  
   
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}   
+  enabled: {{ .Values.monitoring.enabled }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }} 
 
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
