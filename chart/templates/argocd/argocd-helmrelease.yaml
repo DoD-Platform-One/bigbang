@@ -22,6 +22,11 @@ spec:
 
   {{- toYaml $fluxSettingsArgo | nindent 2 }}
 
+  {{- if .Values.addons.argocd.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.argocd.postRenderers | nindent 4 }}
+  {{- end }}
+
   valuesFrom:
     - name: {{ .Release.Name }}-argocd-values
       kind: Secret
