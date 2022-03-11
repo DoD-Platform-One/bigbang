@@ -701,6 +701,13 @@ changelog_format_check() {
   hasTypeOfChange=1
   nonstandardHeader=0
 
+  # Adds a new line to end of changelog for proper parsing
+  if [ "$(tail -c 1 ./CHANGELOG.md)" != "" ]; then
+    echo "" >> ./CHANGELOG.md
+    echo -e "\e[31mError: Changelog must end with a new line.\e[0m"
+    exitFlag=1
+  fi
+
   while IFS= read -r line; do
     if [[ $firstLine == 1 ]]; then
       # ensure first line says changelog
