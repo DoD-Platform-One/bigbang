@@ -1,21 +1,6 @@
 # Big Bang Overview
 
-Table of Contents
-
-- [Big Bang Overview](#big-bang-overview)
-  - [Key Concepts](#key-concepts)
-    - [Big Bang](#big-bang)
-    - [Big Bang Components](#big-bang-components)
-    - [Flux v2](#flux-v2)
-    - [GitOps](#gitops)
-    - [SOPS](#sops)
-    - [Kustomize](#kustomize)
-    - [Helm](#helm)
-  - [Packages](#packages)
-  - [Architecture](#architecture)
-    - [Configuration](#configuration)
-    - [Deployment](#deployment)
-    - [Diagram](#diagram)
+[[_TOC_]]
 
 ---
 

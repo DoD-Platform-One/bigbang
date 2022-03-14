@@ -1,12 +1,6 @@
 # Big Bang Deployment
 
-Table of Contents
-
-- [Big Bang Deployment](#big-bang-deployment)
-  - [GitOps](#gitops)
-  - [Installation](#installation)
-  - [Upgrade](#upgrade)
-  - [Monitor](#monitor)
+[[_TOC_]]
 
 ## GitOps
 
@@ -182,7 +176,8 @@ The following commands will help you monitor the progress of the Big Bang deploy
     gatekeeper-system   deployment.apps/gatekeeper-audit                1/1     1            1           2m8s
     istio-operator      deployment.apps/istio-operator                  0/1     1            0           8s
 
-    NAMESPACE           NAME                                                 READY   STATUS              RESTARTS   AGEkube-system         pod/local-path-provisioner-6d59f47c7-s6rln           1/1     Running             0          4m36s
+    NAMESPACE           NAME                                                 READY   STATUS              RESTARTS   AGE
+    kube-system         pod/local-path-provisioner-6d59f47c7-s6rln           1/1     Running             0          4m36s
     kube-system         pod/coredns-7944c66d8d-flk4p                         1/1     Running             0          4m36s
     flux-system         pod/helm-controller-578cdbcd8b-tjzs7                 1/1     Running             0          4m6s
     flux-system         pod/notification-controller-7c59d85f77-92ckv         1/1     Running             0          4m6s

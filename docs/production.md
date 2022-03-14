@@ -1,14 +1,12 @@
 # Big Bang Production
 
-Table of Contents
-
-- [Big Bang Production](#big-bang-production)
-  - [Production Deployment](#production-deployment)
+[[_TOC_]]
 
 ## Production Deployment
 
 The gatekeeper `values` section should resemble below when deploying to production.
-```
+
+```yaml
 # OPA Gatekeeper
 #
 gatekeeper:
@@ -41,7 +39,8 @@ To validate it was deployed correctly on your cluster run the following command:
 You should only see `kube-system` under `excludedNamespaces` section.
 
 Output:
-```
+
+```yaml
   name: allowed-docker-registries
   resourceVersion: "10390"
   uid: b51b3887-3cf8-4495-b37e-fb8ef31755db
@@ -61,5 +60,3 @@ spec:
     - registry1.dso.mil
     - registry.dso.mil
 ```
-
-

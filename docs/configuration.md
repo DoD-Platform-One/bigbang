@@ -1,21 +1,6 @@
 # Big Bang Configuration
 
-Table of Contents
-
-- [Big Bang Configuration](#big-bang-configuration)
-  - [Overview](#overview)
-  - [Pre-configuration](#pre-configuration)
-  - [Minimum Viable Configuration](#minimum-viable-configuration)
-  - [Big Bang Globals](#big-bang-globals)
-    - [`hostname`](#hostname)
-    - [`registryCredentials`](#registrycredentials)
-    - [`flux`](#flux)
-    - [Package](#package)
-  - [Flux Resources](#flux-resources)
-  - [Big Bang Version](#big-bang-version)
-  - [Environment Location](#environment-location)
-  - [Registry Pull Credentials](#registry-pull-credentials)
-  - [Package settings](#package-settings)
+[[_TOC_]]
 
 ## Overview
 
@@ -121,7 +106,7 @@ Big Bang deploys four flux resources that can be customized:
 
 In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Helm chart templates](../chart/templates) for the these resources.
 
-Settings for eny of these resources can be overridden by [patching](https://kubectl.docs.kubernetes.io/references/kustomize/patches/) the resource in your environment's kustomization files.  Use Flux's documentation for [GitRepository](https://toolkit.fluxcd.io/components/source/gitrepositories/), [HelmRelease](https://toolkit.fluxcd.io/components/helm/helmreleases/), and [Kustomization](https://toolkit.fluxcd.io/components/kustomize/kustomization/) to find settings for these resources. The following are examples of commonly reqeusted custom patches covered in the [bigbang template repo]https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#flux-components):
+Settings for eny of these resources can be overridden by [patching](https://kubectl.docs.kubernetes.io/references/kustomize/patches/) the resource in your environment's kustomization files.  Use Flux's documentation for [GitRepository](https://toolkit.fluxcd.io/components/source/gitrepositories/), [HelmRelease](https://toolkit.fluxcd.io/components/helm/helmreleases/), and [Kustomization](https://toolkit.fluxcd.io/components/kustomize/kustomization/) to find settings for these resources. The following are examples of commonly requested custom patches covered in the [bigbang template repo]<https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#flux-components>):
 
 - Updating flux-system component resource usage
   - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#adjust-resource-allocation-for-a-flux-system-component)
@@ -133,6 +118,7 @@ Settings for eny of these resources can be overridden by [patching](https://kube
 - Changing the image name / version
   - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#updating-a-flux-system-component-image-tag)
   - This patch could be used to update the tag of the flux-system component image to be deployed.
+
 > NOTE: Multiple patches could be applied within a single kustomization.yaml
 
 ## Big Bang Version
