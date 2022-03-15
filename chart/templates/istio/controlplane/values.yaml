@@ -37,6 +37,9 @@ authservice:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+kiali:
+  enabled: {{ .Values.kiali.enabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
