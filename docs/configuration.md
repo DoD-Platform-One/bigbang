@@ -26,7 +26,7 @@ Before configuring Big Bang, it is expected that you have already setup:
 - A [SOPS key pair](encryption.md)
 - A Git repository to hold your configuration
   - Pull credentials for the Git repository (if not public)
-- An Iron Bank robot account for production, or a non-robot account for testing. Reference [Iron Bank authentication](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/b_troubleshooting.md#iron-bank-authentication) for additional details.
+- An Iron Bank robot account for production, or a non-robot account for testing. Reference [Iron Bank authentication](./troubleshooting.md#iron-bank-authentication) for additional details.
 - Certificates specific to your environment (if needed)
 
 ## Minimum Viable Configuration

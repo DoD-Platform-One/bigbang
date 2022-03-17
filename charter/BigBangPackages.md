@@ -2,7 +2,7 @@
 
 Each Big Bang Package is present in the [Big Bang Package](https://repo1.dso.mil/platform-one/big-bang/apps) repository and broken up into several sub-groupings.
 
-Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [here](ApplicationOwners.md).
+Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [here](PackageOwner.md).
 
 [[_TOC_]]
 

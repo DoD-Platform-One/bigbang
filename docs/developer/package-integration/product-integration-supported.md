@@ -26,7 +26,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Make a branch from the BigBang chart repository `master` branch. You can automatically create a branch from the Repo1 Gitlab issue. Or, in some cases you might manually create the branch. Name the branch with your issue number. For example, if your issue number is `9999` then your branch name can be `9999-my-description`. It is best practice to make branch names short and simple.
 
-1. Make sure the files described in this [document](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/developer/package-integration/package-integration-flux.md) have been generated in `chart/templates/<your-package-name>` directory
+1. Make sure the files described in this [document](./package-integration-flux.md) have been generated in `chart/templates/<your-package-name>` directory
 
 1. More details about secret-*.yaml: The secret template is where the code for secrets go. Typically you will see secrets for imagePullSecret, sso, database, and possibly object storage. These secrets are a BigBang chart enhancement. They are created conditionally based on what the user enables in the config. For example if the app supports SSO and will need a Certificate Authority supplied to trust the connection to the IdP there should be a `secret-ca.yaml` template to populate a secret with the `sso.certificate_authority` value in the application namespace.
 
