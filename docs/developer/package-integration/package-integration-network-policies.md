@@ -63,7 +63,7 @@ spec:
 
 ### Was Something Important Blocked? <a name="something-important-blocked"></a>
 There are a few ways to determine if a network policy is blocking egress or ingress to or from a pod.
-- Test things from the pod's perspective using ssh/exec. See [this portion](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/guides/deployment_scenarios/sso_quickstart.md#step-18-update-inner-cluster-dns-on-the-workload-cluster) of the keycloak quickstart for an example of how do to that.
+- Test things from the pod's perspective using ssh/exec. See [this portion](../../guides/deployment_scenarios/sso_quickstart.md#step-18-update-inner-cluster-dns-on-the-workload-cluster) of the keycloak quickstart for an example of how do to that.
 - Curl a pod's IP from another pod to see if network polices are blocking that traffic. Use `kubectl pod -o wide -n <podNamespace>` to see pod IP addresses.
 - Check the pod logs (or curl from one container to the service) for a `context deadline exceeded` or `connection refused` message.
 

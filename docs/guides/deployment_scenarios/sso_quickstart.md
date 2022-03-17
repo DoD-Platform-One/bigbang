@@ -35,10 +35,10 @@ Why 2 VMs? 2 reasons:
 * This quick start assumes you have kubectl installed on your Administrator Workstation
 
 ### Additional Auth Service and Keycloak documentation can be found in these locations
-* <https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice>
-* <https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/charter/packages/authservice/Architecture.md>
-* <https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak>
-* <https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/charter/packages/keycloak/Architecture.md>
+* [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
+* [Authservice Architecture](../../../charter/packages/authservice/Architecture.md)
+* [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)
+* [Keycloak Architecture](../../../charter/packages/keycloak/Architecture.md)
 
 ## Step 1: Provision 2 Virtual Machines
 

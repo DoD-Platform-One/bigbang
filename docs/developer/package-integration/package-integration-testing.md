@@ -11,7 +11,7 @@ Usually, Helm charts come with a set of Helm tests that can be run to test the d
 
 ## Prerequisites
 
-- Package helm chart with CI settings pointing to one of bigbang's [package pipelines](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/ci-integration-doc/docs/developer/package-integration/package-integration-pipeline.md)
+- Package helm chart with CI settings pointing to one of bigbang's [package pipelines](./package-integration-pipeline.md)
 
 ## Integration
 
