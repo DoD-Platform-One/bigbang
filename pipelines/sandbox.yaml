@@ -98,7 +98,10 @@ clean install:
     ## Create final images.txt: Remove items from the dependencies list from the full-list.
     # Remove rancher upstream images. The k3d cluster will inject images for various purposes like load balancers, PVCs, etc.
     # If we don't explicitly filter those out there's the potential that they sneak in
-    - package_images
+    - image_list_creation
+    # Install and wait for pos-install packages
+    - post_install_packages
+    - post_install_wait
     # Run package helm tests
     - package_test
     # Run tests for API deprecations in cluster
@@ -147,6 +150,9 @@ upgrade:
     # Install and wait for package
     - package_install
     - package_wait
+    # Install and wait for pos-install packages
+    - post_install_packages
+    - post_install_wait
     # Run package helm tests
     - package_test
     - echo "Upgrading ${CI_PROJECT_NAME} to ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
@@ -161,6 +167,9 @@ upgrade:
     # Upgrade and wait for Package
     - package_install
     - package_wait
+    # Install and wait for pos-install packages
+    - post_install_packages
+    - post_install_wait
     # Re-run package helm tests
     - package_upgrade_test
     - cluster_deprecation_check
