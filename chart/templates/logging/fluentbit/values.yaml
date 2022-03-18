@@ -26,6 +26,7 @@ extraVolumes:
 extraVolumeMounts:
   - mountPath: /var/log/flb-storage/
     name: flb-storage
+    readOnly: false
   - mountPath: /etc/elasticsearch/certs/
     name: elasticsearch-certs
 {{- end }}
