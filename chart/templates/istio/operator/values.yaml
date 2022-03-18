@@ -5,6 +5,7 @@
 {{- define "bigbang.defaults.istiooperator" -}}
 createNamespace: false
 
+enterprise: {{ .Values.istio.enterprise }}
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 imagePullSecrets:
