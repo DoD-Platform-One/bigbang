@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: master
+    ref: more-bug-fixes
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: master
-  DEBUG_ENABLED: "true"
+  PIPELINE_REPO_BRANCH: more-bug-fixes
+  DEBUG_ENABLED: "false"
