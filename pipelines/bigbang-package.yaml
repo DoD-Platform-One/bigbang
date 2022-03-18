@@ -20,6 +20,7 @@ stages:
   - 🤞 package tests
   - 📦 package
   - 🚀 release
+  - 🏷️ tag
 
 variables:
   PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
@@ -251,6 +252,28 @@ release:
   script:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - package_release
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+auto tag:
+  stage: 🏷️ tag
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # run tag stage on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - get_chart_version
+    - create_tag
+  allow_failure:
+    exit_codes:
+      - 201
   retry:
     max: 2
     when:
