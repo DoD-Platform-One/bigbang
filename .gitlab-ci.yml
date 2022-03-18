@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: 2.3.3
+    ref: master
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 2.3.3
+  PIPELINE_REPO_BRANCH: master
   DEBUG_ENABLED: "true"
