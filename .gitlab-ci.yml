@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: master
+    ref: automate-tag
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: master
+  PIPELINE_REPO_BRANCH: automate-tag
   DEBUG_ENABLED: "true"
