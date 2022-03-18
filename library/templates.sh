@@ -967,6 +967,34 @@ package_release() {
    echo -e "\e[0Ksection_end:`date +%s`:release\r\e[0K"
 }
 
+get_chart_version() {
+   # change to target branch and check if Chart.yaml or Changelog missing. If so, check source.
+   echo -e "\e[0Ksection_start:`date +%s`:get_chart_version[collapsed=true]\r\e[0KGetting Chart Version"
+   if [ ! -f "chart/Chart.yaml" ]; then
+     echo -e "\e[31mFAIL: Package must have chart/Chart.yaml\e[0m"
+     exit 1
+   else
+     CHART_VERSION=$(yq e '.version' chart/Chart.yaml)
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:get_chart_version\r\e[0K"
+}
+
+create_tag() {
+   echo -e "\e[0Ksection_start:`date +%s`:create_tag[collapsed=true]\r\e[0KCreating Tag"
+   echo "Running tag create comand"
+   tag_output=$(curl --request POST --header "PRIVATE-TOKEN: ${TOKEN_TAG}" "https://repo1.dso.mil/api/v4/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${CHART_VERSION}&ref=${CI_DEFAULT_BRANCH}")
+   if [[ $(echo $tag_output | jq -r '.name') == "${CHART_VERSION}" ]]; then
+     exit 0
+   elif [[ $(echo $tag_output | jq -r '.message') =~ "already exists" ]]; then
+     echo -e "\e[31mNOTICE: Tag Exists. If this change does not require a new package release this is OK. Otherwise this needs to be looked at further\e[0m"
+     exit 201
+   else
+     echo -e "\e[31mFAILED: Tag Not Created: \e[0m"
+     echo $tag_output
+     exit 1
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
+}
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Re-Usable Functions

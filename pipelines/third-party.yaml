@@ -19,6 +19,7 @@ stages:
   - ⚙️ configuration validation
   - 🤞 package tests
   - 🤝 integration test
+  - 🏷️ tag
 
 variables:
   BB_VERSION: "latest"
@@ -234,6 +235,28 @@ integration:
     when: always
   allow_failure:
     exit_codes: 123
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+auto tag:
+  stage: 🏷️ tag
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # run tag stage on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - get_chart_version
+    - create_tag
+  allow_failure:
+    exit_codes:
+      - 201
   retry:
     max: 2
     when:
