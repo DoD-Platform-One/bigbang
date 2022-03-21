@@ -81,6 +81,9 @@ jaeger:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
   values:
+    istio:
+      jaeger:
+        enabled: true
     bbtests:
       enabled: true
       cypress:
@@ -457,22 +460,11 @@ loki:
 
 tempo:
   enabled: false
-  resources:
-    limits:
-      cpu: 200m
-      memory: 128Mi
-    requests:
-      cpu: 200m
-      memory: 128Mi
-
-  persistence:
-    enabled: true
-    # storageClassName: local-path
-    accessModes:
-      - ReadWriteOnce
-    size: 5Gi
-
-  tempoQuery:
+  values:
+    istio:
+      tempoQuery:
+        hosts:
+          - "tempo.{{ .Values.domain }}"
     resources:
       limits:
         cpu: 200m
@@ -481,14 +473,30 @@ tempo:
         cpu: 200m
         memory: 128Mi
 
-  opentelemetryCollector:
-    resources:
-      limits:
-        cpu: 200m
-        memory: 128Mi
-      requests:
-        cpu: 200m
-        memory: 128Mi
+    persistence:
+      enabled: true
+      # storageClassName: local-path
+      accessModes:
+        - ReadWriteOnce
+      size: 5Gi
+
+    tempoQuery:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+        requests:
+          cpu: 200m
+          memory: 128Mi
+
+    opentelemetryCollector:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+        requests:
+          cpu: 200m
+          memory: 128Mi
 
 monitoring:
   enabled: true

@@ -132,6 +132,12 @@ PLATFORM ONE LOGGING WARNING:
   After the beta period, only one logging stack will be supported at one time, with the PLG stack becoming the default supported stack.
 {{- end }}
 
+{{- if and $.Values.jaeger.enabled .Values.tempo.enabled }}
+PLATFORM ONE TRACING WARNING:
+  You have enabled both Jaeger and Tempo Tracing Engines.  This is permitted during beta testing of Tempo.
+  After the beta period, only one Tracing engine will be supported at one time, with Tempo becoming the default supported engine over a direct Jaeger installation. Tempo will deploy with Tempo-Query, a Jaeger frontend with Tempo as the backend.
+{{- end }}
+
 {{- if $.Values.addons.mattermost.enabled }}
 Mattermost is enabled.
 {{- with .Values.addons.mattermost.database }}

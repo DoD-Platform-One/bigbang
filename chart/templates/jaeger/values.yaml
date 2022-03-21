@@ -17,6 +17,7 @@ domain: {{ $domainName }}
 istio:
   enabled: {{ .Values.istio.enabled }}
   jaeger:
+    enabled: {{ .Values.istio.enabled }}
     gateways:
     - istio-system/{{ default "public" .Values.jaeger.ingress.gateway }}
 
