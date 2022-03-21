@@ -847,10 +847,10 @@ addons:
       # -- Name of AWS IAM profile to use.
       # -- If using an AWS IAM profile, the accessKey and accessSecret values must be left as empty strings eg: ""
       iamProfile: ""
-      
+
     redis:
       # -- Redis plain text password to connect to the redis server.  If empty (""), the gitlab charts will create the gitlab-redis-secret
-      # with a random password.  
+      # with a random password.
       # -- This needs to be set to a non-empty value in order for the Grafana Redis Datasource and Dashboards to be installed.
       password: ""
 
@@ -1032,7 +1032,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.15.0-bb.10"
+      tag: "1.17.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
