@@ -1,5 +1,9 @@
 # Guides
 
+## backups-and-migrations
+
+Guides on handling backups/migrations using Velero for specific Big Bang packages.
+
 ## deployment_scenarios
 
 Beginner friendly how to guides are intended to be added to these subfolders over time.

@@ -163,7 +163,7 @@ Big Bang will automatically create a secret with the TLS key and cert provided f
 
 ### Virtual Services
 
-Virtual services use full URL host and path information to route incoming traffic to a Service.  Each package in Big Bang manages its own Virtual Services since the paths and ports vary for each package.  However, in order to receive traffic at the Virtual Service, it must be connected to a Gateway.  In Big Bang we configure this under each package.  The followng is an example of this configuration that matches the architecture diagram above.
+Virtual services use full URL host and path information to route incoming traffic to a Service.  Each package in Big Bang manages its own Virtual Services since the paths and ports vary for each package.  However, in order to receive traffic at the Virtual Service, it must be connected to a Gateway.  In Big Bang we configure this under each package.  The following is an example of this configuration that matches the architecture diagram above.
 
 ```yaml
 monitoring:
