@@ -1,4 +1,6 @@
-# ImagePullPolicy at Big Bang Level
+# ImagePullPolicy for Big Bang
+
+## Setting ImagePullPolicy at the Big Bang Level
 
 Big Bang is currently working to standardize the adoption of a global image pull policy so that customers can set a single value and have it passed to all packages.
 
@@ -6,7 +8,7 @@ The global image pull policy has been adopted in Big Bang for the core packages 
 
 We have also documented the package overrides required if you want to set a single package/pod with a different pull policy than the global.
 
-# ImagePullPolicy per Package
+## Setting ImagePullPolicy per Package
 
 | Package | Default | Value Override |
 |---|---|---|
@@ -16,7 +18,7 @@ We have also documented the package overrides required if you want to set a sing
 | Kiali | `IfNotPresent` | <pre lang="yaml">kiali:<br>  values:<br>    image:<br>      pullPolicy: IfNotPresent<br>    cr:<br>      spec:<br>        deployment:<br>          image_pull_policy: IfNotPresent</pre> |
 | Cluster Auditor | `Always` | <pre lang="yaml">clusterAuditor:<br>  values:<br>    image:<br>      imagePullPolicy: IfNotPresent</pre> |
 | OPA Gatekeeper | `IfNotPresent` | <pre lang="yaml">gatekeeper:<br>  values:<br>    postInstall:<br>      labelNamespace:<br>        image:<br>          pullPolicy: IfNotPresent<br>    postUpgrade:<br>      cleanupCRD:<br>        image:<br>          pullPolicy: IfNotPresent<br>    image:<br>      pullPolicy: IfNotPresent</pre> |
-| Kyverno  | `IfNotPresent` | <pre lang="yaml">addons:<br>  kyverno:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      initImage:<br>        pullPolicy: IfNotPresent</pre> | 
+| Kyverno  | `IfNotPresent` | <pre lang="yaml">addons:<br>  kyverno:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      initImage:<br>        pullPolicy: IfNotPresent</pre> |
 | Elasticsearch / Kibana | `IfNotPresent` | <pre lang="yaml">logging:<br>  values:<br>    imagePullPolicy: IfNotPresent</pre> |
 | ECK Operator | `IfNotPresent` | <pre lang="yaml">eckoperator:<br>  values:<br>    image:<br>      pullPolicy: IfNotPresent</pre> |
 | Fluentbit | `Always` | <pre lang="yaml">fluentbit:<br>  values:<br>    image:<br>      pullPolicy: IfNotPresent</pre> |
