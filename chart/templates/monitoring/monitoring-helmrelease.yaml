@@ -38,7 +38,7 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.addons.vault.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -50,6 +50,10 @@ spec:
   {{- end }}
   {{- if .Values.kyvernopolicies.enabled }}
     - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.addons.vault.enabled }}
+    - name: vault
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- end }}

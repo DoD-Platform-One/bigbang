@@ -88,19 +88,32 @@ prometheus:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or .Values.monitoring.sso.enabled $istioInjection }}
+    {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled }}
     podMetadata:
-      {{- if .Values.monitoring.sso.enabled }}
-      {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-      {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+      {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) }}
       labels:
+        {{- if .Values.monitoring.sso.enabled }}
+        {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+        {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
         {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
+        {{- end }}
+        {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
+        vault-ingress: "true"
+        {{- end }}
       {{- end }}
-      {{- if $istioInjection }}
+      {{- if or $istioInjection .Values.addons.vault.enabled }}
       annotations:
+        {{- if $istioInjection }}
         {{ include "istioAnnotation" . }}
+        {{- end }}
+        {{- if .Values.addons.vault.enabled }}
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject-token: "true"      
+        vault.hashicorp.com/role: "prometheus"
+        {{- end }}
       {{- end }}
-    {{- end }}
+    {{- end }}        
 
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
@@ -115,6 +128,9 @@ loki:
 redis:
   enabled: true
 {{- end }} 
+
+vault:
+  enabled: {{ .Values.addons.vault.enabled }}
 
 global:
   imagePullSecrets:
@@ -250,12 +266,12 @@ grafana:
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
 
-  {{- if or .Values.loki.enabled .Values.addons.gitlabRunner.enabled $redisDatasource }}
+  {{- if or .Values.loki.enabled .Values.addons.gitlabRunner.enabled $redisDatasource .Values.addons.vault.enabled }}
   plugins:
   {{- if $redisDatasource }}
     - redis-datasource
   {{- end }}
-  {{- if .Values.loki.enabled }}
+  {{- if or .Values.loki.enabled .Values.addons.vault.enabled }}
     - grafana-piechart-panel
   {{- end }}
   {{- if .Values.addons.gitlabRunner.enabled }}
