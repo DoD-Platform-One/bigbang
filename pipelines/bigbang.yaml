@@ -72,6 +72,7 @@ pre vars:
   script:
     # Create the TF_VAR_env variable
     - pre_vars
+    - check_changes
     - label_check
 
   artifacts:

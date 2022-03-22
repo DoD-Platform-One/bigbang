@@ -1,5 +1,5 @@
 #!/bin/sh
-# 
+#
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Shell environment settings for verbosity and debugging
@@ -70,17 +70,129 @@ wait_daemonset(){
 # Bigbang Functions
 #
 #-----------------------------------------------------------------------------------------------------------------------
+check_changes() {
+   echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
+   
+   ## Array of addon packages
+   CHECK_PACKAGES=($(yq e '(.*.git | select(. != null) | (path | .[-2]), .addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}"))
+
+   ## Array of templates
+   TEMPLATES=($(find chart/templates -type d | cut -b 17-))
+
+   ## Collect package configurations on the target (master) branch
+   git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+   mkdir -p target-branch/values
+   mkdir -p target-branch/templates
+   cp -R chart/templates/* target-branch/templates
+   for package in "${CHECK_PACKAGES[@]}"; do
+        # Save all top-level package configs to their own file
+        if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+              yq e ".$package" "${VALUES_FILE}" > target-branch/values/$package.yaml
+        # Save all package configs in .addons to their own file
+        elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+              yq e ".addons.$package" "${VALUES_FILE}" > target-branch/values/$package.yaml
+        fi 
+   done
+
+   ## Collect package configurations on the source branch
+   git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+   mkdir -p source-branch/values
+   mkdir -p source-branch/templates
+   cp -R chart/templates/* source-branch/templates
+   for package in "${CHECK_PACKAGES[@]}"; do
+        # Save all top-level package configs to their own file
+        if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+              yq e ".$package" "${VALUES_FILE}" > source-branch/values/$package.yaml
+        # Save all package configs in .addons to their own file
+        elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+              yq e ".addons.$package" "${VALUES_FILE}" > source-branch/values/$package.yaml
+        fi 
+   done
+  
+   ## Check for package changes in chart/values.yaml
+   for package in "${CHECK_PACKAGES[@]}"; do
+        if [[ $(diff target-branch/values/$package.yaml source-branch/values/$package.yaml) ]]; then
+              CHANGED_PACKAGES+=("$package")
+        fi
+   done
+
+   ## Check for package changes in chart/templates
+   for package in "${TEMPLATES[@]}"; do
+        if [[ $(diff -r target-branch/templates/$package source-branch/templates/$package) ]]; then
+              # Rename packages in chart/templates to match chart/values.yaml and handle subdirectories
+              if [[ "$package" == "gitlab-runner" ]]; then
+                      package="gitlabRunner"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "nexus-repository-manager" ]]; then
+                      package="nexus"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "kyverno/policies" ]]; then
+                      package="kyvernopolicies"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "logging/elasticsearch-kibana" ]]; then
+                      package="logging"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "logging/eck-operator" ]]; then
+                      package="eckoperator"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "logging/fluentbit" ]]; then
+                      package="fluentbit"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "logging/loki" ]]; then
+                      package="loki"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "logging/promtail" ]]; then
+                      package="promtail"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "mattermost/mattermost" ]]; then
+                      package="mattermost"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "mattermost/operator" ]]; then
+                      package="mattermostoperator"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "minio/minio" ]]; then
+                      package="minio"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "minio/minio-operator" ]]; then
+                      package="minioOperator"
+                      CHANGED_PACKAGES+=("$package")
+              else
+                      CHANGED_PACKAGES+=("$package")
+              fi 
+        fi
+   done 
+
+   if [[ -z "$CHANGED_PACKAGES" ]]; then
+        echo "✅ No changes have been made to any packages"
+   else
+        echo "✅ Changes have been made to these packages: ${CHANGED_PACKAGES[@]}"
+   fi
+
+   echo -e "\e[0Ksection_end:`date +%s`:check_changes\r\e[0K"
+}
+
 label_check() {
    set -e
    echo -e "\e[0Ksection_start:`date +%s`:label_check[collapsed=true]\r\e[0K\e[33;1mLabel Check\e[37m"
    ## Show current labels
    OLD_IFS=$IFS
    IFS=","
+   LABEL_CHECK_DEPLOY_LABELS+=("${CI_MERGE_REQUEST_LABELS[*]}")
+
+   for package in ${CHANGED_PACKAGES[*]}; do
+      if [[ ! "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "${package}" ]]; then
+         LABEL_CHECK_DEPLOY_LABELS+=("${package}")
+         echo "    Added "${package}"" 
+      else 
+         echo "    "${package}" already enabled"
+      fi
+   done
+
    if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "all-packages" ]]; then
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
-      LABEL_CHECK_DEPLOY_LABELS=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
    else
-      LABEL_CHECK_DEPLOY_LABELS=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
       echo "Initial MR labels: ${LABEL_CHECK_DEPLOY_LABELS[*]} "
       echo "Evaluating package dependencies..."
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermost" ]]; then
@@ -123,6 +235,17 @@ label_check() {
          fi
       fi
    fi
+
+   # Remove empty array elements    
+   NEW=()
+   for i in "${LABEL_CHECK_DEPLOY_LABELS[@]}"; do
+      if [ -z "$i" ]; then
+        continue
+      fi
+      NEW+=("${i}")
+   done
+   LABEL_CHECK_DEPLOY_LABELS=(${NEW[@]})
+
    echo "CI_DEPLOY_LABELS=${LABEL_CHECK_DEPLOY_LABELS[*]}" >> variables.env
    CI_TEMP_OUT=( "${LABEL_CHECK_DEPLOY_LABELS[*]}" )
    IFS=$OLD_IFS

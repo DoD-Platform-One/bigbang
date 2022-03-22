@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.3.6]
+### Added
+- Added `check_changes` function to enable disabled packages in pipeline if any changes are detected 
+
 ## [2.3.5]
 ### Fixed
 - Fixed updates to new function names in sandbox.yaml and third-party.yaml
