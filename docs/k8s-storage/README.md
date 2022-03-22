@@ -30,11 +30,11 @@ Portworx  2.6 | 3016/19.3k. BW: 74.5MiB/s / 85.1MiB/s | 1337.31 |  113MiB/s / 12
 
 [Website/Docs](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
 
-**REQUIREMENTS**
+### Requirements
 
 - Must be using AWS
 
-**Notes**
+### Notes
 
 - Apache License 2.0
 - Very easy to install and use, apply CSI spec and you are ready.
@@ -43,11 +43,11 @@ Portworx  2.6 | 3016/19.3k. BW: 74.5MiB/s / 85.1MiB/s | 1337.31 |  113MiB/s / 12
 
 [Website/Docs](https://docs.microsoft.com/en-us/azure/aks/azure-disk-csi)
 
-**REQUIREMENTS**
+### Requirements
 
 - Must be using Azure
 
-**Notes**
+### Notes
 
 - Apache License 2.0
 - Very easy to install and use, apply CSI spec and you are ready.
@@ -56,11 +56,11 @@ Portworx  2.6 | 3016/19.3k. BW: 74.5MiB/s / 85.1MiB/s | 1337.31 |  113MiB/s / 12
 
 [Website/Docs](https://longhorn.io/)
 
-**REQUIREMENTS**
+### Requirements
 
 - RWX requires `nfs-common` to be installed on the nodes. [Longhorn RWX Docs](https://longhorn.io/docs/1.1.0/advanced-resources/rwx-workloads/)
 
-**Notes**
+### Notes
 
 - Apache License 2.0
 - Easiest to install
@@ -73,12 +73,12 @@ Portworx  2.6 | 3016/19.3k. BW: 74.5MiB/s / 85.1MiB/s | 1337.31 |  113MiB/s / 12
 
 [Website/Docs](https://openebs.io/)
 
-**REQUIREMENTS**
+### Requirements
 
 - Blank and un-partitioned attached disk(s)
 - RWX is in Alpha and requires work. [OpenEBS RWX Docs](https://docs.openebs.io/docs/next/rwm.html)
 
-**Notes**
+### Notes
 
 - Very flexible, supports multiple storage designs.
 
@@ -91,18 +91,17 @@ Low latency, Local PV                                                           
 Low latency, Local PV                                                                         | Disks/SSDs/Cloud Volumes             | Dynamic Local PV - Device
 Low latency, Local PV, Snapshots, Clones                                                      | Disks/SSDs/Cloud Volumes             | OpenEBS Dynamic Local PV - ZFS
 
-
 ## Rook-Ceph
 
 [Website/Docs](https://rook.io/)
 
-**REQUIREMENTS**
+### Requirements
 
 - Blank and un-partitioned attached disk(s)
 
-**Notes**
+### Notes
 
-- Rook - Apache License 2.0. 
+- Rook - Apache License 2.0.
 - Ceph - dual licensed under the LGPL version 2.1 or 3.0
 - Very Fast
 
@@ -110,11 +109,11 @@ Low latency, Local PV, Snapshots, Clones                                        
 
 [Website/Docs](https://docs.portworx.com/portworx-install-with-kubernetes/)
 
-**REQUIREMENTS**
+### Requirements
 
 - Blank and un-partitioned attached disk(s)
 
-**Notes**
+### Notes
 
 - Portworx Essentials is free **up to** 5nodes, 5TB Storage, 500 volumes
 - Portworx Enterprise and PX-Backup require paid licenses
