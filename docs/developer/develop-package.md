@@ -74,14 +74,17 @@ Package is the term we use for an application that has been prepared to be deplo
    CONTRIBUTING.md   <  instructions for how to contribute to the project  
    README.md         <  introduction and high level information  
    ```
+
 1. Create a top-level tests directory and inside put a test-values.yaml file that includes any special values overrides that are needed for CI pipeline testing. Refer to other packages for examples. But this is specific to what is needed for your package.
-   ```
+
+   ```shell
    mkdir tests
    touch test-values.yaml
    ```
 
 1. At a high level, a Package structure should look like this when you are finished  
-   ```text
+
+   ```plaintext
    ├── chart/
       └── templates/
          └── bigbang/
@@ -136,11 +139,13 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
    ```
 
    Create a local directory on your workstation where you store your helm values override files. Don't make test changes in the Package values.yaml because they could accidentally be committed. The most convenient location is in a sibling directory next to the Package repo. Here is an example directory structure:
-   ```text
+
+   ```plaintext
    ├── PackageRepo/
    └── overrides/
          └── override-values.yaml
    ```
+
    Here are the dev test steps you can iterate:
 
    ```shell
@@ -170,7 +175,8 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
 1. After the merge create a git tag following the charter convention of {UpstreamChartVersion}-bb.{BigBangVersion}. The tag should exactly match the chart version in the Chart.yaml.
 example:    1.2.3-bb.0
 
-### Private registry secret creation
+## Private registry secret creation
+
 In some instances you may wish to manually create a private-registry secret in the namespace or during a helm deployment.  There are a couple of ways to do this:
 
 1. The first way is to add the secret manually using kubectl. This method is useful for standalone package testing/development.
@@ -178,9 +184,11 @@ In some instances you may wish to manually create a private-registry secret in t
    ```shell
    kubectl create secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='Username' --docker-password="CLI secret" --docker-email=<your-email> --namespace=<package-namespace>
    ```
+
 2. The second is to create a yaml file containing the secret and apply it during a helm install. This method is applicable when installing your new package as part of the Big Bang chart. In this example the file name is "reg-creds.yaml":
 
 Create the file with the secret contents:
+
    ```yaml
    registryCredentials:
      registry: registry1.dso.mil
@@ -190,6 +198,7 @@ Create the file with the secret contents:
    ```
 
 Then include a reference to your file during your helm install command by adding the below `-f` to your Big Bang install command:
+
    ```shell
    -f reg-creds.yaml
    ```

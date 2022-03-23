@@ -14,17 +14,19 @@ The development environment can be set up in one of two ways:
 
 All package SSO Integrations within BigBang require a `<package>.sso` block within the BigBang [chart values](../../../chart/values.yaml) for your package along with an enabled flag:
 
-```yml
+```yaml
 <package>:
     sso:
       enabled: true
 ```
+
 Based on the authentication protocol implemented by the package being integrated, either Security Access Markup Language (SAML) or OpenID (OIDC), follow the appropriate example below.
 
 #### OIDC
+
 For SSO integration using OIDC, at a minimum this usually requires `sso.client_id` and `sso.client_secret` values under the same block above. We can then reference these values further down in either the template values for your package ([eg: Gitlab](../../../chart/templates/gitlab/values.yaml)) or [Authservice Values template](../../../chart/templates/authservice/values.yaml) if there is no built-in support for OIDC or SAML in the package. Authservice will be discussed in more detail further down.
 
-```yml
+```yaml
 <package>:
     sso:
       enabled: true
@@ -41,15 +43,16 @@ For SSO integration using OIDC, at a minimum this usually requires `sso.client_i
     Example: [ECK Values template](../../../chart/templates/logging/elasticsearch-kibana/values.yaml)
 
 #### SAML
+
 For SSO integration using SAML, review the upstream documentation specific to the package and create the necessary items to passthrough from BigBang to the package values under the `<package>.sso` key. For example, Sonarqube configures SSO settings through `sonarProperties` values, which are collected from defined values under `addons.sonarqube.sso` within BigBang and passed through in the [sonarqube Values template](../../../chart/templates/sonarqube/values.yaml).
 
-
 ### AuthService Integration
-If SSO is not availble on the package to be integrated, Istio AuthService can be used for authentication. For AuthService integration, add `<package>.sso.client_id` and `<package>.sso.client_secret` definitions for the package within `../../chart/values.yaml`. Authservice has `global` settings defined and any values not explicitly set in this file will be inherited from the global values (like `authorization_uri`, `certificate_authority`, `jwks`, etc). Review the example below below of the jaeger specific chain configured within BigBang and passed through to the authservice values.
+
+If SSO is not available on the package to be integrated, Istio AuthService can be used for authentication. For AuthService integration, add `<package>.sso.client_id` and `<package>.sso.client_secret` definitions for the package within `../../chart/values.yaml`. Authservice has `global` settings defined and any values not explicitly set in this file will be inherited from the global values (like `authorization_uri`, `certificate_authority`, `jwks`, etc). Review the example below below of the jaeger specific chain configured within BigBang and passed through to the authservice values.
 
 Example: [Jaeger chain in Authservice template values](../../../chart/templates/authservice/values.yaml)
 
-In order to use Authservice, Istio injection is required and utilized to route all pod traffic through the Istio side car proxy and the associated Authentication and Authorization policies. 
+In order to use Authservice, Istio injection is required and utilized to route all pod traffic through the Istio side car proxy and the associated Authentication and Authorization policies.
 
 1. The first step is to ensure your namespace template where you package is destined is istio injected, and the appropriate label is set in `chart/templates/<package>/namespace.yaml`.
 
@@ -57,7 +60,7 @@ Example: [Jaeger Namespace template](../../../chart/templates/jaeger/namespace.y
 
 1. Next is to make sure the following label is applied to the workload (pod/deployment/replicaset/daemonset/etc) that will be behind the Authservice gate:
 
-```yml
+```yaml
 ...
 {{- $<package>AuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
 {{- $<package>AuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
@@ -72,7 +75,9 @@ This label is set in the Authservice package, and is set to `protect=keycloak` b
 Example: [Jaeger Values template](../../../chart/templates/jaeger/values.yaml)
 
 ## Validation
+
 For validating package integration with Single Sign On (SSO), carry out the following basic steps:
+
 1. Enable the package and SSO within Big Bang through the values added in the sections above
 2. Using an internet browser, browse to your application (e.g. sonarqube.bigbang.dev)
 3. If using built-in SAML/OIDC, click the login button, confirm a redirect to the Identity Provider happens. If using Authservice, confirm a redirect to the Identity Provider happens, prompting user sign in.
@@ -80,4 +85,4 @@ For validating package integration with Single Sign On (SSO), carry out the foll
 5. Successful sign in should return you to the application page
 6. Confirm you are in the expected account within the application and that you are able to use the application
 
-Note: An unsuccessful sign in may result in an `x509` cert issues, `invalid client ID/group/user` error, `JWKS` error, or other issues. 
+Note: An unsuccessful sign in may result in an `x509` cert issues, `invalid client ID/group/user` error, `JWKS` error, or other issues.

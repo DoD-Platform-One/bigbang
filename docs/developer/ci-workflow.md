@@ -1,26 +1,15 @@
-## Gitlab-ci Workflow
+# Gitlab-ci Workflow
 
 The following is meant to serve as an overview of the pipeline stages required to get a commit merged. There are package, bigbang, and infrastructure pipelines.
 
-### Table of Contents:
+[[_TOC_]]
 
-- [Generic Package Pipeline Stages](#generic-package-pipeline-stages)
-  - [Configuration Validation](#configuration-validation)
-  - [Package Tests](#package-tests)
-- [BigBang Pipeline Stages](#bigbang-pipeline-stages)
-  - [Pre Vars](#pre-vars)
-  - [Smoke Tests](#smoke-tests)
-- [Infrastructure Testing Pipeline Stages](#infrastructure-testing-pipeline-stages)
-  - [Network Creation](#network-creation)
-  - [Cluster Creation](#cluster-creation) 
-  - [Big Bang Installation](#big-bang-installation)
-  - [Big Bang Tests](#big-bang-tests)
-  - [Teardown](#teardown)
-### Generic Package Pipeline Stages
+## Generic Package Pipeline Stages
 
-This pipeline is triggered by the following for individual bigbang packages: 
+This pipeline is triggered by the following for individual bigbang packages:
+
 - merge request events
-  -  Note: Currently upgrade step only runs during MR events
+  - Note: Currently upgrade step only runs during MR events
 - manual tag events
 - commits to default branch
 
@@ -28,14 +17,15 @@ This pipeline is triggered by the following for individual bigbang packages:
 
 [Link to draw.io diagram file](diagrams/BB_gitlab_ci_diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
 
-#### Configuration Validation
+### Configuration Validation
 
 This stage runs a `helm conftest` which is a plugin for testing helm charts with Open Policy Agent. It provides the following checks:
 
 - confirms that the helm chart is valid (should fail similar to how a helm lint fails if there is bad yaml, etc)
 - runs the helm chart against a set of rego policies - currently these tests will only raise warnings on "insecure" things and will allow pipeline to proceed.
 
-#### Package Tests
+### Package Tests
+
 This stage verifies several easy to check assumptions such as:
 
 - does package successfully install
@@ -44,11 +34,12 @@ This stage verifies several easy to check assumptions such as:
 
 If required, the upgrade step can skipped when MR title starts with 'SKIP UPGRADE'
 
-### BigBang Pipeline Stages
+## BigBang Pipeline Stages
 
-This pipeline is triggered by the following for individual bigbang packages: 
+This pipeline is triggered by the following for individual bigbang packages:
+
 - merge request events
-  -  Note: Currently upgrade step only runs during MR events
+  - Note: Currently upgrade step only runs during MR events
 - manual tag events
 - commits to default branch
 
@@ -57,10 +48,12 @@ The pipeline is split into several stages:
 ![BB Pipeline](imgs/BB_pipelines.png)
 
 [Link to draw.io diagram file](diagrams/BB_gitlab_ci_diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
-#### Pre Vars
+
+### Pre Vars
 
 This stage currently has one purpose at this point which is to generate a terraform var.
-#### Smoke Tests
+
+### Smoke Tests
 
 For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`](https://k3d.io) that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
 
@@ -71,6 +64,7 @@ This stage verifies several easy to check assumptions such as:
 - are endpoints routable
 
 This stage will fail if:
+
 - script failures
 - gitrepositories status condition != ready
 - expected helm releases are not present
@@ -85,14 +79,15 @@ This stage also serves as a guide for local development, and care is taken to en
 
 This stage is ran on every merge request event, and is a requirement for merging.
 
-### Infrastructure Testing Pipeline Stages
+## Infrastructure Testing Pipeline Stages
 
 Ultimately, BigBang is designed to deploy production ready workloads on real infrastructure.  While local and ephemeral clusters are excellent for fast feedback during development, changes must ultimately be tested on real clusters on real infrastructure.
 
 As part of BigBang's [charter](https://repo1.dso.mil/platform-one/big-bang/charter), it is expected work on any CNCF conformant kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
-This requires adding `test-ci::infra` label to your MR. In addition, infrastructure testing pipeline is run nightly on a schedule. 
+This requires adding `test-ci::infra` label to your MR. In addition, infrastructure testing pipeline is run nightly on a schedule.
 
-Note: Due to the amount of resources and time required for this pipeline, the `test-ci::infra` label should be used sparringly. The scheduled nightly run will ideally catch issues if they are already in master. The `test-ci::infra` label should mainly be used when:
+Note: Due to the amount of resources and time required for this pipeline, the `test-ci::infra` label should be used sparingly. The scheduled nightly run will ideally catch issues if they are already in master. The `test-ci::infra` label should mainly be used when:
+
 - your changes affect the infra ci
 - your changes are large in scope and likely to behave differently on "real" clusters
 
@@ -107,13 +102,14 @@ More information on the full set of infrastructure tests are below:
 ![Infra Pipeline](imgs/Infra_test_pipelines.png)
 
 [Link to draw.io diagram file](diagrams/BB_gitlab_ci_diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
-#### Network Creation
+
+### Network Creation
 
 For each cloud, a BigBang owned network will be created that conform with the appropriate set of tests about to be ran.  For example, to validate that Big Bang deploys in a connected environment on AWS, a VPC, subnets, route tables, etc... are created, and the outputs are made available through terraform's remote `data` source.
 
 At this time the infrastructure testing pipeline is only utilizing internet-connect AWS govcloud.
 
-#### Cluster Creation
+### Cluster Creation
 
 The infrastructure pipeline is currently setup to standup an `rke2` cluster by default.
 
@@ -121,13 +117,13 @@ An `rke2` cluster is created that leverages the upstream [terraform modules](htt
 
 It is a hard requirement at this stage that every cluster outputs an admin scoped `kubeconfig` as a gitlab ci artifact.  This artifact will be leveraged in the following stages for interacting with the created cluster.
 
-#### Big Bang Installation
+### Big Bang Installation
 
 Given the kubeconfig created in the previous stage, BigBang is installed on the cluster using the same installation process used in the smoke tests.
 
 Like any BigBang installation, several cluster requirements (see [Pre-requisites](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/guides/prerequisites)) must be met before BigBang is installed, and it is up to the vendor to ensure those requirements are met.
 
-#### Big Bang Tests
+### Big Bang Tests
 
 Assuming BigBang has installed successfully, additional tests residing within the `./tests` folder of this repository are run against the deployed cluster.
 
@@ -137,7 +133,7 @@ Currently there are 3 test scripts that test the following:
 - curl VirtualService endpoints, to validate istio works + the UIs are up
 - fetch a list of non-IB images (this test never fails but provides some contextual info)
 
-#### Teardown
+### Teardown
 
 Infrastructure teardown happens in the reverse sequence as to which they are deployed, and the pipeline will ensure these teardown jobs are _always_ ran, regardless of whether or not the previous jobs were successful.
 
