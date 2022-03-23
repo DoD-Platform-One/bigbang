@@ -80,7 +80,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Create an overrrides directory as a sibling directory next to the bigbang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake and create a local overrides directory. One option is to copy the tests/ci/k3d/values.yaml to make the override-values.yaml and make modifications. The file structure is like this:
 
-    ```text
+    ```plaintext
     ├── bigbang/
     └── overrides/
         ├── override-values.yaml

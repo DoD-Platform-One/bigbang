@@ -81,7 +81,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       Example:
 
-      ```text
+      ```plaintext
       * @gitlabuser
       ```
 

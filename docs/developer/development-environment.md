@@ -8,7 +8,7 @@ It is not recommend to run k3d with BigBang on your local computer. Instead use 
 
 There is a script in the [/docs/developer/scripts/](./scripts/) directory that automates the creation and teardown of a development environment. There is a video tutorial in the PlatformOne IL2 Confluence. Search for "T3" and click the link to the page. The video is #57 on 22-February-2022.
 
-The manual steps included below are no longer maintained. The manual steps are only included for historical reference as a study guide to understand how the script works. The script is the singular focus for development environments. 
+The manual steps included below are no longer maintained. The manual steps are only included for historical reference as a study guide to understand how the script works. The script is the singular focus for development environments.
 
 ## Prerequisites
 
@@ -81,7 +81,7 @@ ssh -i ~/.ssh/your-ec2.pem ubuntu@$EC2_PUBLIC_IP
 # Remove any old Docker items
 sudo apt remove docker docker-engine docker.io containerd runc
 
-# Install all pre-reqs for Docker
+# Install all prerequisites for Docker
 sudo apt update
 sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
@@ -227,7 +227,8 @@ gatekeeper:
 ```
 
 **Note2:** The information in this note is simply to give you awareness in advance. You should create local directory on your workstation where you store your helm values override files. Development changes made in the code for testing could accidentally be committed. That is why you should create a separate local directory to hold your override values for testing. The location can be anywhere on your workstation but it is most convenient to place them in a sibling directory next to the BigBang repos. Below is an example directory structure. The directory names are fake (for example only). Other documents will give more specific detail as needed.
-  ```text
+
+  ```plaintext
   ├── BigBangCodeRepo/
   └── overrides/
       ├── override-values-1.yaml
@@ -307,125 +308,145 @@ k3d cluster create \
     --port 443:443@loadbalancer \
     --api-port 6443
 ```
-  - This will create a K3D cluster just like before, except we need to ensure the built in "servicelb" add-on is disabled so we can use metallb.
 
-2. Find the Subnet for your k3d cluster's Docker network
+- This will create a K3D cluster just like before, except we need to ensure the built in "servicelb" add-on is disabled so we can use metallb.
 
-```shell
-docker network inspect k3d-k3s-default | jq .[0].IPAM.Config[0]
-```
+1. Find the Subnet for your k3d cluster's Docker network
 
-  - k3d-k3s-default is the name of the default bridge network k3d creates when creating a k3d cluster.
-  - We need the "Subnet": value to populate the correct addresses in the ConfigMap below.
-  - If my output looks like:
-  ```json
-  {
-    "Subnet": "172.18.0.0/16",
-    "Gateway": "172.18.0.1"
-  }
-  ```
-  - Then the addresses I want to input for metallb would be `172.18.1.240-172.18.1.243` so that I can reserve 4 IP addresses within the subnet of the Docker Network.
-
-3. Before installing BigBang we will need to install and configure [metallb](https://metallb.universe.tf/concepts/)
-
-```shell
-kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
-kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
-cat << EOF > metallb-config.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - 172.18.1.240-172.18.1.243
-EOF
-kubectl create -f metallb-config.yaml
-```
-
-  - The commands will create a metallb install and configure it to assign LoadBalancer IPs within the range `172.18.1.240-172.18.1.243` which is within the standard Docker Bridge Network CIDR meaning that the linux network stack will have a route to this network already.
-
-4. Deploy BigBang with istio ingress gateways configured.
-
-5. Verify LoadBalancers
-
-```shell
-kubectl get svc -n istio-system
-```
-
-  - You should see a result like:
-```
-NAME                         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                                                      AGE
-istiod                       ClusterIP      10.43.59.25    <none>         15010/TCP,15012/TCP,443/TCP,15014/TCP                        151m
-private-ingressgateway       LoadBalancer   10.43.221.12   172.18.1.240   15021:31000/TCP,80:31001/TCP,443:31002/TCP,15443:31003/TCP   150m
-public-ingressgateway        LoadBalancer   10.43.35.202   172.18.1.241   15021:30000/TCP,80:30001/TCP,443:30002/TCP,15443:30003/TCP   150m
-passthrough-ingressgateway   LoadBalancer   10.43.173.31   172.18.1.242   15021:32000/TCP,80:32001/TCP,443:32002/TCP,15443:32003/TCP   119m
-```
-
-  - With the key information here being the assigned `EXTERNAL-IP` sections for the ingressgateways.
-
-6. Update Hosts file on ec2 instance with IPs above
-
-```shell
-sudo vim /etc/hosts
-```
-
-  - Update it with similar entries:
-    - Applications with the following values (eg for Jaeger):
-    ```yaml
-    jaeger:
-      ingress:
-        gateway: "" #(Defaults to public-ingressgateway)
+    ```shell
+    docker network inspect k3d-k3s-default | jq .[0].IPAM.Config[0]
     ```
-    We will need to set to the EXTERNAL-IP of the public-ingressgateway
-    ```
-    172.18.1.241 jaeger.bigbang.dev
-    ```
-    - Applications with the following values (eg for Logging):
-    ```yaml
-    logging:
-      ingress:
-        gateway: "private"
-    ```
-    We will need to set to the EXTERNAL-IP of the private-ingressgateway
-    ```
-    172.18.1.240 kibana.bigbang.dev
-    ```
-    - Keycloak will need to be set to the External-IP of the passthrough-ingressgateway
-    ```
-    172.18.1.242 keycloak.bigbang.dev
-    ```
-  - With these DNS settings in place you will now be able to reach the external *.bigbang.dev URLs from this EC2 instance.
 
-  - To reach outside the EC2 instance use either SSH or SSHUTTLE commands to specify a local port for Dynamic application-level port forwarding (ssh -D). Example
-      ```shell
-      sshuttle --dns -vr ubuntu@$EC2_PRIVATE_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your.pem -D 127.0.0.1:12345'
-      ```
-   - and utilize Firefox's built in SOCKS proxy configuration to route DNS and web traffic through the application-level port forward from the SSH command.
-      1. Open Firefox browser
-      1. Click on hamburger menu in upper right corner and select ```Settings```
-      1. At the bottom of ```Settings``` page in the ```Network Settings``` section select ```Settings```
-      1. Select ```Manual proxy configuration``` and the following values
-          ```
-          SOCKS Host:  localhost
-          Port:  12345
-          ```
-          and select SOCKS v5
-      1. Select ```Proxy DNS when using SOCKS v5```
+    - k3d-k3s-default is the name of the default bridge network k3d creates when creating a k3d cluster.
+    - We need the "Subnet": value to populate the correct addresses in the ConfigMap below.
+    - If my output looks like:
 
-7. To be able to test SSO between BigBang Package apps and your own Keycloak instance deployed in the same cluster you will need to take some extra steps. For SSO OIDC to work the app pod from within the cluster must be able to reach ```keycloak.bigbang.dev```. When using a development k3d environment with the development TLS cert the public DNS for ```keycloak.bigbang.dev``` points to localhost IP 127.0.0.1. This means that from within pod containers your Keycloak deployment can't be found. Therefore the SSO will fail. The development hack to fix this is situation is to edit the cluster coredns configmap and add a NodeHosts entry for Keycloak. 
+    ```json
+    {
+      "Subnet": "172.18.0.0/16",
+      "Gateway": "172.18.0.1"
+    }
+    ```
+
+    - Then the addresses I want to input for metallb would be `172.18.1.240-172.18.1.243` so that I can reserve 4 IP addresses within the subnet of the Docker Network.
+
+1. Before installing BigBang we will need to install and configure [metallb](https://metallb.universe.tf/concepts/)
+
+    ```shell
+    kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+    kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+    cat << EOF > metallb-config.yaml
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      namespace: metallb-system
+      name: config
+    data:
+      config: |
+        address-pools:
+        - name: default
+          protocol: layer2
+          addresses:
+          - 172.18.1.240-172.18.1.243
+    EOF
+    kubectl create -f metallb-config.yaml
+    ```
+
+    - The commands will create a metallb install and configure it to assign LoadBalancer IPs within the range `172.18.1.240-172.18.1.243` which is within the standard Docker Bridge Network CIDR meaning that the linux network stack will have a route to this network already.
+
+1. Deploy BigBang with istio ingress gateways configured.
+
+1. Verify LoadBalancers
+
+    ```shell
+    kubectl get svc -n istio-system
+    ```
+
+    - You should see a result like:
+
+    ```console
+    NAME                         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                                                      AGE
+    istiod                       ClusterIP      10.43.59.25    <none>         15010/TCP,15012/TCP,443/TCP,15014/TCP                        151m
+    private-ingressgateway       LoadBalancer   10.43.221.12   172.18.1.240   15021:31000/TCP,80:31001/TCP,443:31002/TCP,15443:31003/TCP   150m
+    public-ingressgateway        LoadBalancer   10.43.35.202   172.18.1.241   15021:30000/TCP,80:30001/TCP,443:30002/TCP,15443:30003/TCP   150m
+    passthrough-ingressgateway   LoadBalancer   10.43.173.31   172.18.1.242   15021:32000/TCP,80:32001/TCP,443:32002/TCP,15443:32003/TCP   119m
+    ```
+
+    - With the key information here being the assigned `EXTERNAL-IP` sections for the ingressgateways.
+
+1. Update Hosts file on ec2 instance with IPs above
+
+    ```shell
+    sudo vim /etc/hosts
+    ```
+
+    - Update it with similar entries:
+      - Applications with the following values (eg for Jaeger):
+
+        ```yaml
+        jaeger:
+          ingress:
+            gateway: "" #(Defaults to public-ingressgateway)
+        ```
+
+        We will need to set to the EXTERNAL-IP of the public-ingressgateway
+
+        ```plaintext
+        172.18.1.241 jaeger.bigbang.dev
+        ```
+
+      - Applications with the following values (eg for Logging):
+
+        ```yaml
+        logging:
+          ingress:
+            gateway: "private"
+        ```
+
+        We will need to set to the EXTERNAL-IP of the private-ingressgateway
+
+        ```plaintext
+        172.18.1.240 kibana.bigbang.dev
+        ```
+
+      - Keycloak will need to be set to the External-IP of the passthrough-ingressgateway
+
+        ```plaintext
+        172.18.1.242 keycloak.bigbang.dev
+        ```
+
+    - With these DNS settings in place you will now be able to reach the external *.bigbang.dev URLs from this EC2 instance.
+
+    - To reach outside the EC2 instance use either SSH or SSHUTTLE commands to specify a local port for Dynamic application-level port forwarding (ssh -D). Example
+
+        ```shell
+        sshuttle --dns -vr ubuntu@$EC2_PRIVATE_IP 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/your.pem -D 127.0.0.1:12345'
+        ```
+
+    - and utilize Firefox's built in SOCKS proxy configuration to route DNS and web traffic through the application-level port forward from the SSH command.
+          1. Open Firefox browser
+          1. Click on hamburger menu in upper right corner and select ```Settings```
+          1. At the bottom of ```Settings``` page in the ```Network Settings``` section select ```Settings```
+          1. Select ```Manual proxy configuration``` and the following values
+
+        ```plaintext
+        SOCKS Host:  localhost
+        Port:  12345
+        ```
+
+        and select SOCKS v5
+          1. Select ```Proxy DNS when using SOCKS v5```
+
+1. To be able to test SSO between BigBang Package apps and your own Keycloak instance deployed in the same cluster you will need to take some extra steps. For SSO OIDC to work the app pod from within the cluster must be able to reach ```keycloak.bigbang.dev```. When using a development k3d environment with the development TLS cert the public DNS for ```keycloak.bigbang.dev``` points to localhost IP 127.0.0.1. This means that from within pod containers your Keycloak deployment can't be found. Therefore the SSO will fail. The development hack to fix this is situation is to edit the cluster coredns configmap and add a NodeHosts entry for Keycloak.
     - Edit the coredns configmap
 
-      ```
+      ```shell
       kubectl edit configmap/coredns -n kube-system
       ```
+
     - add NodeHosts entry for Keycloak using using the passthrough-ingressgateway service EXTERNAL-IP
-      ```
+
+      ```yaml
       data:
         NodeHosts: |
           172.18.0.2 k3d-k3s-default-server-0
@@ -434,10 +455,13 @@ sudo vim /etc/hosts
           172.18.0.5 k3d-k3s-default-agent-2
           172.18.1.242 keycloak.bigbang.dev
       ```
+
     - Restart the coredns pod so it can pick up the new config
-      ```
+
+      ```console
       kubectl rollout restart deployment coredns -n kube-system
       ```
+
     - You might also need to restart the Package app pods before they can detect the new coredns config
     - Deploy Keycloak using the example dev config values ```docs/developer/example_configs/keycloak-dev-values.yaml```
 
@@ -467,7 +491,6 @@ sudo wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh 
 ```
 
 ### Setting an imagePullSecret on the cluster with k3d
-
 
 **_This methodology is not recommended_**
 It is possible to set your image pull secret on the cluster so that you don't have to put your credentials in the code or in the command line in later steps
