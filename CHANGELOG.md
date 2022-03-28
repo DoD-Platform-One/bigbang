@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.3.7]
+### Added
+- Added label and commit message filter for "disable-ci" to disable pipelines on MR
+
 ## [2.3.6]
 ### Added
 - Added `check_changes` function to enable disabled packages in pipeline if any changes are detected 
