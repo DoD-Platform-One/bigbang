@@ -15,6 +15,9 @@ workflow:
     # skip pipeline for MRs with docs label
     - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
       when: never
+    # skip pipeline for MRs with disable-ci label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)disable-ci(,|$)/
+      when: never
     # run pipeline for manual tag events such as a new release
     - if: $CI_COMMIT_TAG
     # run pipeline on merge request events
