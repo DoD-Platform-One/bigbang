@@ -76,6 +76,9 @@ minio:
   secretKey: {{ .secretKey | default "BigBangDEVONLY" }}
   imagePullSecrets:
     - name: private-registry
+  tenants:
+    metrics:
+      enabled: {{ $.Values.monitoring.enabled }}
 {{- end }}
 {{- end }}
 

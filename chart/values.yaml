@@ -553,7 +553,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "33.2.0-bb.1"
+    tag: "33.2.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -731,7 +731,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "4.4.10-bb.0"
+      tag: "4.4.10-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
@@ -1135,7 +1135,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
       path: "./chart"
-      tag: "0.7.0-bb.0"
+      tag: "0.7.0-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux: {}

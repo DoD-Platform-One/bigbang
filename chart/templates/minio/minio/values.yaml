@@ -48,6 +48,7 @@ tenants:
   secrets:
     accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
     secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
-
-
+  {{- if .Values.monitoring.enabled }}
+  prometheusOperator: true
+  {{- end }}    
 {{- end -}}
