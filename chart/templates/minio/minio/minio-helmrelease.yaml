@@ -36,4 +36,8 @@ spec:
   dependsOn:
     - name: minio-operator
       namespace: {{ .Release.Namespace }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}      
 {{- end }}

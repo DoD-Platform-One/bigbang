@@ -14,6 +14,18 @@ imagePullSecrets:
 operator:
   image:
     pullPolicy: {{ .Values.imagePullPolicy}}
+
+  {{- if .Values.monitoring.enabled }}
+  env:
+    - name: MINIO_OPERATOR_TLS_ENABLE
+      value: "on"
+    - name: CLUSTER_DOMAIN
+      value: "cluster.local"
+    - name: WATCHED_NAMESPACE
+      value: ""
+    - name: PROMETHEUS_NAMESPACE
+      value: "monitoring"
+  {{- end }}    
     
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
