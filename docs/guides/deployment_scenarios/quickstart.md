@@ -396,7 +396,8 @@ k3d-k3s-default-server-0   Ready  control-plane,master   11m   v1.21.3+k3s1
 
 1. Here we continue to follow the DevOps best practice of enabling early left-shifted feedback whenever possible; Before adding credentials to a configuration file and not finding out there is an issue until after we see an ImagePullBackOff error during deployment, we will do a quick left-shifted verification of the credentials.
 
-    1. Look up your IronBank image pull credentials
+1. Look up your IronBank image pull credentials
+
     1. In a web browser go to [https://registry1.dso.mil](https://registry1.dso.mil)
     1. Login via OIDC provider
     1. In the top right of the page, click your name, and then User Profile
@@ -483,81 +484,81 @@ EOF
 cat << EOF > ~/demo_values.yaml
 logging:
   values:
-  kibana:
-    count: 1
-    resources:
-    requests:
-      cpu: 400m
-      memory: 1Gi
-    limits:
-      cpu: null  # nonexistent cpu limit results in faster spin up
-      memory: null
-  elasticsearch:
-    master:
-    count: 1
-    resources:
-      requests:
-      cpu: 400m
-      memory: 2Gi
-      limits:
-      cpu: null
-      memory: null
-    data:
-    count: 1
-    resources:
-      requests:
-      cpu: 400m
-      memory: 2Gi
-      limits:
-      cpu: null
-      memory: null
+    kibana:
+      count: 1
+      resources:
+        requests:
+          cpu: 400m
+          memory: 1Gi
+        limits:
+          cpu: null  # nonexistent cpu limit results in faster spin up
+          memory: null
+    elasticsearch:
+      master:
+        count: 1
+        resources:
+          requests:
+            cpu: 400m
+            memory: 2Gi
+          limits:
+            cpu: null
+            memory: null
+      data:
+        count: 1
+        resources:
+          requests:
+            cpu: 400m
+            memory: 2Gi
+          limits:
+            cpu: null
+            memory: null
 
 clusterAuditor:
   values:
-  resources:
-    requests:
-    cpu: 400m
-    memory: 2Gi
-    limits:
-    cpu: null
-    memory: null
+    resources:
+      requests:
+        cpu: 400m
+        memory: 2Gi
+      limits:
+        cpu: null
+        memory: null
 
 gatekeeper:
   enabled: false
   values:
-  replicas: 1
-  controllerManager:
-    resources:
-    requests:
-      cpu: 100m
-      memory: 512Mi
-    limits:
-      cpu: null
-      memory: null
-  audit:
-    resources:
-    requests:
-      cpu: 400m
-      memory: 768Mi
-    limits:
-      cpu: null
-      memory: null
-  violations:
-    allowedDockerRegistries:
-    enforcementAction: dryrun
+    replicas: 1
+    controllerManager:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: null
+          memory: null
+    audit:
+      resources:
+        requests:
+          cpu: 400m
+          memory: 768Mi
+        limits:
+          cpu: null
+          memory: null
+    violations:
+      allowedDockerRegistries:
+        enforcementAction: dryrun
 
 istio:
   values:
-  values: # possible values found here https://istio.io/v1.5/docs/reference/config/installation-options (ignore 1.5, latest docs point here)
-    global: # global istio operator values
-    proxy: # mutating webhook injected istio sidecar proxy's values
-      resources:
-      requests:
-        cpu: 0m # null get ignored if used here
-        memory: 0Mi
-      limits:
-        cpu: 0m
-        memory: 0Mi
+    values: # possible values found here https://istio.io/v1.5/docs/reference/config/installation-options (ignore 1.5, latest docs point here)
+      global: # global istio operator values
+        proxy: # mutating webhook injected istio sidecar proxy's values
+          resources:
+            requests:
+              cpu: 0m # null get ignored if used here
+              memory: 0Mi
+            limits:
+              cpu: 0m
+              memory: 0Mi
 
 twistlock:
   enabled: false # twistlock requires a license to work, so we're disabling it
@@ -715,7 +716,7 @@ It should make sense that the following is a valid edit
 cat << EOF > ~/tinkering.yaml
 addons:
   argocd:
-  enabled: true
+    enabled: true
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
