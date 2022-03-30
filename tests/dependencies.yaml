@@ -1,4 +1,4 @@
 kyverno:
   git:
-    repo: "https://repo1.dsop.io/platform-one/big-bang/apps/sandbox/kyverno.git"
-  namespace: "kyverno-policies"
+    repo: "https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git"
+  namespace: "kyverno"
