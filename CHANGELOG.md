@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.8] - 2022-03-29
+
+### Changed
+
+- Removed 1.22 deprecated API versions from test to support pipeline update to 1.23
+
 ## [1.0.0-bb.7] - 2022-03-03
 
 ### Changed
