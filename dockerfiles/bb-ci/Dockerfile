@@ -44,7 +44,7 @@ ADD https://download.docker.com/linux/centos/docker-ce.repo /etc/yum.repos.d/doc
 
 RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python3 diffutils
 
-RUN pip3 install boto3==1.21.14 requests==2.27.1 urllib3==1.26.5
+RUN pip3 install boto3==1.21.14 requests==2.27.1 urllib3==1.26.5 jsonschema==4.0.0
 
 # Install Conftest
 

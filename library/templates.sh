@@ -814,6 +814,23 @@ package_deprecation_check() {
    echo -e "\e[0Ksection_end:`date +%s`:package_deprecation_check\r\e[0K"
 }
 
+package_oscal_validate() {
+   if [[ -f "oscal-component.yaml" ]]; then
+   echo -e "\e[0Ksection_start:`date +%s`:package_oscal_validate[collapsed=true]\r\e[0KPackage OSCAL validation check"
+   echo -n "oscal-component.yaml found, validating... "
+   cat oscal-component.yaml |\
+       yq eval -o=json |\
+       jsonschema ${PIPELINE_REPO_DESTINATION}/oscal/oscal_component_schema.json || jsec=$?
+   if [[ ${jsec:=0} -eq 0 ]]; then
+       echo "OK"
+   else
+       echo "oscal component check failed, jsonschema exit code: $jsec"
+       exit 4
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:package_oscal_validate\r\e[0K"
+   fi
+}
+
 changelog_format_check() {
   firstLine=1
   hasAtLeastOneVersion=0

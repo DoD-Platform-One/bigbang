@@ -55,12 +55,15 @@ configuration validation:
     - global_policy_tests
     # Package specific tests
     - package_policy_tests
+    # OSCAL component validation
+    - package_oscal_validate
     # Package API Deprecation Check
     - package_deprecation_check
   allow_failure:
     exit_codes:
       - 2
       - 3
+      - 4
   retry:
     max: 2
     when:

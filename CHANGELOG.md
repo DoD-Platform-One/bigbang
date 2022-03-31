@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.3.9]
+### Added
+- Added `package_oscal_validate` function to validate an oscal-component.yaml against a spec file in oscal/oscal_component_schema.json
+
 ## [2.3.8]
 ### Added
 - Added change owner to cypress directories
