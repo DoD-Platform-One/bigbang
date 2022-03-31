@@ -1,0 +1,18 @@
+apiVersion: kpt.dev/v1
+kind: Kptfile
+metadata:
+  name: oscal
+upstream:
+  type: git
+  git:
+    repo: https://github.com/usnistgov/OSCAL
+    directory: /json/schema
+    ref: main
+  updateStrategy: resource-merge
+upstreamLock:
+  type: git
+  git:
+    repo: https://github.com/usnistgov/OSCAL
+    directory: /json/schema
+    ref: main
+    commit: bfcd0082bd4c08e16c7d5f5515adc5c858e8308e
