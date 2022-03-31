@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.0]
+### Changed
+- Updated k3d to 5.4.1
+- Updated image in k3d config to k3s v1.23.4-k3s1
+- Added gateway config to docker network setup (gateway must be set for k3d to start up)
+
 ## [2.3.9]
 ### Added
 - Added `package_oscal_validate` function to validate an oscal-component.yaml against a spec file in oscal/oscal_component_schema.json
