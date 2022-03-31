@@ -1,7 +1,7 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.3.0
+# @Version bb-ci:2.4.0
 #
 # docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
 # docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
@@ -91,12 +91,12 @@ ADD https://github.com/goabout/kustomize-sopssecretgenerator/releases/download/v
 RUN chmod +x /usr/local/bin/SopsSecretGenerator
 
 # Install K3d
-ENV K3D_VERSION='5.2.2'
+ENV K3D_VERSION='5.4.1'
 ADD https://github.com/rancher/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
 RUN chmod +x /usr/local/bin/k3d
 
 # Install kubectl
-ENV KUBECTL_VERSION='1.22.7'
+ENV KUBECTL_VERSION='1.23.4'
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
