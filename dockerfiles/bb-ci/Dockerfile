@@ -1,7 +1,7 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.4.0
+# @Version bb-ci:2.4.1
 #
 # docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
 # docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
