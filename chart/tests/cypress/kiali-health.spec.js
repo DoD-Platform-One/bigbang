@@ -6,7 +6,7 @@ describe('Kiali Test', function() {
   // Basic test that validates pages are accessible, basic error check
   it('Check Kiali is accessible', function() {
     cy.visit(Cypress.env('url'))
-    cy.title().should("eq", "Kiali");
+    cy.title().should('contain', 'Kiali')
     cy.get('#Graph', { timeout: 15000 }).click();
     cy.get('#Applications', { timeout: 15000 }).click();
     // Check for generic errors (this is the red circle that appears if any connectivity with Promtheus/Grafana/Istio is not working)
