@@ -18,4 +18,5 @@ spec:
           name: tempo
     ports:
     - port: 9411
+    - port: 16686
 {{- end }}
