@@ -2,6 +2,10 @@
 
 ---
 
+## [37.3.0-bb.2] - 2022-03-30
+### Added
+- Added Tempo Zipkin Egress Policy
+
 ## [37.3.0-bb.1] - 2022-02-17
 ### Removed
 - Removed duplicate ingress block from values.yaml
