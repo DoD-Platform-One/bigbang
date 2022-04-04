@@ -20,7 +20,7 @@ spec:
   ports:
     - port: {{ .Values.nexus.nexusPort }}
       protocol: TCP
-      name: nexus-ui
+      name: http-nexus-ui
   selector:
     {{- include "nexus.selectorLabels" . | nindent 4 }}
     {{- if .Values.nexus.extraSelectorLabels }}
