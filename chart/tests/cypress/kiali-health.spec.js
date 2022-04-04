@@ -3,12 +3,14 @@ describe('Kiali Test', function() {
     return false
   })
 
-  // Basic test that validates pages are accessible, no data validation
+  // Basic test that validates pages are accessible, basic error check
   it('Check Kiali is accessible', function() {
     cy.visit(Cypress.env('url'))
     cy.title().should("eq", "Kiali");
     cy.get('#Graph', { timeout: 15000 }).click();
     cy.get('#Applications', { timeout: 15000 }).click();
+    // Check for generic errors (this is the red circle that appears if any connectivity with Promtheus/Grafana/Istio is not working)
+    cy.get('svg[fill="var(--pf-global--danger-color--100)"]').should('not.exist');
   })
 
   // Allow these tests to be skipped with an env variable
@@ -29,9 +31,9 @@ describe('Kiali Test', function() {
       cy.visit(Cypress.env('url'))
       cy.title().should("eq", "Kiali");
       cy.get('#Applications', { timeout: 15000 }).click();
-      cy.get('button[id="namespace-selector"').click()
+      cy.get('button[id="namespace-selector"]').click()
       cy.get('input[type="checkbox"][value="monitoring"]').click()
-      cy.get('button[id="refresh_button"').click()
+      cy.get('button[id="refresh_button"]').click()
       // This gets us to the prometheus application
       cy.get(':nth-child(2) > :nth-child(2) > .virtualitem_definition_link', { timeout: 15000 }).click()
       // Validate the graph is visible
@@ -41,8 +43,9 @@ describe('Kiali Test', function() {
       cy.get('#pf-tab-3-basic-tabs').click()
       // Load the tracing tab
       cy.get('#pf-tab-4-basic-tabs').click()
-      // Validate that the chart exists - if it doesn't there could be a connection issue with Jaeger
-      cy.get('.pf-c-chart > [role="img"]', { timeout: 15000 }).should("be.visible")
+      // Validate that error is not displayed
+      // NOTE: we don't check for actual traces because there can be delays in them displaying on the webpage
+      cy.contains('Error fetching traces').should("not.exist")
     })
   }
 })

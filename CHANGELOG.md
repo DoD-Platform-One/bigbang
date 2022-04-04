@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.47.0-bb.3] - 2022-04-01
+### Changed
+- Modified Cypress test to validate no errors appear on traces tab and check for generic errors
+
 ## [1.47.0-bb.2] - 2022-03-24
 ### Added
 - Added Tempo Zipkin Egress Policy 
