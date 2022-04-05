@@ -332,7 +332,7 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "1.4.0-bb.0"
+    tag: "1.4.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -418,7 +418,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.7.0-bb.0"
+    tag: "0.7.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -458,7 +458,7 @@ eckoperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
-    tag: "2.0.0-bb.0"
+    tag: "2.0.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
@@ -472,7 +472,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.19.20-bb.1"
+    tag: "0.19.20-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -507,7 +507,7 @@ loki:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
     path: "./chart"
-    tag: "2.10.1-bb.2"
+    tag: "2.10.1-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -553,7 +553,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "33.2.0-bb.2"
+    tag: "33.2.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -614,7 +614,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.4.0-bb.1"
+    tag: "0.5.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -639,7 +639,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "4.2.3-bb.0"
+      tag: "4.2.3-bb.1"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -714,7 +714,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
-      tag: "4.4.10-bb.1"
+      tag: "4.4.12-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
@@ -731,7 +731,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "4.4.10-bb.1"
+      tag: "4.4.12-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
@@ -883,7 +883,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
       path: "./chart"
-      tag: "37.3.0-bb.1"
+      tag: "37.3.0-bb.2"
 
     # -- Base64 encoded license file.
     license_key: ""
@@ -1032,7 +1032,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
-      tag: "1.17.1-bb.1"
+      tag: "1.17.1-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1234,7 +1234,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
       path: "./chart"
-      tag: "2.29.0-bb.0"
+      tag: "2.29.0-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -1308,7 +1308,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
       path: "./chart"
-      tag: "0.19.0-bb.5"
+      tag: "0.19.0-bb.6"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
