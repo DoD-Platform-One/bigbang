@@ -329,6 +329,8 @@ aws/rke2/bigbang up:
       artifacts: true
     - job: pre vars
       artifacts: true
+  variables:
+    CI_VALUES_OVERRIDES_FILE: tests/rke2-test-values.yaml
   script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config

@@ -387,7 +387,7 @@ clone_bigbang_and_merge_templates() {
    fi
    cp -r ../bigbang/templates/* ./chart/templates/
    PIPELINE_REPO_DESTINATION="../pipeline-repo"
-   yq eval-all 'select(fileIndex == 0) * select(filename == "../bigbang/values.yaml")' ${CI_VALUES_FILE} ../bigbang/values.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE}
+   yq eval-all 'select(fileIndex == 0) * select(filename == "../bigbang/values.yaml")' ${CI_VALUES_FILE} ../bigbang/values.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE} 
    echo -e "\e[0Ksection_end:`date +%s`:clone_and_checkout_bigbang\r\e[0K"
 }
 
