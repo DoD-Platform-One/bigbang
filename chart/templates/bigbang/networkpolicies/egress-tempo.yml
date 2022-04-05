@@ -15,7 +15,7 @@ spec:
           app.kubernetes.io/name: tempo
       podSelector:
         matchLabels:
-          name: tempo
+          app.kubernetes.io/name: tempo
     ports:
     - port: 9411
     - port: 16686
