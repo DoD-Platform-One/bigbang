@@ -99,6 +99,30 @@ policies:
           # values from a readOnly projected volume holding secrets/configmap items, into the shared
           # volume.  The shared volume is mounted with subpaths pointing to specific files in the container.
           - gitlab-migrations*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `registry` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-registry*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitlab-exporter` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitlab-exporter*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitlab-shell` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitlab-shell*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitaly` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitaly*
       {{- end }}
   {{- end }}
 
