@@ -527,12 +527,18 @@ package_install() {
   if ! kubectl get secret -n ${PACKAGE_NAMESPACE} private-registry 2> /dev/null; then
     kubectl create -n ${PACKAGE_NAMESPACE} secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username="${REGISTRY1_USER}" --docker-password="${REGISTRY1_PASSWORD}"
   fi
+  if [[ $DISABLE_HELM_UPGRADE_WAIT =~ ("true"|"1") ]]; then
+    echo "DISABLE_HELM_UPGRADE_WAIT has been set to true, not passing the --wait argument to helm"
+    helmarg=""
+  else
+    helmarg="--wait"
+  fi
   if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using ${CI_PROJECT_NAME}/tests/test-values.yaml for values"
-    helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
+    helm upgrade -i ${helmarg} --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} -f tests/test-values.y*ml --set istio.enabled=false
   else
     echo "Helm installing ${CI_PROJECT_NAME}/chart into ${PACKAGE_NAMESPACE} namespace using default values"
-    helm upgrade -i --wait --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
+    helm upgrade -i ${helmarg} --timeout 600s ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set istio.enabled=false
   fi
   echo -e "\e[0Ksection_end:`date +%s`:package_install\r\e[0K"
 }
