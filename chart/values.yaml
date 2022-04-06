@@ -296,7 +296,7 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.47.0-bb.3"
+    tag: "1.47.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -527,7 +527,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "0.14.2-bb.0"
+    tag: "0.14.2-bb.1"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
