@@ -415,9 +415,12 @@ aws/rke2/bigbang down:
   script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
-    - helm un -n bigbang bigbang
-    # TODO: Smarter wait
-    - sleep 180
+    # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
+    # Allow failure here since Istio might not be up
+    - kubectl delete hr istio -n bigbang --wait || true
+    # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
+    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
+    - helm uninstall -n bigbang bigbang --wait --timeout 5m0s
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
