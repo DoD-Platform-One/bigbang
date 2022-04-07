@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.5]
+### Added
+- Added conditional that checks if a Big Bang version has been specified in a package repo's `test-values.yaml` file
+
 ## [2.4.4]
 ### Changed
 - Modified bb down for RKE2 pipeline - uninstall istio first to clean up ELBs, then helm uninstall with wait

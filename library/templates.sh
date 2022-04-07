@@ -382,6 +382,8 @@ clone_bigbang_and_merge_templates() {
    cd ${BB_REPO_DESTINATION}
    if [[ $BB_VERSION != "latest" ]]; then
      git checkout ${BB_VERSION}
+   elif [[ $(yq e '. | has("bb-version")' ../tests/test-values.yaml) == "true" ]]; then 
+     git checkout $(yq e '.bb-version' ../tests/test-values.yaml)
    else
      git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
    fi
