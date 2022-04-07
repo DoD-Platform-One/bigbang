@@ -1011,7 +1011,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
       path: "./chart"
-      tag: "1.1.2-bb.3"
+      tag: "1.12.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the HAProxy Package
     flux: {}
