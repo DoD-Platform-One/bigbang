@@ -221,7 +221,7 @@ label_check() {
       fi
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlabRunner"(,|$) ]]; then
          echo "  Checking gitlabRunner"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "gitlab" ]]; then
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlab"(,|$) ]]; then
             echo "    gitlab already enabled"
          else 
             LABEL_CHECK_DEPLOY_LABELS+=("gitlab")
