@@ -219,6 +219,15 @@ label_check() {
             echo "    Added minioOperator"
          fi
       fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlabRunner"(,|$) ]]; then
+         echo "  Checking gitlabRunner"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "gitlab" ]]; then
+            echo "    gitlab already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("gitlab")
+            echo "    Added gitlab"
+         fi
+      fi
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "velero" ]]; then
          echo "  Checking velero"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
