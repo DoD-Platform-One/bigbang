@@ -310,7 +310,7 @@ bigbang_additional_images() {
         continue
       fi
       if curl -f "${repourl%.git}/-/raw/${version}/tests/images.txt?inline=false" 1>${package}.images.txt 2>/dev/null; then
-        cat ${package}.images.txt >> images.txt
+        cat ${package}.images.txt | sed -e '$a\' >> images.txt
       fi
     done
     sort -u -o images.txt images.txt
