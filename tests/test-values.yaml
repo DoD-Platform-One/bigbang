@@ -471,13 +471,14 @@ tempo:
       tempoQuery:
         hosts:
           - "tempo.{{ .Values.domain }}"
-    resources:
-      limits:
-        cpu: 200m
-        memory: 128Mi
-      requests:
-        cpu: 200m
-        memory: 128Mi
+    tempo:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 128Mi
+        requests:
+          cpu: 200m
+          memory: 128Mi
 
     persistence:
       enabled: true
@@ -1254,6 +1255,9 @@ addons:
       server:
         dataStorage:
           enabled: true
+          size: 256Mi
+        auditStorage:
+          size: 256Mi
       injector:
         affinity: |
           podAntiAffinity:
@@ -1266,7 +1270,6 @@ addons:
                       app.kubernetes.io/instance: "{{ .Release.Name }}"
                       component: webhook
                   topologyKey: kubernetes.io/hostname
-
       bbtests:
         enabled: true
         cypress:
