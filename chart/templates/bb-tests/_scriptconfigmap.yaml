@@ -1,0 +1,32 @@
+{{- define "gluon.tests.script-configmap.base" }}
+{{- if .Values.bbtests }}
+{{- if and .Values.bbtests.scripts .Values.bbtests.enabled }}
+{{- if .Values.bbtests.scripts.image }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-script-config"
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-weight": "-5"
+    sidecar.istio.io/inject: "false"
+  labels:
+    helm-test: enabled
+  namespace: {{ .Release.Namespace }}
+data:
+  {{ (.Files.Glob "tests/scripts/*").AsConfig | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "gluon.tests.script-configmap.overrides" }}
+{{- $values := (first .) }}
+{{- if $values.Values.bbtests }}
+{{- if and $values.Values.bbtests.scripts $values.Values.bbtests.enabled }}
+{{- if $values.Values.bbtests.scripts.image }}
+{{- include "gluon.util.merge" (append . "gluon.tests.script-configmap.base") }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
