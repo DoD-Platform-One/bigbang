@@ -39,17 +39,13 @@ variable "ssh_authorized_keys" {
 
 variable "download" {
   type    = bool
-  default = false
+  default = true
   description = "Toggle dependency downloading"
 }
 
 #
 # Server variables
 #
-variable "server_ami" {
-  # RHEL 8.3 RKE2 v1.20.7+rke2r2 STIG: https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-image-builder
-  default = "ami-04fc9486a0c1633cb"
-}
 variable "server_instance_type" {
   default = "m5a.2xlarge"
 }
@@ -57,16 +53,16 @@ variable "servers" {
   default = 1
 }
 variable "rke2_version" {
-  default = "v1.20.5+rke2r1"
+  default = "v1.23.5+rke2r1"
+}
+
+variable "iam_instance_profile" {
+  default = "InstanceOpsRole"
 }
 
 #
 # Generic agent variables
 #
-variable "agent_ami" {
-  # RHEL 8.3 RKE2 v1.20.7+rke2r2 STIG: https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-image-builder
-  default = "ami-04fc9486a0c1633cb"
-}
 variable "agent_instance_type" {
   default = "m5a.4xlarge"
 }

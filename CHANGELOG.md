@@ -3,6 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.9]
+### Changed
+- Updated RKE2 CI to 1.23.5, includes a number of other changes to make things work
+  - Remove pinning of AWS TF provider (no longer needed on newer RKE2 TF)
+  - Add to userdata: iptables rules (needed for RKE2 on stig'd image) and mount the extra volume for ephemeral storage
+  - Use latest AMI for CIS STIG instead of pre-built RHEL + download/install RKE2 (no longer assume pre-baked in)
+  - Update RKE2 TF to latest upstream, update RKE2 version to latest 1.23.x
+  - Set InstanceOpsRole IAM profile for nodes (required for provisioning EBS PVCs)
+  - Apply AWS EBS CSI provisioner as required by Kubernetes 1.23.x
+- Fix a logging issue that could prevent debug output in certain scenarios
+
 ## [2.4.8]
 ### Fixed
 - Fixed missing gitlab runner label check for real
