@@ -69,10 +69,10 @@ patches:
               resources:
                 limits:
                   cpu: 500m
-                  memory: 750Mi
+                  memory: 1Gi
                 requests:
                   cpu: 500m
-                  memory: 750Mi
+                  memory: 1Gi
   - target:
       kind: Deployment
       name: kustomize-controller
