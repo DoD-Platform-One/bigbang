@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.10]
+### Added
+- Auto-tagging added to helm pipeline for Gluon
+
 ## [2.4.9]
 ### Changed
 - Updated RKE2 CI to 1.23.5, includes a number of other changes to make things work

@@ -3,13 +3,44 @@ include:
   - local: '/library/templates.yaml'
 
 stages:
-  - helm
+  - 🏷️ tag
+  - ☸️ helm
+
+variables:
+  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO_DESTINATION: "../pipeline-repo"
+  PIPELINE_REPO_BRANCH: master
 
 # ----------------------------------------------------------------------------------------------
-# oci-helm-library
+# chart-tag
+# ----------------------------------------------------------------------------------------------
+auto tag:
+  stage: 🏷️ tag
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # run tag stage on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - get_chart_version
+    - create_tag
+  allow_failure:
+    exit_codes:
+      - 201
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+# ----------------------------------------------------------------------------------------------
+# oci-helm-publish
 # ----------------------------------------------------------------------------------------------
 helm library release:
-  stage: helm
+  stage: ☸️ helm
   extends:
     - .util-image
   tags:
@@ -38,3 +69,9 @@ helm library release:
     - echo ${CI_REGISTRY_PASSWORD} | helm registry login ${CI_REGISTRY_IMAGE} -u ${CI_REGISTRY_USER} --password-stdin
     # Push to the repo registry
     - helm push ${CHART_NAME}-${CHART_VERSION}.tgz oci://${CI_REGISTRY_IMAGE}
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
