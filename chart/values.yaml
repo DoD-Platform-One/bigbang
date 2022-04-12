@@ -1,16 +1,20 @@
-# Repo and image tag 
 image:
+  # -- Default image pull policy
   imagePullPolicy: IfNotPresent
+  # -- Full image name
   repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
+  # -- Image tag
   tag: v1.17.0
 
-#Mattermost operator desired replicas
 replicas:
+  # -- Mattermost operator desired replicas
   count: 1
 
+# -- Image pull secrets
 imagePullSecrets:
 - name: private-registry
 
+# -- Resources for operator pod(s)
 resources:
   requests:
     memory: 512Mi
@@ -19,6 +23,7 @@ resources:
     memory: 512Mi
     cpu: 100m
 
+# -- Affinity for operator pod(s)
 affinity: {}
   # podAntiAffinity:
   #   requiredDuringSchedulingIgnoredDuringExecution:
@@ -35,27 +40,39 @@ affinity: {}
   #         values:
   #         - "operator"
 
+# -- Node selector for operator pod(s)
 nodeSelector: {}
   # node-type: operator
 
+# -- Tolerations for operator pod(s)
 tolerations: {}
 #- key: "key1"
 #  operator: "Equal"
 #  value: "value1"
 #  effect: "NoSchedule"
 
+# -- Annotations for operator pod(s)
 podAnnotations: {}
 #e.g. bigbang.dev/istioVersion: 1.10.3
 
 networkPolicies:
+  # -- Toggle on/off Big Bang provided network policies
   enabled: false
-  # See `kubectl cluster-info` and then resolve to IP
+  # -- See `kubectl cluster-info` and then resolve to IP
   controlPlaneCidr: 0.0.0.0/0
 
 istio:
+  # -- Toggle on/off istio interaction, used for network policies and mTLS
   enabled: false
+  # -- Default peer authentication
+  mtls:
+    # -- STRICT = Allow only mutual TLS traffic,
+    # PERMISSIVE = Allow both plain text and mutual TLS traffic
+    mode: STRICT
 
 monitoring:
+  # -- Toggle on/off monitoring interaction, used for network policies
   enabled: false
 
+# -- Openshift feature toggle, used for DNS network policy
 openshift: false
