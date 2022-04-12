@@ -1,8 +1,3 @@
-provider "aws" {
-  region = "us-gov-west-1"
-  version = "3.74.1"
-}
-
 terraform {
   backend "s3" {
     bucket               = "umbrella-tf-states"

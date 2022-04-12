@@ -1269,7 +1269,7 @@ get_log_dump(){
       pod=$(echo "$line" | awk '{print $2}')
       mkdir -p "pod_logs/$namespace"
       kubectl -n "$namespace" logs --all-containers=true --prefix=true --previous=true --ignore-errors=true "$pod" > "pod_logs/$namespace/$pod.txt"
-      kubectl -n "$namespace" logs --all-containers=true --prefix=true "$pod" >> "pod_logs/$namespace/$pod.txt"
+      kubectl -n "$namespace" logs --all-containers=true --prefix=true --ignore-errors=true "$pod" >> "pod_logs/$namespace/$pod.txt"
   done
   echo -e "\e[0Ksection_end:`date +%s`:log_dump\r\e[0K"
 }  

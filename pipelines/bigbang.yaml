@@ -334,7 +334,8 @@ aws/rke2/bigbang up:
   script:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
-    # Deploy a default storage class for aws
+    # Deploy CSI/Storage Class for AWS EBS
+    - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.5"
     - kubectl apply -f ${PIPELINE_REPO_DESTINATION}/clusters/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
     - deploy_bigbang
   environment:
