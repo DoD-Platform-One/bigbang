@@ -78,4 +78,11 @@ networkPolicies:
     {{- $gateway := default "public" .Values.jaeger.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+webhookCertGen:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  cleanupProxy:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
 {{- end -}}
