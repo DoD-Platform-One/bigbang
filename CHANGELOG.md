@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.47.0-bb.5] - 2022-04-13
+### Changed
+- Added a document on how to login to Kiali with the default token setup
+- Fixed OSCAL schema validation issues
+
 ## [1.47.0-bb.4] - 2022-04-04
 ### Changed
 - Changed network policy to allow egress traffic to tempo for tracing on port 16686
