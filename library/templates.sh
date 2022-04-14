@@ -818,15 +818,12 @@ package_policy_tests() {
 
 package_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0KPackage API Deprecation Check"
-   helm template ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set monitoring.enabled=true --set istio.enabled=true --set networkPolicies.enabled=true -f tests/test-values.y*ml | pluto detect -owide - && export EXIT_CODE=$? || export EXIT_CODE=$?
-   if [[ ${EXIT_CODE} -eq 2 ]]; then
+   API_EXIT_CODE=0
+   helm template ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set monitoring.enabled=true --set istio.enabled=true --set networkPolicies.enabled=true -f tests/test-values.y*ml | pluto detect -owide - && export API_EXIT_CODE=$? || export API_EXIT_CODE=$?
+   if [[ ${API_EXIT_CODE} -eq 2 ]]; then
      echo -e "\e[31mNOTICE: A deprecated apiVersion has been found.\e[0m"
-     exit ${EXIT_CODE}
-   elif [[ ${EXIT_CODE} -eq 3 ]]; then
+   elif [[ ${API_EXIT_CODE} -eq 3 ]]; then
      echo -e "\e[31mNOTICE: A removed apiVersion has been found.\e[0m"
-     exit ${EXIT_CODE}
-   else
-     exit ${EXIT_CODE}
    fi
    echo -e "\e[0Ksection_end:`date +%s`:package_deprecation_check\r\e[0K"
 }
@@ -834,15 +831,15 @@ package_deprecation_check() {
 package_oscal_validate() {
    if [[ -f "oscal-component.yaml" ]]; then
    echo -e "\e[0Ksection_start:`date +%s`:package_oscal_validate[collapsed=true]\r\e[0KPackage OSCAL validation check"
+   OSCAL_EXIT_CODE=0
    echo -n "oscal-component.yaml found, validating... "
-   cat oscal-component.yaml |\
-       yq eval -o=json |\
-       jsonschema ${PIPELINE_REPO_DESTINATION}/oscal/oscal_component_schema.json || jsec=$?
-   if [[ ${jsec:=0} -eq 0 ]]; then
-       echo "OK"
+   yq eval oscal-component.yaml -o=json > tmp_oscal-component.json
+   jsonschema -i tmp_oscal-component.json ${PIPELINE_REPO_DESTINATION}/oscal/oscal_component_schema.json -o pretty || export OSCAL_EXIT_CODE=$?
+   if [[ ${OSCAL_EXIT_CODE} -ne 0 ]]; then
+     echo "OSCAL is not valid."
+     OSCAL_EXIT_CODE=4
    else
-       echo "oscal component check failed, jsonschema exit code: $jsec"
-       exit 4
+     echo "OSCAL is valid."
    fi
    echo -e "\e[0Ksection_end:`date +%s`:package_oscal_validate\r\e[0K"
    fi
