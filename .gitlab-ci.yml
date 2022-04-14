@@ -1,8 +1,8 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: auto_create_mr
+    ref: master
     file: '/pipelines/bigbang-package.yaml' 
 
 variables:
-  PIPELINE_REPO_BRANCH: auto_create_mr 
+  PIPELINE_REPO_BRANCH: master 
   DEBUG_ENABLED: "true"
