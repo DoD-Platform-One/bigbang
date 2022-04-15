@@ -36,6 +36,18 @@ server:
   {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+  {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
+  {{- if eq .Values.addons.vault.ingress.gateway "passthrough" }}
+  volumes:
+  - name: tls
+    secret:
+      secretName: vault-tls
+  volumeMounts:
+  - name: tls
+    mountPath: "/vault/tls"
+    readOnly: true
+  {{- end }}
+  {{- end }}
 
 csi:
   image:
@@ -56,7 +68,12 @@ istio:
   vault:
     gateways:
       - istio-system/{{ default "public" .Values.addons.vault.ingress.gateway }}
-      
+    {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
+    tls:
+      cert: {{ .Values.addons.vault.ingress.cert | quote }}
+      key:  {{ .Values.addons.vault.ingress.key | quote }}
+    {{- end }}
+
 minio:
   {{- if .Values.istio.enabled }}
   annotations:

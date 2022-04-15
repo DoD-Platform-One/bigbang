@@ -169,3 +169,137 @@ At a minimum an operational deployment of Gitlab should export and save the gitl
 kubectl get secret/gitlab-rails-secret -n gitlab -o yaml > cya.yaml
 ```
 
+## Vault
+This section provides suggested settings for Vault operational/production environments. Vault is a large complicated application and has many options that cannot adequately be covered here. Vault has significant security risks if not properly configured and administrated. Please consult the upstream [Vault documentation](https://learn.hashicorp.com/tutorials/vault/kubernetes-raft-deployment-guide?in=vault/kubernetes#configure-vault-helm-chart) as the ultimate authority. The following is an example operational/production config using a passthrough istio ingress gateway, high availability, auto-unseal, and raft for distributed filesystem persistence. Consult the BigBang Vault Package helm repo [/docs/production-ha.md](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/-/blob/main/docs/production-ha.md) for more information.
+```yaml
+istio:
+  enabled: true
+
+  ingressGateways:
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+      # nodePortBase: 30200
+
+  gateways:
+    passthrough:
+      ingressGateway: "passthrough-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls:
+        mode: "PASSTHROUGH"
+
+addons:
+  vault:
+    enabled: true
+    ingress:
+      gateway: "passthrough"
+      # provide the Vault TLS cert and key. BigBang will create the secret and volumemount for you
+      # Leave blank to create your own secret and provide values for your own volume and volumemount
+      key: |
+        -----BEGIN PRIVATE KEY-----
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        -----END PRIVATE KEY-----
+      cert: |
+        -----BEGIN CERTIFICATE-----
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        -----END CERTIFICATE-----
+
+    values:
+      # disable autoInit. It should not be used for operations.
+      autoInit:
+        enabled: false
+
+      global:
+        # this is a double negative. Put "false" to enable TLS for passthrough ingress
+        tlsDisable: false
+
+      injector:
+        extraEnvironmentVars:
+          AGENT_INJECT_VAULT_ADDR: "https://vault.bigbang.dev"
+
+      server:
+        # Increase default resources
+        resources:
+          requests:
+            memory: 8Gi
+            cpu: 2000m
+          limits:
+            memory: 8Gi
+            cpu: 2000m
+
+        # disable the Vault provided ingress so that Istio ingress can be used.
+        ingress:
+          enabled: false
+
+        # Extra environment variable to support high availability
+        extraEnvironmentVars:
+          # the istio gateway domain
+          VAULT_API_ADDR: https://vault.bigbang.dev
+          VAULT_ADDR:  https://127.0.0.1:8200
+          VAULT_SKIP_VERIFY: "true"
+          VAULT_LOG_FORMAT: "json"
+          VAULT_LICENSE: "your-license-key-goes-here"
+
+        ha:
+          # enable high availability.
+          enabled: true
+          replicas: 3
+
+          # raft is the license free most simple solution for a distributed filesystem
+          raft:
+            enabled: true
+            setNodeId: true
+
+            # these values should be encrypted to prevent the kms_key_id from being revealed 
+            config: |
+              ui = true
+
+              listener "tcp" {
+                tls_disable = 0
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+                tls_cert_file = "/vault/tls/tls.crt"
+                tls_key_file  = "/vault/tls/tls.key"
+              }
+
+              storage "raft" {
+                path = "/vault/data"
+
+                retry_join {
+                  leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+        
+                retry_join {
+                  leader_api_addr = "https://vault-vault-1.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+        
+                retry_join {
+                  leader_api_addr = "https://vault-vault-2.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+              }
+
+              seal "awskms" {
+                region     = "us-gov-west-1"
+                kms_key_id = "your-kms-key-goes-here"
+                endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+              }
+
+              telemetry {
+                prometheus_retention_time = "24h"
+                disable_hostname = true
+                unauthenticated_metrics_access = true
+              }
+
+              service_registration "kubernetes" {}
+```
