@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.12]
+### Added
+- logic in templates.sh to check for and auto-enable minioOperator when loki is also enabled
+
 ## [2.4.11]
 ### Fixed
 - Fix exit codes from API deprecation check and oscal component check
