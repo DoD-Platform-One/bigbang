@@ -1,12 +1,18 @@
-1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostRepo }}{{ . }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostDocker }}{{ . }}
+1. Your ingresses are available here:
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $.Values.ingress.hostRepo }}{{ $.Values.ingress.hostPath }}
+  {{- if $.Values.nexus.docker.enabled }}
+  {{- range $registry := .Values.nexus.docker.registries }}
+  https://{{ $registry.host }}/
+  {{- end }}
+  {{- end }}
 {{- else if contains "NodePort" .Values.service.type }}
+1. Get the application URL by running these commands:
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "nexus.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   Your application is available at http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
+1. Get the application URL by running these commands:
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
            You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "nexus.fullname" . }}'
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "nexus.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
@@ -14,6 +20,7 @@
   Your application is available at http://$SERVICE_IP:{{ $port }}
   {{- end }}
 {{- else if contains "ClusterIP" .Values.service.type }}
+1. Get the application URL by running these commands:
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "nexus.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8081:80
   Your application is available at http://127.0.0.1

@@ -1,0 +1,144 @@
+suite: ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: renders with defaults
+    set:
+      ingress:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: apiVersion
+          value: networking.k8s.io/v1
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/instance]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/managed-by]
+          value: Helm
+      - matchRegex:
+          path: metadata.labels.[app.kubernetes.io/version]
+          pattern: \d+\.\d+\.\d+
+      - matchRegex:
+          path: metadata.labels.[helm.sh/chart]
+          pattern: nexus-repository-manager-\d+\.\d+\.\d+
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/name]
+          value: nexus-repository-manager
+      - equal:
+          path: metadata.annotations
+          value:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-nexus-repository-manager
+      - documentIndex: 0
+        equal:
+          path: spec
+          value:
+            ingressClassName: nginx
+            rules:
+              - host: repo.demo
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: RELEASE-NAME-nexus-repository-manager
+                          port:
+                            number: 8081
+  - it: renders a second docker ingress
+    set:
+      ingress:
+        enabled: true
+      nexus:
+        docker:
+          enabled: true
+          registries:
+            - host: docker.repo.demo
+              port: 5000
+              secretName: registry-secret
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: Ingress
+      - equal:
+          path: apiVersion
+          value: networking.k8s.io/v1
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/instance]
+          value: RELEASE-NAME
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/managed-by]
+          value: Helm
+      - matchRegex:
+          path: metadata.labels.[app.kubernetes.io/version]
+          pattern: \d+\.\d+\.\d+
+      - matchRegex:
+          path: metadata.labels.[helm.sh/chart]
+          pattern: nexus-repository-manager-\d+\.\d+\.\d+
+      - equal:
+          path: metadata.labels.[app.kubernetes.io/name]
+          value: nexus-repository-manager
+      - equal:
+          path: metadata.annotations
+          value:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-nexus-repository-manager
+
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-nexus-repository-manager-docker-5000
+      - documentIndex: 1
+        equal:
+          path: spec
+          value:
+            rules:
+              - host: docker.repo.demo
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: RELEASE-NAME-nexus-repository-manager-docker-5000
+                          port:
+                            number: 5000
+            tls:
+              - hosts:
+                - docker.repo.demo
+                secretName: registry-secret
+
+  - it: is disabled by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders with tls config when provided
+    set:
+      ingress:
+        enabled: true
+        tls:
+          - secretName: nexus-tls-local
+            hosts:
+              - repo.host
+    asserts:
+      - equal:
+          path: spec.tls
+          value:
+            - secretName: nexus-tls-local
+              hosts:
+                - repo.host

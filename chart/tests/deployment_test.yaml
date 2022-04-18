@@ -1,0 +1,85 @@
+suite: deployment
+templates:
+  - deployment.yaml
+  - configmap-properties.yaml
+tests:
+  - it: renders with defaults
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - equal:
+          path: apiVersion
+          value: apps/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-nexus-repository-manager
+      - matchRegex:
+          path: metadata.labels.[app.kubernetes.io/name]
+          pattern: nexus-repository-manager
+      - matchRegex:
+          path: metadata.labels.[app.kubernetes.io/version]
+          pattern: 3\.\d+\.\d+
+      - matchRegex:
+          path: spec.template.metadata.annotations.[checksum/configmap-properties]
+          pattern: .+
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.strategy.type
+          value: Recreate
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: sonatype/nexus3:3\.\d+\.\d+
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value: null
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: IfNotPresent
+      - equal:
+          path: spec.template.spec.containers[0].env
+          value:
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+            - name: NEXUS_SECURITY_RANDOMPASSWORD
+              value: "true"
+      - equal:
+          path: spec.template.spec.containers[0].ports
+          value: 
+            - containerPort: 8081
+              name: nexus-ui
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe
+          value:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe
+          value:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts
+          value:
+            - mountPath: /nexus-data
+              name: nexus-repository-manager-data
+      - equal:
+          path: spec.template.spec.volumes
+          value:
+            - name: nexus-repository-manager-data
+              persistentVolumeClaim:
+                claimName: RELEASE-NAME-nexus-repository-manager-data

@@ -2,6 +2,11 @@
 
 ---
 
+## [38.0.0-bb.0] - 2022-04-04
+### Changed
+- Updated chart to version: 38.0.0-bb.0 | appVersion: 3.38.0
+- Updated gluon dependency to 0.2.8
+
 ## [37.3.0-bb.2] - 2022-03-30
 ### Added
 - Added Tempo Zipkin Egress Policy

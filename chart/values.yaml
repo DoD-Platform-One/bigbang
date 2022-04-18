@@ -80,6 +80,8 @@ job_image:
   tag: 8.5
   pullPolicy: IfNotPresent
 
+openshift: false
+
 # -- End of BigBang Additions
 
 statefulset:
@@ -90,12 +92,41 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.37.3-02
+  tag: 3.38.0-01
   pullPolicy: IfNotPresent
 
 nexus:
+  # BB affinity added
+  affinity: {}
+
+  # BB extraLabels added
   extraLabels:
     app: nexus-repository-manager
+
+  # BB repository added
+  repository:
+    # Raw format Repositories are currently the only supported format.
+    enabled: false
+    repo:
+      - name: "test-nexus"
+        format: "raw"
+        type: "hosted"
+        repo_data:
+          name: "test-nexus"
+          online: true
+          storage:
+            blobStoreName: "default"
+            strictContentTypeValidation: true
+            writePolicy: "allow_once"
+          cleanup:
+            policyNames:
+              - "string"
+          component:
+            proprietaryComponents: true
+          raw:
+            contentDisposition: "ATTACHMENT"
+    
+
   docker:
     enabled: false
     registries: []
@@ -103,8 +134,6 @@ nexus:
     #    port: 5000
     #    secretName: registrySecret
   env:
-    # the correct env variable name is all caps with underscores: https://github.com/sonatype/helm3-charts/pull/81
-    # the upstream values file has wrong env name
     - name: INSTALL4J_ADD_VM_PARAMS
       # using values based on 8GB of RAM on host: https://help.sonatype.com/repomanager3/installation/system-requirements
       # info about fips option: https://access.redhat.com/documentation/en-us/openjdk/8/pdf/configuring_openjdk_8_on_rhel_with_fips/openjdk-8-configuring_openjdk_8_on_rhel_with_fips-en-us.pdf
@@ -130,32 +159,13 @@ nexus:
       cpu: 4
       memory: 8000Mi
 
-  repository:
-    # Raw format Repositories are currently the only supported format.
-    enabled: false
-    repo:
-      - name: "test-nexus"
-        format: "raw"
-        type: "hosted"
-        repo_data:
-          name: "test-nexus"
-          online: true
-          storage:
-            blobStoreName: "default"
-            strictContentTypeValidation: true
-            writePolicy: "allow_once"
-          cleanup:
-            policyNames:
-              - "string"
-          component:
-            proprietaryComponents: true
-          raw:
-            contentDisposition: "ATTACHMENT"
 
-  affinity: {}
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
 
+  # Default the pods UID and GID to match the nexus3 container.
+  # Customize or remove these values from the securityContext as appropriate for
+  # your deployment environment.
   securityContext:
     fsGroup: 2000
   podAnnotations: {}
@@ -191,14 +201,14 @@ deployment:
   # # Add init containers. e.g. to be used to give specific permissions for nexus-data.
   # # Add your own init container or uncomment and modify the given example.
   initContainers:
-  # - name: fmp-volume-permission
-    # image: busybox
-    # imagePullPolicy: IfNotPresent
-    # command: ['chown','-R', '200', '/nexus-data']
-    # volumeMounts:
-      # - name: nexus-data
-        # mountPath: /nexus-data
-  # # Uncomment and modify this to run a command after starting the nexus container.
+  #   - name: fmp-volume-permission
+  #   image: busybox
+  #   imagePullPolicy: IfNotPresent
+  #   command: ['chown','-R', '200', '/nexus-data']
+  #   volumeMounts:
+  #     - name: nexus-data
+  #       mountPath: /nexus-data
+  # Uncomment and modify this to run a command after starting the nexus container.
   postStart:
     command:    # '["/bin/sh", "-c", "ls"]'
   preStart:
@@ -208,20 +218,17 @@ deployment:
   additionalVolumes:
   additionalVolumeMounts:
 
-
 ingress:
   enabled: false
-  annotations: {kubernetes.io/ingress.class: nginx}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  ingressClassName: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
   hostPath: /
   hostRepo: repo.demo
-  tls: []
-    # - secretName: nexus-local-tls
-    #   hosts:
-    #     - nexus.local
-    #     - nexus-docker.local
-    #     - nexus-docker-hosted.local
+  # tls:
+  #   - secretName: nexus-local-tls
+  #     hosts:
+  #       - repo.demo
 
 
 service:
@@ -266,7 +273,7 @@ persistence:
 
 tolerations: []
 
-# # Enable configmap and add data in configmap
+# Enable configmap and add data in configmap
 config:
   enabled: false
   mountPath: /sonatype-nexus-conf
@@ -288,7 +295,3 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-psp:
-  create: false
-
-openshift: false
