@@ -15,6 +15,12 @@ To ensure unnecessary privileged escalation containers are not used, these kerne
 ```shell
 sudo sysctl -w vm.max_map_count=262144      #(ECK crash loops without this)
 ```
+To verify that this setting is in place and check the current value, after Big Bang deployment run the following command:
+```shell
+kubectl exec $(kubectl get pod -n eck-operator -l app.kubernetes.io/name=elastic-operator -o name) --namespace eck-operator -it -- cat /proc/sys/vm/max_map_count
+```
+This should return 262144 (or higher)
+
 
 More information can be found from elasticsearch's documentation [here](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html#k8s-virtual-memory)
 
@@ -53,6 +59,25 @@ sysctl -w vm.max_map_count=524288
 sysctl -w fs.file-max=131072
 ulimit -n 131072
 ulimit -u 8192
+```
+To verify these settings are in place (or check current values) run the following command:
+
+```shell
+kubectl exec $(kubectl get pod -n sonarqube -l app=sonarqube -o name) --namespace sonarqube -it -- cat /proc/sys/vm/max_map_count
+
+This should return 524288 (or higher)
+
+kubectl exec $(kubectl get pod -n sonarqube -l app=sonarqube -o name) --namespace sonarqube -it -- cat /proc/sys/fs/file-max
+
+This should return 131072 (or higher)
+
+kubectl exec $(kubectl get pod -n sonarqube -l app=sonarqube -o name) --namespace sonarqube -it -- ulimit -n
+
+This should return 131072 (or higher)
+
+kubectl exec $(kubectl get pod -n sonarqube -l app=sonarqube -o name) --namespace sonarqube -it -- ulimit -u
+
+This should return 8192 (or higher)
 ```
 
 Another option includes running the init container to modify the kernel values on the host (this requires a busybox container run as root):
