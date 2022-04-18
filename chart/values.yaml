@@ -418,7 +418,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.7.0-bb.1"
+    tag: "0.7.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -458,7 +458,7 @@ eckoperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"
-    tag: "2.0.0-bb.1"
+    tag: "2.0.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
@@ -472,7 +472,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.19.20-bb.2"
+    tag: "0.19.20-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
