@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 37.3.0-bb.2](https://img.shields.io/badge/Version-37.3.0--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.37.3](https://img.shields.io/badge/AppVersion-3.37.3-informational?style=flat-square)
+![Version: 38.0.0-bb.0](https://img.shields.io/badge/Version-38.0.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -93,24 +93,14 @@ helm install nexus-repository-manager chart/
 | job_image.repository | string | `"registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"` |  |
 | job_image.tag | float | `8.5` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
+| openshift | bool | `false` |  |
 | statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.37.3-02"` |  |
+| image.tag | string | `"3.38.0-01"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
+| nexus.affinity | object | `{}` |  |
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
-| nexus.docker.enabled | bool | `false` |  |
-| nexus.docker.registries | list | `[]` |  |
-| nexus.env[0].name | string | `"INSTALL4J_ADD_VM_PARAMS"` |  |
-| nexus.env[0].value | string | `"-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
-| nexus.env[1].name | string | `"NEXUS_SECURITY_RANDOMPASSWORD"` |  |
-| nexus.env[1].value | string | `"true"` |  |
-| nexus.properties.override | bool | `false` |  |
-| nexus.properties.data | object | `{}` |  |
-| nexus.resources.requests.cpu | int | `4` |  |
-| nexus.resources.requests.memory | string | `"8000Mi"` |  |
-| nexus.resources.limits.cpu | int | `4` |  |
-| nexus.resources.limits.memory | string | `"8000Mi"` |  |
 | nexus.repository.enabled | bool | `false` |  |
 | nexus.repository.repo[0].name | string | `"test-nexus"` |  |
 | nexus.repository.repo[0].format | string | `"raw"` |  |
@@ -123,7 +113,18 @@ helm install nexus-repository-manager chart/
 | nexus.repository.repo[0].repo_data.cleanup.policyNames[0] | string | `"string"` |  |
 | nexus.repository.repo[0].repo_data.component.proprietaryComponents | bool | `true` |  |
 | nexus.repository.repo[0].repo_data.raw.contentDisposition | string | `"ATTACHMENT"` |  |
-| nexus.affinity | object | `{}` |  |
+| nexus.docker.enabled | bool | `false` |  |
+| nexus.docker.registries | list | `[]` |  |
+| nexus.env[0].name | string | `"INSTALL4J_ADD_VM_PARAMS"` |  |
+| nexus.env[0].value | string | `"-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
+| nexus.env[1].name | string | `"NEXUS_SECURITY_RANDOMPASSWORD"` |  |
+| nexus.env[1].value | string | `"true"` |  |
+| nexus.properties.override | bool | `false` |  |
+| nexus.properties.data | object | `{}` |  |
+| nexus.resources.requests.cpu | int | `4` |  |
+| nexus.resources.requests.memory | string | `"8000Mi"` |  |
+| nexus.resources.limits.cpu | int | `4` |  |
+| nexus.resources.limits.memory | string | `"8000Mi"` |  |
 | nexus.nexusPort | int | `8081` |  |
 | nexus.securityContext.fsGroup | int | `2000` |  |
 | nexus.podAnnotations | object | `{}` |  |
@@ -150,10 +151,10 @@ helm install nexus-repository-manager chart/
 | deployment.additionalVolumes | string | `nil` |  |
 | deployment.additionalVolumeMounts | string | `nil` |  |
 | ingress.enabled | bool | `false` |  |
-| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| ingress.ingressClassName | string | `"nginx"` |  |
+| ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"0"` |  |
 | ingress.hostPath | string | `"/"` |  |
 | ingress.hostRepo | string | `"repo.demo"` |  |
-| ingress.tls | list | `[]` |  |
 | service.name | string | `"nexus3"` |  |
 | service.enabled | bool | `true` |  |
 | service.labels | object | `{}` |  |
@@ -181,8 +182,6 @@ helm install nexus-repository-manager chart/
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
-| psp.create | bool | `false` |  |
-| openshift | bool | `false` |  |
 
 ## Contributing
 
