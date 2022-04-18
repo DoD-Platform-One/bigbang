@@ -210,6 +210,15 @@ label_check() {
             echo "    Added minioOperator"
          fi
       fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
+         echo "  Checking loki"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
+            echo "    minioOperator already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
+            echo "    Added minioOperator"
+         fi
+      fi
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
          echo "  Checking minio"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
