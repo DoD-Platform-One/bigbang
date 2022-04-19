@@ -460,9 +460,34 @@ fluentbit:
 
 loki:
   enabled: false
+  strategy: scalable
   values:
-    persistence:
-      enabled: true
+    global:
+      createGlobalConfig: true 
+      existingSecretForConfig: "loki-config"
+    loki-simple-scalable:
+      write:
+        replicas: 1
+        persistence:
+          size: 2Gi
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 400Mi 
+          requests:
+            cpu: 200m
+            memory: 400Mi
+      read:
+        replicas: 1
+        persistence:
+          size: 2Gi
+        resources: 
+          limits:
+            cpu: 200m
+            memory: 400Mi 
+          requests:
+            cpu: 200m
+            memory: 400Mi 
 
 tempo:
   enabled: false

@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
+  releaseName: {{ default "loki" .Values.loki.releaseName }}
   targetNamespace: logging
   chart:
     spec:
@@ -53,6 +54,12 @@ spec:
     {{- if .Values.kyvernopolicies.enabled }}
     - name: kyvernopolicies
       namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- with .Values.loki.objectStorage }}
+    {{- if not (and .endpoint .accessKey .accessSecret .bucketNames) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}

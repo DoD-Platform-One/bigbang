@@ -67,7 +67,11 @@ config:
         name                   loki
         match                  kube.*
         labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
+        {{- if eq .Values.loki.strategy "monolith" }}
         host                   logging-loki
+        {{- else }}
+        host                   logging-loki-write
+        {{- end }}
         port                   3100
         auto_kubernetes_labels on
         Retry_Limit            False

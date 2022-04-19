@@ -44,6 +44,10 @@ spec:
     - name: ek
       namespace: {{ .Release.Namespace }}
     {{- end }}
+    {{- if  .Values.loki.enabled }}
+    - name: loki
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}

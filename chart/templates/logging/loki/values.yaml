@@ -17,19 +17,47 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}  
-  
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 istio:
   enabled: {{ .Values.istio.enabled }} 
 
-serviceMonitor:
-  enabled: {{ .Values.monitoring.enabled }}
+global:
+  createGlobalConfig: true
+  existingSecretForConfig: loki-config
+
+  objectStorage:
+    endpoint: {{ .Values.loki.objectStorage.endpoint }}
+    region: {{ .Values.loki.objectStorage.region }}
+    bucketnames: {{ .Values.loki.objectStorage.bucketNames }}
+    access_key_id: {{ .Values.loki.objectStorage.accessKey }}
+    secret_access_key: {{ .Values.loki.objectStorage.accessSecret }}
+
+{{- with .Values.loki.objectStorage }}
+{{- if not (and .endpoint .bucketNames .accessKey .accessSecret) }}
+minio:
+  enabled: true
+{{- end }}
+{{- end }}
 
 {{- if .Values.istio.enabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
+
+loki:
+  enabled: {{ eq .Values.loki.strategy "monolith" }}
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+loki-simple-scalable:
+  enabled: {{ eq .Values.loki.strategy "scalable" }}
+  imagePullSecrets:
+    - name: private-registry
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
 {{- end -}}

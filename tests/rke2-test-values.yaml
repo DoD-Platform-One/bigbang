@@ -50,6 +50,16 @@ logging:
             cpu: .5
           limits: null
 
+loki:
+  values:
+    loki-simple-scalable:
+      write:
+        resources:
+          limits: null
+      read:
+        resources:
+          limits: null
+
 tempo:
   values:
     tempo:

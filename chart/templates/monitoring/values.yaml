@@ -215,7 +215,11 @@ grafana:
   {{- if .Values.loki.enabled }}
   - name: Loki
     type: loki
+    {{- if eq .Values.loki.strategy "monolith" }}
     url: http://logging-loki.logging.svc.cluster.local:3100
+    {{- else }}
+    url: http://logging-loki-read.logging.svc.cluster.local:3100
+    {{- end }}
     access: proxy
   {{- end }}
   {{- if and .Values.loki.enabled .Values.tempo.enabled }}
