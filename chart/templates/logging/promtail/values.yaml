@@ -32,6 +32,10 @@ imagePullSecrets:
 
 {{- if .Values.loki.enabled }}
 config:
+  {{- if eq .Values.loki.strategy "monolith" }}
   lokiAddress: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
+  {{- else }}
+  lokiAddress: http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push
+  {{- end }}
 {{- end }}
 {{- end -}}

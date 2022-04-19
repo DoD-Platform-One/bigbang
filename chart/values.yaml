@@ -507,7 +507,7 @@ loki:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
     path: "./chart"
-    tag: "2.10.1-bb.4"
+    tag: "3.0.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -517,6 +517,28 @@ loki:
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
+
+  # -- Loki architecture.  Options are monolith and scalable
+  strategy: monolith
+
+  objectStorage:
+    # -- S3 compatible endpoint to use for connection information.
+    # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+    endpoint: ""
+
+    # -- S3 compatible region to use for connection information.
+    region: ""
+
+    # -- Access key for connecting to object storage endpoint.
+    accessKey: ""
+
+    # -- Secret key for connecting to object storage endpoint.
+    # Unencoded string data. This should be placed in the secret values and then encrypted
+    accessSecret: ""
+
+    # -- Bucket Names for Loki as a comma delimited list.
+    # examples: "loki-logs"
+    bucketNames: ""
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
