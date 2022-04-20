@@ -3,7 +3,7 @@ include:
     ref: auto_create_mr
     file: '/pipelines/bigbang-package.yaml' 
 
-# Toggle: 🤞
+# Toggle: 🤞🤞
 variables:
   PIPELINE_REPO_BRANCH: auto_create_mr 
   DEBUG_ENABLED: "true"
