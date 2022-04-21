@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
-  releaseName: {{ default "loki" .Values.loki.releaseName }}
+  releaseName: {{ default "logging-loki" .Values.loki.releaseName }}
   targetNamespace: logging
   chart:
     spec:
