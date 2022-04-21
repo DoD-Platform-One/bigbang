@@ -25,6 +25,7 @@ monitoring:
 istio:
   enabled: {{ .Values.istio.enabled }} 
 
+{{- if (eq .Values.loki.strategy "scalable") }}
 global:
   createGlobalConfig: true
   existingSecretForConfig: loki-config
@@ -40,6 +41,7 @@ global:
 {{- if not (and .endpoint .bucketNames .accessKey .accessSecret) }}
 minio:
   enabled: true
+{{- end }}
 {{- end }}
 {{- end }}
 
