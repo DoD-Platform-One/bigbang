@@ -2,6 +2,11 @@
 
 [[_TOC_]]
 
+## Video Walkthrough
+A 36min speed run video walkthrough of this quickstart can be found on the following 2 mirrored locations:
+* [Google Drive - Video Mirror](https://drive.google.com/file/d/1m1pR0a-lrWr_Wed4EsI8-vimkYfb06GQ/view)
+* [Repo1 - Video Mirror](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/blob/master/big_bang/bigbang_quickstart.mp4)
+
 ## Overview
 
 This quick start guide explains in beginner-friendly terminology how to complete the following tasks in under an hour:
