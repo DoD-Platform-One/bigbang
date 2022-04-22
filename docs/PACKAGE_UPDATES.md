@@ -20,7 +20,7 @@ Since the mattermost operator chart is built and maintained by Big Bang syncing 
 
 5. Update the versions for `chart/Chart.yaml` to the new operator version (`version`, `appVersion`, and dependency `version`).
 
-6. Run `helm dependency update chart` and validate that the new CRD chart tgz is under `chart/charts`.
+6. Run `helm dependency update ./chart` and validate that the new CRD chart tgz is under `chart/charts`.
 
 7. Incrementally copy out the remaining sections from `docs/upstream/mattermost-operator.yaml` into their respective files in `chart/templates`. At this step the following file names to match the object types are: `clusterrole`, `clusterrolebinding`, `service`, `serviceaccount`, and `deployment`.
 
@@ -40,4 +40,6 @@ Since the mattermost operator chart is built and maintained by Big Bang syncing 
 
 11. Add a changelog entry for the Chart version.
 
-12. Open an MR on Repo1 and validate that all changes look as expected in the diffs and CI passes. Make any necessary changes if something looks off or CI fails.
+12. Update top-level ./README.md using script from [gluon library](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md).
+
+13. Open an MR on Repo1 and validate that all changes look as expected in the diffs and CI passes. Make any necessary changes if something looks off or CI fails.
