@@ -4,7 +4,7 @@ image:
   # -- Full image name
   repository: "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator"
   # -- Image tag
-  tag: v1.17.0
+  tag: v1.18.0
 
 replicas:
   # -- Mattermost operator desired replicas
