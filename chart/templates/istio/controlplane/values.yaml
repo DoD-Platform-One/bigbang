@@ -13,8 +13,7 @@ enterprise: {{ .Values.istio.enterprise }}
 tracing:
 {{- if .Values.jaeger.enabled }}
   enabled: {{ .Values.jaeger.enabled }}
-{{- end }}
-{{- if .Values.tempo.enabled }}
+{{- else if .Values.tempo.enabled }}
   enabled:  {{ .Values.tempo.enabled }}
   address: 'tempo-tempo.tempo.svc'
   sampling: 100
