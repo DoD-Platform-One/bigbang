@@ -25,6 +25,11 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
+{{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.addons.mattermost.enabled }}
+mattermost:
+  enabled: true
+{{- end }}
+
 {{- with .Values.logging.sso }}
 {{- if .enabled }}
 sso:
