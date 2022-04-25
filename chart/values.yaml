@@ -870,6 +870,11 @@ addons:
       # -- If using an AWS IAM profile, the accessKey and accessSecret values must be left as empty strings eg: ""
       iamProfile: ""
 
+    smtp:
+      # -- Passwords should be placed in an encrypted file. Example: environment-bb-secret.enc.yaml
+      # If a value is provided BigBang will create a k8s secret named gitlab-smtp-password in the gitlab namespace
+      password: ""
+
     redis:
       # -- Redis plain text password to connect to the redis server.  If empty (""), the gitlab charts will create the gitlab-redis-secret
       # with a random password.
