@@ -25,4 +25,4 @@ dependencies:
     repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
 annotations:
   bigbang.dev/applicationVersions: |
-    - Kiali: v1.47.0
+    - Kiali: v1.49.0
