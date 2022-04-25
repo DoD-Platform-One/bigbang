@@ -483,7 +483,9 @@ fluentbit:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-# -- BETA support of promtail/loki logging stack
+# ----------------------------------------------------------------------------------------------------------------------
+# BETA support of promtail/loki logging stack
+#
 promtail:
   # -- Toggle deployment of Promtail.
   enabled: false
@@ -1028,7 +1030,9 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
-  # -- Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
+  #
   haproxy:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
