@@ -320,11 +320,17 @@ global:
     {{- end }}
   {{- end }}
 
-{{- if and (ne .Values.addons.gitlab.redis.password "") (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled) }}
+  {{- if and (ne .Values.addons.gitlab.redis.password "") (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled) }}
   redis:  
     password:
       secret: "gitlab-redis-secret-bb"
-{{- end }}
+  {{- end }}
+
+  {{- if .Values.addons.gitlab.smtp.password }}
+  smtp:
+    password:
+      secret: "gitlab-smtp-password"
+  {{- end }}
 
 {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
 use_iam_profile: true
