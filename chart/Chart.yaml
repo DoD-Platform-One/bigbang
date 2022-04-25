@@ -1,8 +1,8 @@
 apiVersion: v2
 name: kiali-operator
 description: Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
-version: 1.47.0-bb.5
-appVersion: 1.47.0
+version: 1.49.0-bb.0
+appVersion: 1.49.0
 home: https://github.com/kiali/kiali-operator
 maintainers:
 - name: Kiali
