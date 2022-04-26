@@ -280,6 +280,10 @@ aws/network down:
     - .bigbang-gitlab-runner-tags
     - .infra cleanup
     - .network down
+  needs:
+    - job: pre vars
+      artifacts: true
+    - job: aws/rke2/cluster down
   stage: 💣 network down
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}

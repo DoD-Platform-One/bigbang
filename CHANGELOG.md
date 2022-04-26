@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.13]
+### Fixed
+- AWS network down stage should now run when a prior stage is cancelled in rke2 test-ci::infra pipelines
+
 ## [2.4.12]
 ### Added
 - logic in templates.sh to check for and auto-enable minioOperator when loki is also enabled
