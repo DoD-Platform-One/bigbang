@@ -71,6 +71,11 @@ wait_daemonset(){
 #
 #-----------------------------------------------------------------------------------------------------------------------
 check_changes() {
+   # only run on MR events
+   if[[ $CI_PIPELINE_SOURCE != "merge_request_event" ]]; then
+     exit 0
+   fi
+
    echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
    
    ## Array of addon packages
@@ -176,6 +181,10 @@ check_changes() {
 
 label_check() {
    set -e
+   # only run on MR events
+   if[[ $CI_PIPELINE_SOURCE != "merge_request_event" ]]; then
+     exit 0
+   fi
    echo -e "\e[0Ksection_start:`date +%s`:label_check[collapsed=true]\r\e[0K\e[33;1mLabel Check\e[37m"
    ## Show current labels
    OLD_IFS=$IFS
