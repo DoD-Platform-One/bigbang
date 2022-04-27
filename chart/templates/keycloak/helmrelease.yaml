@@ -23,6 +23,10 @@ spec:
         name: {{ $name }}
         namespace: {{ .Release.Namespace }}
 
+  {{- if .Values.addons.keycloak.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.keycloak.postRenderers | nindent 4 }}
+  {{- end }}
 
   {{- toYaml $fluxSettingsKeycloak | nindent 2 }}
 
