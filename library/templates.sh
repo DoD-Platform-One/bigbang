@@ -96,6 +96,9 @@ check_changes() {
 
    ## Collect package configurations on the source branch
    git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+   git config user.email "checkchange@function.com"
+   git config user.name "checkchange"
+   git merge origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --no-commit || (echo -e "\e[31mError: Source branch, ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}, has conflicts with target branch, ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}. Please rebase your branch and re-run the pipeline.\e[0m" && exit 1)
    mkdir -p source-branch/values
    mkdir -p source-branch/templates
    cp -R chart/templates/* source-branch/templates
