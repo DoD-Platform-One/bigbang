@@ -1293,7 +1293,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
       path: "./chart"
-      tag: "18.0.0-bb.1"
+      tag: "18.0.0-bb.4"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
@@ -1329,6 +1329,9 @@ addons:
 
     # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
     values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
 
   # ----------------------------------------------------------------------------------------------------------------------
   # Vault
