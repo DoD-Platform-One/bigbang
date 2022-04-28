@@ -108,10 +108,12 @@ for hr in $installed_helmreleases; do
     if [[ -n `ls /cypress/screenshots/${namespace}/* 2>/dev/null` ]]; then
       mkdir -p test-artifacts/${hr}/cypress/screenshots
       mv /cypress/screenshots/${namespace}/* ./test-artifacts/${hr}/cypress/screenshots
+      rm -rf /cypress/screenshots/${namespace}
     fi
     if [[ -n `ls /cypress/videos/${namespace}/* 2>/dev/null` ]]; then
       mkdir -p test-artifacts/${hr}/cypress/videos
       mv /cypress/videos/${namespace}/* ./test-artifacts/${hr}/cypress/videos
+      rm -rf /cypress/videos/${namespace}
     fi
 
     #### Begin backwards compatibility for configmap videos (gluon 0.2.5 and earlier) ####
