@@ -4,6 +4,7 @@
     - privileged
     - dogfood
     - umbrella
+    - bbci
 
 .dind-package-runner:
   tags:
@@ -11,6 +12,7 @@
     - privileged
     - dogfood
     - packages
+    - bbci
 
 # In cluster k3s using K3D with the docker daemon as a sidecar
 #

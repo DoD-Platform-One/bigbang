@@ -48,6 +48,7 @@ helm library release:
     - privileged
     - dogfood
     - packages
+    - bbci
   variables:
     DOCKER_HOST: tcp://localhost:2376
     DOCKER_TLS_CERTDIR: "/certs"
