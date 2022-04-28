@@ -6,20 +6,13 @@ locals {
 # Configure aws cli default region to current region, it'd be great if the aws cli did this on install........
 aws configure set default.region $(curl -s http://169.254.169.254/latest/meta-data/placement/region)
 
-# Tune vm sysctl for elasticsearch
-sysctl -w vm.max_map_count=524288
-
-# SonarQube host pre-requisites
-sysctl -w fs.file-max=131072
-ulimit -n 131072
-ulimit -u 8192
-
-# Preload kernel modules required by istio-init, required for selinux enforcing instances using istio-init
-modprobe xt_REDIRECT
-modprobe xt_owner
-modprobe xt_statistic
-# Persist modules after reboots
-printf "xt_REDIRECT\nxt_owner\nxt_statistic\n" | sudo tee -a /etc/modules
+# Poor man's partition for ephemeral storage and RKE2 data dir
+mkfs -t xfs /dev/nvme2n1
+mkdir -p /var/lib/rancher
+mount /dev/nvme2n1 /var/lib/rancher
+mkdir -p /var/lib/rancher/rke2
+mkdir -p /var/lib/rancher/kubelet
+ln -s /var/lib/rancher/kubelet /var/lib/kubelet
 
 # iptables rules needed based on https://docs.rke2.io/install/requirements/#networking
 iptables -A INPUT -p tcp -m tcp --dport 2379 -m state --state NEW -j ACCEPT
@@ -39,15 +32,26 @@ iptables -A INPUT -p udp -m udp --dport 51820 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p udp -m udp --dport 51821 -m state --state NEW -j ACCEPT
 iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p icmp --icmp-type 0 -m state --state ESTABLISHED,RELATED -j ACCEPT
-sudo service iptables save
 
-# Poor man's partition for ephemeral storage and RKE2 data dir
-mkfs -t xfs /dev/nvme2n1
-mkdir -p /var/lib/rancher
-mount /dev/nvme2n1 /var/lib/rancher
-mkdir -p /var/lib/rancher/rke2
-mkdir -p /var/lib/rancher/kubelet
-ln -s /var/lib/rancher/kubelet /var/lib/kubelet
+# Grouping sudo commands to increase node spin up time
+sudo -- sh -c 'service iptables save; \
+               sysctl -w vm.max_map_count=524288; \
+               echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf; \
+               sysctl -w fs.nr_open=13181252; \
+               echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf; \
+               sysctl -w fs.file-max=13181250; \
+               echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf; \
+               echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+               echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+               echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+               echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+               sysctl -p; \
+               modprobe xt_REDIRECT; \
+               modprobe xt_owner; \
+               modprobe xt_statistic'
+
+# Persist modules after reboots
+printf "xt_REDIRECT\nxt_owner\nxt_statistic\n" | sudo tee -a /etc/modules
 EOF
 
   tags = {
