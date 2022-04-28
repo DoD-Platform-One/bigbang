@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.19]
+### Changed
+- Changed os_prep data in rke2 terraform to persist ulimit changes.
+
 ## [2.4.18]
 ### Changed
 - Changed runner tags to add bbci so that jobs are forced onto the new runners.
