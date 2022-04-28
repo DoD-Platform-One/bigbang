@@ -55,10 +55,12 @@ spec:
     - name: kyvernopolicies
       namespace: {{ .Release.Namespace }}
     {{- end }}
+    {{- if (eq .Values.loki.strategy "scalable") }}
     {{- with .Values.loki.objectStorage }}
     {{- if not (and .endpoint .accessKey .accessSecret .bucketNames) }}
     - name: minio-operator
       namespace: {{ $.Release.Namespace }}
+    {{- end }}
     {{- end }}
     {{- end }}
   {{- end }}
