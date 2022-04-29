@@ -855,8 +855,8 @@ addons:
           size: 256Mi
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 200m
+            memory: 1024Mi
           limits: {}
         metrics:
           resources:
