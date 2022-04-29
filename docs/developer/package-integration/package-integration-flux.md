@@ -87,7 +87,7 @@ Flux's source controller uses the [GitRepository](https://fluxcd.io/docs/compone
 ```yaml
 {{- $pkg := "podinfo" }}
 {{- if (get .Values $pkg).enabled }}
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
   name: {{ $pkg }}
