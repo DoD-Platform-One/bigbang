@@ -32,7 +32,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - registry1.dso.mil
         - registry.dso.mil
 
-  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled }}
+  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic)}}
   allowedHostFilesystem:
     parameters:
       excludedResources:
@@ -51,6 +51,10 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       # promtail requires hostpath volume mounts
       # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
       - logging/logging-promtail-.*
+      {{- end }}
+      {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
+      # Restic requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
+      - velero/restic-.*
       {{- end }}
   {{- end }}
 
@@ -122,7 +126,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic) }}
   volumeTypes:
     parameters:
       excludedResources:
@@ -145,6 +149,10 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # Promtail requires hostpath volume types
         # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
         - logging/logging-promtail-.*
+       {{- end }}
+       {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
+        # Restic requires hostpath volume mounts in order to facilitate backing up cluster PV/C resources
+        - velero/restic-.*
        {{- end }}
   {{- end }}
 {{- end -}}
