@@ -1,5 +1,5 @@
 {{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled)) }}
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
   name: authservice

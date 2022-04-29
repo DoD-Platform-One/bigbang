@@ -130,7 +130,7 @@ bases:
 - https://repo1.dso.mil/platform-one/big-bang/bigbang.git/base/?ref=v1.2.*
 patchesStrategicMerge:
 - |-
-  apiVersion: source.toolkit.fluxcd.io/v1beta1
+  apiVersion: source.toolkit.fluxcd.io/v1beta2
   kind: GitRepository
   metadata:
     name: bigbang
@@ -147,7 +147,7 @@ patchesStrategicMerge:
 In your top-level `<env>.yaml` Kubernetes manifest, you would place configuration for the location of your environment.  Here is an example:
 
 ```yaml
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
   name: environment-repo

@@ -1,6 +1,6 @@
 registry:2
 registry1.dso.mil/ironbank/big-bang/base:8.4
-registry1.dso.mil/ironbank/big-bang/base:1.1.0
+registry1.dso.mil/ironbank/big-bang/base:1.2.0
 registry1.dso.mil/ironbank/opensource/kubernetes-1.21/kubectl:v1.21.5
 registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner-dotnet31:4.10
 registry.il2.dso.mil/platform-one/devops/pipeline-templates/pipeline-job/sonar-scanner:4.5.0.2216
