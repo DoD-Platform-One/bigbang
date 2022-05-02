@@ -1343,7 +1343,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
       path: "./chart"
-      tag: "0.19.0-bb.7"
+      tag: "0.19.0-bb.8"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
