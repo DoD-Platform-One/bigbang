@@ -119,6 +119,9 @@ clusterAuditor:
       enabled: true
       cypress:
         envs:
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
+          cypress_allownodatas: '0'
           cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
 
 gatekeeper:
@@ -149,6 +152,7 @@ gatekeeper:
         parameters:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
@@ -240,6 +244,7 @@ gatekeeper:
         parameters:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-operator-cypress-test
@@ -346,6 +351,7 @@ kyvernopolicies:
               namespaces:
               - gitlab
               - kiali
+              - cluster-auditor
               - mattermost
               - nexus-repository-manager
               - keycloak
@@ -362,6 +368,7 @@ kyvernopolicies:
               namespaces:
               - gitlab
               - kiali
+              - cluster-auditor
               - mattermost
               - nexus-repository-manager
               - keycloak
@@ -393,6 +400,7 @@ kyvernopolicies:
               namespaces:
               - gitlab
               - kiali
+              - cluster-auditor
               - mattermost
               - nexus-repository-manager
               - keycloak
