@@ -13,7 +13,7 @@ include:
     - bbci
 
 .util-image:
-  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:2.4.1
+  image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:2.4.2
 
 .templates:
   before_script:

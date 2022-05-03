@@ -1,7 +1,7 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.4.1
+# @Version bb-ci:2.4.2
 #
 # docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
 # docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
@@ -42,7 +42,7 @@ gpgcheck=0\n'\
 
 ADD https://download.docker.com/linux/centos/docker-ce.repo /etc/yum.repos.d/docker-ce.repo
 
-RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python3 diffutils
+RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python3 diffutils patch
 
 RUN pip3 install boto3==1.21.14 requests==2.27.1 urllib3==1.26.5 jsonschema==4.0.0
 

@@ -283,9 +283,16 @@ auto tag:
   rules:
     # run tag stage on commits to default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+    BB_REPO_DESTINATION: "./bigbang-repo"
+    BB_TARGET_BRANCH: master
+    BB_PROJECT_ID: 2872
+    VALUES_FILE: chart/values.yaml
   script:
     - get_chart_version
     - create_tag
+    - create_bigbang_merge_request
   allow_failure:
     exit_codes:
       - 201

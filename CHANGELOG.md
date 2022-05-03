@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.21]
+### Added
+- Added `patch` to bb-ci Dockerfile
+- Pushed version `2.4.2` of bb-ci container image
+- Added `create_bigbang_merge_request` function to templates.sh
+- Added variables and the `create_bigbang_merge_request` function to the `auto-tag` stage in the `bigbang-package.yaml` pipeline
+### Changed
+- Updated the image tag in templates.yaml
+
 ## [2.4.20]
 ### Changed
 - Moved rke2 aws transit gateways to bigbang-ci cluster
