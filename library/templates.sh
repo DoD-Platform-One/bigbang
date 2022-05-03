@@ -1163,7 +1163,6 @@ create_tag() {
    if [[ $(echo $tag_output | jq -r '.name') == "${CHART_VERSION}" ]]; then
      echo "Tag ${CHART_VERSION} created successfully."
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
-     exit 0
    elif [[ $(echo $tag_output | jq -r '.message') =~ "already exists" ]]; then
      echo -e "\e[31mNOTICE: Tag Exists. If this change does not require a new package release this is OK. Otherwise this needs to be looked at further\e[0m"
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
@@ -1175,6 +1174,127 @@ create_tag() {
      exit 1
    fi
 }
+
+create_bigbang_merge_request() {
+    echo -e "\e[0Ksection_start:`date +%s`:create_bigbang_merge_request[collapsed=true]\r\e[0KCreating Big Bang Merge Request"
+    echo "Creating new Big Bang merge request..."
+
+    ## Determine which package needs to be updated in the Big Bang chart
+
+    # Account for packages that have a different name in Big Bang's values file vs the name of the package repo
+    # The package name is needed to edit the Big Bang chart/values.yaml
+    if [[ ${CI_PROJECT_NAME} == "istio-controlplane" ]]; then
+        package="istio"
+    elif [[ ${CI_PROJECT_NAME} == "istio-operator" ]]; then 
+        packgage="istiooperator"
+    elif [[ ${CI_PROJECT_NAME} == "cluster-auditor" ]]; then 
+        package="clusterAuditor"
+    elif [[ ${CI_PROJECT_NAME} == "policy" ]]; then 
+        package="gatekeeper"
+    elif [[ ${CI_PROJECT_NAME} == "kyverno-policies" ]]; then 
+        package="kyvernopolicies"
+    elif [[ ${CI_PROJECT_NAME} == "elasticsearch-kibana" ]]; then 
+        package="logging"
+    elif [[ ${CI_PROJECT_NAME} == "eck-operator" ]]; then 
+        package="eckoperator"
+    elif [[ ${CI_PROJECT_NAME} == "minio-operator" ]]; then 
+        package="minioOperator"
+    elif [[ ${CI_PROJECT_NAME} == "gitlab-runner" ]]; then 
+        package="gitlabRunner"
+    elif [[ ${CI_PROJECT_NAME} == "anchore-enterprise" ]]; then 
+        package="anchore"
+    elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then 
+        package="mattermostoperator"
+    else
+        package="${CI_PROJECT_NAME}"
+    fi 
+
+    ## GitLab API endpoint used to interact with project-level resources
+    GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
+
+    ## Data that will be used to create Big Bang MRs
+
+    # The latest git tag for the Big Bang package repo
+    LATEST_GIT_TAG=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/repository/tags" | jq '.[].name' | head -1 | sed 's/\"//g')
+
+    # Get the URL of the latest CHANGELOG.md file
+    CHANGELOG_URL=$(curl ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${LATEST_GIT_TAG}/CHANGELOG.md
+
+    # Get the URL of the relevant package MR
+    PACKAGE_MR_URL=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[].web_url' | head -1 | sed 's/\"//g')
+    
+    # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
+    BB_MR_REVIEWER_NAMES=( "micah.nagel" "BrandenCobb" "ryan.j.garcia" )
+
+    # Collect user IDs from /users API endpoint
+    # Add "%2C" to the end of every user ID for URL encoding commas
+    for reviewer in "${BB_MR_REVIEWER_NAMES[@]}"; do 
+        BB_MR_REVIEWER_IDS+=$(curl "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id' | sed 's/$/%2C/')
+    done 
+
+    ## Pull down Big Bang repo, create a new branch, and configure git 
+    BB_SOURCE_BRANCH=update-${CI_PROJECT_NAME}-tag-${LATEST_GIT_TAG}
+    git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION}
+    cd ${BB_REPO_DESTINATION}
+    git checkout -b ${BB_SOURCE_BRANCH}
+    git config user.email "mr.bot@automr.com"
+    git config user.name "mr.bot"
+
+    ## Bump git tag for updated package in Big Bang chart/values.yaml
+    if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+        # yq strips blank lines from YAML files
+        yq e ".${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE} > /tmp/updated-values.yaml
+        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
+
+        # Adding blank lines back to values file before pushing changes
+        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true
+        patch ${VALUES_FILE} /tmp/patch.diff || true 
+        echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".${package}.git.tag" ${VALUES_FILE})"
+    elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
+        # yq strips blank lines from YAML files
+        yq e ".addons.${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE} > /tmp/updated-values.yaml
+        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml  
+
+        # Adding blank lines back to values file before pushing changes  
+        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true
+        patch ${VALUES_FILE} /tmp/patch.diff || true 
+        echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".addons.${package}.git.tag" ${VALUES_FILE})"
+    fi 
+    
+    ## Push changes and create merge request
+    git add ${VALUES_FILE}
+    git commit -m "Updated ${CI_PROJECT_NAME} git tag"
+    git push --set-upstream origin ${BB_SOURCE_BRANCH} \
+      -o merge_request.create \
+      -o merge_request.target=${BB_TARGET_BRANCH} \
+      -o merge_request.title="Draft: Updated ${CI_PROJECT_NAME} git tag" \
+      -o merge_request.label="status::review"	\
+      -o merge_request.label=${package}
+
+    ## Update merge request with reviewers and a description 
+
+    # Get ID of the MR that was just created
+    BB_MR_ID=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=opened" | jq '.[].iid' | head -1)
+    
+    # Get description of MR and save it to a JSON file
+    JSON_DESCRIPTION_FILE="/tmp/description.json"
+    curl "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '.description' > ${JSON_DESCRIPTION_FILE}
+    
+    # Edit the JSON file by adding curly brackets and "description" to make it a valid JSON request to the GitLab API
+    sed -i 's|^|\{\"description\"\:|' ${JSON_DESCRIPTION_FILE}
+    sed -i 's|$|\}|' ${JSON_DESCRIPTION_FILE}
+
+    # Update description JSON file with package changes
+    sed -i "s|(Describe Package changes here)|${CHANGELOG_URL}|g" ${JSON_DESCRIPTION_FILE}
+
+    # Update description of MR with the package MR URL
+    sed -i "s|(Link to Package MR here)|${PACKAGE_MR_URL}|g" ${JSON_DESCRIPTION_FILE}
+
+    # Update description of MR with package changes from CHANGELOG.md and add reviewers
+    curl --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}"
+    echo -e "\e[0Ksection_end:`date +%s`:create_bigbang_merge_request\r\e[0K"
+}
+
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Re-Usable Functions
