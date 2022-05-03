@@ -510,6 +510,19 @@ tempo:
         requests:
           cpu: 200m
           memory: 128Mi
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_url: 'https://tempo.bigbang.dev'
+          cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3100'
+          cypress_check_datasource: 'true'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+      scripts:
+        image: registry1.dso.mil/ironbank/big-bang/base:1.2.0
+        envs:
+          TEMPO_METRICS_URL: 'http://tempo-tempo.tempo.svc:3100'
 
     persistence:
       enabled: true
