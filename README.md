@@ -28,8 +28,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | Michael McLeroy | michaelmcleroy@cloudfitsoftware.com |  |
 | Micah Nagel | micah.nagel@parsons.com |  |
 | Branden Cobb | cobb_branden@bah.com |  |
-| Tom Runyon | tom@runyon.dev |  |
-| Josh Wolf | josh@rancherfederal.com |  |
+| Tom Runyon | tom@defenseunicorns.com |  |
 
 ## Source Code
 
@@ -251,7 +250,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.minio.enabled | bool | `false` | Toggle deployment of minio. |
 | addons.minio.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git"` |  |
 | addons.minio.git.path | string | `"./chart"` |  |
-| addons.minio.git.tag | string | `"4.4.12-bb.4"` |  |
+| addons.minio.git.tag | string | `"4.4.16-bb.0"` |  |
 | addons.minio.flux | object | `{}` | Flux reconciliation overrides specifically for the Minio Package |
 | addons.minio.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.minio.accesskey | string | `""` | Default access key to use for minio. |
