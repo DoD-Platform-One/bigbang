@@ -151,3 +151,68 @@ wait_project() {
 The sandbox pipeline template is a simple pipeline that allows the pipeline to run to completion even if there are
 failures at any stage of the pipeline.   This allows for quicker debugging of issues with new packages.
 
+# Testing changes to this repo
+
+#### Testing the package CI
+
+When testing changes to pipeline-templates and want to test the package CI, you will need a package to run through pipeline-templates and serve as a test subject. This is done by creating a .gitlab-ci.yml in the root directory of the project you plan to use as follows.
+
+```
+include:
+  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
+    file: '/pipelines/bigbang-package.yaml' 
+    ref: <your branch of pipeline-templates>
+variables:
+  PIPELINE_REPO_BRANCH: <your branch of pipeline-templates>
+  PACKAGE_NAMESPACE: <namespace for the test package>
+  PACKAGE_HELM_NAME: <helm name for the test package>
+```
+
+The `PIPELINE_REPO_BRANCH` variable will need to be set to your test branch in addition to the `ref:` line as it's used within pipeline-templates's shell scripts.
+
+The PACKAGE_NAMESPACE and PACKAGE_HELM_NAME for the test subject package are often the same, but sometimes the name of the package will install itself into a different namespace.
+
+**Note:** By default, gitlab uses .gitlab-ci.yml in the project's root as its CI/CD configuration file, but it can be pointed to another location in the repo config as the gitlab docs mention [here](https://docs.gitlab.com/ee/ci/pipelines/settings.html#specify-a-custom-cicd-configuration-file). Your repo admin may have pointed it elsewhere, and in this case it may be necessary to have one more repo with the default CI/CD config file location where you can copy the test subject package specifically to test your changes to pipeline-templates.
+
+#### Testing the bigbang CI
+
+If you are testing it against a full bigbang deployment and not the individual package CI, your .gitlab-ci.yml file will look like this:
+
+```
+include:
+  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
+    ref:  <your branch of pipeline-templates>
+    file: '/pipelines/bigbang.yaml'
+variables:
+  PIPELINE_REPO_BRANCH: <your branch of pipeline-templates>
+```
+
+## MR Title Keywords
+
+Keywords can be put in the titles of Merge Requests to easily adjust the pipeline behavior without a commit. Keywords supported are:
+
+`DEBUG`  Enables debug mode. This will set -x in shell scripts so each command is printed before it runs, and dumps information such as the networking configuration (virtual services, gateways, dns, /etc/hosts files), cluster information (kustomize, cluster resources, memory and cpu usage), and dumps the cluster logs.
+
+`SKIP UPGRADE`  Skips the upgrade test stage of a pipeline.
+
+`SKIP UPDATE CHECK` Skips the check in the configuration validation stage to see if the chart version was incremented.
+
+`SKIP INTEGRATION` Skips the integration stage which is used in the third-party and sandbox pipelines.
+
+### MR Labels
+
+Similar to the MR title keywords described above, gitlab labels can be added to Merge Requests to adjust CI pipeline behavior.
+
+##### Labels for bigbang MRs
+`all-packages` Enables all bigbang packages. This will typically cause the cluster to run slower due to the increased resource usage, so it can be helpful in making sure any timeouts you've set aren't too short or check for any conflicts between packages, etc.
+
+`<package-name>` Adding a package name as a label will enable that package.
+
+`test-ci::infra` Add stages to provision and destroy the cloud infrastructure where the tests will run.
+
+##### Labels for bigbang and package MRs
+`test-ci::release` Test the release CI, which includes the package and release stages.
+
+`disable-ci` Disables all pipeline runs.
+
+`kind::docs` For MRs with only document changes. Won't run any pipelines.
