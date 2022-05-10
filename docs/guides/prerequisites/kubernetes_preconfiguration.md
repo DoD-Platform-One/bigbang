@@ -44,6 +44,10 @@ You can override bigbang's helm values so istio will provision a service of type
 * Note: P1 has forks of various [Kubernetes Distribution Vendor Repos](https://repo1.dso.mil/platform-one/distros), there's nothing special about the P1 forks.
 * We recommend you leverage the Vendors upstream docs in addition to any docs found in P1 Repos; infact, the Vendor's upstream docs are far more likely to be up to date.
 
+### Kubernetes Version
+
+* We currently support up to k8s version 1.23, and back to Kubernetes releases that are not end of life https://kubernetes.io/releases/
+
 ### VMWare Tanzu Kubernetes Grid
 
 [Prerequisites section of VMware Kubernetes Distribution Docs's](https://repo1.dso.mil/platform-one/distros/vmware/tkg#prerequisites)
