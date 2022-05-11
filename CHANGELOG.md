@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.24]
+### Changed
+- Upgrade api version of k3d config file from `k3d.io/v1alpha3` to `k3d.io/v1alpha4`
+- Revalidated k3d config file w/ [v4 schema](https://github.com/k3d-io/k3d/blob/main/pkg/config/v1alpha4/schema.json)
+- Moved `name` property --> `metadata.name` in k3d config file due to above schema
+
 ## [2.4.23]
 ### Added
 - Migrated renovate pipeline from its repo to `pipelines/renovate.yaml`
