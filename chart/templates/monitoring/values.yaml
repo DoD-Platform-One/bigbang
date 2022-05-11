@@ -221,6 +221,7 @@ grafana:
     url: http://logging-loki-read.logging.svc.cluster.local:3100
     {{- end }}
     access: proxy
+    editable: true
   {{- end }}
   {{- if and .Values.loki.enabled .Values.tempo.enabled }}
     jsonData:
@@ -240,6 +241,27 @@ grafana:
     url: http://tempo-tempo.tempo.svc:3100
     isDefault: false
     editable: true
+  {{- if .Values.loki.enabled }}
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: 'Loki'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        mappedTags: [{ key: 'service.name', value: 'service' }]
+        mapTagNamesEnabled: false
+        spanStartTimeShift: '1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: false
+        filterBySpanID: false
+      serviceMap:
+        datasourceUid: 'prometheus'
+      search:
+        hide: false
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: 'Loki'
+  {{- end }}
   {{- end }}
   {{- end }}
 
