@@ -1,6 +1,7 @@
-apiVersion: k3d.io/v1alpha3
+apiVersion: k3d.io/v1alpha4
 kind: Simple
-name: ci
+metadata:
+  name: ci
 servers: 1
 image: rancher/k3s:v1.23.4-k3s1
 options:
