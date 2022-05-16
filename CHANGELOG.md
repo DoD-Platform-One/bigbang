@@ -2,6 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.9] - 2022-05-13
+
+### Changed
+
+- Removed audit clusterpolicies
+- disabled policies in audit mode except `require-non-root-user`,`require-non-root-group`
+
 ## [1.0.0-bb.8] - 2022-03-29
 
 ### Changed

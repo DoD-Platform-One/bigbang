@@ -72,7 +72,7 @@ policies:
 
   # -- Prevent resources that use deprecated or removed APIs (through Kubernetes 1.26)
   disallow-deprecated-apis:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   # -- Prevent use of the host namespace (PID, IPC, Network) by pods
@@ -82,7 +82,7 @@ policies:
 
   # -- Prevent container images with specified tags.  Also, requires images to have a tag.
   disallow-image-tags:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       disallow:
@@ -90,7 +90,7 @@ policies:
 
   # -- Prevent the `sidecar.istio.io/inject: false` label on pods.
   disallow-istio-injection-bypass:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   # -- Prevent specified labels on pods
@@ -103,7 +103,7 @@ policies:
 
   # -- Prevent pods from using the listed namespaces
   disallow-namespaces:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- List of namespaces to deny pod deployment
@@ -112,7 +112,7 @@ policies:
 
   # -- Prevent services of the type NodePort
   disallow-nodeport-services:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   # -- Prevent the use of `exec` or `attach` on pods
@@ -148,7 +148,7 @@ policies:
 
   # -- Prevent tolerations that bypass specified taints
   disallow-tolerations:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- List of taints to protect from toleration.  Each entry can have `key`, `value`, and/or `effect`.  Wildcards '*' and '?' can be used
@@ -168,7 +168,7 @@ policies:
 
   # -- Prevent additional RBAC permissions on default service accounts
   disallow-rbac-on-default-serviceaccounts:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     exclude:
       any:
@@ -187,7 +187,7 @@ policies:
 
   # -- Require containers have CPU limits defined and within the specified range
   require-cpu-limit:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- CPU limitations (only one required condition needs to be met).  The following operators are valid: >, <, >=, <=, !, |, &.
@@ -216,7 +216,7 @@ policies:
 
   # -- Require Istio sidecar injection label on namespaces
   require-istio-on-namespaces:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   # -- Require specified labels to be on all pods
@@ -234,7 +234,7 @@ policies:
 
   # -- Require containers have memory limits defined and within the specified range
   require-memory-limit:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- Memory limitations (only one required condition needs to be met).  Can use standard Kubernetes resource units (e.g. Mi, Gi).  The following operators are valid: >, <, >=, <=, !, |, &.
@@ -268,7 +268,7 @@ policies:
 
   # -- Require containers set root filesystem to read-only
   require-ro-rootfs:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   # -- Restricts pods that use AppArmor to specified profiles
@@ -312,7 +312,7 @@ policies:
   # -- Restrict container group IDs to specified ranges
   # NOTE: Using require-non-root-group will force runAsGroup to be defined
   restrict-group-id:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
@@ -403,7 +403,7 @@ policies:
   # -- Restrict user IDs to the specified ranges
   # NOTE: Using require-non-root-user will force runAsUser to be defined
   restrict-user-id:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
     parameters:
       # -- Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &.
