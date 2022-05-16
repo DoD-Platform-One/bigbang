@@ -182,7 +182,7 @@ policies:
 
   require-non-root-group:
     validationFailureAction: audit
-    {{- if $deployRestic }}
+    {{- if or $deployRestic .Values.twistlock.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -193,12 +193,23 @@ policies:
           - velero
           names:
           - restic*
-        {{- end }}
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
+      # - read logs from `/var/log` to watch for malicious processes
+      # - audit modifications to `/etc/passwd` (watching for suspicious changes)
+      # - access the container runtime socket (observing all running containers on a node)
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
     validationFailureAction: audit
-    {{- if $deployRestic }}
+    {{- if or $deployRestic .Values.twistlock.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -209,7 +220,19 @@ policies:
           - velero
           names:
           - restic*
-        {{- end }}
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
+      # - read logs from `/var/log` to watch for malicious processes
+      # - audit modifications to `/etc/passwd` (watching for suspicious changes)
+      # - access the container runtime socket (observing all running containers on a node)
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+
     {{- end }}
 
   {{- if .Values.twistlock.enabled }}
