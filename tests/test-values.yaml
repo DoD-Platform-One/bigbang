@@ -530,7 +530,6 @@ tempo:
           cypress_check_datasource: 'true'
           cypress_grafana_url: 'https://grafana.bigbang.dev'
       scripts:
-        image: registry1.dso.mil/ironbank/big-bang/base:1.2.0
         envs:
           TEMPO_METRICS_URL: 'http://tempo-tempo.tempo.svc:3100'
 
@@ -1020,7 +1019,7 @@ addons:
       account:
         adminPassword: new_admin_password
         currentAdminPassword: admin
-      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:8.4
+      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:1.16.0
 
   minioOperator:
     enabled: false
