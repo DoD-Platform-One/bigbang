@@ -1,0 +1,907 @@
+component-definition:
+  uuid: ""
+  metadata:
+    title: "Big Bang"
+    last-modified: '2022-05017T11:21:00Z'
+    version: "1.33.0"
+    oscal-version: "1.0.0"
+    parties:
+    - uuid: 72134592-08C2-4A77-ABAD-C880F109367A 
+      type: organization
+      name: Platform One
+      links:
+      - href: <https://p1.dso.mil>
+        rel: website
+  components:
+  - uuid: 81F6EC5D-9B8D-408F-8477-F8A04F493690
+    type: software
+    title: Istio Controlplane
+    description: |
+      Istio Service Mesh
+    purpose: Istio Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+    control-implementations:
+    - uuid: 06717F3D-CE1E-494C-8F36-99D1316E0D13
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 1822457D-461B-482F-8564-8929C85C04DB
+        control-id: ac-3
+        description: |-
+          Istio RequestAuthentication and AuthorizationPolicies are applied after Authservice.  Istio is configured to only allow access to applications if they have a valid JWT,  denying access by default. Applications that do not use Authservice do not have these
+           policies.
+      - uuid: D7717A9B-7604-45EF-8DCF-EE4DF0417F9C
+        control-id: ac-4
+        description: All HTTP(S) connections into the system via Istio ingress gateways
+          and throughout the system with Istio sidecars.
+      - uuid: 1D1E8705-F6EB-4A21-A24F-1DF7427BA491
+        control-id: ac-4.4
+        description: All encrypted HTTPS connections are terminated at the istio ingress
+          gateway.
+      - uuid: CD1315BF-91FE-490A-B6A6-5616690D78A8
+        control-id: ac-6.3
+        description: Can be configured with an "admin" gateway to restrict access
+          to applications that only need sysadmin access. Not standard in BB itself
+          though.
+      - uuid: 6109E09A-8279-44AB-8CA4-2051AF895648
+        control-id: ac-14
+        description: Istio RequestAuthentication and AuthorizationPolicies are applied
+          after Authservice. Istio is configured to only allow access to applications
+          if they have a valid JWT, denying access by default. Applications that do
+          not use Authservice do not have these policies.
+      - uuid: 9B6BA674-E6ED-4FB6-B216-3C8733F36411
+        control-id: au-2
+        description: Istio provides access logs for all HTTP network requests, including
+          mission applications.
+      - uuid: D3CBC898-F938-4FAA-B1B1-2597A69B5600
+        control-id: au-3
+        description: |-
+          By default, Istio uses the Common Log Format with additional information for access logs.
+          The default configuration does not include the identity of individuals associated with the event.
+      - uuid: D01F6B2D-F18E-47E9-94DC-95C0B5675E13
+        control-id: cm-5
+        description: Configured via Kubernetes resources. Inherited from cluster and
+          flux/ArgoCD.
+      - uuid: 6370B2DA-1E35-4916-8591-91FB9EDBE72B
+        control-id: cm-8
+        description: 'Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali. '
+      - uuid: AB9189FF-34E2-4D7E-8018-EB346C7AE967
+        control-id: cm-8.1
+        description: Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali. The inventory is automatically and
+          continuously updated.
+      - uuid: A740C741-23B4-4ED9-937C-E0276A9B92EE
+        control-id: cm-8.2
+        description: Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali. The inventory is automatically and
+          continuously updated.
+      - uuid: 61615706-5395-4168-8AD0-5C4ACBCC5D7E
+        control-id: ia-2
+        description: Istio RequestAuthentication and AuthorizationPolicies are applied
+          after Authservice. Istio is configured to only allow access to applications
+          if they have a valid JWT, denying access by default. Applications that do
+          not use Authservice do not have these policies.
+      - uuid: 3004BB1D-0F50-48F1-ABFE-40CC522B1C15
+        control-id: ia-4
+        description: Istio uses Kubernetes namespaces and resource names to identifiy
+          workloads in the service mesh. This provides management of identifiers for
+          all services in the cluster.
+      - uuid: FE110D6B-CCB5-41E8-B2DE-287ED843D417
+        control-id: ia-9
+        description: Istio registers all workload identities in the service mesh.
+          The identity is transmitted in the mTLS certificate when establishing communication
+          between services, and is validated by Istio sidecars.
+  - uuid: CB9B1F61-3CEC-4B32-A679-89011E596374
+    type: software
+    title: Istio Operator
+    description: |
+      Operator for managing Istio Service Mesh
+    purpose: Operator for Istio Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements: []
+  - uuid: 50EE9EB1-0DA4-411C-A771-AA1725B27E22
+    type: software
+    title: Jaeger
+    description: |
+      An open source, end-to-end distributed tracing system
+    purpose: Implementation of Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by jaeger for inheritance by applications
+      implemented-requirements: []
+  - uuid: A97D1364-BA7F-46AA-ADE6-1998E846E125
+    type: software
+    title: Kiali
+    description: |
+      A management console for Istio Service Mesh
+    purpose: Observibility into Istio Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 6EC9C476-9C9D-4EF6-854B-A5B799D8AED1
+        control-id: si-4.10
+        description: Kiali provides visibility into mTLS settings of all Istio traffic
+          in the cluster.
+  - uuid: 4045FB97-C11A-4F3B-A021-FD94538F0356
+    type: software
+    title: Cluster Auditor
+    description: |
+      Aggregator of policy violtions in environment
+    purpose: Display policy violations
+    responsible-roles:
+    - role-id: provider
+      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: FD81FE18-FF28-4150-B05D-8001488282BC
+        control-id: ac-6.9
+        description: Cluster Auditor provides a record of policy violiations identified
+          by OPA Gatekeeper to the Monitoring stack
+      - uuid: CDA82D9B-70DC-469A-BE63-43DDA26DE6F2
+        control-id: au-2
+        description: Cluster Auditor has identified policy violations as events that
+          are recorded.
+      - uuid: B381423A-46E9-4E39-8B72-3ABBC46DE4B9
+        control-id: ca-7
+        description: 'Continuous monitoring of controls/violations of the system in
+          accordance with the Control Assessment Plan '
+  - uuid: BE039F48-F418-4D86-BD5F-8CE8CBEAD91E
+    type: software
+    title: Elasticsearch and Kibana
+    description: |
+      Deployment of Elasticsearch and Kibana for logging stack
+    purpose: Provides storage and UI for log aggregation in the cluster
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 31ED9374-C146-4B40-ABD5-537B24DBDCEF
+        control-id: ac-6.9
+        description: Elasticsearch stores and aggregates privilege function calls
+          collected by fluentbt.
+      - uuid: 373074CC-F1EA-40CB-AD17-DB8F199D0600
+        control-id: au-4
+        description: Underlying log storage is elastically scaleable.
+      - uuid: 90FFF3BA-3E88-47AD-88B7-B50A92833A45
+        control-id: au-5
+        description: Kibana has the ability to alert based on events discovered in
+          Elastic indecies
+      - uuid: 3230D443-A18C-4F9B-A0DE-DC89CE5D01C8
+        control-id: au-5.1
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 98DE555D-1B90-475F-9C2E-954438172B39
+        control-id: au-9
+        description: Kibana provides ability to use Role Based Access Control to allow
+          for the indexes that store audit logs to be restricted to just cluster administrators
+      - uuid: 6ED4D692-F65F-40AB-AC3F-C056C2F41BD9
+        control-id: au-9.4
+        description: Kibana provides ability to use Role Based Access Control to allow
+          for the indexes that store audit logs to be restricted to just cluster administrators
+  - uuid: 50EE9EB1-0DA4-411C-A771-AA1725B27E22
+    type: software
+    title: ECK Operator
+    description: |
+      Operator for managing Elasticsearch and Kibana
+    purpose: Managing Elasticsearch and Kibana instances
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by ECK Operator for inheritance by applications
+      implemented-requirements: []
+  - uuid: BE039F48-F418-4D86-BD5F-8CE8CBEAD91E
+    type: software
+    title: Fluentbit
+    description: |
+      Log collector
+    purpose: Collects logs from the cluster
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 6358159C-2710-46EF-ACC5-39FD3117391D
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: D9D09567-C4C7-4DEA-921C-6318DF2F9331
+        control-id: ac-6.9
+        description: Fluentbit can be configured to collect all logs from Kubernetes
+          and underlying operating systems, allowing the aggregation of privileged
+          function calls.
+      - uuid: 373074CC-F1EA-40CB-AD17-DB8F199D0600
+        control-id: au-2
+        description: |-
+          Logging daemons are present on each node that BigBang is installed on.  Out of the box, the following events are captured:
+          * all containers emitting to STDOUT or STDERR (captured  by container runtime translating container logs to /var/log/containers) * all kubernetes api server requests  * all events emitted by the kubelet
+      - uuid: 90FFF3BA-3E88-47AD-88B7-B50A92833A45
+        control-id: au-3
+        description: |-
+          Records captured by the logging daemon are enriched to  ensure the following are always present:
+          * time of the event (UTC) * source of event (pod, namespace, container id)
+          Applications are responsible for providing all other information.
+      - uuid: 3230D443-A18C-4F9B-A0DE-DC89CE5D01C8
+        control-id: au-8
+        description: |-
+          Records captured by the logging daemon are enriched to  ensure the following are always present:
+          * time of the event (UTC) * source of event (pod, namespace, container id)
+          Applications are responsible for providing all other information.
+  - uuid: 4045FB97-C11A-4F3B-A021-FD94538F0356
+    type: software
+    title: Monitoring
+    description: |
+      Aggregator of policy violtions in environment
+    purpose: Display policy violations
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: B5B39044-B02A-4655-B466-7586B24963A1
+        control-id: ac-6.9
+        description: 'Privileged events, including updating the deployment of an application,
+          or use of privileged containers are collected as metrics by prometheus and
+          displayed by Grafana '
+      - uuid: 8AE237CE-E7FF-42FE-B79F-2DF106B0CC09
+        control-id: au-2
+        description: "API endpoints suitable for capturing application level metrics
+          are present on each of the supported applications running as containers.
+          \ In addition, system and cluster level metrics are emitted by containers
+          with read only access to host level information.\nMetrics are captured and
+          stored by Prometheus, an web server capable of scraping endpoints formatted
+          in the appropriate dimensional data format.  Metrics information is stored
+          on disk in a time series data base, and later queried through a separate
+          component providing a web interface for the query language: PromQL. "
+      - uuid: F2FFC2FD-6826-43EE-9922-705A76FE63CC
+        control-id: au-3.1
+        description: Grafana has pre-configured dashboards showing the audit records
+          from Cluster Auditor saved in Prometheus.
+      - uuid: B958C179-EE1F-40FC-BA2A-03B0072B20E6
+        control-id: au-4
+        description: Prometheus is the log aggregator for audit logs since it is used
+          to scrape/collect violations from ClusterAuditor.  The storage capability
+          can be configured in prometheus to use PVCs to ensure metrics have log retention
+          complioance with the org-defined audit-log retention requirements
+      - uuid: 01975AD9-8F46-48EB-81F1-1DDEB6DB0882
+        control-id: au-5
+        description: Grafana and Alertmanager can both alert on prometheus metrics
+          and alerts can be created in either to support this control
+      - uuid: FA95745B-E13E-4153-ABEE-1970C315A381
+        control-id: au-5.1
+        description: Alertmanager has pre-built alerts for PVC storage thresholds
+          that would fire for PVCs supporting prometheus metrics storage
+      - uuid: 5D45F4A3-A37F-451D-9670-8FA9DFD1355F
+        control-id: au-5.2
+        description: |-
+          Alertmanager has pre-build alerts for failed pods that would show when ClusterAuditor is not processeing events, or  prometheus is unable to scrape events.
+          Prometheus also has a deadman's alert to ensure end users are seeing events from prometheus as part of its configuration
+      - uuid: 603A45C9-E730-4321-B8AE-60D048E14BAB
+        control-id: au-6.1
+        description: Cluster Audtitor Events/Alerts could be exported from Prometheus
+          to an external system.  Integration for specific tooling would need to be
+          completed by end user
+      - uuid: 92D322C1-B4D3-4842-8B06-538218AECA7D
+        control-id: au-6.3
+        description: Aggregating cluster auditor events across multiple sources (clusters)
+          is possible with a multi-cluster deployment of prometheus/grafana
+      - uuid: BB0DF859-827F-4E3A-8C61-DEDCE4A9B3EB
+        control-id: au-6.5
+        description: Cluster Auditor's audit data is consolidated with system monitoring
+          tooling (node exporters) for consolidated view to enhance inappropriate
+          or unusual activity
+      - uuid: 77C00727-4195-45A8-8BB6-534AE5889E71
+        control-id: au-6.6
+        description: Cluster Auditor data in prometheus would enable this, but would
+          require prometheus to also obtain access to physical metrics.
+      - uuid: 6F291DF6-5613-46DF-9D9A-AC7CEDFF4A7B
+        control-id: au-7
+        description: Grafana is configured with a pre-built dashboard for policy violations
+          that displays data collected by Cluster Auditor
+      - uuid: 54D583CE-DB4A-4C03-902D-9A37949F4820
+        control-id: au-7.1
+        description: Grafana is configured with a pre-built dashboard for policy violations
+          that displays data collected by Cluster Auditor
+      - uuid: 91D9D559-1666-420B-9F2B-240BC7CD1A3E
+        control-id: au-8
+        description: Prometheus stores all data as timeseries data, so the timestamps
+          of when those violitions were present is part of the datastream
+      - uuid: 2D7AB4A4-1AE7-45A6-BC56-9FBB6402AD98
+        control-id: au-9
+        description: Grafana has the ability to provide Role Based Access Control
+          to limit the data sources that end users can view by leveraging an identity
+          provider.  Grafana can also limit users to subsets of metrics within a datasource
+          by the use of Label Based Acces Control when using Grafana Enterprise.
+      - uuid: 58B88EBD-ABAD-4505-9243-809D8DEFAEF7
+        control-id: au-9.2
+        description: Prometheus can scrape external components outside of the system,
+          but this configuration is not easily supported as part of the current big
+          bang configuration of ClusterAuditor since external access to ClusterAuditor
+          metrics is not exposed via Istio
+      - uuid: 8178202C-6E6C-415A-8B0D-C486AAC85B3A
+        control-id: au-9.4
+        description: Grafana has the ability to provide Role Based Access Control
+          to limit the data sources that end users can view by leveraging an identity
+          provider.  Grafana can also limit users to subsets of metrics within a datasource
+          by the use of Label Based Acces Control when using Grafana Enterprise.
+      - uuid: A471F648-C22C-4217-A3BA-1063E80B4BA3
+        control-id: au-12.1
+        description: Compatible metrics endpoints emitted from each application is
+          compiled by Prometheus and displayed through Grafana with associated timestamps
+          of when the data was collected
+  - uuid: E70A5057-3BA4-4E62-8C74-ED19122BBA9E
+    type: software
+    title: Authservice
+    description: "an implementation of thee Envoy External Authorization focused on
+      handling AuthN/AuthZ \nfor Istio and Kubernetes.\n"
+    purpose: Provides authn/authz capabilites to applications via Istio Service Mesh
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 6EC9C476-9C9D-4EF6-854B-A5B799D8AED1
+        control-id: ac-2.1
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 373074CC-F1EA-40CB-AD17-DB8F199D0600
+        control-id: ac-2.2
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 90FFF3BA-3E88-47AD-88B7-B50A92833A45
+        control-id: ac-2.3
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 3230D443-A18C-4F9B-A0DE-DC89CE5D01C8
+        control-id: ac-2.4
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 98DE555D-1B90-475F-9C2E-954438172B39
+        control-id: ac-8
+        description: Authservice allows the use of an extenrral idtntiy OIDC provider
+          for application login by configuring filter chain matching for hostname
+          (headers) for applications.  This control can then be inherited by the Identity
+          Provider
+      - uuid: 6ED4D692-F65F-40AB-AC3F-C056C2F41BD9
+        control-id: ac-10
+        description: "Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain  matching hostname for application.\nBy
+          restricting the lifetime of the JWT, Authservice will reauthenticate the
+          user when it expires. The  IdP can then implement concurrent session control,
+          enforced during reauthentication. This control can  then be inherited from
+          the IdP. "
+      - uuid: 5D737AC5-0841-480E-87C0-DBBDE4F61F8E
+        control-id: ac-12
+        description: "Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain  matching hostname for application.\nBy
+          restricting the lifetime of the JWT, Authservice will reauthenticate the
+          user when it expires. The  IdP can then implement concurrent session control,
+          enforced during reauthentication. This control can  then be inherited from
+          the IdP. "
+      - uuid: CBBAA8D3-276F-40C2-8E55-02C883201123
+        control-id: ac-14
+        description: "Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain  matching hostname for application.\nBy
+          restricting the lifetime of the JWT, Authservice will reauthenticate the
+          user when it expires. The  IdP can then implement concurrent session control,
+          enforced during reauthentication. This control can  then be inherited from
+          the IdP. "
+      - uuid: 085E711D-A3E8-4CC2-B2E4-F1F0D1E9CE87
+        control-id: ia-2
+        description: Authservice maps user sessions to user identities in an IdP.
+      - uuid: FB487DED-D360-4988-BD1B-4FCFA351258A
+        control-id: ia-2.1
+        description: 'Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain  matching hostname for application. The
+          IdP can enforce multi-factor authentication for the client used  by authservice.
+          This control can then be inherited from the IdP. '
+      - uuid: EC6FF902-2E29-4FEC-A5B7-F3DD1573F61A
+        control-id: ia-2.2
+        description: 'Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain  matching hostname for application. The
+          IdP can enforce multi-factor authentication for the client used  by authservice.
+          This control can then be inherited from the IdP. '
+      - uuid: B41B29FF-131D-4CD8-9275-9E0391BA35C5
+        control-id: ia-2.8
+        description: 'Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain matching hostname for application. The
+          IdP and OIDC protocol use "nonce" and "state" fields for replay resistance.
+          This control can then be inherited from the IdP. '
+      - uuid: 8BD41F8B-3072-4AAD-A7E2-1DFC24F6D0C5
+        control-id: ia-3
+        description: 'Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain matching hostname for application. The
+          IdP can be configured to uniquely idenfify and authenticate devices before
+          establishing connections. This control can then be inherited from the IdP. '
+      - uuid: 2519BEBB-327B-4E03-BA47-423D96114EE4
+        control-id: ia-4
+        description: 'Authservice retreives JWT identfiers from the IdP which include
+          various "claims" including the username of individuals, and a list of "groups"
+          (roles) the user has access to. This control can then be inherited from
+          the IdP. '
+      - uuid: F391AA9E-5EDB-483E-8EC2-60CA9602B1EF
+        control-id: ia-4.4
+        description: 'Authservice retreives JWT identfiers from the IdP, which include
+          various "claims" and such as  a list of "groups" (status) that apply to
+          the user. This control can then be inherited from the IdP. '
+      - uuid: 59AECD61-0244-4930-897C-EAFA9D423F7F
+        control-id: ia-5
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: FF69FC29-C3E0-4B02-948E-CF375F93AF05
+        control-id: ia-5.1
+        description: "Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. \nAuthservice
+          does NOT use the OAuth Resource Owner Password Credentials Flow, no passwords
+          are transmitted by Authservice."
+      - uuid: 1489616B-8A08-437A-8EE8-E86E10C64D94
+        control-id: ia-5.2
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 2B01945F-2793-4CA1-BD40-B236A190EE66
+        control-id: ia-5.6
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: B48BD91F-5A89-4653-89C5-45EC55267049
+        control-id: ia-6
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: BC78A59A-7E43-4F27-8961-7DD8957499D7
+        control-id: ia-8.1
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 13E81A49-24C1-4E05-8E5F-F50402FEEE54
+        control-id: ia-8.2
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 475636F6-74AC-4E12-938C-BA92999A34AF
+        control-id: ia-8.5
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 63130DA3-52C8-402A-9CB9-1DE9AF62DE5E
+        control-id: ia-10
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 9DA88C51-E81D-4D02-8B51-33CF15F5C46C
+        control-id: ia-11
+        description: "Allows the use of an external identiy OIDC provider for application
+          login by configuring filter chain matching hostname for application.\nBy
+          restricting the lifetime of the JWT, Authservice will reauthenticate the
+          user when it expires. The IdP can then implement concurrent session control,
+          enforced during reauthentication. This control can then be inherited from
+          the IdP. "
+      - uuid: 86C613C9-D6AC-4DF1-B8A2-5C51654CB933
+        control-id: ia-12
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: FA83073D-77E5-4DAA-A1A3-88FAD126ED50
+        control-id: ia-12.2
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: AFA5160F-11C1-471E-94E0-8B8E5D2C9050
+        control-id: ia-12.3
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 4284CA32-4CB9-484B-A769-34D6C1364F22
+        control-id: ia-12.4
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: 1906F9E4-6E82-46A5-A575-70FA0F2E131E
+        control-id: ia-12.4
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+      - uuid: C9C67A58-CBA4-4F9D-92A6-B73068C7F3AD
+        control-id: ia-12.5
+        description: 'Authservice does not manage authenticators, they are managed
+          by the IdP. This control can then be inherited from the IdP. '
+  - uuid: 3127D34A-517B-473B-83B0-6536179ABE38
+    type: software
+    title: Velero
+    description: |
+      Velero is an open source tool to safely backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes
+    purpose: Provides backup and restore capabilities to a Kubernetes cluster
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-8542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by velero for inheritance by applications
+      implemented-requirements:
+      - uuid: 2ADA7512-E0D5-4CAE-81BC-C889C640AF93
+        control-id: cp-6
+        description: Velero can take backups of your application configuration/data
+          and store them off-site in either an approved cloud environment or on-premise
+          location.
+      - uuid: 6C3339A0-9636-4E35-8FA8-731CF900B326
+        control-id: cp-6.1
+        description: Velero can take backups of your application configuration/data
+          and store them off-site in either an approved cloud environment or on-premise
+          location.
+      - uuid: 2799CCBF-C48D-4451-85BA-EBD9B949C361
+        control-id: cp-6.2
+        description: Velero can restore application configuration/data from an approved
+          cloud provider or on-premise location on-demand.
+      - uuid: 0AE59B43-50A7-4420-881B-E0635CCB8424
+        control-id: cp-6.3
+        description: Velero supports back-ups to multiple cloud environments (including
+          geo-separated locations for high availibility) and on-premise environments
+          in the event of an accessibility disruptions.
+      - uuid: B11B38B8-8744-4DFD-8C1A-4A4EDD7F9574
+        control-id: cp-7
+        description: Velero can restore application configuration/data from an approved
+          cloud provider or on-premise location to an alternative deployment environment
+          on-demand.
+      - uuid: D74C3A8C-E5B0-4F81-895D-FB2A318D723B
+        control-id: cp-7.1
+        description: Velero supports back-ups to  and restores from multiple cloud
+          environments (including geo-separated locations for high availibility) and
+          on-premise environments in the event of an accessibility disruptions.
+      - uuid: 72D7145F-7A3F-47AF-835F-7E3D6EFAE1CC
+        control-id: cp-7.2
+        description: Velero supports back-ups to  and restores from multiple cloud
+          environments (including geo-separated locations for high availibility) and
+          on-premise environments in the event of an accessibility disruptions.
+      - uuid: 5B0AA4CB-9C49-4D32-8242-5631788BD941
+        control-id: cp-9
+        description: |-
+          "Velero gives you tools to back up and restore your Kubernetes cluster resources and persistent volumes. You can run Velero with a cloud provider or on-premises. This includes:
+            - System components/data.
+            - User-level information/application metadata.
+            - User-level storage/data.
+            - Scheduled back-ups with configurable scopes.
+            - Multi-cloud and on-premise support for availability of backup."
+      - uuid: 8E5917F3-3E45-46C1-8585-48550E19AFFB
+        control-id: cp-9.1
+        description: Velero provides feedback/logging of back-up status for configuration/data
+          via kubectl or the Velero CLI tool. Velero can restore your production configuration/data
+          to validation environment to ensure reliability/integrity.
+      - uuid: 51191D0E-0C7B-4D2D-861D-202AC8C505CF
+        control-id: cp-9.2
+        description: Velero can be configured to restore only certain components of
+          a back-up when necessary.
+      - uuid: C650411C-33FD-4B59-8899-AC34B43C860F
+        control-id: cp-9.3
+        description: Velero supports back-ups to multiple cloud environments (including
+          geo-separated locations for high availibility) and on-premise environments.
+      - uuid: 8AB09B17-301B-4836-835B-9CE22A9E2300
+        control-id: cp-9.5
+        description: 'Velero gives you tools to back up and restore your Kubernetes
+          cluster resources and persistent volumes. You can run Velero with a cloud
+          provider or on-premises. This includes: - System components/data. - User-level
+          information/application metadata. - User-level storage/data. - Scheduled
+          back-ups with configurable scopes. - Multi-cloud and on-premise support
+          for availability of backup.'
+      - uuid: 7FACB782-C183-4585-8C0B-17824438FEA6
+        control-id: cp-9.8
+        description: Velero supports encryption of backups via its supported providers'
+          encryption support/mechanisms.
+      - uuid: 26B3D98B-0C9D-434B-8DE5-06CBBC46A38C
+        control-id: cp-10
+        description: Velero can restore application configuration/data from an approved
+          cloud provider or on-premise location on-demand.
+      - uuid: 3EA444B7-61ED-43DD-8B3D-24B55F286E59
+        control-id: cp-10.4
+        description: 'Velero gives you tools to back up and restore your Kubernetes
+          cluster resources and persistent volumes. You can run Velero with a cloud
+          provider or on-premises. This includes: - System components/data. - User-level
+          information/application metadata. - User-level storage/data. - Scheduled
+          back-ups with configurable scopes. - Multi-cloud and on-premise support
+          for availability of backup.'
+  - uuid: 13936e92-24bd-4948-abe6-af88422174aa
+    type: software
+    title: Keycloak
+    description: |
+      An implementation of a customizable Keycloak for single sign-on (SSO) with Identity and Access Management
+    purpose: Provides user federation, strong authentication, user management, fine-grained
+      authorization.
+    responsible-roles:
+    - role-id: provider
+      party-uuid: ""
+    control-implementations:
+    - uuid: 44bb0268-355d-455b-be33-7fc6ecc89668
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by Keycloak for inheritance by applications
+      implemented-requirements:
+      - uuid: 045bbf72-d7d1-4763-a997-caf62785b2aa
+        control-id: ac-1
+        description: |-
+          System-level access controls
+          Keycloak supports fine-grained authorization policies and is able to combine different access control mechanisms such as:
+
+            - Attribute-based access control (ABAC)
+            - Role-based access control (RBAC)
+            - User-based access control (UBAC)
+            - Context-based access control (CBAC)
+            - Rule-based access control
+            - Using JavaScript
+            - Time-based access control
+            - Support for custom access control mechanisms (ACMs) through a Policy Provider Service Provider Interface (SPI)
+
+          Keycloak is based on a set of administrative UIs and a RESTful API, and provides the necessary means to create permissions for your protected resources and scopes, associate those permissions with authorization policies, and enforce authorization decisions in your applications and services.
+          Resource servers (applications or services serving protected resources) usually rely on some kind of information to decide if access should be granted to a protected resource. For RESTful-based resource servers, that information is usually obtained from a security token, usually sent as a bearer token on every request to the server. For web applications that rely on a session to authenticate users, that information is usually stored in a user’s session and retrieved from there for each request.
+          Permissions can be created to protect two main types of objects:
+
+            - Resources: resource-based permission defines a set of one or more resources to protect using a set of one or more authorization policies.
+            - Scopes: scope-based permissions defines a set of one or more scopes to protect using a set of one or more authorization policies. Unlike resource-based permissions, you can use this permission type to create permissions not only for a resource, but also for the scopes associated with it, providing more granularity when defining the permissions that govern your resources and the actions that can be performed on them.
+
+            https://www.keycloak.org/docs/latest/authorization_services/
+
+          Organizational access controls
+          Organizational roles could be broken down into cluster admins, resource owners / administrators, clients / users
+      - uuid: 86815b87-fc12-432b-9d0a-77492186ad6e
+        control-id: ac-2
+        description: |-
+          Big Bang implements a custom plugin to handle account managment, found here (https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/tree/main/development).  Through this plugin logic is implemented to control automated registration and ties into DoD PKI validation/verification. Additionally, this plugin validates group membership in conjunction with Keycloak Clients to prohibit/allow access to various resources behind the single sign on solution.
+
+            a/c. non-privileged users are prohibited by the keycloak plugin and declarative group structure defined here (https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/tree/main/development). Privileged users follow a similar posture combined with other solutions to prohibit access to resources based on group membership.
+            b. Keycloak can be configured for fine grain permissions to assign account managers, additionally the custom plugin allows configuration of groups with specific permissions within the keycloak web UI console.
+            d (1-3). Declarative groups specify authorized users, groups, and roles. Access authorizations and assignment is related to Day 2 operations of keycloak and may vary between organizations.
+            e. Handled by Day 2 operations of keycloak.
+            f. declarative groups assist in the handling of accounts, but ultimate is is a day 2 operation.
+            g. Keycloak web UI has a queryable audit logging feature and backend logs can be monitored.
+            h. Handled by Day 2 operations of keycloak.
+            i. Handled by Day 2 operations of keycloak.
+            j. Mostly, handled by Day 2 operations of keycloak. However, built in registration flow validates and verifies DoD level authorization.
+            k.  Handled by Day 2 operations of keycloak.
+            l.  Handled by Day 2 operations of keycloak.
+      - uuid: 477fbb45-8837-4755-a1f2-6d1843b7bedb
+        control-id: ac-2.1
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured to notify when an account is created, enabled, modified,
+          disabled, or removed, or when users are terminated or transferred.
+      - uuid: 440ef311-2711-4bb0-9dd8-438d196e84e5
+        control-id: ac-2.2
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured to notify when an account is created, enabled, modified,
+          disabled, or removed, or when users are terminated or transferred.
+      - uuid: 9a76f468-1daa-49ca-9582-7c17751f41bc
+        control-id: ac-2.3
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured to notify when an account is created, enabled, modified,
+          disabled, or removed, or when users are terminated or transferred.
+      - uuid: 93d0b28b-bcf4-4e45-a5e0-f5d1b0ce9d26
+        control-id: ac-2.4
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured to notify when an account is created, enabled, modified,
+          disabled, or removed, or when users are terminated or transferred.
+      - uuid: 6c10ca0e-7b91-45ab-b066-949bdfba126a
+        control-id: ac-2.5
+        description: Keycloak is configured with login timeout, session tokens, etc.
+          and are managed in realm settings/tokens
+      - uuid: 473ce520-ed39-4d88-9433-2a04cc451b16
+        control-id: ac-2.12
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured and automated via email, external webhook, and logging
+          stack monitored by admins to notify when an account is created, enabled,
+          modified, disabled, or removed, or when users are terminated or transferred.
+      - uuid: cb4929fc-3685-45e4-8720-405dc5ed9ea3
+        control-id: ac-2.13
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak.
+          There are roughly 30 different event types in keycloak and an event listener
+          can be configured and automated via email, external webhook, and logging
+          stack monitored by admins to notify when an account is created, enabled,
+          modified, disabled, or removed, or when users are terminated or transferred.
+      - uuid: b704526e-e18f-46ec-8072-2e361115265a
+        control-id: ac-3
+        description: Keycloak allows the creation of clients that provide login to
+          app via Keycloak, allowing account management to be inherited from keycloak
+          and the enforcement of approved authorizaions for logical access to information
+          and system resources.
+      - uuid: ef73dc31-ab9a-4d67-b5b8-c042e47aba25
+        control-id: ac-4
+        description: Keycloak is designed and recommended to be deployed in a stand-alone
+          BB cluster with TLS passthrough for OIDC/SAML integration. Controls are
+          inherited from istio via network policies, virtual services and gateway
+          configs.
+      - uuid: 34ea5ae5-3525-4a81-974f-a73e1999610f
+        control-id: ac-4.4
+        description: Keycloak is designed and recommended to be deployed in a stand-alone
+          BB cluster with TLS passthrough for OIDC/SAML integration. Controls are
+          inherited from istio via network policies, virtual services and gateway
+          configs.
+      - uuid: 25a717a7-3f1f-4d24-9cc1-701be6f97df9
+        control-id: ac-5
+        description: Keycloak is designed and recommended to be deployed in a stand-alone
+          BB cluster with TLS passthrough for OIDC/SAML integration. Controls are
+          inherited from istio via network policies, virtual services and gateway
+          configs.
+      - uuid: 28fba4bc-e1ae-4164-9673-6ed90d93a7c0
+        control-id: ac-6
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 2f8de149-d07f-4e8a-8baf-5bdbace0cf8d
+        control-id: ac-6.1
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 5a04932c-05cf-489a-932c-cb31b9480b73
+        control-id: ac-6.2
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 337a9b7f-71d0-46ef-aaa2-af5367d9b371
+        control-id: ac-6.5
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 6de217bb-f767-4af0-b813-b54df9baf173
+        control-id: ac-6.7
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 59032e55-f51e-4a0d-9394-7474631005ec
+        control-id: ac-6.9
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: ad95419d-4506-48b0-a736-723724acea34
+        control-id: ac-6.10
+        description: Keycloak as an IDM / IAM provider supports least privilege through
+          user / group management (ABAC / RBAC) service offerings
+      - uuid: 16088314-7668-41a2-9ee1-a7128d6c209e
+        control-id: ac-7
+        description: 'Keycloak has brute force protection which has three components:
+          max login failures, quick login check (time between failures) & minimum
+          quick login check wait (time user will be disabled when multiple login failures
+          are detected)'
+      - uuid: 35992922-7375-45fc-bac1-1a6b551a76b9
+        control-id: ac-8
+        description: Keycloak has a standard DOD login banner see https://login.dso.mil
+      - uuid: 2a99e48f-6631-4ff7-b955-b73caafdedac
+        control-id: ac-10
+        description: Keycloak does not suffice this control natively; however, you
+          can implement a “only one session per user” behavior with an ```EventListenerProvider```.
+          On every LOGIN event, delete all the sessions of a user, except the current
+          one.
+      - uuid: 77c2aa64-ab6b-4508-b6f6-fcca929de9ab
+        control-id: ac-12
+        description: Keycloak does not suffice this control natively; however, you
+          can implement a session behaviors with an ```EventListenerProvider```.
+      - uuid: 3b38e765-41f8-4ea6-90dc-b4a1845b62cc
+        control-id: ac-14
+        description: Keycloak has the ability to allow anonymous access to resource
+          if Client Access Type is set to public.
+      - uuid: 9bd24189-a9f7-4ddb-98fb-ba259b46b459
+        control-id: ac-17.1
+        description: Keycloak manages remote access to other applications through
+          IAM.
+      - uuid: 3e901895-d5da-48a0-8317-56b456371243
+        control-id: ac-17.2
+        description: Through EventListeners Keycloak can either ship logs to a SIEM
+          which could alert on remote session events, or with custom SPIs Keycloak
+          can perform an action directly on events. A VPN client would need to use
+          Keycloak as an SSO to generate these events.
+      - uuid: 66bc3835-8369-48ec-b54f-ca5ca034e2fd
+        control-id: ac-17.3
+        description: Keycloak can restrict access to control points through IAM, but
+          a VPN solution like Appgate would be better suited working with Keycloak.
+      - uuid: f6e0f2a4-c729-4335-97f4-b16fb49d27f9
+        control-id: ac-17.4
+        description: Keycloak can support a VPN or other remote management system
+          as its IAM to support remote access control.
+      - uuid: 6a948220-d3ef-4357-989a-38e25f27eb3f
+        control-id: au-2
+        description: Keycloak captures user and admin events and can ship them out
+          to a logging server for analysis or trigger an action on specific event
+          via customizable EventListeners.
+      - uuid: 4b4d19b0-b8e1-4fdd-b57b-448f4e163342
+        control-id: au-3
+        description: Keycloak events contain what, when, where, source, and objects/entities
+          for policy violations.
+      - uuid: 35b33698-d3c5-496e-9cb4-4524c63e2fac
+        control-id: au-3.1
+        description: Keycloak event logs include Time, Event Type, Details (Client,
+          User, IP Address). Events are shipped to logging.
+      - uuid: ab565bfa-78a5-43e6-98cc-ba801a16b980
+        control-id: au-4
+        description: Keycloak events can be both saved to database and shipped to
+          logging server. Both systems are external to Keycloaks application server.
+      - uuid: 24b14c71-b4bd-402f-aba6-80056e1b6fec
+        control-id: au-7
+        description: Keycloak provides audit records for compliance that qualify for
+          this control.
+      - uuid: e528b2ec-6895-432d-acf1-b33e0f8455f5
+        control-id: au-7.1
+        description: Within Keycloak records, sorting and searching are supported.
+      - uuid: ed7026d7-4257-44e6-919c-73e5f8a86be5
+        control-id: au-8
+        description: Keycloak saves timestamps in event logs
+      - uuid: 92b5e2c1-cb7c-4f38-ba5b-22b617b15020
+        control-id: au-9
+        description: Keycloak provides RBAC to restrict management of logs.
+      - uuid: 71c0d1c7-f9a5-4439-829b-8976749481eb
+        control-id: au-9.4
+        description: Keycloak provides RBAC to restrict management of logs.
+      - uuid: 0b7b466e-e33c-4fa0-8979-a82da5fadc32
+        control-id: ia-2
+        description: Keycloak supports control through its IAM/SSO service.
+      - uuid: ff98831e-de87-4f0d-b42f-3af08a6caff6
+        control-id: ia-2.1
+        description: Keycloak supports MFA using mobile and x509 mTLS for both privileged
+          and non-privileged account management.
+      - uuid: e0fbd222-d6ae-4729-a262-7c795dd6a628
+        control-id: ia-2.2
+        description: Keycloak supports MFA using mobile and x509 mTLS for both privileged
+          and non-privileged account management.
+      - uuid: 441d2bbd-b7ee-46e9-8110-f0fda67a2c90
+        control-id: ia-2.5
+        description: Keycloak provides build-in functionality to support control.
+      - uuid: 5c163729-a954-43ca-a035-6040b0526ccd
+        control-id: ia-2.12
+        description: Keycloak supports PIV credentials
+      - uuid: 084779e8-542d-4def-936b-69fd1fb7f266
+        control-id: ia-3
+        description: Keycloak provides built-in functionality to support control.
+      - uuid: 7a4c2837-a205-4b9c-b850-a8afec580275
+        control-id: ia-4
+        description: Keycloak provides built-in functionality to support control.
+      - uuid: ce397926-ec86-491c-82f6-db7e2e164a0d
+        control-id: ia-4.4
+        description: Keycloak provides built-in functionality to support control.
+      - uuid: 7cee87f8-165f-4631-96f5-b2876df0e88a
+        control-id: ia-5.1
+        description: Keycloak provides password-policies to support control. https://github.com/keycloak/keycloak-documentation/blob/main/server_admin/topics/authentication/password-policies.adoc
+      - uuid: 56d5209f-e279-4f67-b6e9-9a814695dda9
+        control-id: ia-5.2
+        description: Keycloak supports OCSP checking, and truststore/chain validation
+          for x509 PKI access.
+      - uuid: 8d858e85-710e-46aa-b6fd-98013480c2b6
+        control-id: ia-8.1
+        description: Keycloak supports authenicating non-orgaizational users through
+          supporting mTLS signed by external certificate authorities.
+      - uuid: c2976939-842a-4efc-afd3-11dc9892fb86
+        control-id: ia-11
+        description: Keycloak supports OIDC/SAML which support expiration dates in
+          tokens/assertions.
+  back-matter:
+    resources: []
+
