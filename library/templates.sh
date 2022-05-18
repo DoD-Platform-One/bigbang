@@ -1553,3 +1553,21 @@ get_cpumem(){
   kubectl top pods --all-namespaces --use-protocol-buffers | tee get_cpumem.txt
   echo -e "\e[0Ksection_end:`date +%s`:get_cpumem\r\e[0K"
 }
+
+renovate_download_external_deps() {
+  curl -sO https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"README.md.gotmpl
+  mv "${CI_PROJECT_DIR}"/README.md.gotmpl "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
+
+  curl -sO https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/.helmdocsignore
+  mv "${CI_PROJECT_DIR}"/.helmdocsignore "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
+
+  HELM_VERSION=1.5.0
+  curl -sL https://github.com/norwoodj/helm-docs/releases/download/v${HELM_VERSION}/helm-docs_${HELM_VERSION}_Linux_x86_64.tar.gz -o "${CI_PROJECT_DIR}"/helm-docs.tar.gz
+  mkdir -p "${CI_PROJECT_DIR}"/helm-docs
+  tar xvf "${CI_PROJECT_DIR}"/helm-docs.tar.gz -C "${CI_PROJECT_DIR}"/helm-docs
+  mv "${CI_PROJECT_DIR}"/helm-docs/helm-docs "${CI_PROJECT_DIR}"/scripts/helm-docs
+  chmod +x "${CI_PROJECT_DIR}"/scripts/helm-docs
+  mkdir -p "${CI_PROJECT_DIR}"/renovate
+
+  ls -la "${CI_PROJECT_DIR}"/scripts
+}
