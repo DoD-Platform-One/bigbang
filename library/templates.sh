@@ -222,6 +222,15 @@ label_check() {
             echo "    Added minioOperator"
          fi
       fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "promtail" ]]; then
+         echo "  Checking promtail"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
+            echo "    loki already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("loki")
+            echo "    Added loki"
+         fi
+      fi
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
          echo "  Checking loki"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
