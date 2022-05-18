@@ -37,8 +37,8 @@ Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big 
 Follow the steps below to get a local Kubernetes cluster for Big Bang  using [k3d](https://k3d.io/).
 
 ```bash
-# Create a local k3d cluster with the appropriate port forwards
-k3d cluster create --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" -p 80:80@loadbalancer -p 443:443@loadbalancer
+# Create a local k3d cluster with the appropriate port forwards (tested on version 5.4.1)
+k3d cluster create --k3s-arg "--no-deploy=metrics-server,traefik@server:*" -p 80:80@loadbalancer -p 443:443@loadbalancer
 ```
 
 ## Deploying Big Bang (Quick Start)
