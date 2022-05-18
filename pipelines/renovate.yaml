@@ -19,7 +19,6 @@ default:
       - $CI_PROJECT_DIR/renovate
 
 renovate:on-schedule:
-  extends: .templates
   only:
     - schedules
   tags:
@@ -27,6 +26,9 @@ renovate:on-schedule:
     - dogfood
     - generic
     - bbci
+  before_script:
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
   script:
     - export PATH=${CI_PROJECT_DIR}/scripts:$PATH
     - renovate_download_external_deps
@@ -39,7 +41,6 @@ renovate:on-schedule:
 
 # test self updates with dry-run
 renovate:
-  extends: .templates
   except:
     - schedules
   tags:
@@ -47,6 +48,9 @@ renovate:
     - dogfood
     - generic
     - bbci
+  before_script:
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
   script:
     - export PATH=${CI_PROJECT_DIR}/scripts:$PATH
     - renovate_download_external_deps
