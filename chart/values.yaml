@@ -492,7 +492,7 @@ promtail:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
     path: "./chart"
-    tag: "3.11.0-bb.1"
+    tag: "4.2.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
