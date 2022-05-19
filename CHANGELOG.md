@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.28]
+### Fixed
+- Fixed a bug where auto MR creation would pull the wrong MR
+
 ## [2.4.27]
 ### Fixed
 - Fixed a bug where Promtail enabled Loki without enabling its dependencies
