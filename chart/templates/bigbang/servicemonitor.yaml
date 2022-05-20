@@ -9,14 +9,14 @@ metadata:
 spec:
   selector:
     matchLabels:
-      name: {{ include "nexus.fullname" . }}
+      app: {{ include "nexus.fullname" . }}
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
   endpoints:
     - interval: 30s
       path: /service/metrics/prometheus
-      port: nexus-ui
+      port: http-nexus-ui
       scheme: http
       basicAuth:
         password:

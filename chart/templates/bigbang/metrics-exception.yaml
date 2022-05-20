@@ -1,0 +1,19 @@
+{{- if .Values.istio.enabled }}
+apiVersion: "security.istio.io/v1beta1"
+kind: PeerAuthentication
+metadata:
+  name: nexus-metrics-exception
+  namespace: {{ .Release.Namespace }}
+spec:
+  mtls:
+    mode: {{ .Values.istio.mtls.mode }}
+  selector:
+    matchLabels:
+      app: {{ include "nexus.fullname" . }}
+  {{- if eq .Values.istio.mtls.mode "STRICT" }}
+  # Permissive for metrics scraping
+  portLevelMtls:
+    "{{ .Values.nexus.nexusPort }}":
+      mode: PERMISSIVE
+  {{- end }}
+{{- end }}
