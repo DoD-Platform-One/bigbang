@@ -1,6 +1,9 @@
 # Changelog
 
 ---
+## [38.0.0-bb.1] - 2022-04-27
+### Changed
+- Add default STRICT mTLS PeerAuthentication policy
 
 ## [38.0.0-bb.0] - 2022-04-04
 ### Changed
