@@ -159,6 +159,7 @@ gatekeeper:
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-operator-cypress-test
+          - monitoring/kube-prometheus-stack-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -251,6 +252,7 @@ gatekeeper:
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-operator-cypress-test
+          - monitoring/kube-prometheus-stack-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -356,6 +358,7 @@ kyvernopolicies:
               - nexus-repository-manager
               - keycloak
               - jaeger
+              - monitoring
               names:
               - "*-cypress-test*"
         parameters:
@@ -373,6 +376,7 @@ kyvernopolicies:
               - nexus-repository-manager
               - keycloak
               - jaeger
+              - monitoring
               names:
               - "*-cypress-test*"
         parameters:
@@ -405,6 +409,7 @@ kyvernopolicies:
               - nexus-repository-manager
               - keycloak
               - jaeger
+              - monitoring
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
