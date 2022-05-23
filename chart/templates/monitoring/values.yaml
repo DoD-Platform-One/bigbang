@@ -24,6 +24,8 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
+openshift: {{ .Values.openshift }}
+
 minioOperator:
   enabled: {{ .Values.addons.minioOperator.enabled }}
 
@@ -291,19 +293,6 @@ grafana:
       {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
-
-  {{- if or .Values.loki.enabled .Values.addons.gitlabRunner.enabled $redisDatasource .Values.addons.vault.enabled }}
-  plugins:
-  {{- if $redisDatasource }}
-    - redis-datasource
-  {{- end }}
-  {{- if or .Values.loki.enabled .Values.addons.vault.enabled }}
-    - grafana-piechart-panel
-  {{- end }}
-  {{- if .Values.addons.gitlabRunner.enabled }}
-    - grafana-polystat-panel
-  {{- end }}
-  {{- end }}
 
 prometheus-node-exporter:
   image:
