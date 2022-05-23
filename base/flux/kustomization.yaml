@@ -6,16 +6,16 @@ resources:
 images:
 - name: ghcr.io/fluxcd/helm-controller
   newName: registry1.dso.mil/ironbank/fluxcd/helm-controller
-  newTag: v0.20.1
+  newTag: v0.21.0
 - name: ghcr.io/fluxcd/kustomize-controller
   newName: registry1.dso.mil/ironbank/fluxcd/kustomize-controller
-  newTag: v0.24.4
+  newTag: v0.25.0
 - name: ghcr.io/fluxcd/notification-controller
   newName: registry1.dso.mil/ironbank/fluxcd/notification-controller
-  newTag: v0.23.4
+  newTag: v0.23.5
 - name: ghcr.io/fluxcd/source-controller
   newName: registry1.dso.mil/ironbank/fluxcd/source-controller
-  newTag: v0.24.3
+  newTag: v0.24.4
 
 patches:
   - target:
