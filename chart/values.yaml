@@ -578,7 +578,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "35.2.0-bb.0"
+    tag: "35.2.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
