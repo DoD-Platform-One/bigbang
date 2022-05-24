@@ -60,6 +60,7 @@ variables:
   REGISTRY1_USER: $REGISTRY1_USER
   PIPELINE_TYPE: "BB"
   DEBUG_ENABLED: "false"
+  METRICS_DISABLED: "false"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

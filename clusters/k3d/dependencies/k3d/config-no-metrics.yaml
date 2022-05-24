@@ -1,0 +1,45 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: ci
+servers: 1
+image: rancher/k3s:v1.23.4-k3s1
+options:
+  k3s:
+    extraArgs:
+      - arg: --disable=metrics-server
+        nodeFilters:
+            - server:*
+      - arg: --disable=traefik
+        nodeFilters:
+          - server:*
+      - arg: --disable=servicelb
+        nodeFilters:
+          - server:*
+      - arg: --cluster-cidr=172.20.1.0/24
+        nodeFilters:
+          - server:*
+      - arg: --service-cidr=172.20.0.0/24
+        nodeFilters:
+          - server:*
+      - arg: --cluster-dns=172.20.0.10
+        nodeFilters:
+          - server:*
+  k3d:
+    wait: true
+volumes:
+  - volume: /etc/machine-id:/etc/machine-id
+    nodeFilters:
+      - server:*
+      - agent:*
+  - volume: /cypress:/cypress
+    nodeFilters:
+      - server:*
+      - agent:*
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
