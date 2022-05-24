@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.29]
+### Added
+- Added a k3d configuration file for a k3d cluster that disables the default metrics server by default
+### Changed
+- Changed `METRICS_DISABLED` flag to bigbang, bigbang-package,sandbox, and third-party pipelines
+- Changed `deploy_k3d.sh` to evaluate which configuration file to used based on the `METRICS_DISABLED` flag value
+
 ## [2.4.28]
 ### Fixed
 - Fixed a bug where auto MR creation would pull the wrong MR

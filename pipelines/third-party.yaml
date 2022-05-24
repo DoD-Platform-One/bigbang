@@ -34,6 +34,7 @@ variables:
   REGISTRY1_USER: $REGISTRY1_USER
   PIPELINE_TYPE: "PKG"
   DEBUG_ENABLED: "false"
+  METRICS_DISABLED: "false"
 
 configuration validation:
   stage: ⚙️ configuration validation
