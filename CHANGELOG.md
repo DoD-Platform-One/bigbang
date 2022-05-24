@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.50.0-bb.0] - 2022-05-23
+### Changed
+- Updated to 1.50.0 images (latest in IB)
+
 ## [1.49.0-bb.0] - 2022-04-25
 ### Changed
 - Updated to 1.49.0 images (latest in IB)
@@ -22,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.47.0-bb.2] - 2022-03-24
 ### Added
-- Added Tempo Zipkin Egress Policy 
+- Added Tempo Zipkin Egress Policy
 
 ## [1.47.0-bb.1] - 2022-03-15
 ### Changed
@@ -52,7 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.44.0-bb.3] - 2022-1-21
 ### Changed
-- Relocated bbtests from `test-values.yaml` to `values.yaml` 
+- Relocated bbtests from `test-values.yaml` to `values.yaml`
 
 ## [1.44.0-bb.2] - 2022-1-13
 ### Added
@@ -144,4 +148,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.32.0-bb.1]
 ### Changed
 - Copied default CR file into values.yaml from here https://github.com/kiali/kiali-operator/blob/v1.28/deploy/kiali/kiali_cr.yaml
-
