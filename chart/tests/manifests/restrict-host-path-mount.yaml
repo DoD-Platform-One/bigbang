@@ -43,3 +43,39 @@ spec:
     hostPath:
       path: /tmp/allowed
       type: DirectoryOrCreate
+---
+# Test 3: Host Path Persistent Volume paths that are not in the allowed list are not allowed
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: restrict-host-path-mount-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  storageClassName: manual 
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce 
+  hostPath:
+    path: /tmp/disallowed
+---
+# Test 4: Host Path Persistent Volume paths that are in the allowed list are allowed
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: restrict-host-path-mount-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  storageClassName: manual 
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce 
+  hostPath:
+    path: /tmp/allowed

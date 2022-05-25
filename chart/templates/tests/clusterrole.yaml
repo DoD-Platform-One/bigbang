@@ -26,6 +26,7 @@ rules:
   - leases
   - namespaces
   - pods
+  - persistentvolumes
   - secrets
   - serviceaccounts
   - services

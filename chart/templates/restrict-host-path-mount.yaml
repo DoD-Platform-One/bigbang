@@ -23,12 +23,14 @@ spec:
   rules:
   - name: restrict-hostpath-dirs
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
-    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod" "PersistentVolume")) .) | nindent 4 }}
     validate:
       message: hostPath volume paths are restricted to the allowed list.
       pattern:
         spec:
           =(volumes):
           - =(hostPath):
+              path: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+          =(hostPath):
               path: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

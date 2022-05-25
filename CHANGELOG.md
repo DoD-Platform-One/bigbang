@@ -2,12 +2,22 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.0-bb.10] - 2022-05-24
+
+### Changed
+
+- Added policy to catch Persistent Volumes of type Hostpath
+- Modifieded `restrict--host-path-mount.yaml`
+
 ## [1.0.0-bb.9] - 2022-05-13
 
 ### Changed
 
 - Removed audit clusterpolicies
-- disabled policies in audit mode except `require-non-root-user`,`require-non-root-group`
+- disabled `disallow-istio-injection-bypass`
+- disabled `require-drop-all-capabilities`
+- disabled `require-istio-on-namespaces`
+- disabled `restrict-capabilities`
 
 ## [1.0.0-bb.8] - 2022-03-29
 
