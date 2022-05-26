@@ -9,8 +9,8 @@ wait_project() {
    # need to remove the default "set -e" to allow commands to return nonzero exit codes without the script failing
    set +e
    while true; do
-      if kubectl get $resourcename --namespace=$resourcename -o jsonpath='{.items[0].status.progress.message}' | \
-         grep "Finished all resource creation" 1>/dev/null
+      if kubectl get $resourcename --namespace=$resourcename -o jsonpath='{.items[0].status.conditions[*]}' | \
+         grep "Last reconciliation succeeded" 1>/dev/null
       then
          echo "$resourcename custom resource creation finished"
          break
