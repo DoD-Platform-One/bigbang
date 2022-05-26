@@ -182,7 +182,7 @@ policies:
 
   require-non-root-group:
     validationFailureAction: audit
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled }}
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -215,11 +215,22 @@ policies:
           names:
           - logging-fluent-bit*
       {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      # promtail requires access to /run/promtail for its buffering and persistent state.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-promtail*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
     validationFailureAction: audit
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled }}
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -251,6 +262,17 @@ policies:
           - logging
           names:
           - logging-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      # promtail requires access to /run/promtail for its buffering and persistent state.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-promtail*
       {{- end }}
     {{- end }}
 
