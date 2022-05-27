@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.31]
+### Changed
+- support for Vault passthrough ingress.
+### Added
+- Added new deployment script to patch coredns for Vault.
+
 ## [2.4.30]
 ### Changed
 - Removed third-party integration pipeline rule to always run on a Merge Request. The topmost rule checking for `bigbang/values.yaml` is sufficient.

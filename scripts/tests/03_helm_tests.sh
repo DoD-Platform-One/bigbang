@@ -50,17 +50,33 @@ echo "Setting up CoreDNS for VS resolution..."
 hosts=$(cat newhosts) yq e -n '.data.NodeHosts = strenv(hosts)' > patch.yaml
 # For k3d
 if [[ ${clusterType} == "k3d" ]]; then
+  echo "Verify coredns configmap NodeHosts before patch"
+  testCoreDnsConfig=$(kubectl get cm coredns -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
+  echo $testCoreDnsConfig
+  echo "Starting coredns configmap patch for k3d cluster"
+  cat patch.yaml
   kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
   kubectl rollout restart deployment -n kube-system ${coreDnsName}
   kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=30s
+  echo "Verify coredns configmap NodeHosts:"
+  testCoreDnsConfig=$(kubectl get cm coredns -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
+  echo $testCoreDnsConfig  
 # For rke2
 elif [[ ${clusterType} == "rke2" ]]; then
+  echo "Verify coredns configmap NodeHosts before patch"
+  testCoreDnsConfig=$(kubectl get cm coredns -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
+  echo $testCoreDnsConfig
+  echo "Starting coredns configmap patch for rke2 cluster"
+  cat patch.yaml
   # Add an entry to the corefile
   sed -i '/prometheus/i \ \ \ \ hosts /etc/coredns/NodeHosts {\n        ttl 60\n        reload 15s\n        fallthrough\n    }' newcorefile
   corefile=$(cat newcorefile) yq e -i '.data.Corefile = strenv(corefile)' patch.yaml
   kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
   kubectl patch deployment ${coreDnsName} -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"config-volume","configMap":{"items":[{"key":"Corefile","path":"Corefile"},{"key":"NodeHosts","path":"NodeHosts"}],"name":"'${coreDnsName}'"}}]}}}}'
   kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=120s
+  echo "Verify coredns configmap NodeHosts:"
+  testCoreDnsConfig=$(kubectl get cm coredns -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
+  echo $testCoreDnsConfig
 # Add other distros in future as needed, catchall so tests won't error on this
 else
   echo "No known CoreDNS deployment found, skipping patching."
