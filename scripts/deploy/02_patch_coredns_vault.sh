@@ -24,7 +24,7 @@ if [[ $(tail -c 1 newhosts) != "" ]]; then
 fi
 
 # Only if Vault is deploying
-if [[ "${CI_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
+if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
   # wait for istio to complete
   echo "Waiting for istio to complete..."
   kubectl wait --for=condition=Ready --timeout 600s helmrelease istio -n bigbang
