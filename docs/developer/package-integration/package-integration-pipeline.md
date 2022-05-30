@@ -13,7 +13,11 @@ Big Bang contains and uses a continuous deployment tool to deploy packages using
 
 ## Package Pipeline
 
-Pipelines provide rapid feedback to changes in our Helm chart as we develop and should be put in place as early as possible.  Big Bang has a [generic pipeline](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/templates/package-tests.yml) that we can reuse for packages.
+Pipelines provide rapid feedback to changes in our Helm chart as we develop and should be put in place as early as possible.  Big Bang has a few different pipelines that can be used for packages.
+
+- [bigbang-package](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/pipelines/bigbang-package.yaml)
+- [sandbox](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/pipelines/sandbox.yaml)
+- [third-party](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/pipelines/third-party.yaml)
 
 1. The pipeline **requires** that all images are stored in either Iron Bank (`registry1.dso.mil`) or Repo1 (`registry.dso.mil`).  In some cases, you may be able to substitute images already in Iron Bank for the ones in the Helm chart.  For example, images for `curl`, `kubectl` or `jq` can use `registry1.dso.mil/ironbank/big-bang/base`.  If you have not already submitted your containers to Iron Bank, [start the process](https://repo1.dso.mil/dsop/dccscr/-/blob/master/README.md).  While you are working your way to Iron Bank approval, you can temporarily put the images in `registry.dso.mil` for development by doing the following:
 
@@ -87,6 +91,18 @@ Pipelines provide rapid feedback to changes in our Helm chart as we develop and 
 
 1. Troubleshoot and fix any failures from the pipeline.
 
-## Big Bang Pipeline
+## Big Bang Integration for Third-Party and Sandbox Packages
 
-TBD
+Big Bang uses a continuous deployment tool, [Flux](https://fluxcd.io) to deploy packages using Helm charts sourced from Git ([GitOps](https://www.weave.works/technologies/gitops/)).
+
+Third-party and sandbox pipelines both have an `integration` stage that will deploy and test a package as a Big Bang compatible package. 
+
+Examples of components that contribute to a package being "Big Bang compatible":
+
+- Configuring a package to be deployed via Flux custom resource definitions ([GitRepositories](https://fluxcd.io/docs/components/source/gitrepositories/) and [HelmReleases](https://fluxcd.io/docs/components/helm/helmreleases/))
+
+- Service mesh components ([Automatic Istio sidecar injection](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/#automatic-sidecar-injection) and [Istio VirtualService](https://istio.io/latest/docs/reference/config/networking/virtual-service/))
+ 
+This stage also allows any Big Bang Core or Addon packages to be deployed alongside a third-party or sandbox package for testing compatibility/functionality.
+
+To set this up in a package repo, see the guide [here](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/developer/package-integration/package-integration-flux.md).
