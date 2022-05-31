@@ -1200,8 +1200,16 @@ create_tag() {
 
 create_bigbang_merge_request() {
     echo -e "\e[0Ksection_start:`date +%s`:create_bigbang_merge_request[collapsed=true]\r\e[0KCreating Big Bang Merge Request"
-    echo "Creating new Big Bang merge request..."
+    ## If MR contains "skip-bb-mr" dont create Big Bang merge request
+    GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
+    BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.iid) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
+    MR_LABELS=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '"\(.labels)"')
+    if [[ "${MR_LABELS}" == *"skip-bb-mr"* ]]; then
+      echo "Skipping auto Big Bang merge request."
+      exit
+    fi
 
+    echo "Creating new Big Bang merge request..."
     ## Determine which package needs to be updated in the Big Bang chart
 
     # Account for packages that have a different name in Big Bang's values file vs the name of the package repo
