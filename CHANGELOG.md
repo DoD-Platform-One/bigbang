@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.33]
+### Added
+- Added conditional to `clone_bigbang_and_merge_templates` for setting the correct git branch in a Flux GitRepository resource for the integration stage.
+### Changed
+- Removed sandbox pipeline rule for integration stage to always run on a Merge Request.
+
 ## [2.4.32]
 ### Fixed
 - Fixed conditionals for Vault CoreDNS patching

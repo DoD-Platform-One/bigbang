@@ -428,6 +428,16 @@ clone_bigbang_and_merge_templates() {
    fi
    cp -r ../bigbang/templates/* ./chart/templates/
    PIPELINE_REPO_DESTINATION="../pipeline-repo"
+   package=$(yq e '. | keys | .[0]' ../bigbang/values.yaml)
+   if [[ $(yq ".${package}.git | has(\"tag\")" ../bigbang/values.yaml) == "true" ]]; then
+     yq e -i "del(.${package}.git.tag)" ../bigbang/values.yaml
+   fi
+   if [[ ! -z ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ]]; then
+     yq e -i ".${package}.git.branch = \"${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}\"" ../bigbang/values.yaml
+   else
+     yq e -i ".${package}.git.branch = \"${CI_DEFAULT_BRANCH}\"" ../bigbang/values.yaml
+   fi 
+   
    yq eval-all 'select(fileIndex == 0) * select(filename == "../bigbang/values.yaml")' ${CI_VALUES_FILE} ../bigbang/values.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE} 
    echo -e "\e[0Ksection_end:`date +%s`:clone_and_checkout_bigbang\r\e[0K"
 }

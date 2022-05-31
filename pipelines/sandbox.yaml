@@ -210,8 +210,6 @@ integration:
     # skip job when MR title contains 'SKIP INTEGRATION'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP INTEGRATION/'
       when: never
-    # run pipeline on merge request events
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
     BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
     BB_REPO_DESTINATION: "./bigbang-repo"
