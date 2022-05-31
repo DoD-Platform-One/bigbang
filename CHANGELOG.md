@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.34]
+### Added
+- Added logic to skip `create_bigbang_merge_request` with `skip-bb-mr` merge request label.
+
 ## [2.4.33]
 ### Added
 - Added conditional to `clone_bigbang_and_merge_templates` for setting the correct git branch in a Flux GitRepository resource for the integration stage.
