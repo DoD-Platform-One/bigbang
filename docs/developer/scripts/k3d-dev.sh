@@ -516,11 +516,11 @@ then
 elif [[ "$PRIVATE_IP" == true ]]
 then
   echo "To access apps from a browser edit your /etc/hosts to add the private IP of your instance with application hostnames. Example:"
-  echo "${PrivateIP}	gitlab.bigbang.dev logging.bigbang.dev kibana.bigbang.dev"
+  echo "${PrivateIP}	gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
   echo
 else   # default is to use the public ip
   echo "To access apps from a browser edit your /etc/hosts to add the public IP of your instance with application hostnames."
   echo "Example:"
-  echo "${PublicIP}	gitlab.bigbang.dev logging.bigbang.dev kibana.bigbang.dev"
+  echo "${PublicIP}	gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
   echo
 fi
