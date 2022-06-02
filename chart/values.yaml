@@ -664,7 +664,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
       path: "./chart"
-      tag: "4.2.3-bb.1"
+      tag: "4.2.3-bb.3"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
