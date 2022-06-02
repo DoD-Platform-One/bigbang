@@ -216,3 +216,5 @@ Similar to the MR title keywords described above, gitlab labels can be added to 
 `disable-ci` Disables all pipeline runs.
 
 `kind::docs` For MRs with only document changes. Won't run any pipelines.
+
+`skip-bb-mr` Will skip the auto-creation of a merge request into bigbang.
