@@ -42,8 +42,11 @@ for vs in $(kubectl get virtualservice -A -o go-template='{{range .items}}{{.met
     fi
 
     echo "${external_ip} ${host}" >> /etc/hosts
-    echo "Verify /etc/hosts entries"
-    cat /etc/hosts
+    
+    if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+      echo "Verify /etc/hosts entries"
+      cat /etc/hosts
+    fi
     
     echo "****************************************"
     echo "Begin curl $host"
