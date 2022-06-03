@@ -161,6 +161,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
+          - logging/loki-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -255,6 +256,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
+          - logging/loki-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -362,6 +364,7 @@ kyvernopolicies:
               - jaeger
               - monitoring
               - vault
+              - logging
               names:
               - "*-cypress-test*"
         parameters:
@@ -381,6 +384,7 @@ kyvernopolicies:
               - jaeger
               - monitoring
               - vault
+              - logging
               names:
               - "*-cypress-test*"
         parameters:
@@ -415,6 +419,7 @@ kyvernopolicies:
               - jaeger
               - monitoring
               - vault
+              - logging
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -515,7 +520,18 @@ loki:
             memory: 400Mi 
           requests:
             cpu: 200m
-            memory: 400Mi 
+            memory: 400Mi
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_check_datasource: 'true'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+      scripts:
+        image: registry1.dso.mil/ironbank/big-bang/base:1.17.0
+        envs:
+          LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
 
 tempo:
   enabled: false
