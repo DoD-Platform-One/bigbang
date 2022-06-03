@@ -28,6 +28,8 @@ if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_
   # wait for istio to complete
   echo "Waiting for istio to complete..."
   kubectl wait --for=condition=Ready --timeout 600s helmrelease istio -n bigbang
+  # Wait until deployment of passthrough-gateway exists
+  timeout 60 bash -c "until kubectl get deployment passthrough-ingressgateway -n istio-system; do sleep 5; done;"
   kubectl rollout status -w deployment passthrough-ingressgateway -n istio-system
   # get passthrough IP
   passthrough_ip=""
