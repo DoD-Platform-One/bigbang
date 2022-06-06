@@ -511,6 +511,7 @@ then
   echo "Manually add more hostnames as needed."
   echo "The IPs to use come from the istio-system services of type LOADBALANCER EXTERNAL-IP that are created when Istio is deployed."
   echo "You must use Firefox browser with with manual SOCKs v5 proxy configuration to localhost with port 12345."
+  echo "Also ensure 'Proxy DNS when using SOCKS v5' is checked."
   echo "Or, with other browsers like Chrome you could use a browser plugin like foxyproxy to do the same thing as Firefox."
   echo
 elif [[ "$PRIVATE_IP" == true ]]
