@@ -730,10 +730,13 @@ addons:
           memory: 100Mi
         limits: {}
       redis:
+        enabled: true
+      redis-bb:
         master:
           persistence:
             size: 256Mi
         replica:
+          replicaCount: 0
           persistence:
             size: 256Mi
 
@@ -996,6 +999,10 @@ addons:
             cpu: 100m
             memory: 200Mi
           limits: {}
+      anchore-ui-redis:
+        enabled: true
+        replica:
+          replicaCount: 0
       bbtests:
         enabled: true
         scripts:
