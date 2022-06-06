@@ -356,12 +356,6 @@ aws/rke2/bigbang up:
       - "test-artifacts/"
     expire_in: 3 days
     when: always
-  retry:
-    max: 2
-    when:
-      - unknown_failure
-      - stuck_or_timeout_failure
-      - runner_system_failure
 
 # Run tests on BigBang on RKE2 cluster on AWS
 aws/rke2/bigbang test:
