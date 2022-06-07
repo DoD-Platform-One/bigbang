@@ -14,5 +14,6 @@ spec:
   ref:
     {{- include "validRef" .Values.twistlock.git | nindent 4 }}
   {{ include "gitIgnore" . }}
+    !/chart/scripts/*.sh
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}
