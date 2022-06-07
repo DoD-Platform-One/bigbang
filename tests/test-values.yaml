@@ -162,6 +162,7 @@ gatekeeper:
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
+          - twistlock/twistlock-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -257,6 +258,7 @@ gatekeeper:
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
+          - twistlock/twistlock-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -365,6 +367,7 @@ kyvernopolicies:
               - monitoring
               - vault
               - logging
+              - twistlock
               names:
               - "*-cypress-test*"
         parameters:
@@ -385,6 +388,7 @@ kyvernopolicies:
               - monitoring
               - vault
               - logging
+              - twistlock
               names:
               - "*-cypress-test*"
         parameters:
@@ -420,6 +424,7 @@ kyvernopolicies:
               - monitoring
               - vault
               - logging
+              - twistlock
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -496,17 +501,17 @@ loki:
   strategy: scalable
   values:
     global:
-      createGlobalConfig: true 
+      createGlobalConfig: true
       existingSecretForConfig: "loki-config"
     loki-simple-scalable:
       write:
         replicas: 1
         persistence:
           size: 2Gi
-        resources: 
+        resources:
           limits:
             cpu: 200m
-            memory: 400Mi 
+            memory: 400Mi
           requests:
             cpu: 200m
             memory: 400Mi
@@ -514,10 +519,10 @@ loki:
         replicas: 1
         persistence:
           size: 2Gi
-        resources: 
+        resources:
           limits:
             cpu: 200m
-            memory: 400Mi 
+            memory: 400Mi
           requests:
             cpu: 200m
             memory: 400Mi
