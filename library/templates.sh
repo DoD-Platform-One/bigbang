@@ -1019,6 +1019,11 @@ chart_update_check() {
    MR_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
    echo "New Chart Version:$MR_BRANCH_VERSION"
    README_BRANCH_MATCH=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
+   # Adds a new line to end of changelog for proper parsing
+   if [ "$(tail -c 1 README.md)" != "" ]; then
+     echo -e "\e[31mNOTICE: README is missing a newline at the end of the file. This typically indicates you are using the wrong version of helm-docs, validate you are using the latest commands from https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+     EXIT="true"
+   fi
    if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
      echo -e "\e[31mNOTICE: You need to bump chart version in Chart.yaml\e[0m"
      EXIT="true"
