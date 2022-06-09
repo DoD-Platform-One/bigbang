@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 38.0.0-bb.1](https://img.shields.io/badge/Version-38.0.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
+![Version: 38.0.0-bb.2](https://img.shields.io/badge/Version-38.0.0--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -102,6 +102,18 @@ helm install nexus-repository-manager chart/
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | nexus.affinity | object | `{}` |  |
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
+| nexus.blobstores.enabled | bool | `false` |  |
+| nexus.blobstores.blobstore[0].name | string | `"test-nexus-blobstore"` |  |
+| nexus.blobstores.blobstore[0].type | string | `"s3"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.name | string | `"test-nexus-blobstore"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucket.region | string | `"your-bucket-region"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucket.name | string | `"your-bucket-name"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucket.prefix | string | `""` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucket.expiration | int | `3` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucketSecurity.accessKeyId | string | `"string"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucketSecurity.secretAccessKey | string | `"string"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucketSecurity.role | string | `"string"` |  |
+| nexus.blobstores.blobstore[0].blobstore_data.bucketConfiguration.bucketSecurity.sessionToken | string | `"string"` |  |
 | nexus.repository.enabled | bool | `false` |  |
 | nexus.repository.repo[0].name | string | `"test-nexus"` |  |
 | nexus.repository.repo[0].format | string | `"raw"` |  |

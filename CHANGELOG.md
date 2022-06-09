@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [38.0.0-bb.2] - 2022-06-07
+### Changed
+- Added improvements to the repository job.  Nexus was failing when a duplicate API POST would occur.
+- Added support for creating and updating blob storage from values.yaml
+
 ## [38.0.0-bb.1] - 2022-04-27
 ### Changed
 - Add default STRICT mTLS PeerAuthentication policy

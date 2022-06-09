@@ -1,13 +1,13 @@
-{{- if .Values.nexus.repository.enabled }}
+{{- if .Values.nexus.blobstores.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
   annotations:
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-weight": "-6"
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
   creationTimestamp: null
-  name: repo
+  name: blobstorage
 spec:
   template:
     metadata:
@@ -21,7 +21,7 @@ spec:
       containers:
       - image: "{{ .Values.job_image.repository }}:{{ .Values.job_image.tag }}"
         imagePullPolicy: {{ .Values.job_image.pullPolicy }}
-        name: repo
+        name: blobstorage
         command:
           - sh
         args:
@@ -30,11 +30,11 @@ spec:
             until curl --head localhost:15000; do echo "Waiting for Istio proxy sidecar"; sleep 10; done; echo "Sidecar available"  &&
             BASE_URL="http://{{ template "nexus.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
             
-            # repo creation
-            {{- range .Values.nexus.repository.repo }}           
+            # blobstore creation
+            {{- range .Values.nexus.blobstores.blobstore }}           
             STATUS=$(curl -X GET -s -o /dev/null -w '%{http_code}' \
                 -u admin:"$API_CREDENTIALS" \
-                "$BASE_URL/service/rest/v1/repositories/{{- .format }}/{{- .type }}/{{- .name }}" \
+                "$BASE_URL/service/rest/v1/blobstores/{{- .type }}/{{- .name }}" \
                 -H "accept: application/json" \
                 -H "Content-Type: application/json" \
             )
@@ -42,20 +42,20 @@ spec:
             then
               curl -X PUT \
                   -u admin:"$API_CREDENTIALS" \
-                  "$BASE_URL/service/rest/v1/repositories/{{- .format }}/{{- .type }}/{{- .name }}" \
+                  "$BASE_URL/service/rest/v1/blobstores/{{- .type }}/{{- .name }}" \
                   -H "accept: application/json" \
                   -H "Content-Type: application/json" \
-                  -d {{ .repo_data | toJson | quote }}
+                  -d {{ .blobstore_data | toJson | quote }}
             else
               curl -X POST \
                   -u admin:"$API_CREDENTIALS" \
-                  "$BASE_URL/service/rest/v1/repositories/{{- .format }}/{{- .type }}" \
+                  "$BASE_URL/service/rest/v1/blobstores/{{- .type }}" \
                   -H "accept: application/json" \
                   -H "Content-Type: application/json" \
-                  -d {{ .repo_data | toJson | quote }}
+                  -d {{ .blobstore_data | toJson | quote }}
             fi             
             {{- end }} 
-            echo "Created repositories"
+            echo "Created blobstores"
             
             curl -fsI -X POST http://localhost:15020/quitquitquit &&
             exit
