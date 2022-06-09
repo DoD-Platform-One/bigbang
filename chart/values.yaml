@@ -107,6 +107,27 @@ nexus:
   extraLabels:
     app: nexus-repository-manager
 
+  # BB blobstore added
+  blobstores:
+    enabled: false
+    blobstore:
+      - name: "test-nexus-blobstore"
+        type: "s3"
+        blobstore_data:
+          name: "test-nexus-blobstore"
+          bucketConfiguration:
+            bucket:
+              region: "your-bucket-region"
+              name: "your-bucket-name"
+              prefix: ""
+              expiration: 3
+            bucketSecurity:
+              accessKeyId: "string"
+              secretAccessKey: "string"
+              role: "string"
+              sessionToken: "string"
+
+          
   # BB repository added
   repository:
     # Raw format Repositories are currently the only supported format.
