@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [1.51.0-bb.0] - 2022-06-07
+### Updated
+- Updated to 1.51.0 images (latest in IB)
+
 ## [1.50.0-bb.1] - 2022-05-26
 ### Changed
 - Changed CI /test/wait.sh. The Big Bang CI infra RKE2 pipeline was failing after the last Kiali upgrade. 

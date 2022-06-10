@@ -3,10 +3,27 @@ describe('Kiali Test', function() {
     return false
   })
 
+  function expandMenu() {
+    cy.get('button[id="nav-toggle"]').invoke('attr', 'aria-expanded').then(($expanded) => {
+      if ($expanded === 'false') {
+        cy.get('button[id="nav-toggle"]').click()
+      }
+    })
+  }
+
+  function collapseMenu() {
+    cy.get('button[id="nav-toggle"]').invoke('attr', 'aria-expanded').then(($expanded) => {
+      if ($expanded === 'true') {
+        cy.get('button[id="nav-toggle"]').click()
+      }
+    })
+  }
+
   // Basic test that validates pages are accessible, basic error check
   it('Check Kiali is accessible', function() {
     cy.visit(Cypress.env('url'))
     cy.title().should('contain', 'Kiali')
+    expandMenu();
     cy.get('#Graph', { timeout: 15000 }).click();
     cy.get('#Applications', { timeout: 15000 }).click();
     // Check for generic errors (this is the red circle that appears if any connectivity with Promtheus/Grafana/Istio is not working)
@@ -19,7 +36,9 @@ describe('Kiali Test', function() {
     it('Check Kiali Graph page loads data', function() {
       cy.visit(Cypress.env('url'))
       cy.title().should("eq", "Kiali");
+      expandMenu();
       cy.get('#Graph', { timeout: 15000 }).click();
+      collapseMenu();
       cy.get('button[id="namespace-selector"').click()
       cy.get('input[type="checkbox"][value="monitoring"]').click()
       cy.get('button[id="refresh_button"').click()
@@ -30,7 +49,9 @@ describe('Kiali Test', function() {
     it('Check Kiali Applications page loads data', function() {
       cy.visit(Cypress.env('url'))
       cy.title().should("eq", "Kiali");
+      expandMenu();
       cy.get('#Applications', { timeout: 15000 }).click();
+      collapseMenu();
       cy.get('button[id="namespace-selector"]').click()
       cy.get('input[type="checkbox"][value="monitoring"]').click()
       cy.get('button[id="refresh_button"]').click()
