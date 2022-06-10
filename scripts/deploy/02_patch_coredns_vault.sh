@@ -27,7 +27,7 @@ fi
 if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
   # wait for istio to complete
   echo "Waiting for istio to complete..."
-  kubectl wait --for=condition=Ready --timeout 600s helmrelease istio -n bigbang
+  kubectl wait --for=condition=Ready --timeout 900s helmrelease istio -n bigbang
   # Wait until deployment of passthrough-gateway exists
   timeout 60 bash -c "until kubectl get deployment passthrough-ingressgateway -n istio-system; do sleep 5; done;"
   kubectl rollout status -w deployment passthrough-ingressgateway -n istio-system
