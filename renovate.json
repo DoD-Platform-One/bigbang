@@ -25,7 +25,8 @@
         {
             "fileMatch": ["^chart/Chart\\.yaml$"],
             "matchStrings": [
-                "- Kiali:\\s*(?<currentValue>.+)"
+                "- Kiali:\\s*(?<currentValue>.+)",
+                "appVersion:[^\\S\\r\\n]+(?<currentValue>.+)"
             ],
             "depNameTemplate": "registry1.dso.mil/ironbank/opensource/kiali/kiali-operator",
             "datasourceTemplate": "docker"
