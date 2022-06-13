@@ -59,3 +59,19 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to not have readiness/liveness probes
           - istio-system/lb-port-.*
+
+kyvernopolicies:
+  values:
+    exclude:
+      any:
+      # Allows k3d load balancer to bypass policies.
+      - resources:
+          namespaces:
+          - istio-system
+          names:
+          - svclb-*
+    policies:
+      restrict-host-path-mount-pv:
+        parameters:
+          allow:
+          - /var/lib/rancher/k3s/storage/pvc-*
