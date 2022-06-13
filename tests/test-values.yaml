@@ -373,6 +373,11 @@ kyvernopolicies:
         parameters:
           allow:
           - /tmp/allowed
+      restrict-host-path-mount-pv:
+        parameters:
+          allow:
+          - /tmp/allowed
+          - /var/lib/rancher/k3s/storage/pvc-*
       restrict-host-path-write:
         exclude:
           any:

@@ -163,7 +163,7 @@ cd ./bigbang
 ./scripts/install_flux.sh -u your-user-name -p your-pull-secret
 ```
 
-**Note1:** When deploying to k3d, the load balancer must be added to `excludedResources` under several violations for gatekeeper. This can be done by modifying `chart/values.yaml` file or passing an override file (e.g. `docs/example_configs/opa-overrides-k3d.yaml`) with the values set below.  This is for development purposes only.
+**Note1:** When deploying to k3d, the load balancer must be added to `excludedResources` under several policies for gatekeeper or kyverno. This can be done by modifying `chart/values.yaml` file or passing an override file (e.g. `docs/example_configs/policy-overrides-k3d.yaml`) with the values set below.  This is for development purposes only.
 
 ```yaml
 gatekeeper:
