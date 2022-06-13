@@ -126,6 +126,11 @@ policies:
     parameters:
       allow:
       - /tmp/allowed
+  restrict-host-path-mount-pv:
+    enabled: true
+    parameters:
+      allow:
+      - /tmp/allowed
   restrict-host-path-write:
     enabled: true
     parameters:

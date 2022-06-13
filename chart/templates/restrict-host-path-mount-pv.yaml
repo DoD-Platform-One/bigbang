@@ -1,4 +1,4 @@
-{{- $name := "restrict-host-path-mount" }}
+{{- $name := "restrict-host-path-mount-pv" }}
 {{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -9,26 +9,23 @@ metadata:
     policies.kyverno.io/category: Best Practices (Security)
     policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
     policies.kyverno.io/minversion: 1.5.0
-    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/subject: PersistentVolume
     policies.kyverno.io/description: >-
-      hostPath volumes consume the underlying node's file system. If hostPath volumes
-      are not universally disabled, they should be restricted to specific
-      host paths to prevent access to sensitive information. This policy ensures
-      that hostPath volume paths are in the allowed list. It is strongly
-      recommended to pair this policy with another to require readOnly on hostPath volumes.
+      PersistentVolume using hostPath consume the underlying node's file system. If not universally disabled, 
+      they should be restricted to specific host paths to prevent access to sensitive information. 
+      This policy ensures that PV hostPath is in the allowed list.
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: restrict-hostpath-dirs
+  - name: restrict-hostpath
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
-    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "PersistentVolume")) .) | nindent 4 }}
     validate:
-      message: hostPath volume paths are restricted to the allowed list.
+      message: PV hostPath is restricted to the allowed list.
       pattern:
         spec:
-          =(volumes):
-          - =(hostPath):
-              path: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+          =(hostPath):
+            path: "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.0-bb.11](https://img.shields.io/badge/Version-1.0.0--bb.11-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.0-bb.12](https://img.shields.io/badge/Version-1.0.0--bb.12-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -102,6 +102,9 @@ helm install kyverno-policies chart/
 | policies.restrict-group-id.parameters.allow | list | `[">=1000"]` | Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
 | policies.restrict-host-path-mount | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"audit"}` | Restrict the paths that can be mounted by hostPath volumes to the allowed list.  HostPath volumes are normally disallowed.  If exceptions are made, the path(s) should be restricted. |
 | policies.restrict-host-path-mount.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount |
+| policies.restrict-host-path-mount-pv.enabled | bool | `true` |  |
+| policies.restrict-host-path-mount-pv.validationFailureAction | string | `"audit"` |  |
+| policies.restrict-host-path-mount-pv.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount |
 | policies.restrict-host-path-write | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"audit"}` | Restrict the paths that can be mounted as read/write by hostPath volumes to the allowed list.  HostPath volumes, if allowed, should normally be mounted as read-only.  If exceptions are made, the path(s) should be restricted. |
 | policies.restrict-host-path-write.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount as read/write |
 | policies.restrict-host-ports | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict host ports in containers to the specified list |
