@@ -35,6 +35,7 @@
     - echo -e "\e[0Ksection_start:`date +%s`:k3d_up[collapsed=true]\r\e[0K\e[33;1mK3D Cluster Create\e[37m"
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - package_auth_setup
     # Give docker-in-docker time to come alive
     - i=0; while [ "$i" -lt 12 ]; do docker info &>/dev/null && break; sleep 5; i=$(( i + 1 )) ; done
     - docker network create ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.20.0.0/16 --gateway 172.20.0.1
