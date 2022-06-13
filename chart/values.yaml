@@ -328,6 +328,13 @@ policies:
       # -- List of allowed paths for hostPath volumes to mount
       allow: []
 
+  restrict-host-path-mount-pv:
+    enabled: true
+    validationFailureAction: audit
+    parameters:
+      # -- List of allowed paths for hostPath volumes to mount
+      allow: []
+      
   # -- Restrict the paths that can be mounted as read/write by hostPath volumes to the allowed list.  HostPath volumes, if allowed, should normally be mounted as read-only.  If exceptions are made, the path(s) should be restricted.
   restrict-host-path-write:
     enabled: true
