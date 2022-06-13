@@ -469,8 +469,8 @@ policies:
       {{- end }}
   {{- end }}
   
+  {{- if $deployRestic }}
   restrict-user-id:
-    {{- if $deployRestic }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -481,8 +481,8 @@ policies:
           - velero
           names:
           - restic*
-        {{- end }}
-    {{- end }}
+      {{- end }}
+  {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled $deployRestic }}
   restrict-volume-types:
