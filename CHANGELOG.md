@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.40]
+### Added
+- Added docker auth to the k3d create function
+
 ## [2.4.39]
 ### Changed
 - Increased vault CoreDNS "wait for istio" HR timeout to 15 minutes
