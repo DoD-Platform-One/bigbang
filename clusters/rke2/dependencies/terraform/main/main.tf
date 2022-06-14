@@ -93,10 +93,7 @@ module "rke2" {
   rke2_version          = var.rke2_version
   iam_instance_profile  = var.iam_instance_profile
 
-  rke2_config = <<EOF
-disable:
-  - rke2-ingress-nginx
-EOF
+  rke2_config = var.rke2_config
 
   block_device_mappings = {
     size = 100

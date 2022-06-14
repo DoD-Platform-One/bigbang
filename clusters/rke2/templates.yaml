@@ -14,6 +14,31 @@
       set -e
       attempt_counter=0
       max_attempts=2
+      if [ $DEBUG_ENABLED == "true" ]; then
+        echo "labels = $CI_MERGE_REQUEST_LABELS[*]"
+        LABELS="$CI_MERGE_REQUEST_LABELS[*]"
+      fi
+      if [ $METRICS_DISABLED == "true" ]; then
+        LABELS+=",metricsServer"
+      fi
+      case "$LABELS" in
+      *metricsServer*)
+          echo "Disabling default metrics server for RKE2 - writing _override.tf to $PWD/_override.tf"
+          cat <<- EOT > _override.tf
+      variable "rke2_config" {
+        type = string
+        default = <<EOF
+      disable:
+      - rke2-ingress-nginx
+      - rke2-metrics-server
+      EOF
+      }
+      EOT
+          ;;
+      *)
+          echo "Big Bang metrics server not enabled, using default RKE2 metrics server" 
+          ;;
+      esac
       until [ $(terraform apply -input=false -auto-approve >/dev/null; echo $?) -eq 0 ]; do
         if [ ${attempt_counter} == ${max_attempts} ];then
           echo "Error applying rke2 cluster up terraform"
@@ -35,7 +60,7 @@
     - .terraform destroy workspace
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:rke2_down[collapsed=true]\r\e[0K\e[33;1mRKE2 Down\e[37m"
-    # Loop to retry rke2 terraform destory
+    # Loop to retry rke2 terraform destroy
     - |
       set -e
       attempt_counter=0

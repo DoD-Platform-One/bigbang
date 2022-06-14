@@ -7,8 +7,12 @@ mkdir -p /cypress/screenshots
 chown 1000:1000 /cypress/screenshots
 mkdir -p /cypress/videos
 chown 1000:1000 /cypress/videos
+if [[ $DEBUG_ENABLED == "true" ]]; then
+  echo "merge labels = ${CI_MERGE_REQUEST_LABELS[*]}"
+  echo "Metrics disabled = $METRICS_DISABLED"
+fi
 
-if [[ $METRICS_DISABLED == "true" ]]; then
+if [[ "${CI_MERGE_REQUEST_LABELS[*]}" =~ "metricsServer" ]] || [[ $METRICS_DISABLED == "true" ]]; then
   echo "Creating k3d cluster without default metric server"
   k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config-no-metrics.yaml --network ${CI_JOB_ID}
 else

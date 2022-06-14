@@ -56,6 +56,14 @@ variable "rke2_version" {
   default = "v1.23.5+rke2r1"
 }
 
+variable "rke2_config" {
+  type = string
+  default = <<EOF
+disable:
+  - rke2-ingress-nginx
+EOF
+}
+
 variable "iam_instance_profile" {
   default = "InstanceOpsRole"
 }

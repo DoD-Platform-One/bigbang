@@ -23,6 +23,7 @@ module "ci" {
   source = "../../main"
 
   env             = var.env
+  rke2_config    = var.rke2_config
   ci_pipeline_url = var.ci_pipeline_url
   vpc_id          = data.terraform_remote_state.networking.outputs.vpc_id
   private_subnets = data.terraform_remote_state.networking.outputs.private_subnets
