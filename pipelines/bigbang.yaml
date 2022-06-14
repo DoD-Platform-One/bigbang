@@ -383,12 +383,6 @@ aws/rke2/bigbang test:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   allow_failure:
     exit_codes: 123
-  retry:
-    max: 2
-    when:
-      - unknown_failure
-      - stuck_or_timeout_failure
-      - runner_system_failure
   artifacts:
     paths:
       - events.txt
