@@ -2,11 +2,11 @@
 # There are 4 different use-cases/pipelines that are supported by this file:
 #   1) Build and test changes made from a Merge Reuqest using a docker-in-docker (DIND) K3D cluster deployment inside the
 #      gitlab runner.
-#   2) Build and test a commit to the Master branch (default branch) using a AWS created K3S cluster which is deployed
+#   2) Build and test a commit to the main branch (default branch) using a AWS created K3S cluster which is deployed
 #       using Terraform
 #   3) Build and test a new release and/or tagged commit using a docker-in-docker (DIND) K3D cluster deployment inside the
 #      gitlab runner.   Once a successful build and test is completed, package the build and perform a release operation.
-#   4) Periodically at a scheduled time, build and test the master branch  using a AWS created K3S cluster which is deployed
+#   4) Periodically at a scheduled time, build and test the main branch  using a AWS created K3S cluster which is deployed
 #       using Terraform
 
 # global rules for when pipelines run
@@ -114,8 +114,8 @@ clean install:
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
-    # Always run a clean installation test unless we are deploying the AWS cluster installation during a scheduled test (nightly master test)
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    # Always run a clean installation test unless we are deploying the AWS cluster installation during a scheduled test (nightly main test)
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     - *chart_changes
   script:
@@ -158,8 +158,8 @@ upgrade:
   extends:
     - .k3d-ci-bb
   rules:
-    # skip job for nightly master and "test-ci::infra" labeled pipelines
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "master") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    # skip job for nightly main and "test-ci::infra" labeled pipelines
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     # skip job when MR title starts with 'SKIP UPGRADE' 
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
@@ -171,9 +171,9 @@ upgrade:
     CLUSTER_NAME: "upgrade-${CI_COMMIT_SHORT_SHA}"
   script:
     - echo "🌌 Install Big Bang from ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
-    - echo -e "\e[0Ksection_start:`date +%s`:git_master[collapsed=true]\r\e[0K\e[33;1mGit Fetch Master\e[37m"  
+    - echo -e "\e[0Ksection_start:`date +%s`:git_target[collapsed=true]\r\e[0K\e[33;1mGit Fetch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}\e[37m"  
     - git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
-    - echo -e "\e[0Ksection_end:`date +%s`:git_master\r\e[0K"
+    - echo -e "\e[0Ksection_end:`date +%s`:git_target\r\e[0K"
     - deploy_bigbang
     - test_bigbang
     - echo "🌌 Upgrade Big Bang to ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
