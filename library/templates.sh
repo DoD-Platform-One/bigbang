@@ -84,7 +84,7 @@ check_changes() {
    ## Array of templates
    TEMPLATES=($(find chart/templates -type d | cut -b 17-))
 
-   ## Collect package configurations on the target (master) branch
+   ## Collect package configurations on the target (main) branch
    git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
    mkdir -p target-branch/values
    mkdir -p target-branch/templates
@@ -329,7 +329,7 @@ pre_vars() {
    # Create the TF_VAR_env variable
    echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
    # Calculate a unique cidr range for vpc
-   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "master" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]]; then
+   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "${CI_DEFAULT_BRANCH}" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]]; then
      echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
    fi
    cat variables.env
@@ -1302,7 +1302,6 @@ create_bigbang_merge_request() {
     git commit -m "Updated ${CI_PROJECT_NAME} git tag"
     git push --set-upstream origin ${BB_SOURCE_BRANCH} \
       -o merge_request.create \
-      -o merge_request.target=${BB_TARGET_BRANCH} \
       -o merge_request.title="Draft: Updated ${CI_PROJECT_NAME} git tag" \
       -o merge_request.label="status::review"	\
       -o merge_request.label=${package}
