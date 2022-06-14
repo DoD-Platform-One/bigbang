@@ -16,8 +16,8 @@
       max_attempts=2
       if [ $DEBUG_ENABLED == "true" ]; then
         echo "labels = $CI_MERGE_REQUEST_LABELS[*]"
-        LABELS="$CI_MERGE_REQUEST_LABELS[*]"
       fi
+      LABELS="$CI_MERGE_REQUEST_LABELS[*]"
       if [ $METRICS_DISABLED == "true" ]; then
         LABELS+=",metricsServer"
       fi

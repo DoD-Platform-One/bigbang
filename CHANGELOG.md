@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.45]
+### Fixed
+- Fixed label variable placement in rke2 deployment
+
 ## [2.4.44]
 ### Added
 - Added functionality to disable rke2/k3d default metrics server when `metricsServer` label present or `METRICS_DISABLED` is set to `true`.
