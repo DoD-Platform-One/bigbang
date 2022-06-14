@@ -18,12 +18,20 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") .Values.istio.enabled) }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
   keycloak:
     enabled: true
     gateways:
     - istio-system/{{ default "public" .Values.addons.keycloak.ingress.gateway }}
+
+{{- if $istioInjection }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -41,6 +49,12 @@ serviceMonitor:
 {{- if .Values.addons.keycloak.database.host }}
 postgresql:
   enabled: false
+{{- else if $istioInjection }}
+postgresql:
+  primary:
+    {{ include "istioAnnotation" . }}
+  readReplicas:
+    {{ include "istioAnnotation" . }}
 {{- end }}
 
 {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
