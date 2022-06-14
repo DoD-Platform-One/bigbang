@@ -1,0 +1,84 @@
+# Rules for when pipeline runs
+workflow:
+  rules:
+    # Never run on docs branch
+    - if: $CI_COMMIT_BRANCH == "docs"
+      when: never
+    - when: always
+
+# Include templates
+include:
+  - local: '/library/templates.yaml'
+
+stages:
+  - test
+  - dry_run
+  - scheduled
+
+before_script:
+  - yum -y install python39 python39-pip npm
+  - rm /usr/bin/python3
+  - ln -s /usr/bin/python3.9 /usr/bin/python3
+  - ln -s /usr/bin/python3.9 /usr/bin/python
+  - ln -s /usr/bin/pip3 /usr/bin/pip
+  - python -m venv ./venv
+  - source venv/bin/activate
+  - python -m pip install --upgrade pip
+  - python -m pip install poetry
+  - npm install --global prettier
+  - poetry config virtualenvs.in-project true
+  - poetry install
+  - poetry shell
+  - git config user.email "docs.gen@bigbang.dev"
+  - git config user.name "docs.gen"
+  - git submodule update --init --recursive
+  - git submodule update --remote
+
+bb-docs:on-schedule:
+  extends:
+    - .util-image
+  stage: scheduled
+  only:
+    - schedules
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+    - bbci
+  script:
+    - mkdir ./build && cd ./build
+    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/sandbox/bb-docs-generator.git" .
+    - git checkout docs --
+    - cd ..
+    - python main.py build --format --speed slow --version 5
+    - cd ./build
+    - git config user.email "docs.gen@bigbang.dev"
+    - git config user.name "docs.gen"
+    - git add .
+    - git commit -m "bb docs generated $(date)"
+    - git push
+
+bb-docs:
+  extends:
+    - .util-image
+  stage: dry_run
+  except:
+    - schedules
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - build/
+  script:
+    - python main.py build --format --speed slow --version 5
+
+test:
+  extends:
+    - .util-image
+  stage: test
+  script:
+    - python -m pytest
