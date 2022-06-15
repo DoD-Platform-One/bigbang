@@ -50,6 +50,10 @@ spec:
           runAsNonRoot: true
           # Added by Big Bang to prevent container from writing to local disk
           readOnlyRootFilesystem: true
+          # Added by Big Bang to improve security posture
+          capabilities:
+            drop:
+              - ALL
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
