@@ -13,14 +13,14 @@ include:
   stage: 🔌 network up
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       allow_failure: false
 
 # Abstract for jobs responsible for creating infrastructure
 .infra create:
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
@@ -29,7 +29,7 @@ include:
 .infra cleanup:
   rules:
     # Run on scheduled jobs
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       allow_failure: true
       when: always
 

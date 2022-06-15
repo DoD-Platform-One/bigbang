@@ -18,7 +18,7 @@ workflow:
     # skip pipeline for MRs with disable-ci label
     - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)disable-ci(,|$)/
       when: never
-    # run pipeline for manual tag events such as a new release
+    # run pipeline for tag events such as a new release
     - if: $CI_COMMIT_TAG
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -115,7 +115,7 @@ clean install:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
     # Always run a clean installation test unless we are deploying the AWS cluster installation during a scheduled test (nightly main test)
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     - *chart_changes
   script:
@@ -159,7 +159,7 @@ upgrade:
     - .k3d-ci-bb
   rules:
     # skip job for nightly main and "test-ci::infra" labeled pipelines
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "${CI_DEFAULT_BRANCH}") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
       when: never
     # skip job when MR title starts with 'SKIP UPGRADE' 
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
