@@ -48,6 +48,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml .Values.nodeSelector | nindent 8 }}

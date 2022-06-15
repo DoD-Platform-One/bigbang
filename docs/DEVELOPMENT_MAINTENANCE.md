@@ -34,7 +34,7 @@ Since the mattermost operator chart is built and maintained by Big Bang syncing 
     helm.sh/chart: '{{ .Chart.Name }}-{{ .Chart.Version }}'
 ```
 
-9. For the deployment file: make sure that you maintain the existing values mapping for `replicas`, `image`, `resources`, `imagePullSecrets`, `nodeSelector`, `affinity`, and `tolerations`. These are all BigBang additions that we need to keep.
+9. For the deployment file: make sure that you maintain the existing values mapping for `replicas`, `image`, `resources`, `imagePullSecrets`, `securityContext`, `nodeSelector`, `affinity`, and `tolerations`. These are all BigBang additions that we need to keep.
 
 10. Modify `chart/values.yaml` to use the latest image under `image.tag`.
 

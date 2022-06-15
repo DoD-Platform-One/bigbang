@@ -23,6 +23,12 @@ resources:
     memory: 512Mi
     cpu: 100m
 
+# -- securityContext for Kubernetes pod(s)
+securityContext:
+  runAsUser: 65532
+  runAsGroup: 65532
+  runAsNonRoot: true
+
 # -- Affinity for operator pod(s)
 affinity: {}
   # podAntiAffinity:

@@ -1,6 +1,6 @@
 # mattermost-operator
 
-![Version: 1.18.0-bb.0](https://img.shields.io/badge/Version-1.18.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.18.0](https://img.shields.io/badge/AppVersion-1.18.0-informational?style=flat-square)
+![Version: 1.18.0-bb.1](https://img.shields.io/badge/Version-1.18.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.18.0](https://img.shields.io/badge/AppVersion-1.18.0-informational?style=flat-square)
 
 Deployment of mattermost operator using Helm
 
@@ -41,6 +41,7 @@ helm install mattermost-operator chart/
 | replicas.count | int | `1` | Mattermost operator desired replicas |
 | imagePullSecrets | list | `[{"name":"private-registry"}]` | Image pull secrets |
 | resources | object | `{"limits":{"cpu":"100m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resources for operator pod(s) |
+| securityContext | object | `{"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532}` | securityContext for Kubernetes pod(s) |
 | affinity | object | `{}` | Affinity for operator pod(s) |
 | nodeSelector | object | `{}` | Node selector for operator pod(s) |
 | tolerations | object | `{}` | Tolerations for operator pod(s) |
