@@ -1150,7 +1150,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
       path: "./chart"
-      tag: "1.18.0-bb.0"
+      tag: "1.18.0-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
     flux: {}
