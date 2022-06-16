@@ -15,4 +15,4 @@ upstreamLock:
     repo: https://github.com/usnistgov/OSCAL
     directory: /json/schema
     ref: main
-    commit: bfcd0082bd4c08e16c7d5f5515adc5c858e8308e
+    commit: dc2220124f4e2a7246697508a837d68e95a77908
