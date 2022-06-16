@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.48]
+### Changed
+- Reverted use of `\\p` regex in OSCAL schema
+
 ## [2.4.47]
 ### Changed
 - Updated OSCAL schema version from `1.0.2` to `1.0.4`
