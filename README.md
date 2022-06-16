@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 1.35.0](https://img.shields.io/badge/Version-1.35.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.36.0](https://img.shields.io/badge/Version-1.36.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -101,7 +101,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"1.50.0-bb.1"` |  |
+| kiali.git.tag | string | `"1.51.0-bb.0"` |  |
 | kiali.flux | object | `{}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
@@ -112,14 +112,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | clusterAuditor.enabled | bool | `true` | Toggle deployment of Cluster Auditor. |
 | clusterAuditor.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git"` |  |
 | clusterAuditor.git.path | string | `"./chart"` |  |
-| clusterAuditor.git.tag | string | `"1.4.0-bb.2"` |  |
+| clusterAuditor.git.tag | string | `"1.4.0-bb.4"` |  |
 | clusterAuditor.flux | object | `{}` | Flux reconciliation overrides specifically for the Cluster Auditor Package |
 | clusterAuditor.values | object | `{}` | Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git |
 | clusterAuditor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | gatekeeper.enabled | bool | `true` | Toggle deployment of OPA Gatekeeper. |
 | gatekeeper.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git"` |  |
 | gatekeeper.git.path | string | `"./chart"` |  |
-| gatekeeper.git.tag | string | `"3.8.0-bb.1"` |  |
+| gatekeeper.git.tag | string | `"3.8.1-bb.0"` |  |
 | gatekeeper.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the OPA Gatekeeper Package |
 | gatekeeper.values | object | `{}` | Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git |
 | gatekeeper.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -133,14 +133,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kyvernopolicies.enabled | bool | `false` | Toggle deployment of Kyverno policies |
 | kyvernopolicies.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git"` |  |
 | kyvernopolicies.git.path | string | `"./chart"` |  |
-| kyvernopolicies.git.tag | string | `"1.0.0-bb.9"` |  |
+| kyvernopolicies.git.tag | string | `"1.0.0-bb.12"` |  |
 | kyvernopolicies.flux | object | `{}` | Flux reconciliation overrides specifically for the Kyverno Package |
 | kyvernopolicies.values | object | `{}` | Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git |
 | kyvernopolicies.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | logging.enabled | bool | `true` | Toggle deployment of Logging (EFK). |
 | logging.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git"` |  |
 | logging.git.path | string | `"./chart"` |  |
-| logging.git.tag | string | `"0.7.0-bb.3"` |  |
+| logging.git.tag | string | `"0.7.1-bb.0"` |  |
 | logging.flux | object | `{"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | logging.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | logging.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -166,14 +166,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | promtail.enabled | bool | `false` | Toggle deployment of Promtail. |
 | promtail.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git"` |  |
 | promtail.git.path | string | `"./chart"` |  |
-| promtail.git.tag | string | `"4.2.0-bb.0"` |  |
+| promtail.git.tag | string | `"4.2.0-bb.1"` |  |
 | promtail.flux | object | `{}` | Flux reconciliation overrides specifically for the Promtail Package |
 | promtail.values | object | `{}` | Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git |
 | promtail.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | loki.enabled | bool | `false` | Toggle deployment of Loki. |
 | loki.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git"` |  |
 | loki.git.path | string | `"./chart"` |  |
-| loki.git.tag | string | `"3.0.4-bb.0"` |  |
+| loki.git.tag | string | `"3.0.4-bb.3"` |  |
 | loki.flux | object | `{}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
 | loki.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
@@ -186,7 +186,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | tempo.enabled | bool | `false` | Toggle deployment of Tempo. |
 | tempo.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git"` |  |
 | tempo.git.path | string | `"./chart"` |  |
-| tempo.git.tag | string | `"0.15.1-bb.0"` |  |
+| tempo.git.tag | string | `"0.15.1-bb.1"` |  |
 | tempo.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | tempo.flux | object | `{}` | Flux reconciliation overrides specifically for the Tempo Package |
 | tempo.values | object | `{}` | Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git |
@@ -212,7 +212,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | twistlock.enabled | bool | `true` | Toggle deployment of Twistlock. |
 | twistlock.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git"` |  |
 | twistlock.git.path | string | `"./chart"` |  |
-| twistlock.git.tag | string | `"0.6.0-bb.0"` |  |
+| twistlock.git.tag | string | `"0.8.0-bb.0"` |  |
 | twistlock.flux | object | `{}` | Flux reconciliation overrides specifically for the Twistlock Package |
 | twistlock.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | twistlock.values | object | `{}` | Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git |
@@ -220,7 +220,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.argocd.enabled | bool | `false` | Toggle deployment of ArgoCD. |
 | addons.argocd.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git"` |  |
 | addons.argocd.git.path | string | `"./chart"` |  |
-| addons.argocd.git.tag | string | `"4.2.3-bb.1"` |  |
+| addons.argocd.git.tag | string | `"4.2.3-bb.3"` |  |
 | addons.argocd.flux | object | `{}` | Flux reconciliation overrides specifically for the ArgoCD Package |
 | addons.argocd.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.argocd.redis.host | string | `""` | Hostname of a pre-existing Redis to use for ArgoCD. Entering connection info will enable external Redis and will auto-create any required secrets. |
@@ -262,7 +262,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.hostnames.registry | string | `"registry"` |  |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"5.10.1-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"6.0.1-bb.2"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
@@ -292,14 +292,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlabRunner.enabled | bool | `false` | Toggle deployment of Gitlab Runner |
 | addons.gitlabRunner.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git"` |  |
 | addons.gitlabRunner.git.path | string | `"./chart"` |  |
-| addons.gitlabRunner.git.tag | string | `"0.39.0-bb.3"` |  |
+| addons.gitlabRunner.git.tag | string | `"0.41.0-bb.0"` |  |
 | addons.gitlabRunner.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Runner Package |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git |
 | addons.gitlabRunner.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.nexus.enabled | bool | `false` | Toggle deployment of Nexus. |
 | addons.nexus.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git"` |  |
 | addons.nexus.git.path | string | `"./chart"` |  |
-| addons.nexus.git.tag | string | `"38.0.0-bb.1"` |  |
+| addons.nexus.git.tag | string | `"38.0.0-bb.2"` |  |
 | addons.nexus.license_key | string | `""` | Base64 encoded license file. |
 | addons.nexus.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.nexus.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599 |
@@ -345,7 +345,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.anchore.enabled | bool | `false` | Toggle deployment of Anchore. |
 | addons.anchore.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git"` |  |
 | addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"1.18.6-bb.1"` |  |
+| addons.anchore.git.tag | string | `"1.18.6-bb.2"` |  |
 | addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchore.enterprise | object | `{"enabled":false,"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
@@ -414,7 +414,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.keycloak.enabled | bool | `false` | Toggle deployment of Keycloak. if you enable Keycloak you should uncomment the istio passthrough configurations above istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough |
 | addons.keycloak.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git"` |  |
 | addons.keycloak.git.path | string | `"./chart"` |  |
-| addons.keycloak.git.tag | string | `"18.1.1-bb.0"` |  |
+| addons.keycloak.git.tag | string | `"18.1.1-bb.1"` |  |
 | addons.keycloak.database.host | string | `""` | Hostname of a pre-existing database to use for Keycloak. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
 | addons.keycloak.database.type | string | `"postgres"` | Pre-existing database type (e.g. postgres) to use for Keycloak. |
 | addons.keycloak.database.port | int | `5432` | Port of a pre-existing database to use for Keycloak. |
