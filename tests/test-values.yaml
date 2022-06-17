@@ -1400,3 +1400,8 @@ addons:
           artifacts: true
           envs:
             cypress_vault_url: "https://vault.bigbang.dev"
+
+  metricsServer:
+    enabled: false
+    values:
+      replicas: 1

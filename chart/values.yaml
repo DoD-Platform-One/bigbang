@@ -1361,3 +1361,23 @@ addons:
 
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Metrics Server
+  #
+  metricsServer:
+    # -- Toggle deployment of metrics server.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+      path: "./chart"
+      tag: "3.8.0-bb.2"
+
+    # -- Flux reconciliation overrides specifically for the metrics server Package
+    flux: {}
+
+    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
