@@ -102,6 +102,9 @@ networkPolicies:
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+openShift:
+  enabled: {{ .Values.openshift }}
+
 {{- if .Values.monitoring.enabled }}
 serviceMonitor:
   enabled: true
