@@ -7,7 +7,7 @@ source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 CORE_HELMRELEASES=("gatekeeper" "istio-operator" "istio" "monitoring" "eck-operator" "ek" "fluent-bit" "twistlock" "cluster-auditor" "jaeger" "kiali")
 
 ## Array of addon HRs
-ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "keycloak" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "vault" "loki" "promtail" "kyverno" "kyvernopolicies" "tempo")
+ADD_ON_HELMRELEASES=("argocd" "authservice" "gitlab" "gitlab-runner" "keycloak" "anchore" "sonarqube" "minio-operator" "minio" "mattermost-operator" "mattermost" "nexus-repository-manager" "velero" "vault" "loki" "promtail" "kyverno" "kyvernopolicies" "tempo" "metrics-server")
 
 ## Map of values-keys/labels to HRs: Only needed if HR name =/= label name
 declare -A ADD_ON_HELMRELEASES_MAP
@@ -16,6 +16,7 @@ ADD_ON_HELMRELEASES_MAP["gitlabRunner"]="gitlab-runner"
 ADD_ON_HELMRELEASES_MAP["minioOperator"]="minio-operator"
 ADD_ON_HELMRELEASES_MAP["mattermostoperator"]="mattermost-operator"
 ADD_ON_HELMRELEASES_MAP["nexus"]="nexus-repository-manager"
+ADD_ON_HELMRELEASES_MAP["metricsServer"]="metrics-server"
 
 ## Function to test an array contains an element
 ## Args:
@@ -53,6 +54,8 @@ function check_if_hr_exist() {
       check_package="mattermostoperator"
     elif [ $1 == "nexus-repository-manager" ]; then
       check_package="nexus"
+    elif [ $1 == "metrics-server" ]; then
+      check_package="metricsServer"
     else
       check_package=$1
     fi
