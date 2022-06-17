@@ -18,11 +18,14 @@
         echo "labels = $CI_MERGE_REQUEST_LABELS[*]"
       fi
       LABELS="$CI_MERGE_REQUEST_LABELS[*]"
-      if [ $METRICS_DISABLED == "true" ]; then
+      if [[ $METRICS_DISABLED == "true" ]]; then
         LABELS+=",metricsServer"
       fi
+      if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]]; then
+        LABELS="all-packages"
+      fi
       case "$LABELS" in
-      *metricsServer*)
+      *metricsServer* | *all-packages*)
           echo "Disabling default metrics server for RKE2 - writing _override.tf to $PWD/_override.tf"
           cat <<- EOT > _override.tf
       variable "rke2_config" {
