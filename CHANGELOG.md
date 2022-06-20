@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.51]
+### Fixed
+- Fixed bug with waiting for HRs for new packages
+
 ## [2.4.50]
 ### Fixed
 - Bug with metrics server and package/3rd party integration pipelines

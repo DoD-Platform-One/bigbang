@@ -62,6 +62,9 @@ function check_if_hr_exist() {
     echo "⏳ Checking if $1 HR is enabled"
     if [[ "$(yq e ".${check_package}.enabled" $CI_VALUES_FILE)" == "false" ]] || [[ "$(yq e ".addons.${check_package}.enabled" $CI_VALUES_FILE)" == "false" ]]; then
       echo "$1 HR not enabled, skipping..."
+    # Check if this is a new package (BETA, will be disabled by default but not present in the values for latest tag on integration stage)
+    elif [[ "$(yq e ". | has(\"${check_package}\")" $CI_VALUES_FILE)" == "false" && "$(yq e ".addons | has(\"${check_package}\")" $CI_VALUES_FILE)" == "false" ]]; then
+      echo "$1 HR not enabled, skipping..."
     else
       echo "$1 HR is enabled, waiting..."
       until kubectl get hr -n bigbang $1 &> /dev/null; do
