@@ -224,7 +224,7 @@ integration:
     BB_REPO_DESTINATION: "./bigbang-repo"
     CI_VALUES_FILE: "./tests/test-values.yaml"
     PIPELINE_REPO_DESTINATION: "pipeline-repo"
-    PIPELINE_TYPE: "BB"
+    PIPELINE_TYPE: "INTEGRATION"
   script:
     - clone_bigbang_and_merge_templates
     - deploy_bigbang

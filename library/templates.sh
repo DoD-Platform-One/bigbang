@@ -1508,7 +1508,7 @@ get_debug() {
 }
 
 bigbang_pipeline() {
-  if [ $PIPELINE_TYPE == "BB" ]; then
+  if [[ $PIPELINE_TYPE == "BB" ]] || [[ $PIPELINE_TYPE == "INTEGRATION" ]]; then
     get_gitrepos
     get_hr
     get_opa_violations
