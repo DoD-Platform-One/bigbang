@@ -12,7 +12,11 @@ if [[ $DEBUG_ENABLED == "true" ]]; then
   echo "Metrics disabled = $METRICS_DISABLED"
 fi
 
-if [[ "${CI_MERGE_REQUEST_LABELS[*]}" =~ "metricsServer" ]] || [[ $METRICS_DISABLED == "true" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
+if [[ "${CI_MERGE_REQUEST_LABELS[*]}" =~ "metricsServer" ]] || \
+   [[ $METRICS_DISABLED == "true" ]] || \
+   [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" && "${PIPELINE_TYPE}" == "BB" ]] || \
+   [[ ! -z "$CI_COMMIT_TAG" && "${PIPELINE_TYPE}" == "BB" ]] || \
+   [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" && "${PIPELINE_TYPE}" == "BB" ]]; then
   echo "Creating k3d cluster without default metric server"
   k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config-no-metrics.yaml --network ${CI_JOB_ID}
 else
