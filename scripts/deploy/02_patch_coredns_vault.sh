@@ -4,27 +4,32 @@
 set -e
 source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 
-# Check clusterType and get original CoreDNS config
-clusterType="unknown"
-coreDnsName="unknown"
-touch newhosts
-if kubectl get configmap -n kube-system coredns &>/dev/null; then
-  clusterType="k3d"
-  coreDnsName="coredns"
-  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.NodeHosts}' > newhosts
-elif kubectl get configmap -n kube-system rke2-coredns-rke2-coredns &>/dev/null; then
-  clusterType="rke2"
-  coreDnsName="rke2-coredns-rke2-coredns"
-  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
-fi
+# Conditionals for BB pipelines: vault label, all-packages label, main pipeline, tag pipeline
+# Conditionals for Integration pipelines: vault explicitly enabled in values
+if [[ "${PIPELINE_TYPE}" == "BB" && "${CI_DEPLOY_LABELS[*]}" =~ "vault" ]] || \
+   [[ "${PIPELINE_TYPE}" == "BB" && "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]] || \
+   [[ "${PIPELINE_TYPE}" == "BB" && "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || \
+   [[ "${PIPELINE_TYPE}" == "BB" && ! -z "$CI_COMMIT_TAG" ]] || \
+   [[ "${PIPELINE_TYPE}" == "INTEGRATION" && "$(yq e ".addons.vault.enabled" ${CI_PROJECT_DIR}/bigbang/values.yaml)" == "true" ]]; then
+  # Check clusterType and get original CoreDNS config
+  clusterType="unknown"
+  coreDnsName="unknown"
+  touch newhosts
+  if kubectl get configmap -n kube-system coredns &>/dev/null; then
+    clusterType="k3d"
+    coreDnsName="coredns"
+    kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.NodeHosts}' > newhosts
+  elif kubectl get configmap -n kube-system rke2-coredns-rke2-coredns &>/dev/null; then
+    clusterType="rke2"
+    coreDnsName="rke2-coredns-rke2-coredns"
+    kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
+  fi
 
-# Safeguard in case configmap doesn't end with newline
-if [[ $(tail -c 1 newhosts) != "" ]]; then
-  echo "" >> newhosts
-fi
+  # Safeguard in case configmap doesn't end with newline
+  if [[ $(tail -c 1 newhosts) != "" ]]; then
+    echo "" >> newhosts
+  fi
 
-# Only if Vault is deploying
-if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
   # wait for istio to complete
   echo "Waiting for istio to complete..."
   kubectl wait --for=condition=Ready --timeout 900s helmrelease istio -n bigbang
