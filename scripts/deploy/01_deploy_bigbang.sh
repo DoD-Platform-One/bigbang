@@ -3,7 +3,7 @@
 set -e
 source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 
-if [ ! -f ../bigbang/values.yaml ]; then
+if [[ "${PIPELINE_TYPE}" == "BB" ]]; then
   if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ "${CI_DEPLOY_LABELS[*]}" =~ "all-packages" ]]; then
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
       yq e ".addons.*.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
