@@ -427,7 +427,7 @@ policies:
   # To override either disable this policy (not ideal) or add an allowed wildcard matching where local paths are provisioned.
   # See `/docs/example_configs/policy-overrides-k3d.yaml` for an example of how to do this for k3d.
   restrict-host-path-mount-pv:
-    validationFailureAction: audit
+    validationFailureAction: enforce
 
   restrict-host-path-write:
     validationFailureAction: enforce
