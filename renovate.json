@@ -24,10 +24,10 @@
     {
       "fileMatch": ["^chart/Chart\\.yaml$"],
       "matchStrings": [
-        "- Mattermost Operator:\\s+(?<currentValue>.+)"
+        "- Mattermost Operator:\\s+(?<currentValue>.+)",
+        "appVersion:\\s+(?<currentValue>.+)"
       ],
-      "registryUrlTemplate": "https://registry1.dso.mil",
-      "depNameTemplate": "ironbank/opensource/mattermost/mattermost-operator",
+      "depNameTemplate": "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator",
       "datasourceTemplate": "docker"
     }
   ]
