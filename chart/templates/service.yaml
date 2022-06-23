@@ -19,5 +19,3 @@ spec:
   selector:
     name: mattermost-operator
   type: ClusterIP
-status:
-  loadBalancer: {}
