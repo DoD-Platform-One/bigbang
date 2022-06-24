@@ -112,8 +112,8 @@ policies:
 
   # -- Prevent services of the type NodePort
   disallow-nodeport-services:
-    enabled: false
-    validationFailureAction: audit
+    enabled: true
+    validationFailureAction: enforce
 
   # -- Prevent the use of `exec` or `attach` on pods
   disallow-pod-exec:

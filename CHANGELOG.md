@@ -2,10 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [1.0.0-bb.12] - 2022-05-31
-
+## [1.0.0-bb.13] - 2022-06-21
 ### Changed
+- Enabled `disallow-nodeport-services` policy in enforcing mode
 
+## [1.0.0-bb.12] - 2022-05-31
+### Changed
 - Separate host path policies from volume and hostpath
 
 ## [1.0.0-bb.11] - 2022-06-01
