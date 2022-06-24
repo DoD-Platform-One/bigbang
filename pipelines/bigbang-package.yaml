@@ -57,7 +57,7 @@ configuration validation:
     # Package specific tests
     - package_policy_tests
     # OSCAL component validation
-    - package_oscal_validate
+    - oscal_validate
     # Package API Deprecation Check
     - package_deprecation_check
     - |

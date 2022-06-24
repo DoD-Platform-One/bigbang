@@ -879,9 +879,9 @@ package_deprecation_check() {
    echo -e "\e[0Ksection_end:`date +%s`:package_deprecation_check\r\e[0K"
 }
 
-package_oscal_validate() {
+oscal_validate() {
    if [[ -f "oscal-component.yaml" ]]; then
-   echo -e "\e[0Ksection_start:`date +%s`:package_oscal_validate[collapsed=true]\r\e[0KPackage OSCAL validation check"
+   echo -e "\e[0Ksection_start:`date +%s`:oscal_validate[collapsed=true]\r\e[0KOSCAL validation check"
    OSCAL_EXIT_CODE=0
    echo -n "oscal-component.yaml found, validating... "
    yq eval oscal-component.yaml -o=json > tmp_oscal-component.json
@@ -892,7 +892,7 @@ package_oscal_validate() {
    else
      echo "OSCAL is valid."
    fi
-   echo -e "\e[0Ksection_end:`date +%s`:package_oscal_validate\r\e[0K"
+   echo -e "\e[0Ksection_end:`date +%s`:oscal_validate\r\e[0K"
    fi
 }
 
