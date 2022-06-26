@@ -493,7 +493,7 @@ sso:
 
 ## [1.0.4]
 
-- Bug fix where argocd's VirtualService wouldn't recieve the top level hostname value.
+- Bug fix where argocd's VirtualService wouldn't receive the top level hostname value.
 
 ## [1.0.3]
 

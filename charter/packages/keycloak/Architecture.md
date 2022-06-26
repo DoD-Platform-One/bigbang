@@ -161,7 +161,7 @@ addons:
 
 #### Certificate Overlap Problem
 
-> This problem automatically worked around by Big Bang if you have non-overlapping certificates as [recommended above](#keycloak-tls).  Youc an skip this section unless you want the gritty details.
+> This problem automatically worked around by Big Bang if you have non-overlapping certificates as [recommended above](#keycloak-tls). You can skip this section unless you want the gritty details.
 
 Modern browsers will reuse established TLS connections when the destination's IP and port are the same and the current certificate is valid.  See the [HTTP/2 spec](https://httpwg.org/specs/rfc7540.html#rfc.section.9.1.1) for details.  If our cluster has a single load balancer and listens on port 443 for multiple apps, then the IP address and port for all apps in the cluster will be the same from the browser's point of view.  Normally, this isn't a problem because Big Bang uses TLS termination for all applications.  The encryption occurs between Istio and the browser no matter which hostname you use, so the connection can be reused without problems.
 

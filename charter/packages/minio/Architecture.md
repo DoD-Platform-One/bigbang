@@ -77,11 +77,11 @@ You can also set things like the number of volumes per server and affinity rules
 
 ## Single Sign On (SSO)
 
-No current SSO is avaiable via Keycloak.
+No current SSO is available via Keycloak.
 
 ## Configuring access to Minio without SSO
 
-Initial access to the MinIO server is via the minioRootCreds. These can be auto generated for you by adding the accesskey and secret key in your Big Bang config.
+Initial access to the MinIO server is via the minioRootCreds. These can be auto generated for you by adding the access key and secret key in your Big Bang config.
 
 ```
 addons:
@@ -101,7 +101,7 @@ License can be found [here](https://github.com/minio/minio/blob/master/LICENSE)
 
 ### File Storage
 
-MinIO is dependent on a default storage class being configured. This is a core prereq for Big Bang itself so this should already in place when starting up the Big Bang framework. The MinIO process will need to create PersistentVolumes and PersistentVolumeClaims for its storage. The requirment for these are that they have a volumeBindingMode: WaitForFirstConsumer. The MinIO operator should take care of creating these at tenant start up.
+MinIO is dependent on a default storage class being configured. This is a core prereq for Big Bang itself so this should already in place when starting up the Big Bang framework. The MinIO process will need to create PersistentVolumes and PersistentVolumeClaims for its storage. The requirement for these are that they have a volumeBindingMode: WaitForFirstConsumer. The MinIO operator should take care of creating these at tenant start up.
 
 
 ## Dependencies

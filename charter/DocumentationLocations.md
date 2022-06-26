@@ -7,7 +7,7 @@
 ### Where is the best place to look for documentation on BigBang? 
 
 - https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/
-- Our goal is to have near 100% of publicly sharable docs in this centralized location to act as a single source of truth where all documentation can be found and help move docs out of IL2 Confluence and Private Repos to better support the open source community. 
+- Our goal is to have near 100% of publicly shareable docs in this centralized location to act as a single source of truth where all documentation can be found and help move docs out of IL2 Confluence and Private Repos to better support the open source community. 
 
 ### What types of documentation can be found in the docs folder? 
 

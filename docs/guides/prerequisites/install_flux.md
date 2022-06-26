@@ -43,4 +43,4 @@ git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
 ./bigbang/scripts/install_flux.sh
 ```
 
-> **NOTE** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE mesage with required arguments needed to complete installation.
+> **NOTE** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE message with required arguments needed to complete installation.
