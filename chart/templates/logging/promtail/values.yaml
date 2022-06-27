@@ -23,6 +23,9 @@ serviceMonitor:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+
 {{- if .Values.istio.enabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
