@@ -1362,11 +1362,14 @@ addons:
               ui = true
 
               listener "tcp" {
-                tls_disable = 0
+                tls_disable = false
                 address = "[::]:8200"
                 cluster_address = "[::]:8201"
                 tls_cert_file = "/vault/tls/tls.crt"
                 tls_key_file  = "/vault/tls/tls.key"
+                telemetry {
+                  unauthenticated_metrics_access = true
+                }
               }
 
               storage "raft" {
@@ -1389,7 +1392,6 @@ addons:
               telemetry {
                 prometheus_retention_time = "24h"
                 disable_hostname = true
-                unauthenticated_metrics_access = true
               }
 
               service_registration "kubernetes" {}

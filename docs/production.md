@@ -237,7 +237,6 @@ addons:
         extraEnvironmentVars:
           # the istio gateway domain
           VAULT_API_ADDR: https://vault.bigbang.dev
-          VAULT_ADDR:  https://127.0.0.1:8200
           VAULT_SKIP_VERIFY: "true"
           VAULT_LOG_FORMAT: "json"
           VAULT_LICENSE: "your-license-key-goes-here"
@@ -257,11 +256,14 @@ addons:
               ui = true
 
               listener "tcp" {
-                tls_disable = 0
+                tls_disable = false
                 address = "[::]:8200"
                 cluster_address = "[::]:8201"
                 tls_cert_file = "/vault/tls/tls.crt"
                 tls_key_file  = "/vault/tls/tls.key"
+                telemetry {
+                  unauthenticated_metrics_access = true
+                }
               }
 
               storage "raft" {
@@ -298,7 +300,6 @@ addons:
               telemetry {
                 prometheus_retention_time = "24h"
                 disable_hostname = true
-                unauthenticated_metrics_access = true
               }
 
               service_registration "kubernetes" {}
