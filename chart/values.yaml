@@ -177,7 +177,7 @@ svcPatchJob:
   enabled: false
   image:
     repository: registry1.dso.mil/ironbank/big-bang/base
-    tag: 8.4
+    tag: 2.0.0
 
 bbtests:
   enabled: false

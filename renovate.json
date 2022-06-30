@@ -12,13 +12,17 @@
         {
             "matchDatasources": ["docker"],
             "groupName": "Ironbank"
-        }
+        },
+        {
+            "matchPackageNames": ["registry1.dso.mil/ironbank/big-bang/base"],
+            "allowedVersions": "!/8.4/"
+        }      
     ],
     "regexManagers": [
         {
             "fileMatch": ["^chart/values\\.yaml$"],
             "matchStrings": [
-                "(repo|image_name)\\S*:\\s*(?<depName>\\S+).*\n\\s+(tag|image_version):\\s*(?<currentValue>.+)"
+                "(repo|image_name|repository)\\S*:\\s*(?<depName>\\S+).*\n\\s+(tag|image_version):\\s*(?<currentValue>.+)"
             ],
             "datasourceTemplate": "docker"
         },
