@@ -446,6 +446,36 @@ kyvernopolicies:
           update:
           - from: replace.image.registry
             to: registry1.dso.mil
+      require-drop-all-capabilities:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+      require-non-root-group:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+      require-non-root-user:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
 
 logging:
   enabled: true
