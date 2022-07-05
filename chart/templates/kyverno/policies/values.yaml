@@ -189,6 +189,17 @@ policies:
 
   require-drop-all-capabilities:
     validationFailureAction: audit
+    {{- if .Values.addons.gitlab.enabled }}
+    exclude:
+      any:
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
+    {{- end }}
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
@@ -211,7 +222,7 @@ policies:
 
   require-non-root-group:
     validationFailureAction: audit
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -255,11 +266,20 @@ policies:
           names:
           - logging-promtail*
       {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
     validationFailureAction: audit
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
     exclude:
       any:
       {{- if $deployRestic }}
@@ -302,6 +322,15 @@ policies:
           - logging
           names:
           - logging-promtail*
+      {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
       {{- end }}
     {{- end }}
 
