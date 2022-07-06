@@ -1,0 +1,5 @@
+build
+site
+docs
+.venv
+.vscode
