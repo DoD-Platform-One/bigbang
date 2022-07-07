@@ -1,0 +1,73 @@
+site_name: !ENV [SITE_NAME, "Big Bang Docs"]
+site_description: Assembled documentation for Platform One's Big Bang product
+site_url: !ENV [SITE_URL, "https://docs-bigbang.dso.mil"]
+site_author: "Harry Randazzo"
+copyright: Made by ✨ <a href="https://razzle.cloud" target="_blank" rel="noopener">Harry Randazzo ↗</a>
+
+repo_name: big-bang/bigbang
+repo_url: https://repo1.dso.mil/platform-one/big-bang/bigbang
+
+theme:
+  name: material
+  custom_dir: material-overrides
+  language: en
+  font: false
+  features:
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.tracking
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  logo: static/img/big_bang_logo_white.png
+  icon:
+    repo: fontawesome/brands/gitlab
+
+extra_css:
+  - static/css/custom.css
+
+markdown_extensions:
+  - toc:
+      permalink: 💣
+      slugify: !!python/name:pymdownx.slugs.uslugify_cased
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.details
+  - smarty
+  - footnotes
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+plugins:
+  - search
+  - awesome-pages:
+      collapse_single_pages: false
+      strict: false
+  - mike:
+      version_selector: true
+      css_dir: static/css
+      javascript_dir: static/js
+      canonical_version: null
+  - tags
+
+extra:
+  version:
+    provider: mike
+  # https://squidfunk.github.io/mkdocs-material/setup/setting-up-versioning/#version-warning
