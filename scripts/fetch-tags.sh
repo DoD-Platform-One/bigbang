@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -eu pipefail
+set -eu
 
 echo "👉 Fetching tags from all submodules"
 

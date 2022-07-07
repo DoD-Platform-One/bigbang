@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
 
-set -eu pipefail
+set -eu
 
 prettier --write docs/*.md docs/**/*.md
