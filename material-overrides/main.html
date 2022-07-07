@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+<!-- add Padawan CSP nonce -->
+{% block extrahead %}
+<meta property="csp-nonce" content="PADAWAN_CSP_NONCE" />
+<script nonce="PADAWAN_CSP_NONCE" type="module">
+  const generatedNonce = document.querySelector('meta[property="csp-nonce"]').getAttribute("content");
+  [...document.getElementsByTagName("script")].forEach((node) => {
+    node.setAttribute("nonce", generatedNonce);
+  });
+</script>
+{% endblock %}

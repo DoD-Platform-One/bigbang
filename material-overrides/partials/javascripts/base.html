@@ -1,0 +1,10 @@
+<!-- overriden from: https://github.com/squidfunk/mkdocs-material/blob/master/material/partials/javascripts/base.html -->
+<script nonce="PADAWAN_CSP_NONCE" type="text/javascript">
+  (__md_scope = new URL("{{ config.extra.scope | d(base_url) }}", location)),
+    (__md_get = (e, _ = localStorage, t = __md_scope) => JSON.parse(_.getItem(t.pathname + "." + e))),
+    (__md_set = (e, _, t = localStorage, a = __md_scope) => {
+      try {
+        t.setItem(a.pathname + "." + e, JSON.stringify(_));
+      } catch (e) {}
+    });
+</script>

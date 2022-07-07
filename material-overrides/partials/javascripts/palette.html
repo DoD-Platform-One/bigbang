@@ -1,0 +1,6 @@
+<!-- overriden from: https://github.com/squidfunk/mkdocs-material/blob/master/material/partials/javascripts/palette.html -->
+<script nonce="PADAWAN_CSP_NONCE" type="text/javascript">
+  var palette = __md_get("__palette");
+  if (palette && "object" == typeof palette.color)
+    for (var key of Object.keys(palette.color)) document.body.setAttribute("data-md-color-" + key, palette.color[key]);
+</script>
