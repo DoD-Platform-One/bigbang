@@ -1,0 +1,21 @@
+source: submodules/bigbang
+
+ignore_patterns:
+  - .gitignore
+  - CODEOWNERS
+  - oscal-component.yaml
+  - renovate.json
+  - "*.tgz"
+  - "*.zip"
+  - .gitlab-ci.yml
+  - LICENSE
+  - tests
+  - .gitlab
+
+nav:
+  - 🏰 Home: README.md
+  - 👥 Contributing: CONTRIBUTING.md
+  - 📜 Changelog: CHANGELOG.md
+  - 📦 Package Overview: Packages.md
+  - 📖 Big Bang Docs: docs
+  - 🧭 Charter: charter

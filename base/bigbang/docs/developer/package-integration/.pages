@@ -1,0 +1,15 @@
+nav:
+  - Home: README.md
+  - Documentation: documentation.md
+  - Upstream: upstream.md
+  - Database: database.md
+  - Flux: flux.md
+  - Monitoring: monitoring.md
+  - Network Policies: network-policies.md
+  - Pipeline: pipeline.md
+  - Policy Enforcement: policy-enforcement.md
+  - Service Mesh: service-mesh.md
+  - SSO: sso.md
+  - Object Storage: storage.md
+  - Testing: testing.md
+  - Supported: supported.md

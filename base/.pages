@@ -1,0 +1,6 @@
+nav:
+  - 🏰 Home: index.md
+  - 👩‍💻 Getting Started: bigbang
+  - 📦 Packages: packages
+  - 📋 Release Notes: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases
+  - ✨ About: about.md

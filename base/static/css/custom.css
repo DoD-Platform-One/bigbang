@@ -1,0 +1,53 @@
+/* https://squidfunk.github.io/mkdocs-material/setup/changing-the-fonts/?h=font#autoloading */
+@font-face {
+  font-family: "Fira Code";
+  src: url("FiraCode-Regular.woff2") format("woff2");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Montserrat";
+  src: url("Montserrat-Regular.woff2") format("woff2");
+  font-weight: 400;
+}
+:root > * {
+  --md-text-font-family: "Montserrat";
+  --md-code-font-family: "Fira Code";
+  --md-primary-fg-color--dark: #053b9f;
+  --md-primary-fg-color: #002743;
+  --md-accent-fg-color: #53b9f9;
+  --md-typeset-a-color: #0056b3;
+}
+:root [data-md-color-scheme="slate"] {
+  --md-accent-fg-color: #e1f03b;
+  --md-typeset-a-color: #bdc931;
+}
+:root {
+  --md-text-font-family: "Montserrat";
+  --md-code-font-family: "Fira Code";
+  --md-clipboard-icon: url("icons/md-clipboard-icon.svg") !important;
+  --md-nav-icon--prev: url("icons/md-nav-icon--prev.svg") !important;
+  --md-nav-icon--next: url("icons/md-nav-icon--prev.svg") !important;
+  --md-toc-icon: url("icons/md-toc-icon.svg") !important;
+  --md-search-result-icon: url("icons/md-search-result-icon.svg") !important;
+  --md-source-forks-icon: url("icons/md-source-forks-icon.svg") !important;
+  --md-source-repositories-icon: url("icons/md-source-repositories-icon.svg") !important;
+  --md-source-stars-icon: url("icons/md-source-stars-icon.svg") !important;
+  --md-source-version-icon: url("icons/md-source-versoin-icon.svg") !important;
+  --md-version-icon: url("icons/md-version-icon.svg") !important;
+  --md-admonition-icon--note: url("icons/md-admonition-icon--note.svg") !important;
+  --md-admonition-icon--abstract: url("icons/md-admonition-icon--abstract.svg") !important;
+  --md-admonition-icon--info: url("icons/md-admonition-icon--info.svg") !important;
+  --md-admonition-icon--tip: url("icons/md-admonition-icon--tip.svg") !important;
+  --md-admonition-icon--success: url("icons/md-admonition-icon--success.svg") !important;
+  --md-admonition-icon--question: url("icons/md-admonition-icon--question.svg") !important;
+  --md-admonition-icon--warning: url("icons/md-admonition-icon--warning.svg") !important;
+  --md-admonition-icon--failure: url("icons/md-admonition-icon--failure.svg") !important;
+  --md-admonition-icon--danger: url("icons/md-admonition-icon--danger.svg") !important;
+  --md-admonition-icon--bug: url("icons/md-admonition-icon--bug.svg") !important;
+  --md-admonition-icon--example: url("icons/md-admonition-icon--example.svg") !important;
+  --md-admonition-icon--quote: url("icons/md-admonition-icon--quote.svg") !important;
+  --md-footnotes-icon: url("icons/md-footnotes-icon.svg") !important;
+  --md-details-icon: url("icons/md-details-icon.svg") !important;
+  --md-tasklist-icon: url("icons/md-tasklist-icon.svg") !important;
+  --md-tasklist-icon--checked: url("icons/md-tasklist-icon--checked.svg") !important;
+}

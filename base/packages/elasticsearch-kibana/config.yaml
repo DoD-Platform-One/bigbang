@@ -1,0 +1,23 @@
+
+source: submodules/elasticsearch-kibana
+
+ignore_patterns:
+  - .gitattributes
+  - .gitignore
+  - CODEOWNERS
+  - oscal-component.yaml
+  - renovate.json
+  - "*.tgz"
+  - "*.zip"
+  - Dockerfile
+  - tests
+  - LICENSE
+  - .pre-commit-config.yaml
+
+
+nav:
+  - 📦 Home: README.md
+  - 🪙 Values: values.md
+  - 👥 Contributing: CONTRIBUTING.md
+  - 📜 Changelog: CHANGELOG.md
+  - 📖 More Info: docs
