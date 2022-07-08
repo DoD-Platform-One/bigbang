@@ -81,6 +81,11 @@ def compiler(bb, tag):
         repo = SubmoduleRepo(str(src_root).split("/")[-1])
 
         if repo.name != "bigbang":
+            if repo.name not in pkgs:
+                # this means that we are trying to build a version of the docs that does not have this (newer) pkg
+                # skip it
+                shutil.rmtree(f"docs/{repo.name}", ignore_errors=True, onerror=None)
+                continue
             repo.checkout(pkgs[repo.name]["tag"])
 
         shutil.copytree(
@@ -228,10 +233,10 @@ def compile(last_x_tags, clean, dev):
     tags_to_compile = tags[:last_x_tags]
     tags_to_compile.reverse()
 
-    setup()
     bb.checkout("master")
 
     if last_x_tags == 1:
+        setup()
         bb.checkout(tags_to_compile[0])
         preflight(bb)
         compiler(bb, tags_to_compile[0])
@@ -244,7 +249,8 @@ def compile(last_x_tags, clean, dev):
 
     else:
         for tag in tags_to_compile:
-            bb.checkout(tags_to_compile[tag])
+            setup()
+            bb.checkout(tag)
             preflight(bb)
             compiler(bb, tag)
             postflight()
@@ -263,11 +269,13 @@ def compile(last_x_tags, clean, dev):
                     "latest",
                 ]
             )
-            repo = Repo(".")
-            repo.git.checkout("mike-build", "build")
-            sp.run(["git", "branch", "-D", "mike-build"])
-            sp.run(["git", "rm", "-r", "--cached", "build", "--quiet"])
-            shutil.copy2("docs-compiler/templates/index.html", "build/index.html")
+        repo = Repo(".")
+        shutil.rmtree("site", ignore_errors=True, onerror=None)
+        repo.git.checkout("mike-build", "build")
+        sp.run(["git", "branch", "-D", "mike-build"])
+        sp.run(["git", "rm", "-r", "--cached", "build", "--quiet"])
+        shutil.move("build", "site")
+        shutil.copy2("docs-compiler/templates/index.html", "site/index.html")
 
     if clean:
         cleanup()

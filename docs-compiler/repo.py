@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from git import Repo
+from git import GitCommandError, Repo
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="rt")
