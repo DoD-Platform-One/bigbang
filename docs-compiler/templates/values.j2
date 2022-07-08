@@ -1,0 +1,17 @@
+---
+tags:
+- values
+hide: toc
+---
+
+# {{ title }} `values.yaml`
+{% for data in values %}
+### {{ data["Key"] }}
+
+Type: {{ data["Type"] }}
+
+```{{ data["language"] }} title="Default value"
+{{ data["Default"] }}
+```
+{% if data["Description"] %} 
+Description: {{ data["Description"] }}{% endif %}{% endfor %}

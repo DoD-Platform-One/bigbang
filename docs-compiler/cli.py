@@ -1,12 +1,18 @@
+import glob
+import shutil
 import subprocess as sp
 from pathlib import Path
-import shutil
+
 import click
+import tabulate
 from git import Repo
 from ruamel.yaml import YAML
-import tabulate
-import glob
-from .import_pkgs import write_awesome_pages
+
+from .utils import (
+    add_frontmatter,
+    copy_helm_readme,
+    write_awesome_pages,
+)
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
@@ -38,6 +44,9 @@ class SubmoduleRepo:
             return
         self.repo.git.checkout(ref)
         # print(f"{self.name} checked out @{ref}")
+
+    def get_revision_date(self, abspath):
+        return self.repo.git.log(abspath, n=1, date="short", format="%ad by %cn")
 
 
 class BigBangRepo(SubmoduleRepo):
@@ -123,6 +132,143 @@ def cleanup():
     shutil.rmtree("docs", ignore_errors=True, onerror=None)
 
 
+def compiler(bb, tag):
+    pkgs = bb.get_pkgs()
+
+    configs = glob.iglob("base/**/config.yaml", recursive=True)
+
+    for fpath in configs:
+        dst_root = Path(fpath.replace("base/", "docs/").replace("/config.yaml", ""))
+
+        with open(fpath, "r") as f:
+            config = yaml.load(f)
+
+        src_root = Path().cwd().joinpath(config["source"]) or None
+
+        if src_root is None:
+            print(f"{fpath} config is missing a `source` key")
+            continue
+
+        repo = SubmoduleRepo(str(src_root).split("/")[-1])
+
+        if repo.name != "bigbang":
+            repo.checkout(pkgs[repo.name]["tag"])
+
+        shutil.copytree(
+            src_root,
+            dst_root,
+            ignore=shutil.ignore_patterns(*config["ignore_patterns"]),
+            dirs_exist_ok=True,
+        )
+
+        write_awesome_pages(config, dst_root / ".pages")
+
+    shutil.copy2(
+        src_root / "Packages.md",
+        Path().cwd().joinpath("docs/packages/index.md"),
+    )
+    with open(Path().cwd().joinpath("docs/.pages"), "r") as f:
+        dot_pages = yaml.load(f)
+
+    dot_pages["nav"][3]["📋 Release Notes"] += "/" + tag
+
+    with open(Path().cwd().joinpath("docs/.pages"), "w") as f:
+        yaml.dump(dot_pages, f)
+
+    copy_helm_readme(
+        "submodules/bigbang/README.md",
+        "docs/bigbang/README.md",
+        "docs/bigbang/values.md",
+        "Big Bang",
+    )
+
+    pkg_readmes = glob.iglob("docs/packages/*/README.md")
+    for md in pkg_readmes:
+        pkg_name = md.split("/")[2]
+        copy_helm_readme(
+            md.replace("docs/packages/", "submodules/"),
+            f"docs/packages/{pkg_name}/README.md",
+            f"docs/packages/{pkg_name}/values.md",
+            pkg_name,
+        )
+
+    bb_docs = glob.iglob("docs/bigbang/**/*.md", recursive=True)
+    for md in bb_docs:
+        if md == "docs/bigbang/values.md":
+            continue
+        add_frontmatter(
+            md,
+            {
+                "tags": ["bigbang"],
+                "revision_date": bb.get_revision_date(
+                    md.replace("docs/bigbang/", "./")
+                ),
+            },
+        )
+
+    charter_docs = glob.iglob("docs/bigbang/charter/**/*.md", recursive=True)
+    for md in charter_docs:
+        # source_md = md.replace("docs/bigbang/", "submodules/bigbang/")
+        add_frontmatter(
+            md,
+            {
+                "tags": ["charter"],
+            },
+        )
+
+    pkg_docs = glob.iglob("docs/packages/**/*.md", recursive=True)
+    for md in pkg_docs:
+        pkg_name = md.split("/")[2]
+        if md == "docs/packages/index.md" or md == f"docs/packages/{pkg_name}/values.md":
+            continue
+        add_frontmatter(
+            md,
+            {
+                "tags": ["package", pkg_name],
+                "revision_date": SubmoduleRepo(pkg_name).get_revision_date(
+                    md.replace(f"docs/packages/{pkg_name}/", "./")
+                ),
+            },
+        )
+
+    # patch docs/docs references
+    pkg_docs_glob = glob.iglob("docs/packages/**/docs/*.md", recursive=True)
+    for doc in pkg_docs_glob:
+        with open(doc, "r") as f:
+            content = f.read()
+
+        import re
+
+        without_bad_links = re.sub(r"\]\(\.\/docs", "](", content)
+        without_bad_links_ex = re.sub(r"\]\(docs", "](", without_bad_links)
+
+        with open(doc, "w") as f:
+            f.write(without_bad_links_ex)
+            f.close()
+    # end patch
+
+    # patch packages nav
+    with open("docs/packages/.pages", "w") as f:
+        f.write("nav:")
+        pkg_dirs = glob.iglob("docs/packages/*/")
+        for dir in pkg_dirs:
+            name = dir.split("/")[2]
+            f.write(f"\n  - {name}: {name}")
+        f.close()
+    # end patch
+
+
+def preflight(bb):
+    pkgs = bb.get_pkgs()
+    for k, _ in pkgs.items():
+        base_exists = Path.cwd().joinpath("submodules").joinpath(k).exists()
+        if base_exists == False:
+            print(f"Base template does not exist in base/packages/{k}")
+            print(
+                f"You will have to run `./scripts/init-pkg` {k}`, commit and try again"
+            )
+
+
 @click.command()
 @click.option("-l", "--last-x-tags", default=1, type=click.IntRange(1, 9, clamp=True))
 @click.option("-c", "--clean", is_flag=True)
@@ -138,64 +284,8 @@ def compile(last_x_tags, clean, dev):
 
     if last_x_tags == 1:
         bb.checkout(tags_to_compile[0])
-        pkgs = bb.get_pkgs()
-
-        configs = glob.iglob("base/**/config.yaml", recursive=True)
-
-        for fpath in configs:
-            dst_root = Path(fpath.replace("base/", "docs/").replace("/config.yaml", ""))
-
-            with open(fpath, "r") as f:
-                config = yaml.load(f)
-
-            src_root = Path().cwd().joinpath(config["source"]) or None
-
-            if src_root is None:
-                print(f"{fpath} config is missing a `source` key")
-                continue
-
-            repo = SubmoduleRepo(str(src_root).split("/")[-1])
-
-            if repo.name != "bigbang":
-                repo.checkout(pkgs[repo.name]["tag"])
-
-            if repo.name == "bigbang":
-                shutil.copy2(
-                    src_root / "Packages.md",
-                    Path().cwd().joinpath("docs/packages/index.md"),
-                )
-                with open(Path().cwd().joinpath("docs/.pages"), "r") as f:
-                    dot_pages = yaml.load(f)
-
-                dot_pages["nav"][3]["📋 Release Notes"] += "/" + tags_to_compile[0]
-
-                with open(Path().cwd().joinpath("docs/.pages"), "w") as f:
-                    yaml.dump(dot_pages, f)
-
-            shutil.copytree(
-                src_root,
-                dst_root,
-                ignore=shutil.ignore_patterns(*config["ignore_patterns"]),
-                dirs_exist_ok=True,
-            )
-
-            write_awesome_pages(config, dst_root / ".pages")
-
-        # patch docs/docs references
-        pkg_docs_glob = glob.iglob("docs/packages/**/docs/*.md", recursive=True)
-        for doc in pkg_docs_glob:
-            with open(doc, "r") as f:
-                content = f.read()
-
-            import re
-
-            without_bad_links = re.sub(r"\]\(\.\/docs", "](", content)
-            without_bad_links_ex = re.sub(r"\]\(docs", "](", without_bad_links)
-
-            with open(doc, "w") as f:
-                f.write(without_bad_links_ex)
-                f.close()
-        # end patch
+        preflight(bb)
+        compiler(bb, tags_to_compile[0])
 
         if dev:
             sp.run(["mkdocs", "serve"])
@@ -205,18 +295,33 @@ def compile(last_x_tags, clean, dev):
     else:
         for tag in tags_to_compile:
             bb.checkout(tags_to_compile[tag])
-            pkgs = bb.get_pkgs()
-            for k, v in pkgs.items():
-                base_exists = Path.cwd().joinpath("submodules").joinpath(k).exists()
-                if base_exists == False:
-                    print(f"Base template does not exist in base/packages/{k}")
-                    print(
-                        "You will have to `mkdir`, and then `touch config.yaml` for that pkg"
-                    )
+            preflight(bb)
+            compiler(bb, tag)
+            sp.run(
+                [
+                    "mike",
+                    "deploy",
+                    "--branch",
+                    "mike-build",
+                    "--update-aliases",
+                    "--template",
+                    "docs-compiler/templates/redirect.html",
+                    "--prefix",
+                    "build",
+                    tag,
+                    "latest",
+                ]
+            )
+            repo = Repo(".")
+            repo.git.checkout("mike-build", "build")
+            sp.run(["git", "branch", "-D", "mike-build"])
+            sp.run(["git", "rm", "-r", "--cached", "build", "--quiet"])
+            shutil.copy2("docs-compiler/templates/index.html", "build/index.html")
 
     if clean:
         cleanup()
     bb.checkout("master")
+    # sp.run(["git", "submodule", "update", "--init", "--recursive"])
 
 
 cli.add_command(pkgs)
