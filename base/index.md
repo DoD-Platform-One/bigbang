@@ -6,16 +6,7 @@ hide:
 
 # Overview
 
-<style>
-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: auto;
-}
-</style>
-
-![logo](static/img/p1-logo.png)
+![logo](static/img/p1-logo.png){ .center-img }
 
 Welcome to the assembled documentation for Big Bang!
 
