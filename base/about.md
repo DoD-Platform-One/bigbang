@@ -16,6 +16,10 @@ _Author_: [`@razzle`](https://razzle.cloud)
 1. Build that version of the docs.
 1. Repeat steps 4-9 for each version specified.
 
+## Demo Gif
+
+![Demo Gif](static/img/demo.gif)
+
 ## Comparisons to other tools
 
 In my pursuit to write this, I did look at alternative build tools to MkDocs. The below contain a **subjective** comparison betweeen MkDocs and other static site generators.

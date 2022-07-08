@@ -24,6 +24,8 @@ poetry config virtualenvs.in-project true
 poetry install --no-dev
 ```
 
+![Demo GIF](base/static/img/demo.gif)
+
 ## Usage
 
 ```bash
