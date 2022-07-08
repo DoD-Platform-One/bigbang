@@ -2,14 +2,6 @@
 
 _Author_: [`@razzle`](https://razzle.cloud)
 
-This project serves as a digital library, and historical changelog for `bigbang`.
-So you may be wondering, why?
-
-It is my belief that:
-
-- Knowledge should always be free.
-- Knowledge should be easily accessible.
-
 ## How it works
 
 1. Add `bigbang` as a Git submodule.
@@ -18,8 +10,9 @@ It is my belief that:
 1. Query Gitlab's API for that `bigbang`'s least recent release, grab the release notes.
 1. Checkout that release of `bigbang`.
 1. Use `bigbang/chart/values.yaml` as the source of truth for each package's version for that release.
-1. Copy each packages' docs over, reformatting `CHANGELOG`s.
+1. Copy each packages' docs over.
 1. Copy `bigbang/charter` and `bigbang/docs` over.
+1. Reformat Helm docs contained in the `README`s.  Creates a separate `values.md` file that is accessible via site search. 
 1. Build that version of the docs.
 1. Repeat steps 4-9 for each version specified.
 
@@ -27,9 +20,10 @@ It is my belief that:
 
 In my pursuit to write this, I did look at alternative build tools to MkDocs.  The below contain a __subjective__ comparison betweeen MkDocs and other static site generators.
 
-<details><summary>Note</summary>
-It is worth noting that whichever tool I went with, I would also build the pre, and post build steps in whichever language the tool was written in.  This would ensure maximum interop across the build process.
-</details>
+
+!!! note 
+
+    It is worth noting that whichever tool I went with, I would also build the pre, and post build steps in whichever language the tool was written in.  This would ensure maximum interop across the build process.  
 
 ### Gatsby
 
