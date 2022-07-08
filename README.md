@@ -15,9 +15,11 @@ git clone <this repo>
 
 cd <this repo>
 
-git submodule update --init --recursive
+./scripts/update-submodules.sh
 
 git submodule update --remote
+
+./scripts/fetch-tags.sh
 
 pip3 install poetry
 
@@ -36,8 +38,10 @@ poetry run bb-docs-compiler -h
 poetry run bb-docs-compiler compile --last-x-tags 1 --dev
 
 # compile docs for last 3 Big Bang tags
+# there is no current way to run as dev
 poetry run bb-docs-compiler compile -l 3
 
-# build assets located in `site`
+# build assets located in `site`, use python's built in webserver to view them
+python3 -m http.server --directory site
 ```
 
