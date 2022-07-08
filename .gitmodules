@@ -1,0 +1,132 @@
+[submodule "submodules/bigbang"]
+	path = submodules/bigbang
+	url = https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+	branch = master
+[submodule "submodules/istio-controlplane"]
+	path = submodules/istio-controlplane
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+	branch = main
+[submodule "submodules/istio-operator"]
+	path = submodules/istio-operator
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+	branch = main
+[submodule "submodules/jaeger"]
+	path = submodules/jaeger
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+	branch = main
+[submodule "submodules/kiali"]
+	path = submodules/kiali
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+	branch = main
+[submodule "submodules/cluster-auditor"]
+	path = submodules/cluster-auditor
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+	branch = main
+[submodule "submodules/policy"]
+	path = submodules/policy
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+	branch = main
+[submodule "submodules/kyverno"]
+	path = submodules/kyverno
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+	branch = main
+[submodule "submodules/elasticsearch-kibana"]
+	path = submodules/elasticsearch-kibana
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+	branch = main
+[submodule "submodules/eck-operator"]
+	path = submodules/eck-operator
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+	branch = main
+[submodule "submodules/fluentbit"]
+	path = submodules/fluentbit
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+	branch = main
+[submodule "submodules/promtail"]
+	path = submodules/promtail
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+	branch = main
+[submodule "submodules/loki"]
+	path = submodules/loki
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+	branch = main
+[submodule "submodules/tempo"]
+	path = submodules/tempo
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+	branch = main
+[submodule "submodules/monitoring"]
+	path = submodules/monitoring
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+	branch = main
+[submodule "submodules/twistlock"]
+	path = submodules/twistlock
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+	branch = main
+[submodule "submodules/argocd"]
+	path = submodules/argocd
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+	branch = main
+[submodule "submodules/authservice"]
+	path = submodules/authservice
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+	branch = main
+[submodule "submodules/minio-operator"]
+	path = submodules/minio-operator
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+	branch = main
+[submodule "submodules/minio"]
+	path = submodules/minio
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+	branch = main
+[submodule "submodules/gitlab"]
+	path = submodules/gitlab
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+	branch = main
+[submodule "submodules/gitlab-runner"]
+	path = submodules/gitlab-runner
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+	branch = main
+[submodule "submodules/nexus"]
+	path = submodules/nexus
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+	branch = main
+[submodule "submodules/sonarqube"]
+	path = submodules/sonarqube
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+	branch = main
+[submodule "submodules/haproxy"]
+	path = submodules/haproxy
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+	branch = main
+[submodule "submodules/anchore-enterprise"]
+	path = submodules/anchore-enterprise
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+	branch = main
+[submodule "submodules/mattermost-operator"]
+	path = submodules/mattermost-operator
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+	branch = main
+[submodule "submodules/mattermost"]
+	path = submodules/mattermost
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+	branch = main
+[submodule "submodules/velero"]
+	path = submodules/velero
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+	branch = main
+[submodule "submodules/keycloak"]
+	path = submodules/keycloak
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+	branch = main
+[submodule "submodules/vault"]
+	path = submodules/vault
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+	branch = main
+[submodule "submodules/kyverno-policies"]
+	path = submodules/kyverno-policies
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+	branch = main
+[submodule "submodules/metrics-server"]
+	path = submodules/metrics-server
+	url = https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+	branch = main
