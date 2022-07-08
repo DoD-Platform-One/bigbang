@@ -15,11 +15,7 @@ git clone <this repo>
 
 cd <this repo>
 
-./scripts/update-submodules.sh
-
-git submodule update --remote
-
-./scripts/fetch-tags.sh
+./scripts/init-submodules.sh
 
 pip3 install poetry
 
