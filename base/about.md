@@ -7,23 +7,22 @@ _Author_: [`@razzle`](https://razzle.cloud)
 1. Add `bigbang` as a Git submodule.
 1. Use `bigbang/chart/values.yaml` to pull in all the packages as submodules.
 1. Use Git to list all of `bigbang`'s tagged versions.
-1. Query Gitlab's API for that `bigbang`'s least recent release, grab the release notes.
 1. Checkout that release of `bigbang`.
 1. Use `bigbang/chart/values.yaml` as the source of truth for each package's version for that release.
-1. Copy each packages' docs over.
-1. Copy `bigbang/charter` and `bigbang/docs` over.
-1. Reformat Helm docs contained in the `README`s.  Creates a separate `values.md` file that is accessible via site search. 
+1. Copy each packages' docs over using declarative config from `base/packages/<package>/config.yaml`.
+1. Copy Big Bang's docs over, using `base/bigbang/config.yaml`.
+1. Reformat Helm docs contained in the `README`s. Creates a separate `values.md` file that is accessible via site search.
+1. Add certain tags to YAML frontmatter to aid in easier site search. Also patch in revision date back into page footer.
 1. Build that version of the docs.
 1. Repeat steps 4-9 for each version specified.
 
 ## Comparisons to other tools
 
-In my pursuit to write this, I did look at alternative build tools to MkDocs.  The below contain a __subjective__ comparison betweeen MkDocs and other static site generators.
+In my pursuit to write this, I did look at alternative build tools to MkDocs. The below contain a **subjective** comparison betweeen MkDocs and other static site generators.
 
+!!! note
 
-!!! note 
-
-    It is worth noting that whichever tool I went with, I would also build the pre, and post build steps in whichever language the tool was written in.  This would ensure maximum interop across the build process.  
+    It is worth noting that whichever tool I went with, I would also build the pre, and post build steps in whichever language the tool was written in. This would ensure maximum interop across the build process.
 
 ### Gatsby
 
@@ -40,7 +39,7 @@ Cons:
 - Personally, I have had some bad experiences with Gatsby and their design decisions / DX
 - Too verbose / complex for simple sites
 
-> __Verdict__: A large inspiration to this project was [Cloudflare's Developer Docs](https://developers.cloudflare.com/), which (formerly) used Gatsby in its [docs-engine](https://github.com/cloudflare/cloudflare-docs-engine).  However, my past experiences with Gatsby, and the complexity that would be required to build a simple docs site, led me to look elsewhere.
+> **Verdict**: A large inspiration to this project was [Cloudflare's Developer Docs](https://developers.cloudflare.com/), which (formerly) used Gatsby in its [docs-engine](https://github.com/cloudflare/cloudflare-docs-engine). However, my past experiences with Gatsby, and the complexity that would be required to build a simple docs site, led me to look elsewhere.
 
 ### Hugo
 
@@ -59,7 +58,7 @@ Cons:
 - API has changed rapidly within last few months
 - Go has a higher barrier to entry vs Python or JavaScript
 
-> __Verdict__:  While Hugo is insanely powerful, I don't think it fits this use case.  I did not relish the idea of building my own docs site using Go templates, and would rather use a batteries included theme like Material, and tweak it to my liking.
+> **Verdict**: While Hugo is insanely powerful, I don't think it fits this use case. I did not relish the idea of building my own docs site using Go templates, and would rather use a batteries included theme like Material, and tweak it to my liking.
 
 ### MkDocs
 
