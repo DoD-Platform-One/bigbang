@@ -49,6 +49,7 @@ markdown_extensions:
   - pymdownx.details
   - smarty
   - footnotes
+  - attr_list
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
