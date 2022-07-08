@@ -1,6 +1,6 @@
 # Development k3d cluster automation
 
-> NOTE: This script does not does not install Flux or deploy BigBang. You must handle those deployments after your k3d dev cluster is ready.
+> NOTE: This script does not does not install Flux or deploy Big Bang. You must handle those deployments after your k3d dev cluster is ready.
 
 The instance will automatically terminate in the middle of the night at 08:00 UTC.
 
@@ -42,7 +42,7 @@ The instance will automatically terminate in the middle of the night at 08:00 UT
 
 The default with no options specified is to use the EC2 public IP for the k3d cluster and the security group.
 
-```shell
+```console
 ./docs/developer/scripts/k3d-dev.sh -h
 AWS User Name: your.name
 Usage:
@@ -53,6 +53,18 @@ k3d-dev.sh -b -p -m -d -h
  -m   create k3d cluster with metalLB
  -d   destroy related AWS resources
  -h   output help
+```
+
+## After Running The Script
+
+Follow the instructions from the script output to access and use the cluster.
+
+
+## Install FluxCD
+
+The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you can deploy Big Bang you must deploy FluxCD on your k8s cluster. To guarantee that you are using the version of FluxCD that is compatible with the version of Big Bang that you are deploying use the Big Bang provided [script](./scripts/install_flux.sh). You will need your Iron Bank pull credentials and command line access to the k8s cluster from your workstation.
+```shell
+./scripts/install_flux.sh -u your-user-name -p your-password
 ```
 
 ## Troubleshooting
