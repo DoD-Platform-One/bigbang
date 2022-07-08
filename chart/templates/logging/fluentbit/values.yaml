@@ -41,6 +41,7 @@ config:
         HTTP_User                elastic
         HTTP_Passwd              ${FLUENT_ELASTICSEARCH_PASSWORD}
         Logstash_Format          On
+        Suppress_Type_Name       On
         Retry_Limit              False
         Replace_Dots             On
         tls                      On
@@ -54,6 +55,7 @@ config:
         HTTP_User                elastic
         HTTP_Passwd              ${FLUENT_ELASTICSEARCH_PASSWORD}
         Logstash_Format          On
+        Suppress_Type_Name       On
         Logstash_Prefix          node
         Retry_Limit              False
         tls                      On
