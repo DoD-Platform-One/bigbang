@@ -8,11 +8,8 @@ import tabulate
 from git import Repo
 from ruamel.yaml import YAML
 
-from .utils import (
-    add_frontmatter,
-    copy_helm_readme,
-    write_awesome_pages,
-)
+from .repo import BigBangRepo, SubmoduleRepo
+from .utils import add_frontmatter, copy_helm_readme, write_awesome_pages
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
@@ -27,74 +24,6 @@ yaml.width = 1000
 )
 def cli():
     pass
-
-
-class SubmoduleRepo:
-    def __init__(self, name):
-        self.name = name
-        self.path = Path.cwd() / "submodules" / name
-        self.repo = Repo(self.path)
-
-    def pull(self):
-        self.repo.git.pull()
-
-    def checkout(self, ref):
-        if self.repo.is_dirty():
-            print(f"{self.name} repo has pending changes, please commit or stash them")
-            return
-        self.repo.git.checkout(ref)
-        # print(f"{self.name} checked out @{ref}")
-
-    def get_revision_date(self, abspath):
-        return self.repo.git.log(abspath, n=1, date="short", format="%ad by %cn")
-
-
-class BigBangRepo(SubmoduleRepo):
-    def __init__(self):
-        SubmoduleRepo.__init__(self, "bigbang")
-
-    def get_pkgs(self):
-        pkgs = {}
-        values_path = self.path / "chart" / "values.yaml"
-        with open(values_path) as values_yaml:
-            values = yaml.load(values_yaml)
-
-        # core
-        for _, v in values.items():
-            if isinstance(v, dict) and "git" in v:
-                pkg = v["git"]
-                pkg["name"] = pkg["repo"].split("/")[-1].split(".")[0]
-                pkg["title"] = pkg["name"].replace("-", " ").title()
-                pkg.pop("path", None)
-                pkg["type"] = "Core"
-                pkgs[pkg["name"]] = pkg
-        # addons
-        for _, v in values["addons"].items():
-            if isinstance(v, dict) and "git" in v:
-                pkg = v["git"]
-                pkg["name"] = pkg["repo"].split("/")[-1].split(".")[0]
-                pkg["title"] = pkg["name"].replace("-", " ").title()
-                pkg.pop("path", None)
-                pkg["type"] = "Addon"
-                pkgs[pkg["name"]] = pkg
-
-        return pkgs
-
-    def get_tags(self):
-        versions = []
-        for tag in reversed(
-            sorted(self.repo.tags, key=lambda t: t.commit.committed_datetime)
-        ):
-            if "rc" in tag.name:
-                # skip rc versions
-                continue
-            elif tag.name == "":
-                # skip blank version(s)
-                continue
-
-            versions.append(tag.name)
-
-        return versions
 
 
 @click.command(help="List all bb pkgs")
@@ -164,9 +93,10 @@ def compiler(bb, tag):
         write_awesome_pages(config, dst_root / ".pages")
 
     shutil.copy2(
-        src_root / "Packages.md",
-        Path().cwd().joinpath("docs/packages/index.md"),
+        "submodules/bigbang/Packages.md",
+        "docs/packages/index.md",
     )
+
     with open(Path().cwd().joinpath("docs/.pages"), "r") as f:
         dot_pages = yaml.load(f)
 
@@ -219,7 +149,10 @@ def compiler(bb, tag):
     pkg_docs = glob.iglob("docs/packages/**/*.md", recursive=True)
     for md in pkg_docs:
         pkg_name = md.split("/")[2]
-        if md == "docs/packages/index.md" or md == f"docs/packages/{pkg_name}/values.md":
+        if (
+            md == "docs/packages/index.md"
+            or md == f"docs/packages/{pkg_name}/values.md"
+        ):
             continue
         add_frontmatter(
             md,
@@ -249,7 +182,7 @@ def compiler(bb, tag):
 
     # patch packages nav
     with open("docs/packages/.pages", "w") as f:
-        f.write("nav:")
+        f.write("nav:\n  - Home: index.md")
         pkg_dirs = glob.iglob("docs/packages/*/")
         for dir in pkg_dirs:
             name = dir.split("/")[2]
@@ -265,8 +198,24 @@ def preflight(bb):
         if base_exists == False:
             print(f"Base template does not exist in base/packages/{k}")
             print(
-                f"You will have to run `./scripts/init-pkg` {k}`, commit and try again"
+                f"You will have to run `./scripts/init-pkg {k}`, commit and try again"
             )
+            exit()
+
+
+def postflight():
+    sp.run(
+        ["./scripts/remove-gitlab-toc.sh"],
+        cwd=Path().cwd(),
+        capture_output=True,
+        encoding="utf-8",
+    )
+    sp.run(
+        ["./scripts/prettier.sh"],
+        cwd=Path().cwd(),
+        capture_output=True,
+        encoding="utf-8",
+    )
 
 
 @click.command()
@@ -286,6 +235,7 @@ def compile(last_x_tags, clean, dev):
         bb.checkout(tags_to_compile[0])
         preflight(bb)
         compiler(bb, tags_to_compile[0])
+        postflight()
 
         if dev:
             sp.run(["mkdocs", "serve"])
@@ -297,6 +247,7 @@ def compile(last_x_tags, clean, dev):
             bb.checkout(tags_to_compile[tag])
             preflight(bb)
             compiler(bb, tag)
+            postflight()
             sp.run(
                 [
                     "mike",
