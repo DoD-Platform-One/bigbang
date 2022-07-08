@@ -16,9 +16,9 @@ _Author_: [`@razzle`](https://razzle.cloud)
 1. Build that version of the docs.
 1. Repeat steps 4-9 for each version specified.
 
-## Demo Gif
+## Demo GIF
 
-![Demo Gif](static/img/demo.gif)
+![Demo GIF](static/img/demo.gif)
 
 ## Comparisons to other tools
 
