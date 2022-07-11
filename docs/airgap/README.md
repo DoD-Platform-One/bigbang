@@ -188,7 +188,7 @@ docker load -i registry2.tar #on your registry server
 docker load -i k3s.tar
 ```
 
-* Use the script [registry.sh](./scripts/registry.sh) to create registry;
+* Use the script [registry.sh](../assets/scripts/airgap-dev/registry.sh) to create registry;
 
 ```shell
 $ chmod +x registry.sh && sudo ./registry.sh
@@ -338,7 +338,7 @@ kubectl create ns bigbang
 
 Installing Big Bang in an air gap environment currently uses the Helm charts from the **[Big Bang Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang)**.
 
-All changes are modified in the custom [values.yaml](./scripts/values.yaml) file. Modify as needed and replace IP.
+All changes are modified in the custom [values.yaml](../assets/scripts/airgap-dev/values.yaml) file. Modify as needed and replace IP.
 
 Change the hostname for the installation. It is currently set to the development domain:
 

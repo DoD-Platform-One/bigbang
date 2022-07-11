@@ -47,21 +47,22 @@ The Big Bang [Environment Template](https://repo1.dso.mil/platform-one/big-bang/
 
 Hostname is used to override the domain of deployed packages.  This allows you to go to the DNS name of a server using the domain.  For example, if the domain is `bigbang.dev`, Kiali can be reached at `kiali.bigbang.dev`.
 
-| Key | Description | Type | Default |
-|--|--|--|--|
-| `hostname` | Domain to use for deployed servers | Domain Name | `bigbang.dev`
+| Key        | Description                        | Type        | Default       |
+| ---------- | ---------------------------------- | ----------- | ------------- |
+| `hostname` | Domain to use for deployed servers | Domain Name | `bigbang.dev` |
 
 ### `registryCredentials`
 
 Registry credentials are used to pull images for Big Bang.  By default, it points to Iron Bank, but can be modified to use a private registry.  These credentials are passed down to all relevant namespaces as an image pull secret.
 
-| Key | Description | Type | Default |
-|--|--|--|--|
-| `registry` | Container registry location | Domain Name | `registry1.dso.mil`
-| `username`* | Container registry username | String | "" |
-| `password`* | User's password | String | "" |
-| `email` | User's email | Email | "" |
-> *Credentials should be SOPS encrypted
+| Key          | Description                 | Type        | Default             |
+| ------------ | --------------------------- | ----------- | ------------------- |
+| `registry`   | Container registry location | Domain Name | `registry1.dso.mil` |
+| `username`\* | Container registry username | String      | ""                  |
+| `password`\* | User's password             | String      | ""                  |
+| `email`      | User's email                | Email       | ""                  |
+
+> \*Credentials should be SOPS encrypted
 
 ### `flux`
 
@@ -69,7 +70,7 @@ Flux settings are used to setup the default continuous deployment configuration 
 
 | Key | Description | Type | Default |
 |--|--|--|--|
-| `interval` | Polling interval to check for Git or Helm chart updates | ##m##s | 2m |
+| `interval` | Polling interval to check for Git or Helm chart updates | ##m##s (ex. 5m30s) | 2m |
 | `install.retries` | The number of retries that should be attempted on Helm chart installation failures before bailing. | int | 3 |
 | `upgrade.retries` | The number of retries that should be attempted on Helm chart upgrade failures before bailing. | int | 3 |
 | `rollback.timeout` | The time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. | ##m##s | 5m |
@@ -97,12 +98,12 @@ Each package (e.g. `istio`, `clusterAuditor`) has configuration to control how B
 
 Big Bang deploys four flux resources that can be customized:
 
-| Resource | Controls | Location |
-|--|--|--|
-| GitRepository | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
-| Kustomization | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`)
-| GitRepository | Big Bang | [Link](../base/gitrepository.yaml) |
-| HelmRelease | Big Bang | [Link](../base/helmrelease.yaml) |
+| Resource      | Controls    | Location                                          |
+| ------------- | ----------- | ------------------------------------------------- |
+| GitRepository | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`) |
+| Kustomization | Environment | Top-level manifest (e.g. `dev.yaml`, `prod.yaml`) |
+| GitRepository | Big Bang    | [Link](../base/gitrepository.yaml)                |
+| HelmRelease   | Big Bang    | [Link](../base/helmrelease.yaml)                  |
 
 In addition, each package contains its own GitRepository and HelmRelease resource that can be customized.  Look in the [Helm chart templates](../chart/templates) for the these resources.
 
@@ -111,7 +112,7 @@ Settings for any of these resources can be overridden by [patching](https://kube
 - Updating flux-system component resource usage
   - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#adjust-resource-allocation-for-a-flux-system-component)
   - This patch could be used to adjust the resources requested by the `flux-system/helm-controller` resource. A similar patch could be used to adjust the resources required by the other flux components.
-  > NOTE: If flux is under-resourced, occasionally requests can fail in a manner that looks like a network connectivity issue (use with caution)
+    > NOTE: If flux is under-resourced, occasionally requests can fail in a manner that looks like a network connectivity issue (use with caution)
 - Adding environment variables to flux-system components
   - [Example `kustomization.yaml`](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main#adjust-resource-allocation-for-a-flux-system-component)
   - This patch could be used to add AWS credential environment variables into the `flux-system/kustomize-controller` resource to enable SOPS decryption using a KMS key from outside of AWS.
@@ -127,17 +128,17 @@ In your `kustomization.yaml` under your environment, here is an example of how t
 
 ```yaml
 bases:
-- https://repo1.dso.mil/platform-one/big-bang/bigbang.git/base/?ref=v1.2.*
+  - https://repo1.dso.mil/platform-one/big-bang/bigbang.git/base/?ref=v1.2.*
 patchesStrategicMerge:
-- |-
-  apiVersion: source.toolkit.fluxcd.io/v1beta2
-  kind: GitRepository
-  metadata:
-    name: bigbang
-  spec:
-    ref:
-      $patch: replace
-      semver: "1.2.x"
+  - |-
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: GitRepository
+    metadata:
+      name: bigbang
+    spec:
+      ref:
+        $patch: replace
+        semver: "1.2.x"
 ```
 
 > Note: You must put the version in two places, once for Kustomize to pull the right configuration base and two for Git Repository to pull the right Helm Chart.
@@ -186,12 +187,12 @@ If you have pull credentials for your docker registry, add them to `secrets.enc.
 apiVersion: v1
 kind: Secret
 metadata:
-    name: common-bb
+  name: common-bb
 stringData:
-    values.yaml: |-
-        registryCredentials:
-          username: iron-bank-user
-          password: iron-bank-password
+  values.yaml: |-
+    registryCredentials:
+      username: iron-bank-user
+      password: iron-bank-password
 ```
 
 You will also need to update your `kustomization.yaml` to merge with the existing secret:
@@ -199,12 +200,12 @@ You will also need to update your `kustomization.yaml` to merge with the existin
 ```yaml
 namespace: bigbang
 patchesStrategicMerge:
-- secrets.enc.yaml
+  - secrets.enc.yaml
 ```
 
 ## Package settings
 
-Besides the [global settings](#big-bang-globals), package settings are defined by the individual packet's helm charts.   You can find these by reviewing the `git.registry` setting for the package in Big Bang's [default values.yaml](../chart/values.yaml)
+Besides the [global settings](#big-bang-globals), package settings are defined by the individual packet's helm charts.  You can find these by reviewing the `git.registry` setting for the package in Big Bang's [default values.yaml](../chart/values.yaml).
 
 To modify a non-sensitive package setting, add it to your `configmap.yaml`.  For sensitive information, follow the pattern for setting [registry pull credentials](#registry-pull-credentials).  Here we disable `twistlock` and set `gatekeeper`'s replicas to `1`:
 
