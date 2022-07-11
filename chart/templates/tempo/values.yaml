@@ -9,17 +9,32 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
+objectStorage: 
+  access_key_id: {{ .Values.tempo.objectStorage.accessKey }}
+  secret_access_key: {{ .Values.tempo.objectStorage.accessSecret }}
+
 tempo:
   imagePullSecrets:
   - name: private-registry
+  pullPolicy: {{ .Values.imagePullPolicy }}
+{{- with .Values.tempo.objectStorage }}
+{{- if and .endpoint .region .bucket }}
+  storage: 
+    trace:
+      backend: s3
+      s3:
+        endpoint: {{ .endpoint }}
+        bucket: {{ .bucket }}
+        region: {{ .region }}
+        insecure: {{ .insecure }}
+        forcepathstyle: true
+{{- end }}
+{{- end }}
 
     # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
-
-tempo:
-  pullPolicy: {{ .Values.imagePullPolicy }}
 
 tempoQuery:
   pullPolicy: {{ .Values.imagePullPolicy }}
