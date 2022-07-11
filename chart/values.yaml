@@ -56,7 +56,7 @@ sso:
     # -- Keycloak realm containing clients
     realm: baby-yoda
 
-  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see ./docs/example_configs/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
+  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see docs/assets/configs/example/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
   certificate_authority: ""
 
   # -- Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs

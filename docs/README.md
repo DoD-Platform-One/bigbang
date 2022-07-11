@@ -14,11 +14,11 @@
 
 ## How do I deploy BigBang?
 
-**Note:** The Deployment Process and Pre-Requisites will vary depending on the deployment scenario. The [Quick Start Demo Deployment](guides/deployment_scenarios/quickstart.md) for example, allows some steps to be skipped due to a mixture of automation and generically reusable demo configuration that satisfies pre-requisites.
-The following is a general overview of the process, the [deployment guides](guides/deployment_scenarios) go into more detail.
+**Note:** The Deployment Process and Pre-Requisites will vary depending on the deployment scenario. The [Quick Start Demo Deployment](guides/deployment-scenarios/quickstart.md) for example, allows some steps to be skipped due to a mixture of automation and generically reusable demo configuration that satisfies pre-requisites.
+The following is a general overview of the process, the [deployment guides](guides/deployment-scenarios) go into more detail.
 
 1. Satisfy Pre-Requisites:
-   * Provision a Kubernetes Cluster according to [best practices](guides/prerequisites/kubernetes_preconfiguration.md#best-practices).
+   * Provision a Kubernetes Cluster according to [best practices](guides/prerequisites/kubernetes-preconfiguration.md#best-practices).
    * Ensure the Cluster has network connectivity to a Git Repo you control.
    * Install Flux GitOps Operator on the Cluster.
    * Configure Flux, the Cluster, and the Git Repo for GitOps Deployments that support deploying encrypted values.

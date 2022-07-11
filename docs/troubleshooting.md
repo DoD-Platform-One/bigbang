@@ -1,13 +1,4 @@
-# Appendix B - Big Bang Troubleshooting
-
-- [Appendix B - Big Bang Troubleshooting](#appendix-b---big-bang-troubleshooting)
-  - [Iron Bank authentication](#iron-bank-authentication)
-  - [Flux install](#flux-install)
-  - [Git Repository](#git-repository)
-  - [ConfigMap or Secrets](#configmap-or-secrets)
-  - [Helm Release](#helm-release)
-  - [Kustomization](#kustomization)
-  - [Packages](#packages)
+# Big Bang Troubleshooting
 
 Big Bang can take a long time to run.  After making changes, it could take 10-15 minutes to take effect.  Use the [sync.sh](../scripts/sync.sh) script to speed this up.
 

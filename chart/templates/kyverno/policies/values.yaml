@@ -454,7 +454,7 @@ policies:
 
   # NOTE: This restricts the ability to have PVCs when using a local path provisioner storage class (i.e. k3d default).
   # To override either disable this policy (not ideal) or add an allowed wildcard matching where local paths are provisioned.
-  # See `/docs/example_configs/policy-overrides-k3d.yaml` for an example of how to do this for k3d.
+  # See `docs/assets/configs/example/policy-overrides-k3d.yaml` for an example of how to do this for k3d.
   restrict-host-path-mount-pv:
     validationFailureAction: enforce
 

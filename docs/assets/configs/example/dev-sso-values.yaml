@@ -1,0 +1,281 @@
+# Enables and configures sso for all packages using the test bigbang.dev clients:
+
+sso:
+  # Entrust certificate authority for login.dso.mil
+  # do not use this CA with a Keycloak deployed with a different certificate authority
+  # For example *.bigbang.dev because that certificate is issued by a different CA
+  certificate_authority: |
+    -----BEGIN CERTIFICATE-----
+    MIIH0zCCBrugAwIBAgIQHeg1retyhPnWuzryBJeBvTANBgkqhkiG9w0BAQsFADCB
+    ujELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsT
+    H1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAy
+    MDEyIEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEuMCwG
+    A1UEAxMlRW50cnVzdCBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eSAtIEwxSzAeFw0y
+    MDEyMTUwMzE1MDJaFw0yMjAxMTQwMzE1MDJaMHMxCzAJBgNVBAYTAlVTMREwDwYD
+    VQQIEwhDb2xvcmFkbzEZMBcGA1UEBxMQQ29sb3JhZG8gU3ByaW5nczEeMBwGA1UE
+    ChMVRGVwYXJ0bWVudCBvZiBEZWZlbnNlMRYwFAYDVQQDEw1sb2dpbi5kc28ubWls
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAymUXk7STDlepS5HJu0ca
+    B57S5dfLp7zxYmcsGjo10YkHy3m9LASQCTyiioDrlwo2b+n8oZ7esGLv3RgggMwf
+    xvLVyx1+lZDswxdQoXmjArTdbqpcSoq3Y1rvVp33/jGb3slBjQtcMt2QvaFv3fxy
+    cwwINvJFEqsQS7zGUgpolJ3smKdcVpUSGZmzpYposuDlPUGeOJaQRMAACW5arWiT
+    VkDhJD+OVOYEHW8uCQfghD3JJXu6Xp9SwlWe6UNOdxo9cq3s/XE4ZwEgffdLXP2A
+    wuJF/7B7CFdZjIMptmOODyCeatC344iyubU0MiGCOm4W4wn0pQ0XJtAzWeYFKATL
+    9BquNOzPUR6pMSFMvIEiS96zbVFuOYt2XKgPryWEYji3Oky082WWYOcXt0NnqnCj
+    SafVU+2fQi4jQ0att5YXagEEPz83lQZdSKb2+grDeFg78VrEZAe+Y0mVu4/G93he
+    UOqfZ9jdCnFXq8sEMG9bJJFKeOXkb1Da8Y0amfOw4hFd4UslrbvC5ZCUZNh6roOk
+    8kast9QWtWFIGPC3f+Uq3gvx3GBHzIG9QPOq1CjSSAF3tWKuMTxK4zaS33mriJo0
+    Dv1CMX3FCmjT/qG3422guBL02hbGHveDSWk0/saY7ZWFifxnvKEdOi4ItnpMuQhE
+    zx6/+t7FWuzBTPAeVqV1l2sCAwEAAaOCAxkwggMVMAwGA1UdEwEB/wQCMAAwHQYD
+    VR0OBBYEFCLwpnkje7QKLWok+nWIeBEnIGfmMB8GA1UdIwQYMBaAFIKicHTdvFM/
+    z3vU981/p2DGCky/MGgGCCsGAQUFBwEBBFwwWjAjBggrBgEFBQcwAYYXaHR0cDov
+    L29jc3AuZW50cnVzdC5uZXQwMwYIKwYBBQUHMAKGJ2h0dHA6Ly9haWEuZW50cnVz
+    dC5uZXQvbDFrLWNoYWluMjU2LmNlcjAzBgNVHR8ELDAqMCigJqAkhiJodHRwOi8v
+    Y3JsLmVudHJ1c3QubmV0L2xldmVsMWsuY3JsMCcGA1UdEQQgMB6CDWxvZ2luLmRz
+    by5taWyCDWxvZ2luLmRzb3AuaW8wDgYDVR0PAQH/BAQDAgWgMB0GA1UdJQQWMBQG
+    CCsGAQUFBwMBBggrBgEFBQcDAjBMBgNVHSAERTBDMDcGCmCGSAGG+mwKAQUwKTAn
+    BggrBgEFBQcCARYbaHR0cHM6Ly93d3cuZW50cnVzdC5uZXQvcnBhMAgGBmeBDAEC
+    AjCCAX4GCisGAQQB1nkCBAIEggFuBIIBagFoAHUAVhQGmi/XwuzT9eG9RLI+x0Z2
+    ubyZEVzA75SYVdaJ0N0AAAF2ZGTpIwAABAMARjBEAiAK+W9ukx92DJPFV87LexEg
+    /qDFTjtkiLh/z+mLmDtOwQIgUD4YrMuo22sV9MeJ8JmzraCQVdUUIprw4K4HN+eO
+    6W0AdwDfpV6raIJPH2yt7rhfTj5a6s2iEqRqXo47EsAgRFwqcwAAAXZkZOlKAAAE
+    AwBIMEYCIQDRpvbR/GroWSGlCIh1q0RUITb8RfI4skqqBa/FeU811AIhAPlRY4lv
+    DC2u9MFSEiCVeaFYJRU0xvAwmHQMtrl+IE4iAHYARqVV63X6kSAwtaKJafTzfREs
+    QXS+/Um4havy/HD+bUcAAAF2ZGTrYAAABAMARzBFAiEAifP8Y0nXFBykaTyzpWpv
+    E3FDi8NCQeJFRMJqD7loTjMCIHVDio7r+zANTbIdRLRRzHoNzo//xfJ0JUqejNRA
+    aCpZMA0GCSqGSIb3DQEBCwUAA4IBAQB/wtYjDQiPLe99tZq98IyxOSJCli2mtlV9
+    gSC67aj4rgW6g+C8P1bSoB5PamMq6rON5q0SXL3CQiQ7vegxCQnleDh0LWeKPFS2
+    jjSIl3CvrYfBlNBzw4H1uAa/yw+enr0So8oX8kdSTBFGnU4KoK646lFZRXSifFIU
+    zzQ9QYYedmiP0iKs5LDYGAOsB/w/O94+zv6qGKXA1fVzBXAD54MddqGk9mHZTSyL
+    6nsSTx4r8vCGQir7d2QuIGLD48zaYQz0TFcGKnBV3/9CB27RxJkRdMwUbMvNdp3C
+    V+C2+jdR8xA/0qCnvSxHc1lTZgXxVkcu/wpqIBn3af5Ha8ddd0DU
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIFDjCCA/agAwIBAgIMDulMwwAAAABR03eFMA0GCSqGSIb3DQEBCwUAMIG+MQsw
+    CQYDVQQGEwJVUzEWMBQGA1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2Vl
+    IHd3dy5lbnRydXN0Lm5ldC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMDkg
+    RW50cnVzdCwgSW5jLiAtIGZvciBhdXRob3JpemVkIHVzZSBvbmx5MTIwMAYDVQQD
+    EylFbnRydXN0IFJvb3QgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkgLSBHMjAeFw0x
+    NTEwMDUxOTEzNTZaFw0zMDEyMDUxOTQzNTZaMIG6MQswCQYDVQQGEwJVUzEWMBQG
+    A1UEChMNRW50cnVzdCwgSW5jLjEoMCYGA1UECxMfU2VlIHd3dy5lbnRydXN0Lm5l
+    dC9sZWdhbC10ZXJtczE5MDcGA1UECxMwKGMpIDIwMTIgRW50cnVzdCwgSW5jLiAt
+    IGZvciBhdXRob3JpemVkIHVzZSBvbmx5MS4wLAYDVQQDEyVFbnRydXN0IENlcnRp
+    ZmljYXRpb24gQXV0aG9yaXR5IC0gTDFLMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+    MIIBCgKCAQEA2j+W0E25L0Tn2zlem1DuXKVh2kFnUwmqAJqOV38pa9vH4SEkqjrQ
+    jUcj0u1yFvCRIdJdt7hLqIOPt5EyaM/OJZMssn2XyP7BtBe6CZ4DkJN7fEmDImiK
+    m95HwzGYei59QAvS7z7Tsoyqj0ip/wDoKVgG97aTWpRzJiatWA7lQrjV6nN5ZGhT
+    JbiEz5R6rgZFDKNrTdDGvuoYpDbwkrK6HIiPOlJ/915tgxyd8B/lw9bdpXiSPbBt
+    LOrJz5RBGXFEaLpHPATpXbo+8DX3Fbae8i4VHj9HyMg4p3NFXU2wO7GOFyk36t0F
+    ASK7lDYqjVs1/lMZLwhGwSqzGmIdTivZGwIDAQABo4IBDDCCAQgwDgYDVR0PAQH/
+    BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQAwMwYIKwYBBQUHAQEEJzAlMCMGCCsG
+    AQUFBzABhhdodHRwOi8vb2NzcC5lbnRydXN0Lm5ldDAwBgNVHR8EKTAnMCWgI6Ah
+    hh9odHRwOi8vY3JsLmVudHJ1c3QubmV0L2cyY2EuY3JsMDsGA1UdIAQ0MDIwMAYE
+    VR0gADAoMCYGCCsGAQUFBwIBFhpodHRwOi8vd3d3LmVudHJ1c3QubmV0L3JwYTAd
+    BgNVHQ4EFgQUgqJwdN28Uz/Pe9T3zX+nYMYKTL8wHwYDVR0jBBgwFoAUanImetAe
+    733nO2lR1GyNn5ASZqswDQYJKoZIhvcNAQELBQADggEBADnVjpiDYcgsY9NwHRkw
+    y/YJrMxp1cncN0HyMg/vdMNY9ngnCTQIlZIv19+4o/0OgemknNM/TWgrFTEKFcxS
+    BJPok1DD2bHi4Wi3Ogl08TRYCj93mEC45mj/XeTIRsXsgdfJghhcg85x2Ly/rJkC
+    k9uUmITSnKa1/ly78EqvIazCP0kkZ9Yujs+szGQVGHLlbHfTUqi53Y2sAEo1GdRv
+    c6N172tkw+CNgxKhiucOhk3YtCAbvmqljEtoZuMrx1gL+1YQ1JH7HdMxWBCMRON1
+    exCdtTix9qrKgWRs6PLigVWXUX/hwidQosk8WwBD9lu51aX8/wdQQGcHsFXwt35u
+    Lcw=
+    -----END CERTIFICATE-----
+    -----BEGIN CERTIFICATE-----
+    MIIEPjCCAyagAwIBAgIESlOMKDANBgkqhkiG9w0BAQsFADCBvjELMAkGA1UEBhMC
+    VVMxFjAUBgNVBAoTDUVudHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50
+    cnVzdC5uZXQvbGVnYWwtdGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3Qs
+    IEluYy4gLSBmb3IgYXV0aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVz
+    dCBSb290IENlcnRpZmljYXRpb24gQXV0aG9yaXR5IC0gRzIwHhcNMDkwNzA3MTcy
+    NTU0WhcNMzAxMjA3MTc1NTU0WjCBvjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUVu
+    dHJ1c3QsIEluYy4xKDAmBgNVBAsTH1NlZSB3d3cuZW50cnVzdC5uZXQvbGVnYWwt
+    dGVybXMxOTA3BgNVBAsTMChjKSAyMDA5IEVudHJ1c3QsIEluYy4gLSBmb3IgYXV0
+    aG9yaXplZCB1c2Ugb25seTEyMDAGA1UEAxMpRW50cnVzdCBSb290IENlcnRpZmlj
+    YXRpb24gQXV0aG9yaXR5IC0gRzIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+    AoIBAQC6hLZy254Ma+KZ6TABp3bqMriVQRrJ2mFOWHLP/vaCeb9zYQYKpSfYs1/T
+    RU4cctZOMvJyig/3gxnQaoCAAEUesMfnmr8SVycco2gvCoe9amsOXmXzHHfV1IWN
+    cCG0szLni6LVhjkCsbjSR87kyUnEO6fe+1R9V77w6G7CebI6C1XiUJgWMhNcL3hW
+    wcKUs/Ja5CeanyTXxuzQmyWC48zCxEXFjJd6BmsqEZ+pCm5IO2/b1BEZQvePB7/1
+    U1+cPvQXLOZprE4yTGJ36rfo5bs0vBmLrpxR57d+tVOxMyLlbc9wPBr64ptntoP0
+    jaWvYkxN4FisZDQSA/i2jZRjJKRxAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAP
+    BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRqciZ60B7vfec7aVHUbI2fkBJmqzAN
+    BgkqhkiG9w0BAQsFAAOCAQEAeZ8dlsa2eT8ijYfThwMEYGprmi5ZiXMRrEPR9RP/
+    jTkrwPK9T3CMqS/qF8QLVJ7UG5aYMzyorWKiAHarWWluBh1+xLlEjZivEtRh2woZ
+    Rkfz6/djwUAFQKXSt/S1mja/qYh2iARVBCuch38aNzx+LaUa2NSJXsq9rD1s2G2v
+    1fN2D807iDginWyTmsQ9v4IbZT+mD12q/OWyFcq1rca8PdCE6OoGcrBNOTJ4vz4R
+    nAuknZoh8/CbCzB428Hch0P+vGOaysXCHMnHjf87ElgI5rY97HosTvuDls4MPGmH
+    VHOkc8KT/1EQrBVUAdj8BbGJoX90g5pJ19xOe4pIb4tF9g==
+    -----END CERTIFICATE-----
+
+  # # LetsEncrypt certificate authority for keycloak.bigbang.dev
+  # # Use this CA if you deployed Keycloak with *.bigbang.dev certificate using docs/assets/configs/example/keycloak-dev-values.yaml
+  # certificate_authority: |
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+  #   TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+  #   cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+  #   WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+  #   ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+  #   MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+  #   h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+  #   0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+  #   A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+  #   T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+  #   B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+  #   B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+  #   KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+  #   OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+  #   jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+  #   qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+  #   rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+  #   HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+  #   hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+  #   ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+  #   3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+  #   NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+  #   ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+  #   TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+  #   jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+  #   oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+  #   4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+  #   mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+  #   emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+  #   -----END CERTIFICATE-----
+
+  
+  # The JSON Web Key Set (JWKS) containing the public keys used to verify any JSON Web Token (JWT) issued by the IDP
+  # The jwks is public and does not require a secret
+  # The jwks is used by Istio authservice
+  # Must be updated for every new deployment of Keycloak. Example of where to get the jwks:
+  # https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/certs
+  # must be single quoted and double quotes must be escaped like this \"xxxx\"
+  # This jwks is from login.bigbang.dev
+  jwks: '{\"keys\":[{\"kid\":\"4CK69bW66HE2wph9VuBs0fTc1MaETSTpU1iflEkBHR4\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"hiML1kjw-sw25BgaZI1AyfgcCRBPJKPE-wwttqa7NNxptr_5RCBGuJXqDyo3p1vjcbb8KjdKnXI7kWer8b2Pz_RP1m_QcPrKOxSluk7GZF8ARsc6FPGbzYgi8o8cBVSsaml6HZzpN3ZnH4DFZ27ifM-Ul_PyMxZ2aweohIaizXp-rgF7Rqpav5NXUwmcSyH8LP92NVIuFlD3HYTDGosVbfA_u_H25Z4XCGKW_vLDTNrl8PcA3HqIoD-vNavysdxAq_KNw7iLLc0KLsjFYSdJL_54H7QubsGR0AyIrLLurJbqAtvttGJK38k5XYWKIwYGtu6iiJwjSb7UtonVdPh8Vw\",\"e\":\"AQAB\",\"x5c\":[\"MIICoTCCAYkCBgFyLIEqUjANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjAwNTE5MTAzNDIyWhcNMzAwNTE5MTAzNjAyWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCGIwvWSPD6zDbkGBpkjUDJ+BwJEE8ko8T7DC22prs03Gm2v/lEIEa4leoPKjenW+NxtvwqN0qdcjuRZ6vxvY/P9E/Wb9Bw+so7FKW6TsZkXwBGxzoU8ZvNiCLyjxwFVKxqaXodnOk3dmcfgMVnbuJ8z5SX8/IzFnZrB6iEhqLNen6uAXtGqlq/k1dTCZxLIfws/3Y1Ui4WUPcdhMMaixVt8D+78fblnhcIYpb+8sNM2uXw9wDceoigP681q/Kx3ECr8o3DuIstzQouyMVhJ0kv/ngftC5uwZHQDIissu6sluoC2+20YkrfyTldhYojBga27qKInCNJvtS2idV0+HxXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAIVkoDYkM6ryBcuchdAL5OmyKbmmY4WDrMlatfa3uniK5jvFXrmVaJ3rcu0apdY/NhBeLSOLFVlC5w1QroGUhWm0EjAA4zyuU63Pk0sro0vyHrxztBrGPQrGXI3kjXEssaehZZvYP4b9VtYpus6oGP6bTmaDw94Zu+WrDsWdFs+27VEYwBuU0D6E+ENDGlfR+9ADEW53t6H2M3H0VsOtbArEutYgb4gmQcOIBygC7L1tGJ4IqbnhTYLh9DMKNklU+tq8TMHacps9FxELpeAib3O0J0E5zYXdraQobCCe+ao1Y7sA/wqcGQBCVuoFgty7Y37nNL7LMvygcafgqVDqw5U=\"],\"x5t\":\"mxFIwx7EdgxyC3Y6ODLx8yr8Bx8\",\"x5t#S256\":\"SdT7ScKVOnBW6qs_MuYdTGVtMGwYK_-nmQF9a_8lXco\"}]}'
+
+kiali:
+  sso:
+    enabled: true
+    client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-kiali
+
+jaeger:
+  sso:
+    enabled: true
+    client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-jaeger
+
+logging:
+  sso:
+    enabled: true
+    client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-kibana
+  license:
+    trial: true
+monitoring:
+  sso:
+    enabled: true
+    prometheus: 
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-prometheus
+    alertmanager:
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-alertmanager
+    grafana:
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-grafana
+      scopes: "Grafana"
+
+twistlock:
+  # Needs to be configured manually in the UI.  Inserted here
+  # for documentation if it can be come automated later
+  sso:
+    enabled: true
+    client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-twistlock
+
+addons:
+  authservice:
+    enabled: true
+  argocd: 
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-argocd
+      client_secret: anything-for-dev
+      provider_name: "P1 SSO"
+      groups: |
+        g, Impact Level 2 Authorized, role:admin
+  gitlab:
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-gitlab
+  sonarqube:
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
+      provider_name: "P1 SSO"
+      certificate: MIICoTCCAYkCBgFyLIEqUjANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjAwNTE5MTAzNDIyWhcNMzAwNTE5MTAzNjAyWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCGIwvWSPD6zDbkGBpkjUDJ+BwJEE8ko8T7DC22prs03Gm2v/lEIEa4leoPKjenW+NxtvwqN0qdcjuRZ6vxvY/P9E/Wb9Bw+so7FKW6TsZkXwBGxzoU8ZvNiCLyjxwFVKxqaXodnOk3dmcfgMVnbuJ8z5SX8/IzFnZrB6iEhqLNen6uAXtGqlq/k1dTCZxLIfws/3Y1Ui4WUPcdhMMaixVt8D+78fblnhcIYpb+8sNM2uXw9wDceoigP681q/Kx3ECr8o3DuIstzQouyMVhJ0kv/ngftC5uwZHQDIissu6sluoC2+20YkrfyTldhYojBga27qKInCNJvtS2idV0+HxXAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAIVkoDYkM6ryBcuchdAL5OmyKbmmY4WDrMlatfa3uniK5jvFXrmVaJ3rcu0apdY/NhBeLSOLFVlC5w1QroGUhWm0EjAA4zyuU63Pk0sro0vyHrxztBrGPQrGXI3kjXEssaehZZvYP4b9VtYpus6oGP6bTmaDw94Zu+WrDsWdFs+27VEYwBuU0D6E+ENDGlfR+9ADEW53t6H2M3H0VsOtbArEutYgb4gmQcOIBygC7L1tGJ4IqbnhTYLh9DMKNklU+tq8TMHacps9FxELpeAib3O0J0E5zYXdraQobCCe+ao1Y7sA/wqcGQBCVuoFgty7Y37nNL7LMvygcafgqVDqw5U=
+      login: login
+      name: name
+      email: email
+  anchore:
+    adminPassword: admin
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-anchore
+    enterprise:
+      enabled: true
+      licenseYaml: |
+       "TBD"
+  jira:
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-jira
+  confluence:
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-confluence
+  mattermost:
+    sso:
+      enabled: true
+      client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost"
+      client_secret: "no-secret"
+  nexus:
+    # Nexus requires manual configuration in Keycloak client and cannot be tested with login.dso.mil
+    # you must test with your own dev deployment.  Example: keycloak.bigbang.dev
+    # See more info in Nexus Package docs /docs/keycloak.md
+    # Nexus SSO is behind a paywall. You must have a valid license to enable SSO
+    # -- Base64 encoded license file.
+    # cat ~/Downloads/sonatype-license-YYYY-MM-ddTnnnnnnZ.lic | base64 -w 0 ; echo
+    license_key: "enter-single-line-base64-encoded-string-here"
+    sso:
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: true
+      idp_data:
+        entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: "username"
+        firstName: "firstName"
+        lastName: "lastName"
+        email: "email"
+        groups: "groups"
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        # curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo
+        idpMetadata: 'enter-single-quoted-single-line-string-here'
+      role:
+        # id is the name of the Keycloak group (case sensitive)
+        - id: "Nexus"
+          name: "Keycloak Nexus Group"
+          description: "unprivilaged users"
+          privileges: []
+          roles: []
+        - id: "Nexus-Admin"
+          name: "Keycloak Nexus Admin Group"
+          description: "keycloak users as admins"
+          privileges:
+            - "nx-all"
+          roles:
+            - "nx-admin"
+    # NexusNotes: |
+    #   Login to Nexus Admin UI and then get the x509 certificate from this path
+    #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+    #   copy and paste the nexus single line certificate into a text file and save it
+    #     vi nexus-x509.txt
+    #     -----BEGIN CERTIFICATE-----
+    #     put-single-line-nexus-x509-certificate-here
+    #     -----END CERTIFICATE-----
+    #   make a valid pem file with proper wrapping at 64 characters per line
+    #     fold -w 64 nexus-x509.txt > nexus.pem
+    #   In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places

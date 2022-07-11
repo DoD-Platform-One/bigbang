@@ -25,4 +25,3 @@ There is a script [/docs/developer/scripts/k3d-dev.sh](./scripts/) that automate
 - optional: [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
 
 > For additional installation details, see [Software Installation and Verification Commands to run from Bash](https://repo1.dso.mil/platform-one/onboarding/big-bang/engineering-cohort/-/blob/master/lab_guides/01-Preflight-Access-Checks/A-software-check.md)
-

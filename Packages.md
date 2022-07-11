@@ -1,6 +1,7 @@
 # Packages
 
 Columns:
+
 * Logging - fluentbit configurations for standardized logging
 * Telemetry - Integration with Prometheus and dedicated Grafana dashboards as appropriate
 * Tracing - Insertion of Tracing data for application traffic
@@ -11,7 +12,7 @@ Columns:
 ## Core
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [Istio Operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator) |  ![Istio Operator Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/641) | Yes | No |
 | [Istio Controlplane](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane) | ![Istio Controlplane Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/632) | Yes | No |
 | [Jaeger](https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger) | ![Jaeger Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/602) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1295) | No |
@@ -28,6 +29,7 @@ Columns:
 | [Promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Promtail Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/badges/main/pipeline.svg) |  No | No | No | Yes | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1516) | No |
 | [Loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Loki Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/badges/main/pipeline.svg) |  No | No | No | Yes | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1516) | No |
 | [Tempo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Tempo Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1253) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1762) | No |
+
 <!-- | [NeuVector](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector) ![ALPHA](https://img.shields.io/badge/ALPHA-red?style=flat-square) | ![NeuVector Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector/badges/main/pipeline.svg) | No | No | No | No | No | No | -->
 
 ## Supported Add-Ons
@@ -35,7 +37,7 @@ Columns:
 ### Security
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak) |  ![Keycloak Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/536) | Yes (PERMISSIVE) | No |
 | [Anchore Enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise) | ![Anchore Build](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/505) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1594) | No |
 | [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice) | ![Authservice Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/badges/main/pipeline.svg) | No | Yes | Yes | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/511) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1329) | No |
@@ -44,7 +46,7 @@ Columns:
 ### Development Tools
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [Gitlab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)  | ![Gitlab Build](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/badges/main/pipeline.svg)    | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/504) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1724) | No |
 | [Gitlab Runner](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner) |  ![Gitlab Runner Build](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/522) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1724)* | No |
 | [Nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus) |  ![Nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/544) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1605) | No |
@@ -55,21 +57,21 @@ Columns:
 ### Collaboration Tools
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [Mattermost](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost)  | ![Mattermost Build](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/badges/main/pipeline.svg)    | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/515) | [No](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/623) | No |
 | [Mattermost Operator](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator) |  ![Mattermost Operator Build](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/499) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1531) | No |
 
 ### Application Utilities
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [MinIO](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio)  | ![MinIO Build](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/badges/main/pipeline.svg)    | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/550) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1566) | No |
 | [MinIO Operator](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator) |  ![MinIO Operator Build](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/685)] | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1554) |No |
 
 ### Cluster Utilities
 
 | Package | Status | Logging | Telemetry | Tracing | Network Policies | mTLS | Behavior Detection |
-| ----    | ---  | ---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | [Argocd](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd) |![Argo Build](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/badges/main/pipeline.svg)  |  No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/572) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1368) | No |
 | [Velero](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero)  | ![Velero Build](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/552) | [Yes (STRICT)](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1451) | No |
 | [Metrics Server](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square) | ![Metrics Server Build](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server/badges/main/pipeline.svg) | No | No | No | [Yes](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/1738) | Yes (PERMISSIVE) | No |
