@@ -552,7 +552,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "0.15.1-bb.5"
+    tag: "0.15.1-bb.6"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -560,6 +560,30 @@ tempo:
 
   # -- Flux reconciliation overrides specifically for the Tempo Package
   flux: {}
+
+  objectStorage:
+    # -- S3 compatible endpoint to use for connection information.
+    # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+    # Note: tempo does not require protocol prefix for URL.
+    endpoint: ""
+
+    # -- S3 compatible region to use for connection information.
+    region: ""
+
+    # -- Access key for connecting to object storage endpoint.
+    accessKey: ""
+
+    # -- Secret key for connecting to object storage endpoint.
+    # Unencoded string data. This should be placed in the secret values and then encrypted
+    accessSecret: ""
+
+    # -- Bucket Names for Loki as a comma delimited list.
+    # examples: "tempo-traces"
+    bucket: ""
+
+    # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
+    # storage on port 80/9000 set this value to true.
+    insecure: false
 
   # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
   values: {}
