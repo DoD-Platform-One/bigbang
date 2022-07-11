@@ -1191,7 +1191,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
       path: "./chart"
-      tag: "6.7.0-bb.0"
+      tag: "7.0.1-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux: {}
