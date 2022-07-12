@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 38.0.0-bb.2](https://img.shields.io/badge/Version-38.0.0--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
+![Version: 38.0.0-bb.3](https://img.shields.io/badge/Version-38.0.0--bb.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -139,7 +139,10 @@ helm install nexus-repository-manager chart/
 | nexus.resources.limits.cpu | int | `4` |  |
 | nexus.resources.limits.memory | string | `"8000Mi"` |  |
 | nexus.nexusPort | int | `8081` |  |
+| nexus.securityContext.runAsNonRoot | bool | `true` |  |
 | nexus.securityContext.fsGroup | int | `2000` |  |
+| nexus.securityContext.runAsUser | int | `200` |  |
+| nexus.securityContext.runAsGroup | int | `2000` |  |
 | nexus.podAnnotations | object | `{}` |  |
 | nexus.livenessProbe.initialDelaySeconds | int | `30` |  |
 | nexus.livenessProbe.periodSeconds | int | `30` |  |
