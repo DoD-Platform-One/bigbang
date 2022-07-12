@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [38.0.0-bb.3] - 2022-07-05
+### Changed
+- updated securityContext UID's
+
 ## [38.0.0-bb.2] - 2022-06-07
 ### Changed
 - Added improvements to the repository job.  Nexus was failing when a duplicate API POST would occur.
