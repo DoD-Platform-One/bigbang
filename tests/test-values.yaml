@@ -172,6 +172,7 @@ gatekeeper:
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
+          - argocd/argo-cd-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -271,6 +272,7 @@ gatekeeper:
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
+          - argocd/argo-cd-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -383,6 +385,7 @@ kyvernopolicies:
               - sonarqube
               - logging
               - tempo
+              - argocd
               names:
               - "*-cypress-test*"
         parameters:
@@ -412,6 +415,7 @@ kyvernopolicies:
               - sonarqube
               - logging
               - tempo
+              - argocd
               names:
               - "*-cypress-test*"
         parameters:
@@ -451,6 +455,7 @@ kyvernopolicies:
               - sonarqube
               - logging
               - tempo
+              - argocd
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
