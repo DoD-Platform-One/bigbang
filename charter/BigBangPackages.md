@@ -218,7 +218,7 @@ Repository: [Cluster Auditor](https://repo1.dso.mil/platform-one/big-bang/apps/c
 
 Dependencies:
 
-* [Logging](#Logging)
+* [Logging](#logging)
 * [OPA Gatekeer](#policy-enforcement)
 
 Owners:

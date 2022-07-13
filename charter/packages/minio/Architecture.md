@@ -13,7 +13,7 @@ The MinIO tenants are created using the [MinIO package](https://repo1.dso.mil/pl
 
 The final package is the MinIO console. This is a graphical user interface that allows management of an individual tenant. The official package can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio).
 
-![Tenant Architecture](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator/-/raw/main/upstream/operator/docs/images/architecture.png)
+[Tenant Architecture](https://raw.githubusercontent.com/minio/operator/master/docs/images/architecture.png)
 
 Note: The Minio Operator needs to be able to reach out to the minio instances. This is to ensure that on an upgrade all existing pools are shut down before starting new ones. If you run into issues with upgrades ensure that networkPolicies allow ingress to the minio pods in your namespace on port 9000.
 

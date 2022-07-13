@@ -62,7 +62,8 @@ Follow the instructions from the script output to access and use the cluster.
 
 ## Install FluxCD
 
-The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you can deploy Big Bang you must deploy FluxCD on your k8s cluster. To guarantee that you are using the version of FluxCD that is compatible with the version of Big Bang that you are deploying use the Big Bang provided [script](./scripts/install_flux.sh). You will need your Iron Bank pull credentials and command line access to the k8s cluster from your workstation.
+The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you can deploy Big Bang you must deploy FluxCD on your k8s cluster. To guarantee that you are using the version of FluxCD that is compatible with the version of Big Bang that you are deploying use the Big Bang provided [script](../../scripts/install_flux.sh). You will need your Iron Bank pull credentials and command line access to the k8s cluster from your workstation.
+
 ```shell
 ./scripts/install_flux.sh -u your-user-name -p your-password
 ```

@@ -252,7 +252,7 @@ If you need to handle mirroring manually, there is an example Ansible script pro
 
 #### Konvoy Cluster
 
-Modify the `cluster.yaml` file and apply. More details can be found on the [D2iQ Konvoy documentation](https://docs.d2iq.com/dkp/konvoy/1.6/install/install-airgapped/).
+Modify the `cluster.yaml` file and apply. More details can be found on the [D2iQ Konvoy documentation](https://docs.d2iq.com/dkp/konvoy/1.8/install/install-airgapped/).
 
 ```yaml
 kind: ClusterConfiguration

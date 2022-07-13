@@ -6,12 +6,6 @@ Table of Contents:
 
 - [Contributing to Big Bang](#contributing-to-big-bang)
   - [Developers Guide](#developers-guide)
-  - [Local Git Setup](#local-git-setup)
-    - [Pre-commit hooks](#pre-commit-hooks)
-      - [Local Setup](#local-setup)
-        - [Prereqs](#prereqs)
-        - [Steps](#steps)
-      - [Combining Multiple Commits](#combining-multiple-commits)
   - [Iron Bank Images](#iron-bank-images)
   - [Local Kubernetes cluster](#local-kubernetes-cluster)
   - [Deploying Big Bang (Quick Start)](#deploying-big-bang-quick-start)
