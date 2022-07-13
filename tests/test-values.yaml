@@ -382,6 +382,7 @@ kyvernopolicies:
               - twistlock
               - sonarqube
               - logging
+              - tempo
               names:
               - "*-cypress-test*"
         parameters:
@@ -410,6 +411,7 @@ kyvernopolicies:
               - twistlock
               - sonarqube
               - logging
+              - tempo
               names:
               - "*-cypress-test*"
         parameters:
@@ -448,6 +450,7 @@ kyvernopolicies:
               - twistlock
               - sonarqube
               - logging
+              - tempo
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
