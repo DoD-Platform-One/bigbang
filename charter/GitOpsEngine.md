@@ -16,8 +16,8 @@ The Flux2 Engine has native Helm support, meaning the controller deployed as par
 
 Argo, has taken the ownership of rendering and managing the lifecycle of applications that does not work exactly as expected by helm. As a result, there are several vendor Helm Charts that **do not deploy successfully** with Argo because of how Argo shims Helm Hooks to Argo specific sync phases.
 
-* GitLab initial secret creation is performed via a [subchart]([https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/charts/shared-secrets](https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/charts/shared-secrets))
-* Kube Prometheus Stack - [prometheusrule admission webhook]([https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusrules-admission-webhooks](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusrules-admission-webhooks)) is created via a helm `install` hook
+* GitLab initial secret creation is performed via a [subchart](https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/charts/shared-secrets)
+* Kube Prometheus Stack - [prometheusrule admission webhook](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack#prometheusrules-admission-webhooks) is created via a helm `install` hook
 * Confluent - A deletion hook is part of a subchart gets run at different point in the lifecycle
 
 As new features of Helm get developed and leveraged by the community, we would need to lean on the time and availability of the Argo developers to re-implement the capabilities.

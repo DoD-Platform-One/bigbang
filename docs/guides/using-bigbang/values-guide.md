@@ -40,7 +40,7 @@ graph TD
 
 ## Values
 
-Variables defined in Big Bang's [values.yaml](/chart/values.yaml) are values that the Big Bang team has identified as ones which users will be most likely to want to set when installing or upgrading Big Bang. This provides a single, standard way to set the most deployment-specific values and many users may not need to do any more than customize these values for their environment. Beyond these the Big Bang team also provides additional ways to pass values through to specific packages or modify templates after rendering. 
+Variables defined in Big Bang's [values.yaml](../../../chart/values.yaml) are values that the Big Bang team has identified as ones which users will be most likely to want to set when installing or upgrading Big Bang. This provides a single, standard way to set the most deployment-specific values and many users may not need to do any more than customize these values for their environment. Beyond these the Big Bang team also provides additional ways to pass values through to specific packages or modify templates after rendering.
 
 ### Big Bang Configuration Values
 
@@ -102,4 +102,4 @@ kiali:
 
 In some cases customers run into limitations that even values passthrough cannot solve. In cases where the package chart/template file itself does not provide a value for configuration you can make use of Post Renderers.
 
-These are an advanced capability within Helm and Flux that allows end users to make modifications to the chart after it has been rendered. For more information and specific on how to leverage this capability see [this document](/docs/postrenderers.md).
+These are an advanced capability within Helm and Flux that allows end users to make modifications to the chart after it has been rendered. For more information and specific on how to leverage this capability see [this document](../../postrenderers.md).

@@ -32,4 +32,4 @@ The following is a general overview of the process, the [deployment guides](guid
   
 ## New User Orientation
 
-* New users are encouraged to read through the Useful Background Contextual Information present in the [understanding_bigbang folder](./understanding_bigbang)
+* New users are encouraged to read through the Useful Background Contextual Information present in the [understanding-bigbang folder](./understanding-bigbang)
