@@ -1,0 +1,14 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flux-grafana-dashboards 
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  flux-cluster-dashboard.json: |
+    {{ .Files.Get "dashboards/flux/cluster.json"  | nindent 4 }}
+  flux-control-plane-dashboard.json: |
+    {{ .Files.Get "dashboards/flux/control-plane.json" | nindent 4 }}
+{{- end }}
