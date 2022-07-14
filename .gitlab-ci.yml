@@ -1,8 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: 'redis-nomr'
+    ref: '53-ci-cleanup'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'redis-nomr' 
-  CI_PROJECT_NAME: "argocd"
+  PIPELINE_REPO_BRANCH: '53-ci-cleanup' 
   DEBUG_ENABLED: "true"
