@@ -4,5 +4,4 @@ include:
     file: '/pipelines/bigbang-package.yaml' 
 variables:
   PIPELINE_REPO_BRANCH: 'redis-nomr' 
-  CI_PROJECT_NAME: "argocd"
   DEBUG_ENABLED: "true"
