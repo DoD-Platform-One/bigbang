@@ -1220,16 +1220,16 @@ create_bigbang_merge_request() {
       echo "Skipping auto Big Bang merge request."
       exit
     fi
-
+    
     echo "Creating new Big Bang merge request..."
     ## Determine which package needs to be updated in the Big Bang chart
-
+    
     # Account for packages that have a different name in Big Bang's values file vs the name of the package repo
     # The package name is needed to edit the Big Bang chart/values.yaml
     if [[ ${CI_PROJECT_NAME} == "istio-controlplane" ]]; then
         package="istio"
     elif [[ ${CI_PROJECT_NAME} == "istio-operator" ]]; then 
-        packgage="istiooperator"
+        package="istiooperator"
     elif [[ ${CI_PROJECT_NAME} == "cluster-auditor" ]]; then 
         package="clusterAuditor"
     elif [[ ${CI_PROJECT_NAME} == "policy" ]]; then 
@@ -1251,6 +1251,8 @@ create_bigbang_merge_request() {
     else
         package="${CI_PROJECT_NAME}"
     fi 
+
+    
 
     ## GitLab API endpoint used to interact with project-level resources
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
@@ -1282,6 +1284,12 @@ create_bigbang_merge_request() {
     git checkout -b ${BB_SOURCE_BRANCH}
     git config user.email "mr.bot@automr.com"
     git config user.name "mr.bot"
+
+    # Avoiding MRing non-bb packages, will cancel out of potential MR
+    if [ $(yq e "has(\"$package\")" ${VALUES_FILE}) == "false" ] && [ $(yq e ".addons | has(\"$package\")" ${VALUES_FILE}) == "false" ]; then 
+      echo "\e[31mThis package is not a Big Bang core or addon package. Skipping auto Big Bang merge request.\e[0m"
+      exit
+    fi
 
     ## Bump git tag for updated package in Big Bang chart/values.yaml
     if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
