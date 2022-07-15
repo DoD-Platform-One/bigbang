@@ -133,8 +133,6 @@ redis:
 
 vault:
   enabled: {{ .Values.addons.vault.enabled }}
-vault:
-  enabled: {{ .Values.addons.vault.enabled }}
   tlsDisable: {{ dig "global" "tlsDisable" true .Values.addons.vault.values }}
 
 global:
