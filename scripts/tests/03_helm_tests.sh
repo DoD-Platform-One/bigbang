@@ -50,7 +50,7 @@ echo "Setting up CoreDNS for VS resolution..."
 hosts=$(cat newhosts) yq e -n '.data.NodeHosts = strenv(hosts)' > patch.yaml
 # For k3d
 if [[ ${clusterType} == "k3d" ]]; then
-  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+  if [[ ${DEBUG} ]]; then
     echo "Verify coredns configmap NodeHosts before patch:"
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig
@@ -60,14 +60,14 @@ if [[ ${clusterType} == "k3d" ]]; then
   kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
   kubectl rollout restart deployment -n kube-system ${coreDnsName}
   kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=30s
-  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+  if [[ ${DEBUG} ]]; then
     echo "Verify coredns configmap NodeHosts after patch:"
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig  
   fi
 # For rke2
 elif [[ ${clusterType} == "rke2" ]]; then
-  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+  if [[ ${DEBUG} ]]; then
     echo "Verify coredns configmap NodeHosts before patch:"
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig
@@ -80,7 +80,7 @@ elif [[ ${clusterType} == "rke2" ]]; then
   kubectl patch configmap -n kube-system ${coreDnsName} --patch "$(cat patch.yaml)"
   kubectl patch deployment ${coreDnsName} -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"config-volume","configMap":{"items":[{"key":"Corefile","path":"Corefile"},{"key":"NodeHosts","path":"NodeHosts"}],"name":"'${coreDnsName}'"}}]}}}}'
   kubectl rollout status deployment -n kube-system ${coreDnsName} --timeout=120s
-  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+  if [[ ${DEBUG} ]]; then
     echo "Verify coredns configmap NodeHosts after patch:"
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig
@@ -105,7 +105,7 @@ for hr in $installed_helmreleases; do
   if [ ! $test_suite == "None" ]; then
     # Since logs are cluttery, only output when failed
     if [[ ${EXIT_CODE} -ne 0 ]]; then
-      echo "❌ One or more tests failed for ${hr}"
+      echo "❌ One or more tests FAILED for ${hr}, enable DEBUG for more verbose output"
       ERRORS=$((ERRORS + 1))
       for pod in $(echo "$test_result" | grep "TEST SUITE" | grep "test" | awk -F: '{print $2}' | xargs); do
         # Only output failed pod logs, not all test pods
@@ -169,5 +169,5 @@ if [ $ERRORS -gt 0 ]; then
   echo "❌ Encountered $ERRORS package(s) with errors while running tests. See output logs for failed test(s) above and artifacts in the job."
   exit 123
 else
-  echo "✅ All helm tests run successfully."
+  echo "✅ All helm tests ran successfully."
 fi
