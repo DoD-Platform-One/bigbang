@@ -11,7 +11,7 @@ metadata:
 {{- end }}
 {{- if .Values.deployment.annotations }}
   annotations:
-{{ toYaml .Values.deployment.annotations | indent 4 }}
+    {{ toYaml .Values.deployment.annotations | nindent 4 }}
 {{- end }}
 spec:
   replicas: 1
@@ -30,7 +30,7 @@ spec:
       annotations:
         checksum/configmap-properties: {{ include (print .Template.BasePath "/configmap-properties.yaml") $ | sha256sum }}
         {{- if .Values.nexus.podAnnotations }}
-{{ toYaml .Values.nexus.podAnnotations | indent 8}}
+          {{ toYaml .Values.nexus.podAnnotations | nindent 8}}
         {{- end }}
       labels:
         {{- include "nexus.selectorLabels" . | nindent 8 }}
@@ -41,23 +41,23 @@ spec:
       serviceAccountName: {{ include "nexus.serviceAccountName" . }}
       {{- if .Values.deployment.initContainers }}
       initContainers:
-{{ toYaml .Values.deployment.initContainers | indent 6 }}
+        {{ toYaml .Values.deployment.initContainers | nindent 6 }}
       {{- end }}
       {{- if .Values.nexus.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.nexus.nodeSelector | indent 8 }}
+        {{ toYaml .Values.nexus.nodeSelector | nindent 8 }}
       {{- end }}
-         {{- if .Values.nexus.affinity }}
+      {{- if .Values.nexus.affinity }}
       affinity:
-{{ toYaml .Values.nexus.affinity | indent 8 }}
+        {{ toYaml .Values.nexus.affinity | nindent 8 }}
       {{- end }}
       {{- if .Values.nexus.hostAliases }}
       hostAliases:
-{{ toYaml .Values.nexus.hostAliases | indent 8 }}
+        {{ toYaml .Values.nexus.hostAliases | nindent 8 }}
       {{- end }}
-      {{- with .Values.nexus.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8}}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.deployment.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
@@ -74,11 +74,11 @@ spec:
                 command: {{ .Values.deployment.postStart.command }}
           {{- end }}
           env:
-{{ toYaml .Values.nexus.env | indent 12 }}
+            {{ toYaml .Values.nexus.env | nindent 12 }}
           envFrom:
-{{ toYaml .Values.nexus.envFrom | indent 12 }}
+            {{ toYaml .Values.nexus.envFrom | nindent 12 }}
           resources:
-{{ toYaml .Values.nexus.resources | indent 12 }}
+            {{ toYaml .Values.nexus.resources | nindent 12 }}
           ports:
             - name: nexus-ui
               containerPort: {{ .Values.nexus.nexusPort }}
@@ -134,14 +134,14 @@ spec:
               readOnly: {{ .Values.secret.readOnly }}
             {{- end }}
             {{- if .Values.deployment.additionalVolumeMounts}}
-{{ toYaml .Values.deployment.additionalVolumeMounts | indent 12 }}
+              {{ toYaml .Values.deployment.additionalVolumeMounts | nindent 12 }}
             {{- end }}
         {{- if .Values.deployment.additionalContainers }}
-{{ toYaml .Values.deployment.additionalContainers | indent 8 }}
+          {{ toYaml .Values.deployment.additionalContainers | nindent 8 }}
         {{- end }}
       {{- if .Values.nexus.securityContext }}
       securityContext:
-{{ toYaml .Values.nexus.securityContext | indent 8 }}
+        {{ toYaml .Values.nexus.securityContext | nindent 8 }}
       {{- end }}
       volumes:
         - name: {{ template "nexus.name" . }}-data
@@ -181,9 +181,9 @@ spec:
               path: admin.password
         {{- end }}
         {{- if .Values.deployment.additionalVolumes }}
-{{ toYaml .Values.deployment.additionalVolumes | indent 8 }}
+          {{ toYaml .Values.deployment.additionalVolumes | nindent 8 }}
         {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
+        {{ toYaml . | nindent 8 }}
     {{- end }}

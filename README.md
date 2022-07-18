@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 38.0.0-bb.3](https://img.shields.io/badge/Version-38.0.0--bb.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.38.0](https://img.shields.io/badge/AppVersion-3.38.0-informational?style=flat-square)
+![Version: 40.1.0-bb.0](https://img.shields.io/badge/Version-40.1.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.40.1](https://img.shields.io/badge/AppVersion-3.40.1-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -92,14 +92,15 @@ helm install nexus-repository-manager chart/
 | proxy.request.data[0].httpsAuthNtlmDomain | string | `nil` |  |
 | proxy.request.data[0].nonProxyHosts | list | `[]` |  |
 | job_image.repository | string | `"registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"` |  |
-| job_image.tag | float | `8.5` |  |
+| job_image.tag | float | `8.6` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
 | openshift | bool | `false` |  |
 | statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.38.0-01"` |  |
+| image.tag | string | `"3.40.1-01"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
+| imagePullSecrets[0].name | string | `"private-registry"` |  |
 | nexus.affinity | object | `{}` |  |
 | nexus.extraLabels.app | string | `"nexus-repository-manager"` |  |
 | nexus.blobstores.enabled | bool | `false` |  |
@@ -127,9 +128,8 @@ helm install nexus-repository-manager chart/
 | nexus.repository.repo[0].repo_data.component.proprietaryComponents | bool | `true` |  |
 | nexus.repository.repo[0].repo_data.raw.contentDisposition | string | `"ATTACHMENT"` |  |
 | nexus.docker.enabled | bool | `false` |  |
-| nexus.docker.registries | list | `[]` |  |
 | nexus.env[0].name | string | `"INSTALL4J_ADD_VM_PARAMS"` |  |
-| nexus.env[0].value | string | `"-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
+| nexus.env[0].value | string | `"-Dcom.redhat.fips=false\n-Xms2703M -Xmx2703M\n-XX:MaxDirectMemorySize=2703M\n-XX:+UnlockExperimentalVMOptions\n-XX:+UseCGroupMemoryLimitForHeap\n-Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
 | nexus.env[1].name | string | `"NEXUS_SECURITY_RANDOMPASSWORD"` |  |
 | nexus.env[1].value | string | `"true"` |  |
 | nexus.properties.override | bool | `false` |  |
@@ -155,7 +155,6 @@ helm install nexus-repository-manager chart/
 | nexus.readinessProbe.timeoutSeconds | int | `10` |  |
 | nexus.readinessProbe.path | string | `"/"` |  |
 | nexus.hostAliases | list | `[]` |  |
-| nexus.imagePullSecrets[0].name | string | `"private-registry"` |  |
 | nameOverride | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | deployment.annotations | object | `{}` |  |

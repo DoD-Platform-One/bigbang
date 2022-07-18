@@ -44,12 +44,17 @@ tests:
           path: spec.template.spec.containers[0].env
           value:
             - name: INSTALL4J_ADD_VM_PARAMS
-              value: -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+              value: |-
+                -Xms2703M -Xmx2703M
+                -XX:MaxDirectMemorySize=2703M
+                -XX:+UnlockExperimentalVMOptions
+                -XX:+UseCGroupMemoryLimitForHeap
+                -Djava.util.prefs.userRoot=/nexus-data/javaprefs
             - name: NEXUS_SECURITY_RANDOMPASSWORD
               value: "true"
       - equal:
           path: spec.template.spec.containers[0].ports
-          value: 
+          value:
             - containerPort: 8081
               name: nexus-ui
       - equal:
@@ -83,3 +88,20 @@ tests:
             - name: nexus-repository-manager-data
               persistentVolumeClaim:
                 claimName: RELEASE-NAME-nexus-repository-manager-data
+
+  - it: should use our simple values
+    template: deployment.yaml
+    set:
+      deploymentStrategy: my-strategy
+      imagePullSecrets:
+        - name: top-secret
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.strategy.type
+          value: my-strategy
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: top-secret
