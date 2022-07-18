@@ -100,7 +100,7 @@ function wait_all_hr() {
         if [[ "$hrstatus" =~ Failed ]]; then
             state=$(kubectl get hr -A -o go-template='{{range $items,$contents := .items}}{{printf "HR %s" $contents.metadata.name}}{{printf " status is %s\n" (index $contents.status.conditions 0).reason}}{{end}}')
             failed=$(echo "${state}" | grep "Failed")
-            echo "❌ Found failed Helm Release(s). Exiting now."
+            echo "❌ Found FAILED Helm Release(s). Exiting now."
             echo "❌ ${failed}"
             failed_hrs=$(echo "{$failed}" | awk  '{print $2}')
             for hr in $failed_hrs; do
@@ -223,8 +223,6 @@ echo "⏳ Waiting on helm releases..."
 wait_all_hr
 echo "⏳ Waiting for custom resources..."
 wait_crd
-
-kubectl get helmreleases,gitrepositories -A
 
 # In case some helm releases are marked as ready before all objects are live...
 echo "⏳ Waiting on all jobs, deployments, statefulsets, and daemonsets"

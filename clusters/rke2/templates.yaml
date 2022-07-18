@@ -48,7 +48,7 @@
           exit 1
         fi
         attempt_counter=$(($attempt_counter+1))
-        echo "Attempt failed to apply will retry in 30 seconds"
+        echo "❌ Attempt FAILED to apply will retry in 30 seconds"
         sleep 30
       done
     - mv rke2.yaml ${CI_PROJECT_DIR}/rke2.yaml
@@ -74,7 +74,7 @@
           exit 1
         fi
         attempt_counter=$(($attempt_counter+1))
-        echo "Attempt failed to destroy will retry in 30 seconds"
+        echo "❌ Attempt FAILED to destroy will retry in 30 seconds"
         sleep 30
       done
     - echo -e "\e[0Ksection_end:`date +%s`:rke2_down\r\e[0K"

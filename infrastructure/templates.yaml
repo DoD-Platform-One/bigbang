@@ -87,7 +87,7 @@ include:
           exit 1
         fi
         attempt_counter=$(($attempt_counter+1))
-        echo "Attempt failed to destroy workspace will retry in 30 seconds"
+        echo "❌ Attempt FAILED to destroy workspace will retry in 30 seconds"
         sleep 30
       done
     - echo -e "\e[0Ksection_end:`date +%s`:terraform_destroy_workspace\r\e[0K"

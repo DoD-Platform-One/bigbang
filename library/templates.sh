@@ -14,9 +14,10 @@ if [[ $BASH_SOURCE == $0 ]]; then
   exit 1 
 fi
 
-if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  ]]; then
+if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  || ${CI_MERGE_REQUEST_LABELS} == *"debug"* ]]; then
   echo "DEBUG_ENABLED is set to true, setting -x in bash"
   set -x
+  DEBUG="true"
 fi
 
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
@@ -100,7 +101,7 @@ check_changes() {
    done
 
    ## Collect package configurations on the source branch
-   git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+   git fetch 1>/dev/null && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
    git config user.email "checkchange@function.com"
    git config user.name "checkchange"
    git merge origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --no-commit || (echo -e "\e[31mError: Source branch, ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}, has conflicts with target branch, ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}. Please rebase your branch and re-run the pipeline.\e[0m" && exit 1)
@@ -311,11 +312,11 @@ test_bigbang() {
      ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
      if [[ ${EXIT_CODE} -ne 0 ]]; then
        if [[ ${EXIT_CODE} -ne 123 ]]; then
-         echo -e "\e[31m❌ ${test_script} failed, see log output above and cluster debug.\e[0m"
+         echo -e "\e[31m❌ ${test_script} FAILED, see log output above and cluster debug.\e[0m"
          exit ${EXIT_CODE}
        fi
        # 123 error codes are allowed to continue
-       echo -e "\e[31m⚠️ ${test_script} failed but was allowed to continue, see log output above and cluster debug.\e[0m"
+       echo -e "\e[31m⚠️ ${test_script} FAILED, but was allowed to continue, see log output above and cluster debug.\e[0m"
        EXIT_FLAG=1
      fi
      echo -e "\e[0Ksection_end:`date +%s`:${test_script##*/}\r\e[0K"
@@ -455,7 +456,7 @@ clone_bigbang_and_merge_templates() {
 #
 #-----------------------------------------------------------------------------------------------------------------------
 dependency_install() {
-   echo -e "\e[0Ksection_start:`date +%s`:dependency_install[collapsed=true]\r\e[0KDependency Install"
+   echo -e "\e[0Ksection_start:`date +%s`:dependency_install[collapsed=true]\r\e[0K\e[33;1mDependency Install\e[37m"
    if [ -f "tests/dependencies.yaml" ]; then
      yq e ".*.git | path | .[-2]" "tests/dependencies.yaml" | while IFS= read -r i; do
        dep_name=$i
@@ -526,7 +527,7 @@ dependency_install() {
 }
 
 dependency_wait() {
-   echo -e "\e[0Ksection_start:`date +%s`:dependency_wait[collapsed=true]\r\e[0KDependency Wait"
+   echo -e "\e[0Ksection_start:`date +%s`:dependency_wait[collapsed=true]\r\e[0K\e[33;1mDependency Wait\e[37m"
    if [ -f "tests/dependencies.yaml" ]; then
      sleep 10
      echo -n "Waiting on CRDS ... "
@@ -568,7 +569,7 @@ dependency_wait() {
 }
 
 package_install() {
-  echo -e "\e[0Ksection_start:`date +%s`:package_install[collapsed=true]\r\e[0KPackage Install"
+  echo -e "\e[0Ksection_start:`date +%s`:package_install[collapsed=true]\r\e[0K\e[33;1mPackage Install\e[37m"
   if [ ! -z ${PROJECT_NAME} ]; then
     if [ ${PACKAGE_HELM_NAME} == ${CI_PROJECT_NAME} ]; then
       PACKAGE_HELM_NAME=${PROJECT_NAME}
@@ -602,7 +603,7 @@ package_install() {
 }
 
 package_wait() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_wait[collapsed=true]\r\e[0KPackage Wait"
+   echo -e "\e[0Ksection_start:`date +%s`:package_wait[collapsed=true]\r\e[0K\e[33;1mPackage Wait\e[37m"
    sleep 10
    echo -n "Waiting on CRDs ... "
    kubectl wait --for=condition=established --timeout 60s -A crd --all > /dev/null
@@ -637,7 +638,7 @@ package_wait() {
 }
 
 post_install_packages() {
-   echo -e "\e[0Ksection_start:`date +%s`:post_install_packages[collapsed=true]\r\e[0KPost Install Packages"
+   echo -e "\e[0Ksection_start:`date +%s`:post_install_packages[collapsed=true]\r\e[0K\e[33;1mPost Install Packages\e[37m"
    if [ -f "tests/post-install-packages.yaml" ]; then
      yq e ".*.git | path | .[-2]" "tests/post-install-packages.yaml" | while IFS= read -r i; do
        post_name=$i
@@ -708,7 +709,7 @@ post_install_packages() {
 }
 
 post_install_wait() {
-   echo -e "\e[0Ksection_start:`date +%s`:post_install_wait[collapsed=true]\r\e[0KPost Install Wait"
+   echo -e "\e[0Ksection_start:`date +%s`:post_install_wait[collapsed=true]\r\e[0K\e[33;1mPost Install Wait\e[37m"
    if [ -f "tests/post-install-packages.yaml" ]; then
      sleep 10
      echo -n "Waiting on CRDS ... "
@@ -750,7 +751,7 @@ post_install_wait() {
 }
 
 package_test() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_test[collapsed=true]\r\e[0KPackage Test"
+   echo -e "\e[0Ksection_start:`date +%s`:package_test[collapsed=true]\r\e[0K\e[33;1mPackage Test\e[37m"
    if [ -d "chart/templates/tests" ]; then
      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
      echo "***** Start Helm Test Logs *****"
@@ -789,7 +790,7 @@ package_test() {
 # Due to some of the quirks with Gitlab CI "script blocks" this is the easiest solution
 # This block should be removed in the future and line 397 updated to just call `package_test`
 package_upgrade_test() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_test2[collapsed=true]\r\e[0KPackage Re-Test"
+   echo -e "\e[0Ksection_start:`date +%s`:package_test2[collapsed=true]\r\e[0K\e[33;1mPackage Re-Test\e[37m"
    if [ -d "chart/templates/tests" ]; then
      rm -rf /cypress/screenshots
      rm -rf /cypress/videos
@@ -833,13 +834,13 @@ package_upgrade_test() {
 }
 
 package_structure() {
-    echo -e "\e[0Ksection_start:`date +%s`:package_tree[collapsed=true]\r\e[0KPackage Directory Structure"
+    echo -e "\e[0Ksection_start:`date +%s`:package_tree[collapsed=true]\r\e[0K\e[33;1mPackage Directory Structure\e[37m"
     tree .
     echo -e "\e[0Ksection_end:`date +%s`:package_tree\r\e[0K"
 }
 
 global_policy_tests() {
-   echo -e "\e[0Ksection_start:`date +%s`:generic_policy_tests[collapsed=true]\r\e[0KGlobal Policy Tests"
+   echo -e "\e[0Ksection_start:`date +%s`:generic_policy_tests[collapsed=true]\r\e[0K\e[33;1mGlobal Policy Tests\e[37m"
    if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
      echo "Checking test values..."
      helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.y*ml
@@ -852,7 +853,7 @@ global_policy_tests() {
 }
 
 package_policy_tests() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_specific_tests[collapsed=true]\r\e[0KPackage Specific Tests"
+   echo -e "\e[0Ksection_start:`date +%s`:package_specific_tests[collapsed=true]\r\e[0K\e[33;1mPackage Specific Tests\e[37m"
    if [ -d "tests/policy" ]; then
      echo "App specific configuration validation tests:"
      if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
@@ -868,7 +869,7 @@ package_policy_tests() {
 }
 
 package_deprecation_check() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0KPackage API Deprecation Check"
+   echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0K\e[33;1mPackage API Deprecation Check\e[37m"
    API_EXIT_CODE=0
    helm template ${PACKAGE_HELM_NAME} chart -n ${PACKAGE_NAMESPACE} --set monitoring.enabled=true --set istio.enabled=true --set networkPolicies.enabled=true -f tests/test-values.y*ml | pluto detect -owide - && export API_EXIT_CODE=$? || export API_EXIT_CODE=$?
    if [[ ${API_EXIT_CODE} -eq 2 ]]; then
@@ -881,7 +882,7 @@ package_deprecation_check() {
 
 oscal_validate() {
    if [[ -f "oscal-component.yaml" ]]; then
-   echo -e "\e[0Ksection_start:`date +%s`:oscal_validate[collapsed=true]\r\e[0KOSCAL validation check"
+   echo -e "\e[0Ksection_start:`date +%s`:oscal_validate[collapsed=true]\r\e[0K\e[33;1mOSCAL validation check\e[37m"
    OSCAL_EXIT_CODE=0
    echo -n "oscal-component.yaml found, validating... "
    yq eval oscal-component.yaml -o=json > tmp_oscal-component.json
@@ -997,11 +998,11 @@ changelog_format_check() {
 
 chart_update_check() {
    # change to target branch and check if Chart.yaml or Changelog missing. If so, check source.
-   echo -e "\e[0Ksection_start:`date +%s`:chart_changelog_checks[collapsed=true]\r\e[0KChecking for Chart.yaml/CHANGELOG updates"
+   echo -e "\e[0Ksection_start:`date +%s`:chart_changelog_checks[collapsed=true]\r\e[0K\e[33;1mChecking for Chart.yaml/CHANGELOG updates\e[37m"
    git fetch && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
    if [ ! -f "chart/Chart.yaml" ] || [ ! -f "CHANGELOG.md" ]; then
      # change to source branch and check if Chart.yaml or Changelog missing. If one or both are missing, fail.
-     git fetch && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+     git fetch && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} &>/dev/null
      if [ ! -f "chart/Chart.yaml" ] || [ ! -f "CHANGELOG.md" ]; then
        echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
        echo -e "\e[31mFAIL: Package must have chart/Chart.yaml and CHANGELOG.md\e[0m"
@@ -1019,7 +1020,7 @@ chart_update_check() {
    echo -e "\e[0Ksection_end:`date +%s`:chart_changelog_checks\r\e[0K"
    DEFAULT_BRANCH_VERSION=$(yq e '.version' chart/Chart.yaml)
    echo "Old Chart Version:$DEFAULT_BRANCH_VERSION"
-   echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KPackage MR Checkout"
+   echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0K\e[33;1mPackage MR Checkout\e[37m"
    git reset --hard && git clean -fd
    git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
    echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
@@ -1049,21 +1050,21 @@ chart_update_check() {
 }
 
 dependency_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0KGetting List of Dependency Images"
+   echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Dependency Images\e[37m"
    deps=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
    echo $deps | jq -r '.images[].repoTags[0] | select(. != null)' | tee dependencies.txt
    echo -e "\e[0Ksection_end:`date +%s`:dep_images\r\e[0K"
 }
 
 installed_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:inst_images[collapsed=true]\r\e[0KGetting List of Installed Images"
+   echo -e "\e[0Ksection_start:`date +%s`:inst_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Installed Images\e[37m"
    images=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
    echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee full-list.txt
    echo -e "\e[0Ksection_end:`date +%s`:inst_images\r\e[0K"
 }
 
 image_list_creation() {
-   echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0KImage List Creation"
+   echo -e "\e[0Ksection_start:`date +%s`:image_fetch[collapsed=true]\r\e[0K\e[33;1mImage List Creation\e[37m"
    (grep -Fxvf dependencies.txt full-list.txt || true) | tee images.txt
    sed -i '/docker.io\/rancher\//d' images.txt
    if [ -f tests/images.txt ]; then
@@ -1073,7 +1074,7 @@ image_list_creation() {
 }
 
 synker_pull() {
-   echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0KRunning Synker and Tar"
+   echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0K\e[33;1mRunning Synker and Tar\e[37m"
    cp ${PIPELINE_REPO_DESTINATION}/synker/synker.yaml ./synker.yaml
    for image in $(cat images.txt); do
      yq -i e "(.source.images |= . + \"${image}\")" "./synker.yaml"
@@ -1085,7 +1086,7 @@ synker_pull() {
 }
 
 package_repos() {
-   echo -e "\e[0Ksection_start:`date +%s`:repos[collapsed=true]\r\e[0KPacking up Repos"
+   echo -e "\e[0Ksection_start:`date +%s`:repos[collapsed=true]\r\e[0K\e[33;1mPacking up Repos\e[37m"
    mkdir -p repos/
    if [ -z ${CI_COMMIT_TAG} ]; then
      git -C repos/ clone -b ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_REPOSITORY_URL}
@@ -1097,14 +1098,14 @@ package_repos() {
 }
 
 package_prep() {
-   echo -e "\e[0Ksection_start:`date +%s`:prep[collapsed=true]\r\e[0KFinal Prep"
+   echo -e "\e[0Ksection_start:`date +%s`:prep[collapsed=true]\r\e[0KFinal Prep\e[37m"
    mkdir -p release
    mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
    echo -e "\e[0Ksection_end:`date +%s`:prep\r\e[0K"
 }
 
 package_publish() {
-   echo -e "\e[0Ksection_start:`date +%s`:publish[collapsed=true]\r\e[0KPublishing"
+   echo -e "\e[0Ksection_start:`date +%s`:publish[collapsed=true]\r\e[0K\e[33;1mPublishing\e[37m"
    if [ -z $CI_COMMIT_TAG ]; then
      aws configure set aws_region ${TEST_AWS_DEFAULT_REGION}
      aws configure set aws_access_key_id ${TEST_AWS_ACCESS_KEY_ID}
@@ -1119,7 +1120,7 @@ package_publish() {
 }
 
 package_release_notes() {
-   echo -e "\e[0Ksection_start:`date +%s`:notes[collapsed=true]\r\e[0KGenerating Release Notes"
+   echo -e "\e[0Ksection_start:`date +%s`:notes[collapsed=true]\r\e[0K\e[33;1mGenerating Release Notes\e[37m"
    echo "# RELEASE NOTES:" >> release_notes.txt
    if [ -z $CI_COMMIT_TAG ]; then
      echo "Please see the repo [documentation](${CI_PROJECT_URL}/-/tree/${CI_COMMIT_SHA}/docs) for additional info on this package." >> release_notes.txt
@@ -1136,7 +1137,7 @@ package_release_notes() {
    fi
    echo -e "\e[31mNOTICE: Release notes saved to artifact release_notes.txt\e[0m"
    echo -e "\e[0Ksection_end:`date +%s`:notes\r\e[0K"
-   echo -e "\e[0Ksection_start:`date +%s`:reqDependencies[collapsed=true]\r\e[0KRequired Dependencies"
+   echo -e "\e[0Ksection_start:`date +%s`:reqDependencies[collapsed=true]\r\e[0K\e[33;1mRequired Dependencies\e[37m"
    if [[ -f tests/dependencies.yaml ]]; then
       printf "\nIf you are using the artifacts from this release, please note that you may need to install some dependencies. It is recommended to check the architecture document for this package under [Big Bang's charter](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/charter/packages) for the most accurate info about what may be required. The dependencies used in CI are:\n" >> release_notes.txt
       echo "Dependencies found:"
@@ -1158,7 +1159,7 @@ package_release_notes() {
 }
 
 package_release() {
-   echo -e "\e[0Ksection_start:`date +%s`:release[collapsed=true]\r\e[0KCreating Release"
+   echo -e "\e[0Ksection_start:`date +%s`:release[collapsed=true]\r\e[0K\e[33;1mCreating Release\e[37m"
    if [ -z $CI_COMMIT_TAG ]; then
      RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${TEST_AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}"
      printf "Release will run: \n\
@@ -1179,7 +1180,7 @@ package_release() {
 
 get_chart_version() {
    # change to target branch and check if Chart.yaml or Changelog missing. If so, check source.
-   echo -e "\e[0Ksection_start:`date +%s`:get_chart_version[collapsed=true]\r\e[0KGetting Chart Version"
+   echo -e "\e[0Ksection_start:`date +%s`:get_chart_version[collapsed=true]\r\e[0K\e[33;1mGetting Chart Version\e[37m"
    if [ ! -f "chart/Chart.yaml" ]; then
      echo -e "\e[31mFAIL: Package must have chart/Chart.yaml\e[0m"
      echo -e "\e[0Ksection_end:`date +%s`:get_chart_version\r\e[0K"
@@ -1192,9 +1193,9 @@ get_chart_version() {
 }
 
 create_tag() {
-   echo -e "\e[0Ksection_start:`date +%s`:create_tag[collapsed=true]\r\e[0KCreating Tag"
+   echo -e "\e[0Ksection_start:`date +%s`:create_tag[collapsed=true]\r\e[0K\e[33;1mCreating Tag\e[37m"
    echo "Running tag create command..."
-   tag_output=$(curl --request POST --header "PRIVATE-TOKEN: ${TOKEN_TAG}" "https://repo1.dso.mil/api/v4/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${CHART_VERSION}&ref=${CI_DEFAULT_BRANCH}" 2>/dev/null)
+   tag_output=$(curl -s --request POST --header "PRIVATE-TOKEN: ${TOKEN_TAG}" "https://repo1.dso.mil/api/v4/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${CHART_VERSION}&ref=${CI_DEFAULT_BRANCH}" 2>/dev/null)
    if [[ $(echo $tag_output | jq -r '.name') == "${CHART_VERSION}" ]]; then
      echo "Tag ${CHART_VERSION} created successfully."
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
@@ -1203,7 +1204,7 @@ create_tag() {
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
      exit 201
    else
-     echo -e "\e[31mFAILED: Tag Not Created: \e[0m"
+     echo -e "\e[31m❌ FAILED: Tag Not Created: \e[0m"
      echo $tag_output
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
      exit 1
@@ -1211,11 +1212,11 @@ create_tag() {
 }
 
 create_bigbang_merge_request() {
-    echo -e "\e[0Ksection_start:`date +%s`:create_bigbang_merge_request[collapsed=true]\r\e[0KCreating Big Bang Merge Request"
+    echo -e "\e[0Ksection_start:`date +%s`:create_bigbang_merge_request[collapsed=true]\r\e[0K\e[33;1mCreating Big Bang Merge Request\e[37m"
     ## If MR contains "skip-bb-mr" dont create Big Bang merge request
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
     BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.iid) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
-    MR_LABELS=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '"\(.labels)"')
+    MR_LABELS=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '"\(.labels)"')
     if [[ "${MR_LABELS}" == *"skip-bb-mr"* ]]; then
       echo "Skipping auto Big Bang merge request."
       exit
@@ -1251,19 +1252,16 @@ create_bigbang_merge_request() {
     else
         package="${CI_PROJECT_NAME}"
     fi 
-
-    
-
     ## GitLab API endpoint used to interact with project-level resources
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
 
     ## Data that will be used to create Big Bang MRs
 
     # The latest git tag for the Big Bang package repo
-    LATEST_GIT_TAG=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/repository/tags" | jq '.[].name' | head -1 | sed 's/\"//g')
+    LATEST_GIT_TAG=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/repository/tags" | jq '.[].name' | head -1 | sed 's/\"//g')
 
     # Get the URL of the latest CHANGELOG.md file
-    CHANGELOG_URL=$(curl ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${LATEST_GIT_TAG}/CHANGELOG.md
+    CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${LATEST_GIT_TAG}/CHANGELOG.md
 
     # Get the URL of the relevant package MR
     PACKAGE_MR_URL=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.web_url) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
@@ -1274,14 +1272,14 @@ create_bigbang_merge_request() {
     # Collect user IDs from /users API endpoint
     # Add "%2C" to the end of every user ID for URL encoding commas
     for reviewer in "${BB_MR_REVIEWER_NAMES[@]}"; do 
-        BB_MR_REVIEWER_IDS+=$(curl "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id' | sed 's/$/%2C/')
+        BB_MR_REVIEWER_IDS+=$(curl -s "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id' | sed 's/$/%2C/')
     done 
 
     ## Pull down Big Bang repo, create a new branch, and configure git 
-    BB_SOURCE_BRANCH=update-${CI_PROJECT_NAME}-tag-${LATEST_GIT_TAG}
-    git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION}
+    BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${LATEST_GIT_TAG}"
+    git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION} 1>/dev/null
     cd ${BB_REPO_DESTINATION}
-    git checkout -b ${BB_SOURCE_BRANCH}
+    git checkout -b ${BB_SOURCE_BRANCH} 1>/dev/null
     git config user.email "mr.bot@automr.com"
     git config user.name "mr.bot"
 
@@ -1298,8 +1296,8 @@ create_bigbang_merge_request() {
         yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
 
         # Adding blank lines back to values file before pushing changes
-        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true
-        patch ${VALUES_FILE} /tmp/patch.diff || true 
+        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true 1>/dev/null
+        patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".${package}.git.tag" ${VALUES_FILE})"
     elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
         # yq strips blank lines from YAML files
@@ -1307,28 +1305,29 @@ create_bigbang_merge_request() {
         yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml  
 
         # Adding blank lines back to values file before pushing changes  
-        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true
-        patch ${VALUES_FILE} /tmp/patch.diff || true 
+        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true 1>/dev/null
+        patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".addons.${package}.git.tag" ${VALUES_FILE})"
     fi 
     
     ## Push changes and create merge request
-    git add ${VALUES_FILE}
-    git commit -m "Updated ${CI_PROJECT_NAME} git tag"
+    git add ${VALUES_FILE} 1>/dev/null
+    git commit -m "Updated ${CI_PROJECT_NAME} git tag" 1>/dev/null
     git push --set-upstream origin ${BB_SOURCE_BRANCH} \
       -o merge_request.create \
       -o merge_request.title="Draft: Updated ${CI_PROJECT_NAME} git tag" \
       -o merge_request.label="status::review"	\
-      -o merge_request.label=${package}
+      -o merge_request.label=${package} 1>/dev/null
 
+    
     ## Update merge request with reviewers and a description 
 
     # Get ID of the MR that was just created
-    BB_MR_ID=$(curl "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=opened" | jq '.[].iid' | head -1)
-    
+    BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=opened" | jq '.[].iid' | head -1)
+
     # Get description of MR and save it to a JSON file
     JSON_DESCRIPTION_FILE="/tmp/description.json"
-    curl "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '.description' > ${JSON_DESCRIPTION_FILE}
+    curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '.description' > ${JSON_DESCRIPTION_FILE}
     
     # Edit the JSON file by adding curly brackets and "description" to make it a valid JSON request to the GitLab API
     sed -i 's|^|\{\"description\"\:|' ${JSON_DESCRIPTION_FILE}
@@ -1341,7 +1340,11 @@ create_bigbang_merge_request() {
     sed -i "s|(Link to Package MR here)|${PACKAGE_MR_URL}|g" ${JSON_DESCRIPTION_FILE}
 
     # Update description of MR with package changes from CHANGELOG.md and add reviewers
-    curl --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}"
+    curl -s --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}" 1>/dev/null
+    
+    # MR Link
+    echo "✅ Big Bang MR created: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/${BB_MR_ID}"
+
     echo -e "\e[0Ksection_end:`date +%s`:create_bigbang_merge_request\r\e[0K"
 }
 
@@ -1351,7 +1354,7 @@ create_bigbang_merge_request() {
 #
 #-----------------------------------------------------------------------------------------------------------------------
 cluster_deprecation_check() {
-   echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0KIn Cluster Deprecation Check"
+   echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0K\e[33;1mIn Cluster Deprecation Check\e[37m"
    kubent -e || export EXIT_CODE=$?
    if [ "$EXIT_CODE" == "200" ]; then 
      echo -e "\e[31mNOTICE: API deprecations or removals were found.\e[0m"
@@ -1507,7 +1510,7 @@ get_cluster_info_dump() {
 }
 
 get_debug() {
-  if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"* ]]; then
+  if [[ ${DEBUG} ]]; then
     get_kustomize
     get_gateways
     get_virtualservices
