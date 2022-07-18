@@ -1,3 +1,4 @@
+---
 # -- Big Bang Additions
 hostname: nexus
 domain: bigbang.dev
@@ -81,7 +82,7 @@ proxy:
 
 job_image:
   repository: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
-  tag: 8.5
+  tag: 8.6
   pullPolicy: IfNotPresent
 
 openshift: false
@@ -91,13 +92,14 @@ openshift: false
 statefulset:
   # This is not supported
   enabled: false
-# By default deploymentStrategy is set to rollingUpdate with maxSurge of 25% and maxUnavailable of 25% . you can change type to `Recreate` or can uncomment `rollingUpdate` specification and adjust them to your usage.
 deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.38.0-01
+  tag: 3.40.1-01
   pullPolicy: IfNotPresent
+imagePullSecrets:
+  - name: private-registry
 
 nexus:
   # BB affinity added
@@ -154,15 +156,22 @@ nexus:
 
   docker:
     enabled: false
-    registries: []
-    #  - host: chart.local
-    #    port: 5000
-    #    secretName: registrySecret
+    # registries:
+    #   - host: chart.local
+    #     port: 5000
+    #     secretName: registry-secret
   env:
+    # minimum recommended memory settings for a small, person instance from
+    # https://help.sonatype.com/repomanager3/product-information/system-requirements
     - name: INSTALL4J_ADD_VM_PARAMS
-      # using values based on 8GB of RAM on host: https://help.sonatype.com/repomanager3/installation/system-requirements
       # info about fips option: https://access.redhat.com/documentation/en-us/openjdk/8/pdf/configuring_openjdk_8_on_rhel_with_fips/openjdk-8-configuring_openjdk_8_on_rhel_with_fips-en-us.pdf
-      value: "-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+      value: |-
+        -Dcom.redhat.fips=false
+        -Xms2703M -Xmx2703M
+        -XX:MaxDirectMemorySize=2703M
+        -XX:+UnlockExperimentalVMOptions
+        -XX:+UseCGroupMemoryLimitForHeap
+        -Djava.util.prefs.userRoot=/nexus-data/javaprefs
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "true"
   properties:
@@ -216,10 +225,6 @@ nexus:
   #   hostnames:
   #   - "example.com"
   #   - "www.example.com"
-
-
-  imagePullSecrets:
-    - name: private-registry
 
 nameOverride: ""
 fullnameOverride: ""
@@ -323,4 +328,3 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-

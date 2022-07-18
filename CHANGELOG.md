@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [40.1.0-bb.0] - 2022-07-12
+### Changed
+- Updated chart to version: 40.1.0-bb.0 | appVersion: 3.40.1
+- Updated gluon dependency to 0.2.10
+
 ## [38.0.0-bb.3] - 2022-07-05
 ### Changed
 - updated securityContext UID's

@@ -13,7 +13,7 @@ spec:
       creationTimestamp: null
     spec:
       activeDeadlineSeconds: 90
-      {{- with .Values.nexus.imagePullSecrets }}
+      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8}}
       {{- end }}
