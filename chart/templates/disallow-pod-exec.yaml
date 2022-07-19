@@ -23,9 +23,10 @@ spec:
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "PodExecOptions" "PodAttachOptions")) .) | nindent 4 }}
     preconditions:
-    - key: "{{ "{{" }}request.operation{{ "}}" }}"
-      operator: Equals
-      value: CONNECT
+      all:
+      - key: "{{ "{{" }}request.operation{{ "}}" }}"
+        operator: Equals
+        value: CONNECT
     validate:
       message: Cannot exec or attach to pods.
       deny: {}

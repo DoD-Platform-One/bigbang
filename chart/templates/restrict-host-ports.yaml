@@ -21,6 +21,7 @@ spec:
   - name: host-ports
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         The host port used is not allowed. The fields spec.containers[*].ports[*].hostPort,

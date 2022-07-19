@@ -48,6 +48,7 @@ spec:
           - storage.k8s.io/v1beta1/CSINode
           - storage.k8s.io/v1beta1/StorageClass
           - storage.k8s.io/v1beta1/VolumeAttachment
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         {{ "{{" }} request.object.apiVersion {{ "}}" }}/{{ "{{" }} request.object.kind {{ "}}" }} is deprecated and will be removed in v1.22.
@@ -66,6 +67,7 @@ spec:
           - policy/v1beta1/PodDisruptionBudget
           - policy/v1beta1/PodSecurityPolicy
           - node.k8s.io/v1beta1/RuntimeClass
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         {{ "{{" }} request.object.apiVersion {{ "}}" }}/{{ "{{" }} request.object.kind {{ "}}" }} is deprecated and will be removed in v1.25.
@@ -80,6 +82,7 @@ spec:
           - flowcontrol.apiserver.k8s.io/v1beta1/FlowSchema
           - flowcontrol.apiserver.k8s.io/v1beta1/PriorityLevelConfiguration
           - autoscaling/v2beta2/HorizontalPodAutoscaler
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         {{ "{{" }} request.object.apiVersion {{ "}}" }}/{{ "{{" }} request.object.kind {{ "}}" }} is deprecated and will be removed in v1.26.

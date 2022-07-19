@@ -20,6 +20,7 @@ spec:
   - name: non-root-user
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         Either `runAsNonRoot` must be set to true or `runAsUser` must be > 0 in

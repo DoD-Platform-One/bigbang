@@ -24,6 +24,7 @@ spec:
   - name: verify-image
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     verifyImages:
     {{- toYaml (dig $name "parameters" "require" nil .Values.policies) | nindent 4 }}
 {{- end -}}

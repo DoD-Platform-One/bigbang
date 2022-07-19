@@ -25,11 +25,7 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     preconditions:
       all:
-      - key: "{{"{{"}}request.operation{{"}}"}}"
-        operator: In
-        value:
-        - CREATE
-        - UPDATE
+      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
       - key: "{{"{{"}} not_null(request.object.spec.volumes[], '') | length(@) {{"}}"}}"
         operator: GreaterThanOrEquals
         value: 1

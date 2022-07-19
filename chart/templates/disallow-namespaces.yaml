@@ -25,6 +25,7 @@ spec:
   - name: validate-namespace
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod" "Deployment" "StatefulSet" "DaemonSet" "Job" "CronJob")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "The namespace used for this resource is not allowed."
       pattern:
@@ -34,6 +35,7 @@ spec:
   - name: require-namespace
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod" "Deployment" "StatefulSet" "DaemonSet" "Job" "CronJob")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "A namespace is required."
       pattern:

@@ -21,6 +21,7 @@ spec:
   - name: capabilities
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         Adding of additional capabilities beyond the allowed set is not allowed.

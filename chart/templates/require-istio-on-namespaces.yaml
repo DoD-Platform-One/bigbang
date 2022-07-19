@@ -21,6 +21,7 @@ spec:
   - name: istio-on-namespace
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Namespace")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "Namespaces must have `istio-injection: enabled` label."
       pattern:
