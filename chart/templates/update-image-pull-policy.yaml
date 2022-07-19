@@ -17,7 +17,6 @@ metadata:
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
-  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
   {{- $index := 0 }}
   {{- range $v := (dig $name "parameters" "update" nil .Values.policies) }}
@@ -25,6 +24,7 @@ spec:
   - name: {{ printf "%s-containers-%d" $name $index }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     mutate:
       patchStrategicMerge:
         spec:
@@ -37,6 +37,7 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     preconditions:
       all:
+      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
       - key: "{{"{{"}} not_null(request.object.spec.initContainers[], '') | length(@) {{"}}"}}"
         operator: GreaterThanOrEquals
         value: 1
@@ -52,6 +53,7 @@ spec:
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
     preconditions:
       all:
+      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
       - key: "{{"{{"}} not_null(request.object.spec.ephemeralContainers[], '') | length(@) {{"}}"}}"
         operator: GreaterThanOrEquals
         value: 1

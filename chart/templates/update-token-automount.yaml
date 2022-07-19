@@ -18,11 +18,11 @@ metadata:
   labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
 spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
-  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
   - name: remove-automount
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "ServiceAccount")) $) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     mutate:
       patchStrategicMerge:
         metadata:

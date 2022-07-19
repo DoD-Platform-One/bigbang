@@ -23,6 +23,7 @@ spec:
   - name: sysctls
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         Sysctl set that is not in the allowed list.  The field spec.securityContext.sysctls

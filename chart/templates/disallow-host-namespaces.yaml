@@ -22,6 +22,7 @@ spec:
   - name: host-namespaces
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         Sharing the host namespaces is disallowed. The fields spec.hostNetwork,

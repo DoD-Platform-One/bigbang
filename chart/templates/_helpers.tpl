@@ -129,3 +129,20 @@ data:
   {{- end }}
 {{- end }}
 {{- end -}}
+
+
+{{/* Add default precondition */}}
+{{- define "kyverno-policies.precondition.default" -}}
+preconditions:
+  all:
+  {{- include "kyverno-policies.precondition.create-update" . | nindent 2 }}
+{{- end -}}
+
+{{/* Add a precondition that triggers on create or update events only */}}
+{{- define "kyverno-policies.precondition.create-update" -}}
+- key: "{{ "{{" }}request.operation{{ "}}" }}"
+  operator: In
+  value:
+  - CREATE
+  - UPDATE
+{{- end -}}

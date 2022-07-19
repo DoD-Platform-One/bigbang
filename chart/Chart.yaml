@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kyverno-policies
-version: 1.0.0-bb.13
-appVersion: 1.0.0
+version: 1.0.1-bb.0
+appVersion: 1.0.1
 icon: https://github.com/kyverno/kyverno/raw/main/img/logo.png
 description: Collection of Kyverno security and best-practice policies for Kyverno
 keywords:
@@ -14,8 +14,8 @@ sources:
   - https://github.com/kyverno/policies
 dependencies:
   - name: gluon
-    version: 0.2.5
+    version: 0.2.9
     repository: oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon
 annotations:
   bigbang.dev/applicationVersions: |
-    - Kyverno Policies: 1.0.0
+    - Kyverno Policies: 1.0.1

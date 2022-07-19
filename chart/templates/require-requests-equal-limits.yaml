@@ -26,13 +26,7 @@ spec:
   - name: require-requests-equal-limits
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
-    preconditions:
-      all:
-      - key: "{{"{{"}}request.operation{{"}}"}}"
-        operator: In
-        value:
-        - CREATE
-        - UPDATE
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "CPU/memory requests must be equal to limits"
       foreach:

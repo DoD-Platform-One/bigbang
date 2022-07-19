@@ -8,11 +8,11 @@ metadata:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
 spec:
-  storageClassName: manual 
+  storageClassName: manual
   capacity:
     storage: 5Gi
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   hostPath:
     path: /tmp/disallowed
 ---
@@ -26,10 +26,10 @@ metadata:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: pass
 spec:
-  storageClassName: manual 
+  storageClassName: manual
   capacity:
     storage: 5Gi
   accessModes:
-    - ReadWriteOnce 
+    - ReadWriteOnce
   hostPath:
     path: /tmp/allowed
