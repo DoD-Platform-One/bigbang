@@ -1,4 +1,4 @@
-{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled)) }}
+{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
 {{- end }}
 
@@ -83,12 +83,10 @@ chains:
   jaeger:
     match:
       header: ":authority"
-    {{- $jaegerValues := .Values.jaeger.values | default dict }}
-    {{- $jaegerIstioValues := $jaegerValues.istio | default dict }}
-    {{- $jaegerHostValues := $jaegerIstioValues.jaeger | default dict}}
-    {{- if hasKey $jaegerHostValues "hosts" }}
-      prefix: {{ range .Values.jaeger.values.istio.jaeger.hosts }}{{ tpl . $}}{{ end }}
-    callback_uri: https://{{ range .Values.jaeger.values.istio.jaeger.hosts }}{{ tpl . $}}{{ end }}/login
+    {{- $jaegerHosts := (dig "istio" "jaeger" "hosts" dict .Values.jaeger.values) }}
+    {{- if $jaegerHosts }}
+      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($jaegerHosts | first) $) }}
+    callback_uri: https://{{ tpl ($jaegerHosts | first) $ }}/login
     {{- else }}
       prefix: "tracing"
     callback_uri: https://tracing.{{ $domainName }}/login
@@ -97,16 +95,33 @@ chains:
     client_secret: "{{ .Values.jaeger.sso.client_secret }}"
   {{- end }}
 
+  {{- if and .Values.tempo.enabled .Values.tempo.sso.enabled }}
+  tempo:
+    match:
+      header: ":authority"
+    {{- $tempoHosts := (dig "istio" "tempoQuery" "hosts" dict .Values.tempo.values) }}
+    {{- if $tempoHosts }}
+      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($tempoHosts | first) $) }}
+    callback_uri: https://{{ tpl ($tempoHosts | first) $ }}/login
+    {{- else if .Values.jaeger.enabled }}
+      prefix: "tempo"
+    callback_uri: https://tempo.{{ $domainName }}/login
+    {{- else }}
+      prefix: "tracing"
+    callback_uri: https://tracing.{{ $domainName }}/login
+    {{- end }}
+    client_id: "{{ .Values.tempo.sso.client_id }}"
+    client_secret: "{{ .Values.tempo.sso.client_secret }}"
+  {{- end }}
+
   {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
   prometheus:
     match:
       header: ":authority"
-    {{- $monitoringValues := .Values.monitoring.values | default dict }}
-    {{- $monitoringIstioValues := $monitoringValues.istio | default dict }}
-    {{- $prometheusHostValues := $monitoringIstioValues.prometheus | default dict}}
-    {{- if hasKey $prometheusHostValues "hosts" }}
-      prefix: {{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}
-    callback_uri: https://{{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}/login/generic_oauth
+    {{- $prometheusHosts := (dig "istio" "prometheus" "hosts" dict .Values.monitoring.values) }}
+    {{- if $prometheusHosts }}
+      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($prometheusHosts | first) $) }}
+    callback_uri: https://{{ tpl ($prometheusHosts | first) $ }}/login/generic_oauth
     {{- else }}
       prefix: "prometheus"
     callback_uri: https://prometheus.{{ $domainName }}/login/generic_oauth
@@ -117,10 +132,11 @@ chains:
   alertmanager:
     match:
       header: ":authority"
-    {{- $alertmanagerHostValues := $monitoringIstioValues.alertmanager | default dict}}
-    {{- if hasKey $alertmanagerHostValues "hosts" }}
-      prefix: {{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}
-    callback_uri: https://{{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}/login/generic_oauth
+    {{- $alertmanagerHosts := (dig "istio" "alertmanager" "hosts" dict .Values.monitoring.values) }}
+    {{- if $alertmanagerHosts }}
+      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($alertmanagerHosts | first) $) }}
+
+    callback_uri: https://{{ tpl ($alertmanagerHosts | first) $ }}/login/generic_oauth
     {{- else }}
       prefix: "alertmanager"
     callback_uri: https://alertmanager.{{ $domainName }}/login/generic_oauth

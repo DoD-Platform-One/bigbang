@@ -31,7 +31,7 @@ tempo:
 {{- end }}
 {{- end }}
 
-    # hostname is deprecated and replaced with domain. But if hostname exists then use it.
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
@@ -68,5 +68,15 @@ monitoring:
 
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
+
+sso:
+  enabled: {{ .Values.tempo.sso.enabled }}
+
+{{- if .Values.tempo.sso.enabled }}
+{{- $tempoAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+{{- $tempoAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+podLabels:
+  {{ $tempoAuthserviceKey }}: {{ $tempoAuthserviceValue }}
+{{- end }}
 
 {{- end -}}
