@@ -36,13 +36,16 @@ spec:
     - name: {{ .Release.Name }}-tempo-values
       kind: Secret
       valuesKey: "overlays"
-  {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
+  {{- if or .Values.monitoring.enabled .Values.istio.enabled .Values.tempo.sso.enabled }}
   dependsOn:
     {{- if  .Values.monitoring.enabled }}
     - name: monitoring
       namespace: {{ .Release.Namespace }}
     {{- end }}
-
+    {{- if .Values.tempo.sso.enabled }}
+    - name: authservice
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
     {{- if .Values.istio.enabled }}
     - name: istio
       namespace: {{ .Release.Namespace }}
