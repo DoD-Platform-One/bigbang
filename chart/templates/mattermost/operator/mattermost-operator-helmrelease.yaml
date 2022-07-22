@@ -24,7 +24,7 @@ spec:
   
   {{- if .Values.addons.mattermostoperator.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.addons.authservice.postRenderers | nindent 4 }}
+  {{- toYaml .Values.addons.mattermostoperator.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-mattermost-operator-values
