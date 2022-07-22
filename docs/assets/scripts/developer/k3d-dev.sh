@@ -489,9 +489,13 @@ then
   then
     echo "Start sshuttle:"
     echo "sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem -D 127.0.0.1:12345'"
-  else  # using metal lb and public ip
+  else  # using MetalLB and public IP
+    echo "OPTION 1 TO ACCESS APPLICATIONS"
     echo "To access apps from browser start ssh with application-level port forwarding:"
     echo "ssh -i ~/.ssh/${KeyName}.pem ubuntu@${PublicIP} -D 127.0.0.1:12345"
+    echo "OPTION 2 TO ACCESS APPLICATIONS"
+    echo "To access apps from browser and from the workstation command line start sshuttle"
+    echo "sshuttle --dns -vr ubuntu@${PublicIP} 172.20.1.0/24 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem'"
   fi
 elif [[ "$PRIVATE_IP" == true ]]
 then	
@@ -505,7 +509,8 @@ echo "export KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-config"
 echo
 
 if [[ "$METAL_LB" == true ]]
-then
+then   # using MetalLB and public IP
+  echo "OPTION 1 TO ACCESS APPLICATIONS"
   echo "Do not edit /etc/hosts on your local workstation."
   echo "To access apps from a browser edit /etc/hosts on the EC2 instance. Sample /etc/host entries have already been added there."
   echo "Manually add more hostnames as needed."
@@ -513,6 +518,14 @@ then
   echo "You must use Firefox browser with with manual SOCKs v5 proxy configuration to localhost with port 12345."
   echo "Also ensure 'Proxy DNS when using SOCKS v5' is checked."
   echo "Or, with other browsers like Chrome you could use a browser plugin like foxyproxy to do the same thing as Firefox."
+  echo "OPTION 2 TO ACCESS APPLICATIONS"
+  echo "To access apps from a browser and from workstation command line"
+  echo "edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-sytem servcies with application hostnames."
+  echo "Here is an example. You might have to change this depending on the number of gateways you configure for k8s cluster."
+  echo "# METALLB"
+  echo "172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev"
+  echo "172.20.1.241 kiali.bigbang.dev"
+  echo "172.20.1.242 sonarqube.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev gitlab.bigbang.dev"
   echo
 elif [[ "$PRIVATE_IP" == true ]]
 then
