@@ -155,6 +155,8 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - velero/restic-.*
        {{- end }}
   {{- end }}
+
+openshift: {{ .Values.openshift }}
 {{- end -}}
 
 
