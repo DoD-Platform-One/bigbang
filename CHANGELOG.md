@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.58]
+### Changed
+- Updated `bigbang_package_images` in `library/templates.sh` to blacklist BETA packages from image list creation.
+Pipeline will exit w/ a `321` code if any package that is _not_ BETA fails to pull and parse its image list.
+
 ## [2.4.57]
 ### Changed
 - Debug enable logic centralized
