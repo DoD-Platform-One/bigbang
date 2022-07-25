@@ -1,565 +1,237 @@
 # Big Bang Packages
 
-Each Big Bang Package is present in the [Big Bang Package](https://repo1.dso.mil/platform-one/big-bang/apps) repository and broken up into several sub-groupings.
-
-Each package has _at least_ two `CODEOWNERS`.  Responsibilities are outlined [here](PackageOwner.md).
+Big Bang includes many different packages that provide services to the ecosystem.  Each of these packages is deployed by a Helm chart located in a repository under [Big Bang's Packages Group](https://repo1.dso.mil/platform-one/big-bang/apps).  The packages are broken up into several categories listed below.  Sometimes packages are tightly coupled and grouped together in a stack.  When using a stack, all packages in the stack will be deployed.
 
 [[_TOC_]]
 
-## Dependencies
+## Technical Oversight Committee (TOC)
+
+The Big Bang TOC supports users and contributors of the Big Bang ecosystem.  If you would like to add, modify, or remove packages in Big Bang, we encourage you to attend the TOC to discuss your ideas.  You can find details in [the TOC repository](https://repo1.dso.mil/platform-one/bbtoc).
+
+## Dependency Tree
+
+Several of Big Bang's packages have dependencies on other packages.  A Dependency exists if the package would have a significant (or total) loss in functionality if the dependency was not present.
 
 ```mermaid
-graph TB
-  subgraph "Core"
-  subgraph "Logging"
-  LoggingElastic[Elasticsearch]
-  LoggingKibana[Kibana]
-  LoggingECK[ECK]
-  LoggingElastic  --> LoggingECK
-  LoggingKibana  --> LoggingECK
-  LoggingKibana --> LoggingElastic
-  Fluentd --> LoggingElastic
-  end
-  subgraph "Monitoring"
-  Grafana --> Prometheus
-  Thanos
-  end
-  ServiceMesh
-  
-  ClusterAuditor --> LoggingECK
-  ClusterAuditor --> OPA[Policy Enforcement]
-  end      
+flowchart LR
+  subgraph Core
+    direction BT
 
-  subgraph "Package Utilities"
-    Postgres[DB]
-    MinIO[S3 Compatible Storage]
-    Redis[Cache Server]
-  end
+    subgraph L[Logging]
+      subgraph EFK[Default]
+        Kibana & Fluentbit --> Elastic
+      end
+      subgraph PLG[Alternative]
+      style PLG stroke-dasharray: 10 10
+        Promtail[Promtail*] --> Loki[Loki*]
+      end
+    end
 
-  subgraph "Security"
-  Keycloak --> Postgres
-  Anchore[Anchore Enterprise] --> Postgres
-  Twistlock
-  end
+    subgraph M[Monitoring]
+      Grafana --> Prometheus
+      Grafana -.-> Loki
+    end
 
-  subgraph "Developer Tools"
-    GitLab --> GitLabRunners[GitLab Runners]
-    GitLab --> MinIO
-    GitLab --> Redis
-    GitLab --> Postgres
-    Sonarqube --> Postgres
-  end
+    subgraph PE[Policy Enforcement]
+      subgraph CA[Default]
+      direction BT
+        ClusterAuditor --> OPA[OPA Gatekeeper]
+      end
+      subgraph KyvernoStack[Alternative]
+      style KyvernoStack stroke-dasharray: 10 10
+      direction BT
+        KyvernoReporter[Kyverno Reporter*] --> Kyverno[Kyverno*]
+      end
+    end
 
-  subgraph "Collaboration Tools"
-    MatterMost --> MinIO
-  end
+    subgraph RS[Runtime Security]
+      subgraph TL[Default]
+        Twistlock[Prisma Cloud Compute]
+      end
+    end
 
+    subgraph DT[Distributed Tracing]
+      subgraph J[Default]
+        Jaeger ----> Elastic
+      end
+      subgraph T[Alternative]
+      style T stroke-dasharray: 10 10
+        Tempo[Tempo*] -.-> Grafana
+      end
+    end
+
+    subgraph SM[Service Mesh]
+      Jaeger --> Istio
+      Tempo -.-> Istio
+      Kiali --> Jaeger & Istio & Prometheus
+    end
+  end
 ```
+
+```mermaid
+flowchart LR
+  subgraph AddOns
+    subgraph AppUtils[Application Utilities]
+      MinIO
+    end
+
+    subgraph ClusterUtils[Cluster Utilities]
+    direction BT
+      ArgoCD
+      Metrics[Metrics Server]
+      Velero
+    end
+
+    subgraph "Security"
+    direction BT
+      Anchore
+      Authservice --> I[Istio]
+      Keycloak
+      Vault[Vault*]
+    end
+
+    subgraph "Collaboration"
+    direction BT
+      Mattermost
+    end
+
+    subgraph "Developer Tools"
+    direction BT
+      GLRunners[GitLab Runners] --> GitLab
+      Nexus[Nexus Repository]
+      Sonarqube
+    end
+  end
+```
+
+> Footnotes:
+>
+> - Pages marked with `*` are  in Beta testing
+> - Dotted lines in `Core` indicate a package that is not enabled by default
+> - The following were left off the chart to keep it simple
+>   - Most packages depend on Istio for encrypted traffic and ingress to interfaces.
+>   - Some packages have operators that are deployed prior to the package and manage the package's state.
 
 ## Core
 
-Core packages are supported Big Bang packages that have to be enabled and are located at [Big Bang Core](https://repo1.dso.mil/platform-one/big-bang/apps/core).  Core packages are platform/admin level packages that are leveraged by other packages.
-
-```mermaid
-graph TB
-  subgraph "Core"
-  subgraph "Logging"
-  LoggingElastic[Elasticsearch]
-  LoggingKibana[Kibana]
-  LoggingECK[ECK]
-  LoggingElastic  --> LoggingECK
-  LoggingKibana  --> LoggingECK
-  LoggingKibana --> LoggingElastic
-  Fluentd --> LoggingElastic
-  end
-  subgraph "Monitoring"
-  Grafana --> Prometheus
-  Thanos
-  end
-  ServiceMesh
-  Twistlock
-  
-  ClusterAuditor --> LoggingECK
-  ClusterAuditor --> OPA[Policy Enforcement]
-  end      
-```
+Core packages make up the foundation of Big Bang.  At least one of the supported stacks listed in each category must be enabled to be considered a Big Bang cluster.  These packages are designed to provide administrative support for other packages.
 
 ### Service Mesh
 
-Current implementation of Service Mesh is provided by Istio. Service Mesh should be the first Package deployed to ensure other applications are operating with visibility and security.
+A service mesh is a dedicated infrastructure layer for making service-to-service communication safe, fast, and reliable.  It provides fine-grained control and enforcement of network routing into, out of, and within the cluster.  It can also supply end-to-end traffic encryption, authentication, and authorization.
 
-Product:
-
-* [Istio](https://istio.io/)
-
-Repository:
-
-* [Istio-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator)
-* [Istio-controlplane](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane)
-
-Dependency: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator/-/blob/main/CODEOWNERS)
-
-### Auth Service
-
-authservice helps delegate the OIDC Authorization Code Grant Flow to the Istio mesh. authservice is compatible with any standard OIDC Provider as well as other Istio End-user Auth features, including Authentication Policy and RBAC. Together, they allow developers to protect their APIs and web apps without any application code required.
-
-Product:
-
-* [authservice](https://github.com/istio-ecosystem/authservice)
-
-Repository:
-
-* [authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
-
-Dependency: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/CODEOWNERS)
+|Default|Stack|Package|Function|Repositories|
+|--|--|--|--|--|
+|X|Istio|Istio Operator|Operator|[istio-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator)|
+|X|Istio|[Istio]([packages/istio/Architecture.md)|Control Plane|[istio-controlplane](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane)|
+|X|Istio|[Kiali](packages/kiali/Architecture.md)|Management Console|[kiali](https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali)|
 
 ### Logging
 
-The logging package is responsible for deploying Elasticsearch, Kibana, and Fluentd.  It is also responsible for configuring the logging pipelines to aggregate all running containers logs for viewing by both Cluster Owners and Application Operators.
+A logging stack is a set of scalable tools that can aggregate logs from cluster services and provide real-time queries and analysis.  Logging is typically comprised of three components: a forwarder, storage, and a visualizer.
 
-The logging capability is comprised of:
-
-* Elastic Cloud on Kubernetes (ECK) Operator
-* Elasticsearch
-* Kibana
-* Fluentd
-* Logging Operator
-
-Repository:
-
-* [Elasticsearch-kibana](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana)
-* [Fluentbit](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit)
-* [Eck-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator)
-
-Dependencies:
-
-* RWO StorageClass
-
-Owners:
-
-* [Elasticsearch-kibana CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/blob/main/CODEOWNERS)
-* [Fluentbit CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/blob/main/CODEOWNERS)
-* [Eck-operator CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator/-/blob/main/CODEOWNERS)
+|Default|Stack|Package|Function|Repositories|
+|--|--|--|--|--|
+|X|EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator)
+|X|EFK|[Elasticsearch / Kibana](packages/elasticsearch-kibana/Architecture.md)|Storage & Visualization|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
+|X|EFK|[Fluentbit](packages/fluentbit/Architecture.md)|Forwarder|[fluentbit](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit)|
+| |PLG|[Loki](packages/loki/Architecture.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Storage|[loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki)|
+| |PLG|Promtail ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Forwarder|[promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail)|
+> PLG stack uses Grafana, deployed in [monitoring](#monitoring), for visualization.
 
 ### Policy Enforcement
 
-Policy Enforcement is done in Big Bang by either Open Policy Agent Gatekeeper (OPA Gatekeeper for short) or Kyverno.
+Policy Enforcement is the ability to validate Kubernetes resources against compliance, security, and best-practice policies.  If a resource violates a policy, the enforcement tool can deny access to the cluster, dynamically modify the resource to force compliance, or simply record the violation in an audit report.  Usually, a reporting tool accompanies the engine to help with analyzing and visualizing policy violations.
 
-#### OPA Gatekeeper
-
-Product:
-
-* [OPA Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
-* [Open Policy Agent](https://www.openpolicyagent.org/)
-
-Repository:
-
-* [Policy Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)
-
-Dependencies: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/-/blob/main/CODEOWNERS)
-
-#### Kyverno
-
-Product:
-
-* [Kyverno](https://github.com/kyverno/kyverno)
-* [Kyverno Policy Reporter](https://github.com/kyverno/policy-reporter)
-
-Repository:
-
-* [Kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno)
-* [Kyverno Policies](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies)
-
-Dependencies: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy/-/blob/main/CODEOWNERS)
+|Default|Stack|Package|Function|Repositories|
+|--|--|--|--|--|
+|X|Gatekeeper|[OPA Gatekeeper](packages/opa-gatekeeper/Architecture.md)|Engine & Policies|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
+|X|Gatekeeper|[Cluster Auditor](packages/cluster-auditor/Architecture.md)|Reporting|[cluster-auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)|
+| |Kyverno|[Kyverno](packages/kyverno/Architecture.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Engine|[kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno)|
+| |Kyverno|Kyverno Policies ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Policies|[kyverno-policies](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies)|
+| |Kyverno|Kyverno Reporter ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Reporting|[kyverno-reporter](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter)|
 
 ### Monitoring
 
-Monitoring is provided by Prometheus, Grafana and Thanos.
+A monitoring stack is used to collect, visualize, and alert on time-series metrics from cluster resources.  Metrics are quantitative measurements that provide insight into the cluster.  Some examples of metrics include memory utilization, disk utilization, network latency, number of web queries, or number of database transactions.
 
+|Default|Stack|Package|Function|Repositories|
+|--|--|--|--|--|
+|X|Monitoring|[Prometheus](packages/monitoring/Architecture.md)|Collection & Alerting|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
+|X|Monitoring|[Grafana](packages/monitoring/Architecture.md)|Visualization|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
+
+### Distributed Tracing
+
+Distributed tracing is a method of tracking application transactions as they flows through cluster services.  It is a diagnosing technique to help characterize and troubleshoot problems from the user's perspective.
+
+|Default|Package|Repositories|
+|--|--|--|
+|X|[Jaeger](packages/jaeger/Architecture.md)|[jaeger](https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger)|
+| |Tempo ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|[tempo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo)|
 Product:
 
-* [Prometheus](https://prometheus.io/)
-* [Grafana](https://grafana.com/)
-* [Thanos](https://thanos.io/)
+### Runtime Security
 
-Repository:
+Runtime security is the active protection of containers running in the cluster.  This type of tool includes scanning for vulnerabilities, checking compliance, detecting threats, and preventing intrusions.  Many of these tools also include forensics and incident response features.
 
-* [Monitoring Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)
-
-Dependencies: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring/-/blob/main/CODEOWNERS)
-
-### Cluster Auditor
-
-Cluster Auditor is an internal tool that provides compliance information to Cluster Owners and Application Developers for insight into Reference DevSecOps compliance
-
-Product:
-
-Repository: [Cluster Auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)
-
-Dependencies:
-
-* [Logging](#logging)
-* [OPA Gatekeer](#policy-enforcement)
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor/-/blob/main/CODEOWNERS)
-
-Repository:
-
-* [Cluster Auditor Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)
-
-### Twistlock
-
-Twistlock provides runtime vulnerability detection
-
-Product:
-
-* [Twistlock](https://www.twistlock.com/labs-/)
-
-Repository: [Twistlock Repo](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock)
-
-Dependencies:
-
-* RWO StorageClass
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/CODEOWNERS)
+|Default|Package|Repositories|
+|--|--|--|
+|X|[Prisma Cloud Compute](packages/twistlock/Architecture.md) (AKA Twistlock) ![License Required](https://img.shields.io/badge/License_Required-orange)|[twistlock](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock)|
 
 ## Addons
 
-Addons are supported Big Bang packages that come disabled by default.
+Addons can be used to extend Big Bang with additional services.  All of the addons listed here are supported by the Big Bang team and integrated into the product.  There may be additional community supported Big Bang packages that are not listed here.  These packages are disabled in Big Bang by default.
 
-### Security Tools
+### Storage Utilities
 
-Security Tools are hosted here: [Security Tools](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools)
+Storage utilities include packages that provide services to store and retrieve temporal or persistent data in the cluster.  This category includes databases, object storage, and data caching.  It is generally advantageous to use cloud based offerings instead of these to take advantage of scalability, availability, and resiliency (e.g. backup and restore).  However, for non-critical or on-prem deployments, these utilities offer a simpler and lower cost solution.
 
-```mermaid
-graph TB  
-
-  subgraph "Package Utilities"
-    Postgres(DB)
-  end
-
-  subgraph "Security"
-  Keycloak --> Postgres
-  Anchore[Anchore Enterprise] --> Postgres
-  end
-```
-
-#### Keycloak
-
-Keycloak provides SSO to applications.
-
-Product:
-
-* [Keycloak](https://www.keycloak.org/)
-* [Postgres](https://www.postgresql.org/)
-
-Repository: [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)
-
-Dependencies:
-
-* Postgres
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/blob/main/CODEOWNERS)
-
-#### Anchore Enterprise
-
-Product:
-
-* [Anchore Enterprise](https://anchore.com/enterprise/)
-
-Repository: [Anchore Enterprise Repo](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise)
-
-Dependencies:
-
-* postgres
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/CODEOWNERS)
-
-### Developer Tools
-
-Developer Tools are hosted here: [Developer Tools](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools)
-
-```mermaid
-graph TB
-
-  subgraph "Application Utilities"
-    Postgres[DB]
-    MinIO[S3 Compatible Storage]
-    Redis[Cache Server]
-  end
-
-
-  subgraph "Package Tools"
-    GitLab --> GitLabRunners[GitLab Runners]
-    GitLab --> MinIO
-    GitLab --> Redis
-    GitLab --> Postgres
-    Sonarqube --> Postgres
-  end
-```
-
-#### GitLab
-
-GitLab is a product for providing DevOps including planning, code hosting, and CICD
-
-Product:
-
-* [GitLab](https://docs.gitlab.com/)
-
-Repository:
-
-* [GitLab Repo](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)
-
-Dependencies:
-
-* postgres
-* S3 compatible object store (ex: [Minio](#minio))
-* Redis
-* RWO StorageClass
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/blob/main/CODEOWNERS)
-
-#### GitLab Runners
-
-GitLab Runners are pods that run jobs for GitLab CI/CD
-
-Product:
-
-* [GitLab Runners](https://docs.gitlab.com/runner/)
-
-Repository:
-
-* [GitLab Runners Repo](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner)
-
-Dependencies:
-
-* [GitLab](#gitlab)
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner/-/blob/main/CODEOWNERS)
-
-#### Sonarqube
-
-Sonarqube provides code reviews for code quality and security
-
-Product:
-
-* [Sonarqube](https://www.sonarqube.org/)
-
-Repository:
-
-* [Sonarqube Repo](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube)
-
-Dependencies:
-
-* postgres
-* RWO StorageClass
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube/-/blob/main/CODEOWNERS)
-
-#### Nexus
-
-Nexus provides a robust artifact repository, supporting artifacts of multiple programming languages
-
-Product:
-
-* [Nexus](https://www.sonatype.com/nexus/repository-pro)
-* Scope:
-  * The Nexus OSS will not be supported as the licenced pro version is required for [HA and SAML SSO capabilities](https://www.sonatype.com/nexus/repository-oss-vs-pro-features)
-  * Only Licended Nexus Repository Pro will be supported
-
-Repository:
-
-* [Nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus)
-
-Dependencies:
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/blob/main/CODEOWNERS)
-
-### Collaboration Tools
-
-Collaboration tools are hosted here: [Collaboration Tools](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools)
-
-```mermaid
-graph TB
-  subgraph "Package Utilities"
-    Postgres[DB]
-    MinIO[S3 Compatible Storage]
-  end
-
-  subgraph "Collaboration Tools"
-    MatterMost --> MinIO
-  end
-
-```
-
-<!-- #### Confluence
-
-Confluence provides a centralized workspace for collaborating on documentation
-
-Product:
-
-* [Confluence](https://www.atlassian.com/software/confluence)
-
-Repository:
-
-* [Confluence Repo](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/confluence)
-
-Dependencies:
-
-* Postgres
-* RWM StorageClass (if HA)
-
-Owners:
-
-* @matt.kaiser
-* @branden.cobb
-
-#### Jira
-
-Development tool for planning and tracking team tasks
-
-Product:
-
-* [Jira](https://www.atlassian.com/software/jira)
-
-Repository:
-
-* [Jira Repo](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/jira)
-
-Dependencies:
-
-* Postgres
-* RWM StorageClass (if HA)
-
-Owners:
-
-* @matt.kaiser
-* @branden.cobb -->
-
-#### Mattermost
-
-Mattermost is an open sourced messaging platform.
-
-Product:
-
-* [Mattermost](https://mattermost.com/)
-
-Repository:
-
-* [Mattermost Repo](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost)ß
-
-Dependencies:
-
-* S3 compatible object store (ex: [Minio](#minio))
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/CODEOWNERS)
-
-### Package Utilities
-
-Application utilities are deployments of utilities used by one or more packages.  They are usually not user facing, and are dependencies of user facing packages.
-
-A clear an obvious example of this is PostgreSQL.
-
-```mermaid
-graph TB
-  subgraph "Package Utilities"
-    Postgres[DB]
-    MinIO[S3 Compatible Storage]
-    Redis[Cache Server]
-  end
-
-```
-
-#### Minio
-
-Minio provides S3 compatible object storage
-
-Product:
-
-* [MinIO](https://min.io/)
-
-Repository:
-
-* [Minio Package](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/)
-
-Dependencies: None
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/blob/main/CODEOWNERS)
+|Stack|Package|Function|Repository|
+|--|--|--|--|
+|MinIO|MinIO Operator|Operator|[minio-operator](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator)|
+|MinIO|[MinIO](packages/minio/Architecture.md)|S3 Object Storage|[minio](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio)|
 
 ### Cluster Utilities
 
-Packages that provider cluster level utility, such as RWX storage or generic backup capabilities.
+Cluster utilities add functionality to Kubernetes clusters rather than applications.  Examples include resource utilization, cluster backup and restore, continuos deployment, or load balancers.
 
-#### ArgoCD
+|Package|Function|Repository|
+|--|--|--|
+|ArgoCD|Continuous Deployment|[argocd](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
+|Metrics Server|Monitors pod CPU & memory utilization|[metrics-server](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server)|
+|Velero|Cluster Backup & Restore|[velero](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero)|
 
-Product:
+### Security
 
-* [ArgoCD](https://argoproj.github.io/argo-cd/)
+Security packages add additional security features for protecting services or data from unauthorized access or exploitation.  This includes things like identity providers (IdP), identity brokers, authentication (AuthN), authorization (AuthZ), single sign-on (SSO), security scanning, intrusion detection/prevention, and sensitive data protection.
 
-Repository:
+|Package|Function|Repository|
+|--|--|--|
+|[Anchore](packages/anchore/Architecture.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise)|
+|[Authservice](packages/authservice/Architecture.md)|Istio extension for Single Sign-On (SSO)|[authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)|
+|[Keycloak](packages/keycloak/Architecture.md)|IdP, Identity Broker, AuthN/Z|[keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)|
+|Vault ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Sensitive Data Access Control|[vault](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault)|
 
-* [ArgoCD Repo](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd)
+### Collaboration
 
-Dependency: None
+Collaboration tools provide environments to help teams work together online.  Chatting, video conferencing, file sharing, and whiteboards are all examples of collaboration tools.
 
-Owners:
+|Stack|Package|Function|Repository|
+|--|--|--|--|
+|Mattermost|Mattermost Operator|Operator|[mattermost-operator](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator)|
+|Mattermost|[Mattermost](packages/mattermost/Architecture.md)|Chat|[mattermost](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost)|
 
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/blob/main/CODEOWNERS)
+### Developer Tools
 
-#### Velero
+Developer tools include packages that a programmer would use to plan, author, test, debug, or control code.  This includes repositories, bug / feature tracking, pipelines, code analysis, automated tests, and development environments.
 
-Velero is an open source tool to safely backup and restore, perform disaster recovery, and migrate Kubernetes cluster resources and persistent volumes
+|Stack|Package|Function|Repository|
+|--|--|--|--|
+|GitLab|[GitLab](packages/gitlab/Architecture.md)|Code repository, issue tracking, release planning, security and compliance scanning, pipelines, artifact repository, wiki|[gitLab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)|
+|GitLab|GitLab Runner|Executor for GitLab pipelines|[gitlab-runner](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner)|
+|Nexus|Nexus Repository|Artifact repository|[nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus)
+|Sonarqube|[Sonarqube](packages/sonarqube/Architecture.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube)
 
-* [Velero](https://velero.io/)
+## Further Information
 
-Repository:
-
-* [Velero Package](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/tree/main)
-
-Owners:
-
-* [CODEOWNERS](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/CODEOWNERS)
-
-### BB Technical Oversight Committee (BB TOC)
-
-[Process](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process)
+You can find some additional details about features supported by each package by visiting [this document](../Packages.md).
