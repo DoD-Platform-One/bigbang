@@ -1,6 +1,15 @@
 #!/bin/bash
 
+#### Global variables - These allow the script to be run by non-bigbang devs easily
+VPC_ID=vpc-065ffa1c7b2a2b979
+AMI_ID=ami-84556de5
 #### Preflight Checks
+# Check that the VPC is available 
+EXISTING_VPC=$(aws ec2 describe-vpcs | grep ${VPC_ID})
+if [[ -z "${EXISTING_VPC}" ]]; then
+  echo "VPC is not available in the current AWS_PROFILE - Update VPC_ID"
+  exit 1
+fi
 # check for tools
 tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl)
 for tooldependency in "${tooldependencies[@]}"
@@ -43,7 +52,7 @@ KeyName="${AWSUSERNAME}-dev"
 # Assign a name for your Security Group.  Typically, people use their username to make it easy to identify
 SGname="${AWSUSERNAME}-dev"
 # Identify which VPC to create the spot instance in
-VPC="vpc-2ffbd44b"  # default VPC
+VPC="${VPC_ID}"  # default VPC
 
 
 while [ -n "$1" ]; do # while loop starts
@@ -186,8 +195,8 @@ VolumeSize=120
 # ImageId=$(aws ec2 describe-images --output json --no-cli-pager --filters "Name=name,Values=${AMIName}" --query "reverse(sort_by(Images, &CreationDate))[:1].ImageId" --output text)
 #echo done
 # Hardcode the latest image instead of searching for it to avoid unexpected changes
-echo Using AMI image id ami-84556de5
-ImageId=ami-84556de5
+echo "Using AMI image id ${AMI_ID}"
+ImageId="${AMI_ID}"
 
 # Create the launch spec
 echo -n Creating launch_spec.json ...
@@ -359,7 +368,7 @@ echo
 echo
 # install k3d on instance
 echo "Installing k3d on instance"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.2.2 bash"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.4 bash"
 echo
 echo "k3d version"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d version"
