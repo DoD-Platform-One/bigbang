@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.59]
+### Added
+- Added `kubectl patch psp global-unrestricted-psp -p '{"spec":{"allowedUnsafeSysctls":["*"]}}'` to rke2 pipelines to allow gatekeeper and kyverno helm tests to work correctly.
+
 ## [2.4.58]
 ### Changed
 - Updated `bigbang_package_images` in `library/templates.sh` to blacklist BETA packages from image list creation.
