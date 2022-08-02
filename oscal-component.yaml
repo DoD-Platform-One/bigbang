@@ -1,10 +1,10 @@
 component-definition:
-  uuid: ""
+  uuid: "4DEDC09C-B2ED-407B-82C6-229F77DDDC8C"
   metadata:
-    title: "Big Bang"
-    last-modified: '2022-05017T11:21:00Z'
-    version: "1.33.0"
-    oscal-version: "1.0.0"
+    title: Big Bang
+    last-modified: '2022-06-06T15:26:59.676009+00:00'
+    version: 1.39.0
+    oscal-version: 1.0.4
     parties:
     - uuid: 72134592-08C2-4A77-ABAD-C880F109367A 
       type: organization
@@ -21,77 +21,91 @@ component-definition:
     purpose: Istio Service Mesh
     responsible-roles:
     - role-id: provider
-      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+      party-uuids:
+      - 72134592-08C2-4A77-8BAD-C880F109367A
     control-implementations:
     - uuid: 06717F3D-CE1E-494C-8F36-99D1316E0D13
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
-      description: Controls implemented by authservice for inheritance by applications
+      description: 
+        Controls implemented by authservice for inheritance by applications
       implemented-requirements:
       - uuid: 1822457D-461B-482F-8564-8929C85C04DB
         control-id: ac-3
-        description: |-
+        description: >-
           Istio RequestAuthentication and AuthorizationPolicies are applied after Authservice.  Istio is configured to only allow access to applications if they have a valid JWT,  denying access by default. Applications that do not use Authservice do not have these
-           policies.
+          policies.
       - uuid: D7717A9B-7604-45EF-8DCF-EE4DF0417F9C
         control-id: ac-4
-        description: All HTTP(S) connections into the system via Istio ingress gateways
+        description: >-
+          All HTTP(S) connections into the system via Istio ingress gateways
           and throughout the system with Istio sidecars.
       - uuid: 1D1E8705-F6EB-4A21-A24F-1DF7427BA491
         control-id: ac-4.4
-        description: All encrypted HTTPS connections are terminated at the istio ingress
+        description: >-
+          All encrypted HTTPS connections are terminated at the istio ingress
           gateway.
       - uuid: CD1315BF-91FE-490A-B6A6-5616690D78A8
         control-id: ac-6.3
-        description: Can be configured with an "admin" gateway to restrict access
+        description: >-
+          Can be configured with an "admin" gateway to restrict access
           to applications that only need sysadmin access. Not standard in BB itself
           though.
       - uuid: 6109E09A-8279-44AB-8CA4-2051AF895648
         control-id: ac-14
-        description: Istio RequestAuthentication and AuthorizationPolicies are applied
+        description: >-
+          Istio RequestAuthentication and AuthorizationPolicies are applied
           after Authservice. Istio is configured to only allow access to applications
           if they have a valid JWT, denying access by default. Applications that do
           not use Authservice do not have these policies.
       - uuid: 9B6BA674-E6ED-4FB6-B216-3C8733F36411
         control-id: au-2
-        description: Istio provides access logs for all HTTP network requests, including
+        description: >-
+          Istio provides access logs for all HTTP network requests, including
           mission applications.
       - uuid: D3CBC898-F938-4FAA-B1B1-2597A69B5600
         control-id: au-3
-        description: |-
+        description: >-
           By default, Istio uses the Common Log Format with additional information for access logs.
           The default configuration does not include the identity of individuals associated with the event.
       - uuid: D01F6B2D-F18E-47E9-94DC-95C0B5675E13
         control-id: cm-5
-        description: Configured via Kubernetes resources. Inherited from cluster and
+        description: >-
+          Configured via Kubernetes resources. Inherited from cluster and
           flux/ArgoCD.
       - uuid: 6370B2DA-1E35-4916-8591-91FB9EDBE72B
         control-id: cm-8
-        description: 'Provides an inventory of all workloads (including mission apps)
-          in the service mesh, viewable in Kiali. '
+        description: >- 
+          Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali.
       - uuid: AB9189FF-34E2-4D7E-8018-EB346C7AE967
         control-id: cm-8.1
-        description: Provides an inventory of all workloads (including mission apps)
+        description: >-
+          Provides an inventory of all workloads (including mission apps)
           in the service mesh, viewable in Kiali. The inventory is automatically and
           continuously updated.
       - uuid: A740C741-23B4-4ED9-937C-E0276A9B92EE
         control-id: cm-8.2
-        description: Provides an inventory of all workloads (including mission apps)
+        description: >-
+          Provides an inventory of all workloads (including mission apps)
           in the service mesh, viewable in Kiali. The inventory is automatically and
           continuously updated.
       - uuid: 61615706-5395-4168-8AD0-5C4ACBCC5D7E
         control-id: ia-2
-        description: Istio RequestAuthentication and AuthorizationPolicies are applied
+        description: >-
+          Istio RequestAuthentication and AuthorizationPolicies are applied
           after Authservice. Istio is configured to only allow access to applications
           if they have a valid JWT, denying access by default. Applications that do
           not use Authservice do not have these policies.
       - uuid: 3004BB1D-0F50-48F1-ABFE-40CC522B1C15
         control-id: ia-4
-        description: Istio uses Kubernetes namespaces and resource names to identifiy
+        description: >-
+          Istio uses Kubernetes namespaces and resource names to identifiy
           workloads in the service mesh. This provides management of identifiers for
           all services in the cluster.
       - uuid: FE110D6B-CCB5-41E8-B2DE-287ED843D417
         control-id: ia-9
-        description: Istio registers all workload identities in the service mesh.
+        description: >-
+          Istio registers all workload identities in the service mesh.
           The identity is transmitted in the mTLS certificate when establishing communication
           between services, and is validated by Istio sidecars.
   - uuid: CB9B1F61-3CEC-4B32-A679-89011E596374
@@ -102,13 +116,94 @@ component-definition:
     purpose: Operator for Istio Service Mesh
     responsible-roles:
     - role-id: provider
-      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+      party-uuids: 
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
-      description: Controls implemented by authservice for inheritance by applications
-      implemented-requirements: []
-  - uuid: 50EE9EB1-0DA4-411C-A771-AA1725B27E22
+      description:
+        Controls implemented by authservice for inheritance by applications
+      implemented-requirements:
+      - uuid: 1822457D-461B-482F-8564-8929C85C04DB
+        control-id: ac-3
+        description: >-
+          Istio RequestAuthentication and AuthorizationPolicies are applied after Authservice.  Istio is configured to only allow access to applications if they have a valid JWT,  denying access by default. Applications that do not use Authservice do not have these
+          policies.
+      - uuid: D7717A9B-7604-45EF-8DCF-EE4DF0417F9C
+        control-id: ac-4
+        description: >-
+          All HTTP(S) connections into the system via Istio ingress gateways
+          and throughout the system with Istio sidecars.
+      - uuid: 1D1E8705-F6EB-4A21-A24F-1DF7427BA491
+        control-id: ac-4.4
+        description: >-
+          All encrypted HTTPS connections are terminated at the istio ingress
+          gateway.
+      - uuid: CD1315BF-91FE-490A-B6A6-5616690D78A8
+        control-id: ac-6.3
+        description: >-
+          Can be configured with an "admin" gateway to restrict access
+          to applications that only need sysadmin access. Not standard in BB itself
+          though.
+      - uuid: 6109E09A-8279-44AB-8CA4-2051AF895648
+        control-id: ac-14
+        description: >-
+          Istio RequestAuthentication and AuthorizationPolicies are applied
+          after Authservice. Istio is configured to only allow access to applications
+          if they have a valid JWT, denying access by default. Applications that do
+          not use Authservice do not have these policies.
+      - uuid: 9B6BA674-E6ED-4FB6-B216-3C8733F36411
+        control-id: au-2
+        description: >-
+          Istio provides access logs for all HTTP network requests, including
+          mission applications.
+      - uuid: D3CBC898-F938-4FAA-B1B1-2597A69B5600
+        control-id: au-3
+        description: >-
+          By default, Istio uses the Common Log Format with additional information for access logs.
+          The default configuration does not include the identity of individuals associated with the event.
+      - uuid: D01F6B2D-F18E-47E9-94DC-95C0B5675E13
+        control-id: cm-5
+        description: >-
+          Configured via Kubernetes resources. Inherited from cluster and
+          flux/ArgoCD.
+      - uuid: 6370B2DA-1E35-4916-8591-91FB9EDBE72B
+        control-id: cm-8
+        description: >- 
+          Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali.
+      - uuid: AB9189FF-34E2-4D7E-8018-EB346C7AE967
+        control-id: cm-8.1
+        description: >-
+          Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali. The inventory is automatically and
+          continuously updated.
+      - uuid: A740C741-23B4-4ED9-937C-E0276A9B92EE
+        control-id: cm-8.2
+        description: >-
+          Provides an inventory of all workloads (including mission apps)
+          in the service mesh, viewable in Kiali. The inventory is automatically and
+          continuously updated.
+      - uuid: 61615706-5395-4168-8AD0-5C4ACBCC5D7E
+        control-id: ia-2
+        description: >-
+          Istio RequestAuthentication and AuthorizationPolicies are applied
+          after Authservice. Istio is configured to only allow access to applications
+          if they have a valid JWT, denying access by default. Applications that do
+          not use Authservice do not have these policies.
+      - uuid: 3004BB1D-0F50-48F1-ABFE-40CC522B1C15
+        control-id: ia-4
+        description: >-
+          Istio uses Kubernetes namespaces and resource names to identifiy
+          workloads in the service mesh. This provides management of identifiers for
+          all services in the cluster.
+      - uuid: FE110D6B-CCB5-41E8-B2DE-287ED843D417
+        control-id: ia-9
+        description: >-
+          Istio registers all workload identities in the service mesh.
+          The identity is transmitted in the mTLS certificate when establishing communication
+          between services, and is validated by Istio sidecars.
+  - uuid: 50EE9EB1-0DA4-411C-8771-AA1725B27E22
     type: software
     title: Jaeger
     description: |
@@ -116,12 +211,19 @@ component-definition:
     purpose: Implementation of Service Mesh
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
-    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+    - uuid: 5108E5FC-C45F-477B-8542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
       description: Controls implemented by jaeger for inheritance by applications
-      implemented-requirements: []
+      implemented-requirements:
+      - uuid: 1822457D-461B-482F-8564-8929C85C04DA
+        control-id: si-4.4
+        description: Jaeger is used, in conjunction with Istio configurations, to
+          collect and aggregate network communications within the system.  This allows
+          the moniotiring of inbound/outbound traffic and payloads within the deployed
+          environment.
   - uuid: A97D1364-BA7F-46AA-ADE6-1998E846E125
     type: software
     title: Kiali
@@ -130,7 +232,8 @@ component-definition:
     purpose: Observibility into Istio Service Mesh
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -148,7 +251,8 @@ component-definition:
     purpose: Display policy violations
     responsible-roles:
     - role-id: provider
-      party-uuid: 72134592-08C2-4A77-ABAD-C880F109367A
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -166,6 +270,57 @@ component-definition:
         control-id: ca-7
         description: 'Continuous monitoring of controls/violations of the system in
           accordance with the Control Assessment Plan '
+  - uuid: 8078c070-2d5b-44b8-8fd1-47797fa12c6d
+    type: software
+    title: OPA Gatekeeper
+    description: "An application which assists in enforcing, monitoring, and remediating
+      policies in Kubernetes while strengthening governance of an environment. \n"
+    purpose: Monitors existing clusters, detects policy violations, and also acts
+      as a customizable Kubernetes Admission Webhook
+    responsible-roles:
+    - role-id: provider
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
+    control-implementations:
+    - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by <component> for inheritance by applications
+      implemented-requirements:
+      - uuid: c89a52f1-4d60-4d4e-9c4c-7c5eb04fe21a
+        control-id: au-2
+        description: OPA Gatekeeper provides policy violations events to Cluster Auditor
+          for event logging.   The list of policies being audited is/will be captured
+          by the Policy Document in Gatekeeper's chart
+      - uuid: c38f765f-b706-4810-96b6-2971f37122df
+        control-id: au-3
+        description: 'Gatekeeper provides the policy being violated, the timestamp
+          of when it occured, the location (cluster/namespace), the object causing
+          the violation and whether it was in warn or deny mode. '
+      - uuid: f856dc53-1c3a-428e-83ff-65723c325dac
+        control-id: au-8
+        description: Gatekeeper policies have timestamps assoicated to when the violation
+          was found and identified.   By logging policy violations into log messages
+          (via logDenies=true ),  these logs are also available in the logging framework
+      - uuid: 41b6ce08-5827-4e08-8ff4-1a61a2e378f8
+        control-id: au-9
+        description: Access to the Gatekeeper violations are managed by/inherited
+          from the Kubernetes cluster
+      - uuid: da7ff1f0-2a16-491c-8854-788cc46cef3c
+        control-id: cm-1
+        description: Provides enforcement of configuration management policy
+      - uuid: ffb9f4b5-0bfe-4053-9e12-5657a1ceb0b9
+        control-id: cm-7.5
+        description: OPA Gatekeeper can prevent by default unauthorized changes to
+          the system.
+      - uuid: 07a4e16a-944b-4989-a6d8-057b545748d0
+        control-id: cm-11
+        description: Gatekeeper can provide the ability for end users to control the
+          policies that allow for the installation of end-user software. It also provides
+          the enforcement and monitoring
+      - uuid: 72d2434e-0dac-4267-8594-d2df5da6b22a
+        control-id: sa-9
+        description: Gatekeeper can ensure applications installed on the kubernetes
+          cluster meet policy requirements for manfiests
   - uuid: BE039F48-F418-4D86-BD5F-8CE8CBEAD91E
     type: software
     title: Elasticsearch and Kibana
@@ -174,7 +329,8 @@ component-definition:
     purpose: Provides storage and UI for log aggregation in the cluster
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -213,12 +369,16 @@ component-definition:
     purpose: Managing Elasticsearch and Kibana instances
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
       description: Controls implemented by ECK Operator for inheritance by applications
-      implemented-requirements: []
+      implemented-requirements:
+      - uuid: 364A133C-2930-413A-8761-E6D82BBA8E6D # Add this to the eck-operator package oscal document
+        control-id: ac-6.9
+        description: This is just a syntax test.
   - uuid: BE039F48-F418-4D86-BD5F-8CE8CBEAD91E
     type: software
     title: Fluentbit
@@ -227,7 +387,8 @@ component-definition:
     purpose: Collects logs from the cluster
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 6358159C-2710-46EF-ACC5-39FD3117391D
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -263,7 +424,8 @@ component-definition:
     purpose: Display policy violations
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -360,6 +522,113 @@ component-definition:
         description: Compatible metrics endpoints emitted from each application is
           compiled by Prometheus and displayed through Grafana with associated timestamps
           of when the data was collected
+  - uuid: 660B7C27-2997-4EB7-BA61-C66FEC2D1602
+    type: software
+    title: ArgoCD
+    description: |
+      A declarative GitOps continuous delivery tool for Kubernetes
+    purpose: GitOps continuous delivery
+    responsible-roles:
+    - role-id: provider
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
+    control-implementations:
+    - uuid: 909C0D05-5BF7-4D89-B82F-38488A02CC85
+      source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
+      description: Controls implemented by ArgoCD for inheritance by applications
+      implemented-requirements:
+      - uuid: 4F924345-FED4-496B-91E3-5361F2B2F2DA
+        control-id: AC-5
+        description: ArgoCD can be configured for granular user access to certain
+          application deployments.
+      - uuid: 27C176A6-BF99-4BE9-9748-63C99C75328E
+        control-id: AC-6
+        description: ArgoCD can be configured per user with the least privilige needed.
+      - uuid: EC3BC1CA-4E31-4130-A246-D15857F1A6E7
+        control-id: AU-2
+        description: ArgoCD logs events related to the applicaction state itself,
+          i.e. start/stop failures.
+      - uuid: ACC00F83-5C88-44FA-A6CA-0AD68AD9E09F
+        control-id: AU-3
+        description: ArgoCD has a natural audit log for what changes were made to
+          an applications configuration,  when they were made, and by who. This is
+          provided by the Git commit history in the GitOps workflow.
+      - uuid: C4E89AE2-3959-4828-B15F-7D4AD1BDB4BC
+        control-id: AC-7
+        description: ArgoCD rejects login attemps after too many failed in order to
+          prevent passsword brute-forcing.  Proceted by the following components,
+          max fail count, failure window, max entry cache size, and max concurrent
+          login requests.
+      - uuid: 8B181052-6E36-4A12-A58B-4049F035021D
+        control-id: CM-2.2
+        description: ArgoCD provides the configuration management engine to ensure
+          CM-2 is met
+      - uuid: 48DBC6A1-28E4-4AF0-95F1-CB70EB818B3C
+        control-id: CM-2.3
+        description: ArgoCD / Git provides history for releases
+      - uuid: 21F72DBE-EA11-4E27-9AE3-82B08C4E16EA
+        control-id: CM-3
+        description: ArgoCD / Git enable teams to do this as part of their workflow
+      - uuid: A89D4C6B-C885-43A4-85A0-7BB1B33E20DF
+        control-id: CM-3.1
+        description: ArgoCD / Git provide automation of documentation, notifications
+          of upgrades to BB
+      - uuid: E3C277C6-A058-4595-B034-3BEE1D74AE51
+        control-id: CM-3.2
+        description: ArgoCD allows for workflows to be created by end users to deploy
+          exact configurations  into stage/dev environment that mirror production.
+      - uuid: ADF0F06E-F773-43A2-BA91-109D4C3B8AF5
+        control-id: CM-4
+        description: BB/Git provides changelogs which identify changes to system via
+          upgrades
+      - uuid: A202F34E-1689-47A2-A55C-406C0437C7DD
+        control-id: CM-4.2
+        description: This current effort will provide controls explicitly as part
+          of the product to track how controls will change with upgrades
+      - uuid: 373DC91F-E590-44B5-B4B1-8DF8453EB9B9
+        control-id: CM-5.1
+        description: Use of ArgoCD/GitOps allows this to be inherited by management
+          in GitLab
+      - uuid: D2B04238-01DB-49B0-A787-069BE6D962C7
+        control-id: CM-6
+        description: ArgoCD manages application configuration settings controlled
+          in GitLab and ensures they match the expected state.
+      - uuid: 4EC8B133-3118-4429-A4F7-A1AF3737F5AD
+        control-id: CM-6.1
+        description: ArgoCD manages/applies and verifies configuration as code
+      - uuid: 8B027EED-6484-473A-B4F6-BADF9F55978D
+        control-id: CM-8
+        description: ArgoCD provides visualization of the deployed application and
+          configurations.
+      - uuid: 0323639F-85B3-4858-99A8-C69C0D6DA16F
+        control-id: CM-8.1
+        description: ArgoCD automatically updates its inventory when changes occur
+          to cluster resources.
+      - uuid: 53E65314-43DB-4464-B9B8-6075AA6B96AB
+        control-id: CM-8.2
+        description: ArgoCD maintains the currency, completeness, accuracy, and availability
+          of cluster resources by  continuously reconciling the desired state in Git
+          to the actual state in Kubernetes.
+      - uuid: 593D198A-E5DF-429F-9BCB-EE5561B50522
+        control-id: CM-8.4
+        description: ArgoCD displays the name of an individual who made a Git commit
+          that resulted in changes to the system component inventory
+      - uuid: 6379A5B5-C5AC-4A30-AAC1-A40BB7AAABFC
+        control-id: CP-2
+        description: ArgoCD will restore applications it manages to the known GitOps
+          state in GitLab
+      - uuid: 4753C850-EC7C-47F2-AE55-541B73D3D957
+        control-id: CP-10
+        description: ArgoCD will restore applications it manages to the known GitOps
+          state in GitLab
+      - uuid: CBCC3D5C-03FE-4F6F-A587-6776813AA87B
+        control-id: CP-10.2
+        description: ArgoCD will restore applications it manages to the known GitOps
+          state in GitLab
+      - uuid: 28D7704A-7859-4A7E-9967-4E564D94BA93
+        control-id: CP-10.4
+        description: ArgoCD will restore applications it manages to the known GitOps
+          state in GitLab
   - uuid: E70A5057-3BA4-4E62-8C74-ED19122BBA9E
     type: software
     title: Authservice
@@ -368,7 +637,8 @@ component-definition:
     purpose: Provides authn/authz capabilites to applications via Istio Service Mesh
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-A542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -544,7 +814,8 @@ component-definition:
     purpose: Provides backup and restore capabilities to a Kubernetes cluster
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 5108E5FC-C45F-477B-8542-9C5611A92485
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -639,7 +910,8 @@ component-definition:
       authorization.
     responsible-roles:
     - role-id: provider
-      party-uuid: ""
+      party-uuids:
+      - 72134592-08C2-4A77-ABAD-C880F109367A
     control-implementations:
     - uuid: 44bb0268-355d-455b-be33-7fc6ecc89668
       source: https://raw.githubusercontent.com/usnistgov/oscal-content/master/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json
@@ -903,5 +1175,8 @@ component-definition:
         description: Keycloak supports OIDC/SAML which support expiration dates in
           tokens/assertions.
   back-matter:
-    resources: []
-
+    resources:
+    - uuid: C322D234-BD2A-4332-B8A9-54D45E7148B8
+      title: Big Bang
+      rlinks:
+      - href: https://repo1.dso.mil/platform-one/big-bang/bigbang
