@@ -19,7 +19,7 @@ istio:
 port: 20001
 image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.51.0
+  tag: v1.54.0
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
   pullSecrets:
@@ -97,6 +97,9 @@ cr:
   # then this is the namespace where the CR will be created (the default will be the operator namespace).
   namespace: ""
 
+  # Annotations to place in the Kiali CR metadata.
+  annotations: {}
+
   spec:
     istio_component_namespaces:
       grafana: monitoring
@@ -106,7 +109,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.51.0
+      image_version: v1.54.0
       image_pull_secrets:
         - private-registry
       ingress_enabled: false
