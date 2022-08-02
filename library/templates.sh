@@ -1536,86 +1536,83 @@ bigbang_pipeline() {
 }
 
 bigbang_package_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:Package-Image-List[collapsed=true]\r\e[0K\e[33;1mPackage-Image-List\e[37m"
-   # Start output header
-   echo "---" > ${PACKAGE_IMAGE_FILE}
-   echo "package-image-list:" >> ${PACKAGE_IMAGE_FILE}
+  echo -e "\e[0Ksection_start:`date +%s`:Package-Image-List[collapsed=true]\r\e[0K\e[33;1mPackage-Image-List\e[37m"
+  # Start output header
+  echo "---" > ${PACKAGE_IMAGE_FILE}
+  echo "package-image-list:" >> ${PACKAGE_IMAGE_FILE}
 
   declare -a errors_list
 
-   # Generate a list of all images in all Big Bang Packages
-   while IFS= read -r package; do
+  packages=$(yq e '.. | select(has("git")) | (path | join("."))' $VALUES_FILE)
 
-       gitrepo=$(yq e ".${package}.git.repo" "${VALUES_FILE}")
-       version=$(yq e ".${package}.git.tag" "${VALUES_FILE}")
-       #echo "Package: $package  Version: $version"
-       # Since keys aren't always packages
-       if [[ -z "$version" || "$version" == "null" ]]; then
-           continue
-       fi
+  for pkg in $packages
+  do
+    gitrepo=$(yq e ".${pkg}.git.repo" "${VALUES_FILE}")
+    version=$(yq e ".${pkg}.git.tag" "${VALUES_FILE}")
 
-       # check if repo is BETA
-       if [[ "$gitrepo" =~ "/sandbox/" ]]; then
-         echo "$package is in BETA/sandbox group, omitting from image list" 1>&2
-         continue
-       fi
+    if [[ "$gitrepo" =~ "/sandbox/" ]]; then
+      echo "$pkg is in BETA/sandbox group, omitting from image list"
+      continue
+    fi
 
-       # Remove prefix
-       gitrepo=${gitrepo#"https://repo1.dso.mil/"}
-       # Remove suffix
-       gitrepo=${gitrepo%".git"}
-       # Replace `/` with `%2F`
-       gitrepo=${gitrepo//\//%2F}
+    # Remove prefix
+    gitrepo=${gitrepo#"https://repo1.dso.mil/"}
+    # Remove suffix
+    gitrepo=${gitrepo%".git"}
+    # Replace `/` with `%2F`
+    gitrepo=${gitrepo//\//%2F}
 
-       # Curl gitlab API to get project ID
-       projid=$(curl -s https://repo1.dso.mil/api/v4/projects/${gitrepo} | jq '.id')
-       #echo "Project ID: $projid"
-       # Curl gitlab API + S3 file to get images list
-       packageinfo=$(curl -s https://repo1.dso.mil/api/v4/projects/${projid}/releases/${version})
-       if [[ -z "${packageinfo}" || $(echo $packageinfo | jq -r '.message') == "404 Not Found" ]] ; then
-         echo "No release found for ${package}@${version}" 1>&2
-         errors_list+=("$package@$version")
-         continue
-       fi
-       repoimagelist=$(echo $packageinfo | jq -r '.assets.links[] | select(.name=="images.txt").url') && export EXIT_STATUS=$? || export EXIT_STATUS=$?
-       if [ -z "${repoimagelist}" -o  ${EXIT_STATUS} -ne 0 ] ; then
-         echo "No image list file found in the release for repo ${package}" 1>&2
-         echo "Repo package info = $packageinfo" 1>&2
-         errors_list+=("$package@$version")
-         continue
-       fi
-       images=$(curl -s ${repoimagelist})
-       package=${package#"addons."}
+    # Curl gitlab API to get project ID
+    projid=$(curl -s https://repo1.dso.mil/api/v4/projects/${gitrepo} | jq '.id')
+    # Curl gitlab API + S3 file to get images list
+    packageinfo=$(curl -s https://repo1.dso.mil/api/v4/projects/${projid}/releases/${version})
 
-       # Generate the output in JSON format
-       header_done=0
-       for image in $images
-       do
-         if [ -n "$(grep ${image} $IMAGE_LIST)" ]
-         then
-           if [ ${header_done} == 0 ] ; then
-             echo "  ${package}: "
-             echo "    version: \"${version}\""
-             echo "    images:"
-             header_done=1
-           fi
-           echo "      - \"${image}\""
-         fi
-       done
-   done < <(yq e '(.,.addons) | ... comments="" | .[] | (path | join(".")) ' "${VALUES_FILE}") >> ${PACKAGE_IMAGE_FILE}
+    if [[ -z "${packageinfo}" || $(echo "$packageinfo" | jq -r '.message') == "404 Not Found" ]] ; then
+      echo "No release found for ${pkg}@${version}"
+      errors_list+=("$pkg@$version")
+      continue
+    fi
 
-   cat ${PACKAGE_IMAGE_FILE}
+    repoimagelist=$(echo "$packageinfo" | jq -r '.assets.links[] | select(.name=="images.txt").url') && export EXIT_STATUS=$? || export EXIT_STATUS=$?
+    if [ -z "${repoimagelist}" -o  ${EXIT_STATUS} -ne 0 ] ; then
+      echo "No image list file found in the release for repo ${pkg}"
+      echo "Repo package info = $packageinfo"
+      errors_list+=("$pkg@$version")
+      continue
+    fi
+
+    pkg=${pkg#"addons."}
+
+    # inplace edit package-image-list to add the version
+    version_path=".package-image-list.$pkg.version" \
+    version=$version \
+     yq -i 'eval(strenv(version_path)) = strenv(version)' $PACKAGE_IMAGE_FILE
+
+    # inplace edit package-image-list to add images.txt
+    images_path=".package-image-list.$pkg.images" \
+    images=$(curl -s "${repoimagelist}" | yq 'split(" ")') \
+     yq -i 'eval(strenv(images_path)) = env(images)' $PACKAGE_IMAGE_FILE
+
+  done
+
+  # double quote all strings
+  yq -i '.. style="double"' $PACKAGE_IMAGE_FILE
+
+  cat ${PACKAGE_IMAGE_FILE}
 
   if [ ${#errors_list[@]} -ne 0 ]; then
-     echo "Failed to find release artifacts for: "
-     for p in "${errors_list[@]}"; do
-       echo "- $p"
-     done
-     echo -e "\e[31m⚠️ WARNING: Failed to find release for one or more BB packages.  Validate that main/release pipelines were run successfully. See output of scripts above for details.\e[0m"
-     exit 321
-   fi
-   
-   echo -e "\e[0Ksection_end:`date +%s`:Package-Image-List\r\e[0K"
+    echo ""
+    echo "Failed to find release artifacts for: "
+    for p in "${errors_list[@]}"; do
+      echo "- $p"
+    done
+    echo ""
+    echo -e "\e[31m⚠️ WARNING: Failed to find release for one or more BB packages.  Validate that main/release pipelines were run successfully. See output of scripts above for details.\e[0m"
+    # exit 99 so that the exit code is different from 123, 0, or 1
+    exit 99
+  fi
+
+  echo -e "\e[0Ksection_end:`date +%s`:Package-Image-List\r\e[0K"
 }
 
 get_cpumem(){
