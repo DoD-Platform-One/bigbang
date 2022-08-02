@@ -380,7 +380,7 @@ if [[ "$METAL_LB" == true ]]
 then
   # create docker network for k3d cluster
   echo creating docker network for k3d cluster
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16"
+  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
 
   # create k3d cluster
   if [[ "$PRIVATE_IP" == true ]]
