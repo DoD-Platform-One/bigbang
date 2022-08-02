@@ -236,7 +236,7 @@ package:
       - stuck_or_timeout_failure
       - runner_system_failure
   allow_failure:
-    exit_codes: 321
+    exit_codes: 99
 
 release:
   stage: 🚀 release
