@@ -128,7 +128,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.14.2-bb.1"
+    tag: "1.14.2-bb.2"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -612,7 +612,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "36.2.1-bb.2"
+    tag: "39.2.1-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
