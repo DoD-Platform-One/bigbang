@@ -738,6 +738,9 @@ addons:
       groups: |
         g, Impact Level 2 Authorized, role:admin
     values:
+      sso:
+        rbac:
+          policy.default: role:admin
       controller:
         resources:
           requests:
