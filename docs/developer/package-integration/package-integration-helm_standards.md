@@ -1,6 +1,6 @@
 # Helm Package Standards
 
-This document describes the technical standards that should be in place when building a Helm chart and integrating it with BigBang
+This document describes the technical guidelines that should be in place when building a Helm chart and integrating it with BigBang. 
 
 ## Helm Package Versioning Scheme
 

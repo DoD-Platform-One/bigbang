@@ -1,5 +1,7 @@
 # Post Renderers
 
+Post rendering gives chart installers the ability to manually manipulate, configure, and/or validate rendered manifests before they are installed by Helm. 
+
 [Flux V2](https://toolkit.fluxcd.io/) provides the ability to apply kustomizations on a Helm Release after rendering using a [Post Renderer](https://toolkit.fluxcd.io/components/helm/helmreleases/#post-renderers).  This feature provides significant flexibility to the Helm objects, and allows for adjusting values inside of Helm that are not exposed explicitly as part of the values file. Each `HelmRelease` is configured with a `postRenderer` pass through:
 
 ```yaml
