@@ -148,15 +148,15 @@ def compiler(bb, tag):
             },
         )
 
-    charter_docs = glob.iglob("docs/bigbang/charter/**/*.md", recursive=True)
-    for md in charter_docs:
-        # source_md = md.replace("docs/bigbang/", "submodules/bigbang/")
-        add_frontmatter(
-            md,
-            {
-                "tags": ["charter"],
-            },
-        )
+    # charter_docs = glob.iglob("docs/bigbang/charter/**/*.md", recursive=True)
+    # for md in charter_docs:
+    #     # source_md = md.replace("docs/bigbang/", "submodules/bigbang/")
+    #     add_frontmatter(
+    #         md,
+    #         {
+    #             "tags": ["charter"],
+    #         },
+    #     )
 
     pkg_docs = glob.iglob("docs/packages/**/*.md", recursive=True)
     for md in pkg_docs:

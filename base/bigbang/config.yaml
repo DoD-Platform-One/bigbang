@@ -15,8 +15,8 @@ ignore_patterns:
 nav:
   - 🏰 Home: README.md
   - 🪙 Values: values.md
+  - 📖 Big Bang Docs: docs
   - 👥 Contributing: CONTRIBUTING.md
   - 📜 Changelog: CHANGELOG.md
   - 📦 Package Overview: Packages.md
-  - 📖 Big Bang Docs: docs
-  - 🧭 Charter: charter
+  # - 🧭 Charter: charter
