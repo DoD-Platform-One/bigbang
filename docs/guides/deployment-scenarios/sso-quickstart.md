@@ -42,9 +42,9 @@ Why 2 VMs? 2 reasons:
 ### Additional Auth Service and Keycloak documentation can be found in these locations
 
 * [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
-* [Authservice Architecture](../../../charter/packages/authservice/Architecture.md)
+* [Authservice Architecture](../../understanding-bigbang/package-architecture/authservice/Architecture.md)
 * [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)
-* [Keycloak Architecture](../../../charter/packages/keycloak/Architecture.md)
+* [Keycloak Architecture](../../understanding-bigbang/package-architecture/keycloak/Architecture.md)
 
 ## Step 1: Provision 2 Virtual Machines
 

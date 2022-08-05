@@ -16,7 +16,7 @@ To test Airgap BigBang on k3d
   sudo apt install -y net-tools
   ```
 
-- Follow [Airgap Documentation](../README.md) to install Git server and Registry.
+- Follow [Airgap Documentation](./README.md) to install Git server and Registry.
 
 - Once Git Server and Registry is up, setup k3d mirroring configuration  `registries.yaml`
 
@@ -44,7 +44,7 @@ To test Airgap BigBang on k3d
   $ k3d cluster create --image "rancher/k3s:v1.20.5-rc1-k3s1" --api-port "33989" -s 1 -a 2 -v "${HOME}/registries.yaml:/etc/rancher/k3s/registries.yaml" -v /etc/machine-id:/etc/machine-id -v "${HOME}/certs/host.k3d.internal.public.pem:/etc/ssl/certs/registry1.pem" --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$PRIVATEIP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
   ```
 
-- Block all egress with `iptables` except those going to instance IP before deploying bigbang  by running [airgap.sh](../assets/scripts/airgap-dev/airgap.sh)
+- Block all egress with `iptables` except those going to instance IP before deploying bigbang  by running [airgap.sh](../../assets/scripts/airgap-dev/airgap.sh)
 
 ```shell
 sudo ./k3d_airgap.sh
@@ -73,4 +73,4 @@ kubectl describe po test # Should fail
 kubectl delete po test
 ```
 
-- Proceed to [bigbang deployment process](../README.md#installing-big-bang)
+- Proceed to [bigbang deployment process](./README.md#installing-big-bang)

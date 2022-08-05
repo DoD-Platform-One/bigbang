@@ -75,7 +75,7 @@ All routable endpoints BigBang deploys will use the TLD of `bigbang.dev` by defa
 
 ## Secrets & Certificates
 
-Follow instructions in the [Big Bang encryption guide](./docs/encryption.md) for how to encrypt and decrypt secrets.
+Follow instructions in the [Big Bang encryption guide](./docs/understanding-bigbang/concepts/encryption.md) for how to encrypt and decrypt secrets.
 
 ## Merge requests process
 

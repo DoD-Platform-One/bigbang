@@ -28,4 +28,4 @@ Argo requires all configuration options to be embedded into the ApplicationCR.  
 
 ## Argo Is Still A Package
 
-As defined in the list of [Big Bang Packages](BigBangPackages.md), Big Bang comes deployed with Argo for use by Mission applications to continue to deploy and manage their applications.  Similarly, even though Big Bang uses Helm internally for management of Big Bang packages, Big Bang does not advocate for Helm for use by applications run on clusters with Big Bang.
+As defined in the list of [Big Bang Packages](../../../Packages.md), Big Bang comes deployed with Argo for use by Mission applications to continue to deploy and manage their applications.  Similarly, even though Big Bang uses Helm internally for management of Big Bang packages, Big Bang does not advocate for Helm for use by applications run on clusters with Big Bang.

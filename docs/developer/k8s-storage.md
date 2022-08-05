@@ -11,11 +11,11 @@ Use this data to assist in your CSI decision. However, when using a cloud provid
 | Longhorn v1.1.0 | **X**         | Apache License 2.0                                                                               |             | **X**                                                         | **X** - [Docs](https://longhorn.io/docs/1.1.0/advanced-resources/deploy/airgap/)                                                                   | Yes, uses host storage |
 | OpenEBS (jiva)  | **X**         | Apache License 2.0                                                                               |             | **X** **[Alpha](https://docs.openebs.io/docs/next/rwm.html)** | Manual Work Required                                                                                                                               | Yes, uses host storage |
 | Rook-Ceph       | **X**         | Rook - Apache License 2.0. Ceph - dual licensed under the LGPL version 2.1 or 3.0                |             | **X**                                                         | Manual Work Required                                                                                                                               | Yes, uses host storage |
-| Portworx        | **X**         | Tiered License - [See website](https://docs.portworx.com/reference/knowledge-base/px-licensing/) |             | **X**                                                         | **X** - [Docs](https://docs.portworx.com/portworx-install-with-kubernetes/operate-and-maintain-on-kubernetes/pxcentral-onprem/install/px-central/) | Yes, uses host storage |
+| Portworx        | **X**         | Tiered License - [See website](https://docs.portworx.com/reference/licensing/) |             | **X**                                                         | **X** - [Docs](https://docs.portworx.com/install-portworx/on-premises/airgapped/airgap-install/) | Yes, uses host storage |
 
 ## Benchmark Results
 
-Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example](./assets/configs/k8s-storage/benchmark.yaml)
+Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example](../assets/configs/k8s-storage/benchmark.yaml)
 
 | Product         | Random Read/Write IOPS                | Average Latency (usec) | Sequential Read/Write | Mixed Random Read/Write IOPS |
 | --------------- | ------------------------------------- | ---------------------- | --------------------- | ---------------------------- |

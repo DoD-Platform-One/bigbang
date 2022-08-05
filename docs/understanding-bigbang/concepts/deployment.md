@@ -40,13 +40,13 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
 
 All changes to the Big Bang cluster should be made through Git.  After changes are pushed, Big Bang will automatically reconcile the difference with the cluster.
 
-> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the [sync.sh](../scripts/sync.sh) script.
+> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the [sync.sh](../../..//scripts/sync.sh) script.
 
 Changes to values can be tested in each environment using the named folders to override values and/or point to specific repo branches or tags.  After testing, the changes can be placed into the `./base` folder if the change is shared between all environments.
 
 ## Monitor
 
-The following commands will help you monitor the progress of the Big Bang deployment.  Review the [flowchart](./overview.md#Diagram), if needed, to understand the progression.  Use the [Troubleshooting Guide](./troubleshooting.md) if you have failures.
+The following commands will help you monitor the progress of the Big Bang deployment.  Review the [flowchart](./glossary.md#Diagram), if needed, to understand the progression.  Use the [Troubleshooting Guide](./troubleshooting.md) if you have failures.
 
 1. Verify Flux is running
 

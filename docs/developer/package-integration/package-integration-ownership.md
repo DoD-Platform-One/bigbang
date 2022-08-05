@@ -3,7 +3,7 @@
 Package owners will be responsible for the following:
 
 * Cutting Releases for the packages and getting into BigBang
-* Implementing Package requirements outlined by the [package integration guide](../package-integration.md)
+* Implementing Package requirements outlined by the [package integration guide](../README.md)
 * Reviewing Merge Requests into the Package Repository
 * Reviewing Merge Request CI/CD pipeline execution results to ensure that there are no regressions in conformance tests nor package cypress tests.  
 * Tracking upstream changes to packages including new features, architectures, dependencies.

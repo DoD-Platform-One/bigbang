@@ -2,6 +2,8 @@
 
 Big Bang is a declarative, continuous delivery tool for deploying DoD hardened and approved packages into a Kubernetes cluster.
 
+> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to https://repo1.dso.mil/platform-one/big-bang/bigbang_
+
 ## Usage & Scope
 
 Big Bang's scope is to provide publicly available installation manifests for:
@@ -25,7 +27,7 @@ Additional information can be found in [Big Bang Docs](./docs/README.md).
 
 There are 3 main ways to contribute to Big Bang: 
 - [Submit new package proposals](https://repo1.dso.mil/platform-one/bbtoc/-/issues/new?issue%5Bmilestone_id%5D=)
-  - Please review the [package integration guide](/docs/developer/package-integration.md) if you are interested in submitting a new package
+  - Please review the [package integration guide](./docs/developer/package-integration/README.md) if you are interested in submitting a new package
   - A shepherd will be assigned to the project to create a repo in the [BB sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)
 - [Contribute to open-source projects under the Big Bang Technical Oversight Committee (bbtoc)](https://repo1.dso.mil/platform-one/bbtoc/-/blob/master/CONTRIBUTING.md)
 - [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues)
@@ -39,7 +41,7 @@ There are 3 main ways to contribute to Big Bang:
 Big Bang Documentation is located in the following locations: 
 
 - [Developer Contribution Documentation](./docs/developer)
-- [Key Big Bang Concept Overviews](./docs/understanding_bigbang)
+- [Key Big Bang Concept Overviews](./docs/understanding-bigbang)
 - [User Guides for Big Bang](./docs/guides/)
 - [Big Bang Prerequisites](./docs/prerequisites/)
-- [Big Bang Example Configurations](./docs/example_configs/)
+- [Big Bang Example Configurations](./docs/assets/configs/example/)
