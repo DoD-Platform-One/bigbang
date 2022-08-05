@@ -89,7 +89,7 @@ backups/nexus-ns-backup/velero-backup.json
 ```
 
 Also ensure an EBS volume snapshot has been created and the Snapshot status is `Completed`.  
-![volume-snapshot](../assets/imgs/guides/volume-snapshot.png)
+![volume-snapshot](../../assets/imgs/guides/volume-snapshot.png)
 
 ## Restoring From Backup
 
@@ -131,7 +131,7 @@ Also ensure an EBS volume snapshot has been created and the Snapshot status is `
     docker run -p 8000:8000 nexus-docker.bigbang.dev/repository/nexus-docker/doom-dos:latest
     ```
 
-    ![doom](../assets/imgs/guides/doom.png "doom")
+    ![doom](../../assets/imgs/guides/doom.png "doom")
 
 ## Appendix
 

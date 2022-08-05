@@ -4,7 +4,7 @@
 
 ## Prometheus Metrics Data Flow Diagram
 
-![metrics_data_flow_diagram.app.diagrams.net.png](../assets/imgs/understanding-bigbang/metrics-data-flow-diagram.app.diagrams.net.png)
+![metrics_data_flow_diagram.app.diagrams.net.png](../../assets/imgs/understanding-bigbang/metrics-data-flow-diagram.app.diagrams.net.png)
 
 | Line Number | Protocol | Port | Description |
 | --- |  --- | --- | --- |

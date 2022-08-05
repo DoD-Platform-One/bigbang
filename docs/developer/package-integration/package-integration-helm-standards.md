@@ -12,7 +12,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 
 ## Big Bang Values File
 
-* In the values.yaml file [here](../chart/values.yaml), each package should have its own region at `.package_name` if its in Core or `.addons.package_name`.
+* In the values.yaml file [here](../../../chart/values.yaml), each package should have its own region at `.package_name` if its in Core or `.addons.package_name`.
 * User Interface:
   * If there exists need for ingress traffic into the package, the package should create a VirtualService conditional on the existence of `istio.enabled` being set to true.  This value should default to false.  The BigBang chart should set this true for all packages
   * There should be a region under the package for configuring SSO that looks like this when there are multiple packages

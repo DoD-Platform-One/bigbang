@@ -12,7 +12,7 @@ Big Bang is a declarative, continuous delivery tool for core DoD hardened and ap
 
 ### Big Bang Components
 
-Big Bang is made of several components that operate together.  These include a [base Kustomize](../base/), a [Helm chart](../chart), [packages](../chart/templates), and an [environment](https://repo1.dso.mil/platform-one/big-bang/customers/bigbang).  The environment and base Kustomize are used together to deploy the Big Bang configuration and Helm chart.  The Helm chart is then used to facilitate deployment of the packages.
+Big Bang is made of several components that operate together.  These include a [base Kustomize](../../../base/), a [Helm chart](../../../chart), [packages](../../../chart/templates), and an [environment](https://repo1.dso.mil/platform-one/big-bang/customers/bigbang).  The environment and base Kustomize are used together to deploy the Big Bang configuration and Helm chart.  The Helm chart is then used to facilitate deployment of the packages.
 
 ### Flux v2
 
@@ -65,7 +65,7 @@ The diagram below shows a typical deployment of Big Bang into a Kubernetes clust
 ### Configuration
 
 1. The user must [setup an encryption key pair](./encryption.md) for SOPS and store the private key securely (e.g. KMS).  This should **NOT** be stored in Git.
-1. The user should then [configure Big Bang](./configuration.md) values and secrets for the targeted Kubernetes cluster.
+1. The user should then [configure Big Bang](../configuration/configuration.md) values and secrets for the targeted Kubernetes cluster.
 1. All secrets should be encrypted with SOPS to protect them.
 1. Once all of the configuration has been completed, it must be pushed to a Git repository.
 

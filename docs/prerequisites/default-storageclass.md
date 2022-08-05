@@ -70,7 +70,7 @@ allowVolumeExpansion: true
 
 ## Bare Metal/Cloud Agnostic Store Class Notes
 
-* The BigBang Product team put together a [Comparison Matrix of a few Cloud Agnostic Storage Class offerings](../../k8s-storage.md#kubernetes-storage-options)
+* The BigBang Product team put together a [Comparison Matrix of a few Cloud Agnostic Storage Class offerings](../developer/k8s-storage.md#kubernetes-storage-options)
 * Note: No storage class specific container images exist in IronBank at this time.
   * Approved IronBank Images will show up in <https://registry1.dso.mil>
   * <https://repo1.dso.mil/dsop> can be used to check status of IronBank images.

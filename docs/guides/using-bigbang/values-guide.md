@@ -102,4 +102,4 @@ kiali:
 
 In some cases customers run into limitations that even values passthrough cannot solve. In cases where the package chart/template file itself does not provide a value for configuration you can make use of Post Renderers.
 
-These are an advanced capability within Helm and Flux that allows end users to make modifications to the chart after it has been rendered. For more information and specific on how to leverage this capability see [this document](../../postrenderers.md).
+These are an advanced capability within Helm and Flux that allows end users to make modifications to the chart after it has been rendered. For more information and specific on how to leverage this capability see [this document](../../understanding-bigbang/configuration/postrenderers.md).

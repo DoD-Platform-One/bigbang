@@ -1,7 +1,7 @@
 # Gitlab Backups and Restores
 
 ## Gitlab Helm Chart Configuration
-1. Follow the `Backup and rename gitlab-rails-secret` task within the [Production document](../production.md).
+1. Follow the `Backup and rename gitlab-rails-secret` task within the [Production document](../../understanding-bigbang/configuration/sample-prod-config.md).
 1. Fill in our externalStorage values, specifically `addons.gitlab.objectStorage.iamProfile` or both `.Values.addons.gitlab.objectStorage.accessKey` & `.Values.addons.gitlab.objectStorage.accessSecret` along with `.Values.addons.gitlab.objectStorage.bucketPrefix` or you can override in the name for your own bucket eg:
 ```yaml
 addons:

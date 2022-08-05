@@ -59,7 +59,7 @@
 ## Prerequisites
 
 * Prerequisites vary depending on deployment scenario
-* [Prerequisites can be found here](../guides/prerequisites)
+* [Prerequisites can be found here](../prerequisites/)
 
 ## Additional Useful Background Contextual Information
 
