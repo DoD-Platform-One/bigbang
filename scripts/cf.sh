@@ -2,11 +2,6 @@
 
 set -eu
 
-echo
-echo "Python version is $PYTHON_VERSION"
-echo "Node version is $NODE_VERSION"
-echo
-
 npm i -g prettier
 
 ./scripts/init-submodules.sh 
