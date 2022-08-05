@@ -11,6 +11,11 @@ Big Bang contains and uses a continuous deployment tool to deploy packages using
 
 > Throughout this document, we will be setting up an application called `podinfo` as a demonstration.
 
+
+## Branching
+
+Each package will have a default branch of `main`.  Immutable tags will be used to identify releases and will follow a semver versioning scheme. 
+
 ## Package Pipeline
 
 Pipelines provide rapid feedback to changes in our Helm chart as we develop and should be put in place as early as possible.  Big Bang has a few different pipelines that can be used for packages.

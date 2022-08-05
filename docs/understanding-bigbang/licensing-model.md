@@ -1,4 +1,4 @@
-# BigBang Licensing Expectations
+# BigBang Licensing Model Overview
 
 While BigBang is open source and free to use, the same cannot be said of its components. The licensing requirements of components requires a nuanced explanation. The intent of this document is to be a self service resource to help consumers of BigBang make an informed decision regarding licenses they may need to successfully deploy an ATO'able DevSecOps Platform using BigBang.
 
