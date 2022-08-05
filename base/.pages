@@ -1,6 +1,8 @@
 nav:
   - 🏰 Home: index.md
   - 💣 Big Bang: bigbang
+  - 📖 Big Bang Docs: bigbang/docs/
+  - 🪙 Big Bang Values: bigbang/values
   - 📦 Packages: packages
   - 📋 Release Notes: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases
   - ✨ About: about.md

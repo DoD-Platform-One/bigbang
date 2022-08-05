@@ -112,7 +112,8 @@ def compiler(bb, tag):
     with open(Path().cwd().joinpath("docs/.pages"), "r") as f:
         dot_pages = yaml.load(f)
 
-    dot_pages["nav"][3]["📋 Release Notes"] += "/" + tag
+    # from base/.pages
+    dot_pages["nav"][5]["📋 Release Notes"] += "/" + tag
 
     with open(Path().cwd().joinpath("docs/.pages"), "w") as f:
         yaml.dump(dot_pages, f)

@@ -10,6 +10,6 @@ nav:
     - Troubleshooting: troubleshooting.md
     - Guides: guides
     - Developing: developer
-    - Understanding: understanding_bigbang
+    - Understanding: understanding-bigbang
     - Airgap: airgap
     - ...
