@@ -58,3 +58,10 @@
   margin-right: auto;
   width: auto;
 }
+
+.p1-footer-logo {
+  height: 4.5rem;
+  width: 10rem;
+  display: inline-block;
+  text-align: center;
+}
