@@ -104,6 +104,8 @@ const config: PlaywrightTestConfig = {
   webServer: {
     command: "python3 -m http.server --directory site &>/dev/null",
     port: 8000,
+    timeout: 10 * 1000,
+    reuseExistingServer: !process.env.CI,
   },
 };
 
