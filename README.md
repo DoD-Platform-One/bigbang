@@ -2,93 +2,121 @@
 
 This repository provides Gitlab CI templates and additional tools / dependencies to test Big Bang and its individual packages.
 
+&nbsp;
+
+## Setting Up Your Project with Pipelines
+
+Please refer to this Big Bang developer [doc](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/developer/package-integration/pipeline.md) to enable and configure pipelines for your Big Bang project
+
+&nbsp;
+
 ## Package CI Pipeline Infrastructure
 
-The package pipeline CI infrastructure files included in this repo can be used within a gitlab CI pipeline
+The package pipeline CI infrastructure files included in this repo can be used within a GitLab CI pipeline
 (via a gitlab runner) for any Big Bang package.
 
 Two or more stages will be executed in the pipeline, which are detailed below.
 
+&nbsp;
+
 ### Conformance Tests (linting)
 
-This stage executes the open source tool "conftest" to execute a set of commands and
-application specific validation on the package. The common conformance policies are located in the "policies"
-directory of this repository. These are Rego based policies. Additionally package specific policies will be
+This stage uses a `helm` plugin called [conftest](https://github.com/instrumenta/helm-conftest) to execute a set of commands and application specific validation on the package.
+
+The common conformance policies are located in the "policies"
+directory of this repository. These are Rego based policies.
+
+Additionally, package specific policies will be
 executed if there is a directory in the package repo named "policy".
+
+&nbsp;
 
 ### Functional Testing
 
-Functional smoke tests are executed via Helm tests. This repo provides a Helm library (`bb-test-lib` folder) which can
-be used to simplify implementation of Helm tests in your package. Currently two testing types are supported through the
-library, scripts (for CLI testing - think bash, python, etc) and cypress (for UI testing). These two test types are
-described below along with examples of how to implement them. NOTE: If your package can be interacted via a UI and a CLI
-both test types should be included. By default UI tests run before CLI tests the way the library is written, but this
+Functional smoke tests are executed via [Helm tests](https://helm.sh/docs/topics/chart_tests/).
+
+We use an internally developed [Helm library chart](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon) which can
+be used to simplify implementation of Helm tests in your package.
+
+Currently two testing types are supported in the library:
+
+- Script tests (Bash, Python, etc)
+
+- [Cypress](https://www.cypress.io/) for UI testing. 
+
+These two test types are described below along with examples of how to implement them. 
+
+NOTE: If your package can be interacted via a UI and a CLI
+both test types should be included. 
+
+By default, UI tests execute before CLI tests, but this
 can be overridden as described below.
 
-Tests will automatically be run by the pipeline, but if you wish to run them locally you will need to install the
-package with the test values, then run `helm test {{HELMRELEASE_NAME}} -n {{HELMRELEASE_NAMESPACE}}` replacing the
-variables with the proper values for your package (you can check the helmrelease name and namespace with `helm ls -A`).
+Tests will automatically be run by the pipeline, but if you wish to run them locally, you can follow the steps listed below:
 
-#### Including the gluon helm test library
+- Create a Kubernetes cluster. For quick, local development, you can use tools such as [kind](https://kind.sigs.k8s.io/) or [k3d](https://k3d.io)
 
-These pipelines run helm tests found in each package by means of the bigbang [gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart.
+- From the root of your package repository, install your package with your test values. This will install your package in the `default` namespace of your Kubernetes cluster
 
-To include the gluon helm test library, you need to add a dependency to the packages Chart.yaml, with the latest version
-(latest version can be seen in [gluon/chart/Chart.yaml](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)):
+```bash
+helm install my-release chart/ --values tests/test-values.yaml
+```
+
+- Execute the Helm tests
+
+```bash
+helm test my-release
+```
+
+#### Including the Gluon Helm Test Library in Your Package
+
+Big Bang pipelines run helm tests found in each package by means of the Big Bang [gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart
+
+To include the gluon helm test library, you need to add a dependency to your package's Chart.yaml file
+
+The latest version can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)
 
 ```yaml
 dependencies:
   - name: gluon
-    version: "x.x.x" # See https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/bb-test-lib/Chart.yaml#L18 for latest
-    repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon/gluon"
-```
+    version: "x.x.x"
+    repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
+``` 
 
-Then verify your helm version is up to date (OCI features are confirmed working on 3.5.2+). After that run:
+The gluon chart is packaged and released as an [OCI artifact](https://helm.sh/docs/topics/registries/)
+
+We recommend using `helm` v3.8.0 or newer to eliminiate potential issues with OCI artifacts
 
 ```bash
-export HELM_EXPERIMENTAL_OCI=1
 helm dependency update chart
 ```
 
-The gluon will now be pulled into the `chart/charts` folder as an archive.
+The gluon chart will now be pulled into the `chart/charts` folder as an archive.
 
-**For more information on how to use this library see the [README](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
+**For more information on how to use this library see this [doc](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
+
+&nbsp;
 
 ### Release CI
 
-When you tag a new release (must be a protected tag) the pipeline will run two additional stages, package (bundles
-artifacts for docker images and git repos, uploads to S3) and release (hits the Gitlab API to publish a release with
-artifact links). The artifacts are designed to be used for airgap installations. If you want to test out these stages
-to verify changes or view the release CI process without creating a tag, make an MR and add the `test-ci::release`
-label. The pipeline will run both stages, uploading to a "timed-disposal" S3 bucket and "dry-running" a release.
+When you tag a new release (must be a protected tag) the pipeline will run two additional stages:
 
-### Using the infrastructure in your package CI gitlab pipeline
+- package (bundles artifacts for docker images and git repos, uploads to S3)
 
-The Package Pipeline template is used to execute a conformance (linting) stage and a functional test phase for
-a package (application). This template (located in /pipelines/bigbang-package.yaml) is intended to be included in the
-gitlab-ci.yml file of a package repo. The following code example can be placed in the gitlab-ci.yml file to include
-the package pipeline template.
+- release (hits the Gitlab API to publish a release with
+artifact links)
 
-All variables are optional, but can provide additional flexibility for more complicated packages.
+The artifacts are designed to be used for airgap installations.
 
-Make sure to also update the ref to the tagged version of the pipeline you want to use. Latest versions and changes can
-always be found in the [CHANGELOG](./CHANGELOG.md).
+If you want to test out these stages
+to verify changes or view the release CI process without creating a tag, create a merge request and add the `test-ci::release`
+label.
 
-```yaml
-include:
-  - project: "platform-one/big-bang/pipeline-templates/pipeline-templates"
-    ref: "master"
-    file: "/pipelines/bigbang-package.yaml"
-# Optional
-variables:
-  RELEASE_NAME: "Pick a name for the package to release as, default is the repo name"
-  PACKAGE_NAMESPACE: "Install package to a specific namespace, default is the repo name"
-  PACKAGE_HELM_NAME: "Install via Helm with specific name, default is the repo name"
-# Example:
-# RELEASE_NAME: "Elasticsearch & Kibana"
-# PACKAGE_NAMESPACE: "logging"
-# PACKAGE_HELM_NAME: "logging-ek"
-```
+The pipeline will run both stages, uploading to a "timed-disposal" S3 bucket and "dry-running" a release
+
+&nbsp;
+
+### Dependencies
 
 If the package has any dependencies that must be installed first (i.e. an operator) you will need to create a file
 in the package repo - `tests/dependencies.yaml` - with the following contents (note optional values):
@@ -122,12 +150,9 @@ opa:
 ```
 
 If the package makes use of an operator and creates custom resources it is best to create a custom wait script for the
-pipeline to run. This script should be added under `tests/wait.sh` and follow this format below. You will need to check
-what sort of health status is available in the k8s object and update the jsonpath and if check accordingly.
-The timeElapsed portion provides a timeout after 10 minutes. You should only need to update the two commented lines
-below in most cases. Some projects may have more than one custom resource
-(i.e. Elasticsearch has both elasticsearch and kibana) and in these situations you can add another resourceHealth line
-and change the if check to verify both.
+pipeline to run.
+
+This script should be added under `tests/wait.sh` and follow this format below:
 
 ```bash
 #!/bin/sh
@@ -146,75 +171,79 @@ wait_project() {
    done
 }
 ```
+
+You will need to check what sort of health status is available in the k8s object and update the jsonpath to check accordingly.
+
+The timeElapsed portion provides a timeout after 10 minutes. In most cases, you should only need to update the two commented lines
+in the script above. 
+
+Some projects may have more than one custom resource (i.e. Elasticsearch has both elasticsearch and kibana) and in these situations you can add another `resourceHealth` line
+and change the `if` check to verify both.
+
+&nbsp;
+
 ## Sandbox Pipeline Template
 
 The sandbox pipeline template is a simple pipeline that allows the pipeline to run to completion even if there are
 failures at any stage of the pipeline.   This allows for quicker debugging of issues with new packages.
 
-# Testing changes to this repo
+&nbsp;
 
-#### Testing the package CI
+# Testing Changes To The Pipelines
 
-When testing changes to pipeline-templates and want to test the package CI, you will need a package to run through pipeline-templates and serve as a test subject. This is done by creating a .gitlab-ci.yml in the root directory of the project you plan to use as follows.
+#### Testing A Package With Your CI Contributions
 
-```
+To test your package against any pipeline contributions you've made, you will need to reach out to the administrator of your project repository to edit the GitLab CI/CD settings to point to your branch.
+
+&nbsp;
+
+#### Testing Big Bang With Your CI Contributions
+
+To test Big Bang against any pipeline contributions you've made, you can simply configure the `.gitlab-ci.yml` as shown below:
+
+```yaml
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    file: '/pipelines/bigbang-package.yaml' 
-    ref: <your branch of pipeline-templates>
-variables:
-  PIPELINE_REPO_BRANCH: <your branch of pipeline-templates>
-  PACKAGE_NAMESPACE: <namespace for the test package>
-  PACKAGE_HELM_NAME: <helm name for the test package>
-```
-
-The `PIPELINE_REPO_BRANCH` variable will need to be set to your test branch in addition to the `ref:` line as it's used within pipeline-templates's shell scripts.
-
-The PACKAGE_NAMESPACE and PACKAGE_HELM_NAME for the test subject package are often the same, but sometimes the name of the package will install itself into a different namespace.
-
-**Note:** By default, gitlab uses .gitlab-ci.yml in the project's root as its CI/CD configuration file, but it can be pointed to another location in the repo config as the gitlab docs mention [here](https://docs.gitlab.com/ee/ci/pipelines/settings.html#specify-a-custom-cicd-configuration-file). Your repo admin may have pointed it elsewhere, and in this case it may be necessary to have one more repo with the default CI/CD config file location where you can copy the test subject package specifically to test your changes to pipeline-templates.
-
-#### Testing the bigbang CI
-
-If you are testing it against a full bigbang deployment and not the individual package CI, your .gitlab-ci.yml file will look like this:
-
-```
-include:
-  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref:  <your branch of pipeline-templates>
+    ref: <my_branch>
     file: '/pipelines/bigbang.yaml'
 variables:
-  PIPELINE_REPO_BRANCH: <your branch of pipeline-templates>
+  PIPELINE_REPO_BRANCH: <my_branch>
 ```
+
+&nbsp;
 
 ## MR Title Keywords
 
-Keywords can be put in the titles of Merge Requests to easily adjust the pipeline behavior without a commit. Keywords supported are:
+To easily adjust the pipeline behavior without a commit, keywords can be placed in the title of Merge Requests. 
 
-`DEBUG`  Enables debug mode. This will set -x in shell scripts so each command is printed before it runs, and dumps information such as the networking configuration (virtual services, gateways, dns, /etc/hosts files), cluster information (kustomize, cluster resources, memory and cpu usage), and dumps the cluster logs.
+Supported keywords:
 
-`SKIP UPGRADE`  Skips the upgrade test stage of a pipeline.
+`DEBUG` -- Enables debug mode. This will set -x in shell scripts so each command is printed before it runs, and dumps information such as the networking configuration (virtual services, gateways, dns, /etc/hosts files), cluster information (kustomize, cluster resources, memory and cpu usage), and dumps the cluster logs.
 
-`SKIP UPDATE CHECK` Skips the check in the configuration validation stage to see if the chart version was incremented.
+`SKIP UPGRADE` -- Skips the upgrade test stage of a pipeline.
 
-`SKIP INTEGRATION` Skips the integration stage which is used in the third-party and sandbox pipelines.
+`SKIP UPDATE CHECK` -- Skips the check in the configuration validation stage to see if the chart version was incremented.
+
+`SKIP INTEGRATION` -- Skips the integration stage which is used in the third-party and sandbox pipelines.
+
+&nbsp;
 
 ### MR Labels
 
 Similar to the MR title keywords described above, gitlab labels can be added to Merge Requests to adjust CI pipeline behavior.
 
 ##### Labels for bigbang MRs
-`all-packages` Enables all bigbang packages. This will typically cause the cluster to run slower due to the increased resource usage, so it can be helpful in making sure any timeouts you've set aren't too short or check for any conflicts between packages, etc.
+`all-packages` -- Enables all bigbang packages. This will typically cause the cluster to run slower due to the increased resource usage, so it can be helpful in making sure any timeouts you've set aren't too short or check for any conflicts between packages, etc.
 
-`<package-name>` Adding a package name as a label will enable that package.
+`<package-name>` -- Adding a package name as a label will enable that package.
 
-`test-ci::infra` Add stages to provision and destroy the cloud infrastructure where the tests will run.
+`test-ci::infra` -- Add stages to provision and destroy the cloud infrastructure where the tests will run.
 
 ##### Labels for bigbang and package MRs
-`test-ci::release` Test the release CI, which includes the package and release stages.
+`test-ci::release` -- Test the release CI, which includes the package and release stages.
 
-`disable-ci` Disables all pipeline runs.
+`disable-ci` -- Disables all pipeline runs.
 
-`kind::docs` For MRs with only document changes. Won't run any pipelines.
+`kind::docs` -- For MRs with only document changes. Won't run any pipelines.
 
-`skip-bb-mr` Will skip the auto-creation of a merge request into bigbang.
+`skip-bb-mr` -- Will skip the auto-creation of a merge request into bigbang.
