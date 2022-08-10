@@ -4,11 +4,11 @@ set -eu
 
 npm i -g prettier
 
-./scripts/init-submodules.sh 
+./scripts/init-submodules.sh
 
-pip3 install poetry 
+pip3 install poetry
 
-poetry config virtualenvs.in-project true 
+poetry config virtualenvs.in-project true
 
 poetry install --no-dev
 

@@ -291,7 +291,9 @@ def compile(last_x_tags, clean, outdir, dev):
 
     if clean:
         cleanup()
-        sp.run(["git", "submodule", "update", "--init", "--recursive"], capture_output=True)
+        sp.run(
+            ["git", "submodule", "update", "--init", "--recursive"], capture_output=True
+        )
 
 
 cli.add_command(pkgs)

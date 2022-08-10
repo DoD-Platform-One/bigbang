@@ -7,7 +7,7 @@ pkg_name=$1
 mkdir base/packages/"$pkg_name"
 touch base/packages/"$pkg_name"/config.yaml
 
-cat <<EOF > base/packages/"$pkg_name"/config.yaml
+cat <<EOF >base/packages/"$pkg_name"/config.yaml
 
 source: submodules/$pkg_name
 
