@@ -196,7 +196,7 @@ def compiler(bb, tag):
     # patch packages nav
     with open("docs/packages/.pages", "w") as f:
         f.write("nav:\n  - Home: index.md")
-        pkg_dirs = glob.iglob("docs/packages/*/")
+        pkg_dirs = sorted(glob.iglob("docs/packages/*/"))
         for dir in pkg_dirs:
             name = dir.split("/")[2]
             f.write(f"\n  - {name}: {name}")
