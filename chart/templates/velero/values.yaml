@@ -77,7 +77,7 @@ initContainers:
 {{- end }}
 {{- if eq . "csi" }}
   - name: velero-plugin-for-csi
-    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.1.2
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.3.0
     imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
