@@ -5,20 +5,6 @@ on:
   pull_request:
     branches: ["main"]
 jobs:
-  build-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: "3.9"
-      - uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-      - name: Run build script
-        run: |
-          ./scripts/vercel.sh
-
   run-tests:
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +20,9 @@ jobs:
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Run your tests
-        run: npm test
+        run: |
+          ./scripts/vercel.sh
+          npm test
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
