@@ -1,9 +1,9 @@
 name: Playwright e2e Tests
 on:
   push:
-    branches: [$default-branch]
+    branches: ["main"]
   pull_request:
-    branches: [$default-branch]
+    branches: ["main"]
 jobs:
   build-docs:
     runs-on: ubuntu-latest
