@@ -101,12 +101,12 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: "python3 -m http.server --directory site &>/dev/null",
-    port: 8000,
-    timeout: 10 * 1000,
-    reuseExistingServer: !process.env.CI,
-  },
+  // webServer: {
+  //   command: "python3 -m http.server --directory site &>/dev/null",
+  //   port: 8000,
+  //   timeout: 10 * 1000,
+  //   reuseExistingServer: !process.env.CI,
+  // },
 };
 
 export default config;

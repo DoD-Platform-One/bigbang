@@ -22,7 +22,9 @@ jobs:
       - name: Run your tests
         run: |
           ./scripts/vercel.sh
+          python3 -m http.server --directory site &>/dev/null &
           npm test
+          kill %1
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v2
