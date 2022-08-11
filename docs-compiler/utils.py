@@ -42,7 +42,7 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
         content = f.read()
         values_tables = re.findall(r"## Values(.*?)## Contributing", content, re.DOTALL)
         if len(values_tables) == 0:
-            print(f":warning:  No values table found in {from_readme}")
+            print(f"WARNING  -  No values table found in {from_readme}")
             shutil.copy2(from_readme, to_readme)
             return
 

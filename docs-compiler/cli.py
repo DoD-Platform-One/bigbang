@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 import tabulate
-from git import Repo
+from git import Repo, GitCommandError
 from ruamel.yaml import YAML
 
 from .repo import BigBangRepo, SubmoduleRepo
@@ -233,18 +233,34 @@ def postflight():
 
 @click.command()
 @click.option("-l", "--last-x-tags", default=1, type=click.IntRange(1, 9, clamp=True))
+@click.option("--pre-release", is_flag=True)
 @click.option("-c", "--clean", is_flag=True)
 @click.option("-o", "--outdir", default="site", type=click.STRING)
 @click.option("--no-build", is_flag=True)
 @click.option("-d", "--dev", is_flag=True)
-def compile(last_x_tags, clean, outdir, no_build, dev):
+def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
     bb = BigBangRepo()
     tags = bb.get_tags()
     tags_to_compile = tags[:last_x_tags]
     tags_to_compile.reverse()
+    setup()
+
+    if pre_release:
+        latest_release_tag = tags_to_compile[0]
+        next_release_tag_x = (
+            "release-1." + str(int(latest_release_tag.split(".")[1]) + 1) + ".x"
+        )
+        tags_to_compile = [next_release_tag_x]
+        try:
+            bb.checkout(next_release_tag_x)
+        except GitCommandError as e:
+            if "did not match any file(s) known to git" in e.stderr:
+                print(
+                    f"ERROR    -  Failed to checkout ({next_release_tag_x}) on bigbang, verify you have correctly run R2-D2"
+                )
+                exit(1)
 
     if last_x_tags == 1:
-        setup()
         bb.checkout(tags_to_compile[0])
         print(f"INFO     -  Compiling docs for Big Bang version {tags_to_compile[0]}")
         preflight(bb)
