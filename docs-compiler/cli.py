@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 import tabulate
-from git import Repo, GitCommandError
+from git import GitCommandError, Repo
 from ruamel.yaml import YAML
 
 from .repo import BigBangRepo, SubmoduleRepo
@@ -288,7 +288,8 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
             postflight()
 
             shutil.move("docs", f"site/{tag}")
-            print(f"INFO     -  Documentation saved to (./docs/{tag})")
+        shutil.move("site", f"docs")
+        print(f"INFO     -  Documentation saved to (./docs/{tag})")
 
     else:
         for tag in tags_to_compile:
