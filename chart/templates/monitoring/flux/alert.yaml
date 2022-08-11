@@ -1,0 +1,19 @@
+{{- if and .Values.monitoring.enabled (dig "grafana" "enabled" true .Values.monitoring.values) }}
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Alert
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  providerRef:
+    name: grafana
+  eventSeverity: info
+  eventSources:
+    - kind: GitRepository
+      name: '*'
+      namespace: bigbang
+{{- end }}
