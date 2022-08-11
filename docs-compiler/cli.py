@@ -235,8 +235,9 @@ def postflight():
 @click.option("-l", "--last-x-tags", default=1, type=click.IntRange(1, 9, clamp=True))
 @click.option("-c", "--clean", is_flag=True)
 @click.option("-o", "--outdir", default="site", type=click.STRING)
+@click.option("--no-build", is_flag=True)
 @click.option("-d", "--dev", is_flag=True)
-def compile(last_x_tags, clean, outdir, dev):
+def compile(last_x_tags, clean, outdir, no_build, dev):
     bb = BigBangRepo()
     tags = bb.get_tags()
     tags_to_compile = tags[:last_x_tags]
@@ -250,10 +251,28 @@ def compile(last_x_tags, clean, outdir, dev):
         compiler(bb, tags_to_compile[0])
         postflight()
 
-        if dev:
+        if dev and no_build == False:
             sp.run(["mkdocs", "serve"])
+        elif no_build:
+            print(
+                "INFO     -  Documentation (./docs) ready to be built w/ `mkdocs build --clean`"
+            )
+            print("INFO     -  Documentation (./docs) can be served w/ `mkdocs serve`")
         else:
             sp.run(["mkdocs", "build", "--clean"])
+
+    elif last_x_tags > 1 and no_build:
+        shutil.rmtree("site", ignore_errors=True, onerror=None)
+        for tag in tags_to_compile:
+            setup()
+            bb.checkout(tag)
+            print(f"INFO     -  Compiling docs for Big Bang version {tag}")
+            preflight(bb)
+            compiler(bb, tag)
+            postflight()
+
+            shutil.move("docs", f"site/{tag}")
+            print(f"INFO     -  Documentation saved to (./docs/{tag})")
 
     else:
         for tag in tags_to_compile:
@@ -286,8 +305,9 @@ def compile(last_x_tags, clean, outdir, dev):
         shutil.move("build", "site")
         shutil.copy2("docs-compiler/templates/index.html", "site/index.html")
 
-    if outdir != "site":
+    if outdir != "site" and Path("site").exists():
         shutil.move("site", outdir)
+        print(f"INFO     -  Build assets located in {outdir}")
 
     if clean:
         cleanup()
