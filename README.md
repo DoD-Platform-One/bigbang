@@ -401,7 +401,7 @@ Big Bang is a declarative, continuous delivery tool for core DoD hardened and ap
 | addons.velero.enabled | bool | `false` | Toggle deployment of Velero. |
 | addons.velero.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git"` |  |
 | addons.velero.git.path | string | `"./chart"` |  |
-| addons.velero.git.tag | string | `"2.30.1-bb.0"` |  |
+| addons.velero.git.tag | string | `"2.30.1-bb.1"` |  |
 | addons.velero.flux | object | `{}` | Flux reconciliation overrides specifically for the Velero Package |
 | addons.velero.plugins | list | `[]` | Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi |
 | addons.velero.values | object | `{}` | Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml |
