@@ -1,0 +1,24 @@
+{{- if and .Values.monitoring.enabled (dig "grafana" "enabled" true .Values.monitoring.values) }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-flux
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: notification-controller
+      namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: flux-system
+    ports:
+    - port: 3000
+      protocol: TCP
+{{- end }}

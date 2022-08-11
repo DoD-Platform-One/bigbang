@@ -11,4 +11,8 @@ data:
     {{ .Files.Get "dashboards/flux/cluster.json"  | nindent 4 }}
   flux-control-plane-dashboard.json: |
     {{ .Files.Get "dashboards/flux/control-plane.json" | nindent 4 }}
+  {{- if .Values.loki.enabled }}
+  flux-logs-dashboard.json: |
+    {{ .Files.Get "dashboards/flux/logs.json" | nindent 4 }}
+  {{- end }}
 {{- end }}
