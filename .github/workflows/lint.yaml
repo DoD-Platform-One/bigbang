@@ -1,0 +1,58 @@
+name: Documentation Linting
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"  
+      - name: Build docs from last BB tag
+        run: |
+          ./scripts/vercel.sh
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install markdownlintcli2
+        run: npm install markdownlint-cli2 --global
+      - name: Run markdownlint
+        run: |
+          markdownlint-cli2-config ".github/.markdownlint-cli2.jsonc" "docs/**/*.md"
+      - name: Run Gitlab's linting scripts
+        run: |
+          # code shamelessly stolen from Gitlab's docs linting
+          # https://gitlab.com/gitlab-org/gitlab/-/blob/master/scripts/lint-doc.sh
+          echo "=> Checking for non-standard spaces..."
+          grep --extended-regexp --binary-file=without-match --recursive '[  ​]' doc/ >/dev/null 2>&1
+          if [ $? -eq 0 ]
+          then
+            echo '✖ ERROR: Non-standard spaces (NBSP, NNBSP, ZWSP) should not be used in documentation.
+                  https://docs.gitlab.com/ee/development/documentation/styleguide/index.html#spaces-between-words
+                  Replace with standard spaces:' >&2
+            # Find the spaces, then add color codes with sed to highlight each NBSP or NNBSP in the output.
+            grep --extended-regexp --binary-file=without-match --recursive --color=auto '[  ]' doc \
+                | sed -e ''/ /s//`printf "\033[0;101m \033[0m"`/'' -e ''/ /s//`printf "\033[0;101m \033[0m"`/''
+          fi
+  vale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: errata-ai/vale-action@reviewdog
+        with:
+          files: docs
+          value_vlags: "--glob='*.md'"
+        env:
+          # Required, set by GitHub actions automatically:
+          # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+
