@@ -32,29 +32,13 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: DavidAnson/markdownlint-cli2-action@v6
         with:
-          node-version: "16"
-      - name: Install markdownlintcli2
-        run: npm install markdownlint-cli2 --location=global
-      - name: Run markdownlint
-        run: |
-          markdownlint-cli2-config ".github/.markdownlint-cli2.jsonc" "docs/**/*.md"
-      - name: Run Gitlab's linting scripts
-        run: |
-          # code shamelessly stolen from Gitlab's docs linting
-          # https://gitlab.com/gitlab-org/gitlab/-/blob/master/scripts/lint-doc.sh
-          echo "=> Checking for non-standard spaces..."
-          grep --extended-regexp --binary-file=without-match --recursive '[  ​]' doc/ >/dev/null 2>&1
-          if [ $? -eq 0 ]
-          then
-            echo '✖ ERROR: Non-standard spaces (NBSP, NNBSP, ZWSP) should not be used in documentation.
-                  https://docs.gitlab.com/ee/development/documentation/styleguide/index.html#spaces-between-words
-                  Replace with standard spaces:' >&2
-            # Find the spaces, then add color codes with sed to highlight each NBSP or NNBSP in the output.
-            grep --extended-regexp --binary-file=without-match --recursive --color=auto '[  ]' doc \
-                | sed -e ''/ /s//`printf "\033[0;101m \033[0m"`/'' -e ''/ /s//`printf "\033[0;101m \033[0m"`/''
-          fi
+          command: config
+          globs: |
+            .github/.markdownlint-cli2.jsonc
+            docs/**/*.md
+        continue-on-error: true
   vale:
     runs-on: ubuntu-latest
     needs: build
