@@ -2,8 +2,18 @@ name: Playwright e2e Tests
 on:
   push:
     branches: ["main"]
+    paths:
+      - "docs-compiler/**"
+      - "base/**"
+      - "mkdocs.yml"
+      - "tests/**"
   pull_request:
     branches: ["main"]
+    paths:
+      - "docs-compiler/**"
+      - "base/**"
+      - "mkdocs.yml"
+      - "tests/**"
 jobs:
   run-tests:
     runs-on: ubuntu-latest
