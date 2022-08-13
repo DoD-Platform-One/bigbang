@@ -6,6 +6,7 @@ on:
     branches: ["main"]
 jobs:
   build:
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,6 +18,7 @@ jobs:
           ./scripts/vercel.sh
   lint:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v2
@@ -44,6 +46,7 @@ jobs:
           fi
   vale:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - uses: errata-ai/vale-action@reviewdog
