@@ -69,3 +69,23 @@
 .md-grid {
   max-width: 1920px;
 }
+
+.type-string{
+  color: var(--md-code-hl-string-color);
+}
+
+.type-bool{
+  color: var(--md-code-hl-special-color);
+}
+
+.type-object {
+  color: var(--md-code-hl-function-color);
+}
+
+.type-list {
+  color: #d9b073;
+}
+
+.type-int {
+  color: var(--md-code-hl-constant-color);
+}
