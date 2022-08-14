@@ -32,12 +32,14 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
+      - name: ls docs
+        run: ls -la docs
       - uses: DavidAnson/markdownlint-cli2-action@v6
         with:
           command: config
           globs: |
-            .github/.markdownlint-cli2.jsonc
-            docs/**/*.md
+            ".github/.markdownlint-cli2.jsonc"
+            "docs/**/*.md"
         continue-on-error: true
   vale:
     name: runner / vale
