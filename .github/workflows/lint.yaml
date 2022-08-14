@@ -44,7 +44,7 @@ jobs:
           path: docs
       - name: ls docs
         run: ls -la docs
-      - uses: DavidAnson/markdownlint-cli2-action@v6
+      - uses: DavidAnson/markdownlint-cli2-action@v7
         with:
           command: config
           globs: |
