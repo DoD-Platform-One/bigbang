@@ -48,8 +48,8 @@ jobs:
         with:
           command: config
           globs: |
-            ".github/.markdownlint-cli2.jsonc"
-            "docs/**/*.md"
+            .github/.markdownlint-cli2.jsonc
+            docs/**/*.md
         continue-on-error: true
   vale:
     name: runner / vale
