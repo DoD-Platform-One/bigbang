@@ -1,4 +1,3 @@
-from calendar import day_abbr
 import json
 import re
 import shutil
@@ -81,14 +80,16 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
                 data["language"] = "json"
                 data["Default"] = json.dumps(json.loads(data["Default"].strip("`")))
                 if data["Default"] != "{}" and data["Default"] != "[]":
-                    data["PrettyPrint"] = "\n".join(json.dumps(json.loads(data["Default"]), indent=2).split(r"\n"))
+                    data["PrettyPrint"] = "\n".join(
+                        json.dumps(json.loads(data["Default"]), indent=2).split(r"\n")
+                    )
             else:
                 data["Default"] = data["Default"].strip("`")
 
             values.append(data)
 
         values_rendered = values_template.render(values=values, title=title)
-        values_md = re.sub("\n\n\n","\n", values_rendered)
+        values_md = re.sub("\n\n\n", "\n", values_rendered)
 
         f.write(values_md)
 
