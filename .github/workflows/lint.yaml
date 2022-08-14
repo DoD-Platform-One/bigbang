@@ -28,7 +28,7 @@ jobs:
 
           poetry run bb-docs-compiler compile -l 1 --no-build
       - name: Upload docs
-        uses: actions/upload-artifact@v3.10
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: docs
           path: docs
