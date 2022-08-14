@@ -1,3 +1,4 @@
+from calendar import day_abbr
 import json
 import re
 import shutil
@@ -40,42 +41,56 @@ values_template = Template(
 def copy_helm_readme(from_readme, to_readme, to_values, title):
     with open(from_readme, "r") as f:
         content = f.read()
-        values_tables = re.findall(r"## Values(.*?)## Contributing", content, re.DOTALL)
-        if len(values_tables) == 0:
+        values_table = re.findall(r"## Values(.*?)## Contributing", content, re.DOTALL)
+        if len(values_table) == 0:
             print(f"WARNING  -  No values table found in {from_readme}")
             shutil.copy2(from_readme, to_readme)
             return
+        table = values_table[0]
 
     with open(to_readme, "w") as f:
         content = re.sub(r"^#\s.*?\n", "", content)
-        for table in values_tables:
-            content = content.replace(
-                table, "\n\nPlease see the [values](values.md) docs.\n\n"
-            )
+        content = content.replace(
+            table, "\n\nPlease see the [values](values.md) docs.\n\n"
+        )
         f.write(content)
         f.close()
 
     with open(to_values, "w") as f:
-        for table in values_tables:
-            rows = table.split("\n")[2:-2]
-            header = [ele.strip() for ele in rows[0].split("|")[1:-1]]
-            values = []
+        rows = table.splitlines()[2:-2]
+        values = []
 
-            for i, row in enumerate(rows[2:]):
-                data = dict(zip(header, [ele.strip() for ele in row.split("|")[1:-1]]))
-                data["Default"] = data["Default"].replace("`", "")
-                if data["Type"] == "list" or data["Type"] == "object":
-                    data["Default"] = json.dumps(data["Default"])
+        for i, row in enumerate(rows[2:]):
+            data = {}
+            data["language"] = "yaml"
+            data["Key"] = row.split("|")[1].strip()
+            data["Type"] = row.split("|")[2].strip()
+            data["Description"] = row.split("|")[-2].strip()
+            # handle default having | within itself
+            data["Default"] = "|".join(row.split("|")[3:-2]).strip()
+            if (
+                data["Default"].startswith("`") == False
+                or data["Default"].endswith("`") == False
+            ):
+                data["language"] = "text"
+                continue
+            if r"\n" in data["Default"]:
+                data["PrettyPrint"] = "\n".join(data["Default"].split(r"\n")).strip("`")
 
-                    if len(data["Default"]) == 4:
-                        data["Default"] = data["Default"][1:-1]
-                    data["language"] = "json"
-                else:
-                    data["language"] = "yaml"
+            if data["Type"] == "list" or data["Type"] == "object":
+                data["language"] = "json"
+                data["Default"] = json.dumps(json.loads(data["Default"].strip("`")))
+                if data["Default"] != "{}" and data["Default"] != "[]":
+                    data["PrettyPrint"] = "\n".join(json.dumps(json.loads(data["Default"]), indent=2).split(r"\n"))
+            else:
+                data["Default"] = data["Default"].strip("`")
 
-                values.append(data)
+            values.append(data)
 
-            f.write(values_template.render(values=values, title=title))
+        values_rendered = values_template.render(values=values, title=title)
+        values_md = re.sub("\n\n\n","\n", values_rendered)
+
+        f.write(values_md)
 
         f.close()
 

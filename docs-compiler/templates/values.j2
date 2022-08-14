@@ -5,13 +5,25 @@ tags:
 
 # {{ title }} `values.yaml`
 {% for data in values %}
-### {{ data["Key"] }}
+## {{ data["Key"] }}
 
-Type: {{ data["Type"] }}
+*Type:* `{{ data["Type"] }}`
 { .type-{{ data["Type"] }} }
 
 ```{{ data["language"] }} title="Default value"
 {{ data["Default"] }}
 ```
+
+{% if data["PrettyPrint"] %}
+<details>
+<summary>Default value (formatted)</summary>
+
+```
+{{ data["PrettyPrint"]|trim('"')|trim() }}
+```
+
+</details>{% endif %}
+
 {% if data["Description"] %} 
-Description: {{ data["Description"] }}{% endif %}{% endfor %}
+*Description:* {{ data["Description"] }}{% endif %}
+{% endfor %}
