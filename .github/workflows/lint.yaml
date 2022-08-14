@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: docs
-          path: docs
+          path: docs/**/*.md
   lint:
     runs-on: ubuntu-latest
     needs: build
