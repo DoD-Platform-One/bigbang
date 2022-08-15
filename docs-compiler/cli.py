@@ -231,6 +231,9 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
     tags = bb.get_tags()
     tags_to_compile = tags[:last_x_tags]
     tags_to_compile.reverse()
+    if "1.38.0" in tags_to_compile:
+        print("ERROR   - Only versions 1.39.0+ are supported via this docs generator")
+        exit(1)
     setup()
 
     ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
