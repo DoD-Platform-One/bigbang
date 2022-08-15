@@ -165,6 +165,9 @@ check_changes() {
               elif [[ "$package" == "minio/minio-operator" ]]; then
                       package="minioOperator"
                       CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "metrics-server" ]]; then
+                      package="metricsServer"
+                      CHANGED_PACKAGES+=("$package")
               else
                       CHANGED_PACKAGES+=("$package")
               fi 
@@ -1249,6 +1252,8 @@ create_bigbang_merge_request() {
         package="anchore"
     elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then 
         package="mattermostoperator"
+    elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then 
+        package="metricsServer"
     else
         package="${CI_PROJECT_NAME}"
     fi 
