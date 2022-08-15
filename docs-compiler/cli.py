@@ -1,4 +1,5 @@
 import glob
+import os
 import shutil
 import subprocess as sp
 from pathlib import Path
@@ -52,9 +53,7 @@ def tags():
 
 def setup():
     shutil.rmtree("docs", ignore_errors=True, onerror=None)
-    shutil.copytree(
-        "base", "docs", ignore=shutil.ignore_patterns("*.yaml"), dirs_exist_ok=True
-    )
+    shutil.copytree("base", "docs", dirs_exist_ok=True)
     print("INFO     -  Pulling latest from all submodules...")
     sp.run(
         ["./scripts/pull-latest.sh"],
@@ -70,47 +69,21 @@ def cleanup():
 
 def compiler(bb, tag):
     pkgs = bb.get_pkgs()
+    docs_root = Path().cwd() / "docs"
 
-    configs = glob.iglob("base/**/config.yaml", recursive=True)
+    with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
+        meta = yaml.load(f)
 
-    for fpath in configs:
-        dst_root = Path(fpath.replace("base/", "docs/").replace("/config.yaml", ""))
-
-        with open(fpath, "r") as f:
-            config = yaml.load(f)
-
-        src_root = Path().cwd().joinpath(config["source"]) or None
-
-        if src_root is None:
-            print(f"{fpath} config is missing a `source` key")
-            continue
-
-        repo = SubmoduleRepo(str(src_root).split("/")[-1])
-
-        if repo.name != "bigbang":
-            if repo.name not in pkgs:
-                # this means that we are trying to build a version of the docs that does not have this (newer) pkg
-                # skip it
-                shutil.rmtree(f"docs/{repo.name}", ignore_errors=True, onerror=None)
-                continue
-            repo.checkout(pkgs[repo.name]["tag"])
-
-        if repo.name == "bigbang":
-            config["nav"][4]["📋 Release Notes"] += "/" + tag
-
-        shutil.copytree(
-            src_root,
-            dst_root,
-            ignore=shutil.ignore_patterns(*config["ignore_patterns"]),
-            dirs_exist_ok=True,
-        )
-
-        write_awesome_pages(config, dst_root / ".pages")
-
-    shutil.copy2(
-        "submodules/bigbang/docs/packages.md",
-        "docs/packages/index.md",
-    )
+    ## bigbang section
+    bb_config = {
+        "source": meta["source"],
+        "nav": meta["nav"],
+        "include": meta["include"],
+    }
+    bb_config["nav"][4]["📋 Release Notes"] += "/" + tag
+    bb.set_compiler_config(bb_config)
+    bb.copy_files(Path().cwd() / "submodules" / "bigbang", docs_root)
+    write_awesome_pages(bb_config, docs_root / ".pages")
 
     copy_helm_readme(
         "submodules/bigbang/docs/understanding-bigbang/configuration/base-config.md",
@@ -128,6 +101,26 @@ def compiler(bb, tag):
         },
     )
 
+    pkgs_configs = meta["packages"]
+    for pkg in pkgs_configs:
+        if pkg not in pkgs:
+            # this means that we are trying to build a version of the docs that does not have this (newer) pkg
+            # skip it
+            continue
+        pkg_config = meta["packages"][pkg]
+        repo = SubmoduleRepo(pkg_config["source"].split("/")[-1])
+        repo.set_compiler_config(pkg_config)
+        dst_root = docs_root / "packages" / pkg
+        os.makedirs(dst_root)
+        src_root = Path().cwd().joinpath(pkg_config["source"])
+        repo.copy_files(src_root, dst_root)
+        write_awesome_pages(pkg_config, dst_root / ".pages")
+
+    shutil.copy2(
+        "submodules/bigbang/docs/packages.md",
+        "docs/packages/index.md",
+    )
+
     pkg_readmes = glob.iglob("docs/packages/*/README.md")
     for md in pkg_readmes:
         pkg_name = md.split("/")[2]
@@ -136,6 +129,9 @@ def compiler(bb, tag):
             f"docs/packages/{pkg_name}/README.md",
             f"docs/packages/{pkg_name}/values.md",
             pkg_name,
+        )
+        add_frontmatter(
+            f"docs/packages/{pkg_name}/values.md", {"tags": ["values", pkg_name]}
         )
 
     bb_docs = glob.iglob("docs/docs/**/*.md", recursive=True)
@@ -186,11 +182,12 @@ def compiler(bb, tag):
 
     # patch packages nav
     with open("docs/packages/.pages", "w") as f:
-        f.write("nav:\n  - Home: index.md")
-        pkg_dirs = sorted(glob.iglob("docs/packages/*/"))
-        for dir in pkg_dirs:
-            name = dir.split("/")[2]
-            f.write(f"\n  - {name}: {name}")
+        dot_pages = {}
+        dot_pages["nav"] = [{"Home":"index.md"}]
+        sorted_pkgs = sorted(meta["packages"])
+        for pkg in sorted_pkgs:
+            dot_pages["nav"].append({pkg:pkg})
+        yaml.dump(dot_pages, f)
         f.close()
     # end patch
 

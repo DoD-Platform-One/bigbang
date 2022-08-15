@@ -1,4 +1,6 @@
 from pathlib import Path
+import shutil
+from rich import print
 
 from git import GitCommandError, Repo
 from ruamel.yaml import YAML
@@ -16,6 +18,9 @@ class SubmoduleRepo:
         self.path = Path.cwd() / "submodules" / name
         self.repo = Repo(self.path)
 
+    def set_compiler_config(self, config):
+        self.config = config
+
     def pull(self):
         self.repo.git.pull()
 
@@ -29,6 +34,19 @@ class SubmoduleRepo:
 
     def get_revision_date(self, abspath):
         return self.repo.git.log(abspath, n=1, date="short", format="%ad by %cn")
+
+    def copy_files(self, src_root, dst_root):
+        paths = self.config["include"]
+        for p in paths:
+            src = Path(src_root / p)
+            if src.exists() == False:
+                print(f"[yellow]WARNING[/yellow]  - No such file or directory: '{self.name}/{p}'")
+                continue
+            dst = dst_root / p
+            if src.is_dir():
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
 
 
 class BigBangRepo(SubmoduleRepo):

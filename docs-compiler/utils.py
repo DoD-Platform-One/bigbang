@@ -47,7 +47,7 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
             print(f"WARNING  -  No values table found in {from_readme}")
             shutil.copy2(from_readme, to_readme)
             return
-        table = values_table[0]
+        table = values_tables[0]
 
     with open(to_readme, "w") as f:
         content = re.sub(r"^#\s.*?\n", "", content)
@@ -79,11 +79,13 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
                 data["PrettyPrint"] = "\n".join(data["Default"].split(r"\n")).strip("`")
 
             if data["Type"] == "list" or data["Type"] == "object":
-                data["language"] = "json"
-                data["Default"] = json.dumps(json.loads(data["Default"].strip("`")))
-                if data["Default"] != "{}" and data["Default"] != "[]":
+                data["language"] = "text"
+                data["Default"] = data["Default"].strip("`")
+                if data["Default"] != "`{}`" and data["Default"] != "`[]`":
                     data["PrettyPrint"] = "\n".join(
-                        json.dumps(json.loads(data["Default"]), indent=2).split(r"\n")
+                        json.dumps(
+                            json.loads(data["Default"]), indent=2
+                        ).split(r"\n")
                     )
             else:
                 data["Default"] = data["Default"].strip("`")
