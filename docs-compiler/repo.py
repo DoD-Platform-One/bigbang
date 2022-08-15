@@ -1,8 +1,8 @@
-from pathlib import Path
 import shutil
-from rich import print
+from pathlib import Path
 
-from git import GitCommandError, Repo
+from git import Repo
+from rich import print
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="rt")
@@ -40,7 +40,9 @@ class SubmoduleRepo:
         for p in paths:
             src = Path(src_root / p)
             if src.exists() == False:
-                print(f"[yellow]WARNING[/yellow]  - No such file or directory: '{self.name}/{p}'")
+                print(
+                    f"[yellow]WARNING[/yellow]  - No such file or directory: '{self.name}/{p}'"
+                )
                 continue
             dst = dst_root / p
             if src.is_dir():

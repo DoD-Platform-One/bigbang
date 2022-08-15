@@ -224,12 +224,34 @@ def postflight():
 
 
 @click.command()
-@click.option("-l", "--last-x-tags", default=1, type=click.IntRange(1, 9, clamp=True))
-@click.option("--pre-release", is_flag=True)
-@click.option("-c", "--clean", is_flag=True)
-@click.option("-o", "--outdir", default="site", type=click.STRING)
-@click.option("--no-build", is_flag=True)
-@click.option("-d", "--dev", is_flag=True)
+@click.option(
+    "-l",
+    "--last-x-tags",
+    help="Build for last x Big Bang tags",
+    default=1,
+    type=click.IntRange(1, 9, clamp=True),
+)
+@click.option(
+    "--pre-release",
+    help="Build for `release-1.X.0` (only for release engineering)",
+    is_flag=True,
+)
+@click.option(
+    "-c", "--clean", help="Destroy + reset resources after build", is_flag=True
+)
+@click.option(
+    "-o",
+    "--outdir",
+    help="Output build folder, default (site)",
+    default="site",
+    type=click.STRING,
+)
+@click.option(
+    "--no-build",
+    help="Generate a `docs` folder but do not render w/ mkdocs",
+    is_flag=True,
+)
+@click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
 def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
     bb = BigBangRepo()
     tags = bb.get_tags()

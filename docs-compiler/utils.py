@@ -83,9 +83,7 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
                 data["Default"] = data["Default"].strip("`")
                 if data["Default"] != "`{}`" and data["Default"] != "`[]`":
                     data["PrettyPrint"] = "\n".join(
-                        json.dumps(
-                            json.loads(data["Default"]), indent=2
-                        ).split(r"\n")
+                        json.dumps(json.loads(data["Default"]), indent=2).split(r"\n")
                     )
             else:
                 data["Default"] = data["Default"].strip("`")
