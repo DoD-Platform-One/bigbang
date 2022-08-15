@@ -10,6 +10,7 @@ packages = [
 
 [tool.poetry.scripts]
 bb-docs-compiler = 'docs-compiler.cli:compiler'
+bb-docs-info = 'docs-compiler.info:info'
 
 [tool.poetry.dependencies]
 python = "^3.9"
