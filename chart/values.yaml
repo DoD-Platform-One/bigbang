@@ -1407,7 +1407,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
       path: "./chart"
-      tag: "3.8.0-bb.2"
+      tag: "3.8.0-bb.4"
 
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
