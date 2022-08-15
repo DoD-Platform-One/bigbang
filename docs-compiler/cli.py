@@ -12,9 +12,11 @@ from .prenpost import cleanup, postflight, preflight, setup
 from .repo import BigBangRepo, SubmoduleRepo
 from .utils import (
     add_frontmatter,
-    copy_helm_readme,
     get_release_notes,
+    parse_values_table_from_helm_docs,
+    patch_values_table_from_helm_docs,
     write_awesome_pages,
+    write_values_md,
 )
 
 yaml = YAML(typ="rt")
@@ -47,12 +49,12 @@ def compile(bb, tag):
     bb.copy_files(Path().cwd() / "submodules" / "bigbang", docs_root)
     write_awesome_pages(bb_config, docs_root / ".pages")
 
-    copy_helm_readme(
+    bb_values_table = parse_values_table_from_helm_docs(
         "submodules/bigbang/docs/understanding-bigbang/configuration/base-config.md",
-        "docs/README.md",
-        "docs/values.md",
-        "Big Bang",
+        r"## Values(.*)",
     )
+
+    write_values_md("docs/values.md", bb_values_table, "Big Bang")
 
     shutil.copy2("submodules/bigbang/README.md", "docs/README.md")
 
@@ -90,12 +92,14 @@ def compile(bb, tag):
     pkg_readmes = glob.iglob("docs/packages/*/README.md")
     for md in pkg_readmes:
         pkg_name = md.split("/")[2]
-        copy_helm_readme(
+        values_table = parse_values_table_from_helm_docs(
             md.replace("docs/packages/", "submodules/"),
-            f"docs/packages/{pkg_name}/README.md",
-            f"docs/packages/{pkg_name}/values.md",
-            pkg_name,
+            r"## Values(.*?)## Contributing",
         )
+        patch_values_table_from_helm_docs(
+            f"docs/packages/{pkg_name}/README.md", values_table
+        )
+        write_values_md(f"docs/packages/{pkg_name}/values.md", values_table, pkg_name)
         add_frontmatter(
             f"docs/packages/{pkg_name}/values.md", {"tags": ["values", pkg_name]}
         )

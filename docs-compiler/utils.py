@@ -38,19 +38,22 @@ values_template = Template(
     ).read()
 )
 
-def copy_helm_readme(from_readme, to_readme, to_values, title):
-    with open(from_readme, "r") as f:
-        content = f.read()
-        values_tables = re.findall(r"## Values(.*?)## Contributing", content, re.DOTALL)
-        if len(values_tables) == 0:
-            values_tables = re.findall(r"## Values(.*)", content, re.DOTALL)
-        if len(values_tables) == 0:
-            print(f"WARNING  -  No values table found in {from_readme}")
-            shutil.copy2(from_readme, to_readme)
-            return
-        table = values_tables[0]
 
-    with open(to_readme, "w") as f:
+def parse_values_table_from_helm_docs(readme, regex):
+    with open(readme, "r") as f:
+        content = f.read()
+        values_tables = re.findall(regex, content, re.DOTALL)
+        if len(values_tables) == 0:
+            print(f"[yellow]WARNING  -[/yellow] No values table found in {readme}")
+            return None
+        table = values_tables[0]
+        return table
+
+
+def patch_values_table_from_helm_docs(readme, table):
+    with open(readme, "r") as f:
+        content = f.read()
+    with open(readme, "w") as f:
         content = re.sub(r"^#\s.*?\n", "", content)
         content = content.replace(
             table, "\n\nPlease see the [values](values.md) docs.\n\n"
@@ -58,7 +61,9 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
         f.write(content)
         f.close()
 
-    with open(to_values, "w") as f:
+
+def write_values_md(fpath, table, title):
+    with open(fpath, "w") as f:
         rows = table.splitlines()
         values = []
         header = "| Key | Type | Default | Description |"
@@ -113,8 +118,11 @@ def add_frontmatter(path, metadata):
     m = post.metadata
     if m is None:
         m = metadata
+    elif m == {}:
+        m = metadata
     else:
         m = always_merger.merge(m, metadata)
+        m["tags"] = list(set(m["tags"]))
 
     with open(path, "w") as f:
         f.write(frontmatter.dumps(post))
