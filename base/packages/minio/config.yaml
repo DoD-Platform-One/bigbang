@@ -1,4 +1,3 @@
-
 source: submodules/minio
 
 ignore_patterns:
@@ -13,7 +12,6 @@ ignore_patterns:
   - tests
   - LICENSE
   - .pre-commit-config.yaml
-
 
 nav:
   - 📦 Home: README.md

@@ -10,7 +10,7 @@ _Author_: [`@razzle`](https://razzle.cloud)
 1. Checkout that release of `bigbang`.
 1. Use `bigbang/chart/values.yaml` as the source of truth for each package's version for that release.
 1. Copy each packages' docs over using declarative config from `base/packages/<package>/config.yaml`.
-1. Copy Big Bang's docs over, using `base/bigbang/config.yaml`.
+1. Copy Big Bang's docs over, using `base/config.yaml`.
 1. Reformat Helm docs contained in the `README`s. Creates a separate `values.md` file that is accessible via site search.
 1. Add certain tags to YAML frontmatter to aid in easier site search. Also patch in revision date back into page footer.
 1. Build that version of the docs.

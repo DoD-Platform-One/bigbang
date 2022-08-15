@@ -95,6 +95,9 @@ def compiler(bb, tag):
                 continue
             repo.checkout(pkgs[repo.name]["tag"])
 
+        if repo.name == "bigbang":
+            config["nav"][4]["📋 Release Notes"] += "/" + tag
+
         shutil.copytree(
             src_root,
             dst_root,
@@ -105,24 +108,24 @@ def compiler(bb, tag):
         write_awesome_pages(config, dst_root / ".pages")
 
     shutil.copy2(
-        "submodules/bigbang/Packages.md",
+        "submodules/bigbang/docs/packages.md",
         "docs/packages/index.md",
     )
 
-    with open(Path().cwd().joinpath("docs/.pages"), "r") as f:
-        dot_pages = yaml.load(f)
-
-    # from base/.pages
-    dot_pages["nav"][3]["📋 Release Notes"] += "/" + tag
-
-    with open(Path().cwd().joinpath("docs/.pages"), "w") as f:
-        yaml.dump(dot_pages, f)
-
     copy_helm_readme(
-        "submodules/bigbang/README.md",
-        "docs/bigbang/README.md",
-        "docs/bigbang/values.md",
+        "submodules/bigbang/docs/understanding-bigbang/configuration/base-config.md",
+        "docs/README.md",
+        "docs/values.md",
         "Big Bang",
+    )
+
+    shutil.copy2("submodules/bigbang/README.md", "docs/README.md")
+
+    add_frontmatter(
+        "docs/README.md",
+        {
+            "revision_date": bb.get_revision_date("README.md"),
+        },
     )
 
     pkg_readmes = glob.iglob("docs/packages/*/README.md")
@@ -135,29 +138,17 @@ def compiler(bb, tag):
             pkg_name,
         )
 
-    bb_docs = glob.iglob("docs/bigbang/**/*.md", recursive=True)
+    bb_docs = glob.iglob("docs/docs/**/*.md", recursive=True)
     for md in bb_docs:
-        if md == "docs/bigbang/values.md":
-            continue
         add_frontmatter(
             md,
             {
                 "tags": ["bigbang"],
                 "revision_date": bb.get_revision_date(
-                    md.replace("docs/bigbang/", "./")
+                    md.replace("docs/docs/", "./docs/")
                 ),
             },
         )
-
-    # charter_docs = glob.iglob("docs/bigbang/charter/**/*.md", recursive=True)
-    # for md in charter_docs:
-    #     # source_md = md.replace("docs/bigbang/", "submodules/bigbang/")
-    #     add_frontmatter(
-    #         md,
-    #         {
-    #             "tags": ["charter"],
-    #         },
-    #     )
 
     pkg_docs = glob.iglob("docs/packages/**/*.md", recursive=True)
     for md in pkg_docs:
@@ -244,6 +235,9 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
     tags_to_compile = tags[:last_x_tags]
     tags_to_compile.reverse()
     setup()
+
+    ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
+    tags_to_compile = ["1272-draft-follow-on-follow-on-docs-design-update"]
 
     if pre_release:
         latest_release_tag = tags_to_compile[0]

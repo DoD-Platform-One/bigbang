@@ -1,0 +1,30 @@
+source: submodules/bigbang
+
+ignore_patterns:
+  - .gitignore
+  - CODEOWNERS
+  - oscal-component.yaml
+  - renovate.json
+  - "*.tgz"
+  - "*.zip"
+  - .gitlab-ci.yml
+  - LICENSE
+  - tests
+  - .gitlab
+
+# nav:
+#   - 🏰 Home: README.md
+#   - 🪙 Values: values.md
+#   # - 📖 Big Bang Docs: docs
+#   - 📦 Package Overview: Packages.md
+#   # - 🧭 Charter: charter
+
+nav:
+  - 🏰 Home: README.md
+  - 💣 Big Bang Docs: docs
+  - 🪙 Values: values.md
+  - 📦 Packages: packages
+  - 📋 Release Notes: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases
+  - 👥 Contributing: CONTRIBUTING.md
+  - 📜 Changelog: CHANGELOG.md
+  - ✨ About: about.md
