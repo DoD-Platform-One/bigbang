@@ -5,7 +5,7 @@
 ## Requirements
 
 - Python v3.9+
-- `prettier` installed (`npm i -g prettier`)
+- `prettier` installed (`npm install prettier --location=global`)
 - An internet connection
 
 ## Install
@@ -33,11 +33,11 @@ poetry install --no-dev
 poetry run bb-docs-compiler -h
 
 # compile docs for latest Big Bang tag, and run dev server
-poetry run bb-docs-compiler compile --last-x-tags 1 --dev
+poetry run bb-docs-compiler --dev
 
 # compile docs for last 3 Big Bang tags
 # there is no current way to run as dev
-poetry run bb-docs-compiler compile -l 3
+poetry run bb-docs-compiler --last-x-tags 3
 
 # build assets located in `site`, use python's built in webserver to view them
 python3 -m http.server --directory site
