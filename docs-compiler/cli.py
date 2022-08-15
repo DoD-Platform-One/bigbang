@@ -5,12 +5,12 @@ import subprocess as sp
 from pathlib import Path
 
 import click
-import tabulate
 from git import GitCommandError, Repo
 from ruamel.yaml import YAML
 
 from .repo import BigBangRepo, SubmoduleRepo
 from .utils import add_frontmatter, copy_helm_readme, write_awesome_pages
+from .prenpost import setup, cleanup, preflight, postflight
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
@@ -19,55 +19,7 @@ yaml.indent(mapping=2, sequence=4, offset=2)
 yaml.width = 1000
 
 
-@click.group(
-    context_settings={"help_option_names": ["-h", "--help"]},
-    epilog="Built and maintained by @razzle",
-)
-def cli():
-    pass
-
-
-@click.command(help="List all bb pkgs")
-def pkgs():
-    bb = BigBangRepo()
-    pkgs = bb.get_pkgs()
-    table = []
-    headers = ["Name", "Added?", "Type", "Repo", "Tag"]
-    for _, v in pkgs.items():
-        is_submodule = Path.cwd().joinpath("submodules").joinpath(v["name"]).exists()
-        table.append([v["name"], is_submodule, v["type"], v["repo"][49:], v["tag"]])
-
-    print(tabulate.tabulate(table, headers=headers))
-    return table
-
-
-@click.command()
-def tags():
-    bb = BigBangRepo()
-    tags = bb.get_tags()
-    import json
-
-    print(json.dumps(tags, indent=2))
-    return tags
-
-
-def setup():
-    shutil.rmtree("docs", ignore_errors=True, onerror=None)
-    shutil.copytree("base", "docs", dirs_exist_ok=True)
-    print("INFO     -  Pulling latest from all submodules...")
-    sp.run(
-        ["./scripts/pull-latest.sh"],
-        cwd=Path().cwd(),
-        capture_output=True,
-        encoding="utf-8",
-    )
-
-
-def cleanup():
-    shutil.rmtree("docs", ignore_errors=True, onerror=None)
-
-
-def compiler(bb, tag):
+def compile(bb, tag):
     pkgs = bb.get_pkgs()
     docs_root = Path().cwd() / "docs"
 
@@ -196,34 +148,10 @@ def compiler(bb, tag):
     # end patch
 
 
-def preflight(bb):
-    pkgs = bb.get_pkgs()
-    for k, _ in pkgs.items():
-        base_exists = Path.cwd().joinpath("submodules").joinpath(k).exists()
-        if base_exists == False:
-            print(f"Base template does not exist in base/packages/{k}")
-            print(
-                f"You will have to run `./scripts/init-pkg {k}`, commit and try again"
-            )
-            exit()
-
-
-def postflight():
-    sp.run(
-        ["./scripts/remove-gitlab-toc.sh"],
-        cwd=Path().cwd(),
-        capture_output=True,
-        encoding="utf-8",
-    )
-    sp.run(
-        ["./scripts/prettier.sh"],
-        cwd=Path().cwd(),
-        capture_output=True,
-        encoding="utf-8",
-    )
-
-
-@click.command()
+@click.command(
+    context_settings={"help_option_names": ["-h", "--help"]},
+    epilog="Built and maintained by @razzle",
+)
 @click.option(
     "-l",
     "--last-x-tags",
@@ -252,7 +180,7 @@ def postflight():
     is_flag=True,
 )
 @click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
-def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
+def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
     bb = BigBangRepo()
     tags = bb.get_tags()
     tags_to_compile = tags[:last_x_tags]
@@ -284,7 +212,7 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
         bb.checkout(tags_to_compile[0])
         print(f"INFO     -  Compiling docs for Big Bang version {tags_to_compile[0]}")
         preflight(bb)
-        compiler(bb, tags_to_compile[0])
+        compile(bb, tags_to_compile[0])
         postflight()
 
         if dev and no_build == False:
@@ -304,7 +232,7 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
             bb.checkout(tag)
             print(f"INFO     -  Compiling docs for Big Bang version {tag}")
             preflight(bb)
-            compiler(bb, tag)
+            compile(bb, tag)
             postflight()
 
             shutil.move("docs", f"site/{tag}")
@@ -317,7 +245,7 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
             bb.checkout(tag)
             print(f"INFO     -  Compiling docs for Big Bang version {tag}")
             preflight(bb)
-            compiler(bb, tag)
+            compile(bb, tag)
             postflight()
             sp.run(
                 [
@@ -351,8 +279,3 @@ def compile(last_x_tags, pre_release, clean, outdir, no_build, dev):
         sp.run(
             ["git", "submodule", "update", "--init", "--recursive"], capture_output=True
         )
-
-
-cli.add_command(pkgs)
-cli.add_command(tags)
-cli.add_command(compile)
