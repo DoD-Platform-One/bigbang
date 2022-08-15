@@ -38,7 +38,6 @@ values_template = Template(
     ).read()
 )
 
-
 def copy_helm_readme(from_readme, to_readme, to_values, title):
     with open(from_readme, "r") as f:
         content = f.read()
@@ -60,10 +59,14 @@ def copy_helm_readme(from_readme, to_readme, to_values, title):
         f.close()
 
     with open(to_values, "w") as f:
-        rows = table.splitlines()[2:-2]
+        rows = table.splitlines()
         values = []
+        header = "| Key | Type | Default | Description |"
+        alignment_header = "|-----|------|---------|-------------|"
 
-        for i, row in enumerate(rows[2:]):
+        for i, row in enumerate(rows):
+            if row == header or row == alignment_header or len(row) == 0:
+                continue
             data = {}
             data["language"] = "yaml"
             data["Key"] = row.split("|")[1].strip()
