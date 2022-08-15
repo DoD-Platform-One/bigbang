@@ -12,4 +12,4 @@ poetry config virtualenvs.in-project true
 
 poetry install --no-dev
 
-poetry run bb-docs-compiler compile -l 1
+poetry run bb-docs-compiler

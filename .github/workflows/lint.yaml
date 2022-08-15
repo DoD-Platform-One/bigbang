@@ -26,7 +26,7 @@ jobs:
 
           poetry install --no-dev &>/dev/null
 
-          poetry run bb-docs-compiler compile -l 1 --no-build
+          poetry run bb-docs-compiler --no-build
       - name: Upload docs
         uses: actions/upload-artifact@v3.1.0
         with:
