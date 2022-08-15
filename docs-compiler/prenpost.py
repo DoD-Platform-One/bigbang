@@ -2,6 +2,9 @@ import shutil
 import subprocess as sp
 from pathlib import Path
 
+from rich import print
+from ruamel.yaml import YAML
+
 
 def setup():
     shutil.rmtree("docs", ignore_errors=True, onerror=None)
@@ -21,12 +24,17 @@ def cleanup():
 
 def preflight(bb):
     pkgs = bb.get_pkgs()
+    with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
+        meta = YAML().load(f)
+    pkgs_from_meta = meta["packages"]
     for k, _ in pkgs.items():
-        base_exists = Path.cwd().joinpath("submodules").joinpath(k).exists()
-        if base_exists == False:
-            print(f"Base template does not exist in base/packages/{k}")
+        config_exists = k in pkgs_from_meta
+        if config_exists == False:
             print(
-                f"You will have to run `./scripts/init-pkg {k}`, commit and try again"
+                f"[red]ERROR[/red]    - Package config '.packages.{k}' does not exist in 'bb-docs-compiler.yaml'"
+            )
+            print(
+                f"You will have to add a new config entry for this package, commit and try again"
             )
             exit()
 

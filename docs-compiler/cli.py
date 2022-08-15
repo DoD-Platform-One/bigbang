@@ -8,9 +8,9 @@ import click
 from git import GitCommandError, Repo
 from ruamel.yaml import YAML
 
+from .prenpost import cleanup, postflight, preflight, setup
 from .repo import BigBangRepo, SubmoduleRepo
 from .utils import add_frontmatter, copy_helm_readme, write_awesome_pages
-from .prenpost import setup, cleanup, preflight, postflight
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
