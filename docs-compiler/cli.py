@@ -101,6 +101,10 @@ def compiler(bb, tag):
         },
     )
 
+    root_level_md = glob.iglob("docs/*.md")
+    for md in root_level_md:
+        add_frontmatter(md, {"hide": ["navigation"]})
+
     pkgs_configs = meta["packages"]
     for pkg in pkgs_configs:
         if pkg not in pkgs:
@@ -183,10 +187,10 @@ def compiler(bb, tag):
     # patch packages nav
     with open("docs/packages/.pages", "w") as f:
         dot_pages = {}
-        dot_pages["nav"] = [{"Home":"index.md"}]
+        dot_pages["nav"] = [{"Home": "index.md"}]
         sorted_pkgs = sorted(meta["packages"])
         for pkg in sorted_pkgs:
-            dot_pages["nav"].append({pkg:pkg})
+            dot_pages["nav"].append({pkg: pkg})
         yaml.dump(dot_pages, f)
         f.close()
     # end patch
