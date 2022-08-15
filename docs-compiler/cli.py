@@ -10,7 +10,12 @@ from ruamel.yaml import YAML
 
 from .prenpost import cleanup, postflight, preflight, setup
 from .repo import BigBangRepo, SubmoduleRepo
-from .utils import add_frontmatter, copy_helm_readme, write_awesome_pages
+from .utils import (
+    add_frontmatter,
+    copy_helm_readme,
+    get_release_notes,
+    write_awesome_pages,
+)
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
@@ -32,7 +37,12 @@ def compile(bb, tag):
         "nav": meta["nav"],
         "include": meta["include"],
     }
-    bb_config["nav"][4]["📋 Release Notes"] += "/" + tag
+    notes = get_release_notes(tag)
+    if notes != None:
+        bb_config["nav"][4]["📋 Release Notes"] = "release-notes.md"
+        with open("docs/release-notes.md", "w") as f:
+            f.write(notes)
+            f.close()
     bb.set_compiler_config(bb_config)
     bb.copy_files(Path().cwd() / "submodules" / "bigbang", docs_root)
     write_awesome_pages(bb_config, docs_root / ".pages")

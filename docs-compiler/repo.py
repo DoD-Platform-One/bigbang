@@ -41,7 +41,7 @@ class SubmoduleRepo:
             src = Path(src_root / p)
             if src.exists() == False:
                 print(
-                    f"[yellow]WARNING[/yellow]  - No such file or directory: '{self.name}/{p}'"
+                    f"[yellow]WARNING  -[/yellow] No such file or directory: '{self.name}/{p}'"
                 )
                 continue
             dst = dst_root / p

@@ -24,6 +24,7 @@ mike = "^1.1.2"
 mkdocs-awesome-pages-plugin = "^2.8.0"
 deepmerge = "^1.0.1"
 rich = "^12.5.1"
+requests = "^2.28.1"
 
 [tool.poetry.dev-dependencies]
 black = {version = "^22.6.0", allow-prereleases = true}

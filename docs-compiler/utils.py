@@ -6,6 +6,8 @@ from pathlib import Path
 import frontmatter
 from deepmerge import always_merger
 from jinja2 import Template
+from requests import get
+from rich import print
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="rt")
@@ -114,3 +116,16 @@ def add_frontmatter(path, metadata):
     with open(path, "w") as f:
         f.write(frontmatter.dumps(post))
         f.close()
+
+
+def get_release_notes(tag):
+    release_url = f"https://repo1.dso.mil/api/v4/projects/2872/releases/{tag}"
+    res = get(release_url)
+    if res.status_code == 404:
+        print(
+            f"[yellow]WARNING  -[/yellow] No Big Bang release found for version: '{tag}'"
+        )
+        return None
+    release = res.json()
+    notes = release["description"]
+    return notes
