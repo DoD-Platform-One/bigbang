@@ -1,9 +1,9 @@
 name: Documentation Linting
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+# on:
+#   push:
+#     branches: ["main"]
+#   pull_request:
+#     branches: ["main"]
 jobs:
   build:
     name: build
@@ -48,8 +48,9 @@ jobs:
         with:
           command: config
           globs: |
-            .github/.markdownlint-cli2.jsonc
+            .github/markdownlint-cli2.jsonc
             docs/**/*.md
+            !docs/**/CHANGELOG.md
         continue-on-error: true
   vale:
     name: runner / vale
@@ -65,6 +66,7 @@ jobs:
       - uses: errata-ai/vale-action@reviewdog
         with:
           files: docs
+          vale_flags: "--output='.github/vale.tmpl' --config='.github/vale.ini' --ext='.md'"
         env:
           # Required, set by GitHub actions automatically:
           # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
