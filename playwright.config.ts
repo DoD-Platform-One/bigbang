@@ -30,7 +30,7 @@ const config: PlaywrightTestConfig = {
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "html",
+  reporter: process.env.CI ? "dot" : "list",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
@@ -42,7 +42,7 @@ const config: PlaywrightTestConfig = {
     trace: process.env.CI ? "on-first-retry" : "on",
 
     /*  save videos on failure. See https://playwright.dev/docs/test-configuration#record-video */
-    video: process.env.CI ? "retain-on-failure" : "on",
+    video: process.env.CI ? "off" : "retain-on-failure",
   },
 
   /* Configure projects for major browsers */
