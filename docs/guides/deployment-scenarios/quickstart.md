@@ -35,6 +35,13 @@ When deploying a dev / demo environment there is a high chance of deploying Big 
     * Only deploy to an isolated VPC, not a shared VPC.
     * Only deploy to VMs with no IAM roles/rights attached.
 
+## Network Requirements Notice
+This install guide by default requires network connectivity from your server to external DNS providers, specifically the Google DNS server at `8.8.8.8`, you can test that your node has connectivity to this DNS server by running the command `nslookup google.com 8.8.8.8` (run this from the node).
+
+If this command returns `DNS request timed out`, then you will need to follow the steps in [troubleshooting](#Troubleshooting) to change the upstream DNS server in your kubernetes cluster to your networks DNS server.
+
+Additionally, if your network has a proxy that has custom/internal SSL certificates then this may cause problems with pulling docker images as the image verification process can sometimes fail. Ensure you are aware of your network rules and restrictions before proceeding with the installation in order to understand potential problems when installing.
+
 ## Important Background Contextual Information
 
 `BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/platform-one/big-bang/customers/template) for guidance on production deployments.
@@ -747,3 +754,48 @@ kubectl get po -n=argocd
 ```
 
 > Remember to un-edit your Hosts file when you are finished tinkering.
+
+## Troubleshooting
+This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation and instructions for additional configuration changes that may be required in restricted networks. 
+
+### Changing CoreDNS upstream DNS server:
+After completing step 5, if you are unable to connect to external DNS providers using the command `nslookup google.com 8.8.8.8`, to test the connection. Then use the steps below to change the upstream DNS server to your networks DNS server.
+
+1. Open config editor to change the CoreDNS pod configuration
+
+    ```shell
+    kubectl -n kube-system edit configmaps CoreDNS -o yaml 
+    ```
+2. Change: 
+
+     ```plaintext
+     forward . /etc/resolv.conf
+     ```
+
+     To:
+
+     ```plaintext
+     forward . <DNS Server IP>
+     ```
+3. Save changes in editor (for vi use `:wq`)
+4. Verify changes in terminal output that prints new config 
+
+### Useful Commands for Obtaining Detailed Logs from Kubernetes Cluster or Containers
+* Print all pods including information related to the status of each pod 
+	```shell
+	kubectl get pods --all-namespaces
+	```
+* Print logs for specified pod
+	```shell 
+	kubectl logs <pod name> -n=<namespace of pod> 
+	```
+* Print a dump of relevent information for debugging and diagnosing your kubernetes cluster
+	```shell
+	kubectl cluster-info dump
+	```
+
+### Documentation References for command line tools used
+* Kubectl - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands 
+* k3d - https://k3d.io/v5.4.3/usage/k3s/
+* Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
+* Helm - https://helm.sh/docs/helm/helm/
