@@ -1,5 +1,7 @@
 # bb-docs-compiler
 
+[![Playwright e2e Tests](https://github.com/Noxsios/bb-docs-compiler/actions/workflows/test.yaml/badge.svg)](https://github.com/Noxsios/bb-docs-compiler/actions/workflows/test.yaml)
+
 > v2.0 Declarative Edition
 
 ## Requirements
