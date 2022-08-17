@@ -2,4 +2,4 @@
 
 set -eu
 
-prettier --write docs/*.md docs/**/*.md
+prettier --write --prose-wrap=preserve --loglevel=warn docs 
