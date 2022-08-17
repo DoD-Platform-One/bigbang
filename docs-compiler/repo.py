@@ -1,4 +1,5 @@
 import shutil
+import subprocess as sp
 from pathlib import Path
 
 from git import Repo
@@ -18,9 +19,6 @@ class SubmoduleRepo:
         self.path = Path.cwd() / "submodules" / name
         self.repo = Repo(self.path)
 
-    def set_compiler_config(self, config):
-        self.config = config
-
     def pull(self):
         self.repo.git.pull()
 
@@ -35,9 +33,8 @@ class SubmoduleRepo:
     def get_revision_date(self, abspath):
         return self.repo.git.log(abspath, n=1, date="short", format="%ad by %cn")
 
-    def copy_files(self, src_root, dst_root):
-        paths = self.config["include"]
-        for p in paths:
+    def copy_files(self, src_root, dst_root, include):
+        for p in include:
             src = Path(src_root / p)
             if src.exists() == False:
                 print(
@@ -97,3 +94,13 @@ class BigBangRepo(SubmoduleRepo):
             versions.append(tag.name)
 
         return versions
+
+
+def pull_latest():
+    print("INFO     -  Pulling latest from all submodules...")
+    sp.run(
+        ["./scripts/pull-latest.sh"],
+        cwd=Path().cwd(),
+        capture_output=True,
+        encoding="utf-8",
+    )

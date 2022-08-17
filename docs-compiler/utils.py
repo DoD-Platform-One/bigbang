@@ -1,6 +1,5 @@
 import json
 import re
-import shutil
 from pathlib import Path
 
 import frontmatter
@@ -18,17 +17,8 @@ yaml.width = 1000
 
 
 def write_awesome_pages(config, dst):
-    dot_pages = {}
-    if "nav" in config:
-        dot_pages["nav"] = config["nav"]
-    else:
-        dot_pages["nav"] = ["..."]
-
-    if "title" in config:
-        dot_pages["title"] = config["title"]
-
     with Path(dst).open("w") as f:
-        yaml.dump(dot_pages, f)
+        yaml.dump(config, f)
 
 
 values_template = Template(
@@ -119,10 +109,11 @@ def add_frontmatter(path, metadata):
     if m is None:
         m = metadata
     elif m == {}:
-        m = metadata
+        m = always_merger.merge(m, metadata)
     else:
         m = always_merger.merge(m, metadata)
-        m["tags"] = list(set(m["tags"]))
+        if m["tags"]:
+            m["tags"] = list(set(m["tags"]))
 
     with open(path, "w") as f:
         f.write(frontmatter.dumps(post))

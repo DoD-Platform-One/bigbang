@@ -6,23 +6,13 @@ from rich import print
 from ruamel.yaml import YAML
 
 
-def setup():
-    shutil.rmtree("docs", ignore_errors=True, onerror=None)
-    shutil.copytree("base", "docs", dirs_exist_ok=True)
-    print("INFO     -  Pulling latest from all submodules...")
-    sp.run(
-        ["./scripts/pull-latest.sh"],
-        cwd=Path().cwd(),
-        capture_output=True,
-        encoding="utf-8",
-    )
-
-
 def cleanup():
     shutil.rmtree("docs", ignore_errors=True, onerror=None)
 
 
 def preflight(bb):
+    shutil.rmtree("docs", ignore_errors=True, onerror=None)
+    shutil.copytree("base", "docs", dirs_exist_ok=True)
     pkgs = bb.get_pkgs()
     with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
         meta = YAML().load(f)

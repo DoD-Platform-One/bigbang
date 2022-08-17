@@ -1,12 +1,15 @@
 import click
-from .repo import BigBangRepo
 from rich.console import Console
 
+from .repo import BigBangRepo
+
 c = Console()
+
 
 @click.group()
 def info():
     pass
+
 
 @info.command()
 def all_bb_tags():
@@ -14,6 +17,7 @@ def all_bb_tags():
     tags = bb.get_tags()
     c.print(tags)
     return tags
+
 
 @info.command()
 def latest_bb_tag():

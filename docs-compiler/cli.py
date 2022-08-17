@@ -1,15 +1,17 @@
 import glob
 import os
+import re
 import shutil
 import subprocess as sp
 from pathlib import Path
 
 import click
 from git import GitCommandError, Repo
+from rich import print
 from ruamel.yaml import YAML
 
-from .prenpost import cleanup, postflight, preflight, setup
-from .repo import BigBangRepo, SubmoduleRepo
+from .prenpost import cleanup, postflight, preflight
+from .repo import BigBangRepo, SubmoduleRepo, pull_latest
 from .utils import (
     add_frontmatter,
     get_release_notes,
@@ -34,20 +36,17 @@ def compile(bb, tag):
         meta = yaml.load(f)
 
     ## bigbang section
-    bb_config = {
-        "source": meta["source"],
-        "nav": meta["nav"],
-        "include": meta["include"],
-    }
+    bb_config = meta["/"]
     notes = get_release_notes(tag)
     if notes != None:
-        bb_config["nav"][4]["📋 Release Notes"] = "release-notes.md"
+        bb_config["pages"]["nav"][4]["📋 Release Notes"] = "release-notes.md"
         with open("docs/release-notes.md", "w") as f:
             f.write(notes)
             f.close()
-    bb.set_compiler_config(bb_config)
-    bb.copy_files(Path().cwd() / "submodules" / "bigbang", docs_root)
-    write_awesome_pages(bb_config, docs_root / ".pages")
+    bb.copy_files(
+        Path().cwd() / "submodules" / "bigbang", docs_root, bb_config["include"]
+    )
+    write_awesome_pages(bb_config["pages"], docs_root / ".pages")
 
     bb_values_table = parse_values_table_from_helm_docs(
         "submodules/bigbang/docs/understanding-bigbang/configuration/base-config.md",
@@ -56,18 +55,18 @@ def compile(bb, tag):
 
     write_values_md("docs/values.md", bb_values_table, "Big Bang")
 
-    shutil.copy2("submodules/bigbang/README.md", "docs/README.md")
-
-    add_frontmatter(
-        "docs/README.md",
-        {
-            "revision_date": bb.get_revision_date("README.md"),
-        },
-    )
-
     root_level_md = glob.iglob("docs/*.md")
     for md in root_level_md:
-        add_frontmatter(md, {"hide": ["navigation"]})
+        if md == "docs/about.md" or md == "docs/values.md":
+            continue
+        else:
+            add_frontmatter(
+                md,
+                {
+                    "hide": ["navigation"],
+                    "revision_date": bb.get_revision_date(md.replace("docs/", "", 1)),
+                },
+            )
 
     pkgs_configs = meta["packages"]
     for pkg in pkgs_configs:
@@ -77,12 +76,11 @@ def compile(bb, tag):
             continue
         pkg_config = meta["packages"][pkg]
         repo = SubmoduleRepo(pkg_config["source"].split("/")[-1])
-        repo.set_compiler_config(pkg_config)
         dst_root = docs_root / "packages" / pkg
         os.makedirs(dst_root)
         src_root = Path().cwd().joinpath(pkg_config["source"])
-        repo.copy_files(src_root, dst_root)
-        write_awesome_pages(pkg_config, dst_root / ".pages")
+        repo.copy_files(src_root, dst_root, pkg_config["include"])
+        write_awesome_pages(pkg_config["pages"], dst_root / ".pages")
 
     shutil.copy2(
         "submodules/bigbang/docs/packages.md",
@@ -93,7 +91,7 @@ def compile(bb, tag):
     for md in pkg_readmes:
         pkg_name = md.split("/")[2]
         values_table = parse_values_table_from_helm_docs(
-            md.replace("docs/packages/", "submodules/"),
+            md.replace("docs/packages/", "submodules/", 1),
             r"## Values(.*?)## Contributing",
         )
         patch_values_table_from_helm_docs(
@@ -111,7 +109,7 @@ def compile(bb, tag):
             {
                 "tags": ["bigbang"],
                 "revision_date": bb.get_revision_date(
-                    md.replace("docs/docs/", "./docs/")
+                    md.replace("docs/docs/", "./docs/", 1)
                 ),
             },
         )
@@ -129,7 +127,7 @@ def compile(bb, tag):
             {
                 "tags": ["package", pkg_name],
                 "revision_date": SubmoduleRepo(pkg_name).get_revision_date(
-                    md.replace(f"docs/packages/{pkg_name}/", "./")
+                    md.replace(f"docs/packages/{pkg_name}/", "./", 1)
                 ),
             },
         )
@@ -140,10 +138,13 @@ def compile(bb, tag):
         with open(doc, "r") as f:
             content = f.read()
 
-        import re
-
         without_bad_links = re.sub(r"\]\(\.\/docs", "](", content)
         without_bad_links_ex = re.sub(r"\]\(docs", "](", without_bad_links)
+
+        if len(content) != len(without_bad_links_ex):
+            print(
+                f"[yellow]WARNING  -[/yellow] File has bad links to '/docs' or './docs' when already in the docs directory: '{doc}'"
+            )
 
         with open(doc, "w") as f:
             f.write(without_bad_links_ex)
@@ -195,6 +196,7 @@ def compile(bb, tag):
 )
 @click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
 def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
+    pull_latest()
     bb = BigBangRepo()
     tags = bb.get_tags()
     tags_to_compile = tags[:last_x_tags]
@@ -202,7 +204,6 @@ def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
     if "1.38.0" in tags_to_compile:
         print("ERROR   - Only versions 1.39.0+ are supported via this docs generator")
         exit(1)
-    setup()
 
     ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
     tags_to_compile = ["1272-draft-follow-on-follow-on-docs-design-update"]
@@ -224,7 +225,7 @@ def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
 
     if last_x_tags == 1:
         bb.checkout(tags_to_compile[0])
-        print(f"INFO     -  Compiling docs for Big Bang version {tags_to_compile[0]}")
+        print(f"INFO     -  Compiling docs for Big Bang version '{tags_to_compile[0]}'")
         preflight(bb)
         compile(bb, tags_to_compile[0])
         postflight()
@@ -242,9 +243,8 @@ def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
     elif last_x_tags > 1 and no_build:
         shutil.rmtree("site", ignore_errors=True, onerror=None)
         for tag in tags_to_compile:
-            setup()
             bb.checkout(tag)
-            print(f"INFO     -  Compiling docs for Big Bang version {tag}")
+            print(f"INFO     -  Compiling docs for Big Bang version '{tag}'")
             preflight(bb)
             compile(bb, tag)
             postflight()
@@ -255,7 +255,6 @@ def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
 
     else:
         for tag in tags_to_compile:
-            setup()
             bb.checkout(tag)
             print(f"INFO     -  Compiling docs for Big Bang version {tag}")
             preflight(bb)
