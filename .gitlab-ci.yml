@@ -2,3 +2,5 @@ include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
     ref: new-runner-tags
     file: '/pipelines/bigbang.yaml'
+variables:
+  PIPELINE_REPO_BRANCH: new-runner-tags
