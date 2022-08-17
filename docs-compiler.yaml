@@ -1,27 +1,30 @@
-source: submodules/bigbang
-nav:
-  - 🏰 Home: README.md
-  - 💣 Big Bang Docs: docs
-  - 🪙 Values: values.md
-  - 📦 Packages: packages
-  - 📋 Release Notes: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases
-  - 👥 Contributing: CONTRIBUTING.md
-  - 📜 Changelog: CHANGELOG.md
-  - ✨ About: about.md
-include:
-  - docs
-  - README.md
-  - CHANGELOG.md
-  - CONTRIBUTING.md
+/:
+  source: submodules/bigbang
+  pages:
+    nav:
+      - 🏰 Home: README.md
+      - 💣 Big Bang Docs: docs
+      - 🪙 Values: values.md
+      - 📦 Packages: packages
+      - 📋 Release Notes: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases
+      - 👥 Contributing: CONTRIBUTING.md
+      - 📜 Changelog: CHANGELOG.md
+      - ✨ About: about.md
+  include:
+    - docs
+    - README.md
+    - CHANGELOG.md
+    - CONTRIBUTING.md
 packages:
   argocd:
     source: submodules/argocd
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -29,12 +32,13 @@ packages:
       - CONTRIBUTING.md
   eck-operator:
     source: submodules/eck-operator
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -42,12 +46,13 @@ packages:
       - CONTRIBUTING.md
   metrics-server:
     source: submodules/metrics-server
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -55,12 +60,13 @@ packages:
       - CONTRIBUTING.md
   velero:
     source: submodules/velero
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -68,12 +74,13 @@ packages:
       - CONTRIBUTING.md
   authservice:
     source: submodules/authservice
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -81,12 +88,13 @@ packages:
       - CONTRIBUTING.md
   mattermost:
     source: submodules/mattermost
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -94,12 +102,13 @@ packages:
       - CONTRIBUTING.md
   mattermost-operator:
     source: submodules/mattermost-operator
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -107,12 +116,13 @@ packages:
       - CONTRIBUTING.md
   twistlock:
     source: submodules/twistlock
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -120,12 +130,13 @@ packages:
       - CONTRIBUTING.md
   sonarqube:
     source: submodules/sonarqube
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -133,12 +144,13 @@ packages:
       - CONTRIBUTING.md
   kyverno:
     source: submodules/kyverno
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -146,12 +158,13 @@ packages:
       - CONTRIBUTING.md
   elasticsearch-kibana:
     source: submodules/elasticsearch-kibana
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -159,12 +172,13 @@ packages:
       - CONTRIBUTING.md
   gitlab-runner:
     source: submodules/gitlab-runner
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -172,12 +186,13 @@ packages:
       - CONTRIBUTING.md
   anchore-enterprise:
     source: submodules/anchore-enterprise
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -185,12 +200,13 @@ packages:
       - CONTRIBUTING.md
   promtail:
     source: submodules/promtail
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -198,12 +214,13 @@ packages:
       - CONTRIBUTING.md
   kyverno-policies:
     source: submodules/kyverno-policies
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -211,12 +228,13 @@ packages:
       - CONTRIBUTING.md
   cluster-auditor:
     source: submodules/cluster-auditor
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -224,12 +242,13 @@ packages:
       - CONTRIBUTING.md
   vault:
     source: submodules/vault
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -237,12 +256,13 @@ packages:
       - CONTRIBUTING.md
   istio-controlplane:
     source: submodules/istio-controlplane
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -250,12 +270,13 @@ packages:
       - CONTRIBUTING.md
   gitlab:
     source: submodules/gitlab
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -263,12 +284,13 @@ packages:
       - CONTRIBUTING.md
   tempo:
     source: submodules/tempo
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -276,12 +298,13 @@ packages:
       - CONTRIBUTING.md
   kiali:
     source: submodules/kiali
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -289,12 +312,13 @@ packages:
       - CONTRIBUTING.md
   jaeger:
     source: submodules/jaeger
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -302,12 +326,13 @@ packages:
       - CONTRIBUTING.md
   keycloak:
     source: submodules/keycloak
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -315,12 +340,13 @@ packages:
       - CONTRIBUTING.md
   haproxy:
     source: submodules/haproxy
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -328,12 +354,13 @@ packages:
       - CONTRIBUTING.md
   minio:
     source: submodules/minio
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -341,12 +368,13 @@ packages:
       - CONTRIBUTING.md
   monitoring:
     source: submodules/monitoring
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -354,12 +382,13 @@ packages:
       - CONTRIBUTING.md
   nexus:
     source: submodules/nexus
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -367,12 +396,13 @@ packages:
       - CONTRIBUTING.md
   istio-operator:
     source: submodules/istio-operator
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -380,12 +410,13 @@ packages:
       - CONTRIBUTING.md
   loki:
     source: submodules/loki
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -393,12 +424,13 @@ packages:
       - CONTRIBUTING.md
   minio-operator:
     source: submodules/minio-operator
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -406,12 +438,13 @@ packages:
       - CONTRIBUTING.md
   policy:
     source: submodules/policy
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
@@ -419,12 +452,13 @@ packages:
       - CONTRIBUTING.md
   fluentbit:
     source: submodules/fluentbit
-    nav:
-      - 📦 Home: README.md
-      - 🪙 Values: values.md
-      - 👥 Contributing: CONTRIBUTING.md
-      - 📜 Changelog: CHANGELOG.md
-      - 📖 More Info: docs
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
     include:
       - docs
       - README.md
