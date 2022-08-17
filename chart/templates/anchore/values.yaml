@@ -92,7 +92,7 @@ anchoreEnterpriseUi:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecretName: private-registry
 
-anchore-ui-redis:
+ui-redis:
   {{- if and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password }}
   enabled: false
   externalEndpoint: "redis://{{ .Values.addons.anchore.redis.username | default "nouser" }}:{{ .Values.addons.anchore.redis.password }}@{{ .Values.addons.anchore.redis.host }}:{{ .Values.addons.anchore.redis.port }}"
