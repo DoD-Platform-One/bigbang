@@ -4,11 +4,11 @@ import os
 import re
 import shutil
 import subprocess as sp
-from pathlib import Path
-from deepmerge import always_merger as merge
 from copy import deepcopy
+from pathlib import Path
 
 import click
+from deepmerge import always_merger as merge
 from git import GitCommandError, Repo
 from rich import print
 from ruamel.yaml import YAML
@@ -73,15 +73,16 @@ def compile(bb, tag):
 
     pkgs_configs = meta["packages"]
     template_config = meta["packages"]["_template"]
-    del(meta["packages"]["_template"])
+    del meta["packages"]["_template"]
     for pkg in pkgs_configs:
-        if pkg not in pkgs.keys():
+        tmpl = deepcopy(template_config)
+        pkg_config = merge.merge(tmpl, meta["packages"][pkg])
+        pkg_name = pkg_config["source"].split("/")[-1]
+        if pkg_name not in pkgs.keys():
             # this means that we are trying to build a version of the docs that does not have this (newer) pkg
             # skip it
             continue
-        tmpl = deepcopy(template_config)
-        pkg_config = merge.merge(tmpl, meta["packages"][pkg]) 
-        repo = SubmoduleRepo(pkg_config["source"].split("/")[-1])
+        repo = SubmoduleRepo(pkg_name)
         dst_root = docs_root / "packages" / pkg
         os.makedirs(dst_root)
         src_root = Path().cwd().joinpath(pkg_config["source"])
