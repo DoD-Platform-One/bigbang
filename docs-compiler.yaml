@@ -16,451 +16,80 @@
     - CHANGELOG.md
     - CONTRIBUTING.md
 packages:
+  _template:
+    pages:
+      nav:
+        - 📦 Home: README.md
+        - 🪙 Values: values.md
+        - 👥 Contributing: CONTRIBUTING.md
+        - 📜 Changelog: CHANGELOG.md
+        - 📖 More Info: docs
+    include:
+      - docs
+      - README.md
+      - CHANGELOG.md
+      - CONTRIBUTING.md    
   argocd:
     source: submodules/argocd
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   eck-operator:
     source: submodules/eck-operator
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   metrics-server:
     source: submodules/metrics-server
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   velero:
     source: submodules/velero
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   authservice:
     source: submodules/authservice
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   mattermost:
     source: submodules/mattermost
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   mattermost-operator:
     source: submodules/mattermost-operator
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   twistlock:
     source: submodules/twistlock
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   sonarqube:
     source: submodules/sonarqube
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   kyverno:
     source: submodules/kyverno
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   elasticsearch-kibana:
     source: submodules/elasticsearch-kibana
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   gitlab-runner:
     source: submodules/gitlab-runner
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   anchore-enterprise:
     source: submodules/anchore-enterprise
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   promtail:
     source: submodules/promtail
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   kyverno-policies:
     source: submodules/kyverno-policies
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   cluster-auditor:
     source: submodules/cluster-auditor
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   vault:
     source: submodules/vault
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   istio-controlplane:
     source: submodules/istio-controlplane
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   gitlab:
     source: submodules/gitlab
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   tempo:
     source: submodules/tempo
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   kiali:
     source: submodules/kiali
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   jaeger:
     source: submodules/jaeger
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   keycloak:
     source: submodules/keycloak
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   haproxy:
     source: submodules/haproxy
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   minio:
     source: submodules/minio
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   monitoring:
     source: submodules/monitoring
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   nexus:
     source: submodules/nexus
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   istio-operator:
     source: submodules/istio-operator
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   loki:
     source: submodules/loki
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   minio-operator:
     source: submodules/minio-operator
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   policy:
     source: submodules/policy
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md
   fluentbit:
     source: submodules/fluentbit
-    pages:
-      nav:
-        - 📦 Home: README.md
-        - 🪙 Values: values.md
-        - 👥 Contributing: CONTRIBUTING.md
-        - 📜 Changelog: CHANGELOG.md
-        - 📖 More Info: docs
-    include:
-      - docs
-      - README.md
-      - CHANGELOG.md
-      - CONTRIBUTING.md

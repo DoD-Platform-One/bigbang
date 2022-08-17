@@ -1,9 +1,12 @@
+import copy
 import glob
 import os
 import re
 import shutil
 import subprocess as sp
 from pathlib import Path
+from deepmerge import always_merger as merge
+from copy import deepcopy
 
 import click
 from git import GitCommandError, Repo
@@ -69,12 +72,15 @@ def compile(bb, tag):
             )
 
     pkgs_configs = meta["packages"]
+    template_config = meta["packages"]["_template"]
+    del(meta["packages"]["_template"])
     for pkg in pkgs_configs:
-        if pkg not in pkgs:
+        if pkg not in pkgs.keys():
             # this means that we are trying to build a version of the docs that does not have this (newer) pkg
             # skip it
             continue
-        pkg_config = meta["packages"][pkg]
+        tmpl = deepcopy(template_config)
+        pkg_config = merge.merge(tmpl, meta["packages"][pkg]) 
         repo = SubmoduleRepo(pkg_config["source"].split("/")[-1])
         dst_root = docs_root / "packages" / pkg
         os.makedirs(dst_root)

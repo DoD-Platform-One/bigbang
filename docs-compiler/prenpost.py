@@ -17,11 +17,11 @@ def preflight(bb):
     with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
         meta = YAML().load(f)
     pkgs_from_meta = meta["packages"]
-    for k, _ in pkgs.items():
-        config_exists = k in pkgs_from_meta
+    for pkg in pkgs.keys():
+        config_exists = pkg in pkgs_from_meta
         if config_exists == False:
             print(
-                f"[red]ERROR[/red]    - Package config '.packages.{k}' does not exist in 'bb-docs-compiler.yaml'"
+                f"[red]ERROR[/red]    - Package config '.packages.{pkg}' does not exist in 'bb-docs-compiler.yaml'"
             )
             print(
                 f"You will have to add a new config entry for this package, commit and try again"
