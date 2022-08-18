@@ -173,6 +173,7 @@ gatekeeper:
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -273,6 +274,7 @@ gatekeeper:
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -386,6 +388,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
         parameters:
@@ -416,6 +419,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
         parameters:
@@ -456,6 +460,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -1126,7 +1131,7 @@ addons:
   minio:
     enabled: false
     values:
-      tenants:
+      tenant:
         pools:
         - servers: 2
           volumesPerServer: 4
