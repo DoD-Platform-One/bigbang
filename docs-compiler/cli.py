@@ -245,8 +245,8 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
                 )
                 exit(1)
 
-    ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
-    ref = "1272-draft-follow-on-follow-on-docs-design-update"
+    ### TEMP MANUAL OVERRIDE TO USE git commit w/ fully up-to-date nav elements
+    ref = "f2b5f0ec3792bdd29846a100962ab73b2803cefb"
 
     try:
         bb.checkout(ref)
@@ -257,7 +257,7 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
             )
             exit(1)
 
-    print(f"INFO     -  Compiling docs for Big Bang version '{ref}'")
+    print(f"INFO     - Compiling docs for Big Bang version '{ref}'")
     preflight(bb)
     compile(bb, ref)
     postflight()
@@ -265,7 +265,7 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
     if dev and no_build == False:
         sp.run(["mkdocs", "serve"])
     elif no_build:
-        print("INFO     -  Documentation compiled to `./docs`")
+        print("INFO     - Documentation compiled to `./docs`")
     else:
         sp.run(["mkdocs", "build", "--clean", "--site-dir", outdir])
 
