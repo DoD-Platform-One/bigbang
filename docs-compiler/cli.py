@@ -4,11 +4,11 @@ import shutil
 import subprocess as sp
 from copy import deepcopy
 from pathlib import Path
-import semver
 
 import click
+import semver
 from deepmerge import always_merger as merge
-from git import GitCommandError, Repo
+from git import GitCommandError
 from rich import print
 from ruamel.yaml import YAML
 
@@ -186,14 +186,14 @@ def compile(bb, tag):
 )
 @click.option(
     "-o",
-    "--site-dir",
+    "--outdir",
     help="Output build folder, default (site)",
     default="site",
     type=click.STRING,
 )
 @click.option(
     "--no-build",
-    help="Generate a `docs` folder but do not render w/ mkdocs",
+    help="Compile the `docs` folder but do not render w/ mkdocs",
     is_flag=True,
 )
 @click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
@@ -228,8 +228,8 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
                 exit(1)
         except ValueError:
             print(
-                    f"[red]ERROR[/red]    - Tag '{ref}' provided is not a valid semver string"
-                )
+                f"[red]ERROR[/red]    - Tag '{ref}' provided is not a valid semver string"
+            )
             exit(1)
     elif branch:
         ref = branch
@@ -244,7 +244,6 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
                     f"[red]ERROR[/red]    - Failed to checkout ({next_release_tag_x}) on bigbang, verify you have correctly run R2-D2"
                 )
                 exit(1)
-
 
     ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
     ref = "1272-draft-follow-on-follow-on-docs-design-update"

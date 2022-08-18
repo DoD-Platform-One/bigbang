@@ -4,11 +4,11 @@ import subprocess as sp
 from pathlib import Path
 
 import frontmatter
+import semver
 from git import Repo
 from rich import print
 from rich.console import Console
 from ruamel.yaml import YAML
-import semver
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
