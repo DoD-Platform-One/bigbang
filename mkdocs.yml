@@ -1,7 +1,7 @@
 site_name: !ENV [SITE_NAME, "Big Bang Docs"]
 site_description: Assembled documentation for Platform One's Big Bang product
 site_url: !ENV [SITE_URL, "https://docs-bigbang.dso.mil"]
-site_author: "Harry Randazzo"
+site_author: Platform One
 
 repo_name: big-bang/bigbang
 repo_url: https://repo1.dso.mil/platform-one/big-bang/bigbang
