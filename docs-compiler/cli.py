@@ -59,7 +59,12 @@ def compile(bb, tag):
     root_level_md = glob.iglob("docs/*.md")
     for md in root_level_md:
         if md == "docs/about.md" or md == "docs/values.md":
-            continue
+            add_frontmatter(
+                md,
+                {
+                    "hide": ["navigation"],
+                },
+            )
         else:
             add_frontmatter(
                 md,
@@ -69,8 +74,7 @@ def compile(bb, tag):
                 },
             )
 
-    bb.patch_external_refs("docs/*.md", docs_root)
-    bb.patch_external_refs("docs/docs/**/*.md", docs_root / "docs")
+    bb.patch_external_refs("**/*.md", docs_root)
 
     pkgs_configs = meta["packages"]
     template_config = meta["packages"]["_template"]
@@ -90,7 +94,7 @@ def compile(bb, tag):
         src_root = Path().cwd().joinpath(pkg_config["source"])
         repo.copy_files(src_root, dst_root, pkg_config["include"])
         write_awesome_pages(pkg_config["pages"], dst_root / ".pages")
-        repo.patch_external_refs(f"docs/packages/{pkg_name}/**/*.md", dst_root)
+        repo.patch_external_refs("**/*.md", dst_root)
 
     shutil.copy2(
         "submodules/bigbang/docs/packages.md",
@@ -108,8 +112,9 @@ def compile(bb, tag):
             f"docs/packages/{pkg_name}/README.md", values_table
         )
         write_values_md(f"docs/packages/{pkg_name}/values.md", values_table, pkg_name)
+        pkg_tag = pkgs[pkg_name]["tag"]
         add_frontmatter(
-            f"docs/packages/{pkg_name}/values.md", {"tags": ["values", pkg_name]}
+            f"docs/packages/{pkg_name}/values.md", {"tags": ["values", pkg_name, pkg_tag]}
         )
 
     bb_docs = glob.iglob("docs/docs/**/*.md", recursive=True)
@@ -117,7 +122,7 @@ def compile(bb, tag):
         add_frontmatter(
             md,
             {
-                "tags": ["bigbang"],
+                "tags": ["bigbang", tag],
                 "revision_date": bb.get_revision_date(
                     md.replace("docs/docs/", "./docs/", 1)
                 ),
@@ -132,10 +137,11 @@ def compile(bb, tag):
             or md == f"docs/packages/{pkg_name}/values.md"
         ):
             continue
+        pkg_tag = pkgs[pkg_name]["tag"]
         add_frontmatter(
             md,
             {
-                "tags": ["package", pkg_name],
+                "tags": ["package", pkg_name, pkg_tag],
                 "revision_date": SubmoduleRepo(pkg_name).get_revision_date(
                     md.replace(f"docs/packages/{pkg_name}/", "./", 1)
                 ),
