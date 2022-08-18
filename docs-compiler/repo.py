@@ -8,6 +8,7 @@ from git import Repo
 from rich import print
 from rich.console import Console
 from ruamel.yaml import YAML
+import semver
 
 yaml = YAML(typ="rt")
 # indent 2 spaces extra on lists
@@ -213,7 +214,11 @@ class BigBangRepo(SubmoduleRepo):
                 # skip blank version(s)
                 continue
 
-            versions.append(tag.name)
+            try:
+                semver.VersionInfo.parse(tag.name)
+                versions.append(tag.name)
+            except ValueError:
+                continue
 
         return versions
 

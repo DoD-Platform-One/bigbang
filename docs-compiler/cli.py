@@ -4,6 +4,7 @@ import shutil
 import subprocess as sp
 from copy import deepcopy
 from pathlib import Path
+import semver
 
 import click
 from deepmerge import always_merger as merge
@@ -114,7 +115,8 @@ def compile(bb, tag):
         write_values_md(f"docs/packages/{pkg_name}/values.md", values_table, pkg_name)
         pkg_tag = pkgs[pkg_name]["tag"]
         add_frontmatter(
-            f"docs/packages/{pkg_name}/values.md", {"tags": ["values", pkg_name, pkg_tag]}
+            f"docs/packages/{pkg_name}/values.md",
+            {"tags": ["values", pkg_name, pkg_tag]},
         )
 
     bb_docs = glob.iglob("docs/docs/**/*.md", recursive=True)
@@ -165,11 +167,14 @@ def compile(bb, tag):
     epilog="Built and maintained by @razzle",
 )
 @click.option(
-    "-l",
-    "--last-x-tags",
-    help="Build for last x Big Bang tags",
-    default=1,
-    type=click.IntRange(1, 9, clamp=True),
+    "-t",
+    "--tag",
+    help="Build docs from Big Bang tag <tag>",
+    default="latest",
+    type=click.STRING,
+)
+@click.option(
+    "-b", "--branch", help="Build docs from Big Bang branch <branch>", type=click.STRING
 )
 @click.option(
     "--pre-release",
@@ -181,7 +186,7 @@ def compile(bb, tag):
 )
 @click.option(
     "-o",
-    "--outdir",
+    "--site-dir",
     help="Output build folder, default (site)",
     default="site",
     type=click.STRING,
@@ -192,97 +197,78 @@ def compile(bb, tag):
     is_flag=True,
 )
 @click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
-def compiler(last_x_tags, pre_release, clean, outdir, no_build, dev):
+def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
+    ref = None
+    if (
+        tag != "latest"
+        and branch
+        or tag != "latest"
+        and pre_release
+        or branch
+        and pre_release
+    ):
+        print(
+            f"[red]ERROR[/red]    - Please use either '--branch' or '--tag' or '--pre-release', not a combination"
+        )
+        exit(1)
     pull_latest()
     bb = BigBangRepo()
     tags = bb.get_tags()
-    tags_to_compile = tags[:last_x_tags]
-    tags_to_compile.reverse()
-    if "1.38.0" in tags_to_compile:
-        print("ERROR   - Only versions 1.39.0+ are supported via this docs generator")
-        exit(1)
 
-    ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
-    tags_to_compile = ["1272-draft-follow-on-follow-on-docs-design-update"]
-
-    if pre_release:
-        latest_release_tag = tags_to_compile[0]
-        next_release_tag_x = (
-            "release-1." + str(int(latest_release_tag.split(".")[1]) + 1) + ".x"
-        )
-        tags_to_compile = [next_release_tag_x]
+    if tag == "latest":
+        ref = tags[0]
+    if tag != "latest":
+        ref = tag
+        try:
+            ver = semver.VersionInfo.parse(ref)
+            if ver.major == 1 and ver.minor <= 40:
+                print(
+                    "[red]ERROR[/red]    - Only versions 1.40.0+ are supported via this docs generator"
+                )
+                exit(1)
+        except ValueError:
+            print(
+                    f"[red]ERROR[/red]    - Tag '{ref}' provided is not a valid semver string"
+                )
+            exit(1)
+    elif branch:
+        ref = branch
+    elif pre_release:
+        next_release_tag_x = "release-1." + str(int(tags[0].split(".")[1]) + 1) + ".x"
+        ref = next_release_tag_x
         try:
             bb.checkout(next_release_tag_x)
         except GitCommandError as e:
             if "did not match any file(s) known to git" in e.stderr:
                 print(
-                    f"ERROR    -  Failed to checkout ({next_release_tag_x}) on bigbang, verify you have correctly run R2-D2"
+                    f"[red]ERROR[/red]    - Failed to checkout ({next_release_tag_x}) on bigbang, verify you have correctly run R2-D2"
                 )
                 exit(1)
 
-    if last_x_tags == 1:
-        bb.checkout(tags_to_compile[0])
-        print(f"INFO     -  Compiling docs for Big Bang version '{tags_to_compile[0]}'")
-        preflight(bb)
-        compile(bb, tags_to_compile[0])
-        postflight()
 
-        if dev and no_build == False:
-            sp.run(["mkdocs", "serve"])
-        elif no_build:
+    ### TEMP MANUAL OVERRIDE TO USE `1272-draft-follow-on-follow-on-docs-design-update` branch
+    ref = "1272-draft-follow-on-follow-on-docs-design-update"
+
+    try:
+        bb.checkout(ref)
+    except GitCommandError as e:
+        if "did not match any file(s) known to git" in e.stderr:
             print(
-                "INFO     -  Documentation (./docs) ready to be built w/ `mkdocs build --clean`"
+                f"[red]ERROR[/red]    - Failed to checkout ({ref}) on bigbang, verify branch/tag exists in Repo1"
             )
-            print("INFO     -  Documentation (./docs) can be served w/ `mkdocs serve`")
-        else:
-            sp.run(["mkdocs", "build", "--clean"])
+            exit(1)
 
-    elif last_x_tags > 1 and no_build:
-        shutil.rmtree("site", ignore_errors=True, onerror=None)
-        for tag in tags_to_compile:
-            bb.checkout(tag)
-            print(f"INFO     -  Compiling docs for Big Bang version '{tag}'")
-            preflight(bb)
-            compile(bb, tag)
-            postflight()
+    print(f"INFO     -  Compiling docs for Big Bang version '{ref}'")
+    preflight(bb)
+    compile(bb, ref)
+    postflight()
 
-            shutil.move("docs", f"site/{tag}")
-        shutil.move("site", f"docs")
-        print(f"INFO     -  Documentation saved to (./docs/{tag})")
-
+    if dev and no_build == False:
+        sp.run(["mkdocs", "serve"])
+    elif no_build:
+        print("INFO     -  Documentation compiled to `./docs`")
     else:
-        for tag in tags_to_compile:
-            bb.checkout(tag)
-            print(f"INFO     -  Compiling docs for Big Bang version {tag}")
-            preflight(bb)
-            compile(bb, tag)
-            postflight()
-            sp.run(
-                [
-                    "mike",
-                    "deploy",
-                    "--branch",
-                    "mike-build",
-                    "--update-aliases",
-                    "--template",
-                    "docs-compiler/templates/redirect.html",
-                    "--prefix",
-                    "build",
-                    tag,
-                    "latest",
-                ]
-            )
-        repo = Repo(".")
-        shutil.rmtree("site", ignore_errors=True, onerror=None)
-        repo.git.checkout("mike-build", "build")
-        sp.run(["git", "branch", "-D", "mike-build"])
-        sp.run(["git", "rm", "-r", "--cached", "build", "--quiet"])
-        shutil.move("build", "site")
-        shutil.copy2("docs-compiler/templates/index.html", "site/index.html")
-
-    if outdir != "site" and Path("site").exists():
-        shutil.move("site", outdir)
-        print(f"INFO     -  Build assets located in {outdir}")
+        sp.run(["mkdocs", "build", "--clean", "--site-dir", outdir])
 
     if clean:
         cleanup()
