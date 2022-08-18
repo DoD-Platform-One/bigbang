@@ -1,4 +1,3 @@
-import glob
 import re
 import shutil
 import subprocess as sp
@@ -46,7 +45,7 @@ class SubmoduleRepo:
             src = Path(src_root / p)
             if src.exists() == False:
                 print(
-                    f"[yellow]WARNING  -[/yellow] No such file or directory: '{self.name}/{p}'"
+                    f"[yellow]WARNING  -[/yellow] `include` has a bad entry, no such file or directory: '{self.name}/{p}'"
                 )
                 continue
             dst = dst_root / p
@@ -55,7 +54,7 @@ class SubmoduleRepo:
             else:
                 shutil.copy2(src, dst)
 
-    def patch_external_refs(self, md_files_glob, root):
+    def patch_external_refs(self, md_files_glob, root: Path):
         """
         This method checks for links to external files (ie, files not found within the `include` block of the config)
         It then patches the files to reference the upstream file (found in Repo1) instead of a relative link
@@ -64,20 +63,18 @@ class SubmoduleRepo:
         # markdown regex to extract links from [Link label](link url)
         md_regex = r"\]\(([^\)]*)\)"
         md_glob = re.compile(md_regex)
-        all_md = glob.iglob(md_files_glob, recursive=True)
+        all_md = root.glob(md_files_glob)
         for md in all_md:
-            relative_path = (
-                str(Path(md).resolve().expanduser())
-                .replace(str(root), "", 1)
-                .removeprefix("/")
-            )
+            relative_path = Path(md).resolve().expanduser().relative_to(root)
             if (
                 Path(md).name == "values.md"
                 and "values" in frontmatter.loads(Path(md).read_text())["tags"]
+                or md == "about.md"
             ):
-                # dont check the values.md files
+                # dont check the values.md files or about.md
                 continue
-            original = Path(md).read_text(errors="ignore")
+            with Path(md).open() as f:
+                original = f.read()
             without_code = re.sub(
                 r"^```[^\S\r\n]*[a-z]*(?:\n(?!```$).*)*\n```",
                 "",
@@ -129,27 +126,40 @@ class SubmoduleRepo:
                         ).exists()
 
                         if without_parent_path_exists:
-                            # print(
-                            #     f"INFO     - Patching broken relative link to './docs' in '{md}': '{p}' --> {without_parent}"
-                            # )
+                            print(
+                                f"INFO     - Patching broken relative link to './docs' in '{self.name}/{str(Path(md).relative_to(root))}': '{p}' --> {without_parent}"
+                            )
                             with Path(md).open() as f:
                                 old_content = f.read()
                             with Path(md).open("w") as f:
                                 patched_content = re.sub(p, without_parent, old_content)
+                                f.write(patched_content)
+                                f.close()
                             continue
 
-                    relative_to_repo_root = str(
+                    relative_to_repo_root = (
                         self.path.joinpath(relative_path)
                         .parent.joinpath(Path(p))
                         .resolve()
-                    ).replace(str(self.path), "", 1)
-                    # print(p, relative_to_repo_root, md)
-                    # continue
+                        .relative_to(self.path)
+                    )
+                    file_actually_exists = self.path.joinpath(
+                        relative_to_repo_root
+                    ).exists()
+                    if file_actually_exists == False:
+                        print(
+                            f"[yellow]WARNING  -[/yellow] Unable to patch broken relative link in '{self.name}/{str(Path(md).relative_to(root))}', file does not exist: '{p}'"
+                        )
+                        continue
                     upstream_path = (
-                        self.upstream + "/-/tree/" + self.ref + relative_to_repo_root
+                        self.upstream
+                        + "/-/tree/"
+                        + self.ref
+                        + "/"
+                        + str(relative_to_repo_root)
                     )
                     print(
-                        f"INFO     - Patching broken relative link in '{md}': '{p}' --> {upstream_path}"
+                        f"INFO     - Patching broken relative link in '{self.name}/{str(Path(md).relative_to(root))}': '{p}' --> {upstream_path}"
                     )
                     with Path(md).open() as f:
                         old_content = f.read()
@@ -209,10 +219,10 @@ class BigBangRepo(SubmoduleRepo):
 
 
 def pull_latest():
-    print("INFO     -  Pulling latest from all submodules...")
-    sp.run(
-        ["./scripts/pull-latest.sh"],
-        cwd=Path().cwd(),
-        capture_output=True,
-        encoding="utf-8",
-    )
+    with c.status("Pulling latest from all submodules...", spinner="aesthetic"):
+        sp.run(
+            ["./scripts/pull-latest.sh"],
+            cwd=Path().cwd(),
+            capture_output=True,
+            encoding="utf-8",
+        )
