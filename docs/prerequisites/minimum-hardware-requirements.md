@@ -1,4 +1,4 @@
-# Big Bang Minimum Hardware Requirements
+# Minimum Hardware Requirements
 
 To calculate the minimum CPU, memory, and disk storage required to run Big Bang, open the [minimum hardware requirements Excel spreadsheet](./minimum-hardware-requirements.xlsx) and follow the instructions there.  This will allow you to select exactly which packages and pods are enabled.  In addition, it includes extra considerations to help you with sizing your cluster.  The final values will be for the entire cluster and can be split between multiple nodes.
 

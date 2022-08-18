@@ -123,4 +123,4 @@ The GitLab Runners used for Umbrella testing will be provided appropriate servic
 Clusters for testing the Umbrella app will be provisioned from vendors that allow for creation of dev and test clusters without licencing limitations.  Vendors will be required to provide
 
 1. A repository inside <https://repo1.dso.mil/platform-one/distros> to maintain code
-2. A GitLab pipeline task that provisions their distribution: [Vendor Distribution Integration](VendorDistroIntegration.md)
+2. A GitLab pipeline task that provisions their distribution: [Vendor Distribution Integration](vendor-distro-integration.md)

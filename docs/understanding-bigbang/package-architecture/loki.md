@@ -57,7 +57,7 @@ Loki utilizes an AGPLv3 License for it's code and binaries. By default the appli
 
 ### Single Sign On
 
-Loki utilizes Grafana as the frontend for searching and viewing logs, please refer to the [monitoring package for Single Sign On capabilities](../monitoring/Architecture.md).
+Loki utilizes Grafana as the frontend for searching and viewing logs, please refer to the [monitoring package for Single Sign On capabilities](monitoring.md).
 
 ### High Availability
 

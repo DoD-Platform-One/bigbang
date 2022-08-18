@@ -1,4 +1,4 @@
-# Big Bang Package: Database Integration
+# Database Integration
 
 If the package you are integrating connects to a database, you will need to follow the instructions below to integrate this feature into Big Bang.
 

@@ -1,4 +1,4 @@
-# Big Bang Package: Supported Package Integration
+# Supported Package Integration
 
 After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process) and getting approval to add it to Big Bang, the following instructions must be completed.
 

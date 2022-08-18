@@ -1,0 +1,17 @@
+nav:
+  - Home: README.md
+  - Database: database.md
+  - Documentation: documentation.md
+  - Flux: flux.md
+  - Helm Standards: helm-standards.md
+  - Monitoring: monitoring.md
+  - Network Policies: network-policies.md
+  - Ownership: ownership.md
+  - Pipeline: pipeline.md
+  - Policy Enforcement: policy-enforcement.md
+  - Service Mesh: service-mesh.md
+  - SSO: sso.md
+  - Object Storage: storage.md
+  - Supported: supported.md
+  - Testing: testing.md
+  - Upstream: upstream.md

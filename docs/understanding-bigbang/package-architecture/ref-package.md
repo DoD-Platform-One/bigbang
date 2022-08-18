@@ -1,4 +1,4 @@
-# Big Bang Package Architecture Review
+# Package Architecture Review
 
 - Big Bang to Package touch points / interactions - does the package have a GUI, storage needs, logging, monitoring, health checks, etc
 - HA - What is required for HA

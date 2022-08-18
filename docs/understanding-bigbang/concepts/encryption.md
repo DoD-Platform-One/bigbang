@@ -1,4 +1,4 @@
-# Big Bang Encryption
+# Encryption
 
 [[_TOC_]]
 
