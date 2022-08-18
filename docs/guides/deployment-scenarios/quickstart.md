@@ -1,4 +1,4 @@
-# Big Bang Quick Start
+# Quick Start
 
 [[_TOC_]]
 

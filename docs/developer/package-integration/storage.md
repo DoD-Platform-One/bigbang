@@ -1,4 +1,4 @@
-# Big Bang Package: Object Storage
+# Object Storage
 
 If the package you are integrating connects to object storage (e.g. S3 buckets), you will need to follow the instructions below to integrate this feature into Big Bang.
 

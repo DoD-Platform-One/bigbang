@@ -1,4 +1,4 @@
-# Big Bang Package: Testing
+# Testing
 
 Usually, Helm charts come with a set of Helm tests that can be run to test the deployment of the application.  Big Bang requires some additional tests to verify integration is working as expected.  By adding additional tests, the goal is to verify that the package is functioning.  For example, we may want to validate that
 

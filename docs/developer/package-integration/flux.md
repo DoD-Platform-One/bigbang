@@ -1,4 +1,4 @@
-# Big Bang Package: Flux Integration
+# Flux Integration
 
 Following the steps in this guide will result in the `integration` job being run for Third Party and Sandbox pipelines.
 

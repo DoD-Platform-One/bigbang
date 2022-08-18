@@ -1,4 +1,4 @@
-# Big Bang Configuration
+# Configuration
 
 [[_TOC_]]
 
