@@ -1,7 +1,5 @@
-import copy
 import glob
 import os
-import re
 import shutil
 import subprocess as sp
 from copy import deepcopy
@@ -71,6 +69,9 @@ def compile(bb, tag):
                 },
             )
 
+    bb.patch_external_refs("docs/*.md", docs_root)
+    bb.patch_external_refs("docs/docs/**/*.md", docs_root / "docs")
+
     pkgs_configs = meta["packages"]
     template_config = meta["packages"]["_template"]
     del meta["packages"]["_template"]
@@ -83,11 +84,13 @@ def compile(bb, tag):
             # skip it
             continue
         repo = SubmoduleRepo(pkg_name)
+        repo.checkout(pkgs[pkg]["tag"])
         dst_root = docs_root / "packages" / pkg
         os.makedirs(dst_root)
         src_root = Path().cwd().joinpath(pkg_config["source"])
         repo.copy_files(src_root, dst_root, pkg_config["include"])
         write_awesome_pages(pkg_config["pages"], dst_root / ".pages")
+        repo.patch_external_refs(f"docs/packages/{pkg_name}/**/*.md", dst_root)
 
     shutil.copy2(
         "submodules/bigbang/docs/packages.md",
@@ -138,25 +141,6 @@ def compile(bb, tag):
                 ),
             },
         )
-
-    # patch docs/docs references
-    pkg_docs_glob = glob.iglob("docs/packages/**/docs/*.md", recursive=True)
-    for doc in pkg_docs_glob:
-        with open(doc, "r") as f:
-            content = f.read()
-
-        without_bad_links = re.sub(r"\]\(\.\/docs", "](", content)
-        without_bad_links_ex = re.sub(r"\]\(docs", "](", without_bad_links)
-
-        if len(content) != len(without_bad_links_ex):
-            print(
-                f"[yellow]WARNING  -[/yellow] File has bad links to '/docs' or './docs' when already in the docs directory: '{doc}'"
-            )
-
-        with open(doc, "w") as f:
-            f.write(without_bad_links_ex)
-            f.close()
-    # end patch
 
     # patch packages nav
     with open("docs/packages/.pages", "w") as f:

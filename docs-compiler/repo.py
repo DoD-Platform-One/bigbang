@@ -1,9 +1,13 @@
+import glob
+import re
 import shutil
 import subprocess as sp
 from pathlib import Path
 
+import frontmatter
 from git import Repo
 from rich import print
+from rich.console import Console
 from ruamel.yaml import YAML
 
 yaml = YAML(typ="rt")
@@ -12,12 +16,16 @@ yaml.indent(mapping=2, sequence=4, offset=2)
 # prevent opinionated line wrapping
 yaml.width = 1000
 
+c = Console()
+
 
 class SubmoduleRepo:
     def __init__(self, name):
         self.name = name
         self.path = Path.cwd() / "submodules" / name
         self.repo = Repo(self.path)
+        self.upstream = self.repo.remote().url.removesuffix(".git")
+        self.ref = "main"
 
     def pull(self):
         self.repo.git.pull()
@@ -47,10 +55,114 @@ class SubmoduleRepo:
             else:
                 shutil.copy2(src, dst)
 
+    def patch_external_refs(self, md_files_glob, root):
+        """
+        This method checks for links to external files (ie, files not found within the `include` block of the config)
+        It then patches the files to reference the upstream file (found in Repo1) instead of a relative link
+        """
+        # these look for local and relative links only
+        # markdown regex to extract links from [Link label](link url)
+        md_regex = r"\]\(([^\)]*)\)"
+        md_glob = re.compile(md_regex)
+        all_md = glob.iglob(md_files_glob, recursive=True)
+        for md in all_md:
+            relative_path = (
+                str(Path(md).resolve().expanduser())
+                .replace(str(root), "", 1)
+                .removeprefix("/")
+            )
+            if (
+                Path(md).name == "values.md"
+                and "values" in frontmatter.loads(Path(md).read_text())["tags"]
+            ):
+                # dont check the values.md files
+                continue
+            original = Path(md).read_text(errors="ignore")
+            without_code = re.sub(
+                r"^```[^\S\r\n]*[a-z]*(?:\n(?!```$).*)*\n```",
+                "",
+                original,
+                0,
+                re.MULTILINE,
+            )
+            folder = Path(md).resolve().expanduser().parent
+            md_urls = md_glob.findall(without_code)
+
+            paths_to_check = []
+            for url in md_urls:
+                if url.startswith("mailto:"):
+                    # not gonna check email links yet
+                    continue
+                if url.startswith("#"):
+                    # not gonna check header links yet
+                    continue
+                if url.startswith("<"):
+                    # not gonna check alt href pattern
+                    continue
+                url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+                if re.match(url_pattern, url):
+                    # not gonna check remote
+                    continue
+                if " " in url:
+                    # url contains spaces, prob a bad url anyways
+                    continue
+                # remove title link
+                if re.match(r"^\w|\.", url):
+                    paths_to_check.append(url.rsplit("#", 1)[0])
+
+            paths_to_check: list[str] = list(set(paths_to_check))
+            for p in paths_to_check:
+                full_path = folder.joinpath(p).resolve()
+                if not full_path.exists():
+                    # if the path does not exist, but there is a path that matches without the current folder in the path,
+                    # replace it with that one
+                    if p.startswith(f"./{Path(p).parent.name}") or p.startswith(
+                        Path(p).parent.name
+                    ):
+                        without_parent = (
+                            p.removeprefix(Path(p).parent.name)
+                            .removeprefix(f"./{Path(p).parent.name}")
+                            .removeprefix("/")
+                        )
+                        without_parent_path_exists = folder.joinpath(
+                            without_parent
+                        ).exists()
+
+                        if without_parent_path_exists:
+                            # print(
+                            #     f"INFO     - Patching broken relative link to './docs' in '{md}': '{p}' --> {without_parent}"
+                            # )
+                            with Path(md).open() as f:
+                                old_content = f.read()
+                            with Path(md).open("w") as f:
+                                patched_content = re.sub(p, without_parent, old_content)
+                            continue
+
+                    relative_to_repo_root = str(
+                        self.path.joinpath(relative_path)
+                        .parent.joinpath(Path(p))
+                        .resolve()
+                    ).replace(str(self.path), "", 1)
+                    # print(p, relative_to_repo_root, md)
+                    # continue
+                    upstream_path = (
+                        self.upstream + "/-/tree/" + self.ref + relative_to_repo_root
+                    )
+                    print(
+                        f"INFO     - Patching broken relative link in '{md}': '{p}' --> {upstream_path}"
+                    )
+                    with Path(md).open() as f:
+                        old_content = f.read()
+                    with Path(md).open("w") as f:
+                        patched_content = re.sub(p, upstream_path, old_content)
+                        f.write(patched_content)
+                        f.close()
+
 
 class BigBangRepo(SubmoduleRepo):
     def __init__(self):
         SubmoduleRepo.__init__(self, "bigbang")
+        self.ref = "master"
 
     def get_pkgs(self):
         pkgs = {}
