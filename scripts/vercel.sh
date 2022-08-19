@@ -2,9 +2,7 @@
 
 set -eu
 
-npm i -g prettier
-
-./scripts/init-submodules.sh
+npm install prettier --location=global
 
 pip3 install poetry
 
