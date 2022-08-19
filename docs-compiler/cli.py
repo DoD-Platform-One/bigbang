@@ -15,7 +15,7 @@ from rich.console import Console
 from ruamel.yaml import YAML
 
 from .prenpost import cleanup, postflight, preflight
-from .repo import BigBangRepo, SubmoduleRepo, pull_latest
+from .repo import BigBangRepo, SubmoduleRepo
 from .utils import (
     add_frontmatter,
     get_release_notes,
@@ -205,7 +205,6 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
             f"[red]ERROR[/red]    - Please use either '--branch' or '--tag' or '--pre-release', not a combination"
         )
         exit(1)
-    pull_latest()
     bb = BigBangRepo()
     tags = bb.get_tags()
 

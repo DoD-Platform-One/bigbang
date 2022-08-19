@@ -233,13 +233,3 @@ class BigBangRepo(SubmoduleRepo):
                 continue
 
         return versions
-
-
-def pull_latest():
-    with c.status("Pulling latest from all submodules...", spinner="aesthetic"):
-        sp.run(
-            ["./scripts/pull-latest.sh"],
-            cwd=Path().cwd(),
-            capture_output=True,
-            encoding="utf-8",
-        )
