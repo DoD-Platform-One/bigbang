@@ -20,6 +20,12 @@ postUpgrade:
       pullPolicy: {{ .Values.imagePullPolicy }}
       pullSecrets:
       - name: private-registry
+preUninstall:
+  deleteWebhookConfigurations:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
