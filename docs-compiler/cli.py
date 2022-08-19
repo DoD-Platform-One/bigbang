@@ -4,12 +4,14 @@ import shutil
 import subprocess as sp
 from copy import deepcopy
 from pathlib import Path
+import time
 
 import click
 import semver
 from deepmerge import always_merger as merge
 from git import GitCommandError
 from rich import print
+from rich.console import Console
 from ruamel.yaml import YAML
 
 from .prenpost import cleanup, postflight, preflight
@@ -28,16 +30,19 @@ yaml = YAML(typ="rt")
 yaml.indent(mapping=2, sequence=4, offset=2)
 # prevent opinionated line wrapping
 yaml.width = 1000
+c = Console()
 
 
 def compile(bb, tag):
-    pkgs = bb.get_pkgs()
     docs_root = Path().cwd() / "docs"
 
     with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
         meta = yaml.load(f)
 
     ## bigbang section
+    print()
+    c.rule(f"{bb.name}@{bb.ref}")
+    print()
     bb_config = meta["/"]
     notes = get_release_notes(tag)
     if notes != None:
@@ -77,19 +82,21 @@ def compile(bb, tag):
 
     bb.patch_external_refs("**/*.md", docs_root)
 
-    pkgs_configs = meta["packages"]
     template_config = meta["packages"]["_template"]
     del meta["packages"]["_template"]
-    for pkg in pkgs_configs:
+    pkgs = bb.get_pkgs()
+    for pkg in pkgs:
         tmpl = deepcopy(template_config)
-        pkg_config = merge.merge(tmpl, meta["packages"][pkg])
-        pkg_name = pkg_config["source"].split("/")[-1]
-        if pkg_name not in pkgs.keys():
-            # this means that we are trying to build a version of the docs that does not have this (newer) pkg
-            # skip it
-            continue
-        repo = SubmoduleRepo(pkg_name)
+        try:
+            pkg_config = merge.merge(tmpl, meta["packages"][pkg])
+        except KeyError:
+            pkg_config = tmpl
+            pkg_config["source"] = "submodules/" + pkg
+        repo = SubmoduleRepo(pkgs[pkg]["name"], pkgs[pkg]["repo"])
         repo.checkout(pkgs[pkg]["tag"])
+        print()
+        c.rule(f"\n{repo.name}@{repo.ref}\n")
+        print()
         dst_root = docs_root / "packages" / pkg
         os.makedirs(dst_root)
         src_root = Path().cwd().joinpath(pkg_config["source"])
@@ -97,69 +104,57 @@ def compile(bb, tag):
         write_awesome_pages(pkg_config["pages"], dst_root / ".pages")
         repo.patch_external_refs("**/*.md", dst_root)
 
+        for md in dst_root.glob("**/*.md"):
+            add_frontmatter(
+                md,
+                {
+                    "tags": ["package", pkg, pkgs[pkg]["tag"]],
+                    "revision_date": repo.get_revision_date(md.relative_to(dst_root)),
+                },
+            )
+
+        values_table = parse_values_table_from_helm_docs(
+            src_root / "README.md",
+            r"## Values(.*?)## Contributing",
+        )
+        patch_values_table_from_helm_docs(
+            f"docs/packages/{pkg}/README.md", values_table
+        )
+        write_values_md(f"docs/packages/{pkg}/values.md", values_table, pkg)
+        add_frontmatter(
+            f"docs/packages/{pkg}/values.md",
+            {"tags": ["values", pkg, pkgs[pkg]["tag"]]},
+        )
+
     shutil.copy2(
         "submodules/bigbang/docs/packages.md",
         "docs/packages/index.md",
     )
 
-    pkg_readmes = glob.iglob("docs/packages/*/README.md")
-    for md in pkg_readmes:
-        pkg_name = md.split("/")[2]
-        values_table = parse_values_table_from_helm_docs(
-            md.replace("docs/packages/", "submodules/", 1),
-            r"## Values(.*?)## Contributing",
-        )
-        patch_values_table_from_helm_docs(
-            f"docs/packages/{pkg_name}/README.md", values_table
-        )
-        write_values_md(f"docs/packages/{pkg_name}/values.md", values_table, pkg_name)
-        pkg_tag = pkgs[pkg_name]["tag"]
-        add_frontmatter(
-            f"docs/packages/{pkg_name}/values.md",
-            {"tags": ["values", pkg_name, pkg_tag]},
-        )
+    with c.status(f"Adding tags to Big Bang docs...", spinner="aesthetic"):
+        bb_docs = docs_root.glob("docs/**/*.md")
+        for md in bb_docs:
+            add_frontmatter(
+                md,
+                {
+                    "tags": ["bigbang", tag],
+                    "revision_date": bb.get_revision_date(
+                        md.relative_to(docs_root)
+                    ),
+                },
+            )
 
-    bb_docs = glob.iglob("docs/docs/**/*.md", recursive=True)
-    for md in bb_docs:
-        add_frontmatter(
-            md,
-            {
-                "tags": ["bigbang", tag],
-                "revision_date": bb.get_revision_date(
-                    md.replace("docs/docs/", "./docs/", 1)
-                ),
-            },
-        )
-
-    pkg_docs = glob.iglob("docs/packages/**/*.md", recursive=True)
-    for md in pkg_docs:
-        pkg_name = md.split("/")[2]
-        if (
-            md == "docs/packages/index.md"
-            or md == f"docs/packages/{pkg_name}/values.md"
-        ):
-            continue
-        pkg_tag = pkgs[pkg_name]["tag"]
-        add_frontmatter(
-            md,
-            {
-                "tags": ["package", pkg_name, pkg_tag],
-                "revision_date": SubmoduleRepo(pkg_name).get_revision_date(
-                    md.replace(f"docs/packages/{pkg_name}/", "./", 1)
-                ),
-            },
-        )
-
-    # patch packages nav
-    with open("docs/packages/.pages", "w") as f:
-        dot_pages = {}
-        dot_pages["nav"] = [{"Home": "index.md"}]
-        sorted_pkgs = sorted(meta["packages"])
-        for pkg in sorted_pkgs:
-            dot_pages["nav"].append({pkg: pkg})
-        yaml.dump(dot_pages, f)
-        f.close()
-    # end patch
+    with c.status(f"Creating docs/packages/.pages...", spinner="aesthetic"):
+        # patch packages nav
+        with open("docs/packages/.pages", "w") as f:
+            dot_pages = {}
+            dot_pages["nav"] = [{"Home": "index.md"}]
+            sorted_pkgs = sorted(pkgs)
+            for pkg in sorted_pkgs:
+                dot_pages["nav"].append({pkg: pkg})
+            yaml.dump(dot_pages, f)
+            f.close()
+        # end patch
 
 
 @click.command(
@@ -198,6 +193,7 @@ def compile(bb, tag):
 )
 @click.option("-d", "--dev", help="Run `mkdocs serve` after build", is_flag=True)
 def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
+    time_start = time.time()
     ref = None
     if (
         tag != "latest"
@@ -261,6 +257,10 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
     preflight(bb)
     compile(bb, ref)
     postflight()
+
+    time_end = time.time()
+    time_taken = time_end - time_start
+    print(f"INFO     - Compilation completed in {time_taken.__round__(2)} seconds")
 
     if dev and no_build == False:
         sp.run(["mkdocs", "serve"])

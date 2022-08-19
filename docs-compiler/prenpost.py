@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess as sp
 from pathlib import Path
@@ -17,21 +18,11 @@ def preflight(bb):
     with c.status("Running preflight steps...", spinner="aesthetic"):
         shutil.rmtree("docs", ignore_errors=True, onerror=None)
         shutil.copytree("base", "docs", dirs_exist_ok=True)
-        pkgs = bb.get_pkgs()
         with Path().cwd().joinpath("docs-compiler.yaml").open("r") as f:
             meta = YAML().load(f)
-        pkgs_from_meta = meta["packages"]
-        for pkg in pkgs.keys():
-            config_exists = pkg in pkgs_from_meta
-            if config_exists == False:
-                print(
-                    f"[red]ERROR[/red]    - Package config '.packages.{pkg}' does not exist in 'bb-docs-compiler.yaml'"
-                )
-                print(
-                    f"You will have to add a new config entry for this package, commit and try again"
-                )
-                exit()
-
+        for folder in meta.keys():
+            if folder != "/":
+                os.makedirs(Path().cwd() / "docs" / folder, exist_ok=True)
 
 def postflight():
     with c.status("Running postflight steps...", spinner="aesthetic"):

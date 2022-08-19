@@ -20,15 +20,26 @@ c = Console()
 
 
 class SubmoduleRepo:
-    def __init__(self, name):
+    def __init__(self, name, upstream):
         self.name = name
         self.path = Path.cwd() / "submodules" / name
+        self.upstream = upstream
+        if self.path.exists() == False:
+            self.clone_to_submodules()
         self.repo = Repo(self.path)
-        self.upstream = self.repo.remote().url.removesuffix(".git")
+        self.fetch()
         self.ref = "main"
 
-    def pull(self):
-        self.repo.git.pull()
+    def fetch(self):
+        self.repo.remotes.origin.fetch()
+
+    def clone_to_submodules(self):
+        with c.status(f"Cloning {self.name}...", spinner="aesthetic"):
+            sp.run(
+                ["git", "clone", self.upstream, f"submodules/{self.name}"],
+                capture_output=True,
+                cwd=Path().cwd(),
+            )
 
     def checkout(self, ref):
         if self.repo.is_dirty():
@@ -97,8 +108,7 @@ class SubmoduleRepo:
                 if url.startswith("<"):
                     # not gonna check alt href pattern
                     continue
-                url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
-                if re.match(url_pattern, url):
+                if url.startswith("https") or url.startswith("http"):
                     # not gonna check remote
                     continue
                 if " " in url:
@@ -153,7 +163,7 @@ class SubmoduleRepo:
                         )
                         continue
                     upstream_path = (
-                        self.upstream
+                        self.upstream.removesuffix(".git")
                         + "/-/tree/"
                         + self.ref
                         + "/"
@@ -172,7 +182,7 @@ class SubmoduleRepo:
 
 class BigBangRepo(SubmoduleRepo):
     def __init__(self):
-        SubmoduleRepo.__init__(self, "bigbang")
+        SubmoduleRepo.__init__(self, "bigbang", "https://repo1.dso.mil/platform-one/big-bang/bigbang.git")
         self.ref = "master"
 
     def get_pkgs(self):
