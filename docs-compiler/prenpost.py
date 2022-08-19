@@ -24,6 +24,7 @@ def preflight(bb):
             if folder != "/":
                 os.makedirs(Path().cwd() / "docs" / folder, exist_ok=True)
 
+
 def postflight():
     with c.status("Running postflight steps...", spinner="aesthetic"):
         sp.run(

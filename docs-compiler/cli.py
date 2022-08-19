@@ -2,9 +2,9 @@ import glob
 import os
 import shutil
 import subprocess as sp
+import time
 from copy import deepcopy
 from pathlib import Path
-import time
 
 import click
 import semver
@@ -138,9 +138,7 @@ def compile(bb, tag):
                 md,
                 {
                     "tags": ["bigbang", tag],
-                    "revision_date": bb.get_revision_date(
-                        md.relative_to(docs_root)
-                    ),
+                    "revision_date": bb.get_revision_date(md.relative_to(docs_root)),
                 },
             )
 

@@ -182,7 +182,9 @@ class SubmoduleRepo:
 
 class BigBangRepo(SubmoduleRepo):
     def __init__(self):
-        SubmoduleRepo.__init__(self, "bigbang", "https://repo1.dso.mil/platform-one/big-bang/bigbang.git")
+        SubmoduleRepo.__init__(
+            self, "bigbang", "https://repo1.dso.mil/platform-one/big-bang/bigbang.git"
+        )
         self.ref = "master"
 
     def get_pkgs(self):
