@@ -7,19 +7,6 @@ from deepmerge import always_merger
 from jinja2 import Template
 from requests import get
 from rich import print
-from ruamel.yaml import YAML
-
-yaml = YAML(typ="rt")
-# indent 2 spaces extra on lists
-yaml.indent(mapping=2, sequence=4, offset=2)
-# prevent opinionated line wrapping
-yaml.width = 1000
-
-
-def write_awesome_pages(config, dst):
-    with Path(dst).open("w") as f:
-        yaml.dump(config, f)
-
 
 values_template = Template(
     open(

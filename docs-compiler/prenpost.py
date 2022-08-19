@@ -3,7 +3,6 @@ import shutil
 import subprocess as sp
 from pathlib import Path
 
-from rich import print
 from rich.console import Console
 from ruamel.yaml import YAML
 

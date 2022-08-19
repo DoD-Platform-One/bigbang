@@ -21,7 +21,6 @@ from .utils import (
     get_release_notes,
     parse_values_table_from_helm_docs,
     patch_values_table_from_helm_docs,
-    write_awesome_pages,
     write_values_md,
 )
 
@@ -53,7 +52,8 @@ def compile(bb, tag):
     bb.copy_files(
         Path().cwd() / "submodules" / "bigbang", docs_root, bb_config["include"]
     )
-    write_awesome_pages(bb_config["pages"], docs_root / ".pages")
+    with Path(docs_root / ".pages").open("w") as f:
+        yaml.dump(bb_config["pages"], f)
 
     bb_values_table = parse_values_table_from_helm_docs(
         "submodules/bigbang/docs/understanding-bigbang/configuration/base-config.md",
@@ -101,7 +101,8 @@ def compile(bb, tag):
         os.makedirs(dst_root)
         src_root = Path().cwd().joinpath(pkg_config["source"])
         repo.copy_files(src_root, dst_root, pkg_config["include"])
-        write_awesome_pages(pkg_config["pages"], dst_root / ".pages")
+        with Path(dst_root / ".pages").open("w") as f:
+            yaml.dump(pkg_config["pages"], f)
         repo.patch_external_refs("**/*.md", dst_root)
 
         for md in dst_root.glob("**/*.md"):

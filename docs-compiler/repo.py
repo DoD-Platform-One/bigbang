@@ -10,12 +10,6 @@ from rich import print
 from rich.console import Console
 from ruamel.yaml import YAML
 
-yaml = YAML(typ="rt")
-# indent 2 spaces extra on lists
-yaml.indent(mapping=2, sequence=4, offset=2)
-# prevent opinionated line wrapping
-yaml.width = 1000
-
 c = Console()
 
 
@@ -191,7 +185,7 @@ class BigBangRepo(SubmoduleRepo):
         pkgs = {}
         values_path = self.path / "chart" / "values.yaml"
         with open(values_path) as values_yaml:
-            values = yaml.load(values_yaml)
+            values = YAML().load(values_yaml)
 
         # core
         for _, v in values.items():
