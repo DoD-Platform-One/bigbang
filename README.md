@@ -17,8 +17,6 @@ git clone <this repo>
 
 cd <this repo>
 
-./scripts/init-submodules.sh
-
 pip3 install poetry
 
 poetry config virtualenvs.in-project true
