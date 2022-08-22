@@ -1628,11 +1628,11 @@ get_cpumem(){
 }
 
 renovate_download_external_deps() {
-  curl -sO https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
+  mkdir -p "${CI_PROJECT_DIR}"/scripts/
   
-  curl -sO https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
-
-  curl -sO https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
+  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
+  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
+  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
 
   mkdir -p "${CI_PROJECT_DIR}"/renovate
 }
