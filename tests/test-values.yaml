@@ -127,8 +127,11 @@ clusterAuditor:
         envs:
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           cypress_prometheus_url: 'https://prometheus.bigbang.dev'
-          cypress_allownodatas: '0'
           cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
+          # OPA violations table and violations by kind chart
+          cypress_table_bar_allownodata: '0'
+          # violations over time graph
+          cypress_graph_allownodata: '1'
 
 gatekeeper:
   enabled: true
