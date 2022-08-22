@@ -1265,8 +1265,10 @@ addons:
       nexus:
       # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
         env:
-          - name: install4jAddVmParams
-            value: "-Xms500M -Xmx500M -XX:MaxDirectMemorySize=500M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+          - name: INSTALL4J_ADD_VM_PARAMS
+            value: "-Dcom.redhat.fips=false -Xms1024M -Xmx1024M -XX:MaxDirectMemorySize=1024M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+          - name: NEXUS_SECURITY_RANDOMPASSWORD
+            value: "true"
         resources:
           requests:
             cpu: 100m

@@ -947,7 +947,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
       path: "./chart"
-      tag: "40.1.0-bb.0"
+      tag: "41.0.0-bb.0"
 
     # -- Base64 encoded license file.
     license_key: ""
