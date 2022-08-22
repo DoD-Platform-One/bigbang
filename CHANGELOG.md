@@ -3,7 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
----
+## [2.4.64]
+### Added
+- New pipeline for pipeline templates with changelog validation and auto-tagging
+
 ## [2.4.63]
 ### Changed
 - Updated helm-docs deps to ensure files made it to correct dir
@@ -345,6 +348,7 @@ Pipeline will exit w/ a `321` code if any package that is _not_ BETA fails to pu
 - Add function get_cpumem() to dump cpu and memory usage via the metrics API
 
 ## [2.2.20]
+### Changed
 - Changed kubeconfig permissions to 600 due to pipeline warnings about group and world readable
 
 ## [2.2.19]

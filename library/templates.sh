@@ -1052,6 +1052,42 @@ chart_update_check() {
    fi
 }
 
+changelog_update_check() {
+   # change to target branch and check if Changelog update is missing.
+   echo -e "\e[0Ksection_start:`date +%s`:changelog_update_check[collapsed=true]\r\e[0KChecking default branch CHANGELOG"
+   git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+   if [ ! -f "CHANGELOG.md" ]; then
+     # change to source branch and check if Changelog missing. If missing, fail.
+     git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+     if [ ! -f "CHANGELOG.md" ]; then
+       echo -e "\e[0Ksection_end:`date +%s`:changelog_update_check\r\e[0K"
+       echo -e "\e[31mFAIL: Package must have CHANGELOG.md\e[0m"
+       exit 1
+     else
+       # target branch is missing Changelog. Exit with notice.
+       echo -e "\e[0Ksection_end:`date +%s`:changelog_update_check\r\e[0K"
+       echo -e "\e[31mNOTICE: Changelog not found in ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}, skipping changelog check\e[0m"
+       exit 0
+     fi
+     # return to target branch
+     git fetch &>/dev/null && git checkout ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+   fi
+   cp CHANGELOG.md /tmp/CHANGELOG.md
+   echo -e "\e[0Ksection_end:`date +%s`:changelog_update_check\r\e[0K"
+   echo -e "\e[0Ksection_start:`date +%s`:package_checkout2[collapsed=true]\r\e[0KChecking for CHANGELOG updates"
+   git reset --hard && git clean -fd
+   git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+   echo -e "\e[0Ksection_end:`date +%s`:package_checkout2\r\e[0K"
+   if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ]; then
+     echo -e "\e[31mNOTICE: You need to update CHANGELOG.md\e[0m"
+     EXIT="true"
+   fi
+   if [ "$EXIT" == "true" ]; then
+     exit 1
+   fi
+   echo "Changelog has been updated."
+}
+
 dependency_images() {
    echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Dependency Images\e[37m"
    deps=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
@@ -1189,18 +1225,33 @@ get_chart_version() {
      echo -e "\e[0Ksection_end:`date +%s`:get_chart_version\r\e[0K"
      exit 1
    else
-     CHART_VERSION=$(yq e '.version' chart/Chart.yaml)
-     echo "Using Chart version: ${CHART_VERSION}"
+     TAG_VERSION=$(yq e '.version' chart/Chart.yaml)
+     echo "Using Chart version: ${TAG_VERSION}"
    fi
    echo -e "\e[0Ksection_end:`date +%s`:get_chart_version\r\e[0K"
+}
+
+get_changelog_version() {
+   # Get the latest entry from the changelog and export as `TAG_VERSION` for use by other functions
+   echo -e "\e[0Ksection_start:`date +%s`:get_changelog_version[collapsed=true]\r\e[0KGetting CHANGELOG Version"
+   if [ ! -f "CHANGELOG.md" ]; then
+     echo -e "\e[31mFAIL: Pipeline templates must have CHANGELOG.md\e[0m"
+     echo -e "\e[0Ksection_end:`date +%s`:get_changelog_version\r\e[0K"
+     exit 1
+   else
+     # Grab the version from the latest changelog entry
+     TAG_VERSION=$(cat CHANGELOG.md | grep "##" | grep -o "[0-9]\+\.[0-9]\+\.[0-9]\+" | head -1)
+     echo "Using CHANGELOG version: ${TAG_VERSION}"
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:get_changelog_version\r\e[0K"
 }
 
 create_tag() {
    echo -e "\e[0Ksection_start:`date +%s`:create_tag[collapsed=true]\r\e[0K\e[33;1mCreating Tag\e[37m"
    echo "Running tag create command..."
-   tag_output=$(curl -s --request POST --header "PRIVATE-TOKEN: ${TOKEN_TAG}" "https://repo1.dso.mil/api/v4/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${CHART_VERSION}&ref=${CI_DEFAULT_BRANCH}" 2>/dev/null)
-   if [[ $(echo $tag_output | jq -r '.name') == "${CHART_VERSION}" ]]; then
-     echo "Tag ${CHART_VERSION} created successfully."
+   tag_output=$(curl -s --request POST --header "PRIVATE-TOKEN: ${TOKEN_TAG}" "https://repo1.dso.mil/api/v4/projects/${CI_PROJECT_ID}/repository/tags?tag_name=${TAG_VERSION}&ref=${CI_DEFAULT_BRANCH}" 2>/dev/null)
+   if [[ $(echo $tag_output | jq -r '.name') == "${TAG_VERSION}" ]]; then
+     echo "Tag ${TAG_VERSION} created successfully."
      echo -e "\e[0Ksection_end:`date +%s`:create_tag\r\e[0K"
    elif [[ $(echo $tag_output | jq -r '.message') =~ "already exists" ]]; then
      echo -e "\e[31mNOTICE: Tag Exists. If this change does not require a new package release this is OK. Otherwise this needs to be looked at further\e[0m"
