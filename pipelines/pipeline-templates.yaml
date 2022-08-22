@@ -1,0 +1,72 @@
+# global rules for when pipelines run
+workflow:
+  rules:
+    # skip pipeline for MRs with docs label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
+      when: never
+    # skip pipeline for MRs with disable-ci label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)disable-ci(,|$)/
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # run pipeline on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Include templates and cluster creation jobs
+include:
+  - local: '/library/templates.yaml'
+
+stages:
+  - 📝 changelog check
+  - 🏷️ tag
+
+variables:
+  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO_DESTINATION: "../pipeline-repo"
+  PIPELINE_REPO_BRANCH: master
+
+changelog check:
+  stage: 📝 changelog check
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # skip job when MR title contains 'SKIP UPDATE CHECK'
+    - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPDATE CHECK/'
+      when: never
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    # Check for changelog additions
+    - changelog_format_check
+    - changelog_update_check
+
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+auto tag:
+  stage: 🏷️ tag
+  extends:
+    - .bigbang-gitlab-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    # run tag stage on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - get_changelog_version
+    - create_tag
+  allow_failure:
+    exit_codes:
+      - 201
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
