@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [41.0.0-bb.0] - 2022-08-11
+### Changed
+- Updated chart to version: 41.0.0-bb.0 | appVersion: 3.41.0
+
 ## [40.1.0-bb.0] - 2022-07-12
 ### Changed
 - Updated chart to version: 40.1.0-bb.0 | appVersion: 3.40.1

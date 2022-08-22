@@ -96,7 +96,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.40.1-01
+  tag: 3.41.0-01
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: private-registry
@@ -165,13 +165,7 @@ nexus:
     # https://help.sonatype.com/repomanager3/product-information/system-requirements
     - name: INSTALL4J_ADD_VM_PARAMS
       # info about fips option: https://access.redhat.com/documentation/en-us/openjdk/8/pdf/configuring_openjdk_8_on_rhel_with_fips/openjdk-8-configuring_openjdk_8_on_rhel_with_fips-en-us.pdf
-      value: |-
-        -Dcom.redhat.fips=false
-        -Xms2703M -Xmx2703M
-        -XX:MaxDirectMemorySize=2703M
-        -XX:+UnlockExperimentalVMOptions
-        -XX:+UseCGroupMemoryLimitForHeap
-        -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+      value: "-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
     - name: NEXUS_SECURITY_RANDOMPASSWORD
       value: "true"
   properties:
