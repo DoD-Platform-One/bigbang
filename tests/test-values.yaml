@@ -170,7 +170,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-cypress-test
+          - logging/loki-simple-scalable-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
@@ -271,7 +271,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-cypress-test
+          - logging/loki-simple-scalable-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
@@ -569,32 +569,30 @@ loki:
   enabled: false
   strategy: scalable
   values:
-    global:
-      createGlobalConfig: true
-      existingSecretForConfig: "loki-config"
-    loki-simple-scalable:
-      write:
-        replicas: 1
-        persistence:
-          size: 2Gi
-        resources:
-          limits:
-            cpu: 200m
-            memory: 400Mi
-          requests:
-            cpu: 200m
-            memory: 400Mi
-      read:
-        replicas: 1
-        persistence:
-          size: 2Gi
-        resources:
-          limits:
-            cpu: 200m
-            memory: 400Mi
-          requests:
-            cpu: 200m
-            memory: 400Mi
+    minio:
+      enabled: true
+    write:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
+    read:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
     bbtests:
       enabled: true
       cypress:
