@@ -1,4 +1,7 @@
 describe('Basic Nexus', function() {
+  Cypress.on('uncaught:exception', (err, runnable) => {
+    return false
+  })
   it('Visit the Nexus sign in page', function() {
     cy.visit(Cypress.env('nexus_url'))
     cy.contains("Sign in").click()
