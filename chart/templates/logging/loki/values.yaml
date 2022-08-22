@@ -21,27 +21,28 @@ networkPolicies:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+{{- if (eq .Values.loki.strategy "scalable") }}
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+{{- end }}
 
 istio:
   enabled: {{ .Values.istio.enabled }} 
 
-{{- if (eq .Values.loki.strategy "scalable") }}
-global:
-  createGlobalConfig: true
-  existingSecretForConfig: loki-config
-
-  objectStorage:
-    endpoint: {{ .Values.loki.objectStorage.endpoint }}
-    region: {{ .Values.loki.objectStorage.region }}
-    bucketnames: {{ .Values.loki.objectStorage.bucketNames }}
-    access_key_id: {{ .Values.loki.objectStorage.accessKey }}
-    secret_access_key: {{ .Values.loki.objectStorage.accessSecret }}
+loki:
+  storage:
+    bucketNames:
+      {{- toYaml .Values.loki.objectStorage.bucketNames | nindent 6 }}
+    s3:
+      endpoint: {{ .Values.loki.objectStorage.endpoint }}
+      region: {{ .Values.loki.objectStorage.region }}
+      accessKeyId: {{ .Values.loki.objectStorage.accessKey }}
+      secretAccessKey: {{ .Values.loki.objectStorage.accessSecret }}
 
 {{- with .Values.loki.objectStorage }}
-{{- if not (and .endpoint .bucketNames .accessKey .accessSecret) }}
+{{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
   enabled: true
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -50,16 +51,15 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
-loki:
+monolith:
   enabled: {{ eq .Values.loki.strategy "monolith" }}
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
-
-loki-simple-scalable:
-  enabled: {{ eq .Values.loki.strategy "scalable" }}
-  imagePullSecrets:
-    - name: private-registry
-  serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+{{- if (eq .Values.loki.strategy "monolith") }}
+read:
+  disabled: true
+write:
+  disabled: true
+{{- end }}
 
 {{- end -}}

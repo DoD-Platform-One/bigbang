@@ -70,7 +70,7 @@ config:
         match                  kube.*
         labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
         {{- if eq .Values.loki.strategy "monolith" }}
-        host                   logging-loki
+        host                   loki
         {{- else }}
         host                   logging-loki-write
         {{- end }}
@@ -84,7 +84,7 @@ config:
         match                  host.*
         labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
         {{- if eq .Values.loki.strategy "monolith" }}
-        host                   logging-loki
+        host                   loki
         {{- else }}
         host                   logging-loki-write
         {{- end }}

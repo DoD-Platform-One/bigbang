@@ -509,7 +509,7 @@ loki:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
     path: "./chart"
-    tag: "3.0.5-bb.4"
+    tag: "1.7.6-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -521,7 +521,7 @@ loki:
     # -- S3 compatible endpoint to use for connection information.
     # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
     endpoint: ""
-
+    
     # -- S3 compatible region to use for connection information.
     region: ""
 
@@ -532,9 +532,11 @@ loki:
     # Unencoded string data. This should be placed in the secret values and then encrypted
     accessSecret: ""
 
-    # -- Bucket Names for Loki as a comma delimited list.
-    # examples: "loki-logs"
-    bucketNames: ""
+    # -- Bucket Names for the Loki buckets as YAML
+    # chunks: loki-logs
+    # ruler: loki-ruler
+    # admin: loki-admin
+    bucketNames: {}
 
   # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
   values: {}
