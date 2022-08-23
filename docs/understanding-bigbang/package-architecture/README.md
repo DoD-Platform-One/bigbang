@@ -1,4 +1,4 @@
-# Big Bang Packages
+# Packages
 
 Big Bang includes many different packages that provide services to the ecosystem.  Each of these packages is deployed by a Helm chart located in a repository under [Big Bang's Packages Group](https://repo1.dso.mil/platform-one/big-bang/apps).  The packages are broken up into several categories listed below.  Sometimes packages are tightly coupled and grouped together in a stack.  When using a stack, all packages in the stack will be deployed.
 
@@ -123,8 +123,8 @@ A service mesh is a dedicated infrastructure layer for making service-to-service
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
 |X|Istio|Istio Operator|Operator|[istio-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator)|
-|X|Istio|[Istio](./istio/Architecture.md)|Control Plane|[istio-controlplane](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane)|
-|X|Istio|[Kiali](./kiali/Architecture.md)|Management Console|[kiali](https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali)|
+|X|Istio|[Istio](./istio.md)|Control Plane|[istio-controlplane](https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane)|
+|X|Istio|[Kiali](./kiali.md)|Management Console|[kiali](https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali)|
 
 ### Logging
 
@@ -133,9 +133,9 @@ A logging stack is a set of scalable tools that can aggregate logs from cluster 
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
 |X|EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator)
-|X|EFK|[Elasticsearch / Kibana](./elasticsearch-kibana/Architecture.md)|Storage & Visualization|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
-|X|EFK|[Fluentbit](./fluentbit/Architecture.md)|Forwarder|[fluentbit](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit)|
-| |PLG|[Loki](./loki/Architecture.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Storage|[loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki)|
+|X|EFK|[Elasticsearch / Kibana](./elasticsearch-kibana.md)|Storage & Visualization|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
+|X|EFK|[Fluentbit](./fluentbit.md)|Forwarder|[fluentbit](https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit)|
+| |PLG|[Loki](./loki.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Storage|[loki](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki)|
 | |PLG|Promtail ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Forwarder|[promtail](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail)|
 > PLG stack uses Grafana, deployed in [monitoring](#monitoring), for visualization.
 
@@ -145,9 +145,9 @@ Policy Enforcement is the ability to validate Kubernetes resources against compl
 
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
-|X|Gatekeeper|[OPA Gatekeeper](./opa-gatekeeper/Architecture.md)|Engine & Policies|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
-|X|Gatekeeper|[Cluster Auditor](./cluster-auditor/Architecture.md)|Reporting|[cluster-auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)|
-| |Kyverno|[Kyverno](./kyverno/Architecture.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Engine|[kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno)|
+|X|Gatekeeper|[OPA Gatekeeper](./opa-gatekeeper.md)|Engine & Policies|[policy](https://repo1.dso.mil/platform-one/big-bang/apps/core/policy)|
+|X|Gatekeeper|[Cluster Auditor](./cluster-auditor.md)|Reporting|[cluster-auditor](https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor)|
+| |Kyverno|[Kyverno](./kyverno.md) ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Engine|[kyverno](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno)|
 | |Kyverno|Kyverno Policies ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Policies|[kyverno-policies](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies)|
 | |Kyverno|Kyverno Reporter ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Reporting|[kyverno-reporter](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter)|
 
@@ -157,8 +157,8 @@ A monitoring stack is used to collect, visualize, and alert on time-series metri
 
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
-|X|Monitoring|[Prometheus](./monitoring/Architecture.md)|Collection & Alerting|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
-|X|Monitoring|[Grafana](./monitoring/Architecture.md)|Visualization|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
+|X|Monitoring|[Prometheus](./monitoring.md)|Collection & Alerting|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
+|X|Monitoring|[Grafana](./monitoring.md)|Visualization|[monitoring](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring)|
 
 ### Distributed Tracing
 
@@ -166,7 +166,7 @@ Distributed tracing is a method of tracking application transactions as they flo
 
 |Default|Package|Repositories|
 |--|--|--|
-|X|[Jaeger](./jaeger/Architecture.md)|[jaeger](https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger)|
+|X|[Jaeger](./jaeger.md)|[jaeger](https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger)|
 | |Tempo ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|[tempo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo)|
 Product:
 
@@ -176,7 +176,7 @@ Runtime security is the active protection of containers running in the cluster. 
 
 |Default|Package|Repositories|
 |--|--|--|
-|X|[Prisma Cloud Compute](./twistlock/Architecture.md) (AKA Twistlock) ![License Required](https://img.shields.io/badge/License_Required-orange)|[twistlock](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock)|
+|X|[Prisma Cloud Compute](./twistlock.md) (AKA Twistlock) ![License Required](https://img.shields.io/badge/License_Required-orange)|[twistlock](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock)|
 
 ## Addons
 
@@ -189,7 +189,7 @@ Storage utilities include packages that provide services to store and retrieve t
 |Stack|Package|Function|Repository|
 |--|--|--|--|
 |MinIO|MinIO Operator|Operator|[minio-operator](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator)|
-|MinIO|[MinIO](./minio/Architecture.md)|S3 Object Storage|[minio](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio)|
+|MinIO|[MinIO](./minio.md)|S3 Object Storage|[minio](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio)|
 
 ### Cluster Utilities
 
@@ -207,9 +207,9 @@ Security packages add additional security features for protecting services or da
 
 |Package|Function|Repository|
 |--|--|--|
-|[Anchore](./anchore/Architecture.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise)|
-|[Authservice](./authservice/Architecture.md)|Istio extension for Single Sign-On (SSO)|[authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)|
-|[Keycloak](./keycloak/Architecture.md)|IdP, Identity Broker, AuthN/Z|[keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)|
+|[Anchore](./anchore.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise)|
+|[Authservice](./authservice.md)|Istio extension for Single Sign-On (SSO)|[authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)|
+|[Keycloak](./keycloak.md)|IdP, Identity Broker, AuthN/Z|[keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)|
 |Vault ![BETA](https://img.shields.io/badge/BETA-purple?style=flat-square)|Sensitive Data Access Control|[vault](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault)|
 
 ### Collaboration
@@ -219,7 +219,7 @@ Collaboration tools provide environments to help teams work together online.  Ch
 |Stack|Package|Function|Repository|
 |--|--|--|--|
 |Mattermost|Mattermost Operator|Operator|[mattermost-operator](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator)|
-|Mattermost|[Mattermost](./mattermost/Architecture.md)|Chat|[mattermost](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost)|
+|Mattermost|[Mattermost](./mattermost.md)|Chat|[mattermost](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost)|
 
 ### Developer Tools
 
@@ -227,11 +227,11 @@ Developer tools include packages that a programmer would use to plan, author, te
 
 |Stack|Package|Function|Repository|
 |--|--|--|--|
-|GitLab|[GitLab](./gitlab/Architecture.md)|Code repository, issue tracking, release planning, security and compliance scanning, pipelines, artifact repository, wiki|[gitLab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)|
+|GitLab|[GitLab](./gitlab.md)|Code repository, issue tracking, release planning, security and compliance scanning, pipelines, artifact repository, wiki|[gitLab](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab)|
 |GitLab|GitLab Runner|Executor for GitLab pipelines|[gitlab-runner](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner)|
 |Nexus|Nexus Repository|Artifact repository|[nexus](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus)
-|Sonarqube|[Sonarqube](./sonarqube/Architecture.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube)
+|Sonarqube|[Sonarqube](./sonarqube.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube)
 
 ## Further Information
 
-You can find some additional details about features supported by each package by visiting [this document](../../../Packages.md).
+You can find some additional details about features supported by each package by visiting [this document](../../packages.md).

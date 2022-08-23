@@ -1,4 +1,4 @@
-# Big Bang Production Configuration
+# Production Configuration
 
 [[_TOC_]]
 

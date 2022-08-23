@@ -29,7 +29,7 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 [Integrate Package with Big Bang](./package-integration/README.md)
 
 ## Package Owner Overview
-[Package Owner Requirements & Overview](./package-integration/package-integration-ownership.md)
+[Package Owner Requirements & Overview](./package-integration/ownership.md)
 
 ## Big Bang Code Through Party Bus Pipeline
 

@@ -1,0 +1,12 @@
+nav:
+  - Home: README.md
+  - AWS Dev Script: aws-k3d-script.md
+  - CI Workflow: ci-workflow.md
+  - Package Development: develop-package.md
+  - Development Environment: development-environment.md
+  - K8s Storage Options: k8s-storage.md
+  - Partybus Pipelines: mdo-partybus-pipelines.md
+  - Release Process: release-process.md
+  - Testing: testing.md
+  - Testing Vendor Distros: vendor-distro-integration.md
+  - Package Integration: package-integration

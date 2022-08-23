@@ -1,0 +1,5 @@
+nav:
+  - Kube API Server Webhooks: kube-apiserver-webhooks-diagram.md
+  - Logs Data Flow: logs-data-flow-diagram.md
+  - Metrics Data Flow: metrics-data-flow.md
+  - Network Encryption and Ingress: network-encryption-and-ingress.md

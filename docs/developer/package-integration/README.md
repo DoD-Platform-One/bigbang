@@ -1,4 +1,4 @@
-# Big Bang Integration: Overview
+# Integration: Overview
 
 The following documents should be followed, in order, to fully integrate a new package into Big Bang:
 

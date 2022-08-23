@@ -81,7 +81,7 @@ No current SSO is avaiable via Keycloak.
 
 ## Configuring access to Minio without SSO
 
-Initial access to the MinIO server is via the minioRootCreds. These can be auto generated for you by adding the accesskey and secret key in your Big Bang config.
+Initial access to the MinIO server is via the accessKey and secretKey values in the top level values file.
 
 ```
 addons:

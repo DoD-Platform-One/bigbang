@@ -81,6 +81,7 @@ alertmanager:
         {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
+
 prometheus:
   prometheusSpec:
     # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
@@ -107,15 +108,31 @@ prometheus:
       annotations:
         {{- if $istioInjection }}
         {{ include "istioAnnotation" . }}
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+        proxy.istio.io/config: |
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-output-certs
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
         {{- end }}
         {{- if .Values.addons.vault.enabled }}
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-init-first: "true"
-        vault.hashicorp.com/agent-inject-token: "true"      
+        vault.hashicorp.com/agent-inject-token: "true"
         vault.hashicorp.com/role: "prometheus"
         {{- end }}
       {{- end }}
-    {{- end }}        
+    {{- end }}
+    {{- if $istioInjection }}
+    # Add volume/mount for Istio certs for mTLS scraping
+    volumes:
+      - emptyDir:
+          medium: Memory
+        name: istio-certs
+    volumeMounts:
+      - mountPath: /etc/prom-certs/
+        name: istio-certs
+    {{- end }}
+
 
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
@@ -129,7 +146,7 @@ loki:
 {{- if or $gitlabRedis $authserviceRedisEnabled $redisDatasource }}
 redis:
   enabled: true
-{{- end }} 
+{{- end }}
 
 vault:
   enabled: {{ .Values.addons.vault.enabled }}
@@ -146,7 +163,7 @@ grafana:
 
   {{- if $gitlabRedis }}
   envFromSecret: grafana-env-secret
-  {{- end }} 
+  {{- end }}
 
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
@@ -160,7 +177,7 @@ grafana:
     {{ include "istioAnnotation" . }}
     {{- if $gitlabRedis }}
     checksum/gitlabRedisPassword: {{ sha256sum .Values.addons.gitlab.redis.password }}
-    {{- end }}    
+    {{- end }}
   {{- end }}
 
   {{- if or .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
@@ -171,19 +188,19 @@ grafana:
     access: proxy
     url: argocd-argocd-redis-bb-master.argocd.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   - name: Argo Headless
     type: redis-datasource
     access: proxy
     url: argocd-argocd-redis-bb-headless.argocd.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   - name: Argo Replicas
     type: redis-datasource
     access: proxy
     url: argocd-argocd-redis-bb-replicas.argocd.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   {{- end }}
   {{- if $authserviceRedisEnabled }}
   - name: AuthService Master
@@ -191,19 +208,19 @@ grafana:
     access: proxy
     url: authservice-authservice-redis-bb-master.authservice.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   - name: AuthService Headless
     type: redis-datasource
     access: proxy
     url: authservice-authservice-redis-bb-headless.authservice.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   - name: AuthService Replicas
     type: redis-datasource
     access: proxy
     url: authservice-authservice-redis-bb-replicas.authservice.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
   {{- end }}
   {{- if $gitlabRedis }}
   - name: GitLab
@@ -211,7 +228,7 @@ grafana:
     access: proxy
     url: gitlab-redis-master.gitlab.svc.cluster.local:6379
     jsonData:
-      client: standalone    
+      client: standalone
     secureJsonData:
       password: $GITLAB_REDIS_PASSWORD
   {{- end }}
@@ -219,7 +236,7 @@ grafana:
   - name: Loki
     type: loki
     {{- if eq .Values.loki.strategy "monolith" }}
-    url: http://logging-loki.logging.svc.cluster.local:3100
+    url: http://loki.logging.svc.cluster.local:3100
     {{- else }}
     url: http://logging-loki-read.logging.svc.cluster.local:3100
     {{- end }}
@@ -292,6 +309,16 @@ grafana:
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
 
+  {{- if $istioInjection }}
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
 prometheus-node-exporter:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
@@ -302,6 +329,14 @@ prometheus-node-exporter:
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
+  prometheus:
+    monitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
   {{- end }}
 
   {{- if .Values.openshift }}
@@ -319,6 +354,14 @@ kube-state-metrics:
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
+  prometheus:
+    monitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
   {{- end }}
 
 prometheusOperator:
@@ -331,9 +374,8 @@ prometheusOperator:
     patch:
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
-
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
-{{- end -}}
+{{- end }}

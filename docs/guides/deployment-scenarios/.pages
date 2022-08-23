@@ -1,0 +1,4 @@
+nav:
+  - Quickstart: quickstart.md
+  - SSO Quickstart: sso-quickstart.md
+  - Multiple Ingress: multiple-ingress.md

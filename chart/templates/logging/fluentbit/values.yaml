@@ -70,7 +70,7 @@ config:
         match                  kube.*
         labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
         {{- if eq .Values.loki.strategy "monolith" }}
-        host                   logging-loki
+        host                   loki
         {{- else }}
         host                   logging-loki-write
         {{- end }}
@@ -78,15 +78,21 @@ config:
         auto_kubernetes_labels on
         Retry_Limit            False
         tls                    Off
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
     [OUTPUT]
         name                   loki
         match                  host.*
         labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
-        host                   logging-loki
+        {{- if eq .Values.loki.strategy "monolith" }}
+        host                   loki
+        {{- else }}
+        host                   logging-loki-write
+        {{- end }}
         port                   3100
         auto_kubernetes_labels on
         Retry_Limit            False
         tls                    Off
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
     {{- end }}
 {{- end }}
 {{- end }}

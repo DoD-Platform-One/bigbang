@@ -22,8 +22,6 @@ annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
-minioRootCreds: minio-root-creds-secret
-
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
@@ -40,14 +38,15 @@ podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 
-tenants:
+secrets:
+  accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
+  secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
+
+tenant:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecret:
     name: private-registry
-  secrets:
-    accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
-    secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
   {{- if .Values.monitoring.enabled }}
   prometheusOperator: true
   {{- end }}    

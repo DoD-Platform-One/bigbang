@@ -14,8 +14,19 @@ postInstall:
       pullPolicy: {{ .Values.imagePullPolicy }}
       pullSecrets:
       - name: private-registry
+  probeWebhook:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
 postUpgrade:
   cleanupCRD:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
+preUninstall:
+  deleteWebhookConfigurations:
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
       pullSecrets:

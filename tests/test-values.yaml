@@ -127,8 +127,11 @@ clusterAuditor:
         envs:
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           cypress_prometheus_url: 'https://prometheus.bigbang.dev'
-          cypress_allownodatas: '0'
           cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
+          # OPA violations table and violations by kind chart
+          cypress_table_bar_allownodata: '0'
+          # violations over time graph
+          cypress_graph_allownodata: '1'
 
 gatekeeper:
   enabled: true
@@ -167,12 +170,13 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-cypress-test
+          - logging/loki-simple-scalable-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -267,12 +271,13 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-cypress-test
+          - logging/loki-simple-scalable-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -386,6 +391,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
         parameters:
@@ -416,6 +422,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
         parameters:
@@ -456,6 +463,7 @@ kyvernopolicies:
               - logging
               - tempo
               - argocd
+              - minio
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -561,32 +569,30 @@ loki:
   enabled: false
   strategy: scalable
   values:
-    global:
-      createGlobalConfig: true
-      existingSecretForConfig: "loki-config"
-    loki-simple-scalable:
-      write:
-        replicas: 1
-        persistence:
-          size: 2Gi
-        resources:
-          limits:
-            cpu: 200m
-            memory: 400Mi
-          requests:
-            cpu: 200m
-            memory: 400Mi
-      read:
-        replicas: 1
-        persistence:
-          size: 2Gi
-        resources:
-          limits:
-            cpu: 200m
-            memory: 400Mi
-          requests:
-            cpu: 200m
-            memory: 400Mi
+    minio:
+      enabled: true
+    write:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
+    read:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
     bbtests:
       enabled: true
       cypress:
@@ -1126,7 +1132,7 @@ addons:
   minio:
     enabled: false
     values:
-      tenants:
+      tenant:
         pools:
         - servers: 2
           volumesPerServer: 4
@@ -1257,8 +1263,10 @@ addons:
       nexus:
       # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
         env:
-          - name: install4jAddVmParams
-            value: "-Xms500M -Xmx500M -XX:MaxDirectMemorySize=500M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+          - name: INSTALL4J_ADD_VM_PARAMS
+            value: "-Dcom.redhat.fips=false -Xms1024M -Xmx1024M -XX:MaxDirectMemorySize=1024M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+          - name: NEXUS_SECURITY_RANDOMPASSWORD
+            value: "true"
         resources:
           requests:
             cpu: 100m

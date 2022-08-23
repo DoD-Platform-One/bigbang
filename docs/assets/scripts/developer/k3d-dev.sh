@@ -384,33 +384,37 @@ echo
 
 echo "creating k3d cluster"
 
-if [[ "$METAL_LB" == true ]]
-then
+# Shared settings across all options
+k3d_command="k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:*\;agent:* --k3s-arg \"--disable=traefik@server:0\"  --k3s-arg \"--disable=metrics-server@server:0\" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
+
+# Add MetalLB specific k3d config
+if [[ "$METAL_LB" == true ]]; then
   # create docker network for k3d cluster
-  echo creating docker network for k3d cluster
+  echo "creating docker network for k3d cluster"
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
+  k3d_command+=" --k3s-arg \"--disable=servicelb@server:0\" --network k3d-network"
+fi
 
-  # create k3d cluster
-  if [[ "$PRIVATE_IP" == true ]]
-  then
-    echo "using private ip for k3d"
-    ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PrivateIP}@server:0" --k3s-arg "--disable=servicelb@server:0" --network k3d-network --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
-  else
-    echo "using public ip for k3d"
-    # default is to use public ip
-    ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PublicIP}@server:0" --k3s-arg "--disable=servicelb@server:0" --network k3d-network --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
-  fi
+# Add Public/Private IP specific k3d config
+if [[ "$PRIVATE_IP" == true ]]; then
+  echo "using private ip for k3d"
+  k3d_command+=" --k3s-arg \"--tls-san=${PrivateIP}@server:0\""
+else
+  echo "using public ip for k3d"
+  k3d_command+=" --k3s-arg \"--tls-san=${PublicIP}@server:0\""
+fi
 
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
+# Create k3d cluster
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "${k3d_command}"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
 
-  # install MetalLB
-  echo installing MetalLB
+# Handle MetalLB cluster resource creation
+if [[ "$METAL_LB" == true ]]; then
+  echo "installing MetalLB"
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml"
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml"
 
-
-  # create the metalLB config
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} <<- 'ENDSSH'
 	#run this command on remote
 	cat << EOF > metallb-config.yaml
@@ -429,43 +433,15 @@ then
 	EOF
 	ENDSSH
 
-  # apply the metalLB config
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl create -f metallb-config.yaml"
+fi
 
-  echo
-  echo
-  echo "copying kubeconfig to workstation..."
-  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
-  if [[ "$PRIVATE_IP" == true ]]
-  then
-    $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
-  else  # default is to use public ip
-    $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
-  fi
-  echo
-elif [[ "$PRIVATE_IP" == true ]]
-then
-  echo "using private ip for k3d"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PrivateIP}@server:0" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
-  echo
-  echo
-  echo "copying kubeconfig to workstation..."
-  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
+echo "copying kubeconfig to workstation..."
+scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
+if [[ "$PRIVATE_IP" == true ]]; then
   $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
-  echo
-else # default is public ip
-  echo "using public ip for k3d"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "k3d cluster create --servers 1  --agents 3 --volume /etc/machine-id:/etc/machine-id@server:0 --volume /etc/machine-id:/etc/machine-id@agent:0,1,2 --k3s-arg "--disable=traefik@server:0"  --k3s-arg "--disable=metrics-server@server:0" --k3s-arg "--tls-san=${PublicIP}@server:0" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl config use-context k3d-k3s-default"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP} "kubectl cluster-info"
-  echo
-  echo
-  echo "copying kubeconfig to workstation..."
-  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
+else  # default is to use public ip
   $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
-  echo
 fi
 
 # add tools

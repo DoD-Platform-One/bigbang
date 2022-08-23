@@ -1,4 +1,4 @@
-# Big Bang Auth Service and Keycloak SSO Quick Start Demo
+# Auth Service and Keycloak SSO Quick Start Demo
 
 [[_TOC_]]
 
@@ -42,9 +42,9 @@ Why 2 VMs? 2 reasons:
 ### Additional Auth Service and Keycloak documentation can be found in these locations
 
 * [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
-* [Authservice Architecture](../../understanding-bigbang/package-architecture/authservice/Architecture.md)
+* [Authservice Architecture](../../understanding-bigbang/package-architecture/authservice.md)
 * [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)
-* [Keycloak Architecture](../../understanding-bigbang/package-architecture/keycloak/Architecture.md)
+* [Keycloak Architecture](../../understanding-bigbang/package-architecture/keycloak.md)
 
 ## Step 1: Provision 2 Virtual Machines
 
