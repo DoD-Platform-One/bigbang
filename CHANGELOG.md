@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.65]
+### Added
+- added `bot::mr` label for bb-bot created merge requests
+
 ## [2.4.64]
 ### Added
 - New pipeline for pipeline templates with changelog validation and auto-tagging
