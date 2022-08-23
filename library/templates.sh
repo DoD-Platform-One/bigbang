@@ -1373,6 +1373,7 @@ create_bigbang_merge_request() {
       -o merge_request.create \
       -o merge_request.title="Draft: Updated ${CI_PROJECT_NAME} git tag" \
       -o merge_request.label="status::review"	\
+      -o merge_request.label="bot::mr"	\
       -o merge_request.label=${package} 1>/dev/null
 
     
