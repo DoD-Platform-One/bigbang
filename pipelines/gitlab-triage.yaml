@@ -1,0 +1,32 @@
+image: registry1.dso.mil/ironbank/opensource/gitlab-triage/gitlab-triage:1.23.1
+
+stages:
+  - dry_run
+  - scheduled
+
+before_script:
+  - gitlab-triage --version  # For debugging
+  - source ./gitlab-triage.sh
+
+gitlab-triage:
+  stage: dry_run
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+  except:
+    - schedules
+  script:
+    - gitlab_triage_dryrun
+
+gitlab-triage:on-schedule:
+  stage: scheduled
+  only:
+    - schedules
+  tags:
+    - bigbang
+    - dogfood
+    - generic
+    - bbci
+  script:
+    - gitlab_triage
