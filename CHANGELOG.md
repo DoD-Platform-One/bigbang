@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb-1] - 2022-08-17
+
+### Changed
+
+- Fixed issue with `disallow-deprecated-apis` failing to install when checking old API versions
+
 ## [1.0.1-bb-0] - 2022-07-05
 
 ### Changed
