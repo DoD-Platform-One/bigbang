@@ -14,9 +14,9 @@ objectStorage:
   secret_access_key: {{ .Values.tempo.objectStorage.accessSecret }}
 
 tempo:
-  imagePullSecrets:
-  - name: private-registry
   pullPolicy: {{ .Values.imagePullPolicy }}
+  overrides:
+    ingestion_rate_limit_bytes: 30000000
 {{- with .Values.tempo.objectStorage }}
 {{- if and .endpoint .region .bucket }}
   storage: 
@@ -39,6 +39,10 @@ domain: {{ $domainName }}
 tempoQuery:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
+serviceAccount:
+  imagePullSecrets:
+    - name: private-registry
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
@@ -57,11 +61,6 @@ istio:
     {{- end }}
     gateways:
     - istio-system/{{ default "public" .Values.tempo.ingress.gateway }}
-
-{{- if .Values.istio.enabled }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
