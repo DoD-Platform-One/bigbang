@@ -47,7 +47,11 @@ tenant:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecret:
     name: private-registry
+  metrics:
+    enabled: {{ .Values.monitoring.enabled }}
   {{- if .Values.monitoring.enabled }}
-  prometheusOperator: true
-  {{- end }}    
+  env:
+    - name: MINIO_PROMETHEUS_AUTH_TYPE
+      value: "public"
+  {{- end }}
 {{- end -}}
