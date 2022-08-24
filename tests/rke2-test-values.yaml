@@ -442,7 +442,7 @@ addons:
             cpu: 100m
             memory: 1500Mi
           limits: null
-          
+  
   keycloak:
     values:
       resources:
