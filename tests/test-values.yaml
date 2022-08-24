@@ -51,7 +51,7 @@ flux:
 
 networkPolicies:
   enabled: true
-  controlPlaneCidr: 0.0.0.0/0
+  controlPlaneCidr: 172.16.0.0/12
 
 istio:
   enabled: true
@@ -1451,7 +1451,7 @@ addons:
 
               seal "awskms" {
                 region     = "us-gov-west-1"
-                kms_key_id = "955de827-66e6-4133-aa6e-e60f7d307ee2"
+                kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
                 endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
               }
 
