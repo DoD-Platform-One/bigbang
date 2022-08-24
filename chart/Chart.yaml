@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kyverno-policies
-version: 1.0.1-bb.0
+version: 1.0.1-bb.1
 appVersion: 1.0.1
 icon: https://github.com/kyverno/kyverno/raw/main/img/logo.png
 description: Collection of Kyverno security and best-practice policies for Kyverno
