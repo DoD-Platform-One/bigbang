@@ -1,7 +1,7 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.4.2
+# @Version bb-ci:2.4.67
 #
 # docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
 # docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
@@ -42,12 +42,25 @@ gpgcheck=0\n'\
 
 ADD https://download.docker.com/linux/centos/docker-ce.repo /etc/yum.repos.d/docker-ce.repo
 
-RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python3 diffutils patch
+RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python39 python39-pip diffutils patch
 
 RUN pip3 install boto3==1.21.14 requests==2.27.1 urllib3==1.26.5 jsonschema==4.0.0
 
-# Install Conftest
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.1.13 python3 -
+RUN ln -s /root/.local/bin/poetry /usr/bin/poetry
+RUN poetry config virtualenvs.in-project true
 
+# Install NodeJS
+RUN dnf module install nodejs:16 -y
+# Install Playwright browsers (version from bb-docs-compiler package.json)
+RUN yum -y install gtk3 alsa-lib libX11-xcb nss libgbm
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN mkdir /ms-playwright
+RUN npx playwright@1.24.2 install
+RUN chmod -R 777 /ms-playwright
+
+# Install Conftest
 ENV CONFTEST_VERSION='0.30.0'
 ADD https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
 RUN tar xzf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz conftest && mv conftest /usr/local/bin/  && chmod +x /usr/local/bin/conftest && rm -rf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
