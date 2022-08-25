@@ -14,6 +14,8 @@ imagePullSecrets:
 operator:
   image:
     pullPolicy: {{ .Values.imagePullPolicy}}
+    imagePullSecrets:
+      - name: private-registry
 
   {{- if .Values.monitoring.enabled }}
   env:

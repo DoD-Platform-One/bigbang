@@ -775,7 +775,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
       path: "./chart"
-      tag: "4.4.25-bb.0"
+      tag: "4.4.28-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
@@ -792,7 +792,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
       path: "./chart"
-      tag: "4.4.25-bb.0"
+      tag: "4.4.28-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
