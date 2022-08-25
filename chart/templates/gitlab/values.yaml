@@ -1,5 +1,5 @@
 {{- if .Values.addons.gitlab.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.gitlab "name" "gitlab" "defaults" (include "bigbang.defaults.gitlab" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.gitlab" .))) "name" "gitlab" "defaults" (include "bigbang.defaults.gitlab" .)) }}
 {{- end }}
 {{- if and (ne .Values.addons.gitlab.objectStorage.iamProfile "") (ne .Values.addons.gitlab.objectStorage.accessKey "") }}{{- fail "Must choose to use an IAM profile OR an AWS accessKey/accessSecret at .Values.addons.gitlab.objectStorage" }}{{- end }}
 {{- define "bigbang.defaults.gitlab" -}}
@@ -156,6 +156,12 @@ minio:
 {{- end }}
 
 global:
+  {{- if and .Values.addons.gitlab.sso.enabled .Values.sso.certificate_authority}}
+  certificates:
+    customCAs:
+      - secret: tls-ca-sso
+  {{end}}
+
   # added to help with Gitlab sub-chart configuration
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
@@ -335,5 +341,30 @@ global:
 {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
 use_iam_profile: true
 {{- end }}
-
 {{- end -}}
+
+
+
+{{- /* This function merges defaults in lists from above into overlays */ -}}
+{{- /* The end user will not have to replicate exclusions/repos from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any certificates to ignore the defaults */ -}}
+{{- define "bigbang.overlays.gitlab" }}
+
+  {{- $defaults := fromYaml (include "bigbang.defaults.gitlab" .) }}
+
+  {{- $overlays := dig "values" dict .Values.addons.gitlab }}
+  {{- range $certificates, $default := $defaults.global }}
+    {{- $overlay := (dig "global" $certificates dict $overlays) }}
+    # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
+    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+
+      # Add any default excludedNamespaces to overlay
+      {{- if and (dig "customCAs"  list $default) (dig "customCAs"  list $overlay) }}
+
+         {{ $_ := set $overlay "customCAs" (concat $default.customCAs $overlay.customCAs) }}
+
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{ toYaml $overlays }}
+{{- end }}
