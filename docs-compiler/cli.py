@@ -62,9 +62,12 @@ def compile(bb, tag):
 
     write_values_md("docs/values.md", bb_values_table, "Big Bang")
 
-    root_level_md = glob.iglob("docs/*.md")
-    for md in root_level_md:
-        if md == "docs/about.md" or md == "docs/values.md":
+    for md in docs_root.glob("*.md"):
+        if (
+            md.name == "about.md"
+            or md.name == "values.md"
+            or md.name == "release-notes.md"
+        ):
             add_frontmatter(
                 md,
                 {
@@ -76,7 +79,7 @@ def compile(bb, tag):
                 md,
                 {
                     "hide": ["navigation"],
-                    "revision_date": bb.get_revision_date(md.replace("docs/", "", 1)),
+                    "revision_date": bb.get_revision_date(md.relative_to(docs_root)),
                 },
             )
 
@@ -127,10 +130,16 @@ def compile(bb, tag):
             {"tags": ["values", pkg, pkgs[pkg]["tag"]]},
         )
 
-    shutil.copy2(
-        "submodules/bigbang/docs/packages.md",
-        "docs/packages/index.md",
-    )
+    if Path("submodules/bigbang/docs/packages.md").exists():
+        shutil.copy2(
+            "submodules/bigbang/docs/packages.md",
+            "docs/packages/index.md",
+        )
+    else:
+        shutil.copy2(
+            "submodules/bigbang/Packages.md",
+            "docs/packages/index.md",
+        )
 
     with c.status(f"Adding tags to Big Bang docs...", spinner="aesthetic"):
         bb_docs = docs_root.glob("docs/**/*.md")
@@ -146,8 +155,7 @@ def compile(bb, tag):
     with c.status(f"Creating docs/packages/.pages...", spinner="aesthetic"):
         # patch packages nav
         with open("docs/packages/.pages", "w") as f:
-            dot_pages = {}
-            dot_pages["nav"] = [{"Home": "index.md"}]
+            dot_pages = {"nav": [{"Home": "index.md"}]}
             sorted_pkgs = sorted(pkgs)
             for pkg in sorted_pkgs:
                 dot_pages["nav"].append({pkg: pkg})
@@ -239,9 +247,6 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
                 )
                 exit(1)
 
-    ### TEMP MANUAL OVERRIDE TO USE git commit w/ fully up-to-date nav elements
-    ref = "f2b5f0ec3792bdd29846a100962ab73b2803cefb"
-
     try:
         bb.checkout(ref)
     except GitCommandError as e:
@@ -269,6 +274,3 @@ def compiler(tag, branch, pre_release, clean, outdir, no_build, dev):
 
     if clean:
         cleanup()
-        sp.run(
-            ["git", "submodule", "update", "--init", "--recursive"], capture_output=True
-        )

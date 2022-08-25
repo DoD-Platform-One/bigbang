@@ -43,8 +43,13 @@ class SubmoduleRepo:
         # print(f"{self.name} checked out @{ref}")
         self.ref = ref
 
-    def get_revision_date(self, abspath):
-        return self.repo.git.log(abspath, n=1, date="short", format="%ad by %cn")
+    def get_revision_date(self, relpath):
+        if self.path.joinpath(relpath).exists() == False:
+            print(
+                    f"[yellow]WARNING  -[/yellow] Unable to parse revision date, no such file: '{self.name}/{relpath}'"
+                )
+            return ""
+        return self.repo.git.log(relpath, n=1, date="short", format="%ad by %cn")
 
     def copy_files(self, src_root, dst_root, include):
         for p in include:
