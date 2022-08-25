@@ -109,10 +109,10 @@ patches:
               resources:
                 limits:
                   cpu: 100m
-                  memory: 100Mi
+                  memory: 200Mi
                 requests:
                   cpu: 100m
-                  memory: 100Mi
+                  memory: 200Mi
   - target:
       kind: Deployment
       name: source-controller
