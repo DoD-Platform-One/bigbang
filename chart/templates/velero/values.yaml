@@ -47,7 +47,7 @@ initContainers:
 {{- range .Values.addons.velero.plugins }}
 {{- if eq . "aws" }}
   - name: velero-plugin-for-aws
-    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-aws:v1.4.1
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-aws:v1.5.0
     imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
