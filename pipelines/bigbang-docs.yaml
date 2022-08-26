@@ -32,7 +32,7 @@ bb-docs:on-schedule:
     - bbci
   script:
     - cd ..
-    - git clone $CI_PROJECT_URL scheduled-build
+    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/product-tools/bb-docs-compiler.git" scheduled-build
     - cd scheduled-build
     - git checkout docs
     - ls -la
