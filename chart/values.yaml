@@ -27,7 +27,7 @@ waitforready:
   # -- Image to use in wait for ready job.  This must contain kubectl.
   image:
     repository: registry1.dso.mil/ironbank/opensource/kubernetes/kubectl
-    tag: v1.22.2
+    tag: v1.24.4
   # -- Pull secret for wait for ready job
   imagePullSecrets: []
 
@@ -499,7 +499,7 @@ additionalPolicies:
 bbtests:
   enabled: false
   scripts:
-    image: registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.22.2
+    image: registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.24.4
     envs:
       ENABLED_POLICIES: '{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join " " $p }}'
       IMAGE_PULL_SECRET: '{{ .Values.bbtests.imagePullSecret }}'
