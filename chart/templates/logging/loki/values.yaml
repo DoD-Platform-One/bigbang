@@ -24,6 +24,15 @@ monitoring:
 {{- if (eq .Values.loki.strategy "scalable") }}
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
+    # conditional passes only for default istio: enabled, mTLS: SCRICT
+    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
 {{- end }}
 
 istio:
@@ -55,6 +64,15 @@ monolith:
   enabled: {{ eq .Values.loki.strategy "monolith" }}
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
+    # conditional passes only for default istio: enabled, mTLS: SCRICT
+    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
 {{- if (eq .Values.loki.strategy "monolith") }}
 read:
   disabled: true
