@@ -128,7 +128,7 @@ istio:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
-    tag: "1.14.3-bb.2"
+    tag: "1.14.3-bb.3"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -296,7 +296,7 @@ kiali:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
     path: "./chart"
-    tag: "1.54.0-bb.0"
+    tag: "1.55.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -332,7 +332,7 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
     path: "./chart"
-    tag: "1.4.0-bb.7"
+    tag: "1.4.0-bb.8"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -418,7 +418,7 @@ logging:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
-    tag: "0.9.0-bb.1"
+    tag: "0.9.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -472,7 +472,7 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
     path: "./chart"
-    tag: "0.20.3-bb.1"
+    tag: "0.20.6-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -509,7 +509,7 @@ loki:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
     path: "./chart"
-    tag: "1.7.6-bb.1"
+    tag: "1.7.6-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -554,7 +554,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "0.16.1-bb.0"
+    tag: "0.16.1-bb.1"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -614,7 +614,7 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
     path: "./chart"
-    tag: "39.2.1-bb.5"
+    tag: "39.9.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -825,7 +825,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "6.2.1-bb.1"
+      tag: "6.3.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
@@ -1077,7 +1077,7 @@ addons:
   #
   haproxy:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
       path: "./chart"
       tag: "1.12.0-bb.0"
 
@@ -1088,7 +1088,7 @@ addons:
     ingress:
       gateway: ""
 
-    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/haproxy.git
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1203,7 +1203,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
       path: "./chart"
-      tag: "7.1.2-bb.1"
+      tag: "7.2.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux: {}

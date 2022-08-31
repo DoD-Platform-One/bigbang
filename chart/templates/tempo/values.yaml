@@ -15,7 +15,7 @@ objectStorage:
 
 tempo:
   pullPolicy: {{ .Values.imagePullPolicy }}
-  overrides:
+  global_overrides:
     ingestion_rate_limit_bytes: 30000000
 {{- with .Values.tempo.objectStorage }}
 {{- if and .endpoint .region .bucket }}
