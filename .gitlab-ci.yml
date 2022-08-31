@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: '53-ci-cleanup'
+    ref: 'refactor-auto-bb-mr'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: '53-ci-cleanup' 
+  PIPELINE_REPO_BRANCH: 'refactor-auto-bb-mr' 
   DEBUG_ENABLED: "true"
