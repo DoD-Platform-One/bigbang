@@ -10,8 +10,17 @@
     "packageRules": [
         {
             "matchDatasources": ["docker"],
-            "groupName": "Ironbank"
-        }
+            "groupName": "Ironbank",
+            "registryUrls": ["https://registry1.dso.mil"],
+            "postUpgradeTasks": {
+              "commands": [
+                  "bump-chart-yaml",
+                  "regenerate-helm-docs",
+                  "bump-changelog '- {{{replace 'registry1.dso.mil/' '' depName}}} updated from {{{currentVersion}}} to {{{newVersion}}}'"
+              ],
+              "fileFilters": ["chart/Chart.yaml", "README.md", "CHANGELOG.md"]
+            }
+          }
     ],
     "regexManagers": [
         {
