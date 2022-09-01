@@ -8,10 +8,11 @@
     "enabledManagers": ["helm-values","regex"],
     "ignorePaths": ["chart/charts/**"],
     "labels": ["kiali","renovate"],
+    "commitMessagePrefix": "SKIP UPDATE CHECK",
     "packageRules": [
         {
-            "matchDatasources": ["docker"],
-            "groupName": "Ironbank"
+          "matchDatasources": ["docker"],
+          "groupName": "Ironbank"
         },
         {
             "matchPackageNames": ["registry1.dso.mil/ironbank/big-bang/base"],
