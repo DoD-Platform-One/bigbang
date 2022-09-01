@@ -8,6 +8,7 @@
     "enabledManagers": ["helm-values", "regex"],
     "ignorePaths": ["chart/charts/**", "chart/examples/**", "chart/scripts/**"],
     "labels": ["nexus","renovate"],
+    "commitMessagePrefix": "SKIP UPDATE CHECK",
     "packageRules": [
         {
             "matchDatasources": ["docker"],
