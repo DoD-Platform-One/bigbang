@@ -297,21 +297,22 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
   ```shell
   # [ubuntu@Ubuntu_VM:~]
   # Needed for ECK to run correctly without OOM errors
-  sudo sysctl -w vm.max_map_count=524288
-  # Alternatively can use:
-  # echo 'vm.max_map_count=524288' | sudo tee -a /etc/sysctl.d/vm-max_map_count.conf
+  echo 'vm.max_map_count=524288' | sudo tee -a /etc/sysctl.d/vm-max_map_count.conf
+  # Alternatively can use (not persistent after restart):
+  # sudo sysctl -w vm.max_map_count=524288
+
 
   # Needed by Sonarqube
-  sudo sysctl -w fs.file-max=131072
-  # Alternatively can use:  
-  # echo 'fs.file-max=131072' | sudo tee -a /etc/sysctl.d/fs-file-max.conf
+  echo 'fs.file-max=131072' | sudo tee -a /etc/sysctl.d/fs-file-max.conf
+  # Alternatively can use (not persistent after restart):  
+  # sudo sysctl -w fs.file-max=131072
 
   # Also Needed by Sonarqube
   ulimit -n 131072
   ulimit -u 8192
 
   # Load updated configuration
-  sudo sysctl --load
+  sudo sysctl --load --system
 
   # Preload kernel modules, required by istio-init running on SELinux enforcing instances
   sudo modprobe xt_REDIRECT
@@ -759,7 +760,7 @@ kubectl get po -n=argocd
 This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation and instructions for additional configuration changes that may be required in restricted networks. 
 
 ### Changing CoreDNS upstream DNS server:
-After completing step 5, if you are unable to connect to external DNS providers using the command `nslookup google.com 8.8.8.8`, to test the connection. Then use the steps below to change the upstream DNS server to your networks DNS server.
+After completing step 5, if you are unable to connect to external DNS providers using the command `nslookup google.com 8.8.8.8`, to test the connection. Then use the steps below to change the upstream DNS server to your networks DNS server. Please note that this change will not perist after a restart of the host server therefore, if you restart or shutdown your server you will need to re-apply these changes to CoreDNS. 
 
 1. Open config editor to change the CoreDNS pod configuration
 
