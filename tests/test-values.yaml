@@ -1451,7 +1451,7 @@ addons:
 
               seal "awskms" {
                 region     = "us-gov-west-1"
-                kms_key_id = "17c01cdf-2bf9-4f58-9a54-c1c4e4b145be"
+                kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
                 endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
               }
 
