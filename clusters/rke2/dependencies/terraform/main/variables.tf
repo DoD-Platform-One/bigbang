@@ -53,7 +53,7 @@ variable "servers" {
   default = 1
 }
 variable "rke2_version" {
-  default = "v1.23.5+rke2r1"
+  default = "v1.24.3+rke2r1"
 }
 
 variable "rke2_config" {
@@ -78,7 +78,7 @@ variable "agent_asg" {
   default = { min : 3, max : 10, desired : 3 }
 }
 variable "agent_spot" {
-  default = true
+  default = false
 }
 
 variable "ci_pipeline_url" {

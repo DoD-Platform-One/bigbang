@@ -39,7 +39,7 @@ variables:
 configuration validation:
   stage: ⚙️ configuration validation
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   variables:
@@ -64,7 +64,7 @@ configuration validation:
 chart update check:
   stage: ⚙️ configuration validation
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   rules:
@@ -87,7 +87,8 @@ chart update check:
 clean install:
   stage: 🤞 package tests
   extends:
-    - .k3d-ci-pkg
+    - .sandbox-runner-tags
+    - .k3d-ci
   script:
     # Install and wait for dependencies
     - dependency_install
@@ -135,7 +136,8 @@ clean install:
 upgrade:
   stage: 🤞 package tests
   extends:
-    - .k3d-ci-pkg
+    - .sandbox-runner-tags
+    - .k3d-ci
   rules:
     # skip job when MR title contains 'SKIP UPGRADE'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
@@ -202,7 +204,8 @@ upgrade:
 integration:
   stage: 🤝 integration test
   extends:
-    - .k3d-ci-bb
+    - .sandbox-runner-tags
+    - .k3d-ci
   rules:
     # only run if the /bigbang/values.yaml exists
     - exists:
@@ -247,7 +250,7 @@ integration:
 auto tag:
   stage: 🏷️ tag
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   rules:

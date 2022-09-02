@@ -17,7 +17,7 @@ variables:
 auto tag:
   stage: 🏷️ tag
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   rules:
@@ -42,13 +42,8 @@ auto tag:
 helm library release:
   stage: ☸️ helm
   extends:
+    - .graduated-runner-tags
     - .util-image
-  tags:
-    - bigbang
-    - privileged
-    - dogfood
-    - packages
-    - bbci
   variables:
     DOCKER_HOST: tcp://localhost:2376
     DOCKER_TLS_CERTDIR: "/certs"

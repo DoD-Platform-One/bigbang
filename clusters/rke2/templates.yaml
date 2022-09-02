@@ -7,8 +7,6 @@
   extends: .rke2 tf
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:rke2_up[collapsed=true]\r\e[0K\e[33;1mRKE2 Up\e[37m"
-    # Fetch dependencies
-    - apk add bash aws-cli
     # Loop to retry rke2 terraform apply
     - |
       set -e

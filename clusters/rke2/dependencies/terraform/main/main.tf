@@ -45,6 +45,10 @@ sudo -- sh -c 'service iptables save; \
                echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
                echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
                echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+               echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf; \
+               sysctl -w fs.inotify.max_user_instances=1024; \
+               echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf; \
+               sysctl -w fs.inotify.max_user_watches=1048576; \
                sysctl -p; \
                modprobe xt_REDIRECT; \
                modprobe xt_owner; \

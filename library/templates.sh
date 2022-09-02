@@ -334,6 +334,9 @@ pre_vars() {
    echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
    # Calculate a unique cidr range for vpc
    if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]]; then
+     export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
+     export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
+     export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
      echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
    fi
    cat variables.env
@@ -389,33 +392,21 @@ bigbang_prep(){
 
 bigbang_publish() {
    echo -e "\e[0Ksection_start:`date +%s`:bb_publish[collapsed=true]\r\e[0K\e[33;1mPublish\e[37m"
-   if [ -z $CI_COMMIT_TAG ]; then
-     aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/tests/${CI_COMMIT_SHA}
-   else
-     aws s3 sync --quiet release/ s3://umbrella-bigbang-releases/umbrella/${CI_COMMIT_TAG}
-   fi
+     export AWS_ACCESS_KEY_ID=${RELEASE_AWS_ACCESS_KEY_ID}
+     export AWS_SECRET_ACCESS_KEY=${RELEASE_AWS_SECRET_ACCESS_KEY}
+     export AWS_REGION=${RELEASE_AWS_DEFAULT_REGION}
+     aws s3 sync --quiet release/ s3://${RELEASE_BUCKET}/umbrella/${CI_COMMIT_TAG}
    echo -e "\e[0Ksection_end:`date +%s`:bb_publish\r\e[0K"
 }
 
 bigbang_release() {
    echo -e "\e[0Ksection_start:`date +%s`:bb_release[collapsed=true]\r\e[0K\e[33;1mRelease\e[37m"
-   if [ -z $CI_COMMIT_TAG ]; then
-     RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_COMMIT_SHA}"
-     printf "Release will run: \n\
-       release-cli create --name \"Big Bang \${CI_COMMIT_TAG}\" --tag-name \${CI_COMMIT_TAG} \n\
-       --description \"Automated release notes are a WIP.\" \n\
-       --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
-       --assets-link \"{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}\" \n\
-       --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
-       --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
-   else
      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
        --description "Automated release notes are a WIP." \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
        --assets-link "{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}" \
        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
-   fi
    echo -e "\e[0Ksection_end:`date +%s`:bb_release\r\e[0K"
 }
 
@@ -1145,16 +1136,10 @@ package_prep() {
 
 package_publish() {
    echo -e "\e[0Ksection_start:`date +%s`:publish[collapsed=true]\r\e[0K\e[33;1mPublishing\e[37m"
-   if [ -z $CI_COMMIT_TAG ]; then
-     aws configure set aws_region ${TEST_AWS_DEFAULT_REGION}
-     aws configure set aws_access_key_id ${TEST_AWS_ACCESS_KEY_ID}
-     aws configure set aws_secret_access_key ${TEST_AWS_SECRET_ACCESS_KEY}
-     aws s3 cp --quiet release/${IMAGE_LIST} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
-     aws s3 cp --quiet release/${IMAGE_PKG} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
-     aws s3 cp --quiet release/${REPOS_PKG} s3://${RELEASE_BUCKET}/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}/
-   else
+     export AWS_ACCESS_KEY_ID=${RELEASE_AWS_ACCESS_KEY_ID}
+     export AWS_SECRET_ACCESS_KEY=${RELEASE_AWS_SECRET_ACCESS_KEY}
+     export AWS_REGION=${RELEASE_AWS_DEFAULT_REGION}
      aws s3 sync --quiet release/ s3://${RELEASE_BUCKET}/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
-   fi
    echo -e "\e[0Ksection_end:`date +%s`:publish\r\e[0K"
 }
 
@@ -1199,21 +1184,11 @@ package_release_notes() {
 
 package_release() {
    echo -e "\e[0Ksection_start:`date +%s`:release[collapsed=true]\r\e[0K\e[33;1mCreating Release\e[37m"
-   if [ -z $CI_COMMIT_TAG ]; then
-     RELEASE_ENDPOINT="https://${RELEASE_BUCKET}.s3-${TEST_AWS_DEFAULT_REGION}.amazonaws.com/tests/${CI_PROJECT_NAME}/${CI_COMMIT_SHA}"
-     printf "Release will run: \n\
-       release-cli create --name \"\${RELEASE_NAME} \${CI_COMMIT_SHA}\" --tag-name \${CI_COMMIT_SHA} \n\
-         --description \"\$(cat release_notes.txt)\" \n\
-         --assets-link \"{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}\" \n\
-         --assets-link \"{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}\" \n\
-         --assets-link \"{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}\"\n"
-   else
      release-cli create --name "${RELEASE_NAME} ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
        --description "$(cat release_notes.txt)" \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"
-   fi
    echo -e "\e[0Ksection_end:`date +%s`:release\r\e[0K"
 }
 

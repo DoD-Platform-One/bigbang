@@ -21,15 +21,11 @@ stages:
 
 bb-docs:on-schedule:
   extends:
+    - .generic-runner-tags
     - .util-image
   stage: scheduled
   only:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
   script:
     - cd ..
     - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/product-tools/bb-docs-compiler.git" scheduled-build
@@ -70,14 +66,11 @@ bb-docs:on-schedule:
 
 bb-docs:
   extends:
+    - .generic-runner-tags
     - .util-image
   stage: dry-run
   except:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
   artifacts:
     when: always
     expire_in: 2 days
@@ -89,6 +82,7 @@ bb-docs:
 
 test:
   extends:
+    - .generic-runner-tags
     - .util-image
   stage: test
   except:

@@ -16,19 +16,19 @@ variable "aws_region" {
 #
 # bigbang-ci
 variable "hub_vpc_id" {
-  default = "vpc-02f926e80ce6f13b3"
+  default = "vpc-020f0e0729b49b801"
 }
 # bigbang-ci
 variable "hub_tgw" {
-  default = "tgw-074261d87dcb4dc5b"
+  default = "tgw-096a10016de907333"
 }
 # bigbang-ci
 variable "hub_tgwa" {
-  default = "tgw-attach-041f22d9e59f73594"
+  default = "tgw-attach-03f9f94341e9a4206"
 }
 # bigbang-ci
 variable "hub_tgw_rt" {
-  default = "tgw-rtb-0d173269a5c9b598b"
+  default = "tgw-rtb-09ad4afa5e4faa2cb"
 }
 
 variable "ci_pipeline_url" {
