@@ -98,20 +98,29 @@ addons:
 
 ### Storage
 
-Authservice can be configured to use a redis server for distributed state storage. This Redis instance is used for OIDC token storage/retrieval.
+Authservice can be configured to use a local redis deployment (disabled by default) for distributed state storage. This Redis instance is used cache session data.
 
 ```yaml
 addons:
   authservice:
-    redis:
-      host: "redis.mydomain.com"
-      port: "6379"
-      password: "password"
+    values:
+      redis:
+        enabled: true
+```
+
+Authservice can also be configured to communicate with external redis serivces such as Elasticache.
+
+```yaml
+addons:
+  authservice:
+    values:
+      globals:
+        redis_server_uri: "tcp://redis-01.7abc2d.0001.usw2.cache.amazonaws.com:6379"
 ```
 
 ### High Availability
 
-When setting `replicaCount` above `1`, Authservice will utilize an HA redis deployment, but it can also be configured to use an external redis such as Elasticache.
+When setting `replicaCount` above `1`, Authservice will require an HA redis deployment (see above) in order to function.
 
 Authservice also utilizes a horizontal pod autoscaler, which can be configured with min & max replicas and target CPU & memory utilization:
 
@@ -120,6 +129,8 @@ addons:
   authservice:
     values:
       replicaCount: 2
+      redis:
+        enabled: true
       autoscaling:
         enabled: false
         minReplicas: 1
