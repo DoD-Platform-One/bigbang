@@ -50,6 +50,7 @@ variables:
   PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
   PIPELINE_REPO_BRANCH: master
+  # Change this back to releases after move is complete and old bucket moved
   RELEASE_BUCKET: umbrella-bigbang-releases
   IMAGE_LIST: images.txt
   PACKAGE_IMAGE_FILE: "package-images.yaml"
@@ -70,7 +71,7 @@ variables:
 pre vars:
   stage: .pre
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   script:
@@ -111,7 +112,8 @@ clean install:
     - job: pre vars
       artifacts: true
   extends:
-    - .k3d-ci-bb
+    - .bigbang-runner-tags
+    - .k3d-ci
   variables:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
@@ -157,7 +159,8 @@ upgrade:
     - job: pre vars
       artifacts: true
   extends:
-    - .k3d-ci-bb
+    - .bigbang-runner-tags
+    - .k3d-ci
   rules:
     # skip job for nightly main and "test-ci::infra" labeled pipelines
     - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
@@ -215,7 +218,7 @@ upgrade:
 package:
   stage: 📦 package
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .release-runner-tags
     - .util-image
     - .templates
   rules:
@@ -241,7 +244,7 @@ package:
 release:
   stage: 🚀 release
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .release-runner-tags
     - .util-image
     - .templates
   rules:
@@ -266,7 +269,7 @@ release:
 #-----------------------------------------------------------------------------------------------------------------------
 aws/network up:
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra fork
     - .network up
   environment:
@@ -281,7 +284,7 @@ aws/network up:
 
 aws/network down:
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra cleanup
     - .network down
   needs:
@@ -308,7 +311,7 @@ aws/network down:
 aws/rke2/cluster up:
   stage: ⚓ cluster up
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra create
     - .rke2 up
   needs:
@@ -328,7 +331,7 @@ aws/rke2/cluster up:
 aws/rke2/bigbang up:
   stage: 🌌 bigbang up
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra create
     - .kubectl-output
     - .templates
@@ -366,7 +369,7 @@ aws/rke2/bigbang up:
 aws/rke2/bigbang test:
   stage: 🤞 test
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra create
     - .kubectl-output
     - .templates
@@ -403,7 +406,7 @@ aws/rke2/bigbang test:
 aws/rke2/bigbang down:
   stage: 💣 bigbang down
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra cleanup
     - .kubectl-output
     - .templates
@@ -440,7 +443,7 @@ aws/rke2/bigbang down:
 aws/rke2/cluster down:
   stage: 💣 cluster down
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .infra cleanup
     - .rke2 down
   needs:

@@ -28,7 +28,7 @@ variables:
 changelog check:
   stage: 📝 changelog check
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   rules:
@@ -52,7 +52,7 @@ changelog check:
 auto tag:
   stage: 🏷️ tag
   extends:
-    - .bigbang-gitlab-runner-tags
+    - .generic-runner-tags
     - .util-image
     - .templates
   rules:

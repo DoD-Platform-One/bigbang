@@ -12,6 +12,10 @@ variables:
 #   rules:
 #     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
+# Include templates
+include:
+  - local: '/library/templates.yaml'
+
 stages:
   - test
   - dry_run
@@ -27,11 +31,8 @@ bb-bot:on-schedule:
   stage: scheduled
   only:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
+  extends:
+    - .generic-runner-tags
   artifacts:
     when: always
     expire_in: 2 weeks
@@ -44,10 +45,8 @@ bb-bot:
   stage: dry_run
   except:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
+  extends:
+    - .generic-runner-tags
   artifacts:
     when: always
     expire_in: 1 day
@@ -58,6 +57,8 @@ bb-bot:
 
 test:
   stage: test
+  extends:
+    - .generic-runner-tags
   script:
     - python -m pip install -r requirements-test.txt
     - pytest . 

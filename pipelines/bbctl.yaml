@@ -13,6 +13,10 @@ workflow:
 variables:
   REPO_NAME: repo1.dso.mil/platform-one/big-bang/apps/product-tools/bbctl
 
+# Include templates
+include:
+  - local: '/library/templates.yaml'
+
 before_script:
   - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
@@ -23,12 +27,16 @@ stages:
 
 go-lint:
   stage: test
+  extends:
+    - .generic-runner-tags
   image: registry.gitlab.com/pipeline-components/go-lint:0.14.0
   script:
     - golint -set_exit_status ./...
 
 go-test:
   stage: test
+  extends:
+    - .generic-runner-tags
   image: golang:1.17
   script:
     - go get gotest.tools/gotestsum

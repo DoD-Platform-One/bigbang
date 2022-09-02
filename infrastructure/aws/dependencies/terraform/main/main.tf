@@ -196,7 +196,7 @@ resource "aws_route" "bigbang-ci-private-to-cluster-private-route" {
 
 // Add a route to go from bigbang-ci Public --> TGW --> Cluster Private
 // TODO: Evaluate if we actually want this...
-data "aws_route_table" "bigbang-ci-public-rt" {
+data "aws_route_tables" "bigbang-ci-public-rts" {
   vpc_id = data.aws_vpc.hub.id
 
   filter {
@@ -206,7 +206,9 @@ data "aws_route_table" "bigbang-ci-public-rt" {
 }
 
 resource "aws_route" "bigbang-ci-public-to-cluster-private-route" {
-  route_table_id = data.aws_route_table.bigbang-ci-public-rt.id
+  count                     = length(data.aws_route_tables.bigbang-ci-public-rts.ids)
+
+  route_table_id = tolist(data.aws_route_tables.bigbang-ci-public-rts.ids)[count.index]
 
   destination_cidr_block = data.aws_vpc.spoke.cidr_block
   transit_gateway_id     = var.hub_tgw

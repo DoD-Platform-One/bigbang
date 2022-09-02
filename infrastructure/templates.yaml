@@ -54,6 +54,11 @@ include:
     - echo "$TF_VAR_env"
     - echo "$TF_VAR_vpc_cidr"
     - cd ${TF_ROOT}
+    # Fetch dependencies
+    - apk add bash aws-cli
+    - export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
+    - export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
     - terraform version
     - terraform init -input=false
     # Loop to retry terraform workspace creation due to issues locking terraform.state in s3

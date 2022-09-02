@@ -5,16 +5,47 @@ include:
   # Clusters
   - local: '/clusters/templates.yaml'
 
-.bigbang-gitlab-runner-tags:
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
-
+# Single place to update image used for pipelines
 .util-image:
   image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:2.4.67
 
+# Runner tags
+.bigbang-runner-tags:
+  tags:
+    - bb-prod-ci
+    - bigbang-runner
+    - privileged
+
+.graduated-runner-tags:
+  tags:
+    - bb-prod-ci
+    - graduated-runner
+    - privileged
+
+.incubating-runner-tags:
+  tags:
+    - bb-prod-ci
+    - incubating-runner
+    - privileged
+
+.sandbox-runner-tags:
+  tags:
+    - bb-prod-ci
+    - sandbox-runner
+    - privileged
+
+.generic-runner-tags:
+  tags:
+    - bb-prod-ci
+    - generic
+
+.release-runner-tags:
+  tags:
+    - bb-prod-ci
+    - release-runner
+    - release
+
+# Function to pull and source templates.sh
 .templates:
   before_script:
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
@@ -23,7 +54,6 @@ include:
 
 .kubectl-output:
   extends: 
-  - .bigbang-gitlab-runner-tags
   - .util-image
   after_script:
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh

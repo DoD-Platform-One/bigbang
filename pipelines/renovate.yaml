@@ -1,4 +1,4 @@
-# Include templates and cluster creation jobs
+# Include templates
 include:
   - local: '/library/templates.yaml'
 
@@ -21,11 +21,8 @@ default:
 renovate:on-schedule:
   only:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
+  extends:
+    - .generic-runner-tags
   before_script:
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
@@ -43,11 +40,8 @@ renovate:on-schedule:
 renovate:
   except:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
+  extends:
+    - .generic-runner-tags
   before_script:
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
