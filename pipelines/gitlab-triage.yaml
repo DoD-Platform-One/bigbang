@@ -1,5 +1,9 @@
 image: registry1.dso.mil/ironbank/opensource/gitlab-triage/gitlab-triage:1.23.1
 
+# Include templates
+include:
+  - local: '/library/templates.yaml'
+
 stages:
   - dry_run
   - scheduled
@@ -10,10 +14,8 @@ before_script:
 
 gitlab-triage:
   stage: dry_run
-  tags:
-    - bigbang
-    - dogfood
-    - generic
+  extends:
+    - .generic-runner-tags
   except:
     - schedules
   script:
@@ -23,10 +25,7 @@ gitlab-triage:on-schedule:
   stage: scheduled
   only:
     - schedules
-  tags:
-    - bigbang
-    - dogfood
-    - generic
-    - bbci
+  extends:
+    - .generic-runner-tags
   script:
     - gitlab_triage
