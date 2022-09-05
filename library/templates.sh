@@ -203,12 +203,14 @@ label_check() {
          echo "    "${package}" already enabled"
       fi
    done
-
+   
    if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "all-packages" ]]; then
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
       LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
    else
-      LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      if [[ ${LABEL_CHECK_DEPLOY_LABELS[*]} != ${CI_MERGE_REQUEST_LABELS[*]} ]]; then
+        LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      fi
       echo "Initial MR labels: ${LABEL_CHECK_DEPLOY_LABELS[*]} "
       echo "Evaluating package dependencies..."
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermost" ]]; then
@@ -290,9 +292,8 @@ label_check() {
    LABEL_CHECK_DEPLOY_LABELS=(${NEW[@]})
 
    echo "CI_DEPLOY_LABELS=${LABEL_CHECK_DEPLOY_LABELS[*]}" >> variables.env
-   CI_TEMP_OUT=( "${LABEL_CHECK_DEPLOY_LABELS[*]}" )
    IFS=$OLD_IFS
-   echo "Labels after check: ${CI_TEMP_OUT[*]}"
+   echo "Labels after check: ${LABEL_CHECK_DEPLOY_LABELS[@]}"
    echo -e "\e[0Ksection_end:`date +%s`:label_check\r\e[0K"
 }
 
