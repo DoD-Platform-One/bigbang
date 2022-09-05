@@ -10,7 +10,15 @@
     {
       "matchDatasources": ["docker"],
       "groupName": "Ironbank",
-      "registryUrls": ["https://registry1.dso.mil"]
+      "registryUrls": ["https://registry1.dso.mil"],
+      "postUpgradeTasks": {
+        "commands": [
+            "match-chart-yaml-appversion",
+            "regenerate-helm-docs",
+            "bump-changelog '- {{{replace 'registry1.dso.mil/' '' depName}}} updated from {{{replace 'v' '' currentVersion}}} to {{{replace 'v' '' newVersion}}}'"
+        ],
+        "fileFilters": ["chart/Chart.yaml", "README.md", "CHANGELOG.md"]
+      }
     }
   ],
   "regexManagers": [
@@ -27,6 +35,7 @@
         "- Mattermost Operator:\\s+(?<currentValue>.+)",
         "appVersion:\\s+(?<currentValue>.+)"
       ],
+      "extractVersionTemplate": "^v(?<version>.*)$",
       "depNameTemplate": "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator",
       "datasourceTemplate": "docker"
     }
