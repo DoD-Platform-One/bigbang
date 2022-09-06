@@ -36,7 +36,7 @@ spec:
     - name: {{ .Release.Name }}-velero-values
       kind: Secret
       valuesKey: "overlays"
-  {{- if or .Values.istio.enabled .Values.kyvernopolicies.enabled }}
+  {{- if or .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if .Values.istio.enabled }}  
     - name: istio
@@ -44,6 +44,10 @@ spec:
     {{- end }}
     {{- if .Values.kyvernopolicies.enabled }}  
     - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
       namespace: {{ .Release.Namespace }}
     {{- end }}
   {{- end }}
