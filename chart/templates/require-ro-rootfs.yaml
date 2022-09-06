@@ -28,15 +28,8 @@ spec:
       message: >-
         Container must set spec.containers[*].securityContext.readOnlyRootFilesystem and
         spec.initContainers[*].securityContext.readOnlyRootFilesystem to true.
-      pattern:
-        spec:
-          containers:
-          - securityContext:
-              readOnlyRootFilesystem: true
-          =(initContainers):
-          - securityContext:
-              readOnlyRootFilesystem: true
-          =(ephemeralContainers):
-          - securityContext:
-              readOnlyRootFilesystem: true
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              securityContext:
+                readOnlyRootFilesystem: true
 {{- end -}}

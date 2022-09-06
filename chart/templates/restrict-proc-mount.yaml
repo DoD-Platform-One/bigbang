@@ -29,15 +29,8 @@ spec:
         spec.initContainers[*].securityContext.procMount, and
         spec.ephemeralContainers[*].securityContext.procMount must not be changed
         from `Default`.
-      pattern:
-        spec:
-          =(initContainers):
-            - =(securityContext):
-                =(procMount): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          containers:
-            - =(securityContext):
-                =(procMount): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          =(ephemeralContainers):
-            - =(securityContext):
-                =(procMount): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              =(securityContext):
+                  =(procMount): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

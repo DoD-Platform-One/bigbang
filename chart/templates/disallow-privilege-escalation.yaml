@@ -27,15 +27,8 @@ spec:
         Privilege escalation is disallowed. The fields spec.containers[*].securityContext.allowPrivilegeEscalation,
         spec.initContainers[*].securityContext.allowPrivilegeEscalation, and
         spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation must be undefined or set to `false`.
-      pattern:
-        spec:
-          =(initContainers):
-          - =(securityContext):
-              =(allowPrivilegeEscalation): "false"
-          containers:
-          - =(securityContext):
-              =(allowPrivilegeEscalation): "false"
-          =(ephemeralContainers):
-          - =(securityContext):
-              =(allowPrivilegeEscalation): "false"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              =(securityContext):
+                  =(allowPrivilegeEscalation): "false"
 {{- end -}}

@@ -43,6 +43,32 @@ webhookTimeoutSeconds: {{ $webhookTimeoutSeconds }}
 {{- end }}
 {{- end -}}
 
+{{/* excludeContainers values.  Expects name of policy in .name */}}
+{{- define "kyverno-policies.excludeContainers" -}}
+  {{- $globalexcludeContainers := .Values.excludeContainers -}}
+  {{- $validateOnly := (dig "validateOnly" nil .) -}}
+  {{- $excludeContainers := (dig .name "parameters" "excludeContainers" nil .Values.policies) -}}
+    foreach:
+    {{- if not $validateOnly }}
+    - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+    {{- else }}
+    - list: request.object.spec.[{{$validateOnly}}][]
+    {{- end }}
+    {{- if or $globalexcludeContainers $excludeContainers }}
+      preconditions:
+        all:
+        - key: "{{ "{{" }} element.name {{ "}}" }}"
+          operator: AnyNotIn
+          value:
+            {{- if $globalexcludeContainers }}
+              {{- toYaml $globalexcludeContainers | nindent 10 -}}
+            {{- end }}
+            {{- if $excludeContainers }}
+              {{- toYaml $excludeContainers | nindent 10 -}}
+            {{- end }}
+    {{- end }}
+{{- end -}}
+
 {{/* Match key/value.  Expects name of policy in .name and default kind in .kind as a list */}}
 {{- define "kyverno-policies.match" -}}
   {{- $policyMatch := (dig .name "match" nil .Values.policies) -}}

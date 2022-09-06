@@ -81,4 +81,21 @@ spec:
   initContainers:
   - name: i1
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.6
-    
+---
+# Test 6: Exclude container works
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-image-tags-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.6
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: not-me
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal

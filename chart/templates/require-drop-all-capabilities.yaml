@@ -30,12 +30,11 @@ spec:
         spec.containers[*].securityContext.capabilities.drop,
         spec.initContainers[*].securityContext.capabilities.drop, and
         spec.ephemeralContainers[*].securityContext.capabilities.drop to `ALL`.
-      foreach:
-      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
-        deny:
-          conditions:
-            any:
-            - key: "{{ "{{" }} not_null(element.securityContext.capabilities.drop, '[]') | contains(@, 'ALL') {{ "}}" }}"
-              operator: Equals
-              value: false
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            deny:
+              conditions:
+                any:
+                - key: "{{ "{{" }} not_null(element.securityContext.capabilities.drop, '[]') | contains(@, 'ALL') {{ "}}" }}"
+                  operator: Equals
+                  value: false
 {{- end -}}

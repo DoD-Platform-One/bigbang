@@ -25,26 +25,16 @@ spec:
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "Images without tags are mutable and not allowed."
-      pattern:
-        spec:
-          containers:
-          - image: "*:*"
-          =(initContainers):
-          - image: "*:*"
-          =(ephemeralContainers):
-          - image: "*:*"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              image: "*:*"
   - name: validate-image-tag
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "Using a mutable image tag e.g. 'latest' is not allowed."
-      pattern:
-        spec:
-          containers:
-          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
-          =(initContainers):
-          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
-          =(ephemeralContainers):
-          - image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              image: "!*:{{ (dig $name "parameters" "disallow" nil .Values.policies) | join " & !*:" }}"
 {{- end -}}

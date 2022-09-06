@@ -19,7 +19,7 @@ spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: validate-runasgroup
+  - name: pod-validate-runasgroup
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
@@ -33,14 +33,18 @@ spec:
         spec:
           =(securityContext):
             =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          =(initContainers):
-            - =(securityContext):
-                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          containers:
-            - =(securityContext):
-                =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          =(ephemeralContainers):
-            - =(securityContext):
+  - name: container-validate-runasgroup
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting runAsGroup to an ID outside of the allowed ranges is not allowed.
+        spec.securityContext.runAsGroup, spec.containers[*].securityContext.runAsGroup, and
+        spec.initContainers[*].securityContext.runAsGroup must either be undefined or set to an
+        allowed value.
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              =(securityContext):
                 =(runAsGroup): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
   - name: validate-fsgroup
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}

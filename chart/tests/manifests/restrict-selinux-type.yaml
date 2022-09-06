@@ -99,3 +99,24 @@ spec:
     securityContext:
       seLinuxOptions:
         type: container_init_t
+---
+# Test 6: Test global container exclusion rules
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: not-me
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      seLinuxOptions:
+        type: disallowed
