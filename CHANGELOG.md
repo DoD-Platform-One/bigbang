@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.3] - 2022-08-31
+### Changed
+- Added support for policy container exclusion 
+
 ## [1.0.1-bb-2] - 2022-08-30
 
 ### Changed

@@ -3,6 +3,9 @@ bbtests:
 waitforready:
   imagePullSecrets:
   - name: private-registry
+excludeContainers:
+  - not-me
+  - or-me
 exclude:
   any:
   - resources:

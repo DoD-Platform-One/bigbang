@@ -26,15 +26,8 @@ spec:
         Privileged mode is not allowed. The fields spec.containers[*].securityContext.privileged,
         spec.initContainers[*].securityContext.privileged, and
         spec.ephemeralContainers[*].securityContext.privileged must be undefined or set to false.
-      pattern:
-        spec:
-          =(initContainers):
-            - =(securityContext):
-                =(privileged): "false"
-          containers:
-            - =(securityContext):
-                =(privileged): "false"
-          =(ephemeralContainers):
-            - =(securityContext):
-                =(privileged): "false"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+                =(securityContext):
+                  =(privileged): "false"
 {{- end -}}

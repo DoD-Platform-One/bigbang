@@ -17,7 +17,7 @@ spec:
   {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
-  - name: selinux-options-type
+  - name: pod-selinux-options-type
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
@@ -31,16 +31,17 @@ spec:
           =(securityContext):
             =(seLinuxOptions):
               =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          =(initContainers):
-            - =(securityContext):
-                =(seLinuxOptions):
-                  =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          containers:
-            - =(securityContext):
-                =(seLinuxOptions):
-                  =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
-          =(ephemeralContainers):
-            - =(securityContext):
+  - name: container-selinux-options-type
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    validate:
+      message: >-
+        Setting SELinux type is restricted.  The values from spec.securityContext.seLinuxOptions.type,
+        spec.containers[*].securityContext.seLinuxOptions.type, spec.initContainers[*].securityContext.seLinuxOptions.type,
+        and spec.ephemeralContainers[*].securityContext.seLinuxOptions.type must be in the allowed list.
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              =(securityContext):
                 =(seLinuxOptions):
                   =(type): "{{ join " | " (dig $name "parameters" "allow" nil .Values.policies) }}"
 {{- end -}}

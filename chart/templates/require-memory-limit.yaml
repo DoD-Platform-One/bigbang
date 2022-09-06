@@ -28,19 +28,9 @@ spec:
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "Memory limits are required to be defined and below the maximum."
-      pattern:
-        spec:
-          containers:
-          - resources:
-              limits:
-                memory: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
-          =(initContainers):
-          - resources:
-              limits:
-                memory: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
-          # Resources are not allowed for ephemeral containers, but included here in case it changes
-          =(ephemeralContainers):
-          - resources:
-              limits:
-                memory: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              resources:
+                limits:
+                  memory: "{{ join " | " (dig $name "parameters" "require" nil .Values.policies) }}"
 {{- end -}}

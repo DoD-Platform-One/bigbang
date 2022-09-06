@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.1-bb.2](https://img.shields.io/badge/Version-1.0.1--bb.2-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.0.1-bb.3](https://img.shields.io/badge/Version-1.0.1--bb.3-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -39,17 +39,19 @@ helm install kyverno-policies chart/
 | validationFailureAction | string | `""` | Override all policies' validation failure action with "audit" or "enforce".  If blank, uses policy setting. |
 | webhookTimeoutSeconds | int | `30` | Override all policies' time to wait for admission webhook to respond.  If blank, uses policy setting or default (10).  Range is 1 to 30. |
 | exclude | object | `{}` | Adds an exclusion to all policies.  This is merged with any policy-specific excludes.  See https://kyverno.io/docs/writing-policies/match-exclude for fields. |
+| excludeContainers | list | `[]` | Adds an excludeContainers to all policies.  This is merged with any policy-specific excludeContainers. |
 | customLabels | object | `{}` | Additional labels to apply to all policies. |
 | waitforready.enabled | bool | `true` | Controls wait for ready deployment |
 | waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl","tag":"v1.24.4"}` | Image to use in wait for ready job.  This must contain kubectl. |
 | waitforready.imagePullSecrets | list | `[]` | Pull secret for wait for ready job |
-| policies.sample | object | `{"enabled":false,"exclude":{},"match":{},"parameters":{},"validationFailureAction":"audit","webhookTimeoutSeconds":""}` | Sample policy showing values that can be added to any policy |
+| policies.sample | object | `{"enabled":false,"exclude":{},"match":{},"parameters":{"excludeContainers":[]},"validationFailureAction":"audit","webhookTimeoutSeconds":""}` | Sample policy showing values that can be added to any policy |
 | policies.sample.enabled | bool | `false` | Controls policy deployment |
 | policies.sample.validationFailureAction | string | `"audit"` | Controls if a validation policy rule failure should disallow (enforce) or allow (audit) the admission |
 | policies.sample.webhookTimeoutSeconds | string | `""` | Specifies the maximum time in seconds allowed to apply this policy. Default is 10. Range is 1 to 30. |
 | policies.sample.match | object | `{}` | Defines when this policy's rules should be applied.  This completely overrides any default matches. |
 | policies.sample.exclude | object | `{}` | Defines when this policy's rules should not be applied.  This completely overrides any default excludes. |
-| policies.sample.parameters | object | `{}` | Policy specific parameters that are added to the configMap for the policy rules |
+| policies.sample.parameters | object | `{"excludeContainers":[]}` | Policy specific parameters that are added to the configMap for the policy rules |
+| policies.sample.parameters.excludeContainers | list | `[]` | Adds a container exclusion (by name) to a specific policy.  This is merged with any global excludeContainers. |
 | policies.clone-configs | object | `{"enabled":false,"parameters":{"clone":[]}}` | Clone existing configMap or secret in new Namespaces |
 | policies.clone-configs.parameters.clone | list | `[]` | ConfigMap or Secrets that should be cloned.  Each item requres the kind, name, and namespace of the resource to clone |
 | policies.disallow-annotations | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified annotations on pods |

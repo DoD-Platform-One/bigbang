@@ -26,12 +26,7 @@ spec:
     {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: "Image registry is not in the approved list"
-      pattern:
-        spec:
-          containers:
-          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
-          =(initContainers):
-          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
-          =(ephemeralContainers):
-          - image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) .) | nindent 6 }}
+            pattern:
+              image: "{{ join "* | " (dig $name "parameters" "allow" nil .Values.policies) }}*"
 {{- end -}}

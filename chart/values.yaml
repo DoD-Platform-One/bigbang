@@ -12,6 +12,9 @@ webhookTimeoutSeconds: 30
 # -- Adds an exclusion to all policies.  This is merged with any policy-specific excludes.  See https://kyverno.io/docs/writing-policies/match-exclude for fields.
 exclude: {}
 
+# -- Adds an excludeContainers to all policies.  This is merged with any policy-specific excludeContainers.
+excludeContainers: []
+
 # -- Additional labels to apply to all policies.
 customLabels: {}
 
@@ -47,7 +50,9 @@ policies:
     # -- Defines when this policy's rules should not be applied.  This completely overrides any default excludes.
     exclude: {}
     # -- Policy specific parameters that are added to the configMap for the policy rules
-    parameters: {}
+    parameters: 
+      # -- Adds a container exclusion (by name) to a specific policy.  This is merged with any global excludeContainers.
+      excludeContainers: []
 
   # -- Clone existing configMap or secret in new Namespaces
   clone-configs:

@@ -96,3 +96,44 @@ spec:
     image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
     securityContext:
       runAsUser: 4000
+---
+# Test 6: Test container exclusion ()
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 2000
+  initContainers:
+  - name: not-me
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 500
+---
+# Test 7: Test pod rule 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-7
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 2000

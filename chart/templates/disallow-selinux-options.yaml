@@ -18,10 +18,9 @@ spec:
   validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
   rules:
   {{- range $v := (dig $name "parameters" "disallow" nil .Values.policies) }}
-  - name: disallow-selinux-{{ $v }}
+  - name: pod-disallow-selinux-{{ $v }}
     {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
     {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
-    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
     validate:
       message: >-
         Setting SELinux {{ $v }} is not allowed.  The fields spec.securityContext.seLinuxOptions.{{ $v }},
@@ -32,16 +31,18 @@ spec:
           =(securityContext):
             =(seLinuxOptions):
               X({{ $v }}): "null"
-          =(initContainers):
-            - =(securityContext):
-                =(seLinuxOptions):
-                  X({{ $v }}): "null"
-          containers:
-            - =(securityContext):
-                =(seLinuxOptions):
-                  X({{ $v }}): "null"
-          =(ephemeralContainers):
-            - =(securityContext):
+  - name: container-disallow-selinux-{{ $v }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
+    validate:
+      message: >-
+        Setting SELinux {{ $v }} is not allowed.  The fields spec.securityContext.seLinuxOptions.{{ $v }},
+        spec.containers[*].securityContext.seLinuxOptions.{{ $v }}, spec.initContainers[*].securityContext.seLinuxOptions.{{ $v }},
+        and spec.ephemeralContainers[*].securityContext.seLinuxOptions.{{ $v }} must be undefined.
+      {{- include "kyverno-policies.excludeContainers" (merge (dict "name" $name) $) | nindent 6 }}
+            pattern:
+              =(securityContext):
                 =(seLinuxOptions):
                   X({{ $v }}): "null"
   {{- end }}
