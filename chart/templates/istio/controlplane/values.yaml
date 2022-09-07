@@ -9,6 +9,13 @@ domain: {{ $domainName }}
 
 enterprise: {{ .Values.istio.enterprise }}
 
+{{- if not (semverCompare "<1.19" .Capabilities.KubeVersion.GitVersion) }}
+istiod:
+  env: 
+    - name: ENABLE_LEGACY_FSGROUP_INJECTION
+      value: "false"
+{{- end }}
+
 {{- if or .Values.jaeger.enabled .Values.tempo.enabled }}
 tracing:
 {{- if .Values.jaeger.enabled }}
