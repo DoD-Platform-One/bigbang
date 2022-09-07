@@ -675,7 +675,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.10.0-bb.0"
+    tag: "0.10.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -683,6 +683,34 @@ twistlock:
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
     gateway: ""
+
+  sso:
+    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/initialization.md
+    enabled: false
+
+    # -- SAML client ID
+    client_id: ""
+
+    # -- SAML Povider Alias (optional)
+    provider_name: ""
+
+    # -- SAML Identity Provider. `shibboleth` is recommended by Twistlock support for Keycloak
+    provider_type: "shibboleth"
+
+    # -- Identity Provider url with path to realm
+    issuer_uri: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}"
+
+    # -- SAML Identity Provider SSO URL
+    idp_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml"
+
+    # -- Console URL of the Twistlock app (optional)
+    console_url: "https://twistlock.{{ .Values.domain }}"
+
+    # -- Groups attribute (optional)
+    groups: ""
+
+    # -- X.509 Certificate from Identity Provider (i.e. Keycloak). See https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/KEYCLOAK.md for format. Use the `|-` syntax for multiline string.
+    cert: ""
 
   # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
