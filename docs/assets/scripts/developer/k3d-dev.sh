@@ -341,8 +341,8 @@ ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes u
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_owner'"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_statistic'"
 
-echo "Instance will automatically terminate at 08:00 UTC"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c \"echo '0 8 * * * /usr/sbin/shutdown -h now' | crontab -\""
+echo "Instance will automatically terminate 8 hours from now unless you alter the crontab"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'echo \"\$(date -u -d \"+8 hours\" +\"%M %H\") * * * /usr/sbin/shutdown -h now\" | crontab -'"
 echo
 
 echo
@@ -477,10 +477,10 @@ echo "==========================================================================
 # ending instructions
 echo
 echo "SAVE THE FOLLOWING INSTRUCTIONS INTO A TEMPORARY TEXT DOCUMENT SO THAT YOU DON'T LOOSE THEM"
-echo "NOTE: The EC2 instance will automatically terminate at 08:00 UTC unless you delete the cron job"
+echo "NOTE: The EC2 instance will automatically terminate 8 hours from the time of creation unless you delete the cron job"
 echo
 echo "ssh to instance:"
-echo "  ssh -i ~/.ssh/${KeyName}.pem ubuntu@${PublicIP}"
+echo "  ssh -i ~/.ssh/${KeyName}.pem -o IdentitiesOnly=yes ubuntu@${PublicIP}"
 echo
 echo "To use kubectl from your local workstation you must set the KUBECONFIG environment variable:"
 echo "  export KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-config"
