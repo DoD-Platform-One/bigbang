@@ -391,7 +391,7 @@ addons:
     values:
       tenant:
         pools:
-        - servers: 2
+        - servers: 3
           volumesPerServer: 4
           size: 256Mi
           resources:
@@ -404,6 +404,7 @@ addons:
             runAsGroup: 1001
             fsGroup: 1001
             runAsNonRoot: true
+
 
   mattermost:
     values:
