@@ -1,7 +1,7 @@
 include:
-  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: 'refactor-auto-bb-mr'
+  - project: 'cwilliams68067/package-test'
+    ref: 'oci-test'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'refactor-auto-bb-mr' 
+  PIPELINE_REPO_BRANCH: 'oci-test' 
   DEBUG_ENABLED: "true"
