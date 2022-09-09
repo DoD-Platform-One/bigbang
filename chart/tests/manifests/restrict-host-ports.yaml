@@ -1,0 +1,67 @@
+# Test 1: Containers with a host port that is not in the approved list is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-ports-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    ports:
+      - hostPort: 65000
+        containerPort: 65000
+---
+# Test 2: Init containers with a host port that is not in the approved list is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-ports-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    ports:
+      - hostPort: 65000
+        containerPort: 65000
+---
+# Test 3: Containers and init containers without a host port or with an allowed host port are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-ports-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    ports:
+      - hostPort: 64000
+        containerPort: 64000
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    ports:
+      - hostPort: 64000
+        containerPort: 64000
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal

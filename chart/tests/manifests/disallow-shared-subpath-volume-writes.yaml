@@ -1,0 +1,506 @@
+# Used for testing implicitly read-only volumes
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: disallow-shared-subpath-volume-writes
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: ignore
+data:
+  key: value
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: disallow-shared-subpath-volume-writes
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: ignore
+type: Opaque
+stringData:
+  key: value
+---
+# Test 1: Containers that share a volume and use a subpath are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPath: subPath
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 2: Init containers that share a volume and use a subpath are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPath: subPath
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 3: Init containers shareing a volume with containers that have a subpath are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPath: subPath
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 4: Containers sharing a volume with subpathexpr are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 5: Init containers sharing a volume with subpathexpr are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 6: Init containers sharing a volume with a container and subpathexpr are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 7: Containers and init containers sharing a volume without subpath or supbathexpre volume mounts are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-7
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 8: Containers and init containers using a subpath or subpathexpr without sharing the volume are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-8
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol2
+      subPath: subpath
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol3
+      subPath: subpath
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol4
+      subPathExpr: $(SP)
+  volumes:
+  - name: vol1
+    emptyDir: {}
+  - name: vol2
+    emptyDir: {}
+  - name: vol3
+    emptyDir: {}
+  - name: vol4
+    emptyDir: {}
+---
+# Test 9: Containers and init containers sharing a volume with a subpath or subpathexpr as readonly are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-9
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+      readOnly: true
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPath: subpath
+      readOnly: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPath: subpath
+      readOnly: true
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    env:
+    - name: SP
+      value: subPath
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      subPathExpr: $(SP)
+      readOnly: true
+  volumes:
+  - name: vol1
+    emptyDir: {}
+---
+# Test 10: Containers and init containers sharing a volume that is inherently readonly with a subpath or subpathexpr are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-10
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /vol1
+      name: vol1
+      subPath: key
+    - mountPath: /vol2
+      name: vol2
+      subPath: key
+    - mountPath: /vol3
+      name: vol3
+      subPath: annotations
+    - mountPath: /vol4
+      name: vol4
+      subPath: key
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: KEY
+      value: key
+    - name: ANNOTATIONS
+      value: annotations
+    volumeMounts:
+    - mountPath: /vol1
+      name: vol1
+      subPathExpr: $(KEY)
+    - mountPath: /vol2
+      name: vol2
+      subPathExpr: $(KEY)
+    - mountPath: /vol3
+      name: vol3
+      subPathExpr: $(ANNOTATIONS)
+    - mountPath: /vol4
+      name: vol4
+      subPathExpr: $(KEY)
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    env:
+    - name: KEY
+      value: key
+    - name: ANNOTATIONS
+      value: annotations
+    volumeMounts:
+    - mountPath: /vol1
+      name: vol1
+      subPathExpr: $(KEY)
+    - mountPath: /vol2
+      name: vol2
+      subPathExpr: $(KEY)
+    - mountPath: /vol3
+      name: vol3
+      subPathExpr: $(ANNOTATIONS)
+    - mountPath: /vol4
+      name: vol4
+      subPathExpr: $(KEY)
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /vol1
+      name: vol1
+      subPath: key
+    - mountPath: /vol2
+      name: vol2
+      subPath: key
+    - mountPath: /vol3
+      name: vol3
+      subPath: annotations
+    - mountPath: /vol4
+      name: vol4
+      subPath: key
+  volumes:
+  - name: vol1
+    configMap:
+      name: disallow-shared-subpath-volume-writes
+  - name: vol2
+    secret:
+      secretName: disallow-shared-subpath-volume-writes
+  - name: vol3
+    downwardAPI:
+      items:
+      - path: "annotations"
+        fieldRef:
+          fieldPath: metadata.annotations
+  - name: vol4
+    projected:
+      sources:
+      - secret:
+          name: disallow-shared-subpath-volume-writes
+      - configMap:
+          name: disallow-shared-subpath-volume-writes
+---
+# Test 11: Containers that mount the same volume with subkeys more than once are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-shared-subpath-volume-writes-11
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    env:
+    - name: KEY
+      value: key
+    volumeMounts:
+    - mountPath: /vol1a
+      name: vol1
+      subPath: key
+    - mountPath: /vol1b
+      name: vol1
+      subPath: key
+    - mountPath: /vol1c
+      name: vol1
+      subPathExpr: $(KEY)
+    - mountPath: /vol1d
+      name: vol1
+      subPathExpr: $(KEY)
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    env:
+    - name: KEY
+      value: key
+    volumeMounts:
+    - mountPath: /vol2a
+      name: vol2
+      subPath: key
+    - mountPath: /vol2b
+      name: vol2
+      subPath: key
+    - mountPath: /vol2c
+      name: vol2
+      subPathExpr: $(KEY)
+    - mountPath: /vol2d
+      name: vol2
+      subPathExpr: $(KEY)
+  volumes:
+  - name: vol1
+    emptyDir: {}
+  - name: vol2
+    emptyDir: {}

@@ -1,0 +1,33 @@
+# Test 1: Deploying a service with external names outside of the allowed list is not allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: restrict-external-names-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  type: ExternalName
+  selector:
+    app: restrict-external-names
+  ports:
+  - port: 80
+  externalName: disallowed
+---
+# Test 2: Deploying a service with external names in the approved list is allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: restrict-external-names-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  type: ExternalName
+  selector:
+    app: restrict-external-names
+  ports:
+    - port: 80
+  externalName: allowed

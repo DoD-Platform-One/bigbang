@@ -1,0 +1,68 @@
+{{- $name := "update-image-pull-policy" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Add imagePullPolicy Always
+    policies.kyverno.io/category: Helper
+    policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      If mutable tags (e.g. latest) are used for images, it may be desirable to to have the
+      `imagePullPolicy` set to `Always` to ensure that future pulls will get the latest
+      image. This policy adds or modifies the `imagePullPolicy` to set it to `Always` on
+      all tagged images.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  rules:
+  {{- $index := 0 }}
+  {{- range $v := (dig $name "parameters" "update" nil .Values.policies) }}
+  {{- $index = add1 $index }}
+  - name: {{ printf "%s-containers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
+    mutate:
+      patchStrategicMerge:
+        spec:
+          containers:
+            - (image): "!*@*"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-initcontainers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    preconditions:
+      all:
+      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
+      - key: "{{"{{"}} not_null(request.object.spec.initContainers[], '') | length(@) {{"}}"}}"
+        operator: GreaterThanOrEquals
+        value: 1
+    mutate:
+      patchStrategicMerge:
+        spec:
+          initContainers:
+            - (image): "!*@*"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  - name: {{ printf "%s-ephemeralcontainers-%d" $name $index }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) $) | nindent 4 }}
+    preconditions:
+      all:
+      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
+      - key: "{{"{{"}} not_null(request.object.spec.ephemeralContainers[], '') | length(@) {{"}}"}}"
+        operator: GreaterThanOrEquals
+        value: 1
+    mutate:
+      patchStrategicMerge:
+        spec:
+          ephemeralContainers:
+            - (image): "!*@*"
+              imagePullPolicy: |-
+                {{ "{{" }} regex_replace_all('{{ default ".*" $v.from }}', '{{"{{"}}@{{"}}"}}', '{{ $v.to }}') {{ "}}" }}
+  {{- end }}
+{{- end -}}

@@ -1,0 +1,39 @@
+{{- $name := "require-annotations" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Require Annotations
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: {{ default "medium" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/minversion: 1.3.0
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Some annotations control functionality that is needed for cluster-wide tools to function.
+      This policy requires the use of annotations and values contained in the specified list.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  validationFailureAction: {{ default (dig $name "validationFailureAction" nil .Values.policies) .Values.validationFailureAction }}
+  rules:
+  - name: {{ $name }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Pod")) .) | nindent 4 }}
+    {{- include "kyverno-policies.precondition.default" . | nindent 4 }}
+    validate:
+      message: >-
+        One or more required annotations is missing.
+      pattern:
+        metadata:
+          annotations:
+          {{- range $v := (dig $name "parameters" "require" nil .Values.policies) -}}
+            {{- $t := split ":" $v }}
+            {{- if $t._1 }}
+              {{- $t._0 | nindent 12 }}: "{{ $t._1 | trim }}"
+            {{- else }}
+              {{- $t._0 | nindent 12 }}: "?*"
+            {{- end }}
+          {{- end }}
+{{- end -}}

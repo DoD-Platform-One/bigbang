@@ -1,0 +1,49 @@
+# Test 1: Pods without the required annotations are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-annotations-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/test: required
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods without the required annotation value are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-annotations-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/required: test
+    kyverno-policies-bbtest/test: notrequired
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 3: Pods with the required annotations are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-annotations-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+    kyverno-policies-bbtest/required: test
+    kyverno-policies-bbtest/test: required
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

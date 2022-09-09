@@ -1,0 +1,37 @@
+# Test 1: Specifying the default namespace is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-namespaces-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Deploying a pod without a namespaces is not allowed
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disallow-namespaces-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  selector:
+    matchLabels:
+      app: bbtest
+  template:
+    metadata:
+      labels:
+        app: bbtest
+    spec:
+      containers:
+      - name: c1
+        image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+        args: ["sleep", "infinity"]

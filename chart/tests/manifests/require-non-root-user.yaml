@@ -1,0 +1,279 @@
+# Test 1: Pod + Containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pod + Init containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Pods that set runAsNonRoot to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsNonRoot: false
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 4: Containers that override runAsNonRoot to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsNonRoot: false
+---
+# Test 5: Init Containers that override runAsNonRoot to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsNonRoot: false
+---
+# Test 6: Pods that set runAsUser to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 7: Containers that override runAsUser to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-7
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 0
+---
+# Test 8: Init containers that override runAsUser to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-8
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 0
+---
+# Test 9: Pods that run as non-root are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-9
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 10: Pods that run as user > 0 are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-10
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 11: Pods without a security context, and containers / init containers running as non-root are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-11
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsNonRoot: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsNonRoot: true
+---
+# Test 12: Pods without a security context, container running as nonroot, and init container running as user > 0 are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-12
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsNonRoot: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 1000
+---
+# Test 13: Pods without a security context, init container running as nonroot, and container running as user > 0 are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-13
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 1000
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsNonRoot: true
+---
+# Test 14: Pods without a security context, container/init container running as user > 0 are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-user-14
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 1000
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 1000

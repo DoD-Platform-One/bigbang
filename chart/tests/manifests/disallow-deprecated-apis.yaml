@@ -1,0 +1,20 @@
+# Test 1: APIs deprecated and removed in 1.25 are not allowed
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: disallow-deprecated-apis-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  schedule: "0 0 29 2 *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: c1
+            image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+            args: ["sleep", "1"]
+          restartPolicy: Never

@@ -1,0 +1,104 @@
+# Test 1: Containers without memory limits are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-memory-limit-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      requests:
+        memory: 4Mi
+---
+# Test 2: Init containers without memory limits are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-memory-limit-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        memory: 4Mi
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Containers with memory limits above the maximum are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-memory-limit-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        memory: 640Gi
+---
+# Test 4: Init containers with memory limits above the maximum are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-memory-limit-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        memory: 4Mi
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    resources:
+      limits:
+        memory: 1Ti
+---
+# Test 5: Containers with memory limits below the maximum are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-memory-limit-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        memory: 4Mi
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    resources:
+      limits:
+        memory: 4Mi

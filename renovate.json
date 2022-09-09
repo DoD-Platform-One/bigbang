@@ -1,0 +1,27 @@
+{
+    "baseBranches": ["main"],
+    "configWarningReuseIssue": false,
+    "dependencyDashboard": true,
+    "dependencyDashboardTitle": "Renovate: Upgrade Kyverno Policy Images",
+    "draftPR": true,
+    "enabledManagers": ["helm-values","regex"],
+    "ignorePaths": ["chart/charts/**"],
+    "labels": ["kyverno","renovate"],
+    "packageRules": [
+        {
+            "matchDatasources": ["docker"],
+            "groupName": "Ironbank"
+        }
+    ],
+    "regexManagers": [
+        {
+            "fileMatch": ["^chart/tests/manifests/.*\\.yaml$"],
+            "matchStrings": [
+                "image:\\s+(?<depName>.+):(?<currentValue>.+)",
+                "kyverno-policies-bbtest/value:\\s+(?<depName>.+):(?<currentValue>.+)"
+            ],
+            "datasourceTemplate": "docker"
+        }
+    ],
+    "separateMajorMinor": false
+}

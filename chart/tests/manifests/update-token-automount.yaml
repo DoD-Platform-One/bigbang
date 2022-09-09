@@ -1,0 +1,24 @@
+# Test 1: Default service accounts are mutated
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: update-token-automount-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/kind: ServiceAccount
+    kyverno-policies-bbtest/name: default
+    kyverno-policies-bbtest/namespace: update-token-automount-1
+    kyverno-policies-bbtest/key: .automountServiceAccountToken
+    kyverno-policies-bbtest/value: "false"
+---
+# Test 2: Non-default service accounts are not mutated
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: update-token-automount-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: ignore

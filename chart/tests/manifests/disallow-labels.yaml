@@ -1,0 +1,65 @@
+# Test 1: Pods with a disallowed label key are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-labels-1
+  namespace: default
+  labels:
+    kyverno-policies-bbtest/disallowed: test
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods with a disallowed label value are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-labels-2
+  namespace: default
+  labels:
+    kyverno-policies-bbtest/test: disallowed
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 3: Pods with allowed label keys/values are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-labels-3
+  namespace: default
+  labels:
+    kyverno-policies-bbtest/test: allowed
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 4: Pods with no labels are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-labels-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

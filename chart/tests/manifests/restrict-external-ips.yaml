@@ -1,0 +1,48 @@
+# Test 1: Deploying a service with external IPs outside of the allowed list is not allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: restrict-external-ips-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  selector:
+    app: restrict-external-ips
+  ports:
+  - port: 80
+  externalIPs:
+  - 192.168.0.2
+---
+# Test 2: Deploying a service with external IPs in the approved list is allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: restrict-external-ips-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  selector:
+    app: restrict-external-ips
+  ports:
+    - port: 80
+  externalIPs:
+  - 192.168.0.1
+---
+# Test 3: Deploying a service without external IPs is allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: restrict-external-ips-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  selector:
+    app: restrict-external-ips
+  ports:
+    - port: 80

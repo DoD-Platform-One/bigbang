@@ -1,0 +1,76 @@
+# Test 1: Containers adding non-approved seccomp profiles should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-seccomp-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+---
+# Test 2: Init containers adding non-approved seccomp profiles should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-seccomp-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+---
+# Test 3: Containers or init containers that add allowed seccomp profiles or no seccomp profile should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-seccomp-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      privileged: false
+  - name: c3
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      privileged: false
+  - name: i3
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault

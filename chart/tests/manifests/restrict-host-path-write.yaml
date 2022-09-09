@@ -1,0 +1,165 @@
+# Test 1: Containers mounting a hostPath volume as read/write is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+---
+# Test 2: Init containers mounting a hostPath volume as read/write is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+---
+# Test 3: Containers mounting a hostPath volume explicitly as readOnly=false is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: false
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+---
+# Test 4: Init containers mounting a hostPath volume explicitly as readOnly=false is not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: false
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+---
+# Test 5: Containers and init containers mounting a hostPath volume as read only or other volumes as read/write are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: true
+    - mountPath: /cache2
+      name: vol2
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+      readOnly: true
+    - mountPath: /cache2
+      name: vol2
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/disallowed
+      type: DirectoryOrCreate
+  - name: vol2
+    emptyDir: {}
+---
+# Test 6: Containers and init containers mounting a hostPath volume as read/write and in the allowed list are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-host-path-write-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    volumeMounts:
+    - mountPath: /cache
+      name: vol1
+  volumes:
+  - name: vol1
+    hostPath:
+      path: /tmp/allowed
+      type: DirectoryOrCreate

@@ -1,0 +1,64 @@
+# Test 1: Containers without a readiness probe are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-probes-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    livenessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
+---
+# Test 2: Containers without a liveness probe are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-probes-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    readinessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
+---
+# NOTE: Cannot test periodSeconds=0.  Kubernetes will auto change the periodSeconds to 10
+# Test 3: Containers with a liveness and readiness probe are allowed.  In addition, init containers are allowed without probes
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-probes-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    readinessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
+    livenessProbe:
+      exec:
+        command: ["cat", "/proc/version"]
+      periodSeconds: 10
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal

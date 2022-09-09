@@ -1,0 +1,47 @@
+# Test 1: Pods with a disallowed annotation key are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-annotations-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/disallowed: test
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods with a disallowed annotation value are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-annotations-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+    kyverno-policies-bbtest/test: disallowed
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 3: Pods with allowed annotation keys/values are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-annotations-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+    kyverno-policies-bbtest/test: allowed
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

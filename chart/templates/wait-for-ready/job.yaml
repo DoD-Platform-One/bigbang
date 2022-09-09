@@ -1,0 +1,45 @@
+{{- if $.Values.waitforready.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "kyverno-policies.name" . }}-wait-for-ready-{{ now | date "20060102150405" }}
+  labels:
+    {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  activeDeadlineSeconds: 900
+  ttlSecondsAfterFinished: 15
+  template:
+    metadata:
+      labels: {{- include "kyverno-policies.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ template "kyverno-policies.name" . }}-wait-for-ready
+      containers:
+      - name: {{ template "kyverno-policies.name" . }}-wait-for-ready
+        image: {{ .Values.waitforready.image.repository }}:{{ .Values.waitforready.image.tag }}
+        env:
+        - name: ENABLED_POLICIES
+          value: '{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join " " $p }}'
+        command: ["/bin/bash", "/usr/src/wait-for-ready.sh"]
+        resources:
+          limits:
+            cpu: 0.5
+            memory: 128Mi
+          requests:
+            cpu: 0.5
+            memory: 128Mi
+        securityContext:
+          capabilities:
+            drop: ["ALL"]
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+        volumeMounts:
+        - name: {{ template "kyverno-policies.name" . }}-wait-for-ready
+          mountPath: /usr/src
+      volumes:
+        - name: {{ template "kyverno-policies.name" . }}-wait-for-ready
+          configMap:
+            name: {{ template "kyverno-policies.name" . }}-wait-for-ready
+      restartPolicy: Never
+{{- end }}

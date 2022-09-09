@@ -1,0 +1,31 @@
+# Test 1: Deploying a service of type NodePort is not allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: disallow-nodeport-services-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  type: NodePort
+  selector:
+    app: disallow-nodeport-services
+  ports:
+  - port: 80
+---
+# Test 2: Deploying a service that is not NodePort is allowed
+apiVersion: v1
+kind: Service
+metadata:
+  name: disallow-nodeport-services-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  type: ClusterIP
+  selector:
+    app: disallow-nodeport-services
+  ports:
+    - port: 80

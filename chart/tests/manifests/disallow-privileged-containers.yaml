@@ -1,0 +1,63 @@
+# Test 1: Containers running as privileged should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privileged-containers-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      privileged: true
+---
+# Test 2: Init containers running as privileged should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privileged-containers-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      privileged: true
+---
+# Test 3: Containers and init containers that do not define privileged or set privileged to false are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privileged-containers-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      privileged: false
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      privileged: false

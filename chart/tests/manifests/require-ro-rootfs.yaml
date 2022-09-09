@@ -1,0 +1,95 @@
+# Test 1: Pod + Containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pod + Init containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Containers that set readOnlyRootFilesystem to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: false
+---
+# Test 4: Init Containers that set readOnlyRootFilesystem to false are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      readOnlyRootFilesystem: false
+---
+# Test 5: Containers / init containers with read-only root filesystems are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-ro-rootfs-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      readOnlyRootFilesystem: true
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      readOnlyRootFilesystem: true

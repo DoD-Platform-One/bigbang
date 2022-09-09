@@ -1,0 +1,59 @@
+# Test 1: Unsigned images in the required list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-image-signature-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: ghcr.io/kyverno/test-verify-image:unsigned
+    args: ["sleep", "infinity"]
+---
+# Test 2: Signed images with an incorrect signature are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-image-signature-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: ghcr.io/kyverno/test-verify-image:signed-by-someone-else
+    args: ["sleep", "infinity"]
+---
+# Test 3: Signed images with the correct signature are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-image-signature-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: ghcr.io/kyverno/test-verify-image:signed
+    args: ["sleep", "infinity"]
+---
+# Test 4: Unsigned images not in the required list are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-image-signature-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

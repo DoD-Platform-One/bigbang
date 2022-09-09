@@ -1,0 +1,18 @@
+{{- if dig "bbtests" "enabled" false (merge .Values dict) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "kyverno-policies.name" . }}-bbtest-clusterrolebinding
+  labels:
+    {{- include "kyverno-policies.test-labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "kyverno-policies.name" . }}-bbtest-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: {{ template "kyverno-policies.name" . }}-bbtest-account
+  namespace: {{ .Release.Namespace }}
+{{- end }}

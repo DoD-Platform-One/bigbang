@@ -1,0 +1,107 @@
+# Test 1: Containers that do not specify drop are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-drop-all-capabilities-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        add: ["NET_BIND_SERVICE"]
+---
+# Test 2: Init containers that do not specify drop are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-drop-all-capabilities-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        drop: ["ALL"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        add: ["NET_BIND_SERVICE"]
+---
+# Test 3: Containers that do not drop all are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-drop-all-capabilities-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        drop: ["NET_ADMIN","DISALLOWED"]
+---
+# Test 4: Init containers that do not drop all are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-drop-all-capabilities-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        drop: ["ALL"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        drop: ["NET_ADMIN","DISALLOWED"]
+---
+# Test 5: Containers and init containers that drop all are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-drop-all-capabilities-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        drop: ["NET_ADMIN","ALL"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        drop: ["NET_ADMIN","ALL"]

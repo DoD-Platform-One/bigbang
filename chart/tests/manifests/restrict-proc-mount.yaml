@@ -1,0 +1,41 @@
+
+# Kubernetes automatically converts "Unmasked" to "Default" so we cannot test a deny case
+# Test 1: Containers or init containers without a procMount should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-proc-mount-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 2: Containers or init containers with an allowed procMount should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-proc-mount-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      procMount: "Default"
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      procMount: "Default"

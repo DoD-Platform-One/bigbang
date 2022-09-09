@@ -1,0 +1,115 @@
+# Test 1: Containers without an imagePullPolicy are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.containers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Init containers without an imagePullPolicy are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.initContainers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    imagePullPolicy: Always
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Containers that set imagePullPolicy to something other than desired are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.containers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    imagePullPolicy: IfNotPresent
+---
+# Test 4: Init Containers that set imagePullPolicy to something other than desired are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.initContainers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    imagePullPolicy: Always
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    imagePullPolicy: IfNotPresent
+---
+# Test 5: Containers that use digest are not mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: ignore
+    kyverno-policies-bbtest/key: .spec.containers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal@sha256:dd12ce476ff945500a73d0f0500502dc6ebe9a04229911154f30ca50415c0fce
+    args: ["sleep", "infinity"]
+---
+# Test 6: Init containers that use digest are not mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-pull-policy-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: ignore
+    kyverno-policies-bbtest/key: .spec.initContainers[0].imagePullPolicy
+    kyverno-policies-bbtest/value: Always
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    imagePullPolicy: Always
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal@sha256:dd12ce476ff945500a73d0f0500502dc6ebe9a04229911154f30ca50415c0fce

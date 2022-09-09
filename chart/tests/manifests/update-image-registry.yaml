@@ -1,0 +1,36 @@
+# Test 1: Containers with the image registry are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-registry-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.containers[0].image
+    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:latest
+spec:
+  containers:
+  - name: c1
+    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Init containers with the image registry are mutated
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-image-registry-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: mutate
+    kyverno-policies-bbtest/expected: mutate
+    kyverno-policies-bbtest/key: .spec.initContainers[0].image
+    kyverno-policies-bbtest/value: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: replace.image.registry/ironbank/redhat/ubi/ubi8-minimal

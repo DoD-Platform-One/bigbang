@@ -1,0 +1,80 @@
+# Test 1: Pods using the host PID are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-host-namespaces-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  hostPID: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pods using the host IPC are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-host-namespaces-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  hostIPC: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 3: Pods using the host network are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-host-namespaces-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  hostNetwork: true
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 4: Pods exclusively setting host namespaces to false are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-host-namespaces-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  hostPID: false
+  hostIPC: false
+  hostNetwork: false
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 5: Pods that do not specify host namespaces are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-host-namespaces-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

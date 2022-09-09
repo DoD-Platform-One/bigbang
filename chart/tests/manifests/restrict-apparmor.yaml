@@ -1,0 +1,31 @@
+# Test 1: Unapproved AppArmor profiles specified for containers are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-apparmor-1
+  namespace: default
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/c1: unconfined
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Undefined AppArmor profiles are allowed
+# Cannot test approved list because AppArmor must be enabled on host
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-apparmor-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]

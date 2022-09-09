@@ -1,0 +1,174 @@
+# Test 1: Pod + Containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Pod + Init containers without a security context are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsGroup: 1000
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Pods that set runAsGroup to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 0
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 4: Containers that override runAsGroup to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsGroup: 0
+---
+# Test 5: Init containers that override runAsGroup to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsGroup: 0
+---
+# Test 6: Pods that set fsGroup to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-6
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    fsGroup: 0
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 7: Pods that set supplementalGroups to 0 are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-7
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    supplementalGroups: [1000,0]
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 8: Pods that run non-root groups are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-8
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    supplementalGroups: [1001,1002]
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 9: Pods without a security context, and containers / init containers running as non-root are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-non-root-group-9
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsGroup: 1000
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsGroup: 1000

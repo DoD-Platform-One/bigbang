@@ -1,0 +1,98 @@
+# Ranges: 1000, 2000-2999, 4000+
+# Test 1: Pods using a non-approved user id should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    runAsUser: 999
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Containers using a non-approved user id should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 0
+---
+# Test 3: Init containers using a non-approved user id should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 500
+---
+# Test 4: Pods matching a valid user id are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 5: Containers and init containers matching a valid user id are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-user-id-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 2000
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      runAsUser: 2999
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      runAsUser: 4000

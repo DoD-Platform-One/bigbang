@@ -1,0 +1,87 @@
+# Test 1: Containers adding non-approved capabilites should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-capabilities-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        add: ["disallowed"]
+---
+# Test 2: Init containers adding non-approved capabilities should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-capabilities-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        add: ["disallowed"]
+---
+# Test 3: Containers or init containers that add allowed capabilities or no capabilities should be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-capabilities-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      privileged: false
+  - name: c3
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        drop: ["all"]
+  - name: c4
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      capabilities:
+        add: ["NET_BIND_SERVICE"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      privileged: false
+  - name: i3
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        drop: ["all"]
+  - name: i4
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      capabilities:
+        add: ["NET_BIND_SERVICE"]

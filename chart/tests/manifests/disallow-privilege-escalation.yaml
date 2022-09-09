@@ -1,0 +1,63 @@
+# Test 1: Containers allowing privilege escalation should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privilege-escalation-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      allowPrivilegeEscalation: true
+---
+# Test 2: Init containers allowing privilege escalation should not be allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privilege-escalation-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      allowPrivilegeEscalation: true
+---
+# Test 3: Containers and init containers that do not define privilege escalation or set privilege escalation to false are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: disallow-privilege-escalation-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  - name: c2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      allowPrivilegeEscalation: false
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+  - name: i2
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      allowPrivilegeEscalation: false

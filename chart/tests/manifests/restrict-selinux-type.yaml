@@ -1,0 +1,101 @@
+# Test 1: Pods that use SELinux option types that are not in the list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  securityContext:
+    seLinuxOptions:
+      type: disallowed
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+---
+# Test 2: Containers that use SELinux option types that are not in the list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      seLinuxOptions:
+        type: disallowed
+---
+# Test 3: Init containers that use SELinux option types that are not in the list are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      seLinuxOptions:
+        type: disallowed
+---
+# Test 4: Pods, containers, and init containers that do not use SELinux options are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 5: Pods, containers, and init containers that use allowed SELinux options are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restrict-selinux-type-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  securityContext:
+    seLinuxOptions:
+      type: container_kvm_t
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    securityContext:
+      seLinuxOptions:
+        type: container_t
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    securityContext:
+      seLinuxOptions:
+        type: container_init_t

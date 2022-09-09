@@ -1,0 +1,35 @@
+{{- $name := "clone-configs" }}
+{{- if and .Values.enabled (dig $name "enabled" false .Values.policies) }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ $name }}
+  annotations:
+    policies.kyverno.io/title: Clone ConfigMaps and Secrets
+    policies.kyverno.io/category: Helper
+    policies.kyverno.io/severity: {{ default "low" (dig $name "severity" nil .Values.policies) }}
+    policies.kyverno.io/subject: ConfigMap,Secret
+    policies.kyverno.io/description: >-
+      Configuration held in ConfigMaps or Secrets, like registry credentials,
+      often need to exist in multiple Namespaces so Pods there have access.
+      Manually duplicating these is time consuming and error prone. This policy
+      will copy ConfigMaps or Secrets to new Namespaces when they are created.
+      It will also push updates should the source be changed.
+  labels: {{- include "kyverno-policies.labels" . | nindent 4 }}
+spec:
+  {{- include "kyverno-policies.webhookTimeoutSeconds" (merge (dict "name" $name) .) | indent 2 }}
+  rules:
+  {{- range $v := (dig $name "parameters" "clone" nil .Values.policies) }}
+  - name: {{ printf "%s-%s-%s" (tpl $v.namespace $) $v.name $v.kind }}
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) $) | indent 4 }}
+    {{- include "kyverno-policies.match" (merge (dict "name" $name "kinds" (list "Namespace")) $) | nindent 4 }}
+    generate:
+      kind: {{ $v.kind }}
+      name: {{ $v.name }}
+      namespace: "{{ "{{" }}request.object.metadata.name{{ "}}" }}"
+      synchronize: true
+      clone:
+        namespace: {{ tpl $v.namespace $ }}
+        name: {{ $v.name }}
+  {{- end }}
+{{- end -}}

@@ -1,0 +1,104 @@
+# Test 1: Containers without cpu limits are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-cpu-limit-1
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      requests:
+        cpu: 10m
+---
+# Test 2: Init containers without cpu limits are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-cpu-limit-2
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        cpu: 10m
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+---
+# Test 3: Containers with cpu limits above the maximum not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-cpu-limit-3
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        cpu: 100
+---
+# Test 4: Init containers with cpu limits above the maximum are not allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-cpu-limit-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: fail
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        cpu: 10m
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    resources:
+      limits:
+        cpu: 100000m
+---
+# Test 5: Containers with cpu limits below the maximum are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-cpu-limit-5
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    args: ["sleep", "infinity"]
+    resources:
+      limits:
+        cpu: 10m
+  initContainers:
+  - name: i1
+    image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
+    resources:
+      limits:
+        cpu: 10m
