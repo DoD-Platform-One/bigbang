@@ -1,0 +1,48 @@
+{{- if .Values.ingress.create }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+  annotations:
+    "kubernetes.io/ingress.class": {{ default "nginx" .Values.ingress.className }}
+    {{ if .Values.ingress.nginx }}
+    "nginx.ingress.kubernetes.io/affinity": "cookie"
+    "nginx.ingress.kubernetes.io/affinity-mode": "persistent"
+    "nginx.ingress.kubernetes.io/proxy-body-size": {{ .Values.ingress.maxBodySize }}
+    "nginx.ingress.kubernetes.io/proxy-connect-timeout": {{ .Values.ingress.proxyConnectTimeout|quote }}
+    "nginx.ingress.kubernetes.io/proxy-read-timeout": {{ .Values.ingress.proxyReadTimeout|quote }}
+    "nginx.ingress.kubernetes.io/proxy-send-timeout": {{ .Values.ingress.proxySendTimeout|quote }}
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{ if and (.Values.ingress.tlsSecretName) (.Values.ingress.host) }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+{{ end }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: {{ include "confluence.ingressPath" . }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "common.names.fullname" . }}
+                port:
+                  number: {{ $.Values.confluence.service.port }}
+          {{ if .Values.synchrony.enabled }}
+          - path: /synchrony
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "synchrony.fullname" . }}
+                port:
+                  number: {{ $.Values.synchrony.service.port }}
+          {{ end }}
+{{ end }}

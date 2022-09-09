@@ -1,0 +1,19 @@
+{{- if .Values.istio.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-sticky
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+spec:
+  host: {{ include "common.names.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          # set a new session cookie with istio per atlassian guidelines: https://confluence.atlassian.com/enterprise/confluence-data-center-load-balancer-examples-781200827.html
+          # note: this cookie is explicitly different than JSESSIONID, let confluence handle that
+          name: CONFLUENCECONSISTENTHASH
+          path: /
+          ttl: 300m
+{{- end }}

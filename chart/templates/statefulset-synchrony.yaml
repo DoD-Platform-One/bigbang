@@ -1,0 +1,100 @@
+{{ if .Values.synchrony.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "synchrony.fullname" . }}
+  labels:
+    {{- include "synchrony.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "synchrony.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "synchrony.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config-jvm: {{ include (print $.Template.BasePath "/synchrony-start-script.yaml") . | sha256sum }}
+        {{- include "confluence.podAnnotations" . | nindent 8 }}
+      labels:
+        {{- include "synchrony.selectorLabels" . | nindent 8 }}
+        {{- include "confluence.podLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "confluence.serviceAccountName" . }}
+      terminationGracePeriodSeconds: {{ .Values.synchrony.shutdown.terminationGracePeriodSeconds }}
+      securityContext:
+        fsGroup: {{ .Values.confluence.gid }}
+      hostAliases:
+        {{- include "confluence.additionalHosts" . | nindent 8 }}
+      containers:
+        - name: synchrony
+          image: {{ include "confluence.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsUser: {{ .Values.confluence.gid }}
+            runAsGroup: {{ .Values.confluence.gid }}
+          command: ["/scripts/start-synchrony.sh"]
+          volumeMounts:
+            {{- include "synchrony.volumeMounts" . | nindent 12 }}
+            {{- include "synchrony.additionalVolumeMounts" . | nindent 12 }}
+            {{- include "synchrony.additionalLibraries" . | nindent 12 }}
+            - mountPath: /scripts
+              name: entrypoint-script
+          ports:
+            - name: http
+              containerPort: {{ .Values.synchrony.ports.http }}
+              protocol: TCP
+            - name: hazelcast
+              containerPort: {{ .Values.synchrony.ports.hazelcast }}
+              protocol: TCP
+            {{- include "synchrony.additionalPorts" . | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.synchrony.ports.http }}
+              path: /heartbeat
+            initialDelaySeconds: {{ .Values.synchrony.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.synchrony.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.synchrony.readinessProbe.failureThreshold }}
+          {{- with .Values.synchrony.resources.container }}
+          resources:
+          {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: SET_PERMISSIONS
+              value: {{ .Values.synchrony.setPermissions | quote }}
+            - name: SYNCHRONY_BIND
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SYNCHRONY_SERVICE_URL
+            {{ if .Values.ingress.https }}
+              value: "https://{{ .Values.ingress.host }}/synchrony"
+            {{ else }}
+              value: "http://{{ .Values.ingress.host }}/synchrony"
+            {{- end }}
+            {{- include "synchrony.databaseEnvVars" . | nindent 12 }}
+            {{- include "synchrony.clusteringEnvVars" . | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.synchrony.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: entrypoint-script
+          configMap:
+            name: {{ include "synchrony.fullname" . }}-entrypoint
+            defaultMode: 0744
+        {{ include "synchrony.volumes" . | nindent 8 }}
+  {{ include "synchrony.volumeClaimTemplates" . | nindent 2 }}
+{{ end }}

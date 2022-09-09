@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "common.names.fullname" . }}-application-status-test"
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+    {{- include "confluence.podAnnotations" . | nindent 4 }}
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+spec:
+  imagePullSecrets:
+  - name: private-registry
+  containers:
+    - name: test
+      image: {{ .Values.helmTestImage }}
+      imagePullPolicy: IfNotPresent 
+      env:
+        - name: STATUS_URL
+          value: "http://{{ include "common.names.fullname" . }}:{{ .Values.confluence.service.port }}/status"
+      command:
+        - /bin/sh
+        - -ec
+        - |
+          STATUS=$(curl -s "$STATUS_URL")
+          echo "Verifying application state is RUNNING or FIRST_RUN: $STATUS"
+          echo $STATUS | jq -e '.state|test("RUNNING|FIRST_RUN")'
+  
+  restartPolicy: Never

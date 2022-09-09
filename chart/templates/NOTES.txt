@@ -1,0 +1,70 @@
+Thank you for installing {{ title .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}, and resides in namespace {{ .Release.Namespace }}.
+
+Please run sanity tests against the release to verify it's healthy:
+
+  $ helm test {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+If the Kubernetes resources in the release are still starting up, then the tests may fail, so it
+is advisable to wait for the tests to pass before continuing.
+
+To see the custom values you used for this release:
+
+  $ helm get values {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+{{ if .Values.ingress.create -}}
+{{ title .Chart.Name }} service URL: {{ ternary "https" "http" .Values.ingress.https -}}://{{ .Values.ingress.host }}{{ include "confluence.ingressPath" . }}
+{{- else }}
+Get the {{ title .Chart.Name }} URL by running these commands in the same shell:
+{{- if contains "NodePort" .Values.confluence.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Release.Name }}-{{ .Chart.Name }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.confluence.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer hostname to be available.
+        You can watch the status of by running 'kubectl get svc --namespace {{ .Release.Namespace }} -w {{ .Release.Name }}-{{ .Chart.Name }}'
+
+  export SERVICE_HOSTNAME=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ .Release.Name }}-{{ .Chart.Name }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+  echo http://$SERVICE_HOSTNAME:{{ .Values.confluence.service.port }}
+{{- else if contains "ClusterIP" .Values.confluence.service.type }}
+  Step 1: Get the pod name
+    $ export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  Step 2 (Optional): Check if the pod name has been exported successfully and the pod status
+    $ echo POD_NAME: $POD_NAME && echo POD_STATUS: $(kubectl get pod $POD_NAME -o jsonpath='{.status.phase}')
+  Step 3: Wait for pods up and running, then forward pod port to localhost
+    $ kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.confluence.ports.http }}
+  Step 4: Access {{ title .Chart.Name }} on localhost:
+    http://localhost:{{ .Values.confluence.ports.http }}
+{{- end }}
+{{- end }}
+{{- if not ( or .Values.volumes.localHome.persistentVolumeClaim.create .Values.volumes.localHome.customVolume ) }}
+
+#################################################################################
+######      WARNING: Persistent volume is not used for Local Home!!!        #####
+######            Data will be lost when the pod is terminated.             #####
+#################################################################################
+{{- end }}
+{{- if not ( or .Values.volumes.sharedHome.persistentVolumeClaim.create .Values.volumes.sharedHome.customVolume ) }}
+
+#################################################################################
+######      WARNING: Persistent volume is not used for Shared Home!!!       #####
+######            Data will be lost when the pod is terminated.             #####
+#################################################################################
+{{- end }}
+{{- if ( and .Values.synchrony.enabled ( not ( or .Values.volumes.synchronyHome.persistentVolumeClaim.create .Values.volumes.synchronyHome.customVolume ))) }}
+
+#################################################################################
+######      WARNING: Persistent volume is not used for Synchrony Home!!!    #####
+######         Synchrony logs will be lost when the pod is terminated.      #####
+#################################################################################
+{{- end }}
+{{- if ( or .Values.confluence.securityContext.enabled .Values.confluence.securityContext.gid ) }}
+
+#################################################################################
+#####      DEPRECATION WARNING: confluence.securityContext deprecation      #####
+#####    Update your values to the new confluence.securityContext format    #####
+#################################################################################
+{{- end}}
+
+For further documentation, see https://atlassian.github.io/data-center-helm-charts/

@@ -1,6 +1,9 @@
 dependencies:
+- name: common
+  repository: https://atlassian.github.io/data-center-helm-charts
+  version: 1.0.0
 - name: gluon
   repository: oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon
-  version: 0.2.9
-digest: sha256:0cec9e7b386efbd3bacb900b3ec768477f9c5a24992ee82fb862d1d8abe9ebd0
-generated: "2022-08-30T12:00:04.206267-06:00"
+  version: 0.3.0
+digest: sha256:e31622a741103b6dc278b0641869716d213a3833588b3257a7e5010e01e60f30
+generated: "2022-09-07T09:59:01.894909202-05:00"

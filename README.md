@@ -1,13 +1,14 @@
-# kyverno-policies
+# confluence
 
-![Version: 1.0.1-bb.2](https://img.shields.io/badge/Version-1.0.1--bb.2-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.5.1-bb.0](https://img.shields.io/badge/Version-1.5.1--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.19.0](https://img.shields.io/badge/AppVersion-7.19.0-informational?style=flat-square)
 
-Collection of Kyverno security and best-practice policies for Kyverno
+A chart for installing Confluence Data Center on Kubernetes
 
 ## Upstream References
-* <https://kyverno.io/policies/>
+* <https://atlassian.github.io/data-center-helm-charts/>
 
-* <https://github.com/kyverno/policies>
+* <https://github.com/atlassian/data-center-helm-charts>
+* <https://bitbucket.org/atlassian-docker/docker-atlassian-confluence-server/>
 
 ## Learn More
 * [Application Overview](docs/overview.md)
@@ -19,6 +20,8 @@ Collection of Kyverno security and best-practice policies for Kyverno
 * Kubernetes config installed in `~/.kube/config`
 * Helm installed
 
+Kubernetes: `>=1.19.x-0`
+
 Install Helm
 
 https://helm.sh/docs/intro/install/
@@ -28,120 +31,176 @@ https://helm.sh/docs/intro/install/
 * Clone down the repository
 * cd into directory
 ```bash
-helm install kyverno-policies chart/
+helm install confluence chart/
 ```
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| enabled | bool | `true` | Enable policy deployments |
-| validationFailureAction | string | `""` | Override all policies' validation failure action with "audit" or "enforce".  If blank, uses policy setting. |
-| webhookTimeoutSeconds | int | `30` | Override all policies' time to wait for admission webhook to respond.  If blank, uses policy setting or default (10).  Range is 1 to 30. |
-| exclude | object | `{}` | Adds an exclusion to all policies.  This is merged with any policy-specific excludes.  See https://kyverno.io/docs/writing-policies/match-exclude for fields. |
-| customLabels | object | `{}` | Additional labels to apply to all policies. |
-| waitforready.enabled | bool | `true` | Controls wait for ready deployment |
-| waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl","tag":"v1.24.4"}` | Image to use in wait for ready job.  This must contain kubectl. |
-| waitforready.imagePullSecrets | list | `[]` | Pull secret for wait for ready job |
-| policies.sample | object | `{"enabled":false,"exclude":{},"match":{},"parameters":{},"validationFailureAction":"audit","webhookTimeoutSeconds":""}` | Sample policy showing values that can be added to any policy |
-| policies.sample.enabled | bool | `false` | Controls policy deployment |
-| policies.sample.validationFailureAction | string | `"audit"` | Controls if a validation policy rule failure should disallow (enforce) or allow (audit) the admission |
-| policies.sample.webhookTimeoutSeconds | string | `""` | Specifies the maximum time in seconds allowed to apply this policy. Default is 10. Range is 1 to 30. |
-| policies.sample.match | object | `{}` | Defines when this policy's rules should be applied.  This completely overrides any default matches. |
-| policies.sample.exclude | object | `{}` | Defines when this policy's rules should not be applied.  This completely overrides any default excludes. |
-| policies.sample.parameters | object | `{}` | Policy specific parameters that are added to the configMap for the policy rules |
-| policies.clone-configs | object | `{"enabled":false,"parameters":{"clone":[]}}` | Clone existing configMap or secret in new Namespaces |
-| policies.clone-configs.parameters.clone | list | `[]` | ConfigMap or Secrets that should be cloned.  Each item requres the kind, name, and namespace of the resource to clone |
-| policies.disallow-annotations | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified annotations on pods |
-| policies.disallow-annotations.parameters.disallow | list | `[]` | List of annotations disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.disallow-deprecated-apis | object | `{"enabled":false,"validationFailureAction":"audit"}` | Prevent resources that use deprecated or removed APIs (through Kubernetes 1.26) |
-| policies.disallow-host-namespaces | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent use of the host namespace (PID, IPC, Network) by pods |
-| policies.disallow-image-tags | object | `{"enabled":false,"parameters":{"disallow":["latest"]},"validationFailureAction":"audit"}` | Prevent container images with specified tags.  Also, requires images to have a tag. |
-| policies.disallow-istio-injection-bypass | object | `{"enabled":false,"validationFailureAction":"audit"}` | Prevent the `sidecar.istio.io/inject: false` label on pods. |
-| policies.disallow-labels | object | `{"enabled":false,"parameters":{"disallow":[]},"validationFailureAction":"audit"}` | Prevent specified labels on pods |
-| policies.disallow-labels.parameters.disallow | list | `[]` | List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.disallow-namespaces | object | `{"enabled":false,"parameters":{"disallow":["default"]},"validationFailureAction":"audit"}` | Prevent pods from using the listed namespaces |
-| policies.disallow-namespaces.parameters.disallow | list | `["default"]` | List of namespaces to deny pod deployment |
-| policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent services of the type NodePort |
-| policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"attach"}` | Prevent the use of `exec` or `attach` on pods |
-| policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent privilege escalation on pods |
-| policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers that run as privileged |
-| policies.disallow-selinux-options | object | `{"enabled":true,"parameters":{"disallow":["user","role"]},"validationFailureAction":"enforce"}` | Prevent specified SELinux options from being used on pods. |
-| policies.disallow-selinux-options.parameters.disallow | list | `["user","role"]` | List of selinux options that are not allowed.  Valid values include `level`, `role`, `type`, and `user`. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.disallow-shared-subpath-volume-writes | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers from mounting the same volume as writable and with a subpath (CVE-2021-25741) |
-| policies.disallow-tolerations | object | `{"enabled":false,"parameters":{"disallow":[{"key":"node-role.kubernetes.io/master"}]},"validationFailureAction":"audit"}` | Prevent tolerations that bypass specified taints |
-| policies.disallow-tolerations.parameters.disallow | list | `[{"key":"node-role.kubernetes.io/master"}]` | List of taints to protect from toleration.  Each entry can have `key`, `value`, and/or `effect`.  Wildcards '*' and '?' can be used If key, value, or effect are not defined, they are ignored in the policy rule |
-| policies.disallow-rbac-on-default-serviceaccounts | object | `{"enabled":false,"exclude":{"any":[{"resources":{"name":"system:service-account-issuer-discovery"}}]},"validationFailureAction":"audit"}` | Prevent additional RBAC permissions on default service accounts |
-| policies.require-annotations | object | `{"enabled":false,"parameters":{"require":[]},"validationFailureAction":"audit"}` | Require specified annotations on all pods |
-| policies.require-annotations.parameters.require | list | `[]` | List of annotations required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
-| policies.require-cpu-limit | object | `{"enabled":false,"parameters":{"require":["<10"]},"validationFailureAction":"audit"}` | Require containers have CPU limits defined and within the specified range |
-| policies.require-cpu-limit.parameters.require | list | `["<10"]` | CPU limitations (only one required condition needs to be met).  The following operators are valid: >, <, >=, <=, !, |, &. |
-| policies.require-drop-all-capabilities | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Requires containers to drop all Linux capabilities |
-| policies.require-image-signature | object | `{"enabled":false,"parameters":{"require":[]},"validationFailureAction":"audit"}` | Require specified images to be signed and verified |
-| policies.require-image-signature.parameters.require | list | `[]` | List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields. |
-| policies.require-istio-on-namespaces | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require Istio sidecar injection label on namespaces |
-| policies.require-labels | object | `{"enabled":false,"parameters":{"require":["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]},"validationFailureAction":"audit"}` | Require specified labels to be on all pods |
-| policies.require-labels.parameters.require | list | `["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]` | List of labels required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. See https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels See https://helm.sh/docs/chart_best_practices/labels/#standard-labels |
-| policies.require-memory-limit | object | `{"enabled":false,"parameters":{"require":["<64Gi"]},"validationFailureAction":"audit"}` | Require containers have memory limits defined and within the specified range |
-| policies.require-memory-limit.parameters.require | list | `["<64Gi"]` | Memory limitations (only one required condition needs to be met).  Can use standard Kubernetes resource units (e.g. Mi, Gi).  The following operators are valid: >, <, >=, <=, !, |, &. |
-| policies.require-non-root-group | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run with non-root group |
-| policies.require-non-root-user | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Require containers to run as non-root user |
-| policies.require-probes | object | `{"enabled":false,"parameters":{"require":["readinessProbe","livenessProbe"]},"validationFailureAction":"audit"}` | Require specified probes on pods |
-| policies.require-probes.parameters.require | list | `["readinessProbe","livenessProbe"]` | List of probes that are required on pods.  Valid values are `readinessProbe`, `livenessProbe`, and `startupProbe`. |
-| policies.require-requests-equal-limits | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require CPU and memory requests equal limits for guaranteed quality of service |
-| policies.require-ro-rootfs | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require containers set root filesystem to read-only |
-| policies.restrict-apparmor | object | `{"enabled":true,"parameters":{"allow":["runtime/default","localhost/*"]},"validationFailureAction":"enforce"}` | Restricts pods that use AppArmor to specified profiles |
-| policies.restrict-apparmor.parameters.allow | list | `["runtime/default","localhost/*"]` | List of allowed AppArmor profiles Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#baseline |
-| policies.restrict-external-ips | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict services with External IPs to a specified list (CVE-2020-8554) |
-| policies.restrict-external-ips.parameters.allow | list | `[]` | List of external IPs allowed in services.  Must be an IP address.  Use the wildcard `?*` to support subnets (e.g. `192.168.0.?*`) |
-| policies.restrict-external-names | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict services with External Names to a specified list (CVE-2020-8554) |
-| policies.restrict-external-names.parameters.allow | list | `[]` | List of external names allowed in services.  Must be a lowercase RFC-1123 hostname. |
-| policies.restrict-capabilities | object | `{"enabled":true,"parameters":{"allow":["NET_BIND_SERVICE"]},"validationFailureAction":"enforce"}` | Restrict Linux capabilities added to containers to the specified list |
-| policies.restrict-capabilities.parameters.allow | list | `["NET_BIND_SERVICE"]` | List of capabilities that are allowed to be added Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted See https://man7.org/linux/man-pages/man7/capabilities.7.html for list of capabilities.  The `CAP_` prefix is removed in Kubernetes names. |
-| policies.restrict-group-id | object | `{"enabled":false,"parameters":{"allow":[">=1000"]},"validationFailureAction":"audit"}` | Restrict container group IDs to specified ranges NOTE: Using require-non-root-group will force runAsGroup to be defined |
-| policies.restrict-group-id.parameters.allow | list | `[">=1000"]` | Allowed group IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
-| policies.restrict-host-path-mount | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"audit"}` | Restrict the paths that can be mounted by hostPath volumes to the allowed list.  HostPath volumes are normally disallowed.  If exceptions are made, the path(s) should be restricted. |
-| policies.restrict-host-path-mount.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount |
-| policies.restrict-host-path-mount-pv.enabled | bool | `true` |  |
-| policies.restrict-host-path-mount-pv.validationFailureAction | string | `"audit"` |  |
-| policies.restrict-host-path-mount-pv.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount |
-| policies.restrict-host-path-write | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"audit"}` | Restrict the paths that can be mounted as read/write by hostPath volumes to the allowed list.  HostPath volumes, if allowed, should normally be mounted as read-only.  If exceptions are made, the path(s) should be restricted. |
-| policies.restrict-host-path-write.parameters.allow | list | `[]` | List of allowed paths for hostPath volumes to mount as read/write |
-| policies.restrict-host-ports | object | `{"enabled":true,"parameters":{"allow":[]},"validationFailureAction":"enforce"}` | Restrict host ports in containers to the specified list |
-| policies.restrict-host-ports.parameters.allow | list | `[]` | List of allowed host ports |
-| policies.restrict-image-registries | object | `{"enabled":true,"parameters":{"allow":["registry1.dso.mil"]},"validationFailureAction":"audit"}` | Restricts container images to registries in the specified list |
-| policies.restrict-image-registries.parameters.allow | list | `["registry1.dso.mil"]` | List of allowed registries that images may use |
-| policies.restrict-proc-mount | object | `{"enabled":true,"parameters":{"allow":["Default"]},"validationFailureAction":"enforce"}` | Restrict mounting /proc to the specified mask |
-| policies.restrict-proc-mount.parameters.allow | list | `["Default"]` | List of allowed proc mount values.  Valid values are `Default` and `Unmasked`. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-seccomp | object | `{"enabled":true,"parameters":{"allow":["RuntimeDefault","Localhost"]},"validationFailureAction":"enforce"}` | Restrict seccomp profiles to the specified list |
-| policies.restrict-seccomp.parameters.allow | list | `["RuntimeDefault","Localhost"]` | List of allowed seccomp profiles.  Valid values are `Localhost`, `RuntimeDefault`, and `Unconfined` Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
-| policies.restrict-selinux-type | object | `{"enabled":true,"parameters":{"allow":["container_t","container_init_t","container_kvm_t"]},"validationFailureAction":"enforce"}` | Restrict SELinux types to the specified list. |
-| policies.restrict-selinux-type.parameters.allow | list | `["container_t","container_init_t","container_kvm_t"]` | List of allowed values for the `type` field Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-sysctls | object | `{"enabled":true,"parameters":{"allow":["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]},"validationFailureAction":"enforce"}` | Restrict sysctls to the specified list |
-| policies.restrict-sysctls.parameters.allow | list | `["kernel.shm_rmid_forced","net.ipv4.ip_local_port_range","net.ipv4.ip_unprivileged_port_start","net.ipv4.tcp_syncookies","net.ipv4.ping_group_range"]` | List of allowed sysctls. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.restrict-user-id | object | `{"enabled":false,"parameters":{"allow":[">=1000"]},"validationFailureAction":"audit"}` | Restrict user IDs to the specified ranges NOTE: Using require-non-root-user will force runAsUser to be defined |
-| policies.restrict-user-id.parameters.allow | list | `[">=1000"]` | Allowed user IDs / ranges.  The following operators are valid: >, <, >=, <=, !, |, &. For a lower and upper limit, use ">=min & <=max" |
-| policies.restrict-volume-types | object | `{"enabled":true,"parameters":{"allow":["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]},"validationFailureAction":"enforce"}` | Restrict the volume types to the specified list |
-| policies.restrict-volume-types.parameters.allow | list | `["configMap","csi","downwardAPI","emptyDir","ephemeral","persistentVolumeClaim","projected","secret"]` | List of allowed Volume types.  Valid values are the volume types listed here: https://kubernetes.io/docs/concepts/storage/volumes/#volume-types Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted |
-| policies.update-image-pull-policy | object | `{"enabled":false,"parameters":{"update":[{"to":"Always"}]}}` | Updates the image pull policy on containers |
-| policies.update-image-pull-policy.parameters.update | list | `[{"to":"Always"}]` | List of image pull policy updates.  `from` contains the pull policy value to replace.  If `from` is blank, it matches everything.  `to` contains the new pull policy to use.  Must be one of `Always`, `Never`, or `IfNotPresent`. |
-| policies.update-image-registry | object | `{"enabled":false,"parameters":{"update":[]}}` | Updates an existing image registry with a new registry in containers (e.g. proxy) |
-| policies.update-image-registry.parameters.update | list | `[]` | List of registry updates.  `from` contains the registry to replace. `to` contains the new registry to use. |
-| policies.update-token-automount | object | `{"enabled":false}` | Updates automount token on default service accounts to false |
-| additionalPolicies | object | `{"samplePolicy":{"annotations":{"policies.kyverno.io/category":"Examples","policies.kyverno.io/description":"This sample policy blocks pods from deploying into the 'default' namespace.","policies.kyverno.io/severity":"low","policies.kyverno.io/subject":"Pod","policies.kyverno.io/title":"Sample Policy"},"enabled":false,"kind":"ClusterPolicy","namespace":"","spec":{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}}}` | Adds custom policies.  See https://kyverno.io/docs/writing-policies/. |
-| additionalPolicies.samplePolicy | object | `{"annotations":{"policies.kyverno.io/category":"Examples","policies.kyverno.io/description":"This sample policy blocks pods from deploying into the 'default' namespace.","policies.kyverno.io/severity":"low","policies.kyverno.io/subject":"Pod","policies.kyverno.io/title":"Sample Policy"},"enabled":false,"kind":"ClusterPolicy","namespace":"","spec":{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}}` | Name of the policy.  Addtional policies can be added by adding a key. |
-| additionalPolicies.samplePolicy.enabled | bool | `false` | Controls policy deployment |
-| additionalPolicies.samplePolicy.kind | string | `"ClusterPolicy"` | Kind of policy.  Currently, "ClusterPolicy" and "Policy" are supported. |
-| additionalPolicies.samplePolicy.namespace | string | `""` | If kind is "Policy", which namespace to target.  The namespace must already exist. |
-| additionalPolicies.samplePolicy.annotations | object | `{"policies.kyverno.io/category":"Examples","policies.kyverno.io/description":"This sample policy blocks pods from deploying into the 'default' namespace.","policies.kyverno.io/severity":"low","policies.kyverno.io/subject":"Pod","policies.kyverno.io/title":"Sample Policy"}` | Policy annotations to add |
-| additionalPolicies.samplePolicy.annotations."policies.kyverno.io/title" | string | `"Sample Policy"` | Human readable name of policy |
-| additionalPolicies.samplePolicy.annotations."policies.kyverno.io/category" | string | `"Examples"` | Category of policy.  Arbitrary. |
-| additionalPolicies.samplePolicy.annotations."policies.kyverno.io/severity" | string | `"low"` | Severity of policy if a violation occurs.  Choose "critical", "high", "medium", "low". |
-| additionalPolicies.samplePolicy.annotations."policies.kyverno.io/subject" | string | `"Pod"` | Type of resource policy applies to (e.g. Pod, Service, Namespace) |
-| additionalPolicies.samplePolicy.annotations."policies.kyverno.io/description" | string | `"This sample policy blocks pods from deploying into the 'default' namespace."` | Description of what the policy does, why it is important, and what items are allowed or unallowed. |
-| additionalPolicies.samplePolicy.spec | object | `{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}` | Policy specification.  See `kubectl explain clusterpolicies.spec` |
-| additionalPolicies.samplePolicy.spec.rules | list | `[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]` | Policy rules.  At least one is required |
-| bbtests | object | `{"enabled":false,"imagePullSecret":"private-registry","scripts":{"additionalVolumeMounts":[{"mountPath":"/yaml","name":"kyverno-policies-bbtest-manifests"},{"mountPath":"/.kube/cache","name":"kyverno-policies-bbtest-kube-cache"}],"additionalVolumes":[{"configMap":{"name":"kyverno-policies-bbtest-manifests"},"name":"kyverno-policies-bbtest-manifests"},{"emptyDir":{},"name":"kyverno-policies-bbtest-kube-cache"}],"envs":{"ENABLED_POLICIES":"{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join \" \" $p }}","IMAGE_PULL_SECRET":"{{ .Values.bbtests.imagePullSecret }}"},"image":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.24.4"}}` | Reserved values for Big Bang test automation |
+| replicaCount | int | `1` | The initial number of Confluence pods that should be started at deployment time. Note that Confluence requires manual configuration via the browser post deployment after the first pod is deployed. This configuration must be completed before scaling up additional pods. As such this value should always be kept as 1, but can be altered once manual configuration is complete.  |
+| image.repository | string | `"registry1.dso.mil/ironbank/atlassian/confluence-data-center/confluence-node"` |  |
+| image.imagePullSecrets | string | `"private-registry"` | Optional image repository pull secret |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.tag | string | `"7.19.0"` | The docker image tag to be used. Defaults to the Chart appVersion. |
+| serviceAccount.create | bool | `true` | Set to 'true' if a ServiceAccount should be created, or 'false' if it already exists.  |
+| serviceAccount.name | string | `nil` | The name of the ServiceAccount to be used by the pods. If not specified, but the "serviceAccount.create" flag is set to 'true', then the ServiceAccount name will be auto-generated, otherwise the 'default' ServiceAccount will be used. https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server  |
+| serviceAccount.imagePullSecrets | list | `[]` | For Docker images hosted in private registries, define the list of image pull secrets that should be utilized by the created ServiceAccount https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount (if created)  |
+| serviceAccount.clusterRole.create | bool | `true` | Set to 'true' if a ClusterRole should be created, or 'false' if it already exists.  |
+| serviceAccount.clusterRole.name | string | `nil` | The name of the ClusterRole to be used. If not specified, but the "serviceAccount.clusterRole.create" flag is set to 'true', then the ClusterRole name will be auto-generated.  |
+| serviceAccount.clusterRoleBinding.create | bool | `true` | Set to 'true' if a ClusterRoleBinding should be created, or 'false' if it already exists.  |
+| serviceAccount.clusterRoleBinding.name | string | `nil` | The name of the ClusterRoleBinding to be created. If not specified, but the "serviceAccount.clusterRoleBinding.create" flag is set to 'true', then the ClusterRoleBinding name will be auto-generated.  |
+| database.type | string | `nil` | The database type that should be used. If not specified, then it will need to be provided via the browser during manual configuration post deployment. Valid values include: - 'postgresql' - 'mysql' - 'oracle' - 'mssql' https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databasetype  |
+| database.user | string | `nil` |  |
+| database.password | string | `"userpassword"` |  |
+| database.url | string | `nil` | The jdbc URL of the database. If not specified, then it will need to be provided via the browser during manual configuration post deployment. Example URLs include: - 'jdbc:postgresql://<dbhost>:5432/<dbname>' - 'jdbc:mysql://<dbhost>/<dbname>' - 'jdbc:sqlserver://<dbhost>:1433;databaseName=<dbname>' - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>' https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databaseurl  |
+| database.credentials.secretName | string | `nil` | from-literal=password=<password>' https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets  |
+| database.credentials.usernameSecretKey | string | `"username"` | The key ('username') in the Secret used to store the database login username  |
+| database.credentials.passwordSecretKey | string | `"password"` | The key ('password') in the Secret used to store the database login password  |
+| ingress.create | bool | `false` | Set to 'true' if an Ingress Resource should be created. This depends on a pre-provisioned Ingress Controller being available.  |
+| ingress.className | string | `"nginx"` | The class name used by the ingress controller if it's being used.  Please follow documentation of your ingress controller. If the cluster contains multiple ingress controllers, this setting allows you to control which of them is used for Atlassian application traffic.  |
+| ingress.nginx | bool | `true` | Set to 'true' if the Ingress Resource is to use the K8s 'ingress-nginx' controller. https://kubernetes.github.io/ingress-nginx/  This will populate the Ingress Resource with annotations that are specific to the K8s ingress-nginx controller. Set to 'false' if a different controller is to be used, in which case the appropriate annotations for that controller must be specified below under 'ingress.annotations'.  |
+| ingress.maxBodySize | string | `"250m"` | The max body size to allow. Requests exceeding this size will result in an HTTP 413 error being returned to the client.  |
+| ingress.proxyConnectTimeout | int | `60` | Defines a timeout for establishing a connection with a proxied server. It should be noted that this timeout cannot usually exceed 75 seconds.  |
+| ingress.proxyReadTimeout | int | `60` | Defines a timeout for reading a response from the proxied server. The timeout is set only between two successive read operations, not for the transmission of the whole response. If the proxied server does not transmit anything within this time, the connection is closed.  |
+| ingress.proxySendTimeout | int | `60` | Sets a timeout for transmitting a request to the proxied server. The timeout is set only between two successive write operations, not for the transmission of the whole request. If the proxied server does not receive anything within this time, the connection is closed.  |
+| ingress.host | string | `nil` | The fully-qualified hostname (FQDN) of the Ingress Resource. Traffic coming in on this hostname will be routed by the Ingress Resource to the appropriate backend Service.  |
+| ingress.path | string | `nil` | The base path for the Ingress Resource. For example '/confluence'. Based on a 'ingress.host' value of 'company.k8s.com' this would result in a URL of 'company.k8s.com/confluence'. Default value is 'confluence.service.contextPath' |
+| ingress.annotations | object | `{}` | The custom annotations that should be applied to the Ingress Resource when NOT using the K8s ingress-nginx controller.  |
+| ingress.https | bool | `true` | Set to 'true' if browser communication with the application should be TLS (HTTPS) enforced.  |
+| ingress.tlsSecretName | string | `nil` | The name of the K8s Secret that contains the TLS private key and corresponding certificate. When utilised, TLS termination occurs at the ingress point where traffic to the Service, and it's Pods is in plaintext.  Usage is optional and depends on your use case. The Ingress Controller itself can also be configured with a TLS secret for all Ingress Resources. https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets https://kubernetes.io/docs/concepts/services-networking/ingress/#tls  |
+| volumes.localHome.persistentVolumeClaim.create | bool | `false` | If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically created for each pod based on the 'StorageClassName' supplied below.  |
+| volumes.localHome.persistentVolumeClaim.storageClassName | string | `nil` | Specify the name of the 'StorageClass' that should be used for the local-home volume claim.  |
+| volumes.localHome.persistentVolumeClaim.resources | object | `{"requests":{"storage":null}}` | Specifies the standard K8s resource requests for the local-home volume claims.  |
+| volumes.localHome.customVolume | object | `{}` | Static provisioning of local-home using K8s PVs and PVCs  NOTE: Due to the ephemeral nature of pods this approach to provisioning volumes for pods is not recommended. Dynamic provisioning described above is the prescribed approach.  When 'persistentVolumeClaim.create' is 'false', then this value can be used to define a standard K8s volume that will be used for the local-home volume(s). If not defined, then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object. https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static  |
+| volumes.localHome.mountPath | string | `"/var/atlassian/application-data/confluence"` | Specifies the path in the Confluence container to which the local-home volume will be mounted.  |
+| volumes.sharedHome.persistentVolumeClaim.create | bool | `false` | If 'true', then a 'PersistentVolumeClaim' and 'PersistentVolume' will be dynamically created for shared-home based on the 'StorageClassName' supplied below.  |
+| volumes.sharedHome.persistentVolumeClaim.storageClassName | string | `nil` | Specify the name of the 'StorageClass' that should be used for the 'shared-home' volume claim.  |
+| volumes.sharedHome.persistentVolumeClaim.resources | object | `{"requests":{"storage":null}}` | Specifies the standard K8s resource requests limits for the shared-home volume claims.  |
+| volumes.sharedHome.efs | string | `nil` | If AWS efs is utilized, please make efs true and put id of efs volume to create pv |
+| volumes.sharedHome.efsid | string | `nil` |  |
+| volumes.sharedHome.driver | string | `"efs.csi.aws.com"` |  |
+| volumes.sharedHome.customVolume | object | `{}` | Static provisioning of shared-home using K8s PVs and PVCs  When 'persistentVolumeClaim.create' is 'false', then this value can be used to define a standard K8s volume that will be used for the shared-home volume. If not defined, then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object. https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static https://atlassian.github.io/data-center-helm-charts/examples/storage/aws/SHARED_STORAGE/  |
+| volumes.sharedHome.mountPath | string | `"/var/atlassian/confluence-datacenter"` | Specifies the path in the Confluence container to which the shared-home volume will be mounted.  |
+| volumes.sharedHome.subPath | string | `nil` | Specifies the sub-directory of the shared-home volume that will be mounted in to the Confluence container.  |
+| volumes.sharedHome.nfsPermissionFixer.enabled | bool | `false` | If 'true', this will alter the shared-home volume's root directory so that Confluence can write to it. This is a workaround for a K8s bug affecting NFS volumes: https://github.com/kubernetes/examples/issues/260  |
+| volumes.sharedHome.nfsPermissionFixer.mountPath | string | `"/shared-home"` | The path in the K8s initContainer where the shared-home volume will be mounted  |
+| volumes.sharedHome.nfsPermissionFixer.command | string | `nil` | By default, the fixer will change the group ownership of the volume's root directory to match the Confluence container's GID (2002), and then ensures the directory is group-writeable. If this is not the desired behaviour, command used can be specified here.  |
+| volumes.synchronyHome.persistentVolumeClaim.create | bool | `false` | If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically created for each pod based on the 'StorageClassName' supplied below.  |
+| volumes.synchronyHome.persistentVolumeClaim.storageClassName | string | `nil` | Specify the name of the 'StorageClass' that should be used for the synchrony-home volume claim.  |
+| volumes.synchronyHome.persistentVolumeClaim.resources | object | `{"requests":{"storage":null}}` | Specifies the standard K8s resource requests for the synchrony-home volume claims.  |
+| volumes.synchronyHome.customVolume | object | `{}` | Static provisioning of synchrony-home using K8s PVs and PVCs  NOTE: Due to the ephemeral nature of pods this approach to provisioning volumes for pods is not recommended. Dynamic provisioning described above is the prescribed approach.  When 'persistentVolumeClaim.create' is 'false', then this value can be used to define a standard K8s volume that will be used for the synchrony-home volume(s). If not defined, then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object. https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static  |
+| volumes.synchronyHome.mountPath | string | `"/var/atlassian/application-data/confluence"` | Specifies the path in the Synchrony container to which the synchrony-home volume will be mounted.  |
+| volumes.additional | list | `[{"configMap":{"defaultMode":484,"name":"server-xml-j2"},"name":"server-xml-j2"},{"configMap":{"defaultMode":484,"name":"server-xml"},"name":"server-xml"},{"configMap":{"defaultMode":484,"name":"footer-content-vm"},"name":"footer-content-vm"}]` | Defines additional volumes that should be applied to all Confluence pods. Note that this will not create any corresponding volume mounts; those needs to be defined in confluence.additionalVolumeMounts  |
+| volumes.additionalSynchrony | list | `[]` | Defines additional volumes that should be applied to all Synchrony pods. Note that this will not create any corresponding volume mounts; those needs to be defined in synchrony.additionalVolumeMounts  |
+| confluence.service.port | int | `80` | The port on which the Confluence K8s Service will listen  |
+| confluence.service.type | string | `"ClusterIP"` | The type of K8s service to use for Confluence  |
+| confluence.service.loadBalancerIP | string | `nil` | Use specific loadBalancerIP. Only applies to service type LoadBalancer.  |
+| confluence.service.contextPath | string | `nil` | The Tomcat context path that Confluence will use. The ATL_TOMCAT_CONTEXTPATH will be set automatically.  |
+| confluence.service.annotations | object | `{}` | Additional annotations to apply to the Service  |
+| confluence.securityContextEnabled | bool | `true` | Whether to apply security context to pod.  |
+| confluence.securityContext.fsGroup | int | `2002` | The GID used by the Confluence docker image GID will default to 2002 if not supplied and securityContextEnabled is set to true. This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Confluence container. However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260 |
+| confluence.containerSecurityContext | object | `{}` | Standard K8s field that holds security configurations that will be applied to a container. https://kubernetes.io/docs/tasks/configure-pod-container/security-context/  |
+| confluence.umask | string | `"0022"` | The umask used by the Confluence process when it creates new files. The default is 0022. This gives the new files:  - read/write permissions for the Confluence user  - read permissions for everyone else.  |
+| confluence.setPermissions | bool | `true` | Boolean to define whether to set local home directory permissions on startup of Confluence container. Set to 'false' to disable this behaviour.  |
+| confluence.ports.http | int | `8090` | The port on which the Confluence container listens for HTTP traffic  |
+| confluence.ports.hazelcast | int | `5701` | The port on which the Confluence container listens for Hazelcast traffic  |
+| confluence.ports.intconnector | int | `8888` | The port used for Confluence Inernal Connecitons between multiple Confluence nodes |
+| confluence.ports.intersvc | int | `8081` | The port used for Confluence internal services |
+| confluence.ports.synchrony | int | `8091` | The port on which Synchrony is used for collaborative editing It is easier to manage Synchrony on the container itself rather than deploying a separate stateful set and services |
+| confluence.license.secretName | string | `nil` | The name of the K8s Secret that contains the Confluence license key. If specified, then the license will be automatically populated during Confluence setup. Otherwise, it will need to be provided via the browser after initial startup. An Example of creating a K8s secret for the license below: 'kubectl create secret generic <secret-name> --from-literal=license-key=<license> https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets  |
+| confluence.license.secretKey | string | `"license-key"` | The key in the K8s Secret that contains the Confluence license key  |
+| confluence.readinessProbe.initialDelaySeconds | int | `10` | The initial delay (in seconds) for the Confluence container readiness probe, after which the probe will start running.  |
+| confluence.readinessProbe.periodSeconds | int | `5` | How often (in seconds) the Confluence container readiness probe will run  |
+| confluence.readinessProbe.failureThreshold | int | `6` | The number of consecutive failures of the Confluence container readiness probe before the pod fails readiness checks.  |
+| confluence.accessLog.enabled | bool | `true` | Set to 'true' if access logging should be enabled.  |
+| confluence.accessLog.mountPath | string | `"/opt/atlassian/confluence/logs"` | The path within the Confluence container where the local-home volume should be mounted in order to capture access logs.  |
+| confluence.accessLog.localHomeSubPath | string | `"logs"` | The subdirectory within the local-home volume where access logs should be stored.  |
+| confluence.livenessProbe.enabled | bool | `false` |  |
+| confluence.livenessProbe.initialDelaySeconds | int | `300` | The initial delay (in seconds) for the Confluence container liveness probe, |
+| confluence.livenessProbe.periodSeconds | int | `5` | How often (in seconds) the Confluence container liveness probe will run |
+| confluence.livenessProbe.failureThreshold | int | `12` | The number of consecutive failures of the Confluence container liveness probe |
+| confluence.clustering.enabled | bool | `false` | Set to 'true' if Data Center clustering should be enabled This will automatically configure cluster peer discovery between cluster nodes.  |
+| confluence.clustering.usePodNameAsClusterNodeName | bool | `true` | Set to 'true' if the K8s pod name should be used as the end-user-visible name of the Data Center cluster node.  |
+| confluence.resources.jvm.maxHeap | string | `"1g"` | The maximum amount of heap memory that will be used by the Confluence JVM  |
+| confluence.resources.jvm.minHeap | string | `"1g"` | The minimum amount of heap memory that will be used by the Confluence JVM  |
+| confluence.resources.jvm.reservedCodeCache | string | `"256m"` | The memory reserved for the Confluence JVM code cache  |
+| confluence.resources.container.requests.cpu | string | `"2"` | Initial CPU request by Confluence pod.  |
+| confluence.resources.container.requests.memory | string | `"2G"` | Initial Memory request by Confluence pod  |
+| confluence.shutdown.terminationGracePeriodSeconds | int | `25` | The termination grace period for pods during shutdown. This should be set to the Confluence internal grace period (default 20 seconds), plus a small buffer to allow the JVM to fully terminate.  |
+| confluence.shutdown.command | string | `"/shutdown-wait.sh"` | By default pods will be stopped via a [preStop hook](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/), using a script supplied by the Docker image. If any other shutdown behaviour is needed it can be achieved by overriding this value. Note that the shutdown command needs to wait for the application shutdown completely before exiting; see [the default command](https://bitbucket.org/atlassian-docker/docker-atlassian-confluence-server/src/master/shutdown-wait.sh) for details.  |
+| confluence.additionalJvmArgs | list | `[]` | Specifies a list of additional arguments that can be passed to the Confluence JVM, e.g. system properties.  |
+| confluence.additionalLibraries | list | `[]` | Specifies a list of additional Java libraries that should be added to the Confluence container. Each item in the list should specify the name of the volume that contains the library, as well as the name of the library file within that volume's root directory. Optionally, a subDirectory field can be included to specify which directory in the volume contains the library file. Additional details: https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/  |
+| confluence.additionalBundledPlugins | list | `[]` | Specifies a list of additional Confluence plugins that should be added to the Confluence container. Note plugins installed via this method will appear as bundled plugins rather than user plugins. These should be specified in the same manner as the 'additionalLibraries' property. Additional details: https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/  NOTE: only .jar files can be loaded using this approach. OBR's can be extracted (unzipped) to access the associated .jar  An alternative to this method is to install the plugins via "Manage Apps" in the product system administration UI.  |
+| confluence.additionalVolumeMounts | list | `[{"mountPath":"/opt/atlassian/etc/server.xml.j2","name":"server-xml-j2","subPath":"server.xml.j2"},{"mountPath":"/opt/atlassian/confluence/conf/server.xml","name":"server-xml","subPath":"server.xml"},{"mountPath":"/opt/atlassian/confluence/confluence/decorators/includes/footer-content.vm","name":"footer-content-vm","subPath":"footer-content.vm"}]` | Defines any additional volumes mounts for the Confluence container. These can refer to existing volumes, or new volumes can be defined in volumes.additional. |
+| confluence.additionalEnvironmentVariables | list | `[]` | Defines any additional environment variables to be passed to the Confluence container. See https://hub.docker.com/r/atlassian/confluence-server for supported variables.  |
+| confluence.additionalPorts | list | `[]` | Defines any additional ports for the Confluence container.  |
+| confluence.additionalVolumeClaimTemplates | list | `[]` | Defines additional volumeClaimTemplates that should be applied to the Confluence pod. Note that this will not create any corresponding volume mounts; those needs to be defined in confluence.additionalVolumeMounts  |
+| confluence.topologySpreadConstraints | list | `[]` | Defines topology spread constraints for Confluence pods. See details: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/  |
+| confluence.jvmDebug.enabled | bool | `false` | Set to 'true' for remote debugging. Confluence JVM will be started with debugging port 5005 open. |
+| synchrony.enabled | bool | `false` | Set to 'true' if Synchrony (i.e. collaborative editing) should be enabled. This will result in a separate StatefulSet and Service to be created for Synchrony. If disabled, then collaborative editing will be disabled in Confluence. |
+| synchrony.service.port | int | `80` | The port on which the Synchrony K8s Service will listen  |
+| synchrony.service.type | string | `"ClusterIP"` | The type of K8s service to use for Synchrony  |
+| synchrony.service.loadBalancerIP | string | `nil` | Use specific loadBalancerIP. Only applies to service type LoadBalancer.  |
+| synchrony.setPermissions | bool | `true` | Boolean to define whether to set synchrony home directory permissions on startup of Synchrony container. Set to 'false' to disable this behaviour.  |
+| synchrony.ports.http | int | `8091` | The port on which the Synchrony container listens for HTTP traffic  |
+| synchrony.ports.hazelcast | int | `5701` | The port on which the Synchrony container listens for Hazelcast traffic  |
+| synchrony.readinessProbe.initialDelaySeconds | int | `5` | The initial delay (in seconds) for the Synchrony container readiness probe, after which the probe will start running.  |
+| synchrony.readinessProbe.periodSeconds | int | `1` | How often (in seconds) the Synchrony container readiness probe will run  |
+| synchrony.readinessProbe.failureThreshold | int | `10` | The number of consecutive failures of the Synchrony container readiness probe before the pod fails readiness checks.  |
+| synchrony.resources.jvm.minHeap | string | `"1g"` | The maximum amount of heap memory that will be used by the Synchrony JVM  |
+| synchrony.resources.jvm.maxHeap | string | `"2g"` | The minimum amount of heap memory that will be used by the Synchrony JVM  |
+| synchrony.resources.jvm.stackSize | string | `"2048k"` | The memory allocated for the Synchrony stack  |
+| synchrony.resources.container.requests.cpu | string | `"2"` | Initial CPU request by Synchrony pod  |
+| synchrony.resources.container.requests.memory | string | `"2.5G"` | Initial Memory request Synchrony pod  |
+| synchrony.additionalJvmArgs | object | `{}` | Specifies a list of additional arguments that can be passed to the Synchrony JVM, e.g. system properties.  |
+| synchrony.shutdown.terminationGracePeriodSeconds | int | `25` | The termination grace period for pods during shutdown. This should be set to the Synchrony internal grace period (default 20 seconds), plus a small buffer to allow the JVM to fully terminate. |
+| synchrony.additionalLibraries | list | `[]` | Specifies a list of additional Java libraries that should be added to the Synchrony container. Each item in the list should specify the name of the volume that contains the library, as well as the name of the library file within that volume's root directory. Optionally, a subDirectory field can be included to specify which directory in the volume contains the library file. Additional details: https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/  |
+| synchrony.additionalVolumeMounts | list | `[]` | Defines any additional volumes mounts for the Synchrony container. These can refer to existing volumes, or new volumes can be defined via 'volumes.additionalSynchrony'.  |
+| synchrony.additionalPorts | list | `[]` | Defines any additional ports for the Synchrony container.  |
+| synchrony.topologySpreadConstraints | list | `[]` | Defines topology spread constraints for Synchrony pods. See details: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/  |
+| fluentd.enabled | bool | `false` | Set to 'true' if the Fluentd sidecar (DaemonSet) should be added to each pod  |
+| fluentd.imageName | string | `"fluent/fluentd-kubernetes-daemonset:v1.11.5-debian-elasticsearch7-1.2"` | The Fluentd sidecar image  |
+| fluentd.command | string | `nil` | The command used to start Fluentd. If not supplied the default command will be used: "fluentd -c /fluentd/etc/fluent.conf -v"  Note: The custom command can be free-form, however pay particular attention to the process that should ultimately be left running in the container. This process should be invoked with 'exec' so that signals are appropriately propagated to it, for instance SIGTERM. An example of how such a command may look is: "<command 1> && <command 2> && exec <primary command>" |
+| fluentd.customConfigFile | bool | `false` | Set to 'true' if a custom config (see 'configmap-fluentd.yaml' for default) should be used for Fluentd. If enabled this config must be supplied via the 'fluentdCustomConfig' property below.  |
+| fluentd.fluentdCustomConfig | object | `{}` | Custom fluent.conf file  |
+| fluentd.httpPort | int | `9880` | The port on which the Fluentd sidecar will listen  |
+| fluentd.elasticsearch.enabled | bool | `true` | Set to 'true' if Fluentd should send all log events to an Elasticsearch service.  |
+| fluentd.elasticsearch.hostname | string | `"elasticsearch"` | The hostname of the Elasticsearch service that Fluentd should send logs to.  |
+| fluentd.elasticsearch.indexNamePrefix | string | `"confluence"` | The prefix of the Elasticsearch index name that will be used  |
+| fluentd.extraVolumes | list | `[]` | Specify custom volumes to be added to Fluentd container (e.g. more log sources)  |
+| podAnnotations | object | `{}` | Custom annotations that will be applied to all Confluence pods  |
+| podLabels | object | `{}` | Custom labels that will be applied to all Confluence pods  |
+| nodeSelector | object | `{}` | Standard K8s node-selectors that will be applied to all Confluence pods  |
+| tolerations | list | `[]` | Standard K8s tolerations that will be applied to all Confluence pods  |
+| affinity | object | `{}` | Standard K8s affinities that will be applied to all Confluence pods  |
+| schedulerName | string | `nil` | Standard K8s schedulerName that will be applied to all Confluence pods. Check Kubernetes documentation on how to configure multiple schedulers: https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/#specify-schedulers-for-pods  |
+| additionalContainers | list | `[]` | Additional container definitions that will be added to all Confluence pods  |
+| additionalInitContainers | list | `[]` | Additional initContainer definitions that will be added to all Confluence pods |
+| additionalLabels | object | `{}` | Additional labels that should be applied to all resources |
+| additionalFiles | list | `[]` | Additional existing ConfigMaps and Secrets not managed by Helm that should be mounted into service container. Configuration details below (camelCase is important!): 'name'      - References existing ConfigMap or secret name. 'type'      - 'configMap' or 'secret' 'key'       - The file name. 'mountPath' - The destination directory in a container. VolumeMount and Volumes are added with this name and index position, for example; custom-config-0, keystore-2  |
+| additionalHosts | list | `[]` | Additional host aliases for each pod, equivalent to adding them to the /etc/hosts file. https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/ |
+| proxyName | string | `nil` |  |
+| hostnamePrefix | string | `"confluence"` |  |
+| hostname | string | `"bigbang.dev"` |  |
+| istio.enabled | bool | `false` |  |
+| istio.gateways[0] | string | `"istio-system/main"` |  |
+| monitoring.enabled | bool | `false` | ref: https://marketplace.atlassian.com/apps/1222775/prometheus-exporter-for-confluence?hosting=server&tab=overview |
+| bbtests.enabled | bool | `false` |  |
+| bbtests.cypress.artifacts | bool | `true` |  |
+| bbtests.cypress.envs.cypress_url | string | `"http://{{ include \"confluence.fullname\" . }}:{{ .Values.confluence.service.port }}/setup/setuplicense.action"` |  |
+| bbtests.cypress.resources.requests.cpu | string | `"1"` |  |
+| bbtests.cypress.resources.requests.memory | string | `"1Gi"` |  |
+| bbtests.cypress.resources.limits.cpu | string | `"1"` |  |
+| bbtests.cypress.resources.limits.memory | string | `"1Gi"` |  |
+| helmTestImage | string | `"registry1.dso.mil/ironbank/big-bang/base:2.0.0"` | Image used for the upstream provided helm tests |
+| hpa.enabled | bool | `false` |  |
+| hpa.maxReplicas | int | `4` |  |
+| hpa.cpu | int | `70` |  |
+| hpa.memory | int | `80` |  |
+| hpa.behavior.enabled | bool | `false` |  |
+| hpa.behavior.time | int | `300` |  |
 
 ## Contributing
 

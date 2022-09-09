@@ -1,0 +1,68 @@
+#* @vtlvariable name="licenseService" type="com.atlassian.confluence.license.LicenseService" *#
+
+<div id="footer" role="contentinfo">
+    <section class="footer-body">
+
+        #if ($generalUtil.isSetupComplete())
+            #if($showHSQLWarning && $action.usingHSQL)
+                <div id="footer-warning">
+                    $action.getText('hsql.footerWarning')
+                </div>
+            #end
+            #if($showH2Warning && $action.usingH2)
+                <div id="footer-warning">
+                    $action.getText('h2.footerWarning')
+                </div>
+            #end
+            #set ($license = $licenseService.retrieve() )
+            #if (!$license)
+                <p class="license license-none">
+                    $action.getText('licensing.error', [$action.getText('mailto.confluence.support')])
+                </p>
+            #elseif ($license.isEvaluation())
+                <p class="license license-eval">
+                    <strong>#if ($generalUtil.isLicenseExpired()) $action.getText('licensefooter.evaluation.expired',[$action.getText('licensefooter.expired.url')])#else$action.getText('licensefooter.evaluation')#end</strong>
+                    #if ($generalUtil.isLicenseExpired())
+                    #else
+                        $action.getText('consider.purchasing',[$action.getText('hitcounter.consider.purchasing')])
+                    #end
+                </p>
+            #elseif ($license.licenseType.name() == "NON_PROFIT")
+                <p class="license license-nonprofit">
+                    $action.getText('licensefooter.nonprofit',[$action.getText('hitcounter.nonprofit'), $htmlUtil.htmlEncode($license.organisation.name)])
+                </p>
+            #elseif ($license.licenseType.name() == "PERSONAL")
+                <p class="license license-personal">
+                    $action.getText('licensefooter.personal',[$action.getText('hitcounter.personal')])<br>
+                </p>
+            #elseif ($license.licenseType.name() == "COMMUNITY")
+                <p class="license license-community">
+                    $action.getText('licensefooter.community',[$action.getText('hitcounter.community'), $htmlUtil.htmlEncode($license.organisation.name)])<br>
+                </p>
+            #elseif ($license.licenseType.name() == "OPEN_SOURCE")
+                <p class="license license-opensource">
+                    $action.getText('licensefooter.opensource',[$action.getText('hitcounter.opensource'), $htmlUtil.htmlEncode($license.organisation.name)])<br>
+                </p>
+            #elseif ($license.licenseType.name() == "DEVELOPER")
+                <p class="license license-developer">
+                    $action.getText('licensefooter.developer')<br>
+                </p>
+            #elseif ($license.licenseType.name() == "DEMONSTRATION")
+                <p class="license license-demonstration">
+                    $action.getText('licensefooter.demonstration', [$action.getText('hitcounter.demonstration')])<br>
+                </p>
+            #end
+        #end
+
+        $!sitemeshPage.getProperty("page.login-language")
+
+        $!sitemeshPage.getProperty("page.coherence-copyright")
+
+        <div id="footer-logo"><a href="http://www.atlassian.com/" rel="nofollow">Atlassian</a></div>
+
+        #if ($!decorator.name != "admin")
+            $!settingsManager.globalSettings.customHtmlSettings.beforeBodyEnd
+        #end
+
+    </section>
+</div>

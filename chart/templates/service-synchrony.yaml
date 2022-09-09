@@ -1,0 +1,24 @@
+{{ if .Values.synchrony.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "synchrony.fullname" . }}
+  labels:
+    {{- include "synchrony.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.synchrony.service.type }}
+  {{- if and (eq .Values.synchrony.service.type "LoadBalancer") (not (empty .Values.synchrony.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.synchrony.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.synchrony.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.synchrony.ports.hazelcast }}
+      targetPort: hazelcast
+      protocol: TCP
+      name: hazelcast
+  selector:
+    {{- include "synchrony.selectorLabels" . | nindent 4 }}
+{{ end }}

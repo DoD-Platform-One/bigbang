@@ -1,0 +1,46 @@
+{{- if .Values.ingress.create }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "common.names.fullname" . }}-setup
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+  annotations:
+    "kubernetes.io/ingress.class": {{ default "nginx" .Values.ingress.className }}
+    {{ if .Values.ingress.nginx }}
+    "nginx.ingress.kubernetes.io/affinity": "cookie"
+    "nginx.ingress.kubernetes.io/affinity-mode": "persistent"
+    "nginx.ingress.kubernetes.io/proxy-body-size": {{ .Values.ingress.maxBodySize }}
+    "nginx.ingress.kubernetes.io/proxy-connect-timeout": "300"
+    "nginx.ingress.kubernetes.io/proxy-read-timeout": "300"
+    "nginx.ingress.kubernetes.io/proxy-send-timeout": "300"
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{ if and (.Values.ingress.tlsSecretName) (.Values.ingress.host) }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+{{ end }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: {{ trimSuffix "/" (include "confluence.ingressPath" .) }}/setup
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "common.names.fullname" . }}
+                port:
+                  number: {{ $.Values.confluence.service.port }}
+          - path: {{ trimSuffix "/" (include "confluence.ingressPath" .) }}/bootstrap
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "common.names.fullname" . }}
+                port:
+                  number: {{ $.Values.confluence.service.port }}
+{{ end }}

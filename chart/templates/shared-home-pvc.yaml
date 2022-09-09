@@ -1,0 +1,18 @@
+{{- if .Values.volumes.sharedHome.persistentVolumeClaim.create }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "common.names.fullname" . }}-shared-home
+  labels:
+  {{- include "common.labels.commonLabels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  {{- if .Values.volumes.sharedHome.persistentVolumeClaim.storageClassName }}
+  storageClassName: {{ .Values.volumes.sharedHome.persistentVolumeClaim.storageClassName | quote }}
+  {{- end }}
+  {{- with .Values.volumes.sharedHome.persistentVolumeClaim.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{ end }}

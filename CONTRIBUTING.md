@@ -1,35 +1,22 @@
 # Contributing
 
-This repository uses the following conventions:
+Thanks for contributing to this repository!
+
+This repository follows the following conventions:
 
 * [Semantic Versioning](https://semver.org/)
 * [Keep a Changelog](https://keepachangelog.com/)
 * [Conventional Commits](https://www.conventionalcommits.org/)
-* [Policy Naming Guide](./docs/naming.md)
-* Scripted framework for testing.  See the [Testing Documentation](./docs/testing.md) for details.
 
-Development requires the following tools
-
-* [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-* [helm](https://helm.sh/docs/intro/install/)
-* [fluxcd](https://fluxcd.io/docs/installation/)
+Development requires the Kubernetes CLI tool as well as a local Kubernetes cluster. [K3D](https://k3d.io/) is recommended as a lightweight local option for standing up Kubernetes clusters.
 
 To contribute a change:
 
-1. Open an issue in GitLab describing the scope of your work
-1. Assign yourself to the issue
-1. Label the issue with `status::doing`
-1. Create a branch in the repository using your issue number as a prefix
-1. Make changes in code and push to your branch
-1. Write test cases by following the [testing documentation](docs/testing.md).
-1. Make commits using the [Conventional Commits](https://www.conventionalcommits.org/) format
-1. Update `CHANGELOG.md` using the [Keep a Changelog](https://keepachangelog.com) format
-1. Open a merge request into the `main` branch
-1. Add a reference to the issue in the merge request description
-1. Resolve any failures from the pipeline
-1. Resolve any merge conflicts
-1. Label the Merge Request with `status::review`
-1. Contact the code owners to expedite your Merge Request review
-1. Address any review comments and merge conflicts during the review process
-1. Wait for a code owner to approve and merge your changes
-1. Request a repository maintainer to create a release and tag
+1. Create a branch on the cloned repository with a descriptive name, prefixed with your name or a tracking number (for work items). For example, `bb-123/add-ingress` is an appropriate branch name.
+1. Make code changes.  Test the changes in your local environment before pushing them to Git.
+1. Make commits using the [Conventional Commits](https://www.conventionalcommits.org/) format. This helps with automation for changelog. Update `CHANGELOG.md` in the same commit using the [Keep a Changelog](https://keepachangelog.com). Depending on tooling maturity, this step may be automated.
+1. Write tests using [KUTTL](https://kuttl.dev) and [Conftest](https://conftest.dev)
+1. Open a merge request using one of the provided templates. Reference any issues fixed in the merge request.
+1. During this time, ensure that all new commits are rebased into your branch so that it remains up to date with the `main` branch.
+1. Wait for a maintainer of the repository (see CODEOWNERS) to approve.
+1. If you have permissions to merge, you are responsible for merging. Otherwise, a CODEOWNER will merge the commit.

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.confluence.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.confluence.service.type }}
+  {{- if and (eq .Values.confluence.service.type "LoadBalancer") (not (empty .Values.confluence.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.confluence.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.confluence.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.confluence.ports.hazelcast }}
+      targetPort: hazelcast
+      protocol: TCP
+      name: hazelcast
+    - port: {{ .Values.confluence.ports.intconnector }}
+      targetPort: intconnector
+      protocol: TCP
+      name: intconnector
+    - port: {{ .Values.confluence.ports.intersvc }}
+      targetPort: intersvc
+      protocol: TCP
+      name: intersvc
+    - port: {{ .Values.confluence.ports.synchrony }}
+      targetPort: synchrony
+      protocol: TCP
+      name: synchrony
+  selector:
+    {{- include "confluence.selectorLabels" . | nindent 4 }}

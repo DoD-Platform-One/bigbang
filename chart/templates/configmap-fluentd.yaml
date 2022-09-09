@@ -1,0 +1,42 @@
+{{ if .Values.fluentd.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-fluentd-config
+  labels:
+  {{- include "common.labels.commonLabels" . | nindent 4 }}
+data:
+  {{ if .Values.fluentd.customConfigFile }}
+{{- range $key, $value := .Values.fluentd.fluentdCustomConfig }}
+  {{ $key }}: |
+{{ $value | indent 4 }}
+  {{- end }}
+  {{ else }}
+  fluent.conf: |
+    <source>
+      @type http
+      port {{ .Values.fluentd.httpPort }}
+      bind 0.0.0.0
+    </source>
+    <filter **>
+      @type record_transformer
+      <record>
+        podname "#{ENV['POD_NAME']}"
+        podnamespace "#{ENV['POD_NAMESPACE']}"
+        podip "#{ENV['POD_IP']}"
+        helmrelease "#{ENV['HELM_RELEASE_NAME']}"
+      </record>
+    </filter>
+    <filter **>
+      @type stdout
+    </filter>
+    {{ if .Values.fluentd.elasticsearch.enabled }}
+    <match **>
+      @type elasticsearch
+      host {{ .Values.fluentd.elasticsearch.hostname }}
+      logstash_format true
+      logstash_prefix {{ .Values.fluentd.elasticsearch.indexNamePrefix }}
+    </match>
+    {{ end }}
+  {{ end }}
+{{ end }}

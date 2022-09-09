@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-jvm-config
+  labels:
+    {{- include "common.labels.commonLabels" . | nindent 4 }}
+data:
+  additional_jvm_args: >-
+    {{ include "confluence.sysprop.hazelcastListenPort" . }}
+    {{ include "confluence.sysprop.synchronyServiceUrl" . }}
+    {{ include "confluence.sysprop.enable.synchrony.by.default" . }}
+    {{ include "confluence.sysprop.clusterNodeName" . }}
+    {{ include "confluence.sysprop.fluentdAppender" . }}
+    {{- include "confluence.sysprop.debug" . -}}
+    {{- range .Values.confluence.additionalJvmArgs }}
+    {{ . }}
+    {{- end }}
+    -XX:ActiveProcessorCount={{ include "flooredCPU" .Values.confluence.resources.container.requests.cpu }}
+  max_heap: {{ .Values.confluence.resources.jvm.maxHeap }}
+  min_heap: {{ .Values.confluence.resources.jvm.minHeap }}
+  reserved_code_cache: {{ .Values.confluence.resources.jvm.reservedCodeCache }}

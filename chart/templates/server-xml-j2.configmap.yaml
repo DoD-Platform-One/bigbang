@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: server-xml-j2
+data:
+{{ (.Files.Glob "files/server.xml.j2").AsConfig | indent 2 }}
+

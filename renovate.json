@@ -2,24 +2,25 @@
     "baseBranches": ["main"],
     "configWarningReuseIssue": false,
     "dependencyDashboard": true,
-    "dependencyDashboardTitle": "Renovate: Upgrade Kyverno Policy Images",
+    "dependencyDashboardHeader": "- [ ] Sync upstream helm chart version with updated dependencies.",
+    "dependencyDashboardTitle": "Renovate: Upgrade Confluence Package Dependencies",
     "draftPR": true,
-    "enabledManagers": ["helm-values","regex"],
     "ignorePaths": ["chart/charts/**"],
-    "labels": ["kyverno","renovate"],
+    "labels": ["confluence","Package Sustainment","kind::maintenance"],
     "packageRules": [
         {
             "matchDatasources": ["docker"],
-            "groupName": "Ironbank"
+            "groupName": "Ironbank",
+            "registryUrls": ["https://registry1.dso.mil"]
         }
     ],
     "regexManagers": [
         {
-            "fileMatch": ["^chart/tests/manifests/.*\\.yaml$"],
+            "fileMatch": ["^chart/values\\.yaml$"],
             "matchStrings": [
-                "image:\\s+(?<depName>.+):(?<currentValue>.+)",
-                "kyverno-policies-bbtest/value:\\s+(?<depName>.+):(?<currentValue>.+)"
+                "image:\\s+repository:\\s+[^/]+/(?<depName>.+)\\s+tag:\\s+(?<currentValue>.+)"
             ],
+            "depNameTemplate": "registry1.dso.mil/ironbank/atlassian/confluence-data-center/confluence-node",
             "datasourceTemplate": "docker"
         }
     ],

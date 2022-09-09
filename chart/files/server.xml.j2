@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Server port="{{ atl_tomcat_mgmt_port | default('8000') }}"
+        shutdown="SHUTDOWN">
+
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener"/>
+  <Listener className="org.apache.catalina.core.AprLifecycleListener"
+            SSLEngine="on"/>
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+
+  <Service name="Catalina">
+
+    <Connector port="{{ atl_tomcat_port | default('8090') }}"
+               maxThreads="{{ atl_tomcat_maxthreads | default('100') }}"
+               minSpareThreads="{{ atl_tomcat_minsparethreads | default('10') }}"
+               connectionTimeout="{{ atl_tomcat_connectiontimeout | default('20000') }}"
+               enableLookups="{{ atl_tomcat_enablelookups | default('false') }}"
+               protocol="{{ atl_tomcat_protocol | default('HTTP/1.1') }}"
+               redirectPort="{{ atl_tomcat_redirectport | default('8443') }}"
+               acceptCount="{{ atl_tomcat_acceptcount | default('10') }}"
+               secure="{{ atl_tomcat_secure | default(catalina_connector_secure) | default('false') }}"
+               scheme="{{ atl_tomcat_scheme | default(catalina_connector_scheme) | default('http') }}"
+               proxyName="{{ atl_proxy_name | default(catalina_connector_proxyname) | default('') }}"
+               proxyPort="{{ atl_proxy_port | default(catalina_connector_proxyport) | default('') }}"
+               maxConnections="{{ atl_tomcat_maxconnections | default('10000') }}"
+               acceptorThreadCount="{{ atl_tomcat_acceptorthreadcount | default('10') }}"
+
+               relaxedPathChars="[]|"
+               relaxedQueryChars="[]|{}^\`&quot;&lt;&gt;"
+               bindOnInit="false"
+               maxHttpHeaderSize="{{ atl_tomcat_maxhttpheadersize | default('8192') }}"
+               useBodyEncodingForURI="true"
+               disableUploadTimeout="true" />
+
+    <Connector port="8081"
+               maxThreads="100"
+               minSpareThreads="10"
+               connectionTimeout="20000"
+               enableLookups="false"
+               protocol="HTTP/1.1"
+               redirectPort="8443"
+               acceptCount="10"
+               maxConnections="10000"
+               acceptorThreadCount="10"
+
+               relaxedPathChars="[]|"
+               relaxedQueryChars="[]|{}^\`&quot;&lt;&gt;"
+               bindOnInit="false"
+               maxHttpHeaderSize="8192"
+               useBodyEncodingForURI="false"
+               disableUploadTimeout="true" />
+
+    <Engine name="Standalone"
+            defaultHost="localhost"
+            debug="0">
+      <Host name="localhost"
+            debug="0"
+            appBase="webapps"
+            unpackWARs="true"
+            autoDeploy="false"
+            startStopThreads="4">
+        <Context path="{{ atl_tomcat_contextpath | default(catalina_context_path) | default('') }}"
+                 docBase="../confluence"
+                 debug="0"
+                 reloadable="false"
+                 useHttpOnly="true">
+          <!-- Logging configuration for Confluence is specified in confluence/WEB-INF/classes/log4j.properties -->
+          <Manager pathname=""/>
+          <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve"
+                 threshold="60"/>
+        {% if atl_tomcat_access_log == 'true' %}
+          <Valve className="org.apache.catalina.valves.AccessLogValve"
+                 requestAttributesEnabled="true"
+                 directory="logs"
+                 prefix="confluence_access"
+                 suffix=".log"
+                 rotatable="true"
+                 pattern="%h %{X-AUSERNAME}o %t &quot;%r&quot; %s %b %D %U %I &quot;%{User-Agent}i&quot;" />
+          <Valve className="org.apache.catalina.valves.RemoteIpValve"
+                 proxiesHeader="x-forwarded-by"
+                 internalProxies="{{ atl_tomcat_proxy_internal_ips | default('') }}"
+                 remoteIpHeader="x-forwarded-for"
+                 protocolHeader="x-forwarded-proto"
+                 requestAttributesEnabled="true"
+                 resolveHosts="false" />
+        {% endif %}
+        </Context>
+
+        <Context path="${confluence.context.path}/synchrony-proxy"
+                 docBase="../synchrony-proxy"
+                 debug="0"
+                 reloadable="false"
+                 useHttpOnly="true">
+          <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve"
+                 threshold="60"/>
+        </Context>
+
+      </Host>
+    </Engine>
+
+  </Service>
+
+</Server>

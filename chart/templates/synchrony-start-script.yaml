@@ -1,0 +1,26 @@
+{{ if .Values.synchrony.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "synchrony.fullname" . }}-entrypoint
+data:
+  # The script we use as the entrypoint for the Synchrony container, because there isn't one we can use out of the box.
+  # Note that the classpath ony really needs to contain synchrony-standalone.jar and the JDBC driver JAR, but for simplicitly
+  # we just add every JAR in the Confluence lib directory.
+  start-synchrony.sh: |
+    #!/usr/bin/env bash
+
+    java \
+       -Xms{{ .Values.synchrony.resources.jvm.minHeap }} \
+       -Xmx{{ .Values.synchrony.resources.jvm.maxHeap }} \
+       -Xss{{ .Values.synchrony.resources.jvm.stackSize }} \
+       -Dsynchrony.port={{ .Values.synchrony.ports.http }} \
+       -Dcluster.listen.port={{ .Values.synchrony.ports.hazelcast }} \
+       {{- range .Values.synchrony.additionalJvmArgs }}
+       {{ . }} \
+       {{- end }}
+       -XX:ActiveProcessorCount={{ .Values.synchrony.resources.container.requests.cpu }} \
+       -classpath /opt/atlassian/confluence/confluence/WEB-INF/packages/synchrony-standalone.jar:/opt/atlassian/confluence/confluence/WEB-INF/lib/* \
+       synchrony.core \
+       sql
+{{ end }}
