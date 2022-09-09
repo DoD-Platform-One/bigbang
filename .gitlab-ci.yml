@@ -1,7 +1,7 @@
 include:
   - project: 'cwilliams68067/package-test'
-  - ref: 'oci-test'
-  - file: '/pipelines/bigbang-package.yaml' 
+    ref: 'oci_test'
+    file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'oci-test' 
+  PIPELINE_REPO_BRANCH: 'oci_test' 
   DEBUG_ENABLED: "true"
