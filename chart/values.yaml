@@ -29,6 +29,14 @@ securityContext:
   runAsGroup: 65532
   runAsNonRoot: true
 
+# -- containerSecurityContext for operator container
+containerSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+  privileged: false
+  readOnlyRootFilesystem: true
+
 # -- Affinity for operator pod(s)
 affinity: {}
   # podAntiAffinity:

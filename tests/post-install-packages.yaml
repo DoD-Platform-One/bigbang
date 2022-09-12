@@ -1,0 +1,6 @@
+minio-operator:
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator
+mattermost:
+  git:
+    repo: "https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git"
