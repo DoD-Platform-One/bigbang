@@ -6,18 +6,15 @@ The below details the steps required to update to a new version of the Nexus pac
 1. Do diff of [upstream chart](https://github.com/sonatype/helm3-charts/tree/nexus-repository-manager-40.1.0/charts/nexus-repository-manager) between old and new release tags to become aware of any significant chart changes. A graphical diff tool such as [Meld](https://meldmerge.org/) is useful. You can see where the current helm chart came from by inspecting ```/chart/kptfile```
 1. Create a development branch and merge request from the Gitlab issue.
 1. Merge/Sync the new helm chart with the existing Nexus package code. A graphical diff tool like [Meld](https://meldmerge.org/) is useful. Reference the "Modifications made to upstream chart" section below. Be careful not to overwrite Big Bang Package changes that need to be kept. Note that some files will have combinations of changes that you will overwite and changes that you keep. Stay alert. The hardest file to update is the ```/chart/values.yaml``` because the changes are many and complicated.
-1. Delete all the ```/chart/charts/*.tgz``` files. You will replace these files in a later step.
-1. update gluon to the latest version, tgz the chart directory from [here](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/tags) and place new chart in ```/chart/charts/xxx.tgz```
-1. In ```/Chart.yaml``` update the gluon library dependency to the latest version that you .
+1. In `chart/Chart.yaml` update gluon to the latest version and run `helm dependency update chart` from the top level of the repo to package it up.
 1. Modify the `image.tag` value in `chart/values.yaml` to point to the newest version of Nexus.
-1. Update /chart/Chart.yaml to the appropriate versions. The annotation version should match the ```appVersion```.
+1. Update `chart/Chart.yaml` to the appropriate versions. The annotation version should match the ```appVersion```.
     ```yaml
     version: X.X.X-bb.X
     appVersion: X.X.X
     annotations:
-    annotations:
       bigbang.dev/applicationVersions: |
-        - Gitlab: X.X.X
+        - Nexus: X.X.X
     ```
 1. Update `CHANGELOG.md` adding an entry for the new version and noting all changes (at minimum should include `Updated Nexus to x.x.x`).
 1. Generate the `README.md` updates by following the [guide in gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md).
@@ -25,19 +22,14 @@ The below details the steps required to update to a new version of the Nexus pac
 1. Once all manual testing is complete take your MR out of "Draft" status and add the review label.
 
 # How to test Nexus
-Note that Big Bang has added several CaC jobs to automate certain configurations that the upstream Nexus is not aware of. Nexus upgrades could break the CaC jobs. You need a license to test the SSO job. The CaC job for repo creation might also require a license, not sure. Currently waiting for license from aquisitions. You can request a one-time trial license from the [Nexus website](https://www.sonatype.com/products/repository-pro/trial) if you register an account with your email. Deploy with the following Big Bang values with SSO disabled. 
-```
-domain: bigbang.dev
 
-flux:
-  interval: 1m
-  rollback:
-    cleanupOnFail: false
+Big Bang has added several CaC (config as code) jobs to automate certain configurations that the upstream Nexus Helm chart does not support. Nexus upgrades could break the CaC jobs (which are not currently tested in CI). Note that you will need a license to test the SSO job. The CaC job for repo creation does not require a license. Big Bang has a license for development/testing purposes - you can request this license from one of the CODEOWNERS or reach out via the BB team channel.
 
+## Test Basic Functionality, Repo Job, and Monitoring
 
-networkPolicies:
-  enabled: true
+Deploy with the following Big Bang override values to test the repo job and monitoring interaction:
 
+```yaml
 clusterAuditor:
   enabled: false
 
@@ -66,54 +58,79 @@ fluentbit:
   enabled: false
 
 monitoring:
-  enabled: false
+  enabled: true
 
 twistlock:
   enabled: false
-  values:
-    console:
-      persistence:
-        size: 5Gi
-
-# Gloabl SSO parameters
-sso:
-  oidc:
-    host: keycloak.bigbang.dev
-    realm: baby-yoda
-  client_secret: ""
 
 addons:
-
-  metricsServer:
-    enabled: false
-
   nexus:
     enabled: true
-
     git:
       tag: null
       branch: "name-of-your-development-branch"
+    values:
+      nexus:
+        docker:
+          enabled: true
+          registries:
+            - host: containers.bigbang.dev
+              port: 5000
+        repository:
+          enabled: true
+          repo:
+            - name: "containers"
+              format: "docker"
+              type: "hosted"
+              repo_data:
+                name: "containers"
+                online: true
+                storage:
+                  blobStoreName: "default"
+                  strictContentTypeValidation: true
+                  writePolicy: "allow_once"
+                cleanup:
+                  policyNames:
+                    - "string"
+                component:
+                  proprietaryComponents: true
+                docker:
+                  v1Enabled: false
+                  forceBasicAuth: true
+                  httpPort: 5000
+```
 
+1. Log in as admin and run through the setup wizard to set an admin password and disable anonymous access.
+1. Locally run `docker login containers.bigbang.dev` using the username `admin` and password that you setup. Make sure that you have added `containers.bigbang.dev` to your `/etc/hosts` file along with the other hostnames.
+1. Locally run `docker tag alpine containers.bigbang.dev/alpine` (or tag a similar small image) then push that image with `docker push containers.bigbang.dev/alpine`. Validate the image pushes successfully which will confirm our repo job setup the docker repo.
+1. Navigate to the Prometheus target page (https://prometheus.bigbang.dev/targets) and validate that the Nexus target shows as up.
+
+## Test SSO Job
+
+SSO Job testing will require your own deployment of Keycloak because you must change the client settings. This cannot be done with P1 login.dso.mil because we don't have admin privileges to change the config there. 
+
+Follow the instructions from the corresponding `DEVELOPMENT_MAINTENANCE.md` testing instructions in the Keycloak Package to deploy Keycloak. Then deploy Nexus with the following values (note the `idpMetadata` value must be filled in with your Keycloak's information and `license_key` from the license file):
+
+```yaml
+addons:
+  nexus:
+    enabled: true
+    git:
+      tag: null
+      branch: "name-of-your-development-branch"
     # -- Base64 encoded license file.
     # cat ~/Downloads/sonatype-license-XXXX-XX-XXXXXXXXXX.lic | base64 -w 0 ; echo
     license_key: ""
-    ingress:
-      gateway: "public"
     sso:
-      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
-      enabled: false
+      enabled: true
       idp_data:
         entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
-        # -- IdP Field Mappings
-        # -- NXRM username attribute
         username: "username"
         firstName: "firstName"
         lastName: "lastName"
         email: "email"
         groups: "groups"
-        # -- IDP SAML Metadata XML as a single line string in single quotes
-        # -- this information is public and does not require a secret
-        # curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo
+        # Fill this in with the result from `curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo`
         idpMetadata: 'xxxxxxxxxxxxxxx'
       role:
         # id is the name of the Keycloak group (case sensitive)
@@ -129,35 +146,31 @@ addons:
             - "nx-all"
           roles:
             - "nx-admin"
-    values:
-      nexus:
-        repository:
-          enabled: true
 ```
-To test with SSO enabled you will need your own deployment of Keycloak because you must change the client settings. This cannot be done with P1 login.dso.mil because we obviously don't have admin priveleges to change config. For instructions to set up your own Keycloak see the corresponding DEVELOPMENT_MAINTENANCE.md testing instructions in the Keycloak Package. Then you need to perform the following steps.
-1. get nexus x509 cert from Nexus Admin UI
-   https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
-1. copy and paste the nexus single line cert into a text file and save it
-     ```bash
-     vi nexus-x509.txt
-     ```
-     add the following content
-     ```console
-     -----BEGIN CERTIFICATE-----
-     put-single-line-nexus-x509-certificate-here
-     -----END CERTIFICATE-----
-     ```
-1. make a valid pem file with proper wrapping at 64 characters per line
+
+Once Nexus is up and running complete the following steps to properly configure the Keycloak client:
+
+1. Get the Nexus x509 cert from Nexus Admin UI (after logging in as admin you can get this from https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata inside of the `X509Certificate` XML section).
+1. Copy and paste the Nexus single line cert into a text file and save it:
+    ```bash
+    vi nexus-x509.txt
+    ```
+    Add the following content
+    ```console
+    -----BEGIN CERTIFICATE-----
+    put-single-line-nexus-x509-certificate-here
+    -----END CERTIFICATE-----
+    ```
+1. Make a valid pem file with proper wrapping at 64 characters per line
      ```bash
      fold -w 64 nexus-x509.txt > nexus.pem
      ```
-1. In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places
+1. In Keycloak go to the Nexus client and on the Keys tab (https://keycloak.bigbang.dev/auth/admin/master/console/#/realms/baby-yoda/clients/f975a475-89c7-43bc-bddb-c9d974ff5ac3/saml/keys) import the nexus.pem file in both places, setting the archive format as Certificate PEM.
 
-Extra Credit: You can also deploy logging and monitoring and verify that they are still working.
-
+Return to Nexus and validate you are able to login via SSO.
 
 # Modifications made to upstream chart
-This is a high-level list of modifitations that Big Bang has made to the upstream helm chart. You can use this as as cross-check to make sure that no modifications were lost during an upgrade process.
+This is a high-level list of modifications that Big Bang has made to the upstream helm chart. You can use this as as cross-check to make sure that no modifications were lost during an upgrade process.
 
 ##  chart/charts/*.tgz
 - add the gluon library archive from ```helm dependency update ./chart```
@@ -204,8 +217,7 @@ This is a high-level list of modifitations that Big Bang has made to the upstrea
 - add volume for license
 - add volume for admin password
 
-## chart/templates/deployment.ymal
-- line 1 add conditional for not istio.enabled
+## chart/templates/ingress.ymal
 - fix extraLabels indentation in 2 places to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 

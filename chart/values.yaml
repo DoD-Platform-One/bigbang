@@ -96,7 +96,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.41.0-01
+  tag: 3.41.1-01
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: private-registry
@@ -129,7 +129,6 @@ nexus:
               role: "string"
               sessionToken: "string"
 
-          
   # BB repository added
   repository:
     # Raw format Repositories are currently the only supported format.
@@ -152,7 +151,6 @@ nexus:
             proprietaryComponents: true
           raw:
             contentDisposition: "ATTACHMENT"
-    
 
   docker:
     enabled: false
@@ -178,15 +176,14 @@ nexus:
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
   resources:
-    # requests:
-    # Based on https://help.sonatype.com/repomanager3/installation/system-requirements
+  # minimum recommended memory settings for a small, person instance from
+  # https://help.sonatype.com/repomanager3/product-information/system-requirements
     requests:
       cpu: 4
-      memory: 8000Mi
+      memory: 8Gi
     limits:
       cpu: 4
-      memory: 8000Mi
-
+      memory: 8Gi
 
   # The ports should only be changed if the nexus image uses a different port
   nexusPort: 8081
