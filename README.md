@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 41.0.0-bb.0](https://img.shields.io/badge/Version-41.0.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.0](https://img.shields.io/badge/AppVersion-3.41.0-informational?style=flat-square)
+![Version: 41.1.0-bb.0](https://img.shields.io/badge/Version-41.1.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.1](https://img.shields.io/badge/AppVersion-3.41.1-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -98,7 +98,7 @@ helm install nexus-repository-manager chart/
 | statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.41.0-01"` |  |
+| image.tag | string | `"3.41.1-01"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | imagePullSecrets[0].name | string | `"private-registry"` |  |
 | nexus.affinity | object | `{}` |  |
@@ -129,15 +129,15 @@ helm install nexus-repository-manager chart/
 | nexus.repository.repo[0].repo_data.raw.contentDisposition | string | `"ATTACHMENT"` |  |
 | nexus.docker.enabled | bool | `false` |  |
 | nexus.env[0].name | string | `"INSTALL4J_ADD_VM_PARAMS"` |  |
-| nexus.env[0].value | string | `"-Dcom.redhat.fips=false\n-Xms2703M -Xmx2703M\n-XX:MaxDirectMemorySize=2703M\n-XX:+UnlockExperimentalVMOptions\n-XX:+UseCGroupMemoryLimitForHeap\n-Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
+| nexus.env[0].value | string | `"-Dcom.redhat.fips=false -Xms2703M -Xmx2703M -XX:MaxDirectMemorySize=2703M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"` |  |
 | nexus.env[1].name | string | `"NEXUS_SECURITY_RANDOMPASSWORD"` |  |
 | nexus.env[1].value | string | `"true"` |  |
 | nexus.properties.override | bool | `false` |  |
 | nexus.properties.data | object | `{}` |  |
 | nexus.resources.requests.cpu | int | `4` |  |
-| nexus.resources.requests.memory | string | `"8000Mi"` |  |
+| nexus.resources.requests.memory | string | `"8Gi"` |  |
 | nexus.resources.limits.cpu | int | `4` |  |
-| nexus.resources.limits.memory | string | `"8000Mi"` |  |
+| nexus.resources.limits.memory | string | `"8Gi"` |  |
 | nexus.nexusPort | int | `8081` |  |
 | nexus.securityContext.runAsNonRoot | bool | `true` |  |
 | nexus.securityContext.fsGroup | int | `2000` |  |

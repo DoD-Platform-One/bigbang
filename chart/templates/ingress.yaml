@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.enabled (not .Values.istio.enabled) -}}
+{{- if .Values.ingress.enabled -}}
 {{- $fullName := include "nexus.fullname" . -}}
 {{- $svcPort := .Values.nexus.nexusPort -}}
 {{- $ingressPath := .Values.ingress.path -}}

@@ -1,6 +1,12 @@
 # Changelog
 
 ---
+## [41.1.0-bb.0] - 2022-09-06
+### Changed
+- Updated chart to version: 41.1.0-bb.0 | appVersion: 3.41.1
+- Updated gluon dependency to 0.3.0
+- Updated dev docs to reflect current status
+
 ## [41.0.0-bb.0] - 2022-08-11
 ### Changed
 - Updated chart to version: 41.0.0-bb.0 | appVersion: 3.41.0
