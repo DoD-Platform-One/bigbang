@@ -5,5 +5,5 @@
 [Docs Owners]
 # Allow any one of the listed codeowners to approve merges to the documentation 
 # Does not allow the creator of the merge request to be the approver.
-/docs/                         @brandencobb @cmcgrath @echuang @evan.rush @jasonkrause @kenna81 @kevin.wilder @LynnStill @micah.nagel @michaelmartin @michaelmcleroy @runyontr @ryan.j.garcia @toladipupo @ronwebb @ryan.thompson.44 @gabe @razzle @lucas.rodriguez 
+/docs/                         @brandencobb @echuang @evan.rush @kenna81 @kevin.wilder @LynnStill @micah.nagel @michaelmartin @michaelmcleroy @runyontr @ryan.j.garcia @toladipupo @ronwebb @ryan.thompson.44 @lucas.rodriguez 
 
