@@ -258,6 +258,7 @@ gatekeeper:
           - default/i.?
           - default/disallow-selinux-options-.?
           - default/restrict-selinux-type-.?
+          - default/not-me
       volumeTypes:
         parameters:
           excludedResources:
@@ -297,6 +298,9 @@ kyvernopolicies:
   values:
     bbtests:
       enabled: true
+    excludeContainers:
+    - not-me
+    - or-me
     exclude:
       any:
       # Allows k3d load balancer to bypass policies.
