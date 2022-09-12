@@ -250,6 +250,8 @@ rules:
   - authentication.istio.io
   - rbac.istio.io
   - security.istio.io
+  - extensions.istio.io
+  - telemetry.istio.io
   resources: ["*"]
   verbs:
   - get
