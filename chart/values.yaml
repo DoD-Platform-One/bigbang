@@ -492,7 +492,7 @@ promtail:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
     path: "./chart"
-    tag: "6.2.2-bb.1"
+    tag: "6.2.2-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
@@ -521,7 +521,7 @@ loki:
     # -- S3 compatible endpoint to use for connection information.
     # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
     endpoint: ""
-    
+
     # -- S3 compatible region to use for connection information.
     region: ""
 
