@@ -77,6 +77,9 @@ redis-bb:
 server:
   image: 
     imagePullPolicy: {{ .Values.imagePullPolicy }}
+  config:
+    # Must be enabled for plugins included in PlatformOne image.
+    kustomize.buildOptions: "--enable-alpha-plugins"
 
 repoServer:
   image: 
