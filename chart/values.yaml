@@ -1330,7 +1330,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
       path: "./chart"
-      tag: "2.31.3-bb.0"
+      tag: "2.31.3-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
