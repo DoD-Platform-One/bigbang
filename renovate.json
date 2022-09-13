@@ -16,14 +16,6 @@
         }
     ],
     "regexManagers": [
-	{
-            "fileMatch": ["^chart/Chart\\.yaml$"],
-            "matchStrings": [
-                "appVersion:[^\\S\\r\\n]+(?<currentValue>.+)"
-            ],
-            "depNameTemplate": "registry1.dso.mil/ironbank/sonatype/nexus/nexus",
-            "datasourceTemplate": "docker"
-        },
         {
             "fileMatch": ["^chart/values\\.yaml$"],
             "matchStrings": [
