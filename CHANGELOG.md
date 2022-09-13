@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.73]
+### Changed
+- Timeout is now 10 minutes instead of 5 minutes in 03_helm_test.sh
+
 ## [2.4.72]
 ### Changed
 - Fixed issue with MR labels being processed twice (and duplicate log entries showing up)
