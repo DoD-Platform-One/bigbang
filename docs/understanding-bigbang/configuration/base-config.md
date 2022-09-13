@@ -154,7 +154,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | promtail.enabled | bool | `false` | Toggle deployment of Promtail. |
 | promtail.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git"` |  |
 | promtail.git.path | string | `"./chart"` |  |
-| promtail.git.tag | string | `"6.2.2-bb.1"` |  |
+| promtail.git.tag | string | `"6.2.2-bb.2"` |  |
 | promtail.flux | object | `{}` | Flux reconciliation overrides specifically for the Promtail Package |
 | promtail.values | object | `{}` | Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git |
 | promtail.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
