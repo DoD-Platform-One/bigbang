@@ -65,7 +65,7 @@ if (Cypress.env("check_data")) {
     collapseMenu();
     cy.get('button[id="namespace-selector"').click()
     cy.get('input[type="checkbox"][value="monitoring"]').click()
-    cy.get('button[id="refresh_button"').click()
+    cy.get('button[id="refresh_button"').click({force: true})
     // Check for graph side panel because the main graph is tricky to grab
     cy.get('div[id="graph-side-panel"]', { timeout: 15000 }).should("be.visible")
   })
@@ -78,7 +78,7 @@ if (Cypress.env("check_data")) {
     collapseMenu();
     cy.get('button[id="namespace-selector"]').click()
     cy.get('input[type="checkbox"][value="monitoring"]').click()
-    cy.get('button[id="refresh_button"]').click()
+    cy.get('button[id="refresh_button"]').click({force: true})
     // This gets us to the prometheus application
     cy.get(':nth-child(2) > :nth-child(2) > .virtualitem_definition_link', { timeout: 15000 }).click()
     // Validate the graph is visible
