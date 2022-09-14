@@ -156,7 +156,7 @@ podinfo:
 
 ### Big Bang Passdowns
 
-Big Bang must override the default values for the package to passdown configuration.  It uses `bigbang/templates/podinfo/values.yaml` to do this.  Add the following content to the `bigbang.defaults.podinfo` definition:
+Big Bang must override the default values for the package to pass-down configuration.  It uses `bigbang/templates/podinfo/values.yaml` to do this.  Add the following content to the `bigbang.defaults.podinfo` definition:
 
 ```yaml
 {{- define "bigbang.defaults.podinfo" -}}

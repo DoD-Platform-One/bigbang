@@ -25,7 +25,7 @@ dependencies:
   repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
 ```
 Once this is saved the following commands need to be run on your helm chart to add the dependency:
-```
+```shell
 export HELM_EXPERIMENTAL_OCI=1
 helm dependency update chart
 ```

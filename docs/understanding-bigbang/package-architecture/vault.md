@@ -127,7 +127,7 @@ Vault features a web interface for interacting with Vault. Through the UI you ar
 
 Vault produces detailed logs that contain information about user interactions, internal processes, warnings and errors. The verbosity of the logs is controlled using the /sys/loggers endpoint. The log levels are DEBUG, INFO, WARN, ERROR, and TRACE. It is always recommended to increase the log level to DEBUG in order to ensure the availability of the maximum amount of information.
 
-The following is an example to enable deubg level logging for the vault deployment in Big Bang:
+The following is an example to enable debug level logging for the vault deployment in Big Bang:
 
 ```yaml
 addons:

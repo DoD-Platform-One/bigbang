@@ -29,12 +29,12 @@ addons:
 ### Manual Steps
 To perform a manual complete backup of Gitlab, exec into your Gitlab Toolbox pod and run the following:
   1. find your Gitlab Toolbox pod 
-     ```
-     kubectl get pods -lrelease=gitlab,app=toolbox -n gitlab
+     ```shell
+     kubectl get pods -l release=gitlab,app=toolbox -n gitlab
      kubectl exec -it gitlab-toolbox-XXXXXXXXX-XXXXX -n gitlab -- /bin/sh
      ```
   1. Execute the backup-utility command which will pull down data from the database, gitaly, and other portions of the ecosystem, tar them up and push to your configured cloud storage.
-     ```
+     ```shell
      backup-utility --skip registry,lfs,artifacts,packages,uploads,pseudonymizer,terraformState,backups
      ```
 
@@ -68,29 +68,29 @@ You can read more on the upstream documentation: https://docs.gitlab.com/charts/
 ## Restore Gitlab
 1. Ensure your gitlab-rails secret is present in gitops or in-cluster and it correctly matches the database to which the chart is pointed.
    * If you need to replace or update your rails secret, once it is updated be sure to restart the following pods:
-     ```
+     ```shell
      kubectl rollout -n gitlab restart deploy/gitlab-sidekiq-all-in-1-v2
      kubectl rollout -n gitlab restart deploy/gitlab-webservice-default
      kubectl rollout -n gitlab restart deploy/gitlab-toolbox
      ```
 2. Exec into the toolbox pod and run the backup-utility command:
    1. find your Gitlab Toolbox pod 
-     ```
-     kubectl get pods -lrelease=gitlab,app=toolbox -n gitlab
+     ```shell
+     kubectl get pods -l release=gitlab,app=toolbox -n gitlab
      kubectl exec -it gitlab-toolbox-XXXXXXXXX-XXXXX -n gitlab -- /bin/sh
      ```
    * Find your most recent backup from cloud storage by finding the last line of your most recent backup job pod:
-      ```
+      ```shell
       kubectl get po -l release=gitlab,job-name -n gitlab --sort-by=.metadata.creationTimestamp
       kubectl logs gitlab-toolbox-backup-XXXXXXXX-XXXXX -n gitlab
       ```
    * Find your most recent backup via AWS CLI:
-      ```
+      ```shell
       aws s3api list-objects --bucket gitlab-backups --query 'reverse(sort_by(Contents,&LastModified))[0].Key' --output 
       # Save the output, it is in the format TIMESTAMP_VALUE.tar
       ```
    2. Execute the backup-utility command which will pull down the tarred data from your configured cloud storage and restore.
-     ```
+     ```shell
      # Using the filename
      backup-utility --restore -f s3://BUCKET_NAME/ARCHIVE_NAME.tar
      # Using the Timestamp
