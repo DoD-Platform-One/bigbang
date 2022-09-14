@@ -96,7 +96,7 @@ After the load balancer is created, you will need to setup DNS entries (e.g. Rou
 ### Ingress Gateways
 
 Istio's Ingress Gateways are services that sit on the edge of the Kubernetes cluster and listen for incoming traffic.  In Big Bang, the Ingress Gateways are either setup as Node Port or Load Balancer services.  As a Node Port type, ports on the node are bound to the service and incoming traffic is routed to the nodes on those ports.  As a Load Balancer type, a load balancer is automatically created and configured to communicate to the service.
-> In some cases, automatic load balancer creating oand configuration is not supported and a Node Port service must be used.
+> In some cases, automatic load balancer creating and configuration is not supported and a Node Port service must be used.
 
 Ingress Gateways will listen for incoming traffic on their assigned ports and forward that traffic to attached Gateways on the appropriate port.  For example, traffic may be received on port 30002 and forwarded to all attached Gateways on port 8443.
 

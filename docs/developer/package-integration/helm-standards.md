@@ -60,7 +60,7 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
 ## Secrets
 
 * The BigBang chart should make an `ImagePullSecret` in the namespace the package will be deployed in.
-* If the package chart cannot accept credentials (e.g. for databses) as a value, then the BigBang chart should make the secret with values passed into BigBang and pass the Secret to the package chart by name.  
+* If the package chart cannot accept credentials (e.g. for databases) as a value, then the BigBang chart should make the secret with values passed into BigBang and pass the Secret to the package chart by name.  
 
 ## Big Bang Helm Release
 

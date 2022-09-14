@@ -98,4 +98,4 @@ Twistlock deployment requires license to operate. Enter your license key in the 
 ### Health Checks
 
 Twistlock provides API endpoints to monitor the health and availability of deployed components  at `/api/v1/_ping` \
-Example command: curl -u admin:Password ‘https:<console-ip>:8083/api/ v1/_ping
+Example command: `curl -u admin:Password ‘https:<console-ip>:8083/api/ v1/_ping`

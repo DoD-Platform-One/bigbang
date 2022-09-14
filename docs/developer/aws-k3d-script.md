@@ -59,15 +59,15 @@ The script uses the default AWS profile and defaults the VPC id and AMI id.
 To change this default behavior you can export environment variables before running the script.  
 
 Run the script with a specifc AWS profile by first exporting the AWS_PROFILE environment variable
-```
+```shell
 export AWS_PROFILE=my-aws-profile
 ```
 To run the script with a specific VPC
-```
+```shell
 export VPC_ID=vpc-XXXXXXXXXXXX
 ```
 To run the script with a specific AMI
-```
+```shell
 export AMI_ID=ami-XXXXXXXXXX
 ```
 

@@ -57,7 +57,7 @@ High availability is accomplished by increasing the replicas in the values file 
 
 None. This service doesn't have a web interface.
 
-## Licencing
+## Licensing
 
 [Apache License](https://github.com/open-policy-agent/gatekeeper/blob/master/LICENSE)
 

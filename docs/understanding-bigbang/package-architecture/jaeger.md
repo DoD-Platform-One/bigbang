@@ -98,7 +98,7 @@ end
 
 ## Licencing
 
-Jaeger has no licencing options nor requirements.
+Jaeger has no licensing options nor requirements.
 
 For production workloads, Jaeger uses Elasticsearch to store and query for traces.  
 
