@@ -5,4 +5,4 @@ include:
 variables:
   PIPELINE_REPO_BRANCH: 'oci_test' 
   DEBUG_ENABLED: "true"
-  
+  REGISTRY_OCI: registry.dso.mil/platform-one/big-bang/pipeline-templates/package-validation
