@@ -3,6 +3,6 @@ include:
     ref: 'oci_test'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  #PIPELINE_REPO_BRANCH: 'oci_test' 
+  PIPELINE_REPO_BRANCH: 'oci_test' 
   DEBUG_ENABLED: "true"
   
