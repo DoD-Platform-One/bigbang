@@ -27,7 +27,9 @@ spec:
         args:
           - -c
           - |
+            {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}
             until curl --head localhost:15000; do echo "Waiting for Istio proxy sidecar"; sleep 10; done; echo "Sidecar available"  &&
+            {{- end }}
             BASE_URL="http://{{ template "nexus.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
             # If there is a license key
             {{- if .Values.license_key }}
@@ -57,7 +59,9 @@ spec:
             {{- end }} 
 
             echo "Created roles"
+            {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}
             curl -fsI -X POST http://localhost:15020/quitquitquit &&
+            {{- end }}
             exit
         
         env:

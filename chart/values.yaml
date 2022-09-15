@@ -4,6 +4,7 @@ hostname: nexus
 domain: bigbang.dev
 istio:
   enabled: false
+  injection: disabled
   nexus:
     gateways:
     - "istio-system/main"

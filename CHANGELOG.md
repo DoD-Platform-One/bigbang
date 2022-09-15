@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [41.1.0-bb.1] - 2022-09-13
+### Changed
+- The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang jobs.
+
 ## [41.1.0-bb.0] - 2022-09-06
 ### Changed
 - Updated chart to version: 41.1.0-bb.0 | appVersion: 3.41.1
