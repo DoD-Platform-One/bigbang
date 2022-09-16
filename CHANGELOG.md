@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [41.1.0-bb.2] - 2022-09-16
+### Changed
+- Fixed virtual service template.
+- Make peerauthentication templates conditional on istio-injection.
+
 ## [41.1.0-bb.1] - 2022-09-13
 ### Changed
 - The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang jobs.
