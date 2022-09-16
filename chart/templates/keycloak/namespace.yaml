@@ -1,0 +1,12 @@
+{{- if .Values.addons.keycloak.enabled }}
+{{ $name := "keycloak" }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $name }}
+  labels:
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/component: "security-tools"
+    {{- include "commonLabels" . | nindent 4 }}
+{{- end }}

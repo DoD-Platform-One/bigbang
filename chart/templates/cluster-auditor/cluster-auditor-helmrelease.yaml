@@ -1,0 +1,48 @@
+{{- $fluxSettingsClusterAuditor := merge .Values.clusterAuditor.flux .Values.flux -}}
+{{- if .Values.clusterAuditor.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cluster-auditor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: cluster-auditor
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: cluster-auditor
+  chart:
+    spec:
+      chart: {{ .Values.clusterAuditor.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: cluster-auditor
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsClusterAuditor | nindent 2 }}
+
+  {{- if .Values.clusterAuditor.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.clusterAuditor.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-cluster-auditor-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-cluster-auditor-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-cluster-auditor-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # CA always depends on Gatekeeper so we can assume it exists here
+  dependsOn:
+  - name: gatekeeper
+    namespace: {{ .Release.Namespace }}
+  {{- if .Values.monitoring.enabled }}
+  - name: monitoring
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+{{- end }}

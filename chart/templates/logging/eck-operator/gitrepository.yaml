@@ -1,0 +1,18 @@
+{{- if and (not .Values.offline) (or .Values.eckoperator.enabled .Values.logging.enabled) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: eck-operator
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: eck-operator
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.eckoperator.git.repo }}
+  ref:
+    {{- include "validRef" .Values.eckoperator.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

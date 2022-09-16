@@ -1,0 +1,102 @@
+comments: |
+  This example values override file is provided FOR DEVELOPMENT PURPOSES ONLY 
+  Operational deployments use a different configuration including but not limited to:
+  - a custom realm would not automatically be loaded. 
+  - needed secrets would be created independently through a GitOps process rather than using the keycolak chart to create secrets
+  - the certificate would not be inlined in the values.yaml but instead the keycloak-tlscert and keycloak-tlskey secrets are created independently through a GitOps process
+  - an external database would be used
+  - master realm would be disabled to prevent admin login
+  
+  If you are deploying this development configuration on a k3d cluster, multiple istio ingress is not supported by default. 
+  You must follow the instructions in the development environment addendum to configure k3d with MetalLB.
+    /docs/developer/development-environment.md#multi-ingress-gateway-support-with-metallb-and-k3d
+  
+  Here are some of the URL paths that are available in Keycloak 
+  Admin UI. Default credentials for development are admin:password  
+  https://keycloak.bigbang.dev/auth/admin   
+  User registration and/or account page  
+  https://keycloak.bigbang.dev/  
+  
+  For a keycloak realm config file that already has some sso clients configured, reach out to one of the Keycloak package codeowners. 
+  Within the Keycloak admin UI delete the existing custom realm, and then import the new one. 
+  If the cert in the example values override file has expired. Get a current *.bigbang.dev cert at /chart/ingress-certs.yaml.
+  Then open a Gitlab issue so we can update the example file with the new cert. 
+
+
+domain: bigbang.dev
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+istio:
+  ingressGateways:
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+
+  gateways:
+    passthrough:
+      ingressGateway: "passthrough-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls:
+        mode: "PASSTHROUGH"
+
+addons:
+  keycloak:
+    enabled: true
+
+    ingress:
+      gateway: "passthrough"
+
+      key: |
+        -----BEGIN PRIVATE KEY-----
+        INSERT KEY HERE
+        -----END PRIVATE KEY-----
+      cert: |
+        -----BEGIN CERTIFICATE-----
+        INSERT CERT HERE
+        -----END CERTIFICATE-----
+
+    values:
+      replicas: 1
+      secrets:
+        env:
+          stringData:
+            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
+            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
+            X509_CA_BUNDLE: /etc/x509/https/cas.pem
+        certauthority:
+          stringData:
+            cas.pem: '{{ .Files.Get "resources/dev/dod_cas.pem" }}'
+        customreg:
+          stringData:
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+        realm:
+          stringData:
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+      extraVolumes: |-              
+        - name: certauthority
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-certauthority
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+      extraVolumeMounts: |-
+        - name: certauthority
+          mountPath: /etc/x509/https/cas.pem
+          subPath: cas.pem
+          readOnly: true
+        - name: customreg
+          mountPath: /opt/jboss/keycloak/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/jboss/keycloak/realm.json
+          subPath: realm.json
+          readOnly: true
+

@@ -1,0 +1,14 @@
+{{- if and (not .Values.offline) .Values.addons.sonarqube.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: sonarqube
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.sonarqube.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.sonarqube.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

@@ -1,0 +1,120 @@
+{{- if .Values.addons.argocd.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.argocd "name" "argocd" "defaults" (include "bigbang.defaults.argocd" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.argocd" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+createNamespace: false
+
+global:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+    - name: private-registry
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") .Values.istio.enabled) }}
+{{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
+
+controller:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+    - name: private-registry
+
+dex:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+    - name: private-registry
+
+{{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
+redis:
+  externalEndpoint: {{ .Values.addons.argocd.redis.host }}:{{ .Values.addons.argocd.redis.port }}
+  enabled: false
+{{- end }}
+
+redis-bb:
+  {{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
+  enabled: false
+  {{- else }}
+  enabled: true
+  {{- end }}
+  image: 
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  auth:
+    enabled: false
+  {{- if .Values.monitoring.enabled }}
+  metrics:
+    enabled: true
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: argocd
+      selector:
+        app.kubernetes.io/name: redis-bb
+        app.kubernetes.io/instance: argocd-argocd
+    prometheusRule:
+      enabled: true
+      namespace: monitoring
+  {{- end }}
+{{- if $istioInjection }}  
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  replica:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+{{- end }}
+
+server:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+  config:
+    # Must be enabled for plugins included in PlatformOne image.
+    kustomize.buildOptions: "--enable-alpha-plugins"
+
+repoServer:
+  image: 
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  argocd:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.argocd.ingress.gateway }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.argocd.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+{{- if .Values.addons.argocd.sso.enabled }}
+sso:
+  enabled: {{ .Values.addons.argocd.sso.enabled }}
+  rbac:
+    policy.csv: {{- toYaml .Values.addons.argocd.sso.groups | nindent 4 }}
+  keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
+  config:
+    oidc.config: |
+      name: {{ .Values.addons.argocd.sso.provider_name }}
+      issuer: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
+      clientID: {{ .Values.addons.argocd.sso.client_id }}
+      clientSecret: $oidc.keycloak.clientSecret
+      requestedScopes: ["openid","ArgoCD"]
+{{- end }}
+{{- end -}}
+

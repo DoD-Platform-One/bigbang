@@ -1,0 +1,81 @@
+{{- if .Values.addons.vault.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.vault "name" "vault" "defaults" (include "bigbang.defaults.vault" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.vault" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+prometheus:
+  servicemonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+global:
+  imagePullSecrets:
+  - name: private-registry
+
+injector:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+server:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
+  {{- if eq .Values.addons.vault.ingress.gateway "passthrough" }}
+  volumes:
+  - name: tls
+    secret:
+      secretName: vault-tls
+  volumeMounts:
+  - name: tls
+    mountPath: "/vault/tls"
+    readOnly: true
+  {{- end }}
+  {{- end }}
+
+csi:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.vault.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}  
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  vault:
+    gateways:
+      - istio-system/{{ default "public" .Values.addons.vault.ingress.gateway }}
+    {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
+    tls:
+      cert: {{ .Values.addons.vault.ingress.cert | quote }}
+      key:  {{ .Values.addons.vault.ingress.key | quote }}
+    {{- end }}
+
+minio:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}        
+{{- end -}}

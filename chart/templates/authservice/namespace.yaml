@@ -1,0 +1,14 @@
+{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: authservice
+  labels:
+    {{- if .Values.istio.enabled }}
+    istio-injection: enabled
+    {{- end }}
+    app.kubernetes.io/name: authservice
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}
+

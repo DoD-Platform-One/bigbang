@@ -1,0 +1,11 @@
+{{- if or .Values.eckoperator.enabled .Values.logging.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eck-operator
+  labels:
+    app.kubernetes.io/name: eck-operator
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+{{- end }}

@@ -1,0 +1,14 @@
+{{- if .Values.addons.anchore.enabled  }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: anchore
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.anchore.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.anchore.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

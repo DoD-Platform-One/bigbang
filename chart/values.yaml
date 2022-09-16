@@ -1,1099 +1,1449 @@
-## Atlassian Confluence Data Center Helm values
-#
-# HEADS UP!
-#
-# Data loss will occur if sections declared as 'REQUIRED' are not configured appropriately!
-# These sections are:
-# - database
-# - volumes
-#
-# Additional details on pre-provisioning these required resources can be found here:
-# https://atlassian.github.io/data-center-helm-charts/userguide/INSTALLATION/#3-configure-database
-# https://atlassian.github.io/data-center-helm-charts/userguide/INSTALLATION/#5-configure-persistent-storage
-#
-# To manage external access to the Confluence instance, an ingress resource can also be configured
-# under the 'ingress' stanza. This requires a pre-provisioned ingress controller to be present.
-#
-# Additional details on pre-provisioning an ingress controller can be found here:
-# https://atlassian.github.io/data-center-helm-charts/userguide/INSTALLATION/#4-configure-ingress
-#
-##
+# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
+domain: bigbang.dev
 
+# -- (experimental) Toggle sourcing from external repos.
+# All this does right now is toggle GitRepositories, it is _not_ fully functional
+offline: false
 
-# -- The initial number of Confluence pods that should be started at deployment time.
-# Note that Confluence requires manual configuration via the browser post deployment
-# after the first pod is deployed. This configuration must be completed before
-# scaling up additional pods. As such this value should always be kept as 1,
-# but can be altered once manual configuration is complete.
-#
-replicaCount: 1
+# -- Single set of registry credentials used to pull all images deployed by BigBang.
+registryCredentials:
+  registry: registry1.dso.mil
+  username: ""
+  password: ""
+  email: ""
 
-# Image configuration
-#
-image:
-  # repository: atlassian/confluence-server
-  repository: registry1.dso.mil/ironbank/atlassian/confluence-data-center/confluence-node
-  # -- Optional image repository pull secret
-  imagePullSecrets: private-registry
-  pullPolicy: IfNotPresent
-  # -- The docker image tag to be used. Defaults to the Chart appVersion.
-  tag: "7.19.0"
+# -- Multiple sets of registry credentials used to pull all images deployed by BigBang.
+# Credentials will only be created when a valid combination exists, registry, username, and password (email is optional)
+# Or a list of registires:
+#  - registry: registry1.dso.mil
+#    username: ""
+#    password: ""
+#    email: ""
+#  - registry: registry.dso.mil
+#    username: ""
+#    password: ""
+#    email: ""
 
-# K8s ServiceAccount configuration. Give fine-grained identity and authorization
-# to Pods
-#
-serviceAccount:
+# Openshift Container Platform Feature Toggle
+openshift: false
 
-  # -- Set to 'true' if a ServiceAccount should be created, or 'false' if it
-  # already exists.
-  #
-  create: true
-  
-  # -- The name of the ServiceAccount to be used by the pods. If not specified, but
-  # the "serviceAccount.create" flag is set to 'true', then the ServiceAccount name
-  # will be auto-generated, otherwise the 'default' ServiceAccount will be used.
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
-  #
-  name:
+# -- Git credential settings for accessing private repositories
+# Order of precedence is:
+#   1. existingSecret
+#   2. http credentials (username/password/caFile)
+#   3. ssh credentials (privateKey/publicKey/knownHosts)
+git:
+  # -- Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+  existingSecret: ""
 
-  # -- For Docker images hosted in private registries, define the list of image pull
-  # secrets that should be utilized by the created ServiceAccount
-  # https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
-  #
-  imagePullSecrets: []
-  # - name: secretName
-
-  # -- Annotations to add to the ServiceAccount (if created)
-  #
-  annotations: {}
-  
-   # Define permissions
-   # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole
-   #
-  clusterRole:
-  
-    # -- Set to 'true' if a ClusterRole should be created, or 'false' if it
-    # already exists.
-    #
-    create: true
-    
-    # -- The name of the ClusterRole to be used. If not specified, but
-    # the "serviceAccount.clusterRole.create" flag is set to 'true',
-    # then the ClusterRole name will be auto-generated.
-    #
-    name:
-    
-  # Grant permissions defined in ClusterRole
-  # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding
-  #
-  clusterRoleBinding:
-  
-    # -- Set to 'true' if a ClusterRoleBinding should be created, or 'false' if it
-    # already exists.
-    #
-    create: true
-    
-    # -- The name of the ClusterRoleBinding to be created. If not specified, but
-    # the "serviceAccount.clusterRoleBinding.create" flag is set to 'true',
-    # then the ClusterRoleBinding name will be auto-generated.
-    #
-    name:
-
-# REQUIRED - Database configuration
-#
-# Confluence requires a backend database. The configuration below can be used to define the
-# database to use and its connection details.
-# https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#database-connectivity
-#
-database:
-
-  # -- The database type that should be used. If not specified, then it will need to be
-  # provided via the browser during manual configuration post deployment. Valid values
-  # include:
-   # - 'postgresql'
-   # - 'mysql'
-   # - 'oracle'
-   # - 'mssql'
-  # https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databasetype
-  #
-  type:
-  #CMW
-  user: 
-  #CMW
-  password: userpassword
-  # -- The jdbc URL of the database. If not specified, then it will need to be provided
-  # via the browser during manual configuration post deployment. Example URLs include:
-   # - 'jdbc:postgresql://<dbhost>:5432/<dbname>'
-   # - 'jdbc:mysql://<dbhost>/<dbname>'
-   # - 'jdbc:sqlserver://<dbhost>:1433;databaseName=<dbname>'
-   # - 'jdbc:oracle:thin:@<dbhost>:1521:<SID>'
-  # https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#databaseurl
-  #
-  url:
-  
-  # JDBC connection credentials
-  #
+  # -- Chart created secrets with user defined values
   credentials:
-  
-    # -- The name of the K8s Secret that contains the database login credentials.
-    # If the secret is specified, then the credentials will be automatically utilised on
-    # Confluence startup. If the secret is not provided, then the credentials will need to be
-    # provided via the browser during manual configuration post deployment.
-    #
-    # Example of creating a database credentials K8s secret below:
-    # 'kubectl create secret generic <secret-name> --from-literal=username=<username> \
-    # --from-literal=password=<password>'
-    # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
-    #
-    secretName:
-    
-    # -- The key ('username') in the Secret used to store the database login username
-    #
-    usernameSecretKey: username
-    
-    # -- The key ('password') in the Secret used to store the database login password
-    #
-    passwordSecretKey: password
+    # -- HTTP git credentials, both username and password must be provided
+    username: ""
+    password: ""
+    # -- HTTPS certificate authority file.  Required for any repo with a self signed certificate
+    caFile: ""
+    # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+    privateKey: ""
+    publicKey: ""
+    knownHosts: ""
 
-# Ingress configuration
+# -- Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages.
+sso:
+  oidc:
+    # -- Domain for keycloak used for configuring SSO
+    host: login.dso.mil
+    # -- Keycloak realm containing clients
+    realm: baby-yoda
+
+  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see docs/assets/configs/example/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
+  certificate_authority: ""
+
+  # -- Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs
+  jwks: ''
+
+  # -- OIDC client ID used for packages authenticated through authservice
+  client_id: ""
+
+  # -- OIDC client secret used for packages authenticated through authservice
+  client_secret: ""
+
+  # -- OIDC token URL template string (to be used as default)
+  token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
+
+  # -- OIDC auth URL template string (to be used as default)
+  auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
+
+  # -- Kubernetes Secret containing the sso.certificate_authority value for SSO enabled application namespaces
+  secretName: "tls-ca-sso"
+
+# -- (Advanced) Flux reconciliation parameters.
+# The default values provided will be sufficient for the majority of workloads.
+flux:
+  timeout: 10m
+  interval: 2m
+  test:
+    enable: false
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+    cleanupOnFail: true
+  rollback:
+    timeout: 10m
+    cleanupOnFail: true
+
+# -- Global NetworkPolicies settings
+networkPolicies:
+  # -- Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled`
+  enabled: true
+  # -- Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster
+  # Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints)
+  # Used by package NetworkPolicies to allow Kube API access
+  controlPlaneCidr: 0.0.0.0/0
+  # -- Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks.
+  # use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range.
+  # Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs)
+  nodeCidr: ""
+  # -- VPC CIDR, defaults to 0.0.0.0/0
+  # In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3.
+  # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
+  # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
+  vpcCidr: 0.0.0.0/0
+
+# -- Global ImagePullPolicy value for all packages
+# Permitted values are: None, Always, IfNotPresent
+imagePullPolicy: IfNotPresent
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Istio
 #
-# To make the Atlassian product available from outside the K8s cluster an Ingress
-# Controller should be pre-provisioned. With this in place the configuration below
-# can be used to configure an appropriate Ingress Resource.
-# https://atlassian.github.io/data-center-helm-charts/userguide/CONFIGURATION/#ingress
+istio:
+  # -- Toggle deployment of Istio.
+  enabled: true
+
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+    path: "./chart"
+    tag: "1.14.3-bb.4"
+
+  # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
+  # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
+  enterprise: false
+
+  # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
+  # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
+  # Besides some ports needed by Istio, only ports 80 and 443 are opened
+  # Ingress gateways that require more configuration can be completed using `istio.values`
+  ingressGateways:
+    public-ingressgateway:
+      type: "LoadBalancer" # or "NodePort"
+      kubernetesResourceSpec: {} # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+
+    # private-ingressgateway:
+    #   type: "LoadBalancer" # or "NodePort"
+    #   kubernetesResourceSpec: # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
+    #     serviceAnnotations: # Example for AWS internal load balancer
+    #       service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    #       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+    # passthrough-ingressgateway:
+    #   type: "NodePort" # or "LoadBalancer"
+    #   # Node ports are assigned starting from nodePortBase.  The nodePortBase specifies the start of a range of 4 unused node ports.
+    #   # Node port will be assigned as follows: Port 15021 (Status) = nodePortBase, Port 80 = nodePortBase+1, Port 443 = nodePortBase+2, Port 15443 (SNI) = nodePortBase+3
+    #   # Node port base should be in the range from 30000 to 32764
+    #   nodePortBase: 32000  # Alternatively, the kubernetesResourceSpec can be used to configure all port parameters
+
+  gateways:
+    public:
+      ingressGateway: "public-ingressgateway"
+      hosts:
+        - "*.{{ .Values.domain }}"
+      # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+      autoHttpRedirect:
+        enabled: true
+      tls:
+        key: ""
+        cert: ""
+    # private:
+    #   ingressGateway: "private-ingressgateway"
+    #   hosts:
+    #   - "example.bigbang.dev"
+    #   ports:
+    #     - name: tls-2
+    #       number: 1234
+    #       protocol: TCP
+    #     - name: tls
+    #       number: 5678
+    #       protocol: TCP
+    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+    #   autoHttpRedirect:
+    #     enabled: false
+    #   tls:
+    #     key: ""
+    #     cert: ""
+    # passthrough:
+    #   ingressGateway: "passthrough-ingressgateway"
+    #   hosts:
+
+    ####
+    # Alternate multi-server configuration method
+    ####
+    # private:
+    #   ingressGateway: "private-ingressgateway"
+    #   servers:
+    #   - hosts:
+    #     - "example.bigbang.dev"
+    #     port:
+    #       name: tls-1
+    #       number: 1234
+    #       protocol: TCP
+    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+    #     autoHttpRedirect:
+    #       enabled: false
+    #     tls:
+    #       key: ""
+    #       cert: ""
+    #   - hosts:
+    #     - "example.bigbang.dev"
+    #     port:
+    #       name: tls-2
+    #       number: 5678
+    #       protocol: TCP
+    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+    #     autoHttpRedirect:
+    #       enabled: false
+    #     tls:
+    #       key: ""
+    #       cert: ""
+    # passthrough:
+    #   ingressGateway: "passthrough-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.domain }}"
+    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+    #   autoHttpRedirect:
+    #     enabled: true
+    #   tls:
+    #     mode: "PASSTHROUGH"
+
+  # -- Flux reconciliation overrides specifically for the Istio Package
+  flux: {}
+
+  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+istiooperator:
+  # -- Toggle deployment of Istio Operator.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+    path: "./chart"
+    tag: "1.14.3-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Istio Operator Package
+  flux: {}
+
+  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+jaeger:
+  # -- Toggle deployment of Jaeger.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    path: "./chart"
+    tag: "2.35.0-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Jaeger Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SSO for Jaeger on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Jaeger
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Jaeger
+    client_secret: ""
+
+  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+kiali:
+  # -- Toggle deployment of Kiali.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    path: "./chart"
+    tag: "1.56.1-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Kiali Package
+  flux: {}
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SSO for Kiali on and off
+    enabled: false
+
+    # -- OIDC Client ID to use for Kiali
+    client_id: ""
+
+    # -- OIDC Client Secret to use for Kiali
+    client_secret: ""
+
+  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Cluster Auditor
 #
-ingress:
+clusterAuditor:
+  # -- Toggle deployment of Cluster Auditor.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+    path: "./chart"
+    tag: "1.4.0-bb.10"
 
-  # -- Set to 'true' if an Ingress Resource should be created. This depends on a
-  # pre-provisioned Ingress Controller being available.
-  #
-  create: false
+  # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
+  flux: {}
 
-  # -- The class name used by the ingress controller if it's being used.
-  #
-  # Please follow documentation of your ingress controller. If the cluster
-  # contains multiple ingress controllers, this setting allows you to control
-  # which of them is used for Atlassian application traffic.
-  #
-  className: "nginx"
-  
-  # -- Set to 'true' if the Ingress Resource is to use the K8s 'ingress-nginx'
-  # controller.
-  # https://kubernetes.github.io/ingress-nginx/
-  #
-  # This will populate the Ingress Resource with annotations that are specific to
-  # the K8s ingress-nginx controller. Set to 'false' if a different controller is
-  # to be used, in which case the appropriate annotations for that controller must
-  # be specified below under 'ingress.annotations'.
-  #
-  nginx: true
-  
-  # -- The max body size to allow. Requests exceeding this size will result
-  # in an HTTP 413 error being returned to the client.
-  #
-  maxBodySize: 250m
-  
-  # -- Defines a timeout for establishing a connection with a proxied server. It should
-  # be noted that this timeout cannot usually exceed 75 seconds.
-  #
-  proxyConnectTimeout: 60
+  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+  values: {}
 
-  # -- Defines a timeout for reading a response from the proxied server. The timeout is
-  # set only between two successive read operations, not for the transmission of the
-  # whole response. If the proxied server does not transmit anything within this time,
-  # the connection is closed.
-  #
-  proxyReadTimeout: 60
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
 
-  # -- Sets a timeout for transmitting a request to the proxied server. The timeout is set
-  # only between two successive write operations, not for the transmission of the whole
-  # request. If the proxied server does not receive anything within this time, the
-  # connection is closed.
-  #
-  proxySendTimeout: 60
-
-  # -- The fully-qualified hostname (FQDN) of the Ingress Resource. Traffic coming in on
-  # this hostname will be routed by the Ingress Resource to the appropriate backend
-  # Service.
-  #
-  host:
-
-  # -- The base path for the Ingress Resource. For example '/confluence'. Based on a
-  # 'ingress.host' value of 'company.k8s.com' this would result in a URL of
-  # 'company.k8s.com/confluence'. Default value is 'confluence.service.contextPath'
-  path:
-  
-  # -- The custom annotations that should be applied to the Ingress Resource
-  # when NOT using the K8s ingress-nginx controller.
-  #
-  annotations: {}
-  
-  # -- Set to 'true' if browser communication with the application should be TLS
-  # (HTTPS) enforced.
-  #
-  https: true
-  
-  # -- The name of the K8s Secret that contains the TLS private key and corresponding
-  # certificate. When utilised, TLS termination occurs at the ingress point where
-  # traffic to the Service, and it's Pods is in plaintext.
-  #
-  # Usage is optional and depends on your use case. The Ingress Controller itself
-  # can also be configured with a TLS secret for all Ingress Resources.
-  # https://kubernetes.io/docs/concepts/configuration/secret/#tls-secrets
-  # https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
-  #
-  tlsSecretName:
-
-volumes:
-
-  # Each pod requires its own volume for 'local-home'. This is needed for key data
-  # that help define how Confluence works.
-  # https://confluence.atlassian.com/doc/confluence-home-and-other-important-directories-590259707.html
-  #
-  localHome:
-  
-    # Dynamic provisioning of local-home using the K8s Storage Classes
-    #
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#dynamic
-    # https://atlassian.github.io/data-center-helm-charts/examples/storage/aws/LOCAL_STORAGE/
-    #
-    persistentVolumeClaim:
-    
-      # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically
-      # created for each pod based on the 'StorageClassName' supplied below.
-      #
-      create: false
-      
-      # -- Specify the name of the 'StorageClass' that should be used for the local-home
-      # volume claim.
-      #
-      storageClassName:
-      
-      # -- Specifies the standard K8s resource requests for the local-home
-      # volume claims.
-      #
-      resources:
-        requests:
-          storage:
-          
-    # -- Static provisioning of local-home using K8s PVs and PVCs
-    #
-    # NOTE: Due to the ephemeral nature of pods this approach to provisioning volumes for
-    # pods is not recommended. Dynamic provisioning described above is the prescribed
-    # approach.
-    #
-    # When 'persistentVolumeClaim.create' is 'false', then this value can be used to define
-    # a standard K8s volume that will be used for the local-home volume(s). If not defined,
-    # then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify
-    # the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object.
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
-    #
-    customVolume: {}
-    # persistentVolumeClaim:
-    #   claimName: "<pvc>"
-    
-    # -- Specifies the path in the Confluence container to which the local-home volume will be
-    # mounted.
-    #
-    mountPath: "/var/atlassian/application-data/confluence"
-    
-  # A volume for 'shared-home' is required by Confluence to effectively operate in multi-node
-  # environment
-  # https://confluence.atlassian.com/doc/set-up-a-confluence-data-center-cluster-982322030.html#SetupaConfluenceDataCentercluster-Setupandconfigureyourcluster
-  #
-  sharedHome:
-    
-    # Dynamic provisioning of shared-home using the K8s Storage Class
-    #
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#dynamic
-    #
-    persistentVolumeClaim:
-    
-      # -- If 'true', then a 'PersistentVolumeClaim' and 'PersistentVolume' will be dynamically
-      # created for shared-home based on the 'StorageClassName' supplied below.
-      #
-      create: false
-      
-      # -- Specify the name of the 'StorageClass' that should be used for the 'shared-home'
-      # volume claim.
-      #
-      storageClassName:
-      
-      # -- Specifies the standard K8s resource requests limits for the shared-home
-      # volume claims.
-      #
-      resources:
-        requests:
-          storage:
-    # -- If AWS efs is utilized, please make efs true and put id of efs volume to create pv
-    efs: 
-    efsid:
-    driver: efs.csi.aws.com 
-    # -- Static provisioning of shared-home using K8s PVs and PVCs
-    #
-    # When 'persistentVolumeClaim.create' is 'false', then this value can be used to define
-    # a standard K8s volume that will be used for the shared-home volume. If not defined,
-    # then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify
-    # the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object.
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
-    # https://atlassian.github.io/data-center-helm-charts/examples/storage/aws/SHARED_STORAGE/
-    #
-    customVolume: {}
-    # persistentVolumeClaim:
-    #   claimName: "<pvc>"
-    
-    # -- Specifies the path in the Confluence container to which the shared-home volume will be
-    # mounted.
-    #
-    mountPath: "/var/atlassian/confluence-datacenter"
-    
-    # -- Specifies the sub-directory of the shared-home volume that will be mounted in to the
-    # Confluence container.
-    #
-    subPath:
-    
-    # Modify permissions on shared-home
-    #
-    nfsPermissionFixer:
-    
-      # -- If 'true', this will alter the shared-home volume's root directory so that Confluence
-      # can write to it. This is a workaround for a K8s bug affecting NFS volumes:
-      # https://github.com/kubernetes/examples/issues/260
-      #
-      enabled: false
-      
-      # -- The path in the K8s initContainer where the shared-home volume will be mounted
-      #
-      mountPath: "/shared-home"
-      
-      # -- By default, the fixer will change the group ownership of the volume's root directory
-      # to match the Confluence container's GID (2002), and then ensures the directory is
-      # group-writeable. If this is not the desired behaviour, command used can be specified
-      # here.
-      #
-      command:
-
-  # Each synchrony pod needs its own volume for 'synchrony-home'. The Synchrony process will write logs to that location
-  # and any configuration files can be placed there.
-  #
-  synchronyHome:
-
-    # Dynamic provisioning of synchrony-home using the K8s Storage Classes
-    #
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#dynamic
-    # https://atlassian.github.io/data-center-helm-charts/examples/storage/aws/LOCAL_STORAGE/
-    #
-    persistentVolumeClaim:
-
-      # -- If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically
-      # created for each pod based on the 'StorageClassName' supplied below.
-      #
-      create: false
-
-      # -- Specify the name of the 'StorageClass' that should be used for the synchrony-home
-      # volume claim.
-      #
-      storageClassName:
-
-      # -- Specifies the standard K8s resource requests for the synchrony-home
-      # volume claims.
-      #
-      resources:
-        requests:
-          storage:
-
-    # -- Static provisioning of synchrony-home using K8s PVs and PVCs
-    #
-    # NOTE: Due to the ephemeral nature of pods this approach to provisioning volumes for
-    # pods is not recommended. Dynamic provisioning described above is the prescribed
-    # approach.
-    #
-    # When 'persistentVolumeClaim.create' is 'false', then this value can be used to define
-    # a standard K8s volume that will be used for the synchrony-home volume(s). If not defined,
-    # then an 'emptyDir' volume is utilised. Having provisioned a 'PersistentVolume', specify
-    # the bound 'persistentVolumeClaim.claimName' for the 'customVolume' object.
-    # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#static
-    #
-    customVolume: { }
-    # persistentVolumeClaim:
-    #   claimName: "<pvc>"
-
-    # -- Specifies the path in the Synchrony container to which the synchrony-home volume will be
-    # mounted.
-    #
-    mountPath: "/var/atlassian/application-data/confluence"
-
-  # -- Defines additional volumes that should be applied to all Confluence pods.
-  # Note that this will not create any corresponding volume mounts;
-  # those needs to be defined in confluence.additionalVolumeMounts
-  #
-  additional:
-    - name: server-xml-j2
-      configMap:
-        name: server-xml-j2
-        defaultMode: 0744
-    - name: server-xml
-      configMap:
-        name: server-xml
-        defaultMode: 0744
-    - name: footer-content-vm
-      configMap:
-        name: footer-content-vm
-        defaultMode: 0744
-
-  # -- Defines additional volumes that should be applied to all Synchrony pods.
-  # Note that this will not create any corresponding volume mounts;
-  # those needs to be defined in synchrony.additionalVolumeMounts
-  #
-  additionalSynchrony: []
-
-
-# Confluence configuration
+# ----------------------------------------------------------------------------------------------------------------------
+# OPA Gatekeeper
 #
-confluence:
+gatekeeper:
+  # -- Toggle deployment of OPA Gatekeeper.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    path: "./chart"
+    tag: "3.9.0-bb.2"
 
-  # K8s Confluence Service configuration
-  #
-  service:
-  
-    # -- The port on which the Confluence K8s Service will listen
-    #
-    port: 80
-    
-    # -- The type of K8s service to use for Confluence
-    #
-    type: ClusterIP
+  # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
 
-    # -- Use specific loadBalancerIP. Only applies to service type LoadBalancer.
-    #
-    loadBalancerIP:
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+  values: {}
 
-    # -- The Tomcat context path that Confluence will use. The ATL_TOMCAT_CONTEXTPATH
-    # will be set automatically.
-    #
-    contextPath:
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
 
-    # -- Additional annotations to apply to the Service
-    #
-    annotations: {}
+# ----------------------------------------------------------------------------------------------------------------------
+# Kyverno
+#
+kyverno:
+  # -- Toggle deployment of Kyverno.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+    path: "./chart"
+    tag: "2.5.3-bb.0"
 
-  # Standard K8s field that holds pod-level security attributes and common container settings.
-  # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  # Do not populate when deploying to OpenShift, unless anyuid policy is attached to a service account.
-  #
+  # -- Flux reconciliation overrides specifically for the Kyverno Package
+  flux: {}
 
-  # -- Whether to apply security context to pod.
-  #
-  securityContextEnabled: true
+  # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+  values: {}
 
-  securityContext:
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
-    # -- The GID used by the Confluence docker image
-    # GID will default to 2002 if not supplied and securityContextEnabled is set to true.
-    # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Confluence container.
-    # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
-    fsGroup: 2002
 
-  # -- Standard K8s field that holds security configurations that will be applied to a container.
-  # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  #
-  containerSecurityContext: {}
+kyvernopolicies:
+  # -- Toggle deployment of Kyverno policies
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+    path: ./chart
+    tag: "1.0.1-bb.4"
 
-  # -- The umask used by the Confluence process when it creates new files.
-  # The default is 0022. This gives the new files:
-    #  - read/write permissions for the Confluence user
-    #  - read permissions for everyone else.
-  #
-  umask: "0022"
-  
-  # -- Boolean to define whether to set local home directory permissions on startup
-  # of Confluence container. Set to 'false' to disable this behaviour.
-  #
-  setPermissions: true
-  
-  # Port definitions
-  #
-  ports:
-  
-    # -- The port on which the Confluence container listens for HTTP traffic
-    #
-    http: 8090
-    
-    # -- The port on which the Confluence container listens for Hazelcast traffic
-    #
-    hazelcast: 5701
-    # -- The port used for Confluence Inernal Connecitons between multiple Confluence nodes
-    intconnector: 8888
-    # --  The port used for Confluence internal services
-    intersvc: 8081
-    # -- The port on which Synchrony is used for collaborative editing
-    # It is easier to manage Synchrony on the container itself rather than deploying a separate stateful set and services
-    synchrony: 8091
+  # -- Flux reconciliation overrides specifically for the Kyverno Package
+  flux: {}
+
+  # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Logging
+#
+logging:
+  # -- Toggle deployment of Logging (EFK).
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    path: "./chart"
+    tag: "0.10.0-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
+  flux:
+    timeout: 20m
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
+    # Enabling this option will auto-create any required secrets.
+    enabled: false
+
+    # -- Elasticsearch/Kibana OIDC client ID
+    client_id: ""
+
+    # -- Elasticsearch/Kibana OIDC client secret
+    client_secret: ""
 
   license:
-    
-    # -- The name of the K8s Secret that contains the Confluence license key. If specified, then
-    # the license will be automatically populated during Confluence setup. Otherwise, it will
-    # need to be provided via the browser after initial startup. An Example of creating
-    # a K8s secret for the license below:
-    # 'kubectl create secret generic <secret-name> --from-literal=license-key=<license>
-    # https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets
-    #
-    secretName:
-    
-    # -- The key in the K8s Secret that contains the Confluence license key
-    #
-    secretKey: license-key
-    
-  # Confirm that Confluence is up and running with a ReadinessProbe
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes
-  #
-  readinessProbe:
-  
-    # -- The initial delay (in seconds) for the Confluence container readiness probe,
-    # after which the probe will start running.
-    #
-    initialDelaySeconds: 10
-    
-    # -- How often (in seconds) the Confluence container readiness probe will run
-    #
-    periodSeconds: 5
-    
-    # -- The number of consecutive failures of the Confluence container readiness probe
-    # before the pod fails readiness checks.
-    #
-    failureThreshold: 6
+    # -- Toggle trial license installation of elasticsearch.  Note that enterprise (non trial) is required for SSO to work.
+    trial: false
 
-  # Confluence log configuration
-  #
-  accessLog:
-  
-    # -- Set to 'true' if access logging should be enabled.
-    #
-    enabled: true
-    
-    # -- The path within the Confluence container where the local-home volume should be
-    # mounted in order to capture access logs.
-    #
-    mountPath: "/opt/atlassian/confluence/logs"
-    
-    # -- The subdirectory within the local-home volume where access logs should be
-    # stored.
-    #
-    localHomeSubPath: "logs"
+    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana#enterprise-license
+    keyJSON: ""
 
-  # Confirm that Confluence is up and running with a Liveness
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-a-liveness-command
-  #
-  livenessProbe:
-    enabled: false
-    # -- The initial delay (in seconds) for the Confluence container liveness probe,
-    initialDelaySeconds: 300
-    # -- How often (in seconds) the Confluence container liveness probe will run
-    periodSeconds: 5
-    # -- The number of consecutive failures of the Confluence container liveness probe
-    failureThreshold: 12
+  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+  values: {}
 
-  clustering:
-  
-    # -- Set to 'true' if Data Center clustering should be enabled
-    # This will automatically configure cluster peer discovery between cluster nodes.
-    #
-    enabled: false
-    
-    # -- Set to 'true' if the K8s pod name should be used as the end-user-visible
-    # name of the Data Center cluster node.
-    #
-    usePodNameAsClusterNodeName: true
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
-  # Confluence Pod resource requests
-  #
-  resources:
-  
-    # JVM Memory / Heap Size definitions. The values below are based on the
-    # defaults defined for the Confluence docker container.
-    # https://bitbucket.org/atlassian-docker/docker-atlassian-confluence-server/src/master/#markdown-header-memory-heap-size
-    #
-    jvm:
-    
-      # -- The maximum amount of heap memory that will be used by the Confluence JVM
-      #
-      maxHeap: "1g"
-      
-      # -- The minimum amount of heap memory that will be used by the Confluence JVM
-      #
-      minHeap: "1g"
-      
-      # -- The memory reserved for the Confluence JVM code cache
-      #
-      reservedCodeCache: "256m"
-      
-    # Specifies the standard K8s resource requests and/or limits for the Confluence
-    # container. It is important that if the memory resources are specified here,
-    # they must allow for the size of the Confluence JVM. That means the maximum heap
-    # size, the reserved code cache size, plus other JVM overheads, must be
-    # accommodated. Allowing for (maxHeap+codeCache)*1.5 would be an example.
-    #
-    container: 
-    
-      requests:
-        # -- Initial CPU request by Confluence pod.
-        #
-        cpu: "2"
-        
-        # -- Initial Memory request by Confluence pod
-        #
-        memory: "2G"
-      #  limits:
-      #    cpu: "2"
-      #    memory: "2G"
+eckoperator:
+  # -- Toggle deployment of ECK Operator.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+    path: "./chart"
+    tag: "2.3.0-bb.0"
 
-  shutdown:
+  # -- Flux reconciliation overrides specifically for the ECK Operator Package
+  flux: {}
 
-    # -- The termination grace period for pods during shutdown. This
-    # should be set to the Confluence internal grace period (default 20
-    # seconds), plus a small buffer to allow the JVM to fully terminate.
-    #
-    terminationGracePeriodSeconds: 25
+  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+  values: {}
 
-    # -- By default pods will be stopped via a [preStop hook](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/),
-    # using a script supplied by the Docker image. If any other
-    # shutdown behaviour is needed it can be achieved by overriding
-    # this value. Note that the shutdown command needs to wait for the
-    # application shutdown completely before exiting; see [the default
-    # command](https://bitbucket.org/atlassian-docker/docker-atlassian-confluence-server/src/master/shutdown-wait.sh)
-    # for details.
-    #
-    command: "/shutdown-wait.sh"
+fluentbit:
+  # -- Toggle deployment of Fluent-Bit.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+    path: "./chart"
+    tag: "0.20.6-bb.1"
 
-  # -- Specifies a list of additional arguments that can be passed to the Confluence JVM, e.g.
-  # system properties.
-  #
-  additionalJvmArgs: []
-  
-  # -- Specifies a list of additional Java libraries that should be added to the
-  # Confluence container. Each item in the list should specify the name of the volume
-  # that contains the library, as well as the name of the library file within that
-  # volume's root directory. Optionally, a subDirectory field can be included to
-  # specify which directory in the volume contains the library file. Additional details:
-  # https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/
-  #
-  additionalLibraries: []
-  #   - volumeName:
-  #     subDirectory:
-  #     fileName:
+  # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
+  flux: {}
 
-  # -- Specifies a list of additional Confluence plugins that should be added to the
-  # Confluence container. Note plugins installed via this method will appear as
-  # bundled plugins rather than user plugins. These should be specified in the same
-  # manner as the 'additionalLibraries' property. Additional details:
-  # https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/
-  #
-  # NOTE: only .jar files can be loaded using this approach. OBR's can be extracted
-  # (unzipped) to access the associated .jar
-  #
-  # An alternative to this method is to install the plugins via "Manage Apps" in the
-  # product system administration UI.
-  #
-  additionalBundledPlugins: []
-  #   - volumeName:
-  #     subDirectory:
-  #     fileName:
+  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  values: {}
 
-  # -- Defines any additional volumes mounts for the Confluence container.
-  # These can refer to existing volumes, or new volumes can be defined in volumes.additional.
-  additionalVolumeMounts:
-    - name: "server-xml-j2"
-      mountPath: /opt/atlassian/etc/server.xml.j2
-      subPath: server.xml.j2
-    - name: "server-xml"
-      mountPath: /opt/atlassian/confluence/conf/server.xml
-      subPath: server.xml
-    - mountPath: /opt/atlassian/confluence/confluence/decorators/includes/footer-content.vm
-      name: footer-content-vm
-      subPath: footer-content.vm
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
-  # -- Defines any additional environment variables to be passed to the Confluence
-  # container. See https://hub.docker.com/r/atlassian/confluence-server for
-  # supported variables.
-  #
-  additionalEnvironmentVariables: []
+# ----------------------------------------------------------------------------------------------------------------------
+# BETA support of promtail/loki logging stack
+#
+promtail:
+  # -- Toggle deployment of Promtail.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+    path: "./chart"
+    tag: "6.2.2-bb.2"
 
-  # -- Defines any additional ports for the Confluence container.
-  #
-  additionalPorts: []
-  #  - name: jmx
-  #    containerPort: 5555
-  #    protocol: TCP
+  # -- Flux reconciliation overrides specifically for the Promtail Package
+  flux: {}
 
-  # -- Defines additional volumeClaimTemplates that should be applied to the Confluence pod.
-  # Note that this will not create any corresponding volume mounts;
-  # those needs to be defined in confluence.additionalVolumeMounts
-  #
-  additionalVolumeClaimTemplates: []
-  #  - name: myadditionalvolumeclaim
-  #    storageClassName:
-  #    resources:
-  #      requests:
-  #        storage: 1Gi
+  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  values: {}
 
-  # -- Defines topology spread constraints for Confluence pods. See details:
-  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-  #
-  topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: kubernetes.io/hostname
-  #   whenUnsatisfiable: ScheduleAnyway
-  #   labelSelector:
-  #     matchLabels:
-  #       app.kubernetes.io/name: confluence
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
-  # Debugging
-  #
-  jvmDebug:
-  
-    # -- Set to 'true' for remote debugging. Confluence JVM will be started with debugging
-    # port 5005 open.
+loki:
+  # -- Toggle deployment of Loki.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+    path: "./chart"
+    tag: "1.8.10-bb.2"
+
+  # -- Flux reconciliation overrides specifically for the Loki Package
+  flux: {}
+
+  # -- Loki architecture.  Options are monolith and scalable
+  strategy: monolith
+
+  objectStorage:
+    # -- S3 compatible endpoint to use for connection information.
+    # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+    endpoint: ""
+
+    # -- S3 compatible region to use for connection information.
+    region: ""
+
+    # -- Access key for connecting to object storage endpoint.
+    accessKey: ""
+
+    # -- Secret key for connecting to object storage endpoint.
+    # Unencoded string data. This should be placed in the secret values and then encrypted
+    accessSecret: ""
+
+    # -- Bucket Names for the Loki buckets as YAML
+    # chunks: loki-logs
+    # ruler: loki-ruler
+    # admin: loki-admin
+    bucketNames: {}
+
+  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+tempo:
+  # -- Toggle deployment of Tempo.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+    path: "./chart"
+    tag: "0.16.1-bb.2"
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  # -- Flux reconciliation overrides specifically for the Tempo Package
+  flux: {}
+
+  sso:
+    # -- Toggle SSO for Tempo on and off
     enabled: false
 
-# Confluence Synchrony configuration
-# https://confluence.atlassian.com/doc/configuring-synchrony-858772125.html
-synchrony:
+    # -- OIDC Client ID to use for Tempo
+    client_id: ""
 
-  # -- Set to 'true' if Synchrony (i.e. collaborative editing) should be enabled.
-  # This will result in a separate StatefulSet and Service to be created for Synchrony.
-  # If disabled, then collaborative editing will be disabled in Confluence.
-  enabled: false
-  
-  # K8s Synchrony Service configuration
-  #
-  service:
-  
-    # -- The port on which the Synchrony K8s Service will listen
-    #
-    port: 80
-    
-    # -- The type of K8s service to use for Synchrony
-    #
-    type: ClusterIP
+    # -- OIDC Client Secret to use for Tempo
+    client_secret: ""
 
-    # -- Use specific loadBalancerIP. Only applies to service type LoadBalancer.
-    #
-    loadBalancerIP:
+  objectStorage:
+    # -- S3 compatible endpoint to use for connection information.
+    # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+    # Note: tempo does not require protocol prefix for URL.
+    endpoint: ""
 
-  # -- Boolean to define whether to set synchrony home directory permissions on startup
-  # of Synchrony container. Set to 'false' to disable this behaviour.
-  #
-  setPermissions: true
+    # -- S3 compatible region to use for connection information.
+    region: ""
 
-  # Port definitions
-  #
-  ports:
-  
-    # -- The port on which the Synchrony container listens for HTTP traffic
-    #
-    http: 8091
-    
-    # -- The port on which the Synchrony container listens for Hazelcast traffic
-    #
-    hazelcast: 5701
-    
-  # Confirm that Synchrony is up and running with a ReadinessProbe
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#define-readiness-probes
-  #
-  readinessProbe:
-  
-    # -- The initial delay (in seconds) for the Synchrony container readiness probe,
-    # after which the probe will start running.
-    #
-    initialDelaySeconds: 5
-    
-    # -- How often (in seconds) the Synchrony container readiness probe will run
-    #
-    periodSeconds: 1
-    
-    # -- The number of consecutive failures of the Synchrony container readiness probe
-    # before the pod fails readiness checks.
-    #
-    failureThreshold: 10
-  
-  # Synchrony Pod resource requests
-  #
-  resources:
-  
-    # JVM Memory / Heap Size definitions. The values below are based on the
-    # defaults defined for the Synchrony docker container.
-    #
-    jvm:
+    # -- Access key for connecting to object storage endpoint.
+    accessKey: ""
 
-      # -- The maximum amount of heap memory that will be used by the Synchrony JVM
-      #
-      minHeap: "1g"
-      
-      # -- The minimum amount of heap memory that will be used by the Synchrony JVM
-      #
-      maxHeap: "2g"
-      
-      # -- The memory allocated for the Synchrony stack
-      #
-      stackSize: "2048k"
-      
-    # Specifies the standard K8s resource requests and/or limits for the Synchrony
-    # container. It is important that if the memory resources are specified here,
-    # they must allow for the size of the Synchrony JVM. That means the maximum heap
-    # size, the reserved code cache size, plus other JVM overheads, must be
-    # accommodated. Allowing for (maxHeap+codeCache)*1.5 would be an example.
-    #
-    container:
-      requests:
-        # -- Initial CPU request by Synchrony pod
-        #
-        cpu: "2"
-        
-        # -- Initial Memory request Synchrony pod
-        #
-        memory: "2.5G"
+    # -- Secret key for connecting to object storage endpoint.
+    # Unencoded string data. This should be placed in the secret values and then encrypted
+    accessSecret: ""
 
-  # -- Specifies a list of additional arguments that can be passed to the Synchrony JVM, e.g.
-  # system properties.
-  #
-  additionalJvmArgs: {}
-    #- -Dsynchrony.example.system.property=46
+    # -- Bucket Names for Loki as a comma delimited list.
+    # examples: "tempo-traces"
+    bucket: ""
 
-  shutdown:
-    # -- The termination grace period for pods during shutdown. This
-    # should be set to the Synchrony internal grace period (default 20
-    # seconds), plus a small buffer to allow the JVM to fully terminate.
-    terminationGracePeriodSeconds: 25
-  
-  # -- Specifies a list of additional Java libraries that should be added to the
-  # Synchrony container. Each item in the list should specify the name of the volume
-  # that contains the library, as well as the name of the library file within that
-  # volume's root directory. Optionally, a subDirectory field can be included to
-  # specify which directory in the volume contains the library file. Additional details:
-  # https://atlassian.github.io/data-center-helm-charts/examples/external_libraries/EXTERNAL_LIBS/
-  #
-  additionalLibraries: []
-  #   - volumeName:
-  #     subDirectory:
-  #     fileName:
+    # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
+    # storage on port 80/9000 set this value to true.
+    insecure: false
 
-  # -- Defines any additional volumes mounts for the Synchrony container. These
-  # can refer to existing volumes, or new volumes can be defined via
-  # 'volumes.additionalSynchrony'.
-  #
-  additionalVolumeMounts: []
+  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+  values: {}
 
-  # -- Defines any additional ports for the Synchrony container.
-  #
-  additionalPorts: []
-  #  - name: jmx
-  #    containerPort: 5555
-  #    protocol: TCP
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
 
-  # -- Defines topology spread constraints for Synchrony pods. See details:
-  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-  #
-  topologySpreadConstraints: []
-  # - maxSkew: 1
-  #   topologyKey: kubernetes.io/hostname
-  #   whenUnsatisfiable: ScheduleAnyway
-  #   labelSelector:
-  #     matchLabels:
-  #       app.kubernetes.io/name: confluence-synchrony
+# ----------------------------------------------------------------------------------------------------------------------
 
-# Fluentd configuration
+# Monitoring
 #
-# Confluence log collection and aggregation can be enabled using Fluentd. This config
-# assumes an existing ELK stack has been stood up and is available.
-# https://www.fluentd.org/
-#
-fluentd:
-
-  # -- Set to 'true' if the Fluentd sidecar (DaemonSet) should be added to each pod
-  #
-  enabled: false
-  
-  # -- The Fluentd sidecar image
-  #
-  imageName: fluent/fluentd-kubernetes-daemonset:v1.11.5-debian-elasticsearch7-1.2
-
-  # -- The command used to start Fluentd. If not supplied the default command
-  # will be used: "fluentd -c /fluentd/etc/fluent.conf -v"
-  #
-  # Note: The custom command can be free-form, however pay particular attention to
-  # the process that should ultimately be left running in the container. This process
-  # should be invoked with 'exec' so that signals are appropriately propagated to it,
-  # for instance SIGTERM. An example of how such a command may look is:
-  # "<command 1> && <command 2> && exec <primary command>"
-  command:
-  
-  # -- Set to 'true' if a custom config (see 'configmap-fluentd.yaml' for default)
-  # should be used for Fluentd. If enabled this config must be supplied via the
-  # 'fluentdCustomConfig' property below.
-  #
-  customConfigFile: false
-  
-  # -- Custom fluent.conf file
-  #
-  fluentdCustomConfig: {}
-  # fluent.conf: |
-  #   <source>
-  #     @type tail
-  #     <parse>
-  #     @type multiline
-  #     format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-  #     </parse>
-  #     path /opt/atlassian/confluence/logs/access_log.*
-  #     pos_file /tmp/confluencelog.pos
-  #     tag confluence-access-logs
-  #   </source>
-
-  # -- The port on which the Fluentd sidecar will listen
-  #
-  httpPort: 9880
-  
-  # Elasticsearch config based on your ELK stack
-  #
-  elasticsearch:
-  
-    # -- Set to 'true' if Fluentd should send all log events to an Elasticsearch service.
-    #
-    enabled: true
-    
-    # -- The hostname of the Elasticsearch service that Fluentd should send logs to.
-    #
-    hostname: elasticsearch
-    
-    # -- The prefix of the Elasticsearch index name that will be used
-    #
-    indexNamePrefix: confluence
-    
-  # -- Specify custom volumes to be added to Fluentd container (e.g. more log sources)
-  #
-  extraVolumes: []
-  # - name: local-home
-  #   mountPath: /opt/atlassian/confluence/logs
-  #   subPath: log
-  #   readOnly: true
-  
-  
-# -- Custom annotations that will be applied to all Confluence pods
-#
-podAnnotations: {}
-#  name: <value>
-
-# -- Custom labels that will be applied to all Confluence pods
-#
-podLabels: {}
-#  name: <value>
-
-# -- Standard K8s node-selectors that will be applied to all Confluence pods
-#
-nodeSelector: {}
-#  name: <value>
-
-# -- Standard K8s tolerations that will be applied to all Confluence pods
-#
-tolerations: []
-# - effect: <name>
-#   operator: <operator>
-#   key: <key>
-
-# -- Standard K8s affinities that will be applied to all Confluence pods
-#
-affinity: {}
-#  name: <value>
-
-# -- Standard K8s schedulerName that will be applied to all Confluence pods.
-# Check Kubernetes documentation on how to configure multiple schedulers:
-# https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/#specify-schedulers-for-pods
-#
-schedulerName:
-
-# -- Additional container definitions that will be added to all Confluence pods
-#
-additionalContainers: []
-#  - name: <name>
-#    image: <image>:<tag>
-
-# -- Additional initContainer definitions that will be added to all Confluence pods
-additionalInitContainers: [] 
-
-
-# -- Additional labels that should be applied to all resources
-additionalLabels: {}
-
-# -- Additional existing ConfigMaps and Secrets not managed by Helm that should be
-# mounted into service container. Configuration details below (camelCase is important!):
-  # 'name'      - References existing ConfigMap or secret name.
-  # 'type'      - 'configMap' or 'secret'
-  # 'key'       - The file name.
-  # 'mountPath' - The destination directory in a container.
-# VolumeMount and Volumes are added with this name and index position, for example;
-# custom-config-0, keystore-2
-#
-additionalFiles: []
-#  - name: custom-config
-#    type: configMap
-#    key: log4j.properties
-#    mountPath:  /var/atlassian
-#  - name: custom-config
-#    type: configMap
-#    key: web.xml
-#    mountPath: /var/atlassian
-#  - name: keystore
-#    type: secret
-#    key: keystore.jks
-#    mountPath: /var/ssl
-
-# -- Additional host aliases for each pod, equivalent to adding them to the /etc/hosts file.
-# https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-additionalHosts: []
-#  - ip: "127.0.0.1"
-#    hostnames:
-#    - "foo.local"
-#    - "bar.local"
-
-# Big Bang Additions
-proxyName:
-## hostnamePrefix added to allow custom configuration of entire hostname
-hostnamePrefix: confluence
-## This is domain name as per chat from bigbang 
-hostname: bigbang.dev
-istio:
-  enabled: false
-  gateways: 
-  - istio-system/main
-
 monitoring:
-  # -- This will enable monitoring via Prometheus.  In order for this to work, the Prometheus monitoring plugin needs to be installed via the Confluence UI
-  # -- ref: https://marketplace.atlassian.com/apps/1222775/prometheus-exporter-for-confluence?hosting=server&tab=overview
-  enabled: false
+  # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+    path: "./chart"
+    tag: "40.0.0-bb.0"
 
-# Values for bigbang helm tests
-bbtests:
-  enabled: false
-  cypress:
-    artifacts: true
-    envs:
-      cypress_url: 'http://{{ include "common.names.fullname" . }}:{{ .Values.confluence.service.port }}/setup/setuplicense.action'
-    resources:
-      requests:
-        cpu: "1"
-        memory: "1Gi"
-      limits:
-        cpu: "1"
-        memory: "1Gi"
+  # -- Flux reconciliation overrides specifically for the Monitoring Package
+  flux:
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
 
-# -- Image used for the upstream provided helm tests
-helmTestImage: "registry1.dso.mil/ironbank/big-bang/base:2.0.0"
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
-hpa:
-  enabled: false
-  maxReplicas: 4
-  cpu: 70
-  memory: 80 
-  behavior:
+  sso:
+    # -- Toggle SSO for monitoring components on and off
     enabled: false
-    time: 300 
+    prometheus:
+      # -- Prometheus OIDC client ID
+      client_id: ""
+
+      # -- Prometheus OIDC client secret
+      client_secret: ""
+
+    alertmanager:
+      # -- Alertmanager OIDC client ID
+      client_id: ""
+
+      # -- Alertmanager OIDC client secret
+      client_secret: ""
+
+    grafana:
+      # -- Grafana OIDC client ID
+      client_id: ""
+
+      # -- Grafana OIDC client secret
+      client_secret: ""
+
+      # -- Grafana OIDC client scopes, comma separated, see https://grafana.com/docs/grafana/latest/auth/generic-oauth/
+      scopes: ""
+
+      allow_sign_up: "true"
+
+      role_attribute_path: "Viewer"
+      # -- Other options available, see package Documentation.
+
+  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Twistlock
+#
+twistlock:
+  # -- Toggle deployment of Twistlock.
+  enabled: true
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+    path: "./chart"
+    tag: "0.10.0-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Twistlock Package
+  flux: {}
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  sso:
+    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/initialization.md
+    enabled: false
+
+    # -- SAML client ID
+    client_id: ""
+
+    # -- SAML Povider Alias (optional)
+    provider_name: ""
+
+    # -- SAML Identity Provider. `shibboleth` is recommended by Twistlock support for Keycloak
+    provider_type: "shibboleth"
+
+    # -- Identity Provider url with path to realm
+    issuer_uri: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}"
+
+    # -- SAML Identity Provider SSO URL
+    idp_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml"
+
+    # -- Console URL of the Twistlock app (optional)
+    console_url: "https://twistlock.{{ .Values.domain }}"
+
+    # -- Groups attribute (optional)
+    groups: ""
+
+    # -- X.509 Certificate from Identity Provider (i.e. Keycloak). See https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/KEYCLOAK.md for format. Use the `|-` syntax for multiline string.
+    cert: ""
+
+  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+#
+# ----------------------------------------------------------------------------------------------------------------------
+#
+addons:
+  argocd:
+    # -- Toggle deployment of ArgoCD.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+      path: "./chart"
+      tag: "4.10.8-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the ArgoCD Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    redis:
+      # -- Hostname of a pre-existing Redis to use for ArgoCD.
+      # Entering connection info will enable external Redis and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing Redis to use for ArgoCD.
+      port: ""
+
+    sso:
+      # -- Toggle SSO for ArgoCD on and off
+      enabled: false
+
+      # -- ArgoCD OIDC client ID
+      client_id: ""
+
+      # -- ArgoCD OIDC client secret
+      client_secret: ""
+
+      # -- ArgoCD SSO login text
+      provider_name: ""
+
+      # -- ArgoCD SSO group roles, see docs for more details: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
+      groups: |
+        g, Impact Level 2 Authorized, role:admin
+
+    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  authservice:
+    # -- Toggle deployment of Authservice.
+    # if enabling authservice, a filter needs to be provided by either enabling
+    # sso for monitoring or istio, or manually adding a filter chain in the values here:
+    # values:
+    #   chain:
+    #     minimal:
+    #       callback_uri: "https://somecallback"
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+      path: "./chart"
+      tag: "0.5.2-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Authservice Package
+    flux: {}
+
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+    # -- Additional authservice chain configurations.
+    chains: {}
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Minio Operator and Instance
+  #
+  minioOperator:
+    # -- Toggle deployment of minio operator and instance.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      path: "./chart"
+      tag: "4.4.28-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Minio Operator Package
+    flux: {}
+
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  minio:
+    # -- Toggle deployment of minio.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      path: "./chart"
+      tag: "4.4.28-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Minio Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Default access key to use for minio.
+    accesskey: ""
+
+    # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
+    secretkey: ""
+
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  gitlab:
+    # -- Toggle deployment of Gitlab
+    enabled: false
+
+    hostnames:
+      # host name only without the domain
+      gitlab: gitlab
+      registry: registry
+
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      path: "./chart"
+      tag: "6.3.2-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Gitlab Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Gitlab on and off.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- Gitlab OIDC client ID
+      client_id: ""
+
+      # -- Gitlab OIDC client secret
+      client_secret: ""
+
+      # -- Gitlab SSO login button label
+      label: ""
+
+      # -- Gitlab SSO Scopes, default is ["Gitlab"]
+      scopes:
+      - Gitlab
+
+      # -- GitLab SSO Issuer URI,
+      # Only needed if your SSO is non-Keycloak
+      issuer_uri: ""
+
+      # -- GitLab SSO End Session URI,
+      # Only needed if your SSO is non-Keycloak
+      end_session_uri: ""
+
+      # -- Gitlab SSO UID field
+      uid_field: preferred_username
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Gitlab.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: "" # example: gitlab
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    objectStorage:
+      # -- Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used.
+      # Entering connection info will enable this option and will auto-create any required secrets
+      type: "" # supported types are "s3" or "minio"
+
+      # -- S3 compatible endpoint to use for connection information.
+      # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- S3 compatible region to use for connection information.
+      region: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      # -- If using accessKey and accessSecret, the iamProfile must be left as an empty string: ""
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket prefix to use for identifying buckets.
+      # Example: "prod" will produce "prod-gitlab-bucket"
+      bucketPrefix: ""
+
+      # -- NOTE: Current bug with AWS IAM Profiles and Object Storage where only artifacts are stored. Fixed in Gitlab 14.5
+      # -- Name of AWS IAM profile to use.
+      # -- If using an AWS IAM profile, the accessKey and accessSecret values must be left as empty strings eg: ""
+      iamProfile: ""
+
+    smtp:
+      # -- Passwords should be placed in an encrypted file. Example: environment-bb-secret.enc.yaml
+      # If a value is provided BigBang will create a k8s secret named gitlab-smtp-password in the gitlab namespace
+      password: ""
+
+    redis:
+      # -- Redis plain text password to connect to the redis server.  If empty (""), the gitlab charts will create the gitlab-redis-secret
+      # with a random password.
+      # -- This needs to be set to a non-empty value in order for the Grafana Redis Datasource and Dashboards to be installed.
+      password: ""
+
+    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  gitlabRunner:
+    # -- Toggle deployment of Gitlab Runner
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+      path: "./chart"
+      tag: "0.43.1-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
+    flux: {}
+
+    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  nexus:
+    # -- Toggle deployment of Nexus.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+      path: "./chart"
+      tag: "41.1.0-bb.0"
+
+    # -- Base64 encoded license file.
+    license_key: ""
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SAML SSO for NXRM.
+      # -- handles SAML SSO, a Client must be configured in Keycloak or IdP
+      # -- to complete setup.
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: false
+
+      # -- NXRM SAML SSO Integration data
+      idp_data:
+        # Nexus saml URL. example: "https://nexus.example.mil/service/rest/v1/security/saml/metadata"
+        entityId: ""
+
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: ""
+
+        # -- NXRM firstname attribute (optional)
+        firstName: ""
+
+        # -- NXRM lastname attribute (optional)
+        lastName: ""
+
+        # -- NXRM email attribute (optional)
+        email: ""
+
+        # -- NXRM groups attribute (optional)
+        groups: ""
+
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        idpMetadata: ''
+
+      # -- NXRM Role
+      role:
+        # the id must match the Keycloak group name (case sensitive)
+        - id: ""
+          name: ""
+          description: ""
+          privileges: []
+          roles: []
+
+    # -- Flux reconciliation overrides specifically for the Nexus Repository Manager Package
+    flux: {}
+
+    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  sonarqube:
+    # -- Toggle deployment of SonarQube.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      path: "./chart"
+      tag: "1.0.29-bb.2"
+
+    # -- Flux reconciliation overrides specifically for the Sonarqube Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SAML SSO for SonarQube.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- SonarQube SAML client ID
+      client_id: ""
+
+      # -- SonarQube SSO login button label
+      provider_name: ""
+
+      # -- SonarQube plaintext SAML sso certificate.
+      # example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
+      certificate: ""
+
+      # -- SonarQube login sso attribute.
+      login: login
+
+      # -- SonarQube name sso attribute.
+      name: name
+
+      # -- SonarQube email sso attribute.
+      email: email
+
+      # -- (optional) SonarQube group sso attribute.
+      group: group
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for SonarQube.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for SonarQube.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
+  #
+  haproxy:
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+      path: "./chart"
+      tag: "1.12.0-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the HAProxy Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  anchore:
+    # -- Toggle deployment of Anchore.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      path: "./chart"
+      tag: "1.19.4-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Anchore Package
+    flux:
+      upgrade:
+        disableWait: true
+
+    # -- Initial admin password used to authenticate to Anchore.
+    adminPassword: ""
+
+    # -- Anchore Enterprise functionality.
+    enterprise:
+      # -- Toggle the installation of Anchore Enterprise.  This must be accompanied by a valid license.
+      enabled: false
+
+      # -- License for Anchore Enterprise.
+      # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
+      licenseYaml: |
+        FULL LICENSE
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Anchore on and off.
+      # Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license).
+      enabled: false
+
+      # -- Anchore OIDC client ID
+      client_id: ""
+
+      # -- Anchore OIDC client role attribute
+      role_attribute: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Anchore.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Anchore.
+      port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+      # -- Database name to connect to on host (Note: database name CANNOT contain hyphens).
+      database: ""
+
+      # -- Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens).
+      # Only required for enterprise edition of anchore.
+      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#handling-dependencies
+      feeds_database: ""
+
+    redis:
+      # -- Hostname of a pre-existing Redis to use for Anchore Enterprise.
+      # Entering connection info will enable external redis and will auto-create any required secrets.
+      # Anchore only requires redis for enterprise deployments and will not provision an instance if using external
+      host: ""
+
+      # -- Port of a pre-existing Redis to use for Anchore Enterprise.
+      port: ""
+
+      # -- OPTIONAL: Username to connect to a pre-existing Redis (for password-only auth leave empty)
+      username: ""
+
+      # -- Password to connect to pre-existing Redis.
+      password: ""
+
+    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Mattermost Operator and Instance
+  #
+  mattermostoperator:
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      path: "./chart"
+      tag: "1.18.1-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
+    flux: {}
+
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  mattermost:
+    # -- Toggle deployment of Mattermost.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      path: "./chart"
+      tag: "7.2.0-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Mattermost Package
+    flux: {}
+
+    # -- Mattermost Enterprise functionality.
+    enterprise:
+      # -- Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install.
+      enabled: false
+
+      # -- License for Mattermost.
+      # This should be the entire contents of the license file from Mattermost (should be one line), example below
+      # license: "eyJpZCI6InIxM205bjR3eTdkYjludG95Z3RiOD---REST---IS---HIDDEN
+      license: ""
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Mattermost on and off.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- Mattermost OIDC client ID
+      client_id: ""
+
+      # -- Mattermost OIDC client secret
+      client_secret: ""
+
+      # -- Mattermost OIDC auth endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      auth_endpoint: ""
+
+      # -- Mattermost OIDC token endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      token_endpoint: ""
+
+      # -- Mattermost OIDC user API endpoint
+      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
+      user_api_endpoint: ""
+
+    database:
+      # -- Hostname of a pre-existing PostgreSQL database to use for Mattermost.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Port of a pre-existing PostgreSQL database to use for Mattermost.
+      port: ""
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+      # -- Database name to connect to on host.
+      database: ""
+
+      # -- SSL Mode to use when connecting to the database.
+      # Allowable values for this are viewable in the postgres documentation: https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS
+      ssl_mode: ""
+
+    objectStorage:
+      # -- S3 compatible endpoint to use for connection information.
+      # Entering connection info will enable this option and will auto-create any required secrets.
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket name to use for Mattermost - will be auto-created.
+      bucket: ""
+
+    # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
+    # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
+    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    elasticsearch:
+      # -- Toggle interaction with Elastic for optimized search indexing
+      enabled: false
+
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  velero:
+    # -- Toggle deployment of Velero.
+    enabled: false
+
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+      path: "./chart"
+      tag: "2.31.3-bb.1"
+
+    # -- Flux reconciliation overrides specifically for the Velero Package
+    flux: {}
+
+    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi
+    plugins: []
+    # - aws
+
+    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+  #
+  # ----------------------------------------------------------------------------------------------------------------------
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Keycloak
+  #
+  keycloak:
+    # -- Toggle deployment of Keycloak.
+    # if you enable Keycloak you should uncomment the istio passthrough configurations above
+    # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      path: "./chart"
+      tag: "18.2.1-bb.3"
+
+    database:
+      # -- Hostname of a pre-existing database to use for Keycloak.
+      # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
+      host: ""
+
+      # -- Pre-existing database type (e.g. postgres) to use for Keycloak.
+      type: postgres
+
+      # -- Port of a pre-existing database to use for Keycloak.
+      port: 5432
+
+      # -- Database name to connect to on host.
+      database: "" # example: keycloak
+
+      # -- Username to connect as to external database, the user must have all privileges on the database.
+      username: ""
+
+      # -- Database password for the username used to connect to the existing database.
+      password: ""
+
+    # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      # the istio gateway for keycloak must have tls.mode: PASSTHROUGH
+      gateway: "passthrough"
+      # -- Certificate/Key pair to use as the certificate for exposing Keycloak
+      # Setting the ingress cert here will automatically create the volume and volumemounts in the Keycloak Package chart
+      key: ""
+      cert: ""
+
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Vault
+  #
+  vault:
+    # -- Toggle deployment of Vault.
+    enabled: false
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      path: "./chart"
+      tag: "0.21.0-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Vault Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+      # -- Certificate/Key pair to use as the certificate for exposing Vault
+      # Setting the ingress cert here will automatically create the volume and volumemounts in the Vault package chart
+      key: ""
+      cert: ""
+
+    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Metrics Server
+  #
+  metricsServer:
+    # -- Toggle deployment of metrics server
+    # Acceptable options are enabled: true, enabled: false, enabled: auto
+    # true = enabled / false = disabled / auto = automatic (Installs only if metrics API endpoint is not present)
+    enabled: auto
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+      path: "./chart"
+      tag: "3.8.0-bb.4"
+
+    # -- Flux reconciliation overrides specifically for the metrics server Package
+    flux: {}
+
+    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []

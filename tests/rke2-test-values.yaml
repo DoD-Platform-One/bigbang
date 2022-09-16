@@ -1,0 +1,454 @@
+# Values overrides for RKE2 pipelines
+# These values inherit and override values from tests/test-values.yaml
+networkPolicies:
+  controlPlaneCidr: 10.0.0.0/8
+
+clusterAuditor:
+  values:
+    resources:
+      requests:
+        cpu: 300m
+        memory: 300Mi
+      limits: null
+    
+gatekeeper:
+  values:
+    replicas: 1
+    controllerManager:
+      resources:
+        limits: null
+        requests:
+          cpu: 175m
+          memory: 512Mi
+
+kyverno:
+  values:
+    replicaCount: 3
+    resources:
+      limits: null
+      requests:
+        cpu: 500m
+        memory: 384Mi
+
+logging:
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: null
+      data:
+        count: 2
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: null
+
+loki:
+  values:
+    loki-simple-scalable:
+      write:
+        resources:
+          limits: null
+      read:
+        resources:
+          limits: null
+
+tempo:
+  values:
+    tempo:
+      resources:
+        limits: null
+        requests:
+          cpu: 500m
+          memory: 1024Mi
+    persistence:
+      size: 5Gi
+    tempoQuery:
+      resources:
+        limits: null
+        requests:
+          cpu: 300m
+          memory: 256Mi
+    opentelemetryCollector:
+      resources:
+        limits: null
+        requests:
+          cpu: 300m
+          memory: 256Mi
+
+monitoring:
+  values:
+    prometheus:
+      prometheusSpec:
+        resources:
+          requests:
+            cpu: 300m
+            memory: 5Gi
+          limits: null
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits: null
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 200m
+          memory: 50Mi
+        limits: null
+    grafana:
+      downloadDashboards:
+        resources:
+          limits: null
+          requests:
+            cpu: 20m
+            memory: 20Mi
+
+twistlock:
+  values:
+    console:
+      persistence:
+        size: 256Mi
+
+# Addons are toggled based on labels in CI
+addons:
+  argocd:
+    values:
+      controller:
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits: null
+      dex:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits: null
+      redis-bb:
+        master:
+          persistence:
+            size: 512Mi
+        replica:
+          persistence:
+            size: 512Mi
+      redis:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits: null
+      server:
+        resources:
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits: null
+      repoServer:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+
+  authservice:
+    values:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits: null
+      redis:
+        master:
+          persistence:
+            size: 256Mi
+        replica:
+          persistence:
+            size: 256Mi
+
+  gitlab:
+    flux:
+      timeout: 30m
+    values:
+      gitlab-runner:
+        resources:
+          requests:
+            cpu: 20m
+          limits: null
+      gitlab:
+        gitaly:
+          persistence:
+            size: 256Mi
+          resources:
+            ## values raised to help pass CI after default values for gitaly are fixed then can revert to original request.
+            #requests:
+            #  cpu: 50m
+            #limits: null
+            requests:
+              cpu: 400m
+              memory: 600Mi
+            limits: null
+        shared-secrets:
+          resources:
+            requests:
+              cpu: 30m
+            limits: null
+        migrations:
+          resources:
+            requests:
+              cpu: 30m
+            limits: null
+        toolbox:
+          persistence:
+            size: 256Mi
+          resources:
+            requests:
+              cpu: 20m
+            limits: null
+      postgresql:
+        persistence:
+          size: 256Mi
+        metrics:
+          resources:
+            requests:
+              cpu: 50m
+            limits: null
+      minio:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 100m
+          limits: null
+      redis:
+        master:
+          persistence:
+            size: 256Mi
+        slave:
+          persistence:
+            size: 256Mi
+
+  gitlabRunner:
+    values:
+      resources:
+        requests:
+          memory: 128Mi
+          cpu: 100m
+        limits: null
+
+  anchore:
+    values:
+      ensureDbJobs:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+      sso:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+      postgresql:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits: null
+      anchoreAnalyzer:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreApi:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreCatalog:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchorePolicyEngine:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreSimpleQueue:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEngineUpgradeJob:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchore-feeds-db:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits: null
+      anchoreEnterpriseFeeds:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEnterpriseFeedsUpgradeJob:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEnterpriseRbac:
+        authResources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+        managerResources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEnterpriseReports:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEnterpriseNotifications:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEntperpiseUi:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+      anchoreEnterpriseEngineUpgradeJob:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits: null
+    
+  sonarqube:
+    values:
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits: null
+      persistence:
+        size: 5Gi
+      postgresql:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: null
+
+  minio:
+    values:
+      tenant:
+        pools:
+        - servers: 3
+          volumesPerServer: 4
+          size: 256Mi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits: null
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            runAsNonRoot: true
+
+
+  mattermost:
+    values:
+      postgresql:
+        persistence:
+          size: 256Mi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 256Mi
+        limits: null
+      minio:
+        tenants:
+          pools:
+          - servers: 1
+            volumesPerServer: 4
+            size: 256Mi
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits: null
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+            
+  nexus:
+    values:
+      persistence:
+        # Do NOT set this below 5Gi, nexus will fail to boot
+        storageSize: 5Gi
+      nexus:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 1500Mi
+          limits: null
+  
+  keycloak:
+    values:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits: null
+        

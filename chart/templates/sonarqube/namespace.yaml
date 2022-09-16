@@ -1,0 +1,11 @@
+{{- if .Values.addons.sonarqube.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sonarqube
+  labels:
+    app.kubernetes.io/name: sonarqube
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
+{{- end }}

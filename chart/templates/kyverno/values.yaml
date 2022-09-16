@@ -1,0 +1,26 @@
+{{- if or .Values.kyverno.enabled .Values.kyvernopolicies.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.kyverno "name" "kyverno" "defaults" (include "bigbang.defaults.kyverno" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kyverno" -}}
+replicaCount: 3
+
+image:
+  pullSecrets:
+  - name: private-registry
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+openshift: {{ .Values.openshift }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+  dashboards:
+    namespace: monitoring
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+{{- end -}}

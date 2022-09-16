@@ -1,0 +1,57 @@
+{{- if .Values.addons.minio.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.minio "name" "minio" "defaults" (include "bigbang.defaults.minio" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.minio" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  console:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+  api:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.minio.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  traffic.sidecar.istio.io/includeInboundPorts: "*"
+  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+
+secrets:
+  accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
+  secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
+
+tenant:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecret:
+    name: private-registry
+  metrics:
+    enabled: {{ .Values.monitoring.enabled }}
+  {{- if .Values.monitoring.enabled }}
+  env:
+    - name: MINIO_PROMETHEUS_AUTH_TYPE
+      value: "public"
+  {{- end }}
+{{- end -}}

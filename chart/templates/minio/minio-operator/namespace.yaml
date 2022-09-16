@@ -1,0 +1,11 @@
+{{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio-operator
+  labels:
+    istio-injection: enabled
+    app.kubernetes.io/name: minioOperator
+    app.kubernetes.io/component: "application-utilities"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}

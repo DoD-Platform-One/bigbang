@@ -1,0 +1,60 @@
+{{- $fluxSettingsMonitoring := merge .Values.monitoring.flux .Values.flux -}}
+{{- if .Values.monitoring.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: monitoring
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: monitoring
+  chart:
+    spec:
+      chart: {{ .Values.monitoring.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: monitoring
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
+
+  {{- if .Values.monitoring.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.monitoring.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-monitoring-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-monitoring-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-monitoring-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # TODO: DRY this up
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.addons.vault.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.addons.vault.enabled }}
+    - name: vault
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

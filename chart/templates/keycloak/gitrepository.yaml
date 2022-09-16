@@ -1,0 +1,18 @@
+{{- if and (not .Values.offline) .Values.addons.keycloak.enabled }}
+{{ $name := "keycloak" }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/component: "security-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.keycloak.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.keycloak.git | nindent 4 }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

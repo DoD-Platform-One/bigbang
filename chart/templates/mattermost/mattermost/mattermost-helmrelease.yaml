@@ -1,0 +1,56 @@
+{{- $fluxSettingsMattermost := merge .Values.addons.mattermost.flux .Values.flux -}}
+{{- if .Values.addons.mattermost.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mattermost
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: mattermost
+    app.kubernetes.io/component: "collaboration-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  releaseName: mattermost
+  targetNamespace: mattermost
+  chart:
+    spec:
+      chart: {{ .Values.addons.mattermost.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: mattermost
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsMattermost | nindent 2 }}
+
+  {{- if .Values.addons.mattermost.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.mattermost.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-mattermost-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-mattermost-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-mattermost-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: mattermost-operator
+      namespace: {{ .Release.Namespace }}
+
+    {{- with .Values.addons.mattermost.objectStorage }}
+    {{- if not (and .endpoint .accessKey .accessSecret .bucket) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- end }}
+
+    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.logging.enabled }}
+    - name: ek
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+{{- end }}

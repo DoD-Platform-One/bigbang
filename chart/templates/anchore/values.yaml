@@ -1,0 +1,131 @@
+{{- if .Values.addons.anchore.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.anchore "name" "anchore" "defaults" (include "bigbang.defaults.anchore" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.anchore" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
+  ui:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
+  api:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.anchore.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+{{- if and .Values.addons.anchore.enterprise.enabled .Values.addons.anchore.enterprise.licenseYaml }}
+enterpriseLicenseYaml: |
+  {{ .Values.addons.anchore.enterprise.licenseYaml | nindent 2 }}
+{{- end }}
+
+  {{- if .Values.addons.anchore.enterprise.enabled }}
+sso:
+  enabled: {{ .Values.addons.anchore.sso.enabled }}
+  spEntityId: {{ .Values.addons.anchore.sso.client_id }}
+  {{- $anchoreUrl := first (dig "istio" "ui" "hosts" list .Values.addons.anchore.values) }}
+  acsUrl: https://{{ tpl ($anchoreUrl | default (printf "%s.%s" "anchore" $domainName)) . }}/service/sso/auth/keycloak
+  idpMetadataUrl: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml/descriptor"
+  roleAttribute: {{ .Values.addons.anchore.sso.role_attribute }}
+  {{- end }}
+
+anchoreEnterpriseGlobal:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  enabled: {{ .Values.addons.anchore.enterprise.enabled }}
+  imagePullSecretName: private-registry
+
+postgresql:
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end}}
+  imagePullSecrets: private-registry
+  {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.database }}
+  enabled: false
+  postgresUser: {{ .Values.addons.anchore.database.username }}
+  postgresPassword: {{ .Values.addons.anchore.database.password }}
+  postgresDatabase: {{ .Values.addons.anchore.database.database }}
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  {{- end }}
+
+anchoreGlobal:
+  {{- if .Values.istio.enabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  openShiftDeployment: {{ .Values.openshift }}
+  {{- if .Values.addons.anchore.adminPassword }}
+  defaultAdminPassword: {{ .Values.addons.anchore.adminPassword }}
+  {{- end }}
+  imagePullSecretName: private-registry
+
+{{- if .Values.addons.anchore.enterprise.enabled }}
+anchore-feeds-db:
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  imagePullSecrets: private-registry
+  {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.feeds_database }}
+  enabled: false
+  postgresUser: {{ .Values.addons.anchore.database.username }}
+  postgresPassword: {{ .Values.addons.anchore.database.password }}
+  postgresDatabase: {{ .Values.addons.anchore.database.feeds_database }}
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  {{- end }}
+
+anchoreEnterpriseUi:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecretName: private-registry
+
+ui-redis:
+  {{- if and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password }}
+  enabled: false
+  externalEndpoint: "redis://{{ .Values.addons.anchore.redis.username | default "nouser" }}:{{ .Values.addons.anchore.redis.password }}@{{ .Values.addons.anchore.redis.host }}:{{ .Values.addons.anchore.redis.port }}"
+  auth:
+    password: {{ .Values.addons.anchore.redis.password }}
+  {{- end }}
+  {{- if .Values.istio.enabled }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  replica:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
+  image:
+    pullSecrets:
+      - private-registry
+  {{- if and .Values.monitoring.enabled (not (and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password)) }}
+  metrics:
+    enabled: true
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: anchore
+      selector:
+        app.kubernetes.io/name: anchore-ui-redis
+        app.kubernetes.io/instance: anchore
+    prometheusRule:
+      enabled: true
+      namespace: monitoring
+  {{- end }}
+{{- end }}
+
+{{- end }}

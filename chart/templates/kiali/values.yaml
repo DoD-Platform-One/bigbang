@@ -1,0 +1,109 @@
+{{- if .Values.kiali.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.kiali "name" "kiali" "defaults" (include "bigbang.defaults.kiali" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kiali" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift}}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  kiali:
+    gateways:
+    - istio-system/{{ default "public" .Values.kiali.ingress.gateway }}
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+elasticsearch:
+  enabled: {{ .Values.logging.enabled }}
+cr:
+  spec:
+    deployment:
+      image_pull_policy: {{ .Values.imagePullPolicy }}
+      {{- if .Values.istio.enabled }}
+      pod_annotations:
+        {{ include "istioAnnotation" . }}
+      {{- end }}
+    server:
+      web_port: "443"
+    auth:
+      {{- if .Values.kiali.sso.enabled }}
+      strategy: openid
+      openid:
+        client_id: "{{ .Values.kiali.sso.client_id }}"
+        disable_rbac: true
+        issuer_uri: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}"
+        scopes:
+        - openid
+        - email
+        username_claim: email
+      {{- else }}
+      strategy: token
+      {{- end }}
+    external_services:
+      grafana:
+        enabled: {{ dig "grafana" "enabled" true .Values.monitoring.values }}
+        {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.monitoring.values) }}
+        url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
+        {{- if (dig "grafana" "enabled" true .Values.monitoring.values) }}
+        auth:
+          {{- if (dig "grafana" "admin" "existingSecret" "" .Values.monitoring.values) }}
+          {{- $userKey := (dig "grafana" "admin" "userKey" "admin-user" .Values.monitoring.values) }}
+          {{- with lookup "v1" "Secret" "monitoring" .Values.monitoring.values.grafana.admin.existingSecret }}
+          username: {{ (get .data $userKey | b64dec) | default "admin" }}
+          {{- end }}
+          {{- else }}
+          username: {{ dig "grafana" "adminUser" "admin" .Values.monitoring.values }}
+          {{- end }}
+          password: "secret:grafana-auth:password"
+        {{- end }}
+      tracing:
+        enabled: {{ or .Values.tempo.enabled .Values.jaeger.enabled }}
+        {{- if and .Values.tempo.enabled (not .Values.jaeger.enabled)}}
+        in_cluster_url: "http://tempo-tempo.tempo.svc.cluster.local:16686"
+        {{- $tracingUrl := first (dig "istio" "tempoQuery" "hosts" list .Values.tempo.values) }}
+        url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
+        {{- else}}
+        {{- $tracingUrl := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
+        url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
+        {{- end }}
+      istio:
+        component_status:
+          components:
+            - app_label: istiod
+              is_core: true
+              is_proxy: false
+            {{- range $name, $values := .Values.istio.ingressGateways }}
+            - app_label: {{ $name }}
+              is_core: true
+              is_proxy: true
+            {{- end }}
+            {{- range $name, $values := .Values.istio.values.ingressGateways }}
+            - app_label: {{ $name }}
+              is_core: true
+              is_proxy: true
+            {{- end }}
+    api:
+      namespaces:
+        # bigbang watches all!
+        exclude: []
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.kiali.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+{{- end -}}

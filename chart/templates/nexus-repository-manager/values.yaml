@@ -1,0 +1,88 @@
+{{- if .Values.addons.nexus.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.nexus "name" "nexus-repository-manager" "defaults" (include "bigbang.defaults.nexus-repository-manager" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.nexus-repository-manager" -}}
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+hostname: nexus
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  nexus:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.nexus.ingress.gateway }}
+
+openshift: {{ .Values.openshift }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+job_image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+  
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.nexus.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+nexus:
+  imagePullSecrets:
+    - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  {{- if .Values.addons.nexus.license_key }}
+  properties:
+    override: true
+    data: 
+      nexus.licenseFile: /nexus-data/sonatype-license.lic
+  {{- end }}
+
+license_key: "{{ .Values.addons.nexus.license_key }}"
+
+{{- if .Values.addons.nexus.sso.enabled }}
+sso:
+  enabled: {{ .Values.addons.nexus.sso.enabled }}
+  idp_data:
+    {{- if .Values.addons.nexus.sso.idp_data.entityId }}
+    entityId: {{ .Values.addons.nexus.sso.idp_data.entityId }}
+    {{- else }}
+    entityId: "https://nexus.{{ $domainName }}/service/rest/v1/security/saml/metadata"
+    {{- end }}
+    usernameAttribute: "{{ default "username" .Values.addons.nexus.sso.idp_data.username }}"
+    firstNameAttribute: "{{ default "firstName" .Values.addons.nexus.sso.idp_data.firstName }}"
+    lastNameAttribute: "{{ default "lastName" .Values.addons.nexus.sso.idp_data.lastName }}"
+    emailAttribute: "{{ default "email" .Values.addons.nexus.sso.idp_data.email }}"
+    groupsAttribute: "{{ default "groups" .Values.addons.nexus.sso.idp_data.groups }}"
+    validateResponseSignature: "true"
+    validateAssertionSignature: "true"
+    idpMetadata: '{{ .Values.addons.nexus.sso.idp_data.idpMetadata }}'
+  realm:
+    - "NexusAuthenticatingRealm"
+    - "NexusAuthorizingRealm"
+    - "SamlRealm"
+  role:
+    {{- range .Values.addons.nexus.sso.role }}
+    - id: {{ .id | quote }}
+      name: {{ .name | quote }}
+      description: {{ .description | quote }}
+      privileges: 
+        {{- range .privileges }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+      roles: 
+        {{- range .roles }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+    {{- end }}
+
+{{- end }}
+{{- end -}}

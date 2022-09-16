@@ -1,0 +1,11 @@
+{{- if or .Values.kyverno.enabled .Values.kyvernopolicies.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: kyverno
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
+  name: kyverno
+{{- end }}

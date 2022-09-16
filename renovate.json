@@ -1,26 +1,38 @@
 {
-    "baseBranches": ["main"],
+    "baseBranches": ["master"],
     "configWarningReuseIssue": false,
     "dependencyDashboard": true,
-    "dependencyDashboardHeader": "- [ ] Sync upstream helm chart version with updated dependencies.",
-    "dependencyDashboardTitle": "Renovate: Upgrade Confluence Package Dependencies",
+    "dependencyDashboardHeader": "- [ ] If there are Flux updates: Update your Flux CLI to the latest version possible based on available IB images, then from the root of the bigbang repository, run `flux install --components source-controller,kustomize-controller,helm-controller,notification-controller --export > base/flux/gotk-components.yaml` to generate the latest manifests",
+    "dependencyDashboardTitle": "Renovate: Update Dependencies",
     "draftPR": true,
-    "ignorePaths": ["chart/charts/**"],
-    "labels": ["confluence","Package Sustainment","kind::maintenance"],
+    "enabledManagers": ["helm-values","regex"],
+    "labels": ["renovate","kind::maintenance"],
     "packageRules": [
         {
             "matchDatasources": ["docker"],
             "groupName": "Ironbank",
             "registryUrls": ["https://registry1.dso.mil"]
+        },
+        {
+            "matchPackagePatterns": ["flux"],
+            "additionalBranchPrefix": "flux-",
+            "addLabels": ["flux"],
+            "groupName": "Flux"
         }
     ],
     "regexManagers": [
         {
-            "fileMatch": ["^chart/values\\.yaml$"],
+            "fileMatch": ["^base/flux/kustomization\\.yaml"],
             "matchStrings": [
-                "image:\\s+repository:\\s+[^/]+/(?<depName>.+)\\s+tag:\\s+(?<currentValue>.+)"
+                "newName\\S*:\\s*(?<depName>\\S+).*\n\\s+newTag:\\s*(?<currentValue>.+)"
+              ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^tests/images\\.txt$"],
+            "matchStrings": [
+              "s*(?<depName>.+):(?<currentValue>.+)"
             ],
-            "depNameTemplate": "registry1.dso.mil/ironbank/atlassian/confluence-data-center/confluence-node",
             "datasourceTemplate": "docker"
         }
     ],

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: benchmark
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dbench
+  namespace: benchmark  
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dbench
+  namespace: benchmark    
+spec:
+  template:
+    spec:
+      containers:
+      - name: dbench
+        image: sotoaster/dbench:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: DBENCH_MOUNTPOINT
+            value: /data
+          - name: FIO_SIZE
+            value: 25G
+        volumeMounts:
+        - name: dbench-pv
+          mountPath: /data
+      restartPolicy: Never
+      volumes:
+      - name: dbench-pv
+        persistentVolumeClaim:
+          claimName: dbench
+  backoffLimit: 4

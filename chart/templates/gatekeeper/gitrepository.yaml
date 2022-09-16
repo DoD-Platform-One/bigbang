@@ -1,0 +1,18 @@
+{{- if and (not .Values.offline) (or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: gatekeeper
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gatekeeper
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.gatekeeper.git.repo }}
+  ref:
+    {{- include "validRef" .Values.gatekeeper.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

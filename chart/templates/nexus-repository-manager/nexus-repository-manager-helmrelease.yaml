@@ -1,0 +1,52 @@
+{{- $fluxSettingsNexus := merge .Values.addons.nexus.flux .Values.flux -}}
+{{- if .Values.addons.nexus.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nexus-repository-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: "nexus-repository-manager"
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: nexus-repository-manager
+  releaseName: nexus-repository-manager
+  chart:
+    spec:
+      chart: {{ .Values.addons.nexus.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: nexus-repository-manager
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsNexus | nindent 2 }}
+
+  {{- if .Values.addons.nexus.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.nexus.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-nexus-repository-manager-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-nexus-repository-manager-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-nexus-repository-manager-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{ if or .Values.istio.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

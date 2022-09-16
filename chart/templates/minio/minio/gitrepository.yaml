@@ -1,0 +1,14 @@
+{{- if and (not .Values.offline) .Values.addons.minio.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: minio
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.minio.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.minio.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

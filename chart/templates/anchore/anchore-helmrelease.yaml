@@ -1,0 +1,49 @@
+{{- $fluxSettingsAnchore := merge .Values.addons.anchore.flux .Values.flux -}}
+{{- if .Values.addons.anchore.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: anchore
+  namespace: {{ .Release.Namespace }}
+spec:
+  releaseName: anchore
+  targetNamespace: anchore
+  chart:
+    spec:
+      chart: {{ .Values.addons.anchore.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: anchore
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsAnchore | nindent 2 }}
+
+  {{- if .Values.addons.anchore.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.anchore.postRenderers | nindent 4 }}
+  {{- end }}
+
+  valuesFrom:
+    - name: {{ .Release.Name }}-anchore-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-anchore-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-anchore-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or .Values.istio.enabled .Values.monitoring.enabled }}
+  dependsOn:
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

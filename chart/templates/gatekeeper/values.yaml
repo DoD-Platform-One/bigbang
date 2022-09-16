@@ -1,0 +1,199 @@
+{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.gatekeeper" .))) "name" "gatekeeper" "defaults" (include "bigbang.defaults.gatekeeper" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.gatekeeper" -}}
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+  pullSecrets:
+  - name: private-registry
+postInstall:
+  labelNamespace:
+    enabled: false
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
+  probeWebhook:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
+postUpgrade:
+  cleanupCRD:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
+preUninstall:
+  deleteWebhookConfigurations:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      pullSecrets:
+      - name: private-registry
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+violations:  # Try to keep this in alpha order to make it easier to find keys
+
+  allowedDockerRegistries:
+    parameters:
+      repos:
+        - registry1.dso.mil
+        - registry.dso.mil
+
+  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic)}}
+  allowedHostFilesystem:
+    parameters:
+      excludedResources:
+      {{- if .Values.monitoring.enabled }}
+      # Prometheus-node-exporter needs access to host to get node metrics
+      - monitoring/monitoring-monitoring-prometheus-node-exporter-.*
+      {{- end }}
+      {{- if .Values.fluentbit.enabled }}
+      # Fluentbit pods need access to host to get log files
+      - logging/logging-fluent-bit-.*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      - twistlock/twistlock-defender-ds-.*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires hostpath volume mounts
+      # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
+      - logging/logging-promtail-.*
+      {{- end }}
+      {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
+      # Restic requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
+      - velero/restic-.*
+      {{- end }}
+  {{- end }}
+
+  {{- if .Values.twistlock.enabled }}
+  hostNetworking:
+    parameters:
+      excludedResources:
+        # Twistlock, by default, does its own network monitoring. hostNetworking is enabled by default for this purpose
+        # With hostNetworking enabled, Istio sidecar injection is disabled. If this function is disabled, Twistlock wil
+        # not be able to self monitor. If both Istio sidecar injection and TL monitoring are disabled, a security gap will
+        # be created for network monitoring in Twistlock, so it is  important to make sure at least one is enabled.
+        - twistlock/twistlock-defender-ds-.*
+  noHostNamespace:
+    parameters:
+      excludedResources:
+        - twistlock/twistlock-defender-ds-.*
+  {{- end }}
+
+  imageDigest:
+    enabled: false
+
+  namespacesHaveIstio:
+    enabled: {{ .Values.istio.enabled }}
+
+  {{- if .Values.fluentbit.enabled }}
+  noPrivilegedContainers:
+    parameters:
+      excludedResources:
+        # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
+        - logging/fluent-bit
+  {{- end }}
+
+  podsHaveIstio:
+    enabled: {{ .Values.istio.enabled }}
+    match:
+      excludedNamespaces:
+        # Istio does not inject sidecars in itself
+        - istio-operator
+        - istio-system
+
+  {{- if or .Values.monitoring.enabled .Values.twistlock.enabled }}
+  restrictedTaint:
+    parameters:
+      excludedResources:
+      {{- if .Values.monitoring.enabled }}
+      # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
+      - monitoring/monitoring-monitoring-prometheus-node-exporter-.*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      - twistlock/twistlock-defender-ds-.*
+      {{- end }}
+  {{- end }}
+
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled }}
+  selinuxPolicy:
+    parameters:
+      excludedResources:
+      {{- if .Values.fluentbit.enabled }}
+      # FluentBit needs selinux option type spc_t
+      - logging/fluent-bit
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders need selinux option type spc_t
+      - twistlock/twistlock-defender
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # Promtail needs selinux option type spc_t
+      - logging/promtail
+      {{- end }}
+  {{- end }}
+
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic) }}
+  volumeTypes:
+    parameters:
+      excludedResources:
+       {{- if .Values.fluentbit.enabled }}
+        # fluent-bit container requires certain host level access to ship logs and for keep track of state
+        # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-kubernetes-filter
+        - logging/logging-fluent-bit-.*
+       {{- end }}
+       {{- if .Values.twistlock.enabled }}
+        # Twistlock requires /dev/log for its syslog daemon.
+        # https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin-compute/audit/logging.html#
+        - twistlock/twistlock-defender-ds-.*
+       {{- end }}
+       {{- if .Values.monitoring.enabled }}
+        # Prometheus node exported requires hostpath hardcoded in upstream chart on which monitoring pkg has a direct dependency
+        # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/templates/daemonset.yaml#L150
+        - monitoring/monitoring-monitoring-prometheus-node-exporter-.*
+       {{- end }}
+       {{- if .Values.promtail.enabled }}
+        # Promtail requires hostpath volume types
+        # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
+        - logging/logging-promtail-.*
+       {{- end }}
+       {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
+        # Restic requires hostpath volume mounts in order to facilitate backing up cluster PV/C resources
+        - velero/restic-.*
+       {{- end }}
+  {{- end }}
+
+openshift: {{ .Values.openshift }}
+{{- end -}}
+
+
+{{- /* This function merges defaults in lists from above into overlays */ -}}
+{{- /* The end user will not have to replicate exclusions/repos from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any constraint to ignore the defaults */ -}}
+{{- define "bigbang.overlays.gatekeeper" }}
+  {{- $defaults := fromYaml (include "bigbang.defaults.gatekeeper" .) }}
+  {{- $overlays := dig "values" dict .Values.gatekeeper }}
+  {{- range $constraint, $default := $defaults.violations }}
+    {{- $overlay := (dig "violations" $constraint dict $overlays) }}
+    # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
+    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+      # Add any default excludedNamespaces to overlay
+      {{- if and (dig "match" "excludedNamespaces" list $default) (dig "match" "excludedNamespaces" list $overlay) }}
+         {{ $_ := set $overlay.match "excludedNamespaces" (concat $default.match.excludedNamespaces $overlay.match.excludedNamespaces) }}
+      {{- end }}
+      # Add any default excludedResources to overlay
+      {{- if and (dig "parameters" "excludedResources" list $default) (dig "parameters" "excludedResources" list $overlay) }}
+         {{ $_ := set $overlay.parameters "excludedResources" (concat $default.parameters.excludedResources $overlay.parameters.excludedResources) }}
+      {{- end }}
+      # Special case to add registries for allowed registries to overlay
+      {{- if and (dig "parameters" "repos" list $default) (dig "parameters" "repos" list $overlay) }}
+         {{ $_ := set $overlay.parameters "repos" (concat $default.parameters.repos $overlay.parameters.repos) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{ toYaml $overlays }}
+{{- end }}

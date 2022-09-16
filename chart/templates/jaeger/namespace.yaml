@@ -1,0 +1,11 @@
+{{- if .Values.jaeger.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jaeger
+  labels:
+    istio-injection: enabled
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}

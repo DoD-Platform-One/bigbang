@@ -1,0 +1,56 @@
+{{- $fluxSettingsPromtail := merge .Values.promtail.flux .Values.flux -}}
+{{- if .Values.promtail.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: logging
+  chart:
+    spec:
+      chart: {{ .Values.promtail.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: promtail
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsPromtail | nindent 2 }}
+
+  {{- if .Values.promtail.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.promtail.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "overlays"
+
+{{/* promtail _always_ depend on .Values.loki being enabled, so can assume they exist here */}}
+  dependsOn:
+    - name: loki
+      namespace: {{ .Release.Namespace }}
+    {{- if  .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,18 @@
+{{- if .Values.addons.mattermost.enabled  }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: mattermost
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: mattermost
+    app.kubernetes.io/component: "collaboration-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.mattermost.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.mattermost.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

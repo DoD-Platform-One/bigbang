@@ -1,8 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: 'oci_test'
-    file: '/pipelines/bigbang-package.yaml' 
+    ref: bb_merge_resilience
+    file: '/pipelines/bigbang.yaml'
 variables:
-  PIPELINE_REPO_BRANCH: 'oci_test' 
+  PIPELINE_REPO_BRANCH: 'bb_merge_resilience' 
   DEBUG_ENABLED: "true"
-  REGISTRY_OCI: registry.dso.mil/platform-one/big-bang/pipeline-templates/package-validation

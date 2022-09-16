@@ -1,0 +1,85 @@
+{{- if .Values.addons.sonarqube.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.sonarqube "name" "sonarqube" "defaults" (include "bigbang.defaults.sonarqube" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.sonarqube" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+
+# Define variables to help with conditionals later
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") .Values.istio.enabled) }}
+
+OpenShift:
+  enabled: {{ .Values.openshift }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  sonarqube:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.sonarqube.ingress.gateway }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.sonarqube.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+  pullSecret: private-registry
+
+{{- if $istioInjection }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+{{- if .Values.addons.sonarqube.sso.enabled }}
+sonarProperties:
+  sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
+  sonar.core.serverBaseURL: https://sonarqube.{{ $domainName }}
+  sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
+  sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.provider_name | default .Values.addons.sonarqube.sso.label }}
+  sonar.auth.saml.providerId: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
+  sonar.auth.saml.loginUrl: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml
+  sonar.auth.saml.certificate.secured: {{ .Values.addons.sonarqube.sso.certificate }}
+  sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}
+  sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}
+  sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}
+  {{- if .Values.addons.sonarqube.sso.group }}
+  sonar.auth.saml.group.name: {{ .Values.addons.sonarqube.sso.group }}
+  {{- end }}
+{{- end }}
+
+# External Postgres config
+{{- with .Values.addons.sonarqube.database }}
+postgresql:
+  {{- if and .host .username .password .database .port }}
+  # Use external database
+  enabled: false
+  postgresqlServer: {{ .host }}
+  postgresqlDatabase: {{ .database }}
+  postgresqlUsername: {{ .username }}
+  existingSecret: sonarqube-db-secret
+  service:
+    port: {{ .port }}
+  {{- else }}
+  {{- if $istioInjection }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" $ }}
+  slave:
+    podAnnotations:
+      {{ include "istioAnnotation" $ }}
+  {{- end }}
+  # Use internal database, defaults are fine
+  enabled: true
+  {{- end }}
+{{- end }}
+
+{{- end -}}

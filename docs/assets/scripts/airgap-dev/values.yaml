@@ -1,0 +1,125 @@
+# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
+hostname: bigbang.dev
+registryCredentials:
+  registry: host.k3d.internal
+  username: ""
+  password: ""
+  email: ""
+git:
+  # -- Existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+  existingSecret: "ssh-credentials"
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+
+eckoperator:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/eck-operator
+
+fluentbit:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/fluentbit
+logging:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/elasticsearch-kibana
+
+istio:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/istio-controlplane
+
+istiooperator:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/istio-operator
+
+clusterAuditor:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/cluster-auditor
+  values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 0.5Gi
+
+monitoring:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/monitoring
+
+gatekeeper:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/policy
+
+twistlock:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/twistlock
+
+# Explicitly enable all addons for CI
+addons:
+  argocd:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/argocd
+  authservice:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/authservice
+    chains:
+      minimal:
+        callback_uri: "https://minimal.bigbang.dev"
+  gitlab:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/gitlab
+    sso:
+      enabled: false
+  gitlabRunner:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/gitlab-runner
+  anchore:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/anchore-enterprise
+  sonarqube:
+    enabled: true
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/sonarqube
+  minioOperator:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/minio-operator
+  minio:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/minio
+  haproxy:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/haproxy
+  mattermostoperator:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/mattermost-operator
+  mattermost:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/mattermost
+  keycloak:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/keycloak
+  nexus:
+    enabled: false
+    git:
+      repo: ssh://git@host.k3d.internal/home/git/repos/nexus

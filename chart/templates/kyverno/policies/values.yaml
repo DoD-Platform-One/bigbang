@@ -1,0 +1,657 @@
+{{- $pkg := "kyvernopolicies" }}
+
+{{- if .Values.kyvernopolicies.enabled }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyvernopolicies" .))) "name" "kyvernopolicies" "defaults" (include "bigbang.defaults.kyvernopolicies" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kyvernopolicies" -}}
+
+{{- $deployRestic := (and .Values.addons.velero.enabled (dig "deployRestic" false .Values.addons.velero.values)) }}
+
+waitforready:
+  imagePullSecrets:
+  - name: private-registry
+
+policies:
+
+  {{- if .Values.twistlock.enabled }}
+  disallow-host-namespaces:
+    exclude:
+      any:
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock, by default, does its own network monitoring. hostNetworking is enabled by default for this purpose
+      # With hostNetworking enabled, Istio sidecar injection is disabled. If this function is disabled, Twistlock will
+      # not be able to self monitor. If both Istio sidecar injection and TL monitoring are disabled, a security gap will
+      # be created for network monitoring in Twistlock.  So, it is important to make sure at least one is enabled.
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+        {{- end }}
+  {{- end }}
+
+  {{- $nodePortIngressGateways := list }}
+  {{- range $name, $values := .Values.istio.ingressGateways }}
+  {{- if eq $values.type "NodePort" }}
+  {{- $nodePortIngressGateways = append $nodePortIngressGateways $name }}
+  {{- end }}
+  {{- end }}
+
+  {{- range $name, $values := .Values.istio.values.ingressGateways }}
+  {{- if eq (dig "k8s" "service" "type" "LoadBalancer" $values) "NodePort" }}
+  {{- $nodePortIngressGateways = append $nodePortIngressGateways $name }}
+  {{- end }}
+  {{- end }}
+
+  {{- if $nodePortIngressGateways }}
+  # Istio services (istio ingress) can create type: NodePort services
+  disallow-nodeport-services:
+    exclude:
+      any:
+      - resources:
+          kinds:
+          - Service
+          names:
+          {{- range $name := $nodePortIngressGateways }}
+          - {{ $name }}
+          {{- end }}
+          namespaces:
+          - "istio-system"
+  {{- end }}
+
+  disallow-image-tags:
+    validationFailureAction: enforce
+
+  disallow-istio-injection-bypass:
+    enabled: {{ .Values.istio.enabled }}
+    exclude:
+      any:
+      # Istio does not inject itself
+      - resources:
+          namespaces:
+          - istio-system
+
+  disallow-namespaces:
+    validationFailureAction: enforce
+    parameters:
+      disallow:
+      - bigbang
+      - default
+
+  {{- if .Values.fluentbit.enabled }}
+  disallow-privileged-containers:
+    exclude:
+      any:
+      {{- if .Values.fluentbit.enabled }}
+      # NEEDS FURTHER JUSTIFICATION
+      # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-fluent-bit*
+      {{- end }}
+  {{- end }}
+
+  {{- if .Values.addons.gitlab.enabled }}
+  disallow-shared-subpath-volume-writes:
+    # Subpath volumes can be used in combination with symlinks to break out into the host filesystem
+    exclude:
+      any:
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          # Volume `toolbox-secrets` is an emptyDir mounted read/write in initContainer `configure`
+          # It is also mounted in the container `toolbox` using a subPath, making it open to the
+          # vulnerability.  The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume.  The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-toolbox*
+          # Volume `sidekiq-secrets` is an emptyDir mounted read/write in initContainer `configure`
+          # It is also mounted in the containers `sidekiq` and `dependencies` using a subPath,
+          # making it open to the vulnerability.  The initContainer uses a shell script, stored in
+          # a configmap, to copies values from a readOnly projected volume holding secrets/configmap
+          # items, into the shared volume.  The shared volume is mounted with subpaths pointing to
+          # specific files in the container.
+          - gitlab-sidekiq*
+          # Volume `webservice-secrets` is an emptyDir mounted read/write in initContainer `configure`
+          # It is also mounted in the containers `webservice` and `dependencies` using a subPath,
+          # making it open to the vulnerability.  The initContainer uses a shell script, stored in
+          # a configmap, to copies values from a readOnly projected volume holding secrets/configmap
+          # items, into the shared volume.  The shared volume is mounted with subpaths pointing to
+          # specific files in the container.
+          - gitlab-webservice-default*
+          # Volume `migrations-secrets` is an emptyDir mounted read/write in initContainer `configure`
+          # It is also mounted in the container `migrations` using a subPath, making it open to the
+          # vulnerability.  The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume.  The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-migrations*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `registry` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-registry*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitlab-exporter` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitlab-exporter*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitlab-shell` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitlab-shell*
+          # Volume `etc-ssl-certs` is an emptyDir mounted read/write in initContainer `certificates`
+          # It is also mounted in the container `gitaly` using a subPath, making it open to the
+          # vulnerability. The initContainer uses a shell script, stored in a configmap, to copies
+          # values from a readOnly projected volume holding secrets/configmap items, into the shared
+          # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
+          - gitlab-gitaly*
+      {{- end }}
+  {{- end }}
+
+  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
+  disallow-tolerations:
+    exclude:
+      any:
+      {{- if .Values.fluentbit.enabled }}
+      # Fluent bit needs to be able to run on all nodes to gather logs from the host for containers
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-fluent-bit*
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
+      - resources:
+          namespaces:
+          - monitoring
+          names:
+          - monitoring-monitoring-prometheus-node-exporter*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # In order to provide real-time scanning of all nodes, Twistlock must ignore taints
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+  {{- end }}
+
+  require-drop-all-capabilities:
+    validationFailureAction: audit
+    {{- if .Values.addons.gitlab.enabled }}
+    exclude:
+      any:
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
+    {{- end }}
+
+  require-istio-on-namespaces:
+    enabled: {{ .Values.istio.enabled }}
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          # Kuberentes control plane does not use Istio
+          - kube-node-lease
+          - kube-public
+          - kube-system
+          # No pods in bigbang / default
+          - bigbang
+          - default
+          # Flux is installed prior to Istio
+          - flux-system
+          # Istio does not inject itself
+          - istio-operator
+          - istio-system
+
+  require-non-root-group:
+    validationFailureAction: audit
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
+    exclude:
+      any:
+      {{- if $deployRestic }}
+      # Velero.  The restic backup tool requires root group access to see the host's runtime pod directory which is
+      # mounted inside velero/restic pods.
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - restic*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
+      # - read logs from `/var/log` to watch for malicious processes
+      # - audit modifications to `/etc/passwd` (watching for suspicious changes)
+      # - access the container runtime socket (observing all running containers on a node)
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+      {{- if .Values.fluentbit.enabled }}
+      # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      # promtail requires access to /run/promtail for its buffering and persistent state.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-promtail*
+      {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
+      {{- end }}
+    {{- end }}
+
+  require-non-root-user:
+    validationFailureAction: audit
+    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
+    exclude:
+      any:
+      {{- if $deployRestic }}
+      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/restic pods.
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - restic*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
+      # - read logs from `/var/log` to watch for malicious processes
+      # - audit modifications to `/etc/passwd` (watching for suspicious changes)
+      # - access the container runtime socket (observing all running containers on a node)
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+      {{- if .Values.fluentbit.enabled }}
+      # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # and then granting permissions recursively on /var/log.
+      # promtail requires access to /run/promtail for its buffering and persistent state.
+      - resources:
+          namespaces:
+          - logging
+          names:
+          - logging-promtail*
+      {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - gitlab-redis-*
+      {{- end }}
+    {{- end }}
+
+  {{- if .Values.twistlock.enabled }}
+  restrict-apparmor:
+    exclude:
+      any:
+      # NEEDS FURTHER JUSTIFICATION
+      # Twistlock Defenders use an `unconfined` appArmor profile.
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+  {{- end }}
+
+  restrict-capabilities:
+    validationFailureAction: audit
+    # NEEDS FURTHER JUSTIFICATION
+    # Twistlock Defenders require the following capabilities
+    # - NET_ADMIN  - Process monitoring and Iptables
+    # - NET_RAW    - Iptables (CNNF, runtime DNS, WAAS)  See https://bugzilla.redhat.com/show_bug.cgi?id=1895032
+    # - SYS_ADMIN  - filesystem monitoring
+    # - SYS_PTRACE - local audit monitoring
+    # - SYS_CHROOT - changing mount namespace using setns
+    # - MKNOD      - Create special files using mknod, used by docker-less registry scanning
+    # - SETFCAP    - Set file capabilties, used by docker-less registry scanning
+    # - IPC_LOCK
+    # {{- if .Values.twistlock.enabled }}
+    # exclude:
+    #   any:
+    #   - resources:
+    #       namespaces:
+    #       - twistlock
+    #       names:
+    #       - twistlock-defender-ds*
+    # {{- end }}
+    parameters:
+      allow:
+      # Defaults from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
+      - NET_BIND_SERVICE
+      {{- if .Values.istio.enabled }}
+      # Istio requires NET_ADMIN and NET_RAW for sidecar init: https://istio.io/latest/docs/ops/deployment/requirements/#pod-requirements
+      # It uses these permissions to setup iptables for network routing
+      # Cannot create exclusion since sidecar is injected in most containers, so allow the capabilities globally
+      - NET_ADMIN
+      - NET_RAW
+      {{- end }}
+
+  restrict-host-path-mount:
+    validationFailureAction: enforce
+    {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled $deployRestic }}
+    exclude:
+      any:
+      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - logging
+          names:
+          {{- if .Values.fluentbit.enabled }}
+          # Fluent Bit mounts the following hostPaths:
+          # - `/var/log`: to tail node logs (e.g. journal) and pod logs
+          # - `/var/lib/docker/containers`: to tail container logs
+          # - `/etc/machine-id`: to obtain the node's unique machine ID for identifying systemd log folder
+          # - `/var/log/flb-storage`: for Fluent Bit's buffering and persistent state
+          # Since logs can have sensitive information, it is better to exclude
+          # FluentBit from the policy than add the paths as allowable mounts
+          - logging-fluent-bit*
+          {{- end }}
+          {{- if .Values.promtail.enabled }}
+          # Promtail mounts the following hostPaths:
+          # - `/var/log/pods`: to tail pod logs
+          # - `/var/lib/docker/containers`: to tail container logs
+          # - `/run/promtail`: for Promtail's buffering and persistent state
+          # Since logs can have sensitive information, it is better to exclude
+          # Promtail from the policy than add the paths as allowable mounts
+          - logging-promtail*
+          {{- end }}
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      # Prometheus Node Exporter mounts the following hostPaths:
+      # - `/`: monitor disk usage on filesystem mounts using e2fs call
+      # - `/proc` and `/sys`: gather node metrics
+      # Since mounting the root would expose sensitive information, it is better to
+      # exlcude Prometheus Node Exporter than add the paths as allowable mounts
+      - resources:
+          namespaces:
+          - monitoring
+          names:
+          - monitoring-monitoring-prometheus-node-exporter*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # NEEDS FURTHER JUSTIFICATION
+      # Twistlock mounts the following hostPaths:
+      # - `/dev/log`: writing twistlock logs to syslog socket on node (if enabled)
+      # - `/var/lib/twistlock`: data folder reserved for twistlock
+      # - `/etc/passwd`: audits changes to passwd file
+      # - `/var/run`: communication to docker daemon
+      # - `/var/lib/containers`: Container images data from CRI
+      # - `/var/run/docker/netns`: Docker's Network Namespace
+      # - `/var/log/audit`: Audit logs
+      # Because the mounts are dynamically created for defenders at runtime, we cannot
+      # anticipate all of the paths it may mount and must exclude it from the policy
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+      {{- if $deployRestic }}
+      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/restic pods.  Since the host's pod runtime directory may expose sensitive information, 
+      # it is better to exclude the restic pods than to add the path as allowable mounts
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - restic*
+      {{- end }}
+    {{- end }}
+
+  # NOTE: This restricts the ability to have PVCs when using a local path provisioner storage class (i.e. k3d default).
+  # To override either disable this policy (not ideal) or add an allowed wildcard matching where local paths are provisioned.
+  # See `docs/assets/configs/example/policy-overrides-k3d.yaml` for an example of how to do this for k3d.
+  restrict-host-path-mount-pv:
+    validationFailureAction: enforce
+
+  restrict-host-path-write:
+    validationFailureAction: enforce
+    {{- if .Values.twistlock.enabled }}
+    exclude:
+      any:
+      # NEEDS FURTHER JUSTIFICATION
+      # Twistlock mounts the following hostPaths as writable:
+      # - `/dev/log`: writing twistlock logs to syslog socket on node (if enabled)
+      # - `/var/lib/twistlock`: data folder reserved for twistlock
+      # - `/run` or `/var/run`: communication to docker daemon and IP tables
+      # - `/var/lib/containers`: Container images data from CRI
+      # - `/var/log/audit`: Audit logs
+      # Because the mounts are dynamically created for defenders at runtime, we cannot
+      # anticipate all of the paths it may mount and must exclude it from the policy
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+    {{- end }}
+    {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+    parameters:
+      allow:
+      {{- if .Values.fluentbit.enabled }}
+      # FluentBit - `/var/log/flb-storage`: fluent bit buffering and persistent state
+      - /var/log/flb-storage/
+      # FluentBit - `/var/log`
+      # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/issues/31
+      # Temporarily added so policy could be enforced
+      - /var/log
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # Promtail - `/run/promtail`: promtail buffering and persistent state
+      - /run/promtail
+      {{- end }}
+    {{- end }}
+
+  restrict-image-registries:
+    validationFailureAction: enforce
+    parameters:
+      allow:
+      - registry1.dso.mil
+      - registry.dso.mil
+
+  {{- if or .Values.fluentbit.enabled .Values.promtail.enabled .Values.twistlock.enabled }}
+  restrict-selinux-type:
+    exclude:
+      any:
+      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - logging
+          names:
+          {{- if .Values.fluentbit.enabled }}
+          # NEEDS FURTHER JUSTIFICATION
+          # FluentBit needs selinux option type spc_t
+          - logging-fluent-bit*
+          {{- end }}
+          {{- if .Values.promtail.enabled }}
+          # NEEDS FURTHER JUSTIFICATION
+          # Promtail needs selinux option type spc_t
+          - logging-promtail*
+          {{- end }}
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # NEEDS FURTHER JUSTIFICATION
+      # Twistlock Defenders need selinux option type spc_t
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+  {{- end }}
+  
+  {{- if $deployRestic }}
+  restrict-user-id:
+    exclude:
+      any:
+      {{- if $deployRestic }}
+      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/restic pods.
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - restic*
+      {{- end }}
+  {{- end }}
+
+  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled $deployRestic }}
+  restrict-volume-types:
+    exclude:
+      any:
+      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - logging
+          names:
+          {{- if .Values.fluentbit.enabled }}
+          # Fluent bit containers requires HostPath volumes, to tail node and container logs.  It is also used for buffering
+          # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-+-kubernetes-filter
+          - logging-fluent-bit*
+          {{- end }}
+          {{- if .Values.promtail.enabled }}
+          # NEEDS FURTHER JUSTIFICATION
+          # Promtail requires HostPath volume types
+          # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
+          - logging-promtail*
+          {{- end }}
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      # Prometheus node exporter requires a HostPath volume to monitor host metrics in /proc and /sys
+      - resources:
+          namespaces:
+          - monitoring
+          names:
+          - monitoring-monitoring-prometheus-node-exporter*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock requires access to node logs, syslog, and docker daemon for defense monitoring
+      # https://docs.paloaltonetworks.com/prisma/prisma-cloud/prisma-cloud-admin-compute/audit/logging.html
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+      {{- end }}
+      {{- if $deployRestic }}
+      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/restic pods.
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - restic*
+      {{- end }}
+  {{- end }}
+
+{{- end }}
+
+{{- /* This function merges defaults in lists from above into overlays */ -}}
+{{- /* The end user will not have to replicate exclusions/repos from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any policy to ignore the defaults */ -}}
+{{- define "bigbang.overlays.kyvernopolicies" -}}
+  {{- $defaults := fromYaml (include "bigbang.defaults.kyvernopolicies" .) -}}
+  {{- $overlays := dig "values" dict .Values.kyvernopolicies -}}
+
+  {{- /* Global merge for exclude fields */ -}}
+  {{- if and (dig "exclude" "any" list $defaults) (dig "exclude" "any" list $overlays) -}}
+    {{ $_ := set $overlays.exclude "any" (concat $defaults.exclude.any $overlays.exclude.any) -}}
+  {{- end -}}
+  {{- if and (dig "exclude" "all" list $defaults) (dig "exclude" "all" list $overlays) -}}
+    {{ $_ := set $overlays.exclude "all" (concat $defaults.exclude.all $overlays.exclude.all) -}}
+  {{- end -}}
+
+  {{- /* Policy specific merges */ -}}
+  {{- range $policy, $default := $defaults.policies -}}
+    {{- $overlay := (dig "policies" $policy dict $overlays) -}}
+
+    {{- /* Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set */ -}}
+    {{- if and $overlay (not $overlay.skipOverlayMerge) -}}
+
+      {{- /* Add exclude fields */ -}}
+      {{- if and (dig "exclude" "any" list $default) (dig "exclude" "any" list $overlay) -}}
+        {{ $_ := set $overlay.exclude "any" (concat $default.exclude.any $overlay.exclude.any) -}}
+      {{- end -}}
+      {{- if and (dig "exclude" "all" list $default) (dig "exclude" "all" list $overlay) -}}
+        {{ $_ := set $overlay.exclude "all" (concat $default.exclude.all $overlay.exclude.all) -}}
+      {{- end -}}
+
+      {{- /* Add match fields */ -}}
+      {{- if and (dig "match" "any" list $default) (dig "match" "any" list $overlay) -}}
+        {{ $_ := set $overlay.match "any" (concat $default.match.any $overlay.match.any) -}}
+      {{- end -}}
+      {{- if and (dig "match" "all" list $default) (dig "match" "all" list $overlay) -}}
+        {{ $_ := set $overlay.match "all" (concat $default.match.all $overlay.match.all) -}}
+      {{- end -}}
+
+      {{- /* Add parameters.allow fields */ -}}
+      {{- if and (dig "parameters" "allow" list $default) (dig "parameters" "allow" list $overlay) -}}
+        {{ $_ := set $overlay.parameters "allow" (concat $default.parameters.allow $overlay.parameters.allow) -}}
+      {{- end -}}
+
+      {{- /* Add parameters.disallow fields */ -}}
+      {{- if and (dig "parameters" "disallow" list $default) (dig "parameters" "disallow" list $overlay) -}}
+        {{ $_ := set $overlay.parameters "disallow" (concat $default.parameters.disallow $overlay.parameters.disallow) -}}
+      {{- end -}}
+
+      {{- /* Add parameters.require fields */ -}}
+      {{- if and (dig "parameters" "require" list $default) (dig "parameters" "require" list $overlay) -}}
+        {{ $_ := set $overlay.parameters "require" (concat $default.parameters.require $overlay.parameters.require) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{ toYaml $overlays }}
+{{- end }}

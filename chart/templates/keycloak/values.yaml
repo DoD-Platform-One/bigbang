@@ -1,0 +1,105 @@
+{{- if .Values.addons.keycloak.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.keycloak "name" "keycloak" "defaults" (include "bigbang.defaults.keycloak" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.keycloak" -}}
+replicas: 2
+
+imagePullSecrets:
+- name: private-registry
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") .Values.istio.enabled) }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
+  keycloak:
+    enabled: true
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.keycloak.ingress.gateway }}
+
+{{- if $istioInjection }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "passthrough" .Values.addons.keycloak.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- if .Values.addons.keycloak.database.host }}
+postgresql:
+  enabled: false
+{{- else if $istioInjection }}
+postgresql:
+  primary:
+    {{ include "istioAnnotation" . }}
+  readReplicas:
+    {{ include "istioAnnotation" . }}
+{{- end }}
+
+{{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
+secrets:
+  {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+  tlscert:
+    stringData:
+      tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
+  tlskey:
+    stringData:
+      tls.key: {{ .Values.addons.keycloak.ingress.key  | quote }}
+  {{- end }}
+
+  {{- with .Values.addons.keycloak.database }}
+  {{- if .host }}
+  env:
+    stringData:
+      DB_USER: {{ .username | quote }}
+      DB_PASSWORD: {{ .password | quote }}
+      DB_VENDOR: {{ default "postgres" .type }}
+      DB_ADDR: {{ .host }}
+      DB_PORT: {{ .port | quote }}
+      DB_DATABASE: {{ .database }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+extraVolumesBigBang:
+  - name: tlscert
+    secret:
+      secretName: keycloak-tlscert
+  - name: tlskey
+    secret:
+      secretName: keycloak-tlskey
+
+extraVolumeMountsBigBang:
+  - name: tlscert
+    mountPath: /etc/x509/https/tls.crt
+    subPath: tls.crt
+    readOnly: true
+  - name: tlskey
+    mountPath: /etc/x509/https/tls.key
+    subPath: tls.key
+    readOnly: true
+{{- end }}
+
+{{- end }}

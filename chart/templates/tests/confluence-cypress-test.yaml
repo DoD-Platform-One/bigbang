@@ -1,3 +1,0 @@
-{{- include "gluon.tests.cypress-configmap.base" .}}
----
-{{- include "gluon.tests.cypress-runner.base" .}}

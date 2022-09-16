@@ -1,0 +1,11 @@
+{{- if .Values.istio.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    app.kubernetes.io/name: istio-controlplane
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: disabled
+{{- end }}

@@ -1,0 +1,29 @@
+{{- if .Values.clusterAuditor.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.clusterAuditor "name" "cluster-auditor" "defaults" (include "bigbang.defaults.clusterauditor" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.clusterauditor" -}}
+elasticsearch:
+  imagePullSecrets:
+    - name: private-registry
+
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+openshift: {{ .Values.openshift }}
+{{- end -}}

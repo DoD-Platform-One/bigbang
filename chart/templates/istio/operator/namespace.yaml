@@ -1,0 +1,12 @@
+{{- if .Values.istiooperator.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-operator
+  labels:
+    istio-operator-managed: Reconcile
+    istio-injection: disabled
+    app.kubernetes.io/name: istio-operator
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}

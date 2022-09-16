@@ -1,0 +1,53 @@
+{{- $fluxSettingsEk := merge .Values.logging.flux .Values.flux -}}
+{{- if .Values.logging.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ek
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: logging
+  chart:
+    spec:
+      chart: {{ .Values.logging.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: elasticsearch-kibana
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsEk | nindent 2 }}
+
+  {{- if .Values.logging.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.logging.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
+  dependsOn:
+    - name: eck-operator
+      namespace: {{ .Release.Namespace }}
+
+    {{- if  .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

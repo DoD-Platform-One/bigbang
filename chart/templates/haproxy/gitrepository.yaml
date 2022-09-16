@@ -1,0 +1,19 @@
+{{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
+{{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: haproxy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: haproxy
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.haproxy.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.haproxy.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

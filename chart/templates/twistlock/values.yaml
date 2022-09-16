@@ -1,0 +1,52 @@
+{{- if .Values.twistlock.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.twistlock "name" "twistlock" "defaults" (include "bigbang.defaults.twistlock" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.twistlock" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+domain: {{ default .Values.domain .Values.hostname }}
+
+openshift: {{ .Values.openshift }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+imagePullSecrets:
+- name: private-registry
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.twistlock.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  console:
+    gateways:
+    - istio-system/{{ default "public" .Values.twistlock.ingress.gateway }}
+
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+console:
+  image:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+sso:
+  enabled: {{ .Values.twistlock.sso.enabled }}
+  client_id: {{ .Values.twistlock.sso.client_id }}
+  provider_name: {{ .Values.twistlock.sso.provider_name }}
+  provider_type: {{ .Values.twistlock.sso.provider_type }}
+  issuer_uri: {{ tpl .Values.twistlock.sso.issuer_uri . }}
+  idp_url: {{ tpl .Values.twistlock.sso.idp_url . }}
+  console_url: {{ tpl .Values.twistlock.sso.console_url . }}
+  groups: {{ .Values.twistlock.sso.groups }}
+  cert: {{ .Values.twistlock.sso.cert | quote }}
+
+{{- end -}}

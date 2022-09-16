@@ -1,0 +1,109 @@
+{{- if .Values.addons.velero.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.velero "name" "velero" "defaults" (include "bigbang.defaults.velero" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.velero" -}}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- if .Values.monitoring.enabled }}
+metrics:
+  enabled: true
+  scrapeInterval: 30s
+  scrapeTimeout: 10s
+  service:
+    annotations: {}
+    labels: {}
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8085"
+    prometheus.io/path: "/metrics"
+  serviceMonitor:
+    enabled: true
+    additionalLabels: {}
+{{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+imagePullSecrets:
+- name: private-registry
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+{{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure, csi" }}{{- end }}
+initContainers:
+{{- range .Values.addons.velero.plugins }}
+{{- if eq . "aws" }}
+  - name: velero-plugin-for-aws
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-aws:v1.5.0
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 100m
+    securityContext:
+      capabilities:
+        drop: 
+          - ALL
+{{- end }}
+{{- if eq . "azure" }}
+  - name: velero-plugin-for-azure
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.5.0
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 100m
+    securityContext:
+      capabilities:
+        drop: 
+          - ALL
+{{- end }}
+{{- if eq . "csi" }}
+  - name: velero-plugin-for-csi
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-csi:v0.3.0
+    imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 100m
+    securityContext:
+      capabilities:
+        drop: 
+          - ALL
+configuration:
+  features: EnableCSI
+{{- end }}
+{{- end }}
+
+{{- end -}}

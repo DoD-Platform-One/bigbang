@@ -1,0 +1,11 @@
+{{- if .Values.addons.anchore.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: anchore
+    app.kubernetes.io/component: "security"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
+  name: anchore
+{{- end }}

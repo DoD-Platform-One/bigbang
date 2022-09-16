@@ -1,0 +1,17 @@
+{{- if .Values.istiooperator.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.istiooperator "name" "istio-operator" "defaults" (include "bigbang.defaults.istiooperator" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.istiooperator" -}}
+createNamespace: false
+
+enterprise: {{ .Values.istio.enterprise }}
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+imagePullSecrets:
+  - private-registry
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+{{- end -}}

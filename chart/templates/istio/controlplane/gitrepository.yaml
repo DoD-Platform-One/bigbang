@@ -1,0 +1,18 @@
+{{- if and (not .Values.offline) .Values.istio.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: istio-controlplane
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-controlplane
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.istio.git.repo }}
+  ref:
+    {{- include "validRef" .Values.istio.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

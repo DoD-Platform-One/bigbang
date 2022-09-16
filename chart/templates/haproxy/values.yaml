@@ -1,0 +1,103 @@
+{{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
+{{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.haproxy "name" "haproxy-sso" "defaults" (include "bigbang.defaults.haproxy-sso" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.haproxy-sso" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+{{- $haproxyAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+{{- $haproxyAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+podLabels:
+  {{ $haproxyAuthserviceKey }}: {{ $haproxyAuthserviceValue }}
+config: |
+  global
+    maxconn 1024
+    daemon
+    log stdout format raw local0 info
+  defaults
+    log global
+    mode http
+    option httplog
+    timeout client 60s
+    timeout connect 60s
+    timeout server 60s
+  frontend fe_main
+    # Create custom headers as temporary holding places for info
+    http-request set-header X-Scheme http if !{ ssl_fc }
+    http-request set-header X-Scheme https if { ssl_fc }
+    http-request set-header X-TraceId %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+    http-request set-header X-SegmentId0 %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+    http-request set-header X-SegmentId1 %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+    http-request set-header X-SegmentId2 %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+    http-request set-header X-SegmentId3 %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+    http-request set-header X-SegmentId4 %[rand,hex,bytes(8,8),lower]%[rand,hex,bytes(8,8),lower]
+
+    # Declare capture slots for logging headers
+    declare capture request len 512
+    http-request capture req.fhdr(User-Agent) id 0
+
+    declare capture request len 5
+    http-request capture req.hdr(X-Scheme) id 1
+
+    declare capture request len 512
+    http-request capture req.hdr(Host) id 2
+
+    declare capture request len 24
+    http-request capture req.hdr(X-TraceId) id 3
+
+    declare capture request len 16
+    http-request capture req.hdr(X-SegmentId0) id 4
+
+    declare capture request len 16
+    http-request capture req.hdr(X-SegmentId1) id 5
+
+    declare capture request len 16
+    http-request capture req.hdr(X-SegmentId2) id 6
+
+    declare capture request len 16
+    http-request capture req.hdr(X-SegmentId3) id 7
+
+    declare capture request len 16
+    http-request capture req.hdr(X-SegmentId4) id 8
+
+    declare capture response len 8
+    http-response capture res.hdr(Content-Length) id 0
+
+    # Generate a unique Trace ID
+    unique-id-format %{+X}o\ 1-%[date,hex,bytes(8,8),lower]-%[capture.req.hdr(3)]
+    http-request set-header X-Amzn-Trace-Id Root=%[unique-id,lower]
+    bind :8080
+    {{- $monitoringValues := .Values.monitoring.values | default dict }}
+    {{- $monitoringIstioValues := $monitoringValues.istio | default dict }}
+    {{- $prometheusHostValues := $monitoringIstioValues.prometheus | default dict}}
+    {{- $alertmanagerHostValues := $monitoringIstioValues.alertmanager | default dict}}
+    {{- if hasKey $alertmanagerHostValues "hosts" }}
+    acl host_alertmanager hdr(host) -i {{ range .Values.monitoring.values.istio.alertmanager.hosts }}{{ tpl . $}}{{ end }}
+    {{- else }}
+    acl host_alertmanager hdr(host) -i alertmanager.{{ $domainName }}
+    {{- end }}
+    {{- if hasKey $prometheusHostValues "hosts" }}
+    acl host_prometheus hdr(host) -i {{ range .Values.monitoring.values.istio.prometheus.hosts }}{{ tpl . $}}{{ end }}
+    {{- else }}
+    acl host_prometheus hdr(host) -i prometheus.{{ $domainName }}
+    {{- end }}
+
+    option forwardfor
+    use_backend alertmanager_main if host_alertmanager
+    use_backend prometheus_main if host_prometheus
+  backend alertmanager_main
+    mode http
+    option forwardfor
+    http-request replace-header Host .* monitoring-monitoring-kube-alertmanager.monitoring.svc.cluster.local
+    server alertmanager monitoring-monitoring-kube-alertmanager.monitoring.svc.cluster.local:9093
+  backend prometheus_main
+    mode http
+    option forwardfor
+    http-request replace-header Host .* monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local
+    server prometheus monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090
+image:
+  repository: registry1.dso.mil/ironbank/opensource/haproxy/haproxy22
+containerPorts:
+  http: 8080
+{{- end -}}

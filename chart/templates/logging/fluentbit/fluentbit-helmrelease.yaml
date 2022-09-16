@@ -1,0 +1,68 @@
+{{- $fluxSettingsFluentbit := merge .Values.fluentbit.flux .Values.flux -}}
+{{- if .Values.fluentbit.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: fluent-bit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: logging
+  chart:
+    spec:
+      chart: {{ .Values.fluentbit.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: fluentbit
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsFluentbit | nindent 2 }}
+
+  {{- if .Values.fluentbit.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.fluentbit.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{/* To support a "standalone" fluentbit for shipping to central location we conditionally depend on logging enabled */}}
+  {{- if or .Values.logging.enabled .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+    {{- if .Values.logging.enabled }}
+    - name: ek
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if  .Values.loki.enabled }}
+    - name: loki
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

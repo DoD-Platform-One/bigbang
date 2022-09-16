@@ -1,0 +1,18 @@
+{{- if .Values.addons.nexus.enabled  }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: nexus-repository-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: nexus-repository-manager
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.nexus.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.nexus.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

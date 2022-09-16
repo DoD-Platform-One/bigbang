@@ -1,0 +1,50 @@
+{{- $fluxSettingsHaProxy := merge .Values.addons.haproxy.flux .Values.flux -}}
+{{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
+{{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: haproxy-sso
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: haproxy
+    app.kubernetes.io/component: "developer-tools"
+  {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: authservice
+  chart:
+    spec:
+      chart: "./chart"
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: haproxy
+        namespace: {{ .Release.Namespace }}
+  {{- if .Values.addons.haproxy.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.haproxy.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-haproxy-sso-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- toYaml $fluxSettingsHaProxy | nindent 2 }}
+
+  dependsOn:
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+{{- end }}

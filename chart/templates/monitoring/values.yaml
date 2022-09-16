@@ -1,0 +1,381 @@
+{{- if .Values.monitoring.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.monitoring "name" "monitoring" "defaults" (include "bigbang.defaults.monitoring" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.monitoring" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled") .Values.istio.enabled) }}
+{{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
+{{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
+{{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
+
+flux:
+  enabled: true
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+openshift: {{ .Values.openshift }}
+
+minioOperator:
+  enabled: {{ .Values.addons.minioOperator.enabled }}
+
+gitlabRunner:
+  enabled: {{ .Values.addons.gitlabRunner.enabled }}
+
+istio:
+  {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
+  enabled: {{ .Values.istio.enabled }}
+  prometheus:
+    enabled: true
+    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+    service: authservice-haproxy-sso
+    port: 8080
+    namespace: authservice
+    {{- end }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+  alertmanager:
+    enabled: true
+    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+    service: authservice-haproxy-sso
+    port: 8080
+    namespace: authservice
+    {{- end }}
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+  grafana:
+    enabled: true
+    gateways:
+    - istio-system/{{ default "public" .Values.monitoring.ingress.gateway }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
+
+alertmanager:
+  alertmanagerSpec:
+    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+    containers:
+      - name: "alertmanager"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - name: "config-reloader"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if or .Values.monitoring.sso.enabled $istioInjection }}
+    podMetadata:
+      {{- if .Values.monitoring.sso.enabled }}
+      {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+      {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+      labels:
+        {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
+      {{- end }}
+      {{- if $istioInjection }}
+      annotations:
+        {{ include "istioAnnotation" . }}
+      {{- end }}
+    {{- end }}
+
+prometheus:
+  prometheusSpec:
+    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+    containers:
+      - name: "prometheus"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+      - name: "config-reloader"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled }}
+    podMetadata:
+      {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) }}
+      labels:
+        {{- if .Values.monitoring.sso.enabled }}
+        {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+        {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+        {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
+        {{- end }}
+        {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
+        vault-ingress: "true"
+        {{- end }}
+      {{- end }}
+      {{- if or $istioInjection .Values.addons.vault.enabled }}
+      annotations:
+        {{- if $istioInjection }}
+        {{ include "istioAnnotation" . }}
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+        proxy.istio.io/config: |
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-output-certs
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+        {{- end }}
+        {{- if .Values.addons.vault.enabled }}
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-init-first: "true"
+        vault.hashicorp.com/agent-inject-token: "true"
+        vault.hashicorp.com/role: "prometheus"
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if $istioInjection }}
+    # Add volume/mount for Istio certs for mTLS scraping
+    volumes:
+      - emptyDir:
+          medium: Memory
+        name: istio-certs
+    volumeMounts:
+      - mountPath: /etc/prom-certs/
+        name: istio-certs
+    {{- end }}
+
+
+anchore:
+  enabled: {{ .Values.addons.anchore.enabled }}
+
+kiali:
+  enabled: {{ .Values.kiali.enabled }}
+
+loki:
+  enabled: {{ .Values.loki.enabled }}
+
+{{- if or $gitlabRedis $authserviceRedisEnabled $redisDatasource }}
+redis:
+  enabled: true
+{{- end }}
+
+vault:
+  enabled: {{ .Values.addons.vault.enabled }}
+  tlsDisable: {{ dig "global" "tlsDisable" true .Values.addons.vault.values }}
+
+global:
+  imagePullSecrets:
+  - name: private-registry
+
+sso:
+  enabled: {{ .Values.monitoring.sso.enabled }}
+
+grafana:
+
+  {{- if $gitlabRedis }}
+  envFromSecret: grafana-env-secret
+  {{- end }}
+
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    pullSecrets:
+    - private-registry
+  sidecar:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+    {{- if $gitlabRedis }}
+    checksum/gitlabRedisPassword: {{ sha256sum .Values.addons.gitlab.redis.password }}
+    {{- end }}
+  {{- end }}
+
+  {{- if or .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
+  additionalDataSources:
+  {{- if .Values.addons.argocd.enabled }}
+  - name: Argo Master
+    type: redis-datasource
+    access: proxy
+    url: argocd-argocd-redis-bb-master.argocd.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  - name: Argo Headless
+    type: redis-datasource
+    access: proxy
+    url: argocd-argocd-redis-bb-headless.argocd.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  - name: Argo Replicas
+    type: redis-datasource
+    access: proxy
+    url: argocd-argocd-redis-bb-replicas.argocd.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  {{- end }}
+  {{- if $authserviceRedisEnabled }}
+  - name: AuthService Master
+    type: redis-datasource
+    access: proxy
+    url: authservice-authservice-redis-bb-master.authservice.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  - name: AuthService Headless
+    type: redis-datasource
+    access: proxy
+    url: authservice-authservice-redis-bb-headless.authservice.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  - name: AuthService Replicas
+    type: redis-datasource
+    access: proxy
+    url: authservice-authservice-redis-bb-replicas.authservice.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+  {{- end }}
+  {{- if $gitlabRedis }}
+  - name: GitLab
+    type: redis-datasource
+    access: proxy
+    url: gitlab-redis-master.gitlab.svc.cluster.local:6379
+    jsonData:
+      client: standalone
+    secureJsonData:
+      password: $GITLAB_REDIS_PASSWORD
+  {{- end }}
+  {{- if .Values.loki.enabled }}
+  - name: Loki
+    type: loki
+    {{- if eq .Values.loki.strategy "monolith" }}
+    url: http://loki.logging.svc.cluster.local:3100
+    {{- else }}
+    url: http://logging-loki-read.logging.svc.cluster.local:3100
+    {{- end }}
+    access: proxy
+    editable: true
+  {{- end }}
+  {{- if and .Values.loki.enabled .Values.tempo.enabled }}
+    jsonData:
+      derivedFields:
+        - datasourceName: Tempo
+          matcherRegex: "traceID=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+          datasourceUid: tempo
+  {{- end }}
+  {{- if .Values.tempo.enabled }}
+  - name: Tempo
+    type: tempo
+    access: proxy
+    orgId: 1
+    uid: tempo
+    url: http://tempo-tempo.tempo.svc:3100
+    isDefault: false
+    editable: true
+  {{- if .Values.loki.enabled }}
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: 'Loki'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        mappedTags: [{ key: 'service.name', value: 'service' }]
+        mapTagNamesEnabled: false
+        spanStartTimeShift: '1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: false
+        filterBySpanID: false
+      serviceMap:
+        datasourceUid: 'prometheus'
+      search:
+        hide: false
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: 'Loki'
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
+  grafana.ini:
+    {{- if .Values.istio.enabled }}
+    server:
+      root_url: https://grafana.{{ $domainName }}/
+    {{- end }}
+
+    auth.generic_oauth:
+      enabled: {{ .Values.monitoring.sso.enabled }}
+      client_id: {{ .Values.monitoring.sso.grafana.client_id }}
+      client_secret: {{ .Values.monitoring.sso.grafana.client_secret }}
+      scopes: {{ .Values.monitoring.sso.grafana.scopes | default "openid profile email" }}
+      auth_url: {{ .Values.monitoring.sso.grafana.auth_url | default (tpl .Values.sso.auth_url .) }}
+      token_url: {{ .Values.monitoring.sso.grafana.token_url | default (tpl .Values.sso.token_url .) }}
+      api_url: {{ .Values.monitoring.sso.grafana.api_url | default (tpl "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/userinfo" .) }}
+      allow_sign_up: {{ .Values.monitoring.sso.grafana.allow_sign_up | default "True" }}
+      role_attribute_path: {{ .Values.monitoring.sso.grafana.role_attribute_path | default "Viewer" }}
+    {{- with .Values.monitoring.sso.grafana }}
+      {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
+      {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
+    {{- end }}
+
+  {{- if $istioInjection }}
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+prometheus-node-exporter:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  serviceAccount:
+    imagePullSecrets:
+    - name: private-registry
+
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  prometheus:
+    monitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+  {{- if .Values.openshift }}
+  service:
+    targetPort: 9102
+    port: 9102
+  {{- end }}
+
+kube-state-metrics:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  prometheus:
+    monitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+prometheusOperator:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  admissionWebhooks:
+    cleanupProxy:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+    patch:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+{{- end }}

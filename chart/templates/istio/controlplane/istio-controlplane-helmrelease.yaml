@@ -1,0 +1,51 @@
+{{- $fluxSettingsIstioCp := merge .Values.istio.flux .Values.flux -}}
+{{- if .Values.istio.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: istio
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-controlplane
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: istio-system
+  chart:
+    spec:
+      chart: {{ .Values.istio.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: istio-controlplane
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsIstioCp | nindent 2 }}
+
+  {{- if .Values.istio.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.istio.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-istio-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-istio-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-istio-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: istio-operator
+      namespace: {{ .Release.Namespace }}
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

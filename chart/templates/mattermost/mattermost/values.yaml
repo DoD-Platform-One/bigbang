@@ -1,0 +1,89 @@
+{{- if .Values.addons.mattermost.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.mattermost "name" "mattermost" "defaults" (include "bigbang.defaults.mattermost" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.mattermost" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  chat:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.mattermost.ingress.gateway }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+{{- with .Values.addons.mattermost.sso }}
+sso:
+  enabled: {{ .enabled }}
+  client_id: {{ .client_id }}
+  client_secret: {{ .client_secret | default "no-secret" }}
+  auth_endpoint: {{ .auth_endpoint | default (printf "https://%s/oauth/authorize" $.Values.sso.oidc.host) }}
+  token_endpoint: {{ .token_endpoint | default (printf "https://%s/oauth/token" $.Values.sso.oidc.host) }}
+  user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/api/v4/user" $.Values.sso.oidc.host) }}
+{{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.mattermost.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+global:
+  imagePullSecrets:
+    - name: private-registry
+
+{{- with .Values.addons.mattermost.enterprise }}
+enterprise:
+  enabled: {{ .enabled }}
+  license: {{ .license }}
+{{- end }}
+
+{{- with .Values.addons.mattermost.database }}
+{{- if and .username .password .host .port .database }}
+database:
+  secret: "mattermost-database-secret"
+{{- else }}
+
+postgresql:
+  image:
+    pullSecrets:
+      - private-registry
+  install: true
+{{- end }}
+{{- end }}
+
+{{- with .Values.addons.mattermost.objectStorage }}
+{{- if and .endpoint .accessKey .accessSecret .bucket }}
+fileStore:
+  secret: "mattermost-objectstorage-secret"
+  url: {{ .endpoint }}
+  bucket: {{ .bucket }}
+{{- else }}
+minio:
+  install: true
+  accessKey: {{ .accessKey | default "minio" }}
+  secretKey: {{ .secretKey | default "BigBangDEVONLY" }}
+  imagePullSecrets:
+    - name: private-registry
+  tenants:
+    metrics:
+      enabled: {{ $.Values.monitoring.enabled }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.addons.mattermost.elasticsearch.enabled }}
+elasticsearch:
+  enabled: true
+{{- end }}
+{{- end -}}

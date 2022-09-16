@@ -1,0 +1,17 @@
+{{- if and (not .Values.offline) .Values.addons.gitlab.enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: gitlab
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gitlab
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.gitlab.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.gitlab.git | nindent 4 }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

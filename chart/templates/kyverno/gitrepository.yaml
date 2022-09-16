@@ -1,0 +1,18 @@
+{{- if and (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernopolicies.enabled) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: kyverno
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: kyverno
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.kyverno.git.repo }}
+  ref:
+    {{- include "validRef" .Values.kyverno.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

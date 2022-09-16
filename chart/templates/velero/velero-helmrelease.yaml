@@ -1,0 +1,54 @@
+{{- $fluxSettingsVelero := merge .Values.addons.velero.flux .Values.flux -}}
+{{- if .Values.addons.velero.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: velero
+    app.kubernetes.io/component: "cluster-utilities"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: velero
+  chart:
+    spec:
+      chart: {{ .Values.addons.velero.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: velero
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsVelero | nindent 2 }}
+  
+  {{- if .Values.addons.velero.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.velero.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-velero-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-velero-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-velero-values
+      kind: Secret
+      valuesKey: "overlays"
+  {{- if or .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+    {{- if .Values.istio.enabled }}  
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}  
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,46 @@
+{{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.minioOperator "name" "minio-operator" "defaults" (include "bigbang.defaults.minio-operator" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.minio-operator" -}}
+podAnnotations:
+  sidecar.istio.io/inject: "true"
+  traffic.sidecar.istio.io/includeInboundPorts: "*"
+  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+
+imagePullSecrets:
+  - name: private-registry
+
+operator:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy}}
+    imagePullSecrets:
+      - name: private-registry
+
+  {{- if .Values.monitoring.enabled }}
+  env:
+    - name: MINIO_OPERATOR_TLS_ENABLE
+      value: "on"
+    - name: CLUSTER_DOMAIN
+      value: "cluster.local"
+    - name: WATCHED_NAMESPACE
+      value: ""
+    - name: PROMETHEUS_NAMESPACE
+      value: "monitoring"
+  {{- end }}    
+    
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+{{- end -}}

@@ -1,0 +1,54 @@
+{{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
+
+{{- if .Values.addons.vault.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: vault
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: vault
+    app.kubernetes.io/component: "security-tools"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: vault
+  chart:
+    spec:
+      chart: {{ .Values.addons.vault.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: vault
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsVault | nindent 2 }}
+  
+  {{- if .Values.addons.vault.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.vault.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-vault-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-vault-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-vault-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # TODO: DRY this up
+  {{- if or .Values.istio.enabled (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
+  dependsOn:
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+
+    {{- if (dig "values" "minio" "enabled" false .Values.addons.vault) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}      
+    {{- end }}
+  {{- end }}
+{{- end }}

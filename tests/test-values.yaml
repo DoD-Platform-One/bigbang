@@ -1,6 +1,1479 @@
-serviceAccount:
-  imagePullSecrets:
-  - name: private-registry
+domain: bigbang.dev
 
-bbtests:
+sso:
+  # LetsEncrypt certificate authority
+  certificate_authority: |
+    -----BEGIN CERTIFICATE-----
+    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
+    -----END CERTIFICATE-----
+
+  # Must be updated for every new deployment of Keycloak. Example of where to get the jwks:
+  # https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/certs
+  # must be single quoted and double quotes must be escaped like this \"xxxx\"
+  jwks: '{\"keys\":[{\"kid\":\"nZUXZDUyyAEKY4dJyargboayGxJmmlrhcoBoik-7040\",\"kty\":\"RSA\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"qAl-BtUwp2ZVl7wix_8-pucv-jTK1L9QGFVW02kPYlFi0frg-OL9XsSB1MsJIEFfnDIZ_psvvWYoZkVnzibgVlfAjOQXyIevOWLpSlUK3BpWFnAfO-0oyQWSsclyE8-xpzTifL75SvbSvDp3JXVBa4UdgV2qsNs7xu99wipQ7cro2lpne5EIHv6eKJMeG1eFQS2DJrI6ydNOLrzHFOA3pAhZRphId6dxYWaKzH_tcR34uQ2gg-IgmGakYLFhG_P2ZrMdPqouej_WFoc9Y9hlHx8NALfA6uYe4aDCbWCTL1V1sZJjzVR7WiTDh7fIogTu_2ukpCOnXX_SaLadoulxLw\",\"e\":\"AQAB\",\"x5c\":[\"MIICoTCCAYkCBgF/iYn0azANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMzE0MTc0NDUzWhcNMzIwMzE0MTc0NjMzWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoCX4G1TCnZlWXvCLH/z6m5y/6NMrUv1AYVVbTaQ9iUWLR+uD44v1exIHUywkgQV+cMhn+my+9ZihmRWfOJuBWV8CM5BfIh685YulKVQrcGlYWcB877SjJBZKxyXITz7GnNOJ8vvlK9tK8OncldUFrhR2BXaqw2zvG733CKlDtyujaWmd7kQge/p4okx4bV4VBLYMmsjrJ004uvMcU4DekCFlGmEh3p3FhZorMf+1xHfi5DaCD4iCYZqRgsWEb8/Zmsx0+qi56P9YWhz1j2GUfHw0At8Dq5h7hoMJtYJMvVXWxkmPNVHtaJMOHt8iiBO7/a6SkI6ddf9Jotp2i6XEvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAJwSLJ0eybbeBYPvXnawqpy6JSXJ/MnnRvSGN9tXJ2+d/QXMOEPwJaAaOrvFtpUQxyPELJ8nU/Ukf7AL2zWltsCLiwtTrJkC+BpbZYkb1UsByveBS5wTPfiNkFzHeGg+MxBjiju2y04P4kEngXhQh4ZIUdi+WJjew721nJa/tjrMfnuEsMjxY/tWnzkk8xkGgaApZpGyaj1tOmVH4GR6CeBU6459m/GXmGH5TCGwT3EyfpZ189te+xV73WZR/r2nDlGuuy//w/P4JGHh4lcCwLfPcOOH30otcPAgctyX9Takk4MkVjva+b9S88sGaWPg075bxA2sysmkuqEOULjdXjU=\"],\"x5t\":\"ihEvRimRNSdrnr_Fhnd4OElB3-E\",\"x5t#S256\":\"YNijWPCIhWA5xQTwyIfvlBN-UcMe46Um2ywE-ADiqjM\"}]}'
+  oidc:
+    host: keycloak.bigbang.dev
+    realm: baby-yoda
+
+flux:
+  timeout: 20m
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+networkPolicies:
   enabled: true
+  controlPlaneCidr: 172.16.0.0/12
+
+istio:
+  enabled: true
+  ingressGateways:
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+  gateways:
+    passthrough:
+      ingressGateway: "passthrough-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls:
+        mode: "PASSTHROUGH"
+    public:
+      tls:
+        key: "" # Gets added via chart/ingress-certs.yaml
+        cert: "" # Gets added via chart/ingress-certs.yaml
+  values:
+    kiali:
+      dashboard:
+        auth:
+          strategy: "anonymous"
+
+jaeger:
+  enabled: true
+  sso:
+    enabled: false
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
+  values:
+    istio:
+      jaeger:
+        enabled: true
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_url: "https://tracing.bigbang.dev"
+
+kiali:
+  enabled: true
+  sso:
+    enabled: false
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
+  values:
+    cr:
+      spec:
+        auth:
+          # if enabling the keycloak SSO integration test, set strategy to "openid"
+          #strategy: "openid"
+          strategy: "anonymous"
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_url: 'https://kiali.bigbang.dev'
+          cypress_check_data: 'true'
+          # uncomment these next 3 lines if enabling the keycloak SSO integration test
+          #cypress_keycloak_test_enable: "true"
+          #cypress_keycloak_username: "cypress"
+          #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
+
+clusterAuditor:
+  enabled: true
+  values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits: {}
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
+          cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
+          # OPA violations table and violations by kind chart
+          cypress_table_bar_allownodata: '0'
+          # violations over time graph
+          cypress_graph_allownodata: '1'
+
+gatekeeper:
+  enabled: true
+  values:
+    replicas: 1
+    controllerManager:
+      resources:
+        limits: {}
+        requests:
+          cpu: 100m
+          memory: 256Mi
+
+    violations:
+      allowedCapabilities:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to not drop capabilities
+          - istio-system/lb-port-.*
+      allowedDockerRegistries:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to pull from public repos
+          - istio-system/lb-port-.*
+          # Allow argocd to deploy a test app in its cypress test
+          - argocd/guestbook-ui.*
+      allowedHostFilesystem:
+        parameters:
+          excludedResources:
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
+          - kiali/kiali-operator-cypress-test
+          - mattermost/mattermost-cypress-test
+          - keycloak/keycloak-cypress-test
+          - jaeger/jaeger-operator-cypress-test
+          - monitoring/kube-prometheus-stack-cypress-test
+          - vault/vault-cypress-test
+          - logging/loki-simple-scalable-cypress-test
+          - twistlock/twistlock-cypress-test
+          - sonarqube/sonarqube-cypress-test
+          - logging/logging-cypress-test
+          - tempo/tempo-cypress-test
+          - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-host-path-mount-.?
+          - default/restrict-host-path-write-.?
+          - default/restrict-volume-types-.?
+      allowedIPs:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-external-ips-.?
+      allowedSecCompProfiles:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to have an undefined defined seccomp
+          - istio-system/lb-port-.*
+      allowedUsers:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to run as any user/group
+          - istio-system/lb-port-.*
+      bannedImageTags:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
+      containerRatio:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to have undefined limits/requests
+          - istio-system/lb-port-.*
+      hostNetworking:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to mount host ports
+          - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
+      noBigContainers:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to have undefined limits/requests
+          - istio-system/lb-port-.*
+      noPrivilegedEscalation:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to have undefined security context
+          - istio-system/lb-port-.*
+      noSysctls:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-sysctls-.?
+      readOnlyRoot:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to mount filesystems read/write
+          - istio-system/lb-port-.*
+      requiredLabels:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer pods to not have required labels
+          - istio-system/svclb-.*
+      requiredProbes:
+        parameters:
+          excludedResources:
+          # Allows k3d load balancer containers to not have readiness/liveness probes
+          - istio-system/lb-port-.*
+      restrictedTaint:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/disallow-tolerations-.?
+      selinuxPolicy:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
+          - default/disallow-selinux-options-.?
+          - default/restrict-selinux-type-.?
+          - default/not-me
+      volumeTypes:
+        parameters:
+          excludedResources:
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
+          - kiali/kiali-operator-cypress-test
+          - mattermost/mattermost-cypress-test
+          - keycloak/keycloak-cypress-test
+          - jaeger/jaeger-operator-cypress-test
+          - monitoring/kube-prometheus-stack-cypress-test
+          - vault/vault-cypress-test
+          - logging/loki-simple-scalable-cypress-test
+          - twistlock/twistlock-cypress-test
+          - sonarqube/sonarqube-cypress-test
+          - logging/logging-cypress-test
+          - tempo/tempo-cypress-test
+          - argocd/argo-cd-cypress-test
+          - minio/minio-instance-cypress-test
+          # Allow kyverno test vectors for Helm test
+          - default/restrict-host-path-mount-.?
+          - default/restrict-host-path-write-.?
+          - default/restrict-volume-types-.?
+    bbtests:
+      enabled: true
+
+kyverno:
+  enabled: false
+  values:
+    replicaCount: 1
+    bbtests:
+      enabled: true
+
+kyvernopolicies:
+  enabled: false
+  values:
+    bbtests:
+      enabled: true
+    excludeContainers:
+    - not-me
+    - or-me
+    exclude:
+      any:
+      # Allows k3d load balancer to bypass policies.
+      - resources:
+          namespaces:
+          - istio-system
+          names:
+          - svclb-*
+      # Exclude gatekeeper test resources so Helm tests will work
+      - resources:
+          namespaces:
+          - default
+          names:
+          - bad-test*
+          - good-test*
+    # Parameters are copied from kyverno policies for test vectors
+    # Exclusions are for allowing other helm tests to function
+    policies:
+      clone-configs:
+        parameters:
+          clone:
+          - name: clone-configs-1
+            kind: ConfigMap
+            namespace: "{{ .Release.Namespace }}"
+          - name: clone-configs-2
+            kind: Secret
+            namespace: "{{ .Release.Namespace }}"
+      disallow-annotations:
+        parameters:
+          disallow:
+          - 'kyverno-policies-bbtest/test: disallowed'
+          - kyverno-policies-bbtest/disallowed
+      disallow-labels:
+        parameters:
+          disallow:
+          - 'kyverno-policies-bbtest/test: disallowed'
+          - kyverno-policies-bbtest/disallowed
+      disallow-tolerations:
+        parameters:
+          disallow:
+          - effect: NoSchedule
+            key: notallowed
+            value: 'false'
+          - effect: '*NoSchedule'
+            key: disa??owed
+            value: 'true'
+      require-annotations:
+        parameters:
+          require:
+          - 'kyverno-policies-bbtest/test: required'
+          - kyverno-policies-bbtest/required
+      require-image-signature:
+        parameters:
+          require:
+          - image: ghcr.io/kyverno/test-verify-image:*
+            key: |-
+              -----BEGIN PUBLIC KEY-----
+              MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+              5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+              -----END PUBLIC KEY-----
+      require-labels:
+        parameters:
+          require:
+          - 'kyverno-policies-bbtest/test: required'
+          - kyverno-policies-bbtest/required
+      restrict-external-ips:
+        parameters:
+          allow:
+          - 192.168.0.1
+      restrict-external-names:
+        enabled: true
+        parameters:
+          allow:
+          - allowed
+      restrict-host-path-mount:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - jaeger
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              names:
+              - "*-cypress-test*"
+        parameters:
+          allow:
+          - /tmp/allowed
+      restrict-host-path-mount-pv:
+        parameters:
+          allow:
+          - /tmp/allowed
+          - /var/lib/rancher/k3s/storage/pvc-*
+      restrict-host-path-write:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - jaeger
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              names:
+              - "*-cypress-test*"
+        parameters:
+          allow:
+          - /tmp/allowed
+      restrict-host-ports:
+        parameters:
+          allow:
+          - '63999'
+          - '>= 64000 & < 65000'
+          - '> 65000'
+      restrict-image-registries:
+        exclude:
+          any:
+          # ArgoCD deploys a test app as part of its Cypress test
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui*
+      restrict-volume-types:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - jaeger
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              names:
+              - "*-cypress-test*"
+      update-image-pull-policy:
+        parameters:
+          update:
+          - to: Always
+      update-image-registry:
+        parameters:
+          update:
+          - from: replace.image.registry
+            to: registry1.dso.mil
+      require-drop-all-capabilities:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+      require-non-root-group:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+      require-non-root-user:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+
+logging:
+  enabled: true
+  sso:
+    enabled: false
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kibana
+  license:
+    trial: false
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: {}
+        heap:
+          min: 1g
+          max: 1g
+      data:
+        count: 2
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: .5
+          limits: {}
+        heap:
+          min: 1g
+          max: 1g
+    kibana:
+      count: 1
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_expect_logs: "true"
+          cypress_kibana_url: "https://kibana.bigbang.dev"
+
+fluentbit:
+  enabled: true
+  values:
+    securityContext:
+      privileged: true
+    bbtests:
+      enabled: true
+    config:
+      inputs: |
+        [INPUT]
+            Name tail
+            Path /var/log/containers/*flux-system*.log
+            Parser containerd
+            Tag kube.*
+            Mem_Buf_Limit 50MB
+            Skip_Long_Lines On
+            storage.type filesystem
+
+loki:
+  enabled: false
+  strategy: scalable
+  values:
+    minio:
+      enabled: true
+    write:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
+    read:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_check_datasource: 'true'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+      scripts:
+        envs:
+          LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
+
+tempo:
+  enabled: false
+  values:
+    istio:
+      tempoQuery:
+        hosts:
+          - "tempo.{{ .Values.domain }}"
+    tempo:
+      resources:
+        limits: null
+        requests:
+          cpu: 200m
+          memory: 128Mi
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_url: 'https://tempo.bigbang.dev'
+          cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3100'
+          cypress_check_datasource: 'true'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+      scripts:
+        enabled: false
+        envs:
+          TEMPO_METRICS_URL: 'http://tempo-tempo.tempo.svc:3100'
+
+    persistence:
+      enabled: true
+      # storageClassName: local-path
+      accessModes:
+        - ReadWriteOnce
+      size: 5Gi
+
+    tempoQuery:
+      resources:
+        limits: null
+        requests:
+          cpu: 200m
+          memory: 128Mi
+
+monitoring:
+  enabled: true
+  sso:
+    enabled: false
+    prometheus:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_prometheus
+    alertmanager:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
+    grafana:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_grafana
+      scopes: "Grafana"
+  values:
+    prometheus:
+      prometheusSpec:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits: {}
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 30Mi
+        limits: {}
+    grafana:
+      testFramework:
+        enabled: false
+      dashboards:
+        default:
+          k8s-deployment:
+            gnetId: 741
+            revision: 1
+            datasource: Prometheus
+      downloadDashboards:
+        resources:
+          limits:
+            cpu: 20m
+            memory: 20Mi
+          requests:
+            cpu: 20m
+            memory: 20Mi
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+          - name: 'default'
+            orgId: 1
+            folder: ''
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards
+    bbtests:
+      enabled: true
+      cypress:
+        image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/cypress/kubectl:8.3.1
+        envs:
+          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
+          cypress_check_istio_dashboards: 'true'
+
+twistlock:
+  enabled: true
+  sso:
+    enabled: false
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
+  values:
+    console:
+      persistence:
+        size: 256Mi
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_baseUrl: "https://twistlock.bigbang.dev"
+      scripts:
+        envs:
+          twistlock_host: "https://twistlock.bigbang.dev"
+
+# Addons are toggled based on labels in CI
+addons:
+  argocd:
+    enabled: false
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_argocd
+      client_secret: anything-for-dev
+      provider_name: "P1 SSO"
+      groups: |
+        g, Impact Level 2 Authorized, role:admin
+    values:
+      sso:
+        rbac:
+          policy.default: role:admin
+      controller:
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits: {}
+      dex:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits: {}
+      redis-bb:
+        master:
+          persistence:
+            size: 512Mi
+        replica:
+          persistence:
+            size: 512Mi
+      redis:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits: {}
+      server:
+        resources:
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits: {}
+      repoServer:
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits: {}
+      configs:
+        secret:
+          argocdServerAdminPassword: '$2a$10$rUDZDckdDZ2TEwk9PDs3QuqjkL58qR1IHE1Kj4MwDx.7/m5dytZJm'
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: "https://argocd.bigbang.dev"
+
+  authservice:
+    enabled: false
+    chains:
+      minimal:
+        callback_uri: "https://minimal.bigbang.dev"
+    values:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits: {}
+      redis:
+        enabled: true
+      redis-bb:
+        master:
+          persistence:
+            size: 256Mi
+        replica:
+          replicaCount: 0
+          persistence:
+            size: 256Mi
+
+  gitlab:
+    enabled: false
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_gitlab
+    flux:
+      timeout: 30m
+    values:
+      global:
+        rails:
+          bootstrap:
+            enabled: false
+      gitlab-runner:
+        resources:
+          requests:
+            cpu: 10m
+          limits: {}
+      gitlab:
+        webservice:
+          minReplicas: 1
+          maxReplicas: 1
+          helmTests:
+            enabled: false
+        sidekiq:
+          minReplicas: 1
+          maxReplicas: 1
+        gitlab-shell:
+          minReplicas: 1
+          maxReplicas: 1
+        gitaly:
+          persistence:
+            size: 256Mi
+          resources:
+            ## values raised to help pass CI after default values for gitaly are fixed then can revert to original request.
+            #requests:
+            #  cpu: 50m
+            #limits: {}
+            requests:
+              cpu: 400m
+              memory: 600Mi
+            limits:
+              cpu: 400m
+              memory: 600Mi
+        shared-secrets:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+        migrations:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+        toolbox:
+          persistence:
+            size: 256Mi
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+      registry:
+        hpa:
+          minReplicas: 1
+          maxReplicas: 1
+      postgresql:
+        persistence:
+          size: 256Mi
+        metrics:
+          resources:
+            requests:
+              cpu: 10m
+            limits: {}
+      minio:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 50m
+          limits: {}
+      redis:
+        master:
+          persistence:
+            size: 256Mi
+        slave:
+          persistence:
+            size: 256Mi
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_baseUrl: https://gitlab.bigbang.dev
+        scripts:
+          envs:
+            GITLAB_REPOSITORY: https://gitlab.bigbang.dev
+            GITLAB_ORIGIN: https://testuser:12345678@gitlab.bigbang.dev
+            GITLAB_REGISTRY: registry.bigbang.dev
+
+  gitlabRunner:
+    enabled: false
+    values:
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 50m
+        limits: {}
+      runners:
+        protected: false
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_gitlab_first_name: "testrunner"
+            cypress_gitlab_last_name: "userrunner"
+            cypress_gitlab_email: "gitlab@bigbang.dev"
+            cypress_gitlab_username: "gitlabrunner_user"
+            cypress_gitlab_password: "gitlabrunner_pass"
+            cypress_gitlab_project: "runner-hello-world"
+          secretEnvs:
+            - name: cypress_adminpassword
+              valueFrom:
+                secretKeyRef:
+                  name: gitlab-gitlab-initial-root-password
+                  key: password
+
+  anchore:
+    enabled: false
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_anchore
+    enterprise:
+      enabled: false
+      licenseYaml: |
+       "TBD"
+    values:
+      ensureDbJobs:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      sso:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      postgresql:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1024Mi
+          limits: {}
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
+      anchoreAnalyzer:
+        replicaCount: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreApi:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreCatalog:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchorePolicyEngine:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreSimpleQueue:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEngineUpgradeJob:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchore-feeds-db:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+        metrics:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
+      anchoreEnterpriseFeeds:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseFeedsUpgradeJob:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseRbac:
+        authResources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+        managerResources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseReports:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseNotifications:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEntperpiseUi:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchoreEnterpriseEngineUpgradeJob:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      anchore-ui-redis:
+        enabled: true
+        replica:
+          replicaCount: 0
+      bbtests:
+        enabled: true
+        scripts:
+          envs:
+            ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
+
+  sonarqube:
+    enabled: false
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_saml-sonarqube
+      provider_name: "P1 SSO"
+      certificate: MIICoTCCAYkCBgF/iYn0azANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMzE0MTc0NDUzWhcNMzIwMzE0MTc0NjMzWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoCX4G1TCnZlWXvCLH/z6m5y/6NMrUv1AYVVbTaQ9iUWLR+uD44v1exIHUywkgQV+cMhn+my+9ZihmRWfOJuBWV8CM5BfIh685YulKVQrcGlYWcB877SjJBZKxyXITz7GnNOJ8vvlK9tK8OncldUFrhR2BXaqw2zvG733CKlDtyujaWmd7kQge/p4okx4bV4VBLYMmsjrJ004uvMcU4DekCFlGmEh3p3FhZorMf+1xHfi5DaCD4iCYZqRgsWEb8/Zmsx0+qi56P9YWhz1j2GUfHw0At8Dq5h7hoMJtYJMvVXWxkmPNVHtaJMOHt8iiBO7/a6SkI6ddf9Jotp2i6XEvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAJwSLJ0eybbeBYPvXnawqpy6JSXJ/MnnRvSGN9tXJ2+d/QXMOEPwJaAaOrvFtpUQxyPELJ8nU/Ukf7AL2zWltsCLiwtTrJkC+BpbZYkb1UsByveBS5wTPfiNkFzHeGg+MxBjiju2y04P4kEngXhQh4ZIUdi+WJjew721nJa/tjrMfnuEsMjxY/tWnzkk8xkGgaApZpGyaj1tOmVH4GR6CeBU6459m/GXmGH5TCGwT3EyfpZ189te+xV73WZR/r2nDlGuuy//w/P4JGHh4lcCwLfPcOOH30otcPAgctyX9Takk4MkVjva+b9S88sGaWPg075bxA2sysmkuqEOULjdXjU=
+      login: login
+      name: name
+      email: email
+    values:
+      plugins:
+        install: []
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+        limits: {}
+      persistence:
+        enabled: false
+        size: 5Gi
+      postgresql:
+        persistence:
+          size: 256Mi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
+      tests:
+        enabled: false
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: "https://sonarqube.bigbang.dev"
+            cypress_url_setup: "https://sonarqube.bigbang.dev/setup"
+      account:
+        adminPassword: new_admin_password
+        currentAdminPassword: admin
+      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.0.0
+
+  minioOperator:
+    enabled: false
+
+  minio:
+    enabled: false
+    values:
+      tenant:
+        pools:
+        - servers: 3
+          volumesPerServer: 4
+          size: 256Mi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              cpu: 250m
+              memory: 2Gi
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            runAsNonRoot: true
+      bbtests:
+        # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
+        # https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/issues/7
+        # This issue can be reopened if problems reappear.
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: 'https://minio.bigbang.dev/login'
+        scripts:
+          envs:
+            MINIO_PORT: ''
+            MINIO_HOST: 'https://minio-api.bigbang.dev'
+
+  mattermostoperator:
+    enabled: false
+
+  mattermost:
+    enabled: false
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_mattermost
+      client_secret: "no-secret"
+    elasticsearch:
+      enabled: true
+    values:
+      postgresql:
+        persistence:
+          size: 256Mi
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits: {}
+      minio:
+        tenants:
+          pools:
+          - servers: 1
+            volumesPerServer: 4
+            size: 256Mi
+            resources:
+              requests:
+                cpu: 250m
+                memory: 2Gi
+              limits:
+                cpu: 250m
+                memory: 2Gi
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: https://chat.bigbang.dev
+
+  nexus:
+    enabled: false
+    # Nexus requires manual configuration in Keycloak client and cannot be tested with login.dso.mil
+    # you must test with your own dev deployment.  Example: keycloak.bigbang.dev
+    # See more info in Nexus Package docs /docs/keycloak.md
+    # Nexus SSO is behind a paywall. You must have a valid license to enable SSO
+    # -- Base64 encoded license file.
+    # cat ~/Downloads/sonatype-license-YYYY-MM-ddTnnnnnnZ.lic | base64 -w 0 ; echo
+    #license_key: "enter-single-line-base64-encoded-string-here"
+    sso:
+      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      enabled: false
+      idp_data:
+        entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
+        # -- IdP Field Mappings
+        # -- NXRM username attribute
+        username: "username"
+        firstName: "firstName"
+        lastName: "lastName"
+        email: "email"
+        groups: "groups"
+        # -- IDP SAML Metadata XML as a single line string in single quotes
+        # -- this information is public and does not require a secret
+        # curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/descriptor ; echo
+        idpMetadata: 'enter-single-quoted-single-line-string-here'
+      role:
+        # id is the name of the Keycloak group (case sensitive)
+        - id: "Nexus"
+          name: "Keycloak Nexus Group"
+          description: "unprivilaged users"
+          privileges: []
+          roles: []
+        - id: "Nexus-Admin"
+          name: "Keycloak Nexus Admin Group"
+          description: "keycloak users as admins"
+          privileges:
+            - "nx-all"
+          roles:
+            - "nx-admin"
+    # NexusNotes: |
+    #   Login to Nexus Admin UI and then get the x509 certificate from this path
+    #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+    #   copy and paste the nexus single line certificate into a text file and save it
+    #     vi nexus-x509.txt
+    #     -----BEGIN CERTIFICATE-----
+    #     put-single-line-nexus-x509-certificate-here
+    #     -----END CERTIFICATE-----
+    #   make a valid pem file with proper wrapping at 64 characters per line
+    #     fold -w 64 nexus-x509.txt > nexus.pem
+    #   In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places
+    values:
+      persistence:
+        # Do NOT set this below 5Gi, nexus will fail to boot
+        storageSize: 5Gi
+      nexus:
+      # https://help.sonatype.com/repomanager3/installation/system-requirements#SystemRequirements-JVMDirectMemory
+        env:
+          - name: INSTALL4J_ADD_VM_PARAMS
+            value: "-Dcom.redhat.fips=false -Xms1024M -Xmx1024M -XX:MaxDirectMemorySize=1024M -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+          - name: NEXUS_SECURITY_RANDOMPASSWORD
+            value: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 1500Mi
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_nexus_url: "https://nexus.bigbang.dev"
+            cypress_nexus_user: "admin"
+            cypress_nexus_pass_new: "new_admin_password"
+          secretEnvs:
+            - name: cypress_nexus_pass
+              valueFrom:
+                secretKeyRef:
+                  name: nexus-repository-manager-secret
+                  key: admin.password
+
+  velero:
+    enabled: false
+    plugins:
+    - aws
+    values:
+      serviceAccount:
+        server:
+          name: velero
+      configuration:
+        provider: aws
+        backupStorageLocation:
+          bucket: velero
+          config:
+            region: velero
+            s3ForcePathStyle: "true"
+            s3Url: https://minio-api.bigbang.dev
+        volumeSnapshotLocation:
+          provider: aws
+          config:
+            region: velero
+      credentials:
+        useSecret: true
+        secretContents:
+          cloud: |
+            [default]
+            aws_access_key_id = minio
+            aws_secret_access_key = minio123
+      cleanUpCRDs: true
+      bbtests:
+        enabled: true
+        scripts:
+          envs:
+            MINIO_HOST: https://minio-api.bigbang.dev
+
+  keycloak:
+    enabled: false
+    ingress:
+      gateway: "passthrough"
+      key: "" # Gets added via chart/ingress-certs.yaml
+      cert: "" # Gets added via chart/ingress-certs.yaml
+    values:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits: {}
+      # Disabling helm tests for keycloak until they are working on rke2
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: "https://keycloak.bigbang.dev"
+      secrets:
+        env:
+          stringData:
+            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
+            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
+            X509_CA_BUNDLE: /etc/x509/https/cas.pem
+        certauthority:
+          stringData:
+            cas.pem: '{{ .Files.Get "resources/dev/dod_cas.pem" }}'
+        customreg:
+          stringData:
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+        realm:
+          stringData:
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda-ci.json" }}'
+      extraVolumes: |-
+        - name: certauthority
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-certauthority
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+      extraVolumeMounts: |-
+        - name: certauthority
+          mountPath: /etc/x509/https/cas.pem
+          subPath: cas.pem
+          readOnly: true
+        - name: customreg
+          mountPath: /opt/jboss/keycloak/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/jboss/keycloak/realm.json
+          subPath: realm.json
+          readOnly: true
+
+  vault:
+    enabled: false
+    ingress:
+      gateway: "passthrough"
+      key: "" # Gets added via chart/ingress-certs.yaml
+      cert: "" # Gets added via chart/ingress-certs.yaml
+    sso:
+      enabled: false
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
+    values:
+      autoInit:
+        enabled: true
+      global:
+        tlsDisable: false
+      injector:
+        extraEnvironmentVars:
+          VAULT_API_ADDR: https://vault.bigbang.dev
+        certs:
+          secretName: vault-tls
+        affinity: |
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+                      app.kubernetes.io/instance: "{{ .Release.Name }}"
+                      component: webhook
+                  topologyKey: kubernetes.io/hostname
+      server:
+        extraEnvironmentVars:
+          VAULT_API_ADDR: https://vault.bigbang.dev  #istio GW
+          VAULT_SKIP_VERIFY: "true"
+          VAULT_LOG_FORMAT: "json"
+        dataStorage:
+          enabled: true
+          size: 256Mi
+        auditStorage:
+          size: 256Mi
+        ha:
+          enabled: true
+          replicas: 1
+
+          raft:
+            enabled: true
+            config: |
+              ui = true
+
+              listener "tcp" {
+                tls_disable = false
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+                tls_cert_file = "/vault/tls/tls.crt"
+                tls_key_file  = "/vault/tls/tls.key"
+                telemetry {
+                  unauthenticated_metrics_access = true
+                }
+              }
+
+              storage "raft" {
+                path = "/vault/data"
+
+                retry_join {
+                  leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
+                  leader_client_cert_file = "/vault/tls/tls.crt"
+                  leader_client_key_file = "/vault/tls/tls.key"
+                  leader_tls_servername = "vault.bigbang.dev"
+                }
+              }
+
+              seal "awskms" {
+                region     = "us-gov-west-1"
+                kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
+                endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+              }
+
+              telemetry {
+                prometheus_retention_time = "24h"
+                disable_hostname = true
+              }
+
+              service_registration "kubernetes" {}
+
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_vault_url: "https://vault.bigbang.dev"
+
+  metricsServer:
+    enabled: false
+    values:
+      replicas: 1

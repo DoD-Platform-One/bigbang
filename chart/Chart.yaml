@@ -1,39 +1,28 @@
 apiVersion: v2
-name: confluence
-description: A chart for installing Confluence Data Center on Kubernetes
+name: bigbang
+version: 1.42.0
+description: Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
+
 type: application
-version: 1.5.1-bb.1
-appVersion: 7.19.0
-kubeVersion: ">=1.19.x-0"
+
 keywords:
-  - Confluence
-  - Confluence Server
-  - Confluence Data Center
-  - Confluence DC
-  - Atlassian
-home: https://atlassian.github.io/data-center-helm-charts/
-icon: https://atlassian.github.io/data-center-helm-charts/icons/confluence.svg
+  - platform1
+  - bigbang
+
+home: https://p1.dso.mil/#/products/big-bang
 sources:
-  - https://github.com/atlassian/data-center-helm-charts
-  - https://bitbucket.org/atlassian-docker/docker-atlassian-confluence-server/
-deprecated: false
-annotations:
-  artifacthub.io/containsSecurityUpdates: "true"
-  artifacthub.io/changes: |
-     - kind: changed
-       description: Fixed Confluence when Synchrony is enabled
-       links:
-       - name: Github PR
-         url: https://github.com/atlassian/data-center-helm-charts/pull/443
-     - kind: changed
-      description: Confluence updated to 7.19.0 version
-      links:
-      - name: Github PR
-        url: https://github.com/atlassian/data-center-helm-charts/pull/445
-dependencies:
-  - name: common
-    version: 1.0.0
-    repository: https://atlassian.github.io/data-center-helm-charts
-  - name: gluon
-    version: "0.3.0"
-    repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
+  - https://repo1.dso.mil/platform-one/big-bang/bigbang
+
+maintainers:
+  - name: Ryan Garcia
+    email: garcia.ryan@solute.us
+  - name: Michael McLeroy
+    email: michaelmcleroy@cloudfitsoftware.com
+  - name: Micah Nagel
+    email: micah.nagel@parsons.com
+  - name: Branden Cobb
+    email: cobb_branden@bah.com
+  - name: Tom Runyon
+    email: tom@defenseunicorns.com
+
+icon: https://p1.dso.mil/img/Big_Bang_Color_Logo_White_text.b04263b1.png

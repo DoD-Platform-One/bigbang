@@ -1,0 +1,18 @@
+{{- $pkg := "kyvernopolicies" }}
+{{- if (get .Values $pkg).enabled }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: {{ $pkg }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ (get .Values $pkg).git.repo }}
+  ref:
+    {{- include "validRef" (get .Values $pkg).git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}

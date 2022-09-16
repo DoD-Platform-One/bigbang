@@ -1,0 +1,14 @@
+{{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
+{{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
+{{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "bigbang" "metrics-server") }}
+{{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: metrics-server
+    app.kubernetes.io/component: "cluster-utilities"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.metricsServer }}
+  name: metrics-server
+{{- end }}

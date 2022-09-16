@@ -1,0 +1,63 @@
+{{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
+{{- if .Values.addons.keycloak.enabled }}
+{{ $name := "keycloak" }}
+{{ $component := "security-tools" }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    app.kubernetes.io/component: {{ $component }}
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  releaseName: {{ $name }}
+  targetNamespace: {{ $name }}
+  chart:
+    spec:
+      chart: {{ .Values.addons.keycloak.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: {{ $name }}
+        namespace: {{ .Release.Namespace }}
+
+  {{- if .Values.addons.keycloak.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.keycloak.postRenderers | nindent 4 }}
+  {{- end }}
+
+  {{- toYaml $fluxSettingsKeycloak | nindent 2 }}
+
+  valuesFrom:
+    - name: {{ .Release.Name }}-{{ $name }}-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-{{ $name }}-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-{{ $name }}-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.gatekeeper.enabled }}
+  - name: gatekeeper
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.istio.enabled }}
+  - name: istio
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernopolicies.enabled }}
+  - name: kyvernopolicies
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+  - name: monitoring
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

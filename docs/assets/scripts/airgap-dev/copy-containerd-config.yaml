@@ -1,0 +1,23 @@
+---
+- hosts: all
+  gather_facts: no
+  become: yes
+  vars:
+    registry_endpoint: http://localregistry/v2/
+    registry_server: localregistry
+    registry_user: someuser
+  vars_prompt:
+    - name: registry_password
+      prompt: Enter registry password
+      private: yes
+  tasks:
+  - name: Copy containerd config
+    template:
+      src: config.toml.tmpl
+      dest: /etc/containerd/config.toml
+      owner: root
+      group: root
+  - name: Restart containerd
+    service:
+      name: containerd
+      state: restarted

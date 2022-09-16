@@ -1,0 +1,59 @@
+{{- $fluxSettingsMinioOperator := merge .Values.addons.minioOperator.flux .Values.flux -}}
+{{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio-operator
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetNamespace: minio-operator
+  chart:
+    spec:
+      chart: {{ .Values.addons.minioOperator.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: minio-operator
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsMinioOperator | nindent 2 }}
+
+  {{- if .Values.addons.minioOperator.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.minioOperator.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-minio-operator-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-minio-operator-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-minio-operator-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  values:
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
+      traffic.sidecar.istio.io/includeInboundPorts: "*"
+      traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+    imagePullSecrets:
+      - name: private-registry
+
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled }}
+  dependsOn:
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernopolicies.enabled }}
+    - name: kyvernopolicies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

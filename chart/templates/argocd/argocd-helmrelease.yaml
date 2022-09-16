@@ -1,0 +1,52 @@
+{{- $fluxSettingsArgo := merge .Values.addons.argocd.flux .Values.flux -}}
+{{- if .Values.addons.argocd.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: argocd
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: argocd
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: argocd
+  chart:
+    spec:
+      chart: {{ .Values.addons.argocd.git.path }}
+      interval: 5m
+      sourceRef:
+        kind: GitRepository
+        name: argocd
+        namespace: {{ .Release.Namespace }}
+
+  {{- toYaml $fluxSettingsArgo | nindent 2 }}
+
+  {{- if .Values.addons.argocd.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.argocd.postRenderers | nindent 4 }}
+  {{- end }}
+
+  valuesFrom:
+    - name: {{ .Release.Name }}-argocd-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-argocd-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-argocd-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or .Values.monitoring.enabled .Values.istio.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+  - name: istio
+    namespace: {{ .Release.Namespace}}
+  {{- end}}
+  {{- if .Values.monitoring.enabled }}
+  - name: monitoring
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

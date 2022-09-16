@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: footer-content-vm
-data:
-{{ (.Files.Glob "files/footer-content.vm").AsConfig | indent 2 }}
