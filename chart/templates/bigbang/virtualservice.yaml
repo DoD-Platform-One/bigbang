@@ -28,7 +28,6 @@ spec:
             port:
               number: {{ .Values.nexus.nexusPort }}
             host: {{ $serviceName }}
-{{- end }}
 {{- $fullName := include "nexus.fullname" . -}}
 {{ if .Values.nexus.docker.enabled }}
 {{ range $registry := .Values.nexus.docker.registries }}
@@ -53,4 +52,4 @@ spec:
         host: {{ $fullName | trunc 49 }}-docker-{{ $registry.port }}
 {{- end }}
 {{- end }}
-
+{{- end }} 
