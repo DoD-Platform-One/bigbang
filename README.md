@@ -16,7 +16,7 @@ Big Bang also builds tooling around the testing and validation of Big Bang packa
 
 Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, monitoring, etc. are handled via Big Bang.   Additional packages (e.g. ArgoCD, GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the customer can use the Kubernetes cluster to add mission specific applications.
 
-Additional information can be found in [Big Bang Docs](./docs/README.md).
+Additional information can be found at [Big Bang Docs](https://docs-bigbang.dso.mil) and [here](./docs/README.md).
 
 
 ## Getting Started
