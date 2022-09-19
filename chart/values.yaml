@@ -88,6 +88,31 @@ job_image:
 
 openshift: false
 
+bbtests:
+  enabled: false
+  cypress:
+    artifacts: true
+    envs:
+      cypress_nexus_url: "http://nexus-nexus-repository-manager:8081"
+      cypress_nexus_user: "admin"
+    secretEnvs:
+      - name: cypress_nexus_pass
+        valueFrom:
+          secretKeyRef:
+            name: nexus-repository-manager-secret
+            key: admin.password
+  scripts:
+    image: "registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.11.0"
+    envs:
+      docker_host: "nexus-nexus-repository-manager-docker-5000:5000"
+      docker_user: "admin"
+    secretEnvs:
+      - name: docker_password
+        valueFrom:
+          secretKeyRef:
+            name: nexus-repository-manager-secret
+            key: admin.password
+
 # -- End of BigBang Additions
 
 statefulset:

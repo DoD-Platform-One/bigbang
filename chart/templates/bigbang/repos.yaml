@@ -30,7 +30,7 @@ spec:
             {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }} 
             until curl --head localhost:15000; do echo "Waiting for Istio proxy sidecar"; sleep 10; done; echo "Sidecar available"  &&
             {{- end }}
-            BASE_URL="http://{{ template "nexus.name" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
+            BASE_URL="http://{{ include "nexus.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
             
             # repo creation
             {{- range .Values.nexus.repository.repo }}           

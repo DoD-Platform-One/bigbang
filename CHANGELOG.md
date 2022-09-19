@@ -1,10 +1,15 @@
 # Changelog
 
 ---
+## [41.1.0-bb.4] - 2022-09-19
+### Added
+- Added test for CI to push/pull image from nexus docker registry
+### Fixed
+- Fixed service name in BB jobs
+
 ## [41.1.0-bb.3] - 2022-09-19
 ### Changed
 - The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang blob-storage job. 
-
 
 ## [41.1.0-bb.2] - 2022-09-16
 ### Changed

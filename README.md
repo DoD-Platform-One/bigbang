@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 41.1.0-bb.3](https://img.shields.io/badge/Version-41.1.0--bb.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.1](https://img.shields.io/badge/AppVersion-3.41.1-informational?style=flat-square)
+![Version: 41.1.0-bb.4](https://img.shields.io/badge/Version-41.1.0--bb.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.1](https://img.shields.io/badge/AppVersion-3.41.1-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -96,6 +96,19 @@ helm install nexus-repository-manager chart/
 | job_image.tag | float | `8.6` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
 | openshift | bool | `false` |  |
+| bbtests.enabled | bool | `false` |  |
+| bbtests.cypress.artifacts | bool | `true` |  |
+| bbtests.cypress.envs.cypress_nexus_url | string | `"http://nexus-nexus-repository-manager:8081"` |  |
+| bbtests.cypress.envs.cypress_nexus_user | string | `"admin"` |  |
+| bbtests.cypress.secretEnvs[0].name | string | `"cypress_nexus_pass"` |  |
+| bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.name | string | `"nexus-repository-manager-secret"` |  |
+| bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.key | string | `"admin.password"` |  |
+| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.11.0"` |  |
+| bbtests.scripts.envs.docker_host | string | `"nexus-nexus-repository-manager-docker-5000:5000"` |  |
+| bbtests.scripts.envs.docker_user | string | `"admin"` |  |
+| bbtests.scripts.secretEnvs[0].name | string | `"docker_password"` |  |
+| bbtests.scripts.secretEnvs[0].valueFrom.secretKeyRef.name | string | `"nexus-repository-manager-secret"` |  |
+| bbtests.scripts.secretEnvs[0].valueFrom.secretKeyRef.key | string | `"admin.password"` |  |
 | statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
