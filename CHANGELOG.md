@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.5] - 2022-09-14
+### Changed
+- Changed `disallow-nodeport-services` to `audit`
+- Updated Gluon to `0.3.0`
+- Fixed `disallow-pod-exec` from `attach` to `audit`
+
 ## [1.0.1-bb.4] - 2022-09-08
 ### Changed
 - Updated `ttlSecondsAfterFinished` time to extend lifecycle

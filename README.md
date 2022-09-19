@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.1-bb.4](https://img.shields.io/badge/Version-1.0.1--bb.4-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.0.1-bb.5](https://img.shields.io/badge/Version-1.0.1--bb.5-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -64,7 +64,7 @@ helm install kyverno-policies chart/
 | policies.disallow-labels.parameters.disallow | list | `[]` | List of labels disallowed on pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. |
 | policies.disallow-namespaces | object | `{"enabled":false,"parameters":{"disallow":["default"]},"validationFailureAction":"audit"}` | Prevent pods from using the listed namespaces |
 | policies.disallow-namespaces.parameters.disallow | list | `["default"]` | List of namespaces to deny pod deployment |
-| policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent services of the type NodePort |
+| policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent services of the type NodePort |
 | policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"attach"}` | Prevent the use of `exec` or `attach` on pods |
 | policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent privilege escalation on pods |
 | policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers that run as privileged |
