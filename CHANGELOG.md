@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [41.1.0-bb.3] - 2022-09-19
+### Changed
+- The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang blob-storage job. 
+
+
 ## [41.1.0-bb.2] - 2022-09-16
 ### Changed
 - Fixed virtual service template.
