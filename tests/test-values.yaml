@@ -1,16 +1,8 @@
 bbtests:
   enabled: true
-  cypress:
-    artifacts: true
+  scripts:
     envs:
-      cypress_nexus_url: "http://nexus-nexus-repository-manager:8081"
-      cypress_nexus_user: "admin"
-    secretEnvs:
-      - name: cypress_nexus_pass
-        valueFrom:
-          secretKeyRef:
-            name: nexus-repository-manager-secret
-            key: admin.password
+      docker_args: "--insecure"
 
 networkPolicies:
   enabled: true
@@ -29,3 +21,33 @@ nexus:
     limits:
       cpu: 1
       memory: 3000Mi
+
+  docker:
+    enabled: true
+    registries:
+      # This host isn't used when ingress/istio are disabled so it can be whatever we want
+      - host: nexus-registry
+        port: 5000
+
+  repository:
+    enabled: true
+    repo:
+      - name: "containers"
+        format: "docker"
+        type: "hosted"
+        repo_data:
+          name: "containers"
+          online: true
+          storage:
+            blobStoreName: "default"
+            strictContentTypeValidation: true
+            writePolicy: "allow_once"
+          cleanup:
+            policyNames:
+              - "string"
+          component:
+            proprietaryComponents: true
+          docker:
+            v1Enabled: false
+            forceBasicAuth: true
+            httpPort: 5000

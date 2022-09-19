@@ -1,0 +1,23 @@
+{{- include "gluon.tests.script-configmap.overrides" (list . "nexus-test.script-configmap") }}
+{{- define "nexus-test.script-configmap" }}
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ include "nexus.name" . }}
+    helm.sh/chart: {{ include "nexus.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: nexus-repository-manager
+    app.kubernetes.io/component: {{ include "nexus.name" . }}
+{{- end }}
+---
+{{- include "gluon.tests.script-runner.overrides" (list . "nexus-test.script-runner") -}}
+{{- define "nexus-test.script-runner" -}}
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ include "nexus.name" . }}
+    helm.sh/chart: {{ include "nexus.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/part-of: nexus-repository-manager
+    app.kubernetes.io/component: {{ include "nexus.name" . }}
+{{- end }}

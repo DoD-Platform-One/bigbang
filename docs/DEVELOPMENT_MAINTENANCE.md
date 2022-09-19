@@ -266,3 +266,4 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 - set nexus.resources: requests and limits
 - set nexus.securityContext values
 - set .Values.secret.enabled true for CaC with admin credentials
+- added bbtests values to support cypress/script tests
