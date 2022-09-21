@@ -5,7 +5,7 @@ The below details the steps required to update to a new version of the Nexus pac
 1. Read release notes from upstream [Nexus Releases](https://help.sonatype.com/repomanager3/product-information/release-notes). Be aware of changes that are included in the upgrade. Take note of any manual upgrade steps that customers might need to perform, if any.
 1. Do diff of [upstream chart](https://github.com/sonatype/helm3-charts/tree/nexus-repository-manager-40.1.0/charts/nexus-repository-manager) between old and new release tags to become aware of any significant chart changes. A graphical diff tool such as [Meld](https://meldmerge.org/) is useful. You can see where the current helm chart came from by inspecting ```/chart/kptfile```
 1. Create a development branch and merge request from the Gitlab issue.
-1. Merge/Sync the new helm chart with the existing Nexus package code. A graphical diff tool like [Meld](https://meldmerge.org/) is useful. Reference the "Modifications made to upstream chart" section below. Be careful not to overwrite Big Bang Package changes that need to be kept. Note that some files will have combinations of changes that you will overwite and changes that you keep. Stay alert. The hardest file to update is the ```/chart/values.yaml``` because the changes are many and complicated.
+1. Merge/Sync the new helm chart with the existing Nexus package code. A graphical diff tool like [Meld](https://meldmerge.org/) is useful. Reference the "Modifications made to upstream chart" section below. Be careful not to overwrite Big Bang Package changes that need to be kept. Note that some files will have combinations of changes that you will overwrite and changes that you keep. Stay alert. The hardest file to update is the ```/chart/values.yaml``` because the changes are many and complicated.
 1. In `chart/Chart.yaml` update gluon to the latest version and run `helm dependency update chart` from the top level of the repo to package it up.
 1. Modify the `image.tag` value in `chart/values.yaml` to point to the newest version of Nexus.
 1. Update `chart/Chart.yaml` to the appropriate versions. The annotation version should match the ```appVersion```.
@@ -18,7 +18,7 @@ The below details the steps required to update to a new version of the Nexus pac
     ```
 1. Update `CHANGELOG.md` adding an entry for the new version and noting all changes (at minimum should include `Updated Nexus to x.x.x`).
 1. Generate the `README.md` updates by following the [guide in gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md).
-1. Open an MR in "Draft" status and validate that CI passes. This will perform a number of smoke tests against the package, but it is good to manually deploy to test some things that CI doesn't. 
+1. Open an MR in "Draft" status and validate that CI passes. This will perform a number of smoke tests against the package, but it is good to manually deploy to test some things that CI doesn't.
 1. Once all manual testing is complete take your MR out of "Draft" status and add the review label.
 
 # How to test Nexus
@@ -41,7 +41,7 @@ istiooperator:
 
 istio:
   enabled: true
-          
+
 jaeger:
   enabled: false
 
@@ -107,7 +107,7 @@ addons:
 
 ## Test SSO Job
 
-SSO Job testing will require your own deployment of Keycloak because you must change the client settings. This cannot be done with P1 login.dso.mil because we don't have admin privileges to change the config there. 
+SSO Job testing will require your own deployment of Keycloak because you must change the client settings. This cannot be done with P1 login.dso.mil because we don't have admin privileges to change the config there.
 
 Follow the instructions from the corresponding `DEVELOPMENT_MAINTENANCE.md` testing instructions in the Keycloak Package to deploy Keycloak. Then deploy Nexus with the following values (note the `idpMetadata` value must be filled in with your Keycloak's information and `license_key` from the license file):
 
@@ -199,11 +199,11 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 - add templating to handle CaC for license
 
-## chart/templates/configmap.ymal
+## chart/templates/configmap.yaml
 - fix extraLabels indentation to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 
-## chart/templates/deployment.ymal
+## chart/templates/deployment.yaml
 - fix extraLabels indentation to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 - add extraLables to spec.template.metadata.labels
@@ -217,15 +217,15 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 - add volume for license
 - add volume for admin password
 
-## chart/templates/ingress.ymal
+## chart/templates/ingress.yaml
 - fix extraLabels indentation in 2 places to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 
-## chart/templates/pv.ymal
+## chart/templates/pv.yaml
 - fix extraLabels indentation to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 
-## chart/templates/pvc.ymal
+## chart/templates/pvc.yaml
 - fix extraLabels indentation to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 
@@ -237,7 +237,7 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 - fix istio port name "http-nexus-ui"
 
-## chart/templates/serviceaccount.ymal
+## chart/templates/serviceaccount.yaml
 - fix extraLabels indentation to avoid templating errors with helm, fluxcd, etc.
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 
