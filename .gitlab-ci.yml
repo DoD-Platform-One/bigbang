@@ -5,3 +5,4 @@ include:
 variables:
   PIPELINE_REPO_BRANCH: 'bb_merge_resilience' 
   DEBUG_ENABLED: "true"
+  BB_PROJECT_ID: 2906
