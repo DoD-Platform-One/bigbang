@@ -13,7 +13,7 @@ image_tag=$RANDOM
 echo "pushing image to nexus registry..."
 
 # Retry due to timing with Nexus docker registry being ready for our request and finicky package CI
-for i in {1..5}; do 
+for i in {1..10}; do 
   /bin/crane push alpine-push.tar ${docker_host}/alpine:${image_tag} ${docker_args} && export EC=$? || export EC=$?
   if [[ $EC == 0 ]]; then
     break
@@ -28,7 +28,7 @@ fi
 
 # Retry due to timing with Nexus docker registry being ready for our request and finicky package CI
 echo "pulling image from nexus registry..."
-for i in {1..5}; do 
+for i in {1..10}; do 
   /bin/crane pull ${docker_host}/alpine:${image_tag} alpine-pull.tar ${docker_args} && export EC=$? || export EC=$?
   if [[ $EC == 0 ]]; then
     break
