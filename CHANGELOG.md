@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [41.1.0-bb.5] - 2022-09-19
+### Changed
+- Updating registry host VirtualService to use template function to be able to reference domain value.
+
 ## [41.1.0-bb.4] - 2022-09-19
 ### Added
 - Added test for CI to push/pull image from nexus docker registry

@@ -43,7 +43,7 @@ spec:
     - {{ . }}
   {{- end }}
   hosts:
-  - {{ $registry.host | quote }}
+  - {{ tpl $registry.host $ | quote }}
   http:
   - route:
     - destination:
