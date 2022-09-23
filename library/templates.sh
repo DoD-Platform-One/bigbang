@@ -1665,3 +1665,16 @@ renovate_download_external_deps() {
   mkdir -p "${CI_PROJECT_DIR}"/renovate
 }
 
+gitlab_triage_dryrun(){
+    #!/bin/bash
+    for project in $(awk '{print $1}' project_whitelist.txt); do 
+        gitlab-triage --dry-run --token $RO_RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
+    done
+}
+
+gitlab_triage(){
+    #!/bin/bash
+    for project in $(awk '{print $1}' project_whitelist.txt); do 
+        gitlab-triage --token $RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
+    done
+}
