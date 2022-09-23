@@ -10,12 +10,12 @@ stages:
 
 before_script:
   - gitlab-triage --version  # For debugging
+  - source ./gitlab-triage.sh
 
 gitlab-triage:
   stage: dry_run
   extends:
     - .generic-runner-tags
-    - .templates
   except:
     - schedules
   script:
@@ -27,6 +27,5 @@ gitlab-triage:on-schedule:
     - schedules
   extends:
     - .generic-runner-tags
-    - .templates
   script:
     - gitlab_triage
