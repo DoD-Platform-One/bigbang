@@ -250,12 +250,26 @@ echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_in
 sysctl -w fs.inotify.max_user_instances=1024
 echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf
 sysctl -w fs.inotify.max_user_watches=1048576
+echo "fs.may_detach_mounts=1" >> /etc/sysctl.d/fs-may_detach_mounts.conf
+sysctl -w fs.may_detach_mounts=1
 sysctl -p
 ulimit -n 131072
 ulimit -u 8192
+# ulimits/modprobes for Istio
+echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf
+modprobe br_netfilter 
+modprobe nf_nat_redirect
 modprobe xt_REDIRECT
 modprobe xt_owner
 modprobe xt_statistic
+echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf
+echo "nf_nat_redirect" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf
 EOF
 
 
@@ -336,16 +350,6 @@ echo
 echo
 echo
 echo "starting instance config"
-echo "Machine config"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo sysctl -w vm.max_map_count=524288"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c \"echo 'vm.max_map_count=524288' > /etc/sysctl.d/vm-max_map_count.conf\""
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c \"echo 'fs.file-max=131072' > /etc/sysctl.d/fs-file-max.conf\""
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'sysctl -p'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'ulimit -n 131072'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'ulimit -u 8192'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_REDIRECT'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_owner'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_statistic'"
 
 echo "Instance will automatically terminate 8 hours from now unless you alter the crontab"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'echo \"\$(date -u -d \"+8 hours\" +\"%M %H\") * * * /usr/sbin/shutdown -h now\" | crontab -'"
