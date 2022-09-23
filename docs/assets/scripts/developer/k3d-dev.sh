@@ -240,10 +240,16 @@ Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
 Content-Type: text/x-shellscript; charset="us-ascii"
 
 #!/bin/bash
-# Set the vm.max_map_count to 262144.
-# Required for Elastic to run correctly without OOM errors.
-echo 'vm.max_map_count=524288' > /etc/sysctl.d/vm-max_map_count.conf
-echo 'fs.file-max=131072' > /etc/sysctl.d/fs-file-max.conf
+sysctl -w vm.max_map_count=524288
+echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf
+sysctl -w fs.nr_open=13181252
+echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf
+sysctl -w fs.file-max=13181250
+echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf
+echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf
+sysctl -w fs.inotify.max_user_instances=1024
+echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf
+sysctl -w fs.inotify.max_user_watches=1048576
 sysctl -p
 ulimit -n 131072
 ulimit -u 8192
