@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.74]
+### Added
+- Added airgap infrastructure diagram
+
 ## [2.4.73]
 ### Changed
 - Timeout is now 10 minutes instead of 5 minutes in 03_helm_test.sh
@@ -351,7 +355,7 @@ Pipeline will exit w/ a `321` code if any package that is _not_ BETA fails to pu
 
 ## [2.3.6]
 ### Added
-- Added `check_changes` function to enable disabled packages in pipeline if any changes are detected 
+- Added `check_changes` function to enable disabled packages in pipeline if any changes are detected
 
 ## [2.3.5]
 ### Fixed
@@ -460,7 +464,7 @@ Pipeline will exit w/ a `321` code if any package that is _not_ BETA fails to pu
 
 ## [2.2.2]
 ### Fixed
-- Deploy scripts to use new CI_DEPLOY_LABEL array 
+- Deploy scripts to use new CI_DEPLOY_LABEL array
 
 ## [2.2.1]
 ### Fixed
