@@ -31,7 +31,6 @@ bb-docs:on-schedule:
     - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/product-tools/bb-docs-compiler.git" scheduled-build
     - cd scheduled-build
     - git checkout docs
-    - ls -la
     - git checkout main
     - poetry install --no-dev
     - npm ci
@@ -52,11 +51,8 @@ bb-docs:on-schedule:
         echo "[$((10 - $counter))/10] Waiting for 'localhost:8000' to be ready"
         sleep 15
       done
-    - PLAYWRIGHT_BROWSERS_PATH="/ms-playwright" npm test
     - poetry run mike list --branch docs
-    - tag=$(poetry run bb-docs-info latest-bb-tag)
-    - echo $tag
-    - poetry run mike deploy --branch docs --update-aliases --template docs-compiler/templates/redirect.html "${tag}" latest
+    - poetry run mike deploy --branch docs --update-aliases --template docs-compiler/templates/redirect.html "$(poetry run bb-docs-info latest-bb-tag)" latest
     - poetry run mike list --branch docs
     - git checkout docs -- &>/dev/null
     - git show main:docs-compiler/templates/index.html > index.html
