@@ -47,17 +47,16 @@ loki:
       region: {{ .Values.loki.objectStorage.region }}
       accessKeyId: {{ .Values.loki.objectStorage.accessKey }}
       secretAccessKey: {{ .Values.loki.objectStorage.accessSecret }}
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
 
 {{- with .Values.loki.objectStorage }}
 {{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
   enabled: true
 {{- end }}
-{{- end }}
-
-{{- if .Values.istio.enabled }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
 {{- end }}
 
 monolith:
@@ -73,6 +72,12 @@ monolith:
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
+
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
 {{- if (eq .Values.loki.strategy "monolith") }}
 read:
   disabled: true
