@@ -12,12 +12,6 @@ if [[ $DEBUG_ENABLED == "true" ]]; then
   echo "Metrics disabled = $METRICS_DISABLED"
 fi
 
-if [[ $MULTI_NODE == "true" ]]; then
-  echo "Enabling multiple nodes (1 server, 3 agent)"
-  yq -i e '.agents |= 3' ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config-no-metrics.yaml
-  yq -i e '.agents |= 3' ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config.yaml
-fi
-
 # Conditionals for BB pipelines: metricsServer label, all-packages label, main pipeline, tag pipeline
 # Conditionals for Integration pipelines: metricsServer explicitly enabled in values
 # Conditionals for any pipeline: `METRICS_DISABLED` ENV set to "true"

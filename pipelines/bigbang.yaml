@@ -62,7 +62,6 @@ variables:
   PIPELINE_TYPE: "BB"
   DEBUG_ENABLED: "false"
   METRICS_DISABLED: "false"
-  MULTI_NODE: "false"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
