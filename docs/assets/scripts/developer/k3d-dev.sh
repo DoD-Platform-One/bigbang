@@ -19,7 +19,7 @@ if [[ -z "${EXISTING_VPC}" ]]; then
   exit 1
 fi
 # check for tools
-tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl)
+tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl tr base64)
 for tooldependency in "${tooldependencies[@]}"
   do
     command -v $tooldependency >/dev/null 2>&1 || { echo >&2 " $tooldependency is not installed.";  missingtool=1; }
