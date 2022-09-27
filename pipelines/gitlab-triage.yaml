@@ -10,7 +10,8 @@ stages:
 
 before_script:
   - gitlab-triage --version  # For debugging
-  - source ./gitlab-triage.sh
+  - curl https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/raw/master/library/templates.sh -o templates.sh
+  - source ./templates.sh
 
 gitlab-triage:
   stage: dry_run
