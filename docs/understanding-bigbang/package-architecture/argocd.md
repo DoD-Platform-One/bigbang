@@ -68,7 +68,15 @@ Argo CD is largely stateless, all data is persisted as Kubernetes objects, which
 
 ### High Availability
 
-Upstream provides methods and docs for deploying argocd in HA. However, a production HA deployment of argocd within Big Bang has not been fully vetted and may produce results that vary.
+Upstream provides methods and [documentation](https://argo-cd.readthedocs.io/en/stable/operator-manual/high_availability/#argocd-dex-server-argocd-redis) for deploying argocd in HA.
+
+Requirements:
+- HA installation will require at least three different nodes due to pod anti-affinity roles in the specs.
+- `controller.replicas` and the `ARGOCD_CONTROLLER_REPLICAS` controller environment variable must have matching values (see below).
+- ArgoCD is pre-configured with the understanding of only three total redis servers. The package deploys a master with 3 replicas by default.
+
+Caveats:
+- The argocd-dex-server uses an in-memory database, and two or more instances would have inconsistent data.
 
 The following is an example of how to modify the Big Bang values to accommodate a HA deployment.
 
@@ -77,11 +85,14 @@ addons:
   argocd:
     values:
       controller:
-        replicas: 2
+        replicas: 3
+        env:
+        - name: "ARGOCD_CONTROLLER_REPLICAS"
+          value: "3"
       server:
-        replicas: 2  
+        replicas: 3
       repoServer:
-        replicas: 2              
+        replicas: 3
 ```
 
 For additional information about an ArgoCD high availability deployment visit [ArgoCD High Availability](https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/#high-availability)
