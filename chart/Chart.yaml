@@ -1,5 +1,5 @@
 apiVersion: v2
-name: confluence
+name: test-oci-confluence
 description: A chart for installing Confluence Data Center on Kubernetes
 type: application
 version: 1.5.1-bb.1
