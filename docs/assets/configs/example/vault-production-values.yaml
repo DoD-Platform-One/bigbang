@@ -41,10 +41,6 @@ addons:
         # this is a double negative. Put "false" to enable TLS for passthrough ingress
         tlsDisable: false
 
-      injector:
-        extraEnvironmentVars:
-          AGENT_INJECT_VAULT_ADDR: "https://vault.bigbang.dev"
-
       server:
         # Increase default resources
         resources:
@@ -62,7 +58,6 @@ addons:
         # Extra environment variable to support high availability
         extraEnvironmentVars:
           # the istio gateway domain
-          VAULT_API_ADDR: https://vault.bigbang.dev
           VAULT_SKIP_VERIFY: "true"
           VAULT_LOG_FORMAT: "json"
           VAULT_LICENSE: "your-license-key-goes-here"
@@ -71,6 +66,10 @@ addons:
           # enable high availability.
           enabled: true
           replicas: 3
+
+          # tell the deployments where our Vault API endpoint is
+          # see https://github.com/hashicorp/vault-helm/issues/789
+          apiAddr: "https://vault.bigbang.dev"
 
           # raft is the license free most simple solution for a distributed filesystem
           raft:
