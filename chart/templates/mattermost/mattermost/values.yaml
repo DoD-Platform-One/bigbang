@@ -27,9 +27,9 @@ sso:
   enabled: {{ .enabled }}
   client_id: {{ .client_id }}
   client_secret: {{ .client_secret | default "no-secret" }}
-  auth_endpoint: {{ .auth_endpoint | default (printf "https://%s/oauth/authorize" $.Values.sso.oidc.host) }}
-  token_endpoint: {{ .token_endpoint | default (printf "https://%s/oauth/token" $.Values.sso.oidc.host) }}
-  user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/api/v4/user" $.Values.sso.oidc.host) }}
+  auth_endpoint: {{ .auth_endpoint | default (printf "https://%s/auth/realms/%s/protocol/openid-connect/auth" $.Values.sso.oidc.host $.Values.sso.oidc.realm) }}
+  token_endpoint: {{ .token_endpoint | default (printf "https://%s/auth/realms/%s/protocol/openid-connect/token" $.Values.sso.oidc.host $.Values.sso.oidc.realm) }}
+  user_api_endpoint: {{ .user_api_endpoint | default (printf "https://%s/auth/realms/%s/protocol/openid-connect/userinfo" $.Values.sso.oidc.host $.Values.sso.oidc.realm) }}
 {{- end }}
 
 networkPolicies:
