@@ -2,7 +2,7 @@
 
 > NOTE: This script does not does not install Flux or deploy Big Bang. You must handle those deployments after your k3d dev cluster is ready.
 
-The instance will automatically terminate in the middle of the night at 08:00 UTC.
+The instance will automatically terminate 8 hours after creation.
 
 ## Install and Configure Dependencies
 
