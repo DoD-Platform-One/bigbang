@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 41.1.0-bb.5](https://img.shields.io/badge/Version-41.1.0--bb.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.1](https://img.shields.io/badge/AppVersion-3.41.1-informational?style=flat-square)
+![Version: 41.1.0-bb.6](https://img.shields.io/badge/Version-41.1.0--bb.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.41.1](https://img.shields.io/badge/AppVersion-3.41.1-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -157,6 +157,7 @@ helm install nexus-repository-manager chart/
 | nexus.securityContext.fsGroup | int | `2000` |  |
 | nexus.securityContext.runAsUser | int | `200` |  |
 | nexus.securityContext.runAsGroup | int | `2000` |  |
+| nexus.containerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | nexus.podAnnotations | object | `{}` |  |
 | nexus.livenessProbe.initialDelaySeconds | int | `30` |  |
 | nexus.livenessProbe.periodSeconds | int | `30` |  |

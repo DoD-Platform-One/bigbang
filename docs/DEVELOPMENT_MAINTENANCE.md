@@ -216,6 +216,7 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 - add subPath to the secret volumemount
 - add volume for license
 - add volume for admin password
+- add securityContext: '$.Values.nexus.containerSecurityContext` to containers:
 
 ## chart/templates/ingress.yaml
 - fix extraLabels indentation in 2 places to avoid templating errors with helm, fluxcd, etc.

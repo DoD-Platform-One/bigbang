@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [41.1.0-bb.6] - 2022-09-26
+### Changed
+- added securityContext: capabilities: drop: ALL
+
 ## [41.1.0-bb.5] - 2022-09-19
 ### Changed
 - Updating registry host VirtualService to use template function to be able to reference domain value.
