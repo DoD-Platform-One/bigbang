@@ -223,6 +223,11 @@ nexus:
     runAsUser: 200
     runAsGroup: 2000
 
+  containerSecurityContext:
+    capabilities:
+      drop: 
+        - ALL
+
   podAnnotations: {}
   livenessProbe:
     initialDelaySeconds: 30
