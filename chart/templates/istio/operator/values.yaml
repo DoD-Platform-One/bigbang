@@ -14,4 +14,6 @@ imagePullSecrets:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
 {{- end -}}
