@@ -727,6 +727,7 @@ twistlock:
     console:
       persistence:
         size: 256Mi
+      localVolumeUpgrade: true
     bbtests:
       enabled: true
       cypress:
@@ -1275,21 +1276,42 @@ addons:
           requests:
             cpu: 100m
             memory: 1500Mi
+        docker:
+          enabled: true
+          registries:
+            - host: containers.bigbang.dev
+              port: 5000
+        repository:
+          enabled: true
+          repo:
+            - name: "containers"
+              format: "docker"
+              type: "hosted"
+              repo_data:
+                name: "containers"
+                online: true
+                storage:
+                  blobStoreName: "default"
+                  strictContentTypeValidation: true
+                  writePolicy: "allow_once"
+                cleanup:
+                  policyNames:
+                    - "string"
+                component:
+                  proprietaryComponents: true
+                docker:
+                  v1Enabled: false
+                  forceBasicAuth: true
+                  httpPort: 5000
       bbtests:
         enabled: true
         cypress:
           artifacts: true
           envs:
             cypress_nexus_url: "https://nexus.bigbang.dev"
-            cypress_nexus_user: "admin"
-            cypress_nexus_pass_new: "new_admin_password"
-          secretEnvs:
-            - name: cypress_nexus_pass
-              valueFrom:
-                secretKeyRef:
-                  name: nexus-repository-manager-secret
-                  key: admin.password
-
+        scripts:
+          envs:
+            docker_host: "containers.bigbang.dev"
   velero:
     enabled: false
     plugins:

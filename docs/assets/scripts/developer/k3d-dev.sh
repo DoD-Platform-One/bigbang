@@ -8,7 +8,7 @@ fi
 
 if [[ -z "${AMI_ID}" ]]; then
   # default
-  AMI_ID=ami-84556de5
+  AMI_ID=ami-0126fb88475632215
 fi
 
 #### Preflight Checks
@@ -19,7 +19,7 @@ if [[ -z "${EXISTING_VPC}" ]]; then
   exit 1
 fi
 # check for tools
-tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl)
+tooldependencies=(jq sed aws ssh ssh-keygen scp kubectl tr base64)
 for tooldependency in "${tooldependencies[@]}"
   do
     command -v $tooldependency >/dev/null 2>&1 || { echo >&2 " $tooldependency is not installed.";  missingtool=1; }
@@ -206,8 +206,46 @@ VolumeSize=120
 echo "Using AMI image id ${AMI_ID}"
 ImageId="${AMI_ID}"
 
+# Create userdata.txt
+cat << EOF > ~/aws/userdata.txt
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+
+--==MYBOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
+
+#!/bin/bash
+sudo -- bash -c 'sysctl -w vm.max_map_count=524288; \
+  echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf; \
+  sysctl -w fs.nr_open=13181252; \
+  echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf; \
+  sysctl -w fs.file-max=13181250; \
+  echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf; \
+  echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf; \
+  sysctl -w fs.inotify.max_user_instances=1024; \
+  echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf; \
+  sysctl -w fs.inotify.max_user_watches=1048576; \
+  echo "fs.may_detach_mounts=1" >> /etc/sysctl.d/fs-may_detach_mounts.conf; \
+  sysctl -w fs.may_detach_mounts=1; \
+  sysctl -p; \
+  echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+  modprobe br_netfilter; \
+  modprobe nf_nat_redirect; \
+  modprobe xt_REDIRECT; \
+  modprobe xt_owner; \
+  modprobe xt_statistic; \
+  echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "nf_nat_redirect" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf'
+EOF
+
 # Create the launch spec
-echo -n Creating launch_spec.json ...
+echo Creating launch_spec.json ...
 mkdir -p ~/aws
 ##notworking line.  "InstanceInitiatedShutdownBehavior":"Terminate",
 cat << EOF > ~/aws/launch_spec.json
@@ -225,33 +263,10 @@ cat << EOF > ~/aws/launch_spec.json
         "VolumeSize": ${VolumeSize}
       }
     }
-  ]
+  ],
+  "UserData": "$(base64 $HOME/aws/userdata.txt | tr -d \\n)"
 }
 EOF
-
-# TODO: can spot instances be created with userdata?
-# Create userdata.txt
-# https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
-cat << EOF > ~/aws/userdata.txt
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
-
---==MYBOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
-
-#!/bin/bash
-# Set the vm.max_map_count to 262144.
-# Required for Elastic to run correctly without OOM errors.
-echo 'vm.max_map_count=524288' > /etc/sysctl.d/vm-max_map_count.conf
-echo 'fs.file-max=131072' > /etc/sysctl.d/fs-file-max.conf
-sysctl -p
-ulimit -n 131072
-ulimit -u 8192
-modprobe xt_REDIRECT
-modprobe xt_owner
-modprobe xt_statistic
-EOF
-
 
 #### Request a Spot Instance
 # Location of your private SSH key created during setup
@@ -330,16 +345,6 @@ echo
 echo
 echo
 echo "starting instance config"
-echo "Machine config"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo sysctl -w vm.max_map_count=524288"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c \"echo 'vm.max_map_count=524288' > /etc/sysctl.d/vm-max_map_count.conf\""
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c \"echo 'fs.file-max=131072' > /etc/sysctl.d/fs-file-max.conf\""
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'sysctl -p'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'ulimit -n 131072'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'ulimit -u 8192'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_REDIRECT'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_owner'"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'modprobe xt_statistic'"
 
 echo "Instance will automatically terminate 8 hours from now unless you alter the crontab"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'echo \"\$(date -u -d \"+8 hours\" +\"%M %H\") * * * /usr/sbin/shutdown -h now\" | crontab -'"
@@ -376,7 +381,7 @@ echo
 echo
 # install k3d on instance
 echo "Installing k3d on instance"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.4 bash"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.6 bash"
 echo
 echo "k3d version"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "k3d version"
@@ -464,9 +469,12 @@ if [[ "$METAL_LB" == true ]]; then
   # fix /etc/hosts for new cluster
   sudo sed -i '/bigbang.dev/d' /etc/hosts
   sudo bash -c "echo '## begin bigbang.dev section' >> /etc/hosts"
-  sudo bash -c "echo 172.20.1.240  keycloak.bigbang.dev >> /etc/hosts"
-  sudo bash -c "echo 172.20.1.241  gitlab.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo 172.20.1.240  keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo 172.20.1.241 anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
   sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+  # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+  kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+  kubectl delete pod -n kube-system -l k8s-app=kube-dns
 	ENDSSH
 fi
 

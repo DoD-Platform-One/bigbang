@@ -30,6 +30,14 @@ metrics:
   serviceMonitor:
     enabled: true
     additionalLabels: {}
+    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target
+    {{- end }}
 {{- end }}
 
 networkPolicies:

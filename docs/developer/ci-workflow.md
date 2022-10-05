@@ -4,7 +4,29 @@ The following is meant to serve as an overview of the pipeline stages required t
 
 [[_TOC_]]
 
-## Generic Package Pipeline Stages
+## Bigbang Runners Overview
+
+### Privileged runners
+
+  These run on a privileged node pool with limited access to allow for docker in docker k3d clusters.
+  - Package runners:
+    - Separate runners for each BBTOC stage; graduated, incubating, and sandbox.
+    - These run package k3d pipelines.
+  - Bigbang runner:
+    - Runner used specifically for the bigbang repo.
+    - This runs bigbang k3d pipelines.
+    
+### Non-privileged
+
+  These run on a non-privileged node pool.
+  - generic runner:
+    - This runner picks up all non-privileged stages within all pipelines; configuration validation, chart update check, pre vars.
+    - Used to spin up infrastructure testing clusters.
+  - release runner:
+    - This runner handles all package and release stages in all pipelines.
+    - Hashes, signs, and pushes all artifacts to bigbang umbrella s3 bucket.
+
+## Package Pipeline Stages
 
 This pipeline is triggered by the following for individual bigbang packages:
 
@@ -17,12 +39,18 @@ This pipeline is triggered by the following for individual bigbang packages:
 
 [Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
 
+### Chart Update Check
+
+This stage validates that the required files have been updated; README, Changelog, and Chart.yaml. All of these are needed to ensure a package releases can be created. If changes are only documentation a 'SKUP UPDATE CHECK' can be added to the merge request title to skip this check.
+
 ### Configuration Validation
 
 This stage runs a `helm conftest` which is a plugin for testing helm charts with Open Policy Agent. It provides the following checks:
 
 - confirms that the helm chart is valid (should fail similar to how a helm lint fails if there is bad yaml, etc)
 - runs the helm chart against a set of rego policies - currently these tests will only raise warnings on "insecure" things and will allow pipeline to proceed.
+
+This stage also validates the oscal-component.yaml and checks for api deprecations within the package.
 
 ### Package Tests
 
@@ -34,9 +62,21 @@ This stage verifies several easy to check assumptions such as:
 
 If required, the upgrade step can skipped when MR title starts with 'SKIP UPGRADE'
 
+### Auto Tag
+
+When there is a merge into the default branch of a package this stage is triggered and it will create a tag based on the version in the packages Chart.yaml
+
+### Package 
+
+This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging the repo, preping release, publishing to the s3 bucket, and pulling release notes from the changelog.
+
+### Release
+
+Upon successful completion of the package stage this release stage will use those artifacts and run the gitlab release-cli utility to publish the release.
+
 ## BigBang Pipeline Stages
 
-This pipeline is triggered by the following for individual bigbang packages:
+This pipeline is triggered by the following for bigbang:
 
 - merge request events
   - Note: Currently upgrade step only runs during MR events
@@ -51,11 +91,11 @@ The pipeline is split into several stages:
 
 ### Pre Vars
 
-This stage currently has one purpose at this point which is to generate a terraform var.
+This stage generates a terraform var, grabs merge request labels, checks for changes from master to determine what packages have changes, and validates the oscal-component.yaml.
 
 ### Smoke Tests
 
-For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`](https://k3d.io) that lives for the lifetime of the gitlab ci job.  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
+For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`](https://k3d.io) that lives for the lifetime of the gitlab ci job (max 1 hour).  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
 
 This stage verifies several easy to check assumptions such as:
 
@@ -78,6 +118,14 @@ This stage will fail if:
 This stage also serves as a guide for local development, and care is taken to ensure all pipeline actions within this stage are repeatable locally.
 
 This stage is ran on every merge request event, and is a requirement for merging.
+
+### Package 
+
+This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging repos, preping release, publishing to the s3 bucket, and pulling release notes from the changelog.
+
+### Release
+
+Upon successful completion of the package stage this release stage will use those artifacts and run the gitlab release-cli utility to publish the release.
 
 ## Infrastructure Testing Pipeline Stages
 

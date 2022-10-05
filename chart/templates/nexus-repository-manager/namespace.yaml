@@ -5,7 +5,7 @@ metadata:
   name: nexus-repository-manager
   labels:
     {{- if .Values.istio.enabled }}
-    istio-injection: enabled
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.nexus }}
     {{- end }}
     app.kubernetes.io/name: "nexus-repository-manager"
     app.kubernetes.io/component: "developer-tools"

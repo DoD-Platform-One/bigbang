@@ -1,5 +1,5 @@
 {{- if .Values.monitoring.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.monitoring "name" "monitoring" "defaults" (include "bigbang.defaults.monitoring" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.monitoring" .))) "name" "monitoring" "defaults" (include "bigbang.defaults.monitoring" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.monitoring" -}}
@@ -120,6 +120,24 @@ prometheus:
         vault.hashicorp.com/agent-inject-token: "true"
         vault.hashicorp.com/role: "prometheus"
         {{- end }}
+      {{- end }}
+    {{- end }}
+    {{- if .Values.addons.vault.enabled }}
+    additionalScrapeConfigs:
+    - job_name: vault
+      metrics_path: /v1/sys/metrics
+      params:
+        format: ['prometheus']
+      scheme: https
+      authorization:
+        credentials_file: /vault/secrets/token
+      {{- $vaultHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
+      {{- if $vaultHosts }}
+      static_configs:
+      - targets: [{{ tpl ($vaultHosts | first) $ }}]
+      {{- else }}
+      static_configs:
+      - targets: [vault.{{ .Values.domain }}]
       {{- end }}
     {{- end }}
     {{- if $istioInjection }}
@@ -378,4 +396,28 @@ prometheusOperator:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
+{{- end }}
+
+{{- /* This function merges defaults in lists from above into overlays */ -}}
+{{- /* The end user will not have to replicate additionalScrapeConfigs from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any additionalScrapeConfigs to ignore the defaults */ -}}
+{{- define "bigbang.overlays.monitoring" }}
+
+  {{- $defaults := fromYaml (include "bigbang.defaults.monitoring" .) }}
+
+  {{- $overlays := dig "values" dict .Values.monitoring }}
+  {{- range $prometheusConfig, $default := $defaults.prometheus }}
+    {{- $overlay := (dig "prometheus" $prometheusConfig dict $overlays) }}
+    # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
+    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+
+      # Add any default additionalScrapeConfigs to overlay
+      {{- if and (dig "additionalScrapeConfigs"  list $default) (dig "additionalScrapeConfigs"  list $overlay) }}
+         {{ $_ := set $overlay "additionalScrapeConfigs" (concat $default.additionalScrapeConfigs $overlay.additionalScrapeConfigs) }}
+      {{- end }}
+     
+
+    {{- end }}
+  {{- end }}
+{{ toYaml $overlays }}
 {{- end }}
