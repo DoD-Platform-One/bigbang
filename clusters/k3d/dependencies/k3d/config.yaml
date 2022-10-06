@@ -13,10 +13,10 @@ options:
       - arg: --disable=servicelb
         nodeFilters:
           - server:*
-      - arg: --cluster-cidr=172.20.1.0/24
+      - arg: --cluster-cidr=172.21.0.0/16
         nodeFilters:
           - server:*
-      - arg: --service-cidr=172.20.0.0/24
+      - arg: --service-cidr=172.20.0.0/16
         nodeFilters:
           - server:*
       - arg: --cluster-dns=172.20.0.10
