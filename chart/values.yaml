@@ -122,7 +122,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.41.1-01
+  tag: 3.42.0-01
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: private-registry
@@ -195,10 +195,9 @@ nexus:
   properties:
     override: false
     data: {}
-    #   nexus.licenseFile: /nexus-data/sonatype-license.override.lic
-    #   nexus.scripts.allowCreation: true
-    #   See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
-    #   nexus.ldap.env.java.naming.security.authentication: simple
+      # nexus.scripts.allowCreation: true
+      # See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
+      # nexus.ldap.env.java.naming.security.authentication: simple
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
   resources:

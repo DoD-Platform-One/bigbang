@@ -24,7 +24,7 @@ spec:
         {{- with .Values.nexus.extraSelectorLabels }}
           {{ toYaml . | indent 6 }}
         {{- end }}
-      {{- end }}
+      {{- end }}      
   template:
     metadata:
       annotations:
@@ -110,7 +110,7 @@ spec:
             timeoutSeconds: {{ .Values.nexus.readinessProbe.timeoutSeconds }}
             {{- end }}
           volumeMounts:
-            - mountPath: /nexus-data
+            - mountPath: /nexus-data	
               name: {{ template "nexus.name" . }}-data
             - mountPath: /nexus-data/etc
               name: {{ template "nexus.name" . }}-data
