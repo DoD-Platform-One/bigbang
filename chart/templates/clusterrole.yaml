@@ -252,6 +252,7 @@ rules:
   - security.istio.io
   - extensions.istio.io
   - telemetry.istio.io
+  - gateway.networking.k8s.io
   resources: ["*"]
   verbs:
   - get
