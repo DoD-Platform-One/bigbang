@@ -88,6 +88,12 @@ tests:
             - name: nexus-repository-manager-data
               persistentVolumeClaim:
                 claimName: RELEASE-NAME-nexus-repository-manager-data
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 2000
+            runAsGroup: 2000
+            runAsUser: 200
 
   - it: should use our simple values
     template: deployment.yaml

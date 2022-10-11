@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [42.0.0-bb.0] - 2022-10-06
+### Changed
+- Updated chart to version: 42.0.0-bb.0 | appVersion: 3.42.0
+
 ## [41.1.0-bb.6] - 2022-09-26
 ### Changed
 - added securityContext: capabilities: drop: ALL
