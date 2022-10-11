@@ -45,14 +45,16 @@ spec:
         - "--zap-log-level=info"
         - "--leader-election-id={{ include "kiali-operator.fullname" . }}"
         securityContext:
+        {{- if .Values.securityContext }}
+        {{- toYaml .Values.securityContext | nindent 10 }}
+        {{- else }}
           allowPrivilegeEscalation: false
           privileged: false
           runAsNonRoot: true
-          # Added by Big Bang to prevent container from writing to local disk
-          readOnlyRootFilesystem: true
           capabilities:
             drop:
             - ALL
+        {{- end }}
         volumeMounts:
         - mountPath: /tmp/ansible-operator/runner
           name: runner
@@ -75,6 +77,8 @@ spec:
           value: {{ .Values.allowAdHocKialiNamespace | quote }}
         - name: ALLOW_AD_HOC_KIALI_IMAGE
           value: {{ .Values.allowAdHocKialiImage | quote }}
+        - name: ALLOW_SECURITY_CONTEXT_OVERRIDE
+          value: {{ .Values.allowSecurityContextOverride | quote }}
         - name: PROFILE_TASKS_TASK_OUTPUT_LIMIT
           value: "100"
         - name: ANSIBLE_DEBUG_LOGS

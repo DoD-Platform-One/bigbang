@@ -19,7 +19,7 @@ istio:
 port: 20001
 image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.56.1
+  tag: v1.57.1
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
   pullSecrets:
@@ -40,6 +40,15 @@ resources:
 affinity: {}
 replicaCount: 1
 priorityClassName: ""
+securityContext:
+  #BB values for securityContext override 
+  capabilities:
+    drop:
+      - ALL
+  allowPrivilegeEscalation: false
+  privileged: false
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
 
 # metrics.enabled: set to true if you want Prometheus to collect metrics from the operator
 metrics:
@@ -87,6 +96,11 @@ allowAdHocKialiNamespace: true
 # You may want to disable this if you do not want users to install their own Kiali images.
 allowAdHocKialiImage: true
 
+# allowSecurityContextOverride tells the operator to allow a user to be able to fully override the Kiali
+# container securityContext. If this is false, certain securityContext settings must exist on the Kiali
+# container and any attempt to override them will be ignored.
+allowSecurityContextOverride: false
+
 # For what a Kiali CR spec can look like, see:
 # https://github.com/kiali/kiali-operator/blob/master/deploy/kiali/kiali_cr.yaml
 cr:
@@ -109,7 +123,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.56.1
+      image_version: v1.57.1
       image_pull_secrets:
         - private-registry
       ingress_enabled: false
