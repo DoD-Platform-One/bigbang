@@ -138,6 +138,9 @@ check_changes() {
               elif [[ "$package" == "kyverno/policies" ]]; then
                       package="kyvernopolicies"
                       CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "kyverno/reporter" ]]; then
+                      package="kyvernoreporter"
+                      CHANGED_PACKAGES+=("$package")
               elif [[ "$package" == "logging/elasticsearch-kibana" ]]; then
                       package="logging"
                       CHANGED_PACKAGES+=("$package")
@@ -244,6 +247,21 @@ label_check() {
          else 
             LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
             echo "    Added minioOperator"
+         fi
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "promtail" ]]; then
+            echo "    promtail already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("promtail")
+            echo "    Added promtail"
+         fi
+      fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"kyvernoreporter"(,|$) ]]; then
+         echo "  Checking kyvernoreporter"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "kyvernopolicies" ]]; then
+            echo "    kyvernopolicies already enabled"
+         else 
+            LABEL_CHECK_DEPLOY_LABELS+=("kyvernopolicies")
+            echo "    Added kyvernopolicies"
          fi
       fi
       if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
