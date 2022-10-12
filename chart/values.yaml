@@ -407,6 +407,23 @@ kyvernopolicies:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
+kyvernoreporter:
+  # -- Toggle deployment of Kyverno Reporter
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter
+    path: ./chart
+    tag: "2.13.0-bb.0"
+
+  # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
+  flux: {}
+
+  # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------

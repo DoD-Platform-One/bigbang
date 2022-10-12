@@ -1,0 +1,55 @@
+{{- $pkg := "kyvernoreporter" }}
+
+{{- if (get .Values $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kyvernoreporter" -}}
+
+global:
+  fullnameOverride: kyverno-reporter
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+imagePullSecrets:
+- name: private-registry
+
+{{- if .Values.istio.enabled }}
+istio:
+  enabled: true
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+kyvernoPlugin:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
+ui:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+  grafana:
+    namespace: monitoring
+
+openshift: {{ .Values.openshift }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- end -}}
