@@ -40,6 +40,37 @@ kyverno:
     replicaCount: 3
 ```
 
+## Kyverno Reporter
+
+Kyverno Reporter is an optional component providing two main reporting functions: 
+* Providing a metrics endpoint which can be used to observe in monitoring tools like Grafana.
+* Reporting Kyverno policy violations to various configurable `targets`, including Grafana Loki, Elasticsearch, Slack, Discord or MS Teams.
+
+
+```yaml
+kyvernoreporter:
+  enabled: true
+```
+
+### Kyverno Reporter UI
+While not yet officially supported by BigBang the Kyverno Reporter can be useful for inspecting policy results when other tools like Grafana are not available or in debugging scenarios.
+```yaml
+kyvernoreporter:
+  enabled: true
+
+  values:
+    global:
+      plugins:
+        kyverno:
+          enabled: true
+
+    ui:
+      enabled: true
+
+    kyvernoPlugin:
+      enabled: true
+```
+
 ## Single Sign on (SSO)
 
 None. This service doesn't have a web interface.

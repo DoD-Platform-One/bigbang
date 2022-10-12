@@ -293,6 +293,15 @@ kyverno:
     bbtests:
       enabled: true
 
+kyvernoreporter:
+  enabled: false
+  values:
+    bbtests:
+      cypress:
+        envs:
+          cypress_grafana_url: https://grafana.bigbang.dev
+          cypress_prometheus_url: https://prometheus.bigbang.dev
+
 kyvernopolicies:
   enabled: false
   values:

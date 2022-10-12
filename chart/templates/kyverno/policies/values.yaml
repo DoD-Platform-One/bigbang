@@ -1,6 +1,6 @@
 {{- $pkg := "kyvernopolicies" }}
 
-{{- if .Values.kyvernopolicies.enabled }}
+{{- if (get .Values $pkg).enabled }}
 {{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyvernopolicies" .))) "name" "kyvernopolicies" "defaults" (include "bigbang.defaults.kyvernopolicies" .)) }}
 {{- end }}
 
