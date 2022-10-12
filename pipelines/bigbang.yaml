@@ -255,6 +255,7 @@ release:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/umbrella/${CI_COMMIT_TAG}
   script:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
+    - bigbang_release_check
     - bigbang_release
   retry:
     max: 2
@@ -262,6 +263,8 @@ release:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+  allow_failure:
+    exit_codes: 123
 
 #-----------------------------------------------------------------------------------------------------------------------
 #

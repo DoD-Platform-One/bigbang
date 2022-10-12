@@ -411,6 +411,25 @@ bigbang_release() {
    echo -e "\e[0Ksection_end:`date +%s`:bb_release\r\e[0K"
 }
 
+bigbang_release_check() {
+   echo -e "\e[0Ksection_start:`date +%s`:bb_release_check[collapsed=true]\r\e[0K\e[33;1mRelease Check\e[37m"
+   release=$(release-cli --server-url ${CI_SERVER_URL} --project-id ${CI_PROJECT_ID} get --tag-name=${CI_COMMIT_TAG}) || echo "Release not found"
+   if [[ -z $release ]] ; then
+     echo "Release does not already exist, creating..."
+   else
+     assets=$(echo $release | jq '.assets.links | length')
+     echo ${CI_PROJECT_URL}"/-/releases/"${CI_COMMIT_TAG}
+     if [[ $assets > 0 ]] ; then
+       echo "Release exists and appears well-formed. If release needs to be re-generated: Delete the release above and re-run this stage"
+       exit 123
+     else
+  	   echo "Release exists but is missing asset links. Delete the release above and re-run this stage"
+       exit 1
+     fi
+   fi
+   echo -e "\e[0Ksection_end:`date +%s`:bb_release_check\r\e[0K"
+}
+
 clone_bigbang_and_merge_templates() {
    echo -e "\e[0Ksection_start:`date +%s`:clone_and_checkout_bigbang[collapsed=true]\r\e[0K\e[33;1mClone Big Bang and Merge\e[37m"
    git clone ${BB_REPO} ${BB_REPO_DESTINATION}
