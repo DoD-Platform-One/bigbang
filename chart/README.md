@@ -42,7 +42,6 @@ helm install confluence chart/
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-<<<<<<< HEAD
 | replicaCount | int | `1` | The initial number of pods that should be started at deployment of each of Confluence and Synchrony. Note that because Confluence requires initial manual configuration after the first pod is deployed, and before scaling up to additional pods, this should always be kept as 1. |
 | image.repository | string | `"registry1.dso.mil/ironbank/atlassian/confluence-data-center/confluence-node"` |  |
 | image.imagePullSecrets | string | `"private-registry"` | Optional image repository pull secret |
@@ -141,7 +140,6 @@ helm install confluence chart/
 ## Contributing
 
 Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
-=======
 | additionalContainers | list | `[]` | Additional container definitions that will be added to all Confluence pods |
 | additionalFiles | list | `[]` | Additional existing ConfigMaps and Secrets not managed by Helm that should be mounted into service container. Configuration details below (camelCase is important!): 'name'      - References existing ConfigMap or secret name. 'type'      - 'configMap' or 'secret' 'key'       - The file name. 'mountPath' - The destination directory in a container. VolumeMount and Volumes are added with this name and index position, for example; custom-config-0, keystore-2 |
 | additionalHosts | list | `[]` | Additional host aliases for each pod, equivalent to adding them to the /etc/hosts file. https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/ |
@@ -273,4 +271,3 @@ Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in 
 | volumes.synchronyHome.persistentVolumeClaim.create | bool | `false` | If 'true', then a 'PersistentVolume' and 'PersistentVolumeClaim' will be dynamically created for each pod based on the 'StorageClassName' supplied below. |
 | volumes.synchronyHome.persistentVolumeClaim.resources | object | `{"requests":{"storage":"1Gi"}}` | Specifies the standard K8s resource requests for the synchrony-home volume claims. |
 | volumes.synchronyHome.persistentVolumeClaim.storageClassName | string | `nil` | Specify the name of the 'StorageClass' that should be used for the synchrony-home volume claim. |
->>>>>>> update "chart" (https://github.com/atlassian-labs/data-center-helm-charts) from "confluence-0.4.0" (a72be34b47ad767c62e0d8b969db01ed4f938cf2) to "confluence-1.5.1" (9727b511606a2e2081d6259e425c0b66d877bff3)

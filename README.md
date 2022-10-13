@@ -1,6 +1,6 @@
 # confluence
 
-![Version: 1.5.1-bb.1](https://img.shields.io/badge/Version-1.5.1--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.19.0](https://img.shields.io/badge/AppVersion-7.19.0-informational?style=flat-square)
+![Version: 1.5.1-bb.2](https://img.shields.io/badge/Version-1.5.1--bb.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 7.19.0](https://img.shields.io/badge/AppVersion-7.19.0-informational?style=flat-square)
 
 A chart for installing Confluence Data Center on Kubernetes
 
@@ -189,7 +189,7 @@ helm install confluence chart/
 | monitoring.enabled | bool | `false` | ref: https://marketplace.atlassian.com/apps/1222775/prometheus-exporter-for-confluence?hosting=server&tab=overview |
 | bbtests.enabled | bool | `false` |  |
 | bbtests.cypress.artifacts | bool | `true` |  |
-| bbtests.cypress.envs.cypress_url | string | `"http://{{ include \"confluence.fullname\" . }}:{{ .Values.confluence.service.port }}/setup/setuplicense.action"` |  |
+| bbtests.cypress.envs.cypress_url | string | `"http://{{ include \"common.names.fullname\" . }}:{{ .Values.confluence.service.port }}/setup/setuplicense.action"` |  |
 | bbtests.cypress.resources.requests.cpu | string | `"1"` |  |
 | bbtests.cypress.resources.requests.memory | string | `"1Gi"` |  |
 | bbtests.cypress.resources.limits.cpu | string | `"1"` |  |

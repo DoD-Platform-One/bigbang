@@ -2,5 +2,8 @@ serviceAccount:
   imagePullSecrets:
   - name: private-registry
 
+confluence:
+  additionalJvmArgs:
+    - "-Dcom.redhat.fips=false"
 bbtests:
   enabled: true

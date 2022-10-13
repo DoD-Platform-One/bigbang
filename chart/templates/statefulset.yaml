@@ -25,10 +25,6 @@ spec:
         # This is intended to ensure that the shared-home volume is group-writeable by the GID used by the Cnfluence container.
         # However, this doesn't appear to work for NFS volumes due to a K8s bug: https://github.com/kubernetes/examples/issues/260
         fsGroup: {{ .Values.confluence.gid }}
-      {{- with .Values.additionalInitContainers }}
-      initContainers:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       hostAliases:
         {{- include "confluence.additionalHosts" . | nindent 8 }}
       initContainers:
@@ -46,7 +42,7 @@ spec:
               subPath: {{ .Values.volumes.sharedHome.subPath | quote }}
               {{- end }}
           command: ["sh", "-c", {{ include "sharedHome.permissionFix.command" . | quote }}]
-      {{- end }}
+        {{- end }}
       imagePullSecrets:
         {{- if .Values.image.imagePullSecrets }}
         - name: {{ .Values.image.imagePullSecrets }}

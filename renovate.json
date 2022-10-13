@@ -7,6 +7,7 @@
     "draftPR": true,
     "ignorePaths": ["chart/charts/**"],
     "labels": ["confluence","Package Sustainment","kind::maintenance"],
+    "commitMessagePrefix": "SKIP UPDATE CHECK",
     "packageRules": [
         {
             "matchDatasources": ["docker"],
