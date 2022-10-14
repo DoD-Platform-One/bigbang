@@ -1,7 +1,7 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: bb_merge_resilience
+    ref: release_hashes
     file: '/pipelines/bigbang.yaml'
 variables:
-  PIPELINE_REPO_BRANCH: 'bb_merge_resilience' 
+  PIPELINE_REPO_BRANCH: 'release_hashes' 
   DEBUG_ENABLED: "true"
