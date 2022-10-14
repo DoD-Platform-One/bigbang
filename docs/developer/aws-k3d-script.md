@@ -25,7 +25,7 @@ The instance will automatically terminate 8 hours after creation.
    # aws_access_key_id - The AWS access key part of your credentials
    # aws_secret_access_key - The AWS secret access key part of your credentials
    # region - us-gov-west-1
-   # output - JSON
+   # output - json
 
    # Verify configuration
    aws configure list
