@@ -5,3 +5,4 @@ include:
 variables:
   PIPELINE_REPO_BRANCH: 'release_hashes' 
   DEBUG_ENABLED: "true"
+  AWS_DEFAULT_REGION: "us-gov-west-1"
