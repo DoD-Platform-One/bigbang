@@ -14,6 +14,13 @@ istio:
   enabled: {{ .Values.istio.enabled }}
   injection: {{ ternary "enabled" "disabled" .Values.istio.enabled }}
 
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
+
+
 metrics:
   enabled: {{ .Values.monitoring.enabled }}
 
