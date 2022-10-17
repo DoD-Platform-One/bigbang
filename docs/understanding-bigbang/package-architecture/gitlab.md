@@ -72,7 +72,36 @@ More information can be found in the gitlab documentation [here](https://docs.gi
 
 ## High Availability
 
-Gitlab is for the most part a monolithic application. As such it depends on Kubernetes itself for HA.
+GitLab deployed on a Kubernetes(K8S) cluster can achieve “self healing”. In other words, if a container goes down, K8S replaces it with a new one. K8S can also provide rolling upgrades. However, a K8S deployment by itself does not provide full high availablity(HA). Refer to the upstream [Gitlab HA reference achitectures](https://docs.gitlab.com/ee/administration/reference_architectures/). The Gitlab helm chart provides the ability to set replica counts for some of the services as shown in the BigBang values override example below. 
+
+Note that the gitaly service requires a significant and non-trivial amout of configuration to acheive HA. Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data. A Gitaly cluster must be created on Praefect nodes. The Big Bang Product Team has not yet tested use of a Gitaly cluster and will not be able to provide support. If you require Gitaly HA refer to the upstream [Gitaly Cluster documentation](https://docs.gitlab.com/ee/administration/gitaly/praefect.html) and leverage a support contact with Gitlab. For small to medum sized deployments you can simply increase the gitaly resources as shown in the example below.
+```yaml
+addons:
+  gitlab:
+    values:
+      gitlab:
+        webservice:
+          minReplicas: 3
+          maxReplicas: 3
+        gitlab-shell:
+          minReplicas: 3
+          maxReplicas: 3
+        sidekiq:
+          minReplicas: 3
+          maxReplicas: 3
+        gitaly:
+          resources:
+            limits:
+              cpu: 2
+              memory: 4G
+            requests:
+              cpu: 2
+              memory: 4G
+      registry:
+        hpa:
+          minReplicas: 3
+          maxReplicas: 3
+```
 
 ## Single Sign On (SSO)
 
