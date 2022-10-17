@@ -84,6 +84,17 @@ registry:
     {{ include "istioAnnotation" . }}
     {{- end }}
   {{- end }}
+  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+  metrics:
+    serviceMonitor:
+      endpointConfig:
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
 {{- end }}
 
 gitlab:
@@ -113,8 +124,42 @@ gitlab:
       annotations:
         {{ include "istioAnnotation" . }}
     {{- end }}
+    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    metrics:
+      serviceMonitor:
+        endpointConfig:
+          scheme: https
+          tlsConfig:
+            caFile: /etc/prom-certs/root-cert.pem
+            certFile: /etc/prom-certs/cert-chain.pem
+            keyFile: /etc/prom-certs/key.pem
+            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+
   {{- if or $iamProfile $istioInjection }}
   webservice:
+  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    metrics:
+      serviceMonitor:
+        endpointConfig:
+          scheme: https
+          tlsConfig:
+            caFile: /etc/prom-certs/root-cert.pem
+            certFile: /etc/prom-certs/cert-chain.pem
+            keyFile: /etc/prom-certs/key.pem
+            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    workhorse:
+      metrics:
+        serviceMonitor:
+          endpointConfig:
+            scheme: https
+            tlsConfig:
+              caFile: /etc/prom-certs/root-cert.pem
+              certFile: /etc/prom-certs/cert-chain.pem
+              keyFile: /etc/prom-certs/key.pem
+              insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+  {{- if or $iamProfile $istioInjection }}
     annotations: 
       {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
@@ -131,6 +176,7 @@ gitlab:
       {{ include "istioAnnotation" . }}
       {{- end }}
   {{- end }}
+  {{- end }}
 {{- if $istioInjection }}
   migrations:
     annotations:
@@ -138,9 +184,32 @@ gitlab:
   gitaly:
     annotations:
       {{ include "istioAnnotation" . }}
+    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    metrics:
+      serviceMonitor:
+        endpointConfig:
+          scheme: https
+          tlsConfig:
+            caFile: /etc/prom-certs/root-cert.pem
+            certFile: /etc/prom-certs/cert-chain.pem
+            keyFile: /etc/prom-certs/key.pem
+            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
   gitlab-shell:
     annotations:
       {{ include "istioAnnotation" . }}
+    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    metrics:
+      serviceMonitor:
+        endpointConfig:
+          scheme: https
+          tlsConfig:
+            caFile: /etc/prom-certs/root-cert.pem
+            certFile: /etc/prom-certs/cert-chain.pem
+            keyFile: /etc/prom-certs/key.pem
+            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+
   praefect:
     annotations:
       {{ include "istioAnnotation" . }}
