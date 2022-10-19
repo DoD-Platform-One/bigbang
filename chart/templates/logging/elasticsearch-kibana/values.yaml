@@ -69,6 +69,12 @@ kibana:
     {{ include "istioAnnotation" . }}
 {{- end }}
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+metrics:
+  enabled: {{ .Values.monitoring.enabled }}
+
 elasticsearch:
   imagePullSecrets:
     - name: private-registry
