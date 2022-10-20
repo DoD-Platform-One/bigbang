@@ -1,0 +1,36 @@
+.idea/
+certs/
+
+.DS_Store
+
+.terraform
+*.pem
+*rke2.yaml
+
+*tfstate*
+*terraform.lock*
+
+# dependencies
+/node_modules
+
+# debug
+npm-debug.log*
+
+# ignore developer specific files
+# (used frequently in deployments)
+patch.yaml
+notes
+ignore/*
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+
