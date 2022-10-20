@@ -10,7 +10,7 @@ test("homepage has `Big Bang Docs` in title and get started link linking to the 
   const getStarted = page.locator(".md-content >> text=Big Bang Docs");
 
   // Expect an attribute "to be strictly equal" to the value.
-  await expect(getStarted).toHaveAttribute("href", "docs/");
+  await expect(getStarted).toHaveAttribute("href", "https://docs-bigbang.dso.mil");
 
   // Click the get started link.
   await getStarted.click();
