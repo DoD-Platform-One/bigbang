@@ -3,6 +3,6 @@ include:
     ref: release_hashes
     file: '/pipelines/bigbang.yaml'
 variables:
-  PIPELINE_REPO_BRANCH: 'bb_merge_resilience' 
+  PIPELINE_REPO_BRANCH: 'release_hashes' 
   DEBUG_ENABLED: "true"
   AWS_DEFAULT_REGION: "us-gov-west-1"
