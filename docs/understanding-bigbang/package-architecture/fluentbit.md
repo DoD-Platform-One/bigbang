@@ -68,6 +68,10 @@ fluentbit:
             storage.type filesystem
 ```
 
+## High Availability
+
+Fluent-bit by default runs as a [Kubernetes DaemonSet with a single pod on each node in the cluster](https://docs.fluentbit.io/manual/installation/kubernetes#concepts). There is no need to run multiple pods per node as only one is required to maintain the state of logs that appear on that node. The Big Bang fluent-bit package also comes with default values to enable and configure [a storage buffer](https://docs.fluentbit.io/manual/installation/kubernetes#concepts) to better index and process records on your Kubernetes nodes in the event of pod restarts or pods becoming unhealthy.
+
 ## Health Checks
 
 Fluentbit is able to be configured with a service port for the container, which is able to expose [all kinds of metrics](https://docs.fluentbit.io/manual/administration/monitoring) including metrics for Prometheus.
