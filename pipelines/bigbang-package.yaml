@@ -41,6 +41,7 @@ variables:
   DEBUG_ENABLED: "false"
   METRICS_DISABLED: "false"
   MULTI_NODE: "false"
+  CHECKSUM_FILE: ${CI_PROJECT_NAME}-${CI_COMMIT_TAG}_checksums.txt
 
 configuration validation:
   stage: ⚙️ configuration validation

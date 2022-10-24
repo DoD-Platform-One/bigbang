@@ -406,6 +406,7 @@ bigbang_prep(){
    echo -e "\e[0Ksection_start:`date +%s`:bb_prep[collapsed=true]\r\e[0K\e[33;1mPrep\e[37m"
    mkdir -p release
    mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG $PACKAGE_IMAGE_FILE release/
+   find ./release -type f -exec sha256sum {} \; > release/${CHECKSUM_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:bb_prep\r\e[0K"
 }
 
@@ -422,6 +423,7 @@ bigbang_release() {
    echo -e "\e[0Ksection_start:`date +%s`:bb_release[collapsed=true]\r\e[0K\e[33;1mRelease\e[37m"
      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
        --description "Automated release notes are a WIP." \
+       --assets-link "{\"name\":\"${CHECKSUM_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${CHECKSUM_FILE}\"}" \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
        --assets-link "{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}" \
        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
@@ -1169,6 +1171,7 @@ package_prep() {
    echo -e "\e[0Ksection_start:`date +%s`:prep[collapsed=true]\r\e[0KFinal Prep\e[37m"
    mkdir -p release
    mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
+   find ./release -type f -exec sha256sum {} \; > release/${CHECKSUM_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:prep\r\e[0K"
 }
 
@@ -1224,6 +1227,7 @@ package_release() {
    echo -e "\e[0Ksection_start:`date +%s`:release[collapsed=true]\r\e[0K\e[33;1mCreating Release\e[37m"
      release-cli create --name "${RELEASE_NAME} ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
        --description "$(cat release_notes.txt)" \
+       --assets-link "{\"name\":\"${CHECKSUM_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${CHECKSUM_FILE}\"}" \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
        --assets-link "{\"name\":\"${IMAGE_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_PKG}\"}" \
        --assets-link "{\"name\":\"${REPOS_PKG}\",\"url\":\"${RELEASE_ENDPOINT}/${REPOS_PKG}\"}"

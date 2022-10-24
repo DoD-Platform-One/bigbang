@@ -56,6 +56,7 @@ variables:
   PACKAGE_IMAGE_FILE: "package-images.yaml"
   IMAGE_PKG: images.tar.gz
   REPOS_PKG: repositories.tar.gz
+  CHECKSUM_FILE: ${CI_PROJECT_NAME}-${CI_COMMIT_TAG}_checksums.txt
   VALUES_FILE: chart/values.yaml
   CI_VALUES_FILE: tests/test-values.yaml
   REGISTRY1_USER: $REGISTRY1_USER
