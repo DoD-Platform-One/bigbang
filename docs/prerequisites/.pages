@@ -1,4 +1,5 @@
 nav:
+  - Home: README.md
   - Install Flux: install-flux.md
   - OS Preconfiguration: os-preconfiguration.md
   - Kubernetes Preconfiguration: kubernetes-preconfiguration.md

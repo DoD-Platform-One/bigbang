@@ -2,22 +2,21 @@
 
 Big Bang is a declarative, continuous delivery tool for deploying DoD hardened and approved packages into a Kubernetes cluster.
 
-> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to https://repo1.dso.mil/platform-one/big-bang/bigbang_
+> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/platform-one/big-bang/bigbang](https://repo1.dso.mil/platform-one/big-bang/bigbang)_
 
 ## Usage & Scope
 
 Big Bang's scope is to provide publicly available installation manifests for:
 
-- A specific set of packages that adhere to the DevSecOps Reference Architecture. The core list of packages can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/core). 
+- A specific set of packages that adhere to the DevSecOps Reference Architecture. The core list of packages can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/core).
 
-- Packages that facilitate development of applications that adhere to the DevSecOps Reference Architecture. The full list of packages can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps). 
+- Packages that facilitate development of applications that adhere to the DevSecOps Reference Architecture. The full list of packages can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps).
 
 Big Bang also builds tooling around the testing and validation of Big Bang packages. These tools are provided as-is, without support.
 
-Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, monitoring, etc. are handled via Big Bang.   Additional packages (e.g. ArgoCD, GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the customer can use the Kubernetes cluster to add mission specific applications.
+Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, monitoring, etc. are handled via Big Bang.  Additional packages (e.g. ArgoCD, GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
 
 Additional information can be found at [Big Bang Docs](https://docs-bigbang.dso.mil) and [here](./docs/README.md).
-
 
 ## Getting Started
 
@@ -25,23 +24,27 @@ Additional information can be found at [Big Bang Docs](https://docs-bigbang.dso.
 
 ## Contributing to Big Bang
 
-There are 3 main ways to contribute to Big Bang: 
+There are 3 main ways to contribute to Big Bang:
+
+- [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues)
+- [Contribute to open-source projects under the Big Bang Technical Oversight Committee (BBTOC)](https://repo1.dso.mil/platform-one/bbtoc/-/blob/master/CONTRIBUTING.md)
 - [Submit new package proposals](https://repo1.dso.mil/platform-one/bbtoc/-/issues/new?issue%5Bmilestone_id%5D=)
   - Please review the [package integration guide](./docs/developer/package-integration/README.md) if you are interested in submitting a new package
   - A shepherd will be assigned to the project to create a repo in the [BB sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)
-- [Contribute to open-source projects under the Big Bang Technical Oversight Committee (bbtoc)](https://repo1.dso.mil/platform-one/bbtoc/-/blob/master/CONTRIBUTING.md)
-- [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues)
+
+Additional information can be found in the [contributing guide](./CONTRIBUTING.md).
 
 ## Release Schedule
-- Big Bang releases every 2 weeks. In order to stay current with all features and security updates ensure you are no more than `n-2` releases behind. 
+
+- Big Bang releases every 2 weeks with a minor release number. In order to stay current with all features and security updates ensure you are no more than `n-2` releases behind.
   - To see what is on the roadmap please see our [project milestones](https://repo1.dso.mil/groups/platform-one/big-bang/-/milestones)
 
 ## Navigating our documentation
 
-Big Bang Documentation is located in the following locations: 
+Big Bang Documentation is located in the following locations:
 
-- [Developer Contribution Documentation](./docs/developer)
-- [Key Big Bang Concept Overviews](./docs/understanding-bigbang)
-- [User Guides for Big Bang](./docs/guides/)
-- [Big Bang Prerequisites](./docs/prerequisites/)
-- [Big Bang Example Configurations](./docs/assets/configs/example/)
+- [Developer Contribution Documentation](./docs/developer/README.md)
+- [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)
+- [User Guides for Big Bang](./docs/guides/README.md)
+- [Big Bang Prerequisites](./docs/prerequisites/README.md)
+- [Big Bang Example Configurations](https://repo1.dso.mil/groups/platform-one/big-bang/bigbang/docs/assets/configs/example/)
