@@ -1234,6 +1234,25 @@ package_release() {
    echo -e "\e[0Ksection_end:`date +%s`:release\r\e[0K"
 }
 
+oci_release() {
+  # Get Chart version and name
+  export CHART_VERSION=$(yq e ".version" "chart/Chart.yaml")
+  export CHART_NAME=$(yq e ".name" "chart/Chart.yaml")
+  # Save off the chart
+  helm package chart
+  # Login to the repo registry
+  if [ "${HARBOR_BB_REPO}" == "bigbang" ]; then
+    helm registry login ${HARBOR_BB_REGISTRY} -u ${HARBOR_BB_PROD_WRITE_USER} -p ${HARBOR_BB_PROD_WRITE_PASS}
+  elif [ "${HARBOR_BB_REPO}" == "bigbang-staging" ]; then
+    helm registry login ${HARBOR_BB_REGISTRY} -u ${HARBOR_BB_STAGING_WRITE_USER} -p ${HARBOR_BB_STAGING_WRITE_PASS}
+  else
+    echo -e "\e[31mERROR: ${HARBOR_BB_REPO} is not a supported repo.\e[0m"
+    exit 1
+  fi
+  # Push to the repo registry
+  helm push ${CHART_NAME}-${CHART_VERSION}.tgz oci://${HARBOR_BB_REGISTRY}/${HARBOR_BB_REPO}
+}
+
 get_chart_version() {
    # change to target branch and check if Chart.yaml or Changelog missing. If so, check source.
    echo -e "\e[0Ksection_start:`date +%s`:get_chart_version[collapsed=true]\r\e[0K\e[33;1mGetting Chart Version\e[37m"
