@@ -18,6 +18,7 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 [Development Environment](./development-environment.md)
 
 ## Package Requirements
+
 [Big Bang Package Integration Guide](./package-integration/README.md) and [BBTOC Graduated Requirements](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process#graduated-project-requirements)
 
 ## Package Development
@@ -29,6 +30,7 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 [Integrate Package with Big Bang](./package-integration/README.md)
 
 ## Package Owner Overview
+
 [Package Owner Requirements & Overview](./package-integration/ownership.md)
 
 ## Big Bang Code Through Party Bus Pipeline

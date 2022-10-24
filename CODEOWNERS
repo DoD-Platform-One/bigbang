@@ -1,9 +1,9 @@
 [Project Maintainers]
-*                              @brandencobb @micah.nagel @michaelmcleroy @ryan.thompson.44 @runyontr @ryan.j.garcia
+*                              @brandencobb @micah.nagel @michaelmcleroy @ryan.thompson.44 @ryan.j.garcia
 
 
 [Docs Owners]
 # Allow any one of the listed codeowners to approve merges to the documentation 
 # Does not allow the creator of the merge request to be the approver.
-/docs/                         @brandencobb @echuang @evan.rush @kenna81 @kevin.wilder @LynnStill @micah.nagel @michaelmartin @michaelmcleroy @runyontr @ryan.j.garcia @toladipupo @ronwebb @ryan.thompson.44 @lucas.rodriguez 
+/docs/                         @brandencobb @echuang @evan.rush @kenna81 @kevin.wilder @LynnStill @micah.nagel @michaelmcleroy @ryan.j.garcia @toladipupo @ronwebb @ryan.thompson.44 @lucas.rodriguez 
 

@@ -14,15 +14,15 @@ Table of Contents:
   - [Secrets & Certificates](#secrets--certificates)
   - [Merge requests process](#merge-requests-process)
 
-## Developers Guide 
+## Developers Guide
 
 Big Bang is designed in such a way as to be as easily deployed locally as it is in production.  In fact, most contributions begin locally.
 
 ## Iron Bank Images
 
-Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to BigBang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
+Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
 
-1) Register for a free Ironbank account [Here](https://sso-info.il2.dso.mil/new_account.html)
+1) Register for a free Iron Bank account [Here](https://sso-info.il2.dso.mil/new_account.html)
 1) Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
 1) When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token
 
@@ -39,7 +39,7 @@ k3d cluster create --k3s-arg "--no-deploy=metrics-server,traefik@server:*" -p 80
 
 For development, it is quicker to test changes without having to push to Git.  To do this, we can bypass Flux2 and deploy Big Bang directly with its Helm chart.
 
-Start by creating `myvalues.yaml` to configure your local Big Bang.  Big Bang's template repository contains a starter [development values.yaml](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
+Start by creating `myvalues.yaml` to configure your local Big Bang.  The Big Bang template repository contains a starter [development values.yaml](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
 
 Configure `myvalues.yaml` to suit your needs.
 
@@ -82,4 +82,3 @@ Follow instructions in the [Big Bang encryption guide](./docs/understanding-bigb
 The merge request process is provided as an overview of the pipeline stages required to get a commit merged.
 
 Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specific details on the pipeline stages.
-
