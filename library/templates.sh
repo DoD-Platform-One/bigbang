@@ -406,7 +406,7 @@ bigbang_prep(){
    echo -e "\e[0Ksection_start:`date +%s`:bb_prep[collapsed=true]\r\e[0K\e[33;1mPrep\e[37m"
    mkdir -p release
    mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG $PACKAGE_IMAGE_FILE release/
-   find ./release -type f -exec sha256sum {} \; > release/${CHECKSUM_FILE}
+   find ./release -type f -exec sha256sum {} \; | sed -e 's/.\/release\///' > release/${CHECKSUM_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:bb_prep\r\e[0K"
 }
 
@@ -1171,7 +1171,7 @@ package_prep() {
    echo -e "\e[0Ksection_start:`date +%s`:prep[collapsed=true]\r\e[0KFinal Prep\e[37m"
    mkdir -p release
    mv $IMAGE_LIST $IMAGE_PKG $REPOS_PKG release/
-   find ./release -type f -exec sha256sum {} \; > release/${CHECKSUM_FILE}
+   find ./release -type f -exec sha256sum {} \; | sed -e 's/.\/release\///' > release/${CHECKSUM_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:prep\r\e[0K"
 }
 
