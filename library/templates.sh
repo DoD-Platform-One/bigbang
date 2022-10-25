@@ -1383,22 +1383,28 @@ create_bigbang_merge_request() {
 
     ## Bump git tag for updated package in Big Bang chart/values.yaml
     if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-        # yq strips blank lines from YAML files
-        yq e ".${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE} > /tmp/updated-values.yaml
+        # yq strips blank lines from YAML files, make a patch file to re-add these
         yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
+        diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
+
+        # Edit git tag for package
+        yq e -i ".${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE}
 
         # Adding blank lines back to values file before pushing changes
-        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true 1>/dev/null
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
+
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".${package}.git.tag" ${VALUES_FILE})"
     elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-        # yq strips blank lines from YAML files
-        yq e ".addons.${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE} > /tmp/updated-values.yaml
-        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml  
+        # yq strips blank lines from YAML files, make a patch file to re-add these
+        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
+        diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
-        # Adding blank lines back to values file before pushing changes  
-        diff --ignore-blank-lines /tmp/values-noblanks.yaml /tmp/updated-values.yaml > /tmp/patch.diff || true 1>/dev/null
+        # Edit git tag for package
+        yq e -i ".addons.${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE}
+
+        # Adding blank lines back to values file before pushing changes
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
+
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".addons.${package}.git.tag" ${VALUES_FILE})"
     fi 
     
