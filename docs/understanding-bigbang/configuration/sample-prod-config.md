@@ -326,3 +326,7 @@ addons:
 
               service_registration "kubernetes" {}
 ```
+
+## High Availability (HA)
+
+Each package in Big Bang includes documentation of its own High Availability configuration independently in [Package Architecture](../package-architecture).  
