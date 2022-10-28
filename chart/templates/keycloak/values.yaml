@@ -45,8 +45,8 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
-  # conditional passes only for default istio: enabled, mTLS: SCRICT
-  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.keycloak.values) "STRICT") }}
+  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.keycloak.values) "STRICT") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem
