@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.1-bb.5](https://img.shields.io/badge/Version-1.0.1--bb.5-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.0.1-bb.6](https://img.shields.io/badge/Version-1.0.1--bb.6-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -42,7 +42,7 @@ helm install kyverno-policies chart/
 | excludeContainers | list | `[]` | Adds an excludeContainers to all policies.  This is merged with any policy-specific excludeContainers. |
 | customLabels | object | `{}` | Additional labels to apply to all policies. |
 | waitforready.enabled | bool | `true` | Controls wait for ready deployment |
-| waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl","tag":"v1.24.4"}` | Image to use in wait for ready job.  This must contain kubectl. |
+| waitforready.image | object | `{"repository":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl","tag":"v1.25.3"}` | Image to use in wait for ready job.  This must contain kubectl. |
 | waitforready.imagePullSecrets | list | `[]` | Pull secret for wait for ready job |
 | policies.sample | object | `{"enabled":false,"exclude":{},"match":{},"parameters":{"excludeContainers":[]},"validationFailureAction":"audit","webhookTimeoutSeconds":""}` | Sample policy showing values that can be added to any policy |
 | policies.sample.enabled | bool | `false` | Controls policy deployment |
@@ -65,7 +65,7 @@ helm install kyverno-policies chart/
 | policies.disallow-namespaces | object | `{"enabled":false,"parameters":{"disallow":["default"]},"validationFailureAction":"audit"}` | Prevent pods from using the listed namespaces |
 | policies.disallow-namespaces.parameters.disallow | list | `["default"]` | List of namespaces to deny pod deployment |
 | policies.disallow-nodeport-services | object | `{"enabled":true,"validationFailureAction":"audit"}` | Prevent services of the type NodePort |
-| policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"attach"}` | Prevent the use of `exec` or `attach` on pods |
+| policies.disallow-pod-exec | object | `{"enabled":false,"validationFailureAction":"audit"}` | Prevent the use of `exec` or `attach` on pods |
 | policies.disallow-privilege-escalation | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent privilege escalation on pods |
 | policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers that run as privileged |
 | policies.disallow-selinux-options | object | `{"enabled":true,"parameters":{"disallow":["user","role"]},"validationFailureAction":"enforce"}` | Prevent specified SELinux options from being used on pods. |
@@ -143,7 +143,7 @@ helm install kyverno-policies chart/
 | additionalPolicies.samplePolicy.annotations."policies.kyverno.io/description" | string | `"This sample policy blocks pods from deploying into the 'default' namespace."` | Description of what the policy does, why it is important, and what items are allowed or unallowed. |
 | additionalPolicies.samplePolicy.spec | object | `{"rules":[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]}` | Policy specification.  See `kubectl explain clusterpolicies.spec` |
 | additionalPolicies.samplePolicy.spec.rules | list | `[{"match":{"any":[{"resources":{"kinds":["Pods"]}}]},"name":"sample-rule","validate":{"message":"Using 'default' namespace is not allowed.","pattern":{"metadata":{"namespace":"!default"}}}}]` | Policy rules.  At least one is required |
-| bbtests | object | `{"enabled":false,"imagePullSecret":"private-registry","scripts":{"additionalVolumeMounts":[{"mountPath":"/yaml","name":"kyverno-policies-bbtest-manifests"},{"mountPath":"/.kube/cache","name":"kyverno-policies-bbtest-kube-cache"}],"additionalVolumes":[{"configMap":{"name":"kyverno-policies-bbtest-manifests"},"name":"kyverno-policies-bbtest-manifests"},{"emptyDir":{},"name":"kyverno-policies-bbtest-kube-cache"}],"envs":{"ENABLED_POLICIES":"{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join \" \" $p }}","IMAGE_PULL_SECRET":"{{ .Values.bbtests.imagePullSecret }}"},"image":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.24.4"}}` | Reserved values for Big Bang test automation |
+| bbtests | object | `{"enabled":false,"imagePullSecret":"private-registry","scripts":{"additionalVolumeMounts":[{"mountPath":"/yaml","name":"kyverno-policies-bbtest-manifests"},{"mountPath":"/.kube/cache","name":"kyverno-policies-bbtest-kube-cache"}],"additionalVolumes":[{"configMap":{"name":"kyverno-policies-bbtest-manifests"},"name":"kyverno-policies-bbtest-manifests"},{"emptyDir":{},"name":"kyverno-policies-bbtest-kube-cache"}],"envs":{"ENABLED_POLICIES":"{{ $p := list }}{{ range $k, $v := .Values.policies }}{{ if $v.enabled }}{{ $p = append $p $k }}{{ end }}{{ end }}{{ join \" \" $p }}","IMAGE_PULL_SECRET":"{{ .Values.bbtests.imagePullSecret }}"},"image":"registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.25.3"}}` | Reserved values for Big Bang test automation |
 
 ## Contributing
 

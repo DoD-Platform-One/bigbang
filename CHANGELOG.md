@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.6] - 2022-10-18
+### Changed
+- ironbank/opensource/kubernetes/kubectl updated from v1.24.4 to v1.25.3
+
 ## [1.0.1-bb.5] - 2022-09-14
 ### Changed
 - Changed `disallow-nodeport-services` to `audit`
