@@ -1213,6 +1213,7 @@ addons:
       bbtests:
         enabled: true
         cypress:
+          image: registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/cypress/kubectl:8.3.1
           envs:
             cypress_url: https://chat.bigbang.dev
 
