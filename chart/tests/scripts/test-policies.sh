@@ -106,7 +106,7 @@ for POLICY in "${POLICIES[@]}"; do
   DEPLOYS=$(kubectl apply -f /yaml/$POLICY.yaml 2>&1)
 
   # Verify resources were deployed
-  NUM_DEPLOYS=$(echo $DEPLOYS | grep -oP "created$|configured$|blocked" | wc -l)
+  NUM_DEPLOYS=$(echo $DEPLOYS | grep -oP "created$|configured$|denied" | wc -l)
   if [ "${#EXPECTED_RESULTS[@]}" -eq "$NUM_DEPLOYS" ]; then
     echo -e "${GRN}PASS${NC}"
     ((PASS+=1))
@@ -143,7 +143,7 @@ for POLICY in "${POLICIES[@]}"; do
     ##### Validate Test
     if [ "$TESTTYPE" == "validate" ]; then
       ALLOW=$(echo $DEPLOYS | grep -oP "$MANIFEST(?= created)")
-      BLOCK=$(echo $DEPLOYS | grep -oP "$MANIFEST(?= was blocked)")
+      BLOCK=$(echo $DEPLOYS | grep -oP "$MANIFEST(?= for resource (error|violation))")
       if [ "$EXPECTED" == "pass" ]; then
         # Verify manifest is in the allowed list and not in the blocked list
         if [ -n "$ALLOW" ] && [ -z "$BLOCK" ]; then
