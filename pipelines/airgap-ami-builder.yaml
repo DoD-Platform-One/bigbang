@@ -1,5 +1,9 @@
 image: registry1.dso.mil/ironbank/hashicorp/packer/packer:1.8.3
 
+# Include templates
+include:
+  - local: '/library/templates.yaml'
+
 stages:
   - dry_run
   - scheduled
