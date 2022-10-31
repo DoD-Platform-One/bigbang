@@ -12,7 +12,7 @@
 
 Closes (link to issue here)
 
-
+<!--
 #### BB Processes
 
 Add labels for affected packages so that they are deployed in CI as well as a status label:
@@ -28,3 +28,4 @@ Once it is ready for review switch the status and assign reviewers:
 /label ~status::review
 
 /reviewer @reviewer1 @reviewer2
+-->
