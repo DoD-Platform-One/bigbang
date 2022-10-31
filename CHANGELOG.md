@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.4.85]
+### Added
+- Added CI for airgap AMI Builder
+
 ## [2.4.84]
 ### Changed
 - Modified handling of blank lines by MR creation
