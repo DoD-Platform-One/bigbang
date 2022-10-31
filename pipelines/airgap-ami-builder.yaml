@@ -1,0 +1,30 @@
+image: registry1.dso.mil/ironbank/hashicorp/packer/packer:1.8.3
+
+stages:
+  - dry_run
+  - scheduled
+
+before_script:
+  - packer version  # For debugging
+
+packer:
+  stage: dry_run
+  extends:
+    - .generic-runner-tags
+  except:
+    - schedules
+  script:
+    - packer init .
+    - packer validate -var "airgap_ami_name=bb-airgap-ci-dev" .
+    - packer build -var "airgap_ami_name=bb-airgap-ci-dev" .
+
+packer:on-schedule:
+  stage: scheduled
+  only:
+    - schedules
+  extends:
+    - .generic-runner-tags
+  script:
+    - packer init .
+    - packer validate -var "airgap_ami_name=bb-airgap-ci-prod" .
+    - packer build -var "airgap_ami_name=bb-airgap-ci-prod" .
