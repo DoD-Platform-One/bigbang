@@ -244,27 +244,31 @@ sudo -- bash -c 'sysctl -w vm.max_map_count=524288; \
   echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf'
 EOF
 
-# Create the launch spec
-echo Creating launch_spec.json ...
+# Create the device mapping and spot options JSON files
+echo "Creating device_mappings.json ..."
 mkdir -p ~/aws
-##notworking line.  "InstanceInitiatedShutdownBehavior":"Terminate",
-cat << EOF > ~/aws/launch_spec.json
-{
-  "ImageId": "${ImageId}",
-  "InstanceType": "${InstanceType}",
-  "KeyName": "${KeyName}",
-  "SecurityGroupIds": [ "${SecurityGroupId}" ],
-  "BlockDeviceMappings": [
-    {
-      "DeviceName": "/dev/sda1",
-      "Ebs": {
-        "DeleteOnTermination": true,
-        "VolumeType": "gp2",
-        "VolumeSize": ${VolumeSize}
-      }
+
+cat << EOF > ~/aws/device_mappings.json
+[
+  {
+    "DeviceName": "/dev/sda1",
+    "Ebs": {
+      "DeleteOnTermination": true,
+      "VolumeType": "gp2",
+      "VolumeSize": ${VolumeSize}
     }
-  ],
-  "UserData": "$(base64 $HOME/aws/userdata.txt | tr -d \\n)"
+  }
+]
+EOF
+
+echo "Creating spot_options.json ..."
+cat << EOF > ~/aws/spot_options.json
+{
+  "MarketType": "spot",
+  "SpotOptions": {
+    "MaxPrice": "${SpotPrice}",
+    "SpotInstanceType": "one-time"
+  }
 }
 EOF
 
@@ -272,45 +276,32 @@ EOF
 # Location of your private SSH key created during setup
 PEM=~/.ssh/${KeyName}.pem
 
-# Request a spot instance with our launch spec for the max. of 6 hours
+# Run a spot instance with our launch spec for the max. of 6 hours
 # NOTE: t3a.2xlarge spot price is 0.35 m5a.4xlarge is 0.69
-echo Requesting spot instance ...
-#Old spot request
-#SIR=`aws ec2 request-spot-instances \
-#  --output json --no-cli-pager \
-#  --instance-count 1 \
-##broken**  --attribute InstanceInitiatedShutdownBehavior=Terminate \
-##  --instance-initiated-shutdown-behavior terminate \
-#  --block-duration-minutes 360 \
-#  --type "one-time" \
-#  --spot-price "${SpotPrice}" \
-#  --launch-specification file://$HOME/aws/launch_spec.json \
-#  | jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId'`
-SIR=`aws ec2 request-spot-instances \
-  --output json --no-cli-pager \
-  --instance-count 1 \
-  --type "one-time" \
-  --spot-price "${SpotPrice}" \
-  --launch-specification file://$HOME/aws/launch_spec.json \
-  | jq -r '.SpotInstanceRequests[0].SpotInstanceRequestId'`
+echo "Running spot instance ..."
+
+InstId=`aws ec2 run-instances \
+  --output json --no-paginate \
+  --count 1 --image-id "${ImageId}" \
+  --instance-type "${InstanceType}" \
+  --key-name "${KeyName}" \
+  --security-group-ids "${SecurityGroupId}" \
+  --instance-initiated-shutdown-behavior "terminate" \
+  --user-data file://$HOME/aws/userdata.txt \
+  --block-device-mappings file://$HOME/aws/device_mappings.json \
+  --instance-market-options file://$HOME/aws/spot_options.json \
+  | jq -r '.Instances[0].InstanceId'`
 
 # Check if spot instance request was not created
-if [ -z ${SIR} ]; then
+if [ -z ${InstId} ]; then
   exit 1;
 fi
 
-# Request was created, now you need to wait for it to be filled
-echo Waiting for spot instance request ${SIR} to be fulfilled ...
-aws ec2 wait spot-instance-request-fulfilled --output json --no-cli-pager --spot-instance-request-ids ${SIR} &> /dev/null
-
-# Get the instanceId
-InstId=`aws ec2 describe-spot-instance-requests --output json --no-cli-pager --spot-instance-request-ids ${SIR} | jq -r '.SpotInstanceRequests[0].InstanceId'`
-
 # Add name tag to spot instance
-aws ec2 create-tags --resources ${InstId} --tags Key=Name,Value=${AWSUSERNAME}-dev  &> /dev/null
+aws ec2 create-tags --resources ${InstId} --tags Key=Name,Value=${AWSUSERNAME}-dev &> /dev/null
 
-# Request was fulfilled, but instance is still spinng up, so wait on that
-echo Waiting for instance ${InstId} to be ready ...
+# Request was created, now you need to wait for it to be filled
+echo "Waiting for instance ${InstId} to be ready ..."
 aws ec2 wait instance-running --output json --no-cli-pager --instance-ids ${InstId} &> /dev/null
 
 # allow some extra seconds for the instance to be fully initiallized
