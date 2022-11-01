@@ -47,7 +47,7 @@ imagePullSecrets:
 config:
   clients:
     {{- if eq .Values.loki.strategy "monolith" }}
-    - url: http://loki.logging.svc.cluster.local:3100/loki/api/v1/push
+    - url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
     {{- else }}
     - url: http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push
     {{- end }}

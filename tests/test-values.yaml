@@ -166,7 +166,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-simple-scalable-cypress-test
+          - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
@@ -268,7 +268,7 @@ gatekeeper:
           - jaeger/jaeger-operator-cypress-test
           - monitoring/kube-prometheus-stack-cypress-test
           - vault/vault-cypress-test
-          - logging/loki-simple-scalable-cypress-test
+          - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
