@@ -26,6 +26,17 @@ controller:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
+  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+  metrics:
+    serviceMonitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+  {{- end }}
 
 dex:
   image: 
@@ -61,6 +72,16 @@ redis-bb:
       selector:
         app.kubernetes.io/name: redis-bb
         app.kubernetes.io/instance: argocd-argocd
+      # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- end }}
+
     prometheusRule:
       enabled: true
       namespace: monitoring
@@ -80,10 +101,32 @@ server:
   config:
     # Must be enabled for plugins included in PlatformOne image.
     kustomize.buildOptions: "--enable-alpha-plugins"
+  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+  metrics:
+    serviceMonitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+  {{- end }}
 
 repoServer:
   image: 
     imagePullPolicy: {{ .Values.imagePullPolicy }}
+  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+  metrics:
+    serviceMonitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+  {{- end }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
