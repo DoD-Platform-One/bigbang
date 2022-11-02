@@ -1,8 +1,8 @@
 include:
   - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: release_hashes
+    ref: oci_bigbang
     file: '/pipelines/bigbang.yaml'
 variables:
-  PIPELINE_REPO_BRANCH: 'release_hashes' 
+  PIPELINE_REPO_BRANCH: 'oci_bigbang' 
   DEBUG_ENABLED: "true"
   AWS_DEFAULT_REGION: "us-gov-west-1"
