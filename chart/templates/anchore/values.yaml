@@ -19,6 +19,17 @@ istio:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+  {{- if and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
+  {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchore) "STRICT") }}
+  serviceMonitor:
+    scheme: "https"
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+  {{- end }}
+  {{- end }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -122,6 +133,16 @@ ui-redis:
       selector:
         app.kubernetes.io/name: anchore-ui-redis
         app.kubernetes.io/instance: anchore
+      {{- if and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
+      {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchore) "STRICT") }}
+      scheme: "https"
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- end }}
+      {{- end }}
     prometheusRule:
       enabled: true
       namespace: monitoring
