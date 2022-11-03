@@ -97,10 +97,10 @@ chains:
       header: ":authority"
     {{- $jaegerHosts := (dig "istio" "jaeger" "hosts" dict .Values.jaeger.values) }}
     {{- if $jaegerHosts }}
-      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($jaegerHosts | first) $) }}
+      prefix: {{ tpl ($jaegerHosts | first) $ }}
     callback_uri: https://{{ tpl ($jaegerHosts | first) $ }}/login
     {{- else }}
-      prefix: "tracing"
+      prefix: {{ printf "tracing.%s" $domainName }}
     callback_uri: https://tracing.{{ $domainName }}/login
     {{- end }}
     client_id: "{{ .Values.jaeger.sso.client_id }}"
@@ -113,13 +113,13 @@ chains:
       header: ":authority"
     {{- $tempoHosts := (dig "istio" "tempoQuery" "hosts" dict .Values.tempo.values) }}
     {{- if $tempoHosts }}
-      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($tempoHosts | first) $) }}
+      prefix: {{ tpl ($tempoHosts | first) $ }}
     callback_uri: https://{{ tpl ($tempoHosts | first) $ }}/login
     {{- else if .Values.jaeger.enabled }}
-      prefix: "tempo"
+      prefix: {{ printf "tempo.%s" $domainName }}
     callback_uri: https://tempo.{{ $domainName }}/login
     {{- else }}
-      prefix: "tracing"
+      prefix: {{ printf "tracing.%s" $domainName }}
     callback_uri: https://tracing.{{ $domainName }}/login
     {{- end }}
     client_id: "{{ .Values.tempo.sso.client_id }}"
@@ -132,10 +132,10 @@ chains:
       header: ":authority"
     {{- $prometheusHosts := (dig "istio" "prometheus" "hosts" dict .Values.monitoring.values) }}
     {{- if $prometheusHosts }}
-      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($prometheusHosts | first) $) }}
+      prefix: {{ tpl ($prometheusHosts | first) $ }}
     callback_uri: https://{{ tpl ($prometheusHosts | first) $ }}/login/generic_oauth
     {{- else }}
-      prefix: "prometheus"
+      prefix: {{ printf "prometheus.%s" $domainName }}
     callback_uri: https://prometheus.{{ $domainName }}/login/generic_oauth
     {{- end }}
     client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
@@ -146,11 +146,10 @@ chains:
       header: ":authority"
     {{- $alertmanagerHosts := (dig "istio" "alertmanager" "hosts" dict .Values.monitoring.values) }}
     {{- if $alertmanagerHosts }}
-      prefix: {{ trimSuffix (printf ".%s" $domainName) (tpl ($alertmanagerHosts | first) $) }}
-
+      prefix: {{ tpl ($alertmanagerHosts | first) $ }}
     callback_uri: https://{{ tpl ($alertmanagerHosts | first) $ }}/login/generic_oauth
     {{- else }}
-      prefix: "alertmanager"
+      prefix: {{ printf "alertmanager.%s" $domainName }}
     callback_uri: https://alertmanager.{{ $domainName }}/login/generic_oauth
     {{- end }}
     client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
