@@ -198,13 +198,35 @@ Note: Other packages are responsible for deploying Service Monitors for their co
 
 ### HA
 
-High Availability can be accomplished by increasing the number of replicas for the deployment of Alertmanager; Support for Prometheus & Grafana and other apps within the package are being researched and section will be updated:
+Support for Prometheus and other apps within the package are being researched and section will be updated:
+
+#### Alertmanager
+
+High Availability can be accomplished by increasing the number of replicas for the deployment of Alertmanager;
 ```yaml
 monitoring:
   values:
     alertmanager:
       alertmanagerSpec:
         replicas: 3
+```
+
+#### Grafana
+
+High Availability can be accomplished by increasing the number of replicas for the deployment of Grafana and configuring an external database connection (postgresql/mysql) so users and dashboard information can be centrally located for the replicas to have a source of truth. See Grafana's [upstream documentation](https://grafana.com/docs/grafana/v9.0/setup-grafana/configure-grafana/#database)
+```yaml
+monitoring:
+  values:
+    grafana:
+      replicas: 3
+      grafana.ini:
+        ...
+	database:
+	  type: [postgres|mysql]
+	  host: external-db:5432
+	  name: grafana
+	  user: ""
+	  password: ""
 ```
 
 ### Dependency Packages
