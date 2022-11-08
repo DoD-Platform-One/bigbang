@@ -1505,3 +1505,5 @@ addons:
     enabled: false
     values:
       replicas: 1
+      bbtests:
+        enabled: true
