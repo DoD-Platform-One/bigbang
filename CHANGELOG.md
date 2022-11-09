@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.7] - 2022-10-25
+### Changed
+- Changed `require-non-root-user` to support container exclusions
+
 ## [1.0.1-bb.6] - 2022-10-18
 ### Changed
 - ironbank/opensource/kubernetes/kubectl updated from v1.24.4 to v1.25.3

@@ -26,109 +26,43 @@ spec:
         Either `runAsNonRoot` must be set to true or `runAsUser` must be > 0 in
         spec.securityContext or (spec.containers[*].securityContext,
         spec.initContainers[*].securityContext, and spec.ephemeralContainers[*].securityContext)
-      anyPattern:
-      - spec:
-          securityContext:
+      foreach:
+      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+        preconditions:
+          all:
+          {{- include "kyverno-policies.excludeContainersPrecondition" (merge (dict "name" $name "operator" "AnyIn") .) | nindent 4 }}
+        pattern:
+          =(securityContext):
+            =(runAsUser): "*"
+            =(runAsNonRoot): "*"
+      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+        preconditions:
+          any:
+          - key: "{{`{{ request.object.spec.securityContext.runAsUser || to_number('0') }}`}}"
+            operator: NotEquals
+            value: 0
+          - key: "{{`{{ request.object.spec.securityContext.runAsNonRoot || '0' == '1' }}`}}" # 0 == 1 evaluates to false, avoids escaping jsmepath literal bool
+            operator: Equals
+            value: true
+          all:
+          {{- include "kyverno-policies.excludeContainersPrecondition" (merge (dict "name" $name "operator" "AnyNotIn") .) | nindent 4 }}
+        pattern:
+          =(securityContext):
+            =(runAsUser): "!0"
+            =(runAsNonRoot): "!false"
+      - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+        preconditions:
+          all:
+          - key: "{{`{{ request.object.spec.securityContext.runAsUser || to_number('0') }}`}}"
+            operator: Equals
+            value: 0
+          - key: "{{`{{ request.object.spec.securityContext.runAsNonRoot || '0' == '1' }}`}}" # 0 == 1 evaluates to false, avoids escaping jsmepath literal bool
+            operator: NotEquals
+            value: true
+          {{- include "kyverno-policies.excludeContainersPrecondition" (merge (dict "name" $name "operator" "AnyNotIn") .) | nindent 4 }}
+        anyPattern:
+        - securityContext:
             runAsNonRoot: true
-          containers:
-          - =(securityContext):
-              =(runAsNonRoot): true
-          =(initContainers):
-          - =(securityContext):
-              =(runAsNonRoot): true
-          =(ephemeralContainers):
-          - =(securityContext):
-              =(runAsNonRoot): true
-      - spec:
-          securityContext:
+        - securityContext:
             runAsUser: ">0"
-          containers:
-          - =(securityContext):
-              =(runAsUser): ">0"
-          =(initContainers):
-          - =(securityContext):
-              =(runAsUser): ">0"
-          =(ephemeralContainers):
-          - =(securityContext):
-              =(runAsUser): ">0"
-      - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
-          =(initContainers):
-          - securityContext:
-              runAsNonRoot: true
-          =(ephemeralContainers):
-          - securityContext:
-              runAsNonRoot: true
-      - spec:
-          containers:
-          - securityContext:
-              runAsUser: ">0"
-          =(initContainers):
-          - securityContext:
-              runAsNonRoot: true
-          =(ephemeralContainers):
-          - securityContext:
-              runAsNonRoot: true
-      - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
-          =(initContainers):
-          - securityContext:
-              runAsUser: ">0"
-          =(ephemeralContainers):
-          - securityContext:
-              runAsNonRoot: true
-      - spec:
-          containers:
-          - securityContext:
-              runAsUser: ">0"
-          =(initContainers):
-          - securityContext:
-              runAsUser: ">0"
-          =(ephemeralContainers):
-          - securityContext:
-              runAsNonRoot: true
-      - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
-          =(initContainers):
-          - securityContext:
-              runAsNonRoot: true
-          =(ephemeralContainers):
-          - securityContext:
-              runAsUser: ">0"
-      - spec:
-          containers:
-          - securityContext:
-              runAsUser: ">0"
-          =(initContainers):
-          - securityContext:
-              runAsNonRoot: true
-          =(ephemeralContainers):
-          - securityContext:
-              runAsUser: ">0"
-      - spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
-          =(initContainers):
-          - securityContext:
-              runAsUser: ">0"
-          =(ephemeralContainers):
-          - securityContext:
-              runAsUser: ">0"
-      - spec:
-          containers:
-          - securityContext:
-              runAsUser: ">0"
-          =(initContainers):
-          - securityContext:
-              runAsUser: ">0"
-          =(ephemeralContainers):
-          - securityContext:
-              runAsUser: ">0"
 {{- end -}}

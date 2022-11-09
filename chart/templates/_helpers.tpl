@@ -57,15 +57,24 @@ webhookTimeoutSeconds: {{ $webhookTimeoutSeconds }}
     {{- if or $globalexcludeContainers $excludeContainers }}
       preconditions:
         all:
-        - key: "{{ "{{" }} element.name {{ "}}" }}"
-          operator: AnyNotIn
-          value:
-            {{- if $globalexcludeContainers }}
-              {{- toYaml $globalexcludeContainers | nindent 10 -}}
-            {{- end }}
-            {{- if $excludeContainers }}
-              {{- toYaml $excludeContainers | nindent 10 -}}
-            {{- end }}
+        {{- include "kyverno-policies.excludeContainersPrecondition" (merge (dict "name" .name "operator" "AnyNotIn") .) | nindent 4 }}
+    {{- end }}
+{{- end -}}
+
+{{/* excludeContainers values.  Expects name of policy in .name */}}
+{{- define "kyverno-policies.excludeContainersPrecondition" -}}
+  {{- $globalexcludeContainers := .Values.excludeContainers -}}
+  {{- $excludeContainers := (dig .name "parameters" "excludeContainers" nil .Values.policies) -}}
+    {{- if or $globalexcludeContainers $excludeContainers }}
+      - key: "{{ "{{" }} element.name {{ "}}" }}"
+        operator: {{ .operator }}
+        value:
+          {{- if $globalexcludeContainers }}
+            {{- toYaml $globalexcludeContainers | nindent 10 -}}
+          {{- end }}
+          {{- if $excludeContainers }}
+            {{- toYaml $excludeContainers | nindent 10 -}}
+          {{- end }}
     {{- end }}
 {{- end -}}
 
@@ -161,14 +170,15 @@ data:
 {{- define "kyverno-policies.precondition.default" -}}
 preconditions:
   all:
-  {{- include "kyverno-policies.precondition.create-update" . | nindent 2 }}
+  {{- include "kyverno-policies.precondition.create-update-background" . | nindent 2 }}
 {{- end -}}
 
 {{/* Add a precondition that triggers on create or update events only */}}
-{{- define "kyverno-policies.precondition.create-update" -}}
-- key: "{{ "{{" }}request.operation{{ "}}" }}"
+{{- define "kyverno-policies.precondition.create-update-background" -}}
+- key: "{{ "{{" }}request.operation || 'BACKGROUND'{{ "}}" }}"
   operator: In
   value:
   - CREATE
   - UPDATE
+  - BACKGROUND
 {{- end -}}

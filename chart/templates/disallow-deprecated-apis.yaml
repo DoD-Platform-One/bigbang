@@ -50,7 +50,7 @@ spec:
           - storage.k8s.io/*/VolumeAttachment
     preconditions:
       all:
-      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
+      {{- include "kyverno-policies.precondition.create-update-background" . | nindent 6 }}
       - key: "{{ "{{" }}request.object.apiVersion{{ "}}" }}"
         operator: AnyIn
         value:
@@ -86,7 +86,7 @@ spec:
           - node.k8s.io/*/RuntimeClass
     preconditions:
       all:
-      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
+      {{- include "kyverno-policies.precondition.create-update-background" . | nindent 6 }}
       - key: "{{ "{{" }}request.object.apiVersion{{ "}}" }}"
         operator: AnyIn
         value:
@@ -112,7 +112,7 @@ spec:
           - autoscaling/*/HorizontalPodAutoscaler
     preconditions:
       all:
-      {{- include "kyverno-policies.precondition.create-update" . | nindent 6 }}
+      {{- include "kyverno-policies.precondition.create-update-background" . | nindent 6 }}
       - key: "{{ "{{" }}request.object.apiVersion{{ "}}" }}"
         operator: AnyIn
         value:
