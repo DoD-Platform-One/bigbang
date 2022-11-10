@@ -1,4 +1,4 @@
-{{- if or .Values.loki.enabled .Values.promtail.enabled }}
+{{- if .Values.loki.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.loki "name" "loki" "defaults" (include "bigbang.defaults.loki" .)) }}
 {{- end }}
 
@@ -35,7 +35,7 @@ monitoring:
     {{- end }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }} 
+  enabled: {{ .Values.istio.enabled }}
 
 loki:
   storage:
