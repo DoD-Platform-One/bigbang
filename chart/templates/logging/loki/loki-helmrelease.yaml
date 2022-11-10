@@ -1,5 +1,5 @@
 {{- $fluxSettingsLoki := merge .Values.loki.flux .Values.flux -}}
-{{- if or .Values.loki.enabled .Values.promtail.enabled }}
+{{- if .Values.loki.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:

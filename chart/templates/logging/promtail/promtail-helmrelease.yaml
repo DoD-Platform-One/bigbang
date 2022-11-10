@@ -37,10 +37,11 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-{{/* promtail _always_ depend on .Values.loki being enabled, so can assume they exist here */}}
   dependsOn:
+    {{- if .Values.loki.enabled }}
     - name: loki
       namespace: {{ .Release.Namespace }}
+    {{- end }}
     {{- if  .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
