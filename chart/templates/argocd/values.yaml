@@ -130,6 +130,7 @@ repoServer:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.argocd }}
   argocd:
     gateways:
     - istio-system/{{ default "public" .Values.addons.argocd.ingress.gateway }}
