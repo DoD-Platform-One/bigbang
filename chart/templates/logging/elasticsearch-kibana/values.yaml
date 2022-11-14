@@ -74,6 +74,16 @@ monitoring:
 
 metrics:
   enabled: {{ .Values.monitoring.enabled }}
+  {{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.logging) "enabled") .Values.istio.enabled) }}
+  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.logging.values) "STRICT") $istioInjection }}
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+  {{- end }}
 
 elasticsearch:
   imagePullSecrets:
