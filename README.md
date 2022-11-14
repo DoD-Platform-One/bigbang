@@ -47,4 +47,4 @@ Big Bang Documentation is located in the following locations:
 - [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)
 - [User Guides for Big Bang](./docs/guides/README.md)
 - [Big Bang Prerequisites](./docs/prerequisites/README.md)
-- [Big Bang Example Configurations](https://repo1.dso.mil/groups/platform-one/big-bang/bigbang/docs/assets/configs/example/)
+- [Big Bang Example Configurations](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/assets/configs/example/)
