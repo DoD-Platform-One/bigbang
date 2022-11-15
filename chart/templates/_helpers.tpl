@@ -59,7 +59,11 @@ sonatype-license.lic: {{ .Values.license_key }}
 Return Nexus default admin password
 */}}
 {{- define "nexus.defaultAdminPassword" -}}
-{{ randAlphaNum 12 }}
+{{- if .Values.custom_admin_password -}}
+  {{ .Values.custom_admin_password }}
+{{- else -}}
+  {{ randAlphaNum 12 }}
+{{- end -}}
 {{- end -}}
 
 {{/*

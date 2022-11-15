@@ -1,6 +1,13 @@
 # Changelog
 
 ---
+## [42.0.0-bb.1] - 2022-11-02
+### Changed
+- Updated chart to version: 42.0.0-bb.1 | appVersion: 3.42.0
+### Added
+- Updated docs/general.md with an external database example
+- Added .Values.custom_admin_password
+
 ## [42.0.0-bb.0] - 2022-10-06
 ### Changed
 - Updated chart to version: 42.0.0-bb.0 | appVersion: 3.42.0
@@ -21,7 +28,7 @@
 
 ## [41.1.0-bb.3] - 2022-09-19
 ### Changed
-- The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang blob-storage job. 
+- The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang blob-storage job.
 
 ## [41.1.0-bb.2] - 2022-09-16
 ### Changed
