@@ -1059,7 +1059,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
       path: "./chart"
-      tag: "1.0.31-bb.0"
+      tag: "1.0.31-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
