@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [42.0.0-bb.1] - 2022-11-16
+### Changed
+- Updated crane image to `v0.12.0` and ubi8-minimal iamge to `8.7`
+
 ## [42.0.0-bb.0] - 2022-10-06
 ### Changed
 - Updated chart to version: 42.0.0-bb.0 | appVersion: 3.42.0

@@ -83,7 +83,7 @@ proxy:
 
 job_image:
   repository: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
-  tag: 8.6
+  tag: 8.7
   pullPolicy: IfNotPresent
 
 openshift: false
@@ -102,7 +102,7 @@ bbtests:
             name: nexus-repository-manager-secret
             key: admin.password
   scripts:
-    image: "registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.11.0"
+    image: "registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.12.0"
     envs:
       docker_host: "nexus-nexus-repository-manager-docker-5000:5000"
       docker_user: "admin"
