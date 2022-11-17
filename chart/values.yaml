@@ -19,7 +19,7 @@ istio:
 port: 20001
 image:
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.58.0
+  tag: v1.59.1
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
   pullSecrets:
@@ -67,6 +67,7 @@ watchNamespace: ""
 
 # Set to true if you want the operator to be able to create cluster roles. This is necessary
 # if you want to support Kiali CRs with spec.deployment.accessible_namespaces of '**'.
+# Setting this to "true" requires allowAllAccessibleNamespaces to be "true" also.
 # Note that this will be overriden to "true" if cr.create is true and cr.spec.deployment.accessible_namespaces is ['**'].
 clusterRoleCreator: true
 
@@ -101,6 +102,23 @@ allowAdHocKialiImage: true
 # container and any attempt to override them will be ignored.
 allowSecurityContextOverride: false
 
+# allowAllAccessibleNamespaces tells the operator to allow a user to be able to configure Kiali
+# to access all namespaces in the cluster via spec.deployment.accessible_namespaces=['**'].
+# If this is false, the user must specify an explicit list of namespaces in the Kiali CR.
+# Setting this to "true" requires clusterRoleCreator to be "true" also.
+# Note that this will be overriden to "true" if cr.create is true and cr.spec.deployment.accessible_namespaces is ['**'].
+allowAllAccessibleNamespaces: true
+
+# accessibleNamespacesLabel restricts the namespaces that a user can add to the Kiali CR spec.deployment.accessible_namespaces.
+# This value is either an empty string (which disables this feature) or a label name with an optional label value
+# (e.g. "mylabel" or "mylabel=myvalue"). Only namespaces that have that label will be permitted in
+# spec.deployment.accessible_namespaces. Any namespace not labeled properly but specified in accessible_namespaces will cause
+# the operator to abort the Kiali installation.
+# If just a label name (but no label value) is specified, the label value the operator will look for is the value of
+# the Kiali CR's spec.istio_namespace. In other words, the operator will look for the named label whose value must be the name
+# of the Istio control plane namespace (which is typically, but not necessarily, "istio-system").
+accessibleNamespacesLabel: ""
+
 # For what a Kiali CR spec can look like, see:
 # https://github.com/kiali/kiali-operator/blob/master/deploy/kiali/kiali_cr.yaml
 cr:
@@ -123,7 +141,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.58.0
+      image_version: v1.59.1
       image_pull_secrets:
         - private-registry
       ingress_enabled: false

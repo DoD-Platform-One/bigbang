@@ -10,7 +10,7 @@ wait_project() {
    set +e
    while true; do
       if kubectl get $resourcename --namespace=$resourcename -o jsonpath='{.items[0].status.conditions[*]}' | \
-         grep "Last reconciliation succeeded" 1>/dev/null
+         grep "ansibleResult" 1>/dev/null
       then
          echo "$resourcename custom resource creation finished"
          break
