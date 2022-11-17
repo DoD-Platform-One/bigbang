@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 42.0.0-bb.0](https://img.shields.io/badge/Version-42.0.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.42.0](https://img.shields.io/badge/AppVersion-3.42.0-informational?style=flat-square)
+![Version: 42.0.0-bb.1](https://img.shields.io/badge/Version-42.0.0--bb.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.42.0](https://img.shields.io/badge/AppVersion-3.42.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -93,7 +93,7 @@ helm install nexus-repository-manager chart/
 | proxy.request.data[0].httpsAuthNtlmDomain | string | `nil` |  |
 | proxy.request.data[0].nonProxyHosts | list | `[]` |  |
 | job_image.repository | string | `"registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal"` |  |
-| job_image.tag | float | `8.6` |  |
+| job_image.tag | float | `8.7` |  |
 | job_image.pullPolicy | string | `"IfNotPresent"` |  |
 | openshift | bool | `false` |  |
 | bbtests.enabled | bool | `false` |  |
@@ -103,7 +103,7 @@ helm install nexus-repository-manager chart/
 | bbtests.cypress.secretEnvs[0].name | string | `"cypress_nexus_pass"` |  |
 | bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.name | string | `"nexus-repository-manager-secret"` |  |
 | bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.key | string | `"admin.password"` |  |
-| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.11.0"` |  |
+| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.12.0"` |  |
 | bbtests.scripts.envs.docker_host | string | `"nexus-nexus-repository-manager-docker-5000:5000"` |  |
 | bbtests.scripts.envs.docker_user | string | `"admin"` |  |
 | bbtests.scripts.secretEnvs[0].name | string | `"docker_password"` |  |
