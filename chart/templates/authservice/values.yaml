@@ -64,6 +64,8 @@ global:
 
   {{- if .Values.sso.jwks }}
   jwks: "{{ .Values.sso.jwks }}"
+  {{- else if .Values.sso.jwks_uri }}
+  jwks_uri: "{{ .Values.sso.jwks_uri }}"
   {{- end }}
 
   {{- if .Values.sso.client_id}}
