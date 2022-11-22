@@ -21,6 +21,9 @@ networkPolicies:
     app: istio-ingressgateway
     istio: ingressgateway
 
+# External database - See docs/general.md
+custom_admin_password: ""
+
 monitoring:
   enabled: false
 license_key: ""
@@ -196,8 +199,10 @@ nexus:
     override: false
     data: {}
       # nexus.scripts.allowCreation: true
-      # See this article for ldap configuratioon options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
+      # See this article for ldap configuration options https://support.sonatype.com/hc/en-us/articles/216597138-Setting-Advanced-LDAP-Connection-Properties-in-Nexus-Repository-Manager
       # nexus.ldap.env.java.naming.security.authentication: simple
+      # Reference the external database section in docs/general.md
+      # nexus.datastore.enabled: true
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: default-pool
   resources:
@@ -224,7 +229,7 @@ nexus:
 
   containerSecurityContext:
     capabilities:
-      drop: 
+      drop:
         - ALL
 
   podAnnotations: {}
