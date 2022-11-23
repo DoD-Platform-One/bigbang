@@ -38,6 +38,8 @@ metrics:
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target
     {{- end }}
+  prometheusRule:
+    enabled: true
 {{- end }}
 
 networkPolicies:
