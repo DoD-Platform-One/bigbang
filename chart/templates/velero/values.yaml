@@ -76,7 +76,7 @@ initContainers:
 {{- end }}
 {{- if eq . "azure" }}
   - name: velero-plugin-for-azure
-    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.5.1
+    image: registry1.dso.mil/ironbank/opensource/velero/velero-plugin-for-microsoft-azure:v1.5.2
     imagePullPolicy: {{ dig "image" "pullPolicy" "IfNotPresent" $.Values.addons.velero.values }}
     volumeMounts:
       - mountPath: /target
