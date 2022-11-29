@@ -26,6 +26,13 @@ custom_admin_password: ""
 
 monitoring:
   enabled: false
+  serviceMonitor:
+    additionalLabels: {}
+    # ServiceMonitor namespace. Default to nexus-repository-manager namespace.
+    # namespace:
+    scheme: "http"
+    # tlsConfig: {}
+
 license_key: ""
 license:
   mountPath: /nexus-data/sonatype-license.lic

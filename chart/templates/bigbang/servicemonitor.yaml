@@ -17,7 +17,6 @@ spec:
     - interval: 30s
       path: /service/metrics/prometheus
       port: http-nexus-ui
-      scheme: http
       basicAuth:
         password:
           name: {{ template "nexus.name" . }}-secret
@@ -25,5 +24,12 @@ spec:
         username:
           name: {{ template "nexus.name" . }}-secret
           key: admin.username
+      {{- if .Values.monitoring.serviceMonitor.scheme }}
+      scheme: {{ .Values.monitoring.serviceMonitor.scheme }}
+      {{- end }}
+      {{- if .Values.monitoring.serviceMonitor.tlsConfig }}
+      tlsConfig:
+        {{- toYaml .Values.monitoring.serviceMonitor.tlsConfig | nindent 8 }}
+      {{- end }}
   jobLabel: {{ template "nexus.fullname" . }}-metrics
 {{- end }}

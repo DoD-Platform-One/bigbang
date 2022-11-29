@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [42.0.0-bb.3] - 2022-11-28
+### Changed
+- Removed metrics exception for istio mTLS STRICT
+- Added templating to `serviceMonitor` to enable mTLS metrics scraping
+
 ## [42.0.0-bb.2] - 2022-11-02
 ### Changed
 - Updated chart to version: 42.0.0-bb.1 | appVersion: 3.42.0
