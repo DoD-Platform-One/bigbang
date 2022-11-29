@@ -1,6 +1,6 @@
 # kiali-operator
 
-![Version: 1.59.1-bb.0](https://img.shields.io/badge/Version-1.59.1--bb.0-informational?style=flat-square) ![AppVersion: 1.59.1](https://img.shields.io/badge/AppVersion-1.59.1-informational?style=flat-square)
+![Version: 1.59.1-bb.1](https://img.shields.io/badge/Version-1.59.1--bb.1-informational?style=flat-square) ![AppVersion: 1.59.1](https://img.shields.io/badge/AppVersion-1.59.1-informational?style=flat-square)
 
 Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
@@ -39,10 +39,10 @@ helm install kiali-operator chart/
 |-----|------|---------|-------------|
 | nameOverride | string | `""` |  |
 | fullnameOverride | string | `""` |  |
-| hostname | string | `"bigbang.dev"` |  |
+| domain | string | `"bigbang.dev"` |  |
 | istio.enabled | bool | `false` |  |
 | istio.kiali.gateways[0] | string | `"istio-system/main"` |  |
-| istio.kiali.hosts[0] | string | `"kiali.{{ .Values.hostname }}"` |  |
+| istio.kiali.hosts[0] | string | `"kiali.{{ .Values.domain }}"` |  |
 | istio.mtls.mode | string | `"STRICT"` |  |
 | port | int | `20001` |  |
 | image.repo | string | `"registry1.dso.mil/ironbank/opensource/kiali/kiali-operator"` |  |

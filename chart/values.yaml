@@ -1,7 +1,7 @@
 nameOverride: ""
 fullnameOverride: ""
 
-hostname: bigbang.dev
+domain: bigbang.dev
 
 istio:
   enabled: false
@@ -9,7 +9,7 @@ istio:
     gateways:
       - "istio-system/main"
     hosts:
-      - kiali.{{ .Values.hostname }}
+      - kiali.{{ .Values.domain }}
   # Default kiali peer authentication
   mtls:
     # STRICT = Allow only mutual TLS traffic
