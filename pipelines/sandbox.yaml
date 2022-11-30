@@ -217,6 +217,7 @@ integration:
   variables:
     BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
     BB_REPO_DESTINATION: "./bigbang-repo"
+    CERT_FILE_URL: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml
     CI_VALUES_OVERRIDES_FILE: "./../bigbang/values.yaml"
     CI_VALUES_FILE: "./tests/test-values.yaml"
     PIPELINE_REPO_DESTINATION: "pipeline-repo"

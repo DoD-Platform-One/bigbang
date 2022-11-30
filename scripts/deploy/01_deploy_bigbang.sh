@@ -39,8 +39,13 @@ if [[ "${PIPELINE_TYPE}" == "BB" ]]; then
   done
 fi
 
-# Add ingress certs to test values
-yq eval-all 'select(fileIndex == 0) * select(filename == "chart/ingress-certs.yaml")' $CI_VALUES_FILE chart/ingress-certs.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
+# Get latest ingress certs and add to test values
+curl -sS $CERT_FILE_URL -o cert.yaml
+if [[ -f cert.yaml ]]; then
+  yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' $CI_VALUES_FILE cert.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
+else
+  yq eval-all 'select(fileIndex == 0) * select(filename == "chart/ingress-certs.yaml")' $CI_VALUES_FILE chart/ingress-certs.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
+fi
 
 # Deploy BigBang
 if [[ ! -z "$CI_VALUES_OVERRIDES_FILE" ]]; then
