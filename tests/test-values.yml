@@ -6,4 +6,4 @@ serviceAccount:
   imagePullSecrets:
   - name: private-registry
 
-bb-version: 1.41.0
+bb-version: 1.47.0
