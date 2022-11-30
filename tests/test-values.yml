@@ -5,3 +5,5 @@ serviceAccount:
   enabled: true
   imagePullSecrets:
   - name: private-registry
+
+bb-version: 1.41.0
