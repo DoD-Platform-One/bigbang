@@ -9,7 +9,7 @@ source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 function enable_core_package() {
   local package="$1"
   if [[ "${CI_DEPLOY_LABELS[*]}" =~ "${package}" ]] || [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_DEPLOY_LABELS[*]} =~ "all-packages" ]]; then
-    if [[ "$(yq e ". | has(\"${package}\")" $CI_VALUES_FILE)" == "true" ]]; then
+    if [[ "$(yq e ". | has(\"${package}\")" $VALUES_FILE)" == "true" ]]; then
       echo "Enabled ${package}"
       yq e ".${package}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
     else
