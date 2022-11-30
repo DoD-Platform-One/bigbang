@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 ## [2.4.90]
+### Changed
+- modified cert addition to use cert from master always
+
+## [2.4.90]
 ### Fixed
 - fixed check for package presence in values file
 
