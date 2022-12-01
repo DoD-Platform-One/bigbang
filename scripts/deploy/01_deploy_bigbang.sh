@@ -32,7 +32,7 @@ if [[ "${PIPELINE_TYPE}" == "BB" ]]; then
     done
   fi
 
-  check_core_packages=("kyverno" "kyvernopolicies" "kyvernoreporter" "tempo" "loki" "promtail")
+  check_core_packages=("kyverno" "kyvernopolicies" "kyvernoreporter" "tempo" "loki" "promtail" "neuvector")
 
   for package in "${check_core_packages[@]}"; do
     enable_core_package "${package}"
