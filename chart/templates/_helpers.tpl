@@ -83,10 +83,11 @@ Build common set of file extensions to include/exclude
 Common labels for all objects
 */}}
 {{- define "commonLabels" -}}
-app.kubernetes.io/instance: "{{ .Release.Name }}"
-app.kubernetes.io/version: "{{ .Chart.Version }}"
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/version: {{ default .Chart.Version .Chart.AppVersion | replace "+" "_" }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/part-of: "bigbang"
-app.kubernetes.io/managed-by: "flux"
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{- end -}}
 
 {{- define "values-secret" -}}
@@ -157,4 +158,36 @@ bigbang.dev/istioVersion: {{ .Values.istio.git.tag | trimSuffix (regexFind "-bb.
 {{- else if .Values.istio.git.branch -}}
 bigbang.dev/istioVersion: {{ .Values.istio.git.branch }}
 {{- end -}}
+{{- end -}}
+
+{{- /* Helpers below this line are in support of the Big Bang extensibility feature */ -}}
+
+{{- /* Converts the string in . to a legal Kubernetes resource name */ -}}
+{{- define "resourceName" -}}
+  {{- regexReplaceAll "\\W+" . "-" | trimPrefix "-" | trunc 63 | trimSuffix "-" | kebabcase -}}
+{{- end -}}
+
+{{- /* Returns a space separated string of unique namespaces where `<package>.enabled` and key held in `.constraint` are true */ -}}
+{{- /* [Optional] Set `.constraint` to the key under <package> holding a boolean that must be true to be enabled */ -}}
+{{- /* [Optional] Set `.default` to `true` to enable a `true` result when the `constraint` key is not found */ -}}
+{{- /* To use: $ns := compact (splitList " " (include "uniqueNamespaces" (merge (dict "constraint" "some.boolean" "default" true) .))) */ -}}
+{{- define "uniqueNamespaces" -}}
+  {{- $namespaces := list -}}
+  {{- range $pkg, $vals := .Values.packages -}}
+    {{- if (dig "enabled" true $vals) -}}
+      {{- $constraint := $vals -}}
+      {{- range $key := split "." (default "" $.constraint) -}}
+        {{- $constraint = (dig $key dict $constraint) -}}
+      {{- end -}}
+      {{- if (ternary $constraint (default false $.default) (kindIs "bool" $constraint)) -}}
+        {{- $namespaces = append $namespaces (dig "namespace" "name" (include "resourceName" $pkg) $vals) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- join " " (uniq $namespaces) | trim -}}
+{{- end -}}
+
+{{- /* Prints istio version */ -}}
+{{- define "istioVersion" -}}
+{{ regexReplaceAll "-bb.+$" (coalesce .Values.istio.git.semver .Values.istio.git.tag .Values.istio.git.branch) "" }}
 {{- end -}}

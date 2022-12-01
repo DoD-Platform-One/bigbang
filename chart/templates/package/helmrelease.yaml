@@ -1,0 +1,60 @@
+{{- /* Used for deploying a package using a Helm chart */ -}}
+{{- range $pkg, $vals := .Values.packages -}}
+{{- if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
+{{- $pkg := include "resourceName" $pkg -}}
+{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
+{{- if $defaults -}}
+{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- end -}}
+{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ $pkg }}
+  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    {{- include "commonLabels" $ | nindent 4 }}
+spec:
+  releaseName: {{ $pkg }}
+  chart:
+    spec:
+      chart: {{ dig "git" "path" "chart" $vals }}
+      interval: {{ default "5m" $fluxSettings.interval }}
+      reconcileStrategy: Revision
+      sourceRef:
+        kind: GitRepository
+        name: {{ $pkg }}
+        namespace: {{ dig "namespace" "name" $pkg $vals }}
+  {{- toYaml $fluxSettings | nindent 2 }}
+  {{- if $vals.postRenderers }}
+  postRenderers:
+  {{- toYaml $vals.postRenderers | nindent 2 }}
+  {{- end }}
+  valuesFrom:
+  - name: {{ $pkg }}-values
+    kind: Secret
+
+  {{- /* Always wait on policy enforcement */ -}}
+  {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
+  {{- $kyvernoDep := $.Values.kyvernopolicies.enabled -}}
+  {{- /* Wait on istio if sidecar is enabled */ -}}
+  {{- $istioDep := (and $.Values.istio.enabled (dig "istio" "injection" true $vals)) -}}
+  {{- if or $gatekeeperDep $kyvernoDep $istioDep }}
+  dependsOn:
+    {{- if $gatekeeperDep }}
+    - name: gatekeeper
+      namespace: {{ default "bigbang" $.Values.namespace }}
+    {{- end }}
+    {{- if $kyvernoDep }}
+    - name: kyvernopolicies
+      namespace: {{ default "bigbang" $.Values.namespace }}
+    {{- end }}
+    {{- if $istioDep }}
+    - name: istio
+      namespace: {{ default "bigbang" $.Values.namespace }}
+    {{- end -}}
+  {{- end }}
+---
+{{ end -}}
+{{- end -}}

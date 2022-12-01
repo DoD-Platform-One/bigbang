@@ -1,0 +1,26 @@
+{{- /* Used for GitOps on a package's Helm chart */ -}}
+{{- range $pkg, $vals := .Values.packages -}}
+{{- if (dig "enabled" true $vals) -}}
+{{- $pkg = include "resourceName" $pkg -}}
+{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
+{{- if $defaults -}}
+{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- end -}}
+{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: {{ $pkg }}
+  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    {{- include "commonLabels" $ | nindent 4 }}
+spec:
+  interval: {{ default "5m" $fluxSettings.interval }}
+  url: {{ dig "git" "repo" nil $vals }}
+  ref:
+    {{- include "validRef" $vals.git | nindent 4 -}}
+  {{- include "gitCreds" $ | nindent 2 }}
+---
+{{ end -}}
+{{- end -}}

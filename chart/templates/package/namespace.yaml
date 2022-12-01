@@ -1,0 +1,25 @@
+{{- /* Used for creating namespaces that package's use. */ -}}
+{{- /* If two packages reside in the same namespace, set namespace.create=false in one of them. */ -}}
+{{- range $pkg, $vals := .Values.packages -}}
+{{- if and (dig "enabled" true $vals) (dig "namespace" "create" true $vals) -}}
+{{- $pkg = include "resourceName" $pkg -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ dig "namespace" "name" $pkg $vals }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg }}
+    {{- include "commonLabels" $ | nindent 4 }}
+    {{- if $.Values.istio.enabled }}
+    istio-injection: {{ ternary "enabled" "disabled" (dig "istio" "injection" true $vals) }}
+    {{- end -}}
+    {{- if (dig "namespace" "labels" nil $vals) -}}
+    {{- toYaml $vals.namespace.labels | nindent 4 -}}
+    {{- end -}}
+  {{- if (dig "namespace" "annotations" nil $vals) }}
+  annotations:
+    {{- toYaml $vals.namespace.annotations | nindent 4 -}}
+  {{- end }}
+---
+{{ end -}}
+{{- end -}}

@@ -1,0 +1,17 @@
+{{- /* Used for GitOps of the BigBang package wrapper Helm chart.  Shared by all packages */ -}}
+{{- if .Values.wrapper -}}
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: {{ .Release.Name }}-wrapper
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}-wrapper
+    {{- include "commonLabels" $ | nindent 4 }}
+spec:
+  interval: {{ dig "interval" "5m" .Values.flux }}
+  url: {{ .Values.wrapper.git.repo }}
+  ref:
+    {{- include "validRef" .Values.wrapper.git | nindent 4 -}}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end -}}
