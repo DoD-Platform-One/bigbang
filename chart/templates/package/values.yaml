@@ -1,0 +1,22 @@
+{{- /* Used for creating values for the package's Helm chart */ -}}
+{{- range $pkg, $vals := .Values.packages -}}
+{{- if (dig "enabled" true $vals) -}}
+{{- $pkg = include "resourceName" $pkg -}}
+{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
+{{- if $defaults -}}
+{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- end -}}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $pkg }}-values
+  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  labels:
+    {{- include "commonLabels" $ | nindent 4 }}
+type: Opaque
+stringData:
+  values.yaml: |
+    {{- tpl (toYaml $vals.values) $ | nindent 4 }}
+---
+{{ end -}}
+{{- end -}}

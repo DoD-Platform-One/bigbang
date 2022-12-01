@@ -1,0 +1,62 @@
+# -- Wrapper chart for integrating Big Bang into a package
+wrapper:
+  git:
+    # -- Git repo holding the wrapper helm chart
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper
+    # -- Path inside of the git repo to find the helm chart
+    path: chart
+    # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+    tag:
+    branch: main
+
+# -- Packages to deploy with Big Bang integration
+# @default - '{}'
+packages:
+  # -- Package name.  Each package will be independently wrapped for Big Bang integration.
+  # @default -- Uses `defaults/<package name>.yaml` for defaults.  See `package` Helm chart for additional values that can be set.
+  sample:
+    # -- Toggle deployment of this package
+    # @default -- true
+    enabled: false
+    # -- Use a kustomize deployment rather than Helm
+    kustomize: false
+
+    git:
+      # -- (Required) Git repo URL holding the helm chart for this package
+      repo:
+      # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      commit:
+      # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      semver:
+      # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      tag:
+      # -- Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference).
+      # @default -- When no other reference is specified, `master` branch is used
+      branch:
+      # -- Path inside of the git repo to find the helm chart or kustomize
+      # @default -- For Helm charts `chart`.  For Kustomize `/`.
+      path:
+
+    # -- Override flux settings for this package
+    flux: {}
+
+    # -- After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+    postRenderers: []
+
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    istio: {}
+
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    monitor: {}
+
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    network: {}
+
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    secrets: {}
+
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    configMaps: {}
+
+    # -- Values to pass through to package Helm chart
+    values: {}
