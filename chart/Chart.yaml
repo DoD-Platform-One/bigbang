@@ -25,3 +25,8 @@ dependencies:
 annotations:
   bigbang.dev/applicationVersions: |
     - Kiali: 1.59.1
+  helm.sh/images: |
+    - name: kiali
+      image: registry1.dso.mil/ironbank/opensource/kiali/kiali:v1.59.1
+    - name: kiali-operator
+      image: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator:v1.59.1
