@@ -229,6 +229,36 @@ global:
   certificates:
     customCAs:
       - secret: tls-ca-sso
+      - secret: ca-certs-australian-defence-organisation-cross-cert-chain
+      - secret: ca-certs-australian-defence-organisation-direct-trust-chain
+      - secret: ca-certs-boeing
+      - secret: ca-certs-carillon-federal-services-trust-chain-1
+      - secret: ca-certs-carillon-federal-services-trust-chain-2
+      - secret: ca-certs-department-of-state-trust-chain-1
+      - secret: ca-certs-department-of-state-trust-chain-2
+      - secret: ca-certs-digicert-federal-ssp-trust-chain-1
+      - secret: ca-certs-digicert-federal-ssp-trust-chain-2
+      - secret: ca-certs-digicert-nfi-trust-chain-1
+      - secret: ca-certs-digicert-nfi-trust-chain-2
+      - secret: ca-certs-entrust-federal-ssp-trust-chain-1
+      - secret: ca-certs-entrust-federal-ssp-trust-chain-2
+      - secret: ca-certs-entrust-managed-service-nfi
+      - secret: ca-certs-exostar-llc
+      - secret: ca-certs-identrust-nfi
+      - secret: ca-certs-lockheed-martin
+      - secret: ca-certs-netherlands-ministry-of-defence
+      - secret: ca-certs-northrop-grumman
+      - secret: ca-certs-raytheon-trust-chain-1
+      - secret: ca-certs-raytheon-trust-chain-2
+      - secret: ca-certs-us-treasury-ssp-trust-chain-1
+      - secret: ca-certs-us-treasury-ssp-trust-chain-2
+      - secret: ca-certs-verizon-cybertrust-federal-ssp
+      - secret: ca-certs-widepoint-federal-ssp-trust-chain-1
+      - secret: ca-certs-widepoint-federal-ssp-trust-chain-2
+      - secret: ca-certs-widepoint-nfi
+      - secret: ca-certs-dod-intermediate-and-issuing-ca-certs
+      - secret: ca-certs-dod-trust-anchors-self-signed
+      - secret: ca-certs-eca
   {{end}}
 
   # added to help with Gitlab sub-chart configuration
