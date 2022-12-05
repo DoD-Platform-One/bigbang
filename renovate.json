@@ -36,6 +36,13 @@
             "extractVersionTemplate": "^v(?<version>.*)$",
             "depNameTemplate": "registry1.dso.mil/ironbank/opensource/kiali/kiali-operator",
             "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^chart/Chart\\.yaml$"],
+            "matchStrings": [
+                "image:[^\\S\\r\\n]+(?<depName>.+):(?<currentValue>.+)"
+            ],
+            "datasourceTemplate": "docker"
         }
     ],
     "separateMajorMinor": false
