@@ -1649,11 +1649,6 @@ bigbang_package_images() {
     gitrepo=$(yq e ".${pkg}.git.repo" "${VALUES_FILE}")
     version=$(yq e ".${pkg}.git.tag" "${VALUES_FILE}")
 
-    if [[ "$gitrepo" =~ "/sandbox/" ]]; then
-      echo "$pkg is in BETA/sandbox group, omitting from image list"
-      continue
-    fi
-
     # Remove prefix
     gitrepo=${gitrepo#"https://repo1.dso.mil/"}
     # Remove suffix
