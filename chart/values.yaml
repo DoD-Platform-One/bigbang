@@ -416,7 +416,7 @@ kyvernoreporter:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter
     path: ./chart
-    tag: "2.13.1-bb.0"
+    tag: "2.13.4-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
