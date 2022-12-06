@@ -37,6 +37,8 @@ spec:
           value: "20"
         - name: REQUEUE_ON_LIMIT_DELAY
           value: 20s
+        - name: MAX_RECONCILE_CONCURRENCY
+          value: "10"
         {{- with .Values.resources }}
         resources:
           {{- toYaml . | nindent 10 }}
