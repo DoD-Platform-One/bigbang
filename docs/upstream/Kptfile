@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: 67cbaf321940b84ebc8f3f98901d2c986b90db3c
+    commit: 24f43e8b7df514ab8924919068305056ba96cace
     repo: https://github.com/mattermost/mattermost-operator
     directory: /docs/mattermost-operator
-    ref: v1.18.1
+    ref: v1.19.0
