@@ -1,0 +1,101 @@
+# Enables and configures packages for [Appliance Mode](../README.md):
+
+clusterAuditor:
+  enabled: true
+  values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+
+gatekeeper:
+  enabled: true
+  values:
+    replicas: 1
+    controllerManager:
+      resources:
+        limits:
+          cpu: 100m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+
+kiali:
+  enabled: false
+
+kyverno:
+  enabled: false
+  values:
+    replicaCount: 1
+
+loki:
+  values: 
+    singleBinary:
+      replicas: 1
+      resources:
+        limits:
+          cpu: 100m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+  
+tempo:
+  values:
+    tempo: 
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
+
+fluentbit:
+  enabled: false
+
+promtail:
+  enabled: true
+
+monitoring: 
+  values:
+    prometheus:
+      prometheusSpec:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
+        limits:
+          cpu: 10m
+          memory: 128Mi
+    prometheus-node-exporter:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+    grafana:
+      testFramework:
+        enabled: false
+      downloadDashboards:
+        resources:
+          limits:
+            cpu: 20m
+            memory: 20Mi
+          requests:
+            cpu: 20m
+            memory: 20Mi
