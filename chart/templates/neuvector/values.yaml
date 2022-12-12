@@ -1,0 +1,19 @@
+{{- define "bigbang.defaults.neuvector" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+domain: {{ default .Values.domain .Values.hostname }}
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  neuvector:
+    gateways:
+    - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+manager:
+  env:
+    ssl: false
+{{- end }}
+
+{{- /* Create secret */ -}}
+{{- if .Values.neuvector.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.neuvector "name" "neuvector" "defaults" (include "bigbang.defaults.neuvector" .)) }}
+{{- end }}

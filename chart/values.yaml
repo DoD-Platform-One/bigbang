@@ -568,6 +568,31 @@ loki:
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+neuvector:
+   # -- Toggle deployment of Tempo.
+  enabled: false
+  git:
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+    path: "./chart"
+    tag: "2.2.2-bb.1"
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
+
+  # -- Flux reconciliation overrides specifically for the Neuvector Package
+  flux: {}
+
+  # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 tempo:
   # -- Toggle deployment of Tempo.
   enabled: false
