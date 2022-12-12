@@ -43,7 +43,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - registry1.dso.mil
         - registry.dso.mil
 
-  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic)}}
+  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic)}}
   allowedHostFilesystem:
     parameters:
       excludedResources:
@@ -54,6 +54,10 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit pods need access to host to get log files
       - logging/logging-fluent-bit-.*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      - neuvector/neuvector-enforcer-pod.*
+      - neuvector/neuvector-controller-pod.*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       - twistlock/twistlock-defender-ds-.*
@@ -69,6 +73,13 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
+  {{- if .Values.neuvector.enabled }}
+  bannedImageTags:
+    parameters:
+      excludedResources:
+        - neuvector/neuvector-scanner-pod.*
+  {{- end }}
+
   {{- if .Values.twistlock.enabled }}
   hostNetworking:
     parameters:
@@ -78,10 +89,18 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # not be able to self monitor. If both Istio sidecar injection and TL monitoring are disabled, a security gap will
         # be created for network monitoring in Twistlock, so it is  important to make sure at least one is enabled.
         - twistlock/twistlock-defender-ds-.*
+  {{- end }}
+  
+  {{- if or .Values.twistlock.enabled .Values.neuvector.enabled }}
   noHostNamespace:
     parameters:
       excludedResources:
+        {{- if .Values.twistlock.enabled }}
         - twistlock/twistlock-defender-ds-.*
+        {{- end }}
+        {{- if .Values.neuvector.enabled }}
+        - neuvector/neuvector-enforcer-pod.*
+        {{- end }}
   {{- end }}
 
   imageDigest:
@@ -90,12 +109,16 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   namespacesHaveIstio:
     enabled: {{ .Values.istio.enabled }}
 
-  {{- if .Values.fluentbit.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.neuvector.enabled }}
   noPrivilegedContainers:
     parameters:
       excludedResources:
         # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
         - logging/fluent-bit
+        {{- if .Values.neuvector.enabled }}
+        - neuvector/neuvector-enforcer-pod.*
+        - neuvector/neuvector-controller-pod.*
+        {{- end }}
   {{- end }}
 
   podsHaveIstio:
@@ -137,7 +160,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic) }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic) }}
   volumeTypes:
     parameters:
       excludedResources:
@@ -160,6 +183,12 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # Promtail requires hostpath volume types
         # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
         - logging/logging-promtail-.*
+       {{- end }}
+       {{- if .Values.neuvector.enabled }}
+        # Neuvecotr requires hostpath volume types
+        # https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/enforcer-daemonset.yaml#L108
+        - neuvector/neuvector-enforcer-pod.*
+        - neuvector/neuvector-controller-pod.*
        {{- end }}
        {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
         # Restic requires hostpath volume mounts in order to facilitate backing up cluster PV/C resources

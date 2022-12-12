@@ -173,6 +173,7 @@ gatekeeper:
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
           - minio/minio-instance-cypress-test
+          - neuvector/neuvector-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -275,6 +276,7 @@ gatekeeper:
           - tempo/tempo-cypress-test
           - argocd/argo-cd-cypress-test
           - minio/minio-instance-cypress-test
+          - neuvector/neuvector-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -401,6 +403,7 @@ kyvernopolicies:
               - tempo
               - argocd
               - minio
+              - neuvector
               names:
               - "*-cypress-test*"
         parameters:
@@ -432,6 +435,7 @@ kyvernopolicies:
               - tempo
               - argocd
               - minio
+              - neuvector
               names:
               - "*-cypress-test*"
         parameters:
@@ -473,6 +477,7 @@ kyvernopolicies:
               - tempo
               - argocd
               - minio
+              - neuvector
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -722,6 +727,18 @@ monitoring:
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
           cypress_check_istio_dashboards: 'true'
+
+neuvector:
+  enabled: false
+  values:
+    k3s:
+      enabled: true
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        envs:
+          cypress_url: https://neuvector.bigbang.dev
 
 twistlock:
   enabled: true
