@@ -414,7 +414,7 @@ kyvernoreporter:
   # -- Toggle deployment of Kyverno Reporter
   enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter
+    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
     path: ./chart
     tag: "2.13.4-bb.1"
 
