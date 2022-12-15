@@ -13,12 +13,21 @@ spec:
   targetNamespace: istio-operator
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.istiooperator) "true" }}
       chart: {{ .Values.istiooperator.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: istio-operator
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.istiooperator.oci.name }}
+      version: {{ .Values.istiooperator.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.istiooperator.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsIstioOperator | nindent 2 }}
 

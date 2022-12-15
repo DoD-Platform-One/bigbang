@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) .Values.addons.gitlabRunner.enabled }}
+{{- if and (eq (include "checkGitRef" .Values.addons.gitlabRunner) "true") (not .Values.offline) .Values.addons.gitlabRunner.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

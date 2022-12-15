@@ -10,12 +10,21 @@ spec:
   targetNamespace: anchore
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.anchore) "true" }}
       chart: {{ .Values.addons.anchore.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: anchore
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.anchore.oci.name }}
+      version: {{ .Values.addons.anchore.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.anchore.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsAnchore | nindent 2 }}
 

@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) (or .Values.addons.mattermostoperator.enabled .Values.addons.mattermost.enabled) }}
+{{- if and (eq (include "checkGitRef" .Values.addons.mattermostoperator) "true") (not .Values.offline) (or .Values.addons.mattermostoperator.enabled .Values.addons.mattermost.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

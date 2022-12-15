@@ -13,12 +13,21 @@ spec:
   targetNamespace: kyverno
   chart:
     spec:
+      {{- if eq (include "checkGitRef" (get .Values $pkg)) "true" }}
       chart: {{ (get .Values $pkg).git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: {{ $pkg }}
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ (get .Values $pkg).oci.name }}
+      version: {{ (get .Values $pkg).oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ (get .Values $pkg).oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettings | nindent 2 }}
 

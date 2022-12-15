@@ -11,15 +11,23 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: gatekeeper-system
-
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.gatekeeper) "true" }}
       chart: {{ .Values.gatekeeper.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: gatekeeper
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.gatekeeper.oci.name }}
+      version: {{ .Values.gatekeeper.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.gatekeeper.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsGatekeeper | nindent 2 }}
 

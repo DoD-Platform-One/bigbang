@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) .Values.monitoring.enabled }}
+{{- if and (eq (include "checkGitRef" .Values.monitoring) "true") (not .Values.offline) .Values.monitoring.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

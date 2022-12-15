@@ -54,6 +54,31 @@ branch: {{ .branch | quote }}
 {{- end -}}
 
 {{/*
+Check for git ref, given package values map
+*/}}
+{{- define "checkGitRef" -}}
+{{- $git := (dig "git" dict .) -}}
+{{- if not $git.repo -}}
+false
+{{- else -}}
+{{- if $git.commit -}}
+{{- if not $git.branch -}}
+false
+{{- end -}}
+true
+{{- else if $git.semver -}}
+true
+{{- else if $git.tag -}}
+true
+{{- else if $git.branch -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Build the appropriate git credentials secret for private git repositories
 */}}
 {{- define "gitCreds" -}}
@@ -151,12 +176,16 @@ bigbang.addValueIfSet can be used to nil check parameters before adding them to 
 Annotation for Istio version
 */}}
 {{- define "istioAnnotation" -}}
+{{- if (eq (include "checkGitRef" .Values.istio) "true") -}}
 {{- if .Values.istio.git.semver -}}
 bigbang.dev/istioVersion: {{ .Values.istio.git.semver | trimSuffix (regexFind "-bb.*" .Values.istio.git.semver) }}
 {{- else if .Values.istio.git.tag -}}
 bigbang.dev/istioVersion: {{ .Values.istio.git.tag | trimSuffix (regexFind "-bb.*" .Values.istio.git.tag) }}
 {{- else if .Values.istio.git.branch -}}
 bigbang.dev/istioVersion: {{ .Values.istio.git.branch }}
+{{- end -}}
+{{- else -}}
+bigbang.dev/istioVersion: {{ .Values.istio.oci.tag }}
 {{- end -}}
 {{- end -}}
 

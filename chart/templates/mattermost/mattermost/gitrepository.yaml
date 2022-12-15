@@ -1,4 +1,4 @@
-{{- if .Values.addons.mattermost.enabled  }}
+{{- if and (eq (include "checkGitRef" .Values.addons.mattermost) "true") .Values.addons.mattermost.enabled  }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

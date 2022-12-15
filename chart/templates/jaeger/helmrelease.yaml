@@ -13,12 +13,21 @@ spec:
   targetNamespace: jaeger
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.jaeger) "true" }}
       chart: {{ .Values.jaeger.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: jaeger
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.jaeger.oci.name }}
+      version: {{ .Values.jaeger.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.jaeger.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsJaeger | nindent 2 }}
 

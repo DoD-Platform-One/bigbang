@@ -1,4 +1,4 @@
-{{- if .Values.addons.anchore.enabled  }}
+{{- if and (eq (include "checkGitRef" .Values.addons.anchore) "true") .Values.addons.anchore.enabled  }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

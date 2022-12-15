@@ -14,11 +14,21 @@ spec:
   chart:
     spec:
       chart: {{ .Values.neuvector.git.path }}
-      interval: 5m
+      {{- if eq (include "checkGitRef" .Values.neuvector) "true" }}
+      chart: {{ .Values.neuvector.git.path }}
       sourceRef:
         kind: GitRepository
         name: neuvector
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.neuvector.oci.name }}
+      version: {{ .Values.neuvector.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.neuvector.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsNeuvector | nindent 2 }}
 

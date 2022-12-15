@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) (or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (eq (include "checkGitRef" .Values.gatekeeper) "true") (not .Values.offline) (or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

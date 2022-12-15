@@ -13,12 +13,21 @@ spec:
   targetNamespace: logging
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.promtail) "true" }}
       chart: {{ .Values.promtail.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: promtail
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.promtail.oci.name }}
+      version: {{ .Values.promtail.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.promtail.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsPromtail | nindent 2 }}
 

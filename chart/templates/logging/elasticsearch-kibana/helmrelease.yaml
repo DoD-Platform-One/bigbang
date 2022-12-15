@@ -13,12 +13,21 @@ spec:
   targetNamespace: logging
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.logging) "true" }}
       chart: {{ .Values.logging.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: elasticsearch-kibana
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.logging.oci.name }}
+      version: {{ .Values.logging.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.logging.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsEk | nindent 2 }}
 
