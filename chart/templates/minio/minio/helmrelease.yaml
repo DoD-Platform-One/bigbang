@@ -9,12 +9,21 @@ spec:
   targetNamespace: minio
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.minio) "true" }}
       chart: {{ .Values.addons.minio.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: minio
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.minio.oci.name }}
+      version: {{ .Values.addons.minio.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.minio.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsMinio | nindent 2 }}
   

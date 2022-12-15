@@ -13,12 +13,21 @@ spec:
   targetNamespace: mattermost-operator
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.mattermostoperator) "true" }}
       chart: {{ .Values.addons.mattermostoperator.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: mattermost-operator
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.mattermostoperator.oci.name }}
+      version: {{ .Values.addons.mattermostoperator.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.mattermostoperator.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsMattermostOperator | nindent 2 }}
   

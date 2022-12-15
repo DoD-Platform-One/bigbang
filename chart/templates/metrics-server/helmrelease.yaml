@@ -17,12 +17,21 @@ spec:
   targetNamespace: metrics-server
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.metricsServer) "true" }}
       chart: {{ .Values.addons.metricsServer.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: metrics-server
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.metricsServer.oci.name }}
+      version: {{ .Values.addons.metricsServer.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.metricsServer.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsMetrics | nindent 2 }}
 

@@ -13,12 +13,21 @@ spec:
   targetNamespace: eck-operator
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.eckoperator) "true" }}
       chart: {{ .Values.eckoperator.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: eck-operator
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.eckoperator.oci.name }}
+      version: {{ .Values.eckoperator.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.eckoperator.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsEckOperator | nindent 2 }}
 

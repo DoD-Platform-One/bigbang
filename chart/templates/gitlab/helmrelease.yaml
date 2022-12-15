@@ -14,12 +14,22 @@ spec:
   targetNamespace: gitlab
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.gitlab) "true" }}
       chart: {{ .Values.addons.gitlab.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: gitlab
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.gitlab.oci.name }}
+      version: {{ .Values.addons.gitlab.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.gitlab.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
 
   {{- toYaml $fluxSettingsGitlab | nindent 2 }}
 

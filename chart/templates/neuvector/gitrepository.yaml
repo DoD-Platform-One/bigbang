@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) .Values.neuvector.enabled }}
+{{- if and (not .Values.offline) (eq (include "checkGitRef" .Values.neuvector) "true") .Values.neuvector.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

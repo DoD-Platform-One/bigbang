@@ -15,12 +15,21 @@ spec:
   targetNamespace: sonarqube
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.sonarqube) "true" }}
       chart: {{ .Values.addons.sonarqube.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: sonarqube
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.sonarqube.oci.name }}
+      version: {{ .Values.addons.sonarqube.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.sonarqube.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsSonarqube | nindent 2 }}
   

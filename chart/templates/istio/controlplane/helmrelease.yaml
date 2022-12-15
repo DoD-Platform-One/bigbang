@@ -13,12 +13,21 @@ spec:
   targetNamespace: istio-system
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.istio) "true" }}
       chart: {{ .Values.istio.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: istio-controlplane
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.istio.oci.name }}
+      version: {{ .Values.istio.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.istio.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsIstioCp | nindent 2 }}
 

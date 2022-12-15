@@ -13,12 +13,21 @@ spec:
   targetNamespace: authservice
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.authservice) "true" }}
       chart: {{ .Values.addons.authservice.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: authservice
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.authservice.oci.name }}
+      version: {{ .Values.addons.authservice.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.authservice.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsAuthservice | nindent 2 }}
 

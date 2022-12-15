@@ -10,12 +10,21 @@ spec:
   releaseName: gitlab-runner
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.gitlabRunner) "true" }}
       chart: {{ .Values.addons.gitlabRunner.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: gitlab-runner
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.gitlabRunner.oci.name }}
+      version: {{ .Values.addons.gitlabRunner.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.gitlabRunner.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsGitlabRunner | nindent 2 }}
 

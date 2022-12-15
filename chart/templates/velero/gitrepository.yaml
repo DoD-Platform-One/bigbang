@@ -1,4 +1,4 @@
-{{- if .Values.addons.velero.enabled  }}
+{{- if and (eq (include "checkGitRef" .Values.addons.velero) "true") .Values.addons.velero.enabled  }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

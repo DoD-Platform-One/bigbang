@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) ( .Values.logging.enabled ) }}
+{{- if and (eq (include "checkGitRef" .Values.logging) "true") (not .Values.offline) ( .Values.logging.enabled ) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

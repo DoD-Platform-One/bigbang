@@ -13,12 +13,21 @@ spec:
   targetNamespace: monitoring
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.monitoring) "true" }}
       chart: {{ .Values.monitoring.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: monitoring
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.monitoring.oci.name }}
+      version: {{ .Values.monitoring.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.monitoring.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 

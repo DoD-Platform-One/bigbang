@@ -14,12 +14,21 @@ spec:
   releaseName: nexus-repository-manager
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.nexus) "true" }}
       chart: {{ .Values.addons.nexus.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: nexus-repository-manager
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.nexus.oci.name }}
+      version: {{ .Values.addons.nexus.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.nexus.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsNexus | nindent 2 }}
 

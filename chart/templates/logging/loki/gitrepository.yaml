@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) .Values.loki.enabled }}
+{{- if and (eq (include "checkGitRef" .Values.loki) "true") (not .Values.offline) .Values.loki.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

@@ -1,3 +1,247 @@
+# -- List of OCI repositories/credentials to pull helm charts from
+# Must specify username/password or existingSecret (of type kubernetes.io/dockerconfigjson) if repository requires auth
+# Using "private-registry" for existingSecret will reuse credentials from registryCredentials above
+ociRepositories:
+  - name: "registry1"
+    repository: "oci://registry1.dso.mil/bigbang"
+    existingSecret: "private-registry"
+    username: ""
+    password: ""
+    email: ""
+
+# WIP OCI values for each package
+istio:
+  git: null
+  oci:
+    name: "istio"
+    tag: "1.15.3-bb.0"
+    repo: "registry1"
+
+istiooperator:
+  git: null
+  oci:
+    name: "istio-operator"
+    tag: "1.15.3-bb.0"
+    repo: "registry1"
+
+jaeger:
+  git: null
+  oci:
+    name: "jaeger-operator"
+    tag: "2.37.0-bb.0"
+    repo: "registry1"
+
+kiali:
+  git: null
+  oci:
+    name: "kiali-operator"
+    tag: "1.59.1-bb.1"
+    repo: "registry1"
+
+clusterAuditor:
+  git: null
+  oci:
+    name: "cluster-auditor"
+    tag: "1.5.0-bb.1"
+    repo: "registry1"
+
+gatekeeper:
+  git: null
+  oci:
+    name: "gatekeeper"
+    tag: "3.10.0-bb.0"
+    repo: "registry1"
+
+kyverno:
+  git: null
+  oci:
+    name: "kyverno"
+    tag: "2.6.1-bb.0"
+    repo: "registry1"
+
+kyvernopolicies:
+  git: null
+  oci:
+    name: "kyverno-policies"
+    tag: "1.0.1-bb.8"
+    repo: "registry1"
+
+kyvernoreporter:
+  git: null
+  oci:
+    name: "policy-reporter"
+    tag: "2.13.1-bb.0"
+    repo: "registry1"
+
+logging:
+  git: null
+  oci:
+    name: "logging"
+    tag: "0.13.0-bb.0"
+    repo: "registry1"
+
+eckoperator:
+  git: null
+  oci:
+    name: "eck-operator"
+    tag: "2.5.0-bb.0"
+    repo: "registry1"
+
+fluentbit:
+  git: null
+  oci:
+    name: "fluent-bit"
+    tag: "0.21.2-bb.0"
+    repo: "registry1"
+
+promtail:
+  git: null
+  oci:
+    name: "promtail"
+    tag: "6.2.2-bb.2"
+    repo: "registry1"
+
+loki:
+  git: null
+  oci:
+    name: "loki"
+    tag: "3.3.4-bb.0"
+    repo: "registry1"
+
+neuvector:
+  git: null
+  oci:
+    name: "neuvector"
+    tag: "2.2.2-bb.1"
+    repo: "registry1"
+
+tempo:
+  git: null
+  oci:
+    name: "tempo"
+    tag: "0.16.1-bb.2"
+    repo: "registry1"
+
+monitoring:
+  git: null
+  oci:
+    name: "kube-prometheus-stack"
+    tag: "41.7.3-bb.0"
+    repo: "registry1"
+
+twistlock:
+  git: null
+  oci:
+    name: "twistlock"
+    tag: "0.11.4-bb.0"
+    repo: "registry1"
+
+addons:
+  argocd:
+    git: null
+    oci:
+      name: "argo-cd"
+      tag: "5.5.7-bb.5"
+      repo: "registry1"
+
+  authservice:
+    git: null
+    oci:
+      name: "authservice"
+      tag: "0.5.3-bb.0"
+      repo: "registry1"
+
+  minioOperator:
+    git: null
+    oci:
+      name: "minio-operator"
+      tag: "4.5.4-bb.0"
+      repo: "registry1"
+
+  minio:
+    git: null
+    oci:
+      name: "minio-instance"
+      tag: "4.5.4-bb.1"
+      repo: "registry1"
+
+  gitlab:
+    git: null
+    oci:
+      name: "gitlab"
+      tag: "6.5.2-bb.2"
+      repo: "registry1"
+
+  gitlabRunner:
+    git: null
+    oci:
+      name: "gitlab-runner"
+      tag: "0.45.0-bb.3"
+      repo: "registry1"
+
+  nexus:
+    git: null
+    oci:
+      name: "nexus-repository-manager"
+      tag: "42.0.0-bb.3"
+      repo: "registry1"
+
+  sonarqube:
+    git: null
+    oci:
+      name: "sonarqube"
+      tag: "1.0.31-bb.1"
+      repo: "registry1"
+
+  anchore:
+    git: null
+    oci:
+      name: "anchore-engine"
+      tag: "1.20.0-bb.1"
+      repo: "registry1"
+
+  mattermostoperator:
+    git: null
+    oci:
+      name: "mattermost-operator"
+      tag: "1.18.1-bb.1"
+      repo: "registry1"
+
+  mattermost:
+    git: null
+    oci:
+      name: "mattermost"
+      tag: "7.4.0-bb.0"
+      repo: "registry1"
+
+  velero:
+    git: null
+    oci:
+      name: "velero"
+      tag: "2.32.2-bb.0"
+      repo: "registry1"
+
+  keycloak:
+    git: null
+    oci:
+      name: "keycloak"
+      tag: "18.2.1-bb.5"
+      repo: "registry1"
+
+  vault:
+    git: null
+    oci:
+      name: "vault"
+      tag: "0.22.1-bb.0"
+      repo: "registry1"
+
+  metricsServer:
+    git: null
+    oci:
+      name: "metrics-server"
+      tag: "3.8.0-bb.6"
+      repo: "registry1"
+
 # -- Wrapper chart for integrating Big Bang into a package
 wrapper:
   git:

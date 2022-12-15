@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) (or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled) }}
+{{- if and (eq (include "checkGitRef" .Values.addons.minioOperator) "true") (not .Values.offline) (or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

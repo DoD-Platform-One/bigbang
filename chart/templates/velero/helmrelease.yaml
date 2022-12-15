@@ -13,12 +13,21 @@ spec:
   targetNamespace: velero
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.velero) "true" }}
       chart: {{ .Values.addons.velero.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: velero
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.velero.oci.name }}
+      version: {{ .Values.addons.velero.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.velero.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsVelero | nindent 2 }}
   

@@ -569,7 +569,7 @@ loki:
 # ----------------------------------------------------------------------------------------------------------------------
 
 neuvector:
-   # -- Toggle deployment of Tempo.
+   # -- Toggle deployment of Neuvector.
   enabled: false
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git

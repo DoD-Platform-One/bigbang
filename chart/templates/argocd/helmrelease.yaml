@@ -13,12 +13,21 @@ spec:
   targetNamespace: argocd
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.addons.argocd) "true" }}
       chart: {{ .Values.addons.argocd.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: argocd
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.argocd.oci.name }}
+      version: {{ .Values.addons.argocd.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.argocd.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsArgo | nindent 2 }}
 

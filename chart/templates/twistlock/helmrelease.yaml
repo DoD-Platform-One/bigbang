@@ -13,12 +13,21 @@ spec:
   targetNamespace: twistlock
   chart:
     spec:
+      {{- if eq (include "checkGitRef" .Values.twistlock) "true" }}
       chart: {{ .Values.twistlock.git.path }}
-      interval: 5m
       sourceRef:
         kind: GitRepository
         name: twistlock
         namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.twistlock.oci.name }}
+      version: {{ .Values.twistlock.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.twistlock.oci.repo }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsTwistlock | nindent 2 }}
   

@@ -1,4 +1,4 @@
-{{- if and (not .Values.offline) .Values.addons.keycloak.enabled }}
+{{- if and (eq (include "checkGitRef" .Values.addons.keycloak) "true") (not .Values.offline) .Values.addons.keycloak.enabled }}
 {{ $name := "keycloak" }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
