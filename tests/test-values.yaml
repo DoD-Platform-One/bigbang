@@ -519,6 +519,10 @@ kyvernopolicies:
               - gitlab
               names:
               - gitlab-minio-*
+      disallow-namespaces:
+        parameters:
+          disallow:
+          - bigbang
 
 logging:
   enabled: true

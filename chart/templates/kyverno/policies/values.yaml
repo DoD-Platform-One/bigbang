@@ -91,6 +91,7 @@ policies:
           - istio-system
 
   disallow-namespaces:
+    enabled: true
     validationFailureAction: enforce
     parameters:
       disallow:
