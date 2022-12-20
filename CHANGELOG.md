@@ -1,6 +1,11 @@
 # Changelog
 
 ---
+## [42.0.0-bb.4] - 2022-12-12
+### Changed
+- Added job for creation of a metrics user for Service Monitor Basic Auth purposes.
+- Removed individual dns network policies in favor of standardized dns allow 
+
 ## [42.0.0-bb.3] - 2022-11-28
 ### Changed
 - Removed metrics exception for istio mTLS STRICT
@@ -46,7 +51,7 @@
 
 ## [41.1.0-bb.1] - 2022-09-13
 ### Changed
-- The curl statements to istio proxy need to be made conditional on isito.enabled and istio.injection in the BigBang jobs.
+- The curl statements to istio proxy need to be made conditional on istio.enabled and istio.injection in the BigBang jobs.
 
 ## [41.1.0-bb.0] - 2022-09-06
 ### Changed

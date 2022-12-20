@@ -19,11 +19,11 @@ spec:
       port: http-nexus-ui
       basicAuth:
         password:
-          name: {{ template "nexus.name" . }}-secret
-          key: admin.password
+          name: {{ template "nexus.name" . }}-metrics-secret
+          key: metrics.password
         username:
-          name: {{ template "nexus.name" . }}-secret
-          key: admin.username
+          name: {{ template "nexus.name" . }}-metrics-secret
+          key: metrics.username
       {{- if .Values.monitoring.serviceMonitor.scheme }}
       scheme: {{ .Values.monitoring.serviceMonitor.scheme }}
       {{- end }}
