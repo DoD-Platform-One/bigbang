@@ -5,21 +5,18 @@ metadata:
   name: kube-api-dns-egress
   namespace: {{ .Release.Namespace }}
 spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  # Allow access to DNS
   egress:
   - to:
     - namespaceSelector: {}
     ports:
-    - port: 443
-      protocol: TCP
     - port: 53
       protocol: UDP
     {{- if .Values.openshift }}
     - port: 5353
       protocol: UDP
     {{- end }}
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/name: nexus-repository-manager
-  policyTypes:
-  - Egress
 {{- end }}

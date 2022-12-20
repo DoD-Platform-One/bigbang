@@ -1,0 +1,150 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.serviceMonitor.createMetricsUser .Values.secret.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded,hook-failed
+  name: metrics
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      activeDeadlineSeconds: 90
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8}}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.job_image.repository }}:{{ .Values.job_image.tag }}"
+        imagePullPolicy: {{ .Values.job_image.pullPolicy }}
+        name: metrics
+        command:
+          - sh
+        args:
+          - -c
+          - |
+            {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }} 
+            until curl -fsI http://localhost:15021/healthz/ready; do
+              echo "Waiting for Istio sidecar proxy..."
+              sleep 3
+            done
+            {{- end }}
+            echo "Waiting for nexus domain resolution"
+            BASE_URL="http://{{ include "nexus.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.nexus.nexusPort }}"
+            # create a role that has the pre-existing privilege identified here: https://help.sonatype.com/repomanager3/nexus-repository-administration/support-features#SupportFeatures-Prometheus
+            echo "checking for existing role nx-metrics"
+            STATUS=$(curl -X GET -s -o /dev/null -w '%{http_code}' \
+                -u admin:"$API_CREDENTIALS" \
+                "$BASE_URL/service/rest/v1/security/roles/nx-metrics" \
+                -H "Content-Type: application/json" \
+                -d '{"id": "nx-metrics","source": "default"}'
+            )
+            echo "Status = $STATUS"
+            if [ $STATUS -eq 200 ]
+            then
+              echo "Ensuring proper state of the metrics role for prometheus use"
+              ROLE=$(curl -X PUT -s -o /dev/null -w '%{http_code}' \
+                  -u admin:"$API_CREDENTIALS"\
+                  "$BASE_URL/service/rest/v1/security/roles/nx-metrics" \
+                  -H "Content-Type: application/json" \
+                  -d '{"id": "nx-metrics","name": "metrics-role","description": "role required for prometheus service monitor","privileges": ["nx-metrics-all"]}'
+              )
+              echo "role PUT update = $ROLE"
+              if [ $ROLE -ne 204 ]
+              then
+                echo "Problem Updating the role" && exit 1
+              fi
+            else
+              echo "Creation of the metrics role for prometheus use"
+              ROLE=$(curl -X POST -s -o /dev/null -w '%{http_code}' \
+                  -u admin:"$API_CREDENTIALS"\
+                  "$BASE_URL/service/rest/v1/security/roles" \
+                  -H "Content-Type: application/json" \
+                  -d '{"id": "nx-metrics","name": "metrics-role","description": "role required for prometheus service monitor","privileges": ["nx-metrics-all"]}'
+              )
+              echo "role POST update = $ROLE"
+              if [ $ROLE -ne 200 ]
+              then
+                echo "Problem creating the role"
+                {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}      
+                curl -fsI -X POST http://localhost:15020/quitquitquit &&
+                {{- end }}
+                exit 1
+              fi
+            fi
+
+            # Creating user data variable to get around having to escape quotes etc
+            USER_DATA=$( cat <<EOF
+            {
+              "userId": "$METRIC_USER",
+              "source": "default",
+              "password": "$METRIC_PASS",
+              "firstName": "Metrics",
+              "lastName": "User",
+              "emailAddress": "metricsuser@example.com",
+              "status": "active",
+              "roles": ["nx-metrics"]
+            }
+            EOF
+            )
+            STATUS=$(curl -X PUT -s -o /dev/null -w '%{http_code}' \
+                    -u admin:"$API_CREDENTIALS" \
+                    "$BASE_URL/service/rest/v1/security/users/$METRIC_USER" \
+                    -H "Content-Type: application/json" \
+                    -d "$USER_DATA"
+            )
+            echo "Status = $STATUS"
+
+            sleep 3
+            if [ $STATUS -eq 404 ]
+            then
+              USER=$(curl -X POST -s -o /dev/null -w '%{http_code}' \
+                  -u admin:"$API_CREDENTIALS"\
+                  "$BASE_URL/service/rest/v1/security/users" \
+                  -H "Content-Type: application/json" \
+                  -d "$USER_DATA"
+              )
+              if [ $USER -ne 200 ]
+              then
+                echo "Problem creating the user"
+                {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}      
+                curl -fsI -X POST http://localhost:15020/quitquitquit &&
+                {{- end }}
+                exit 1
+              else
+                echo "User created successfully"
+              fi
+            elif [ $STATUS -eq 204 ]
+            then
+              echo "Metrics user updated successfully"
+            else
+              echo "Problem with existing user update"
+              {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}      
+              curl -fsI -X POST http://localhost:15020/quitquitquit &&
+              {{- end }}
+              exit 1
+            fi
+            {{- if and .Values.istio.enabled (eq .Values.istio.injection "enabled") }}      
+            curl -fsI -X POST http://localhost:15020/quitquitquit &&
+            {{- end }}
+            exit
+        env:
+        - name: API_CREDENTIALS
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "nexus.name" . }}-secret
+              key: admin.password
+        - name: METRIC_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "nexus.name" . }}-metrics-secret
+              key: metrics.username
+        - name: METRIC_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "nexus.name" . }}-metrics-secret
+              key: metrics.password
+        resources: {}
+      restartPolicy: Never
+{{- end }}

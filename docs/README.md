@@ -46,6 +46,27 @@ secret:
   readOnly: true
 ```
 
+### Nexus Package Upgrades
+If you are upgrading from versions prior to `42.0.0-bb.4` there are considerations to make for upgrade paths and inclusion of new values. In `42.0.0-bb.4` this package was updated to change the user for metrics collection `basicAuth` from `admin` to a `metrics` user. This was in an effort to reduce the permissions of the user with credentials stored in kubernetes.
+
+#### New Installation
+The recommended process for new installations of this package include:
+- set `.Values.monitoring.serviceMonitor.createMetricsUser` to `true`
+- set `.Values.secret.enabled` to `true`
+- reconcile the package and ensure the target in prometheus for nexus is `UP`
+- set `.Values.monitoring.serviceMonitor.createMetricsUser` to `false`
+- set `.Values.secret.enabled` to `false`
+  - This will remove the admin credentials secret from persisting in the cluster.
+
+#### Package Upgrade
+The recommended process for upgrading an existing installation include:
+- set `.Values.monitoring.serviceMonitor.createMetricsUser` to `true`
+- set `.Values.secret.enabled` to `true`
+- set `.Values.custom_admin_password` to your current admin password
+- set `.Values.monitoring.serviceMonitor.createMetricsUser` to `false`
+- set `.Values.secret.enabled` to `false`
+  - This will remove the admin credentials secret from persisting in the cluster.
+
 ### License
 We expect you to secure your license; the license will be provided as a binary. Encode the binary file as a base64
 encoded string, secure with sops, and place in `.Values.addons.nexusRepositoryManager.license_key`. The `_helpers.tpl`

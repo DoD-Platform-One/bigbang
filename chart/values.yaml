@@ -23,10 +23,12 @@ networkPolicies:
 
 # External database - See docs/general.md
 custom_admin_password: ""
+custom_metrics_password: ""
 
 monitoring:
   enabled: false
   serviceMonitor:
+    createMetricsUser: false
     additionalLabels: {}
     # ServiceMonitor namespace. Default to nexus-repository-manager namespace.
     # namespace:
