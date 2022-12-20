@@ -67,6 +67,7 @@ policies:
         #   # -- Namespace to find the ConfigMap/Secret.  This can be templated.
         #   namespace: "{{ .Release.Namespace }}"
 
+
   # -- Prevent specified annotations on pods
   disallow-annotations:
     enabled: false
@@ -206,18 +207,17 @@ policies:
 
   # -- Require specified images to be signed and verified
   require-image-signature:
-    enabled: false
-    validationFailureAction: audit
+    enabled: true
+    validationFailureAction: enforce
     parameters:
       # -- List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields.
-      require: []
-      # Example
-      # - image: "ghcr.io/kyverno/test-verify-image:*"
-      #   key: |-
-      #     -----BEGIN PUBLIC KEY-----
-      #     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
-      #     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
-      #     -----END PUBLIC KEY-----
+      require: 
+      - image: "registry1.dso.mil/ironbank/*"
+        key: |-
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
+          UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
+          -----END PUBLIC KEY-----
 
   # -- Require Istio sidecar injection label on namespaces
   require-istio-on-namespaces:
@@ -364,7 +364,7 @@ policies:
       # -- List of allowed registries that images may use
       allow:
       - registry1.dso.mil
-
+  
   # -- Restrict mounting /proc to the specified mask
   restrict-proc-mount:
     enabled: true
