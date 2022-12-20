@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.10] - 2022-12-5
+### Changed
+- Changed values.yaml to fail images from ironbank that are not signed.
+
 ## [1.0.1-bb.9] - 2022-12-13
 ### Changed
 - ironbank/opensource/kubernetes/kubectl updated from v1.25.4 to v1.25.5

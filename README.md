@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.1-bb.9](https://img.shields.io/badge/Version-1.0.1--bb.9-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.0.1-bb.10](https://img.shields.io/badge/Version-1.0.1--bb.9-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -79,8 +79,8 @@ helm install kyverno-policies chart/
 | policies.require-cpu-limit | object | `{"enabled":false,"parameters":{"require":["<10"]},"validationFailureAction":"audit"}` | Require containers have CPU limits defined and within the specified range |
 | policies.require-cpu-limit.parameters.require | list | `["<10"]` | CPU limitations (only one required condition needs to be met).  The following operators are valid: >, <, >=, <=, !, |, &. |
 | policies.require-drop-all-capabilities | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Requires containers to drop all Linux capabilities |
-| policies.require-image-signature | object | `{"enabled":false,"parameters":{"require":[]},"validationFailureAction":"audit"}` | Require specified images to be signed and verified |
-| policies.require-image-signature.parameters.require | list | `[]` | List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields. |
+| policies.require-image-signature | object | `{"enabled":true,"parameters":{"require":[{"image":"registry1.dso.mil/ironbank/*","key":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL\nUfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==\n-----END PUBLIC KEY-----"}]},"validationFailureAction":"enforce"}` | Require specified images to be signed and verified |
+| policies.require-image-signature.parameters.require | list | `[{"image":"registry1.dso.mil/ironbank/*","key":"-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL\nUfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==\n-----END PUBLIC KEY-----"}]` | List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields. |
 | policies.require-istio-on-namespaces | object | `{"enabled":false,"validationFailureAction":"audit"}` | Require Istio sidecar injection label on namespaces |
 | policies.require-labels | object | `{"enabled":false,"parameters":{"require":["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]},"validationFailureAction":"audit"}` | Require specified labels to be on all pods |
 | policies.require-labels.parameters.require | list | `["app.kubernetes.io/name","app.kubernetes.io/instance","app.kubernetes.io/version"]` | List of labels required on all pods.  Entries can be just a "key", or a quoted "key: value".  Wildcards '*' and '?' are supported. See https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/#labels See https://helm.sh/docs/chart_best_practices/labels/#standard-labels |
