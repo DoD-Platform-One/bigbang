@@ -31,7 +31,7 @@
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:network_down[collapsed=true]\r\e[0K\e[33;1mNetwork Down\e[37m"
     - echo "Destroying network"
-    # Loop to retry network terraform destory
+    # Loop to retry network terraform destroy
     - |
       set -e
       attempt_counter=0

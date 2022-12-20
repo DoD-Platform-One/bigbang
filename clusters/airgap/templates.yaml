@@ -1,0 +1,77 @@
+.airgap:
+  rules:
+    # Run when `test-ci::airgap` label is assigned
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+      when: never
+  variables:
+    TF_ROOT: "${PIPELINE_REPO_DESTINATION}/clusters/airgap/dependencies/terraform"
+    TF_VAR_ci_pipeline_id: $CI_PIPELINE_ID
+    TF_VAR_airgap_env_name: bb-ci-airgap-$TF_VAR_env
+
+.airgap up:
+  extends:
+    - .terraformer
+    - .airgap
+  artifacts:
+    paths:
+    - ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:airgap_up[collapsed=true]\r\e[0K\e[33;1mAirgap Up\e[37m"
+    - echo "ec2_instance_name:$TF_VAR_airgap_env_name"
+    - echo $TF_VAR_env
+    # Loop to retry airgap up terraform apply due to issues locking terraform.state in s3
+    - |
+      set -e
+      attempt_counter=0
+      max_attempts=2
+      until [ $(terraform apply -auto-approve >/dev/null; echo $?) -eq 0 ]; do
+        if [ ${attempt_counter} == ${max_attempts} ];then
+          echo "Error applying airgap up terraform"
+          exit 1
+        fi
+        attempt_counter=$(($attempt_counter+1))
+        echo "❌ Attempt FAILED to apply will retry in 30 seconds"
+        sleep 30
+      done
+    # Wait for airgap kubeconfig to upload to s3
+    - |
+      set -e
+      attempt_counter=0
+      max_attempts=30
+      until [ $(aws s3api wait object-exists --bucket airgap-tf-states --key airgap/${TF_VAR_env}/airgap_kubeconfig.yaml >/dev/null; echo $?) -eq 0 ]; do
+        if [ ${attempt_counter} == ${max_attempts} ];then
+          echo "Error waiting for airgap kubeconfig"
+          exit 1
+        fi
+        attempt_counter=$(($attempt_counter+1))
+        echo "❌ airgap kubeconfig not found will retry in 10 seconds"
+        sleep 10
+      done
+    - aws s3 cp s3://airgap-tf-states/airgap/${TF_VAR_env}/airgap_kubeconfig.yaml .
+    - mv ./airgap_kubeconfig.yaml ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml
+    - echo -e "\e[0Ksection_end:`date +%s`:airgap_up\r\e[0K"
+
+.airgap down:
+  extends:
+    - .airgap
+    - .terraformer
+    - .terraform destroy workspace
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:airgap_down[collapsed=true]\r\e[0K\e[33;1mAirgap Down\e[37m"
+    - echo "Destroying airgap"
+    # Loop to retry network terraform destroy
+    - |
+      set -e
+      attempt_counter=0
+      max_attempts=2
+      terraform destroy -auto-approve
+    - echo -e "\e[0Ksection_end:`date +%s`:airgap_down\r\e[0K"
+
+.airgap cleanup:
+  rules:
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+      allow_failure: true
+      when: always
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+      when: never

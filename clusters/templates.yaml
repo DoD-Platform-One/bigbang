@@ -5,3 +5,4 @@ include:
   #- local: '/clusters/ocp/templates.yaml'
   - local: '/clusters/rke2/templates.yaml'
   #- local: '/clusters/tkg/templates.yaml'
+  - local: '/clusters/airgap/templates.yaml'
