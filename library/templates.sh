@@ -9,9 +9,9 @@
 # prevent it from being run standalone, which would do nothing
 if [[ $BASH_SOURCE == $0 ]]; then
   echo "$0 is used to set env variables in the current shell and must be sourced to work"
-  echo "examples: . $0" 
+  echo "examples: . $0"
   echo "          source $0"
-  exit 1 
+  exit 1
 fi
 
 if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  || ${CI_MERGE_REQUEST_LABELS} == *"debug"* ]]; then
@@ -78,7 +78,7 @@ check_changes() {
    fi
 
    echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
-   
+
    ## Array of addon packages
    CHECK_PACKAGES=($(yq e '(.*.git | select(. != null) | (path | .[-2]), .addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}"))
 
@@ -97,7 +97,7 @@ check_changes() {
         # Save all package configs in .addons to their own file
         elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
               yq e ".addons.$package" "${VALUES_FILE}" > target-branch/values/$package.yaml
-        fi 
+        fi
    done
 
    ## Collect package configurations on the source branch
@@ -115,9 +115,9 @@ check_changes() {
         # Save all package configs in .addons to their own file
         elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
               yq e ".addons.$package" "${VALUES_FILE}" > source-branch/values/$package.yaml
-        fi 
+        fi
    done
-  
+
    ## Check for package changes in chart/values.yaml
    for package in "${CHECK_PACKAGES[@]}"; do
         if [[ $(diff target-branch/values/$package.yaml source-branch/values/$package.yaml) ]]; then
@@ -173,9 +173,9 @@ check_changes() {
                       CHANGED_PACKAGES+=("$package")
               else
                       CHANGED_PACKAGES+=("$package")
-              fi 
+              fi
         fi
-   done 
+   done
 
    if [[ -z "$CHANGED_PACKAGES" ]]; then
         echo "✅ No changes have been made to any packages"
@@ -201,12 +201,12 @@ label_check() {
    for package in ${CHANGED_PACKAGES[*]}; do
       if [[ ! "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "${package}" ]]; then
          LABEL_CHECK_DEPLOY_LABELS+=("${package}")
-         echo "    Added "${package}"" 
-      else 
+         echo "    Added "${package}""
+      else
          echo "    "${package}" already enabled"
       fi
    done
-   
+
    if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "all-packages" ]]; then
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
       LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
@@ -220,13 +220,13 @@ label_check() {
          echo "  Checking mattermost"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermostoperator" ]]; then
             echo "    mattermostoperator already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("mattermostoperator")
             echo "    Added mattermostoperator"
          fi
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
             echo "    minioOperator already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
             echo "    Added minioOperator"
          fi
@@ -235,7 +235,7 @@ label_check() {
          echo "  Checking promtail"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
             echo "    loki already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("loki")
             echo "    Added loki"
          fi
@@ -244,13 +244,13 @@ label_check() {
          echo "  Checking loki"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
             echo "    minioOperator already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
             echo "    Added minioOperator"
          fi
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "promtail" ]]; then
             echo "    promtail already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("promtail")
             echo "    Added promtail"
          fi
@@ -259,7 +259,7 @@ label_check() {
          echo "  Checking kyvernoreporter"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "kyvernopolicies" ]]; then
             echo "    kyvernopolicies already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("kyvernopolicies")
             echo "    Added kyvernopolicies"
          fi
@@ -268,7 +268,7 @@ label_check() {
          echo "  Checking minio"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
             echo "    minioOperator already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
             echo "    Added minioOperator"
          fi
@@ -277,7 +277,7 @@ label_check() {
          echo "  Checking gitlabRunner"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlab"(,|$) ]]; then
             echo "    gitlab already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("gitlab")
             echo "    Added gitlab"
          fi
@@ -286,20 +286,20 @@ label_check() {
          echo "  Checking velero"
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
             echo "    minio already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("minio")
             echo "    Added minio"
          fi
          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
             echo "    minioOperator already enabled"
-         else 
+         else
             LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
             echo "    Added minioOperator"
          fi
       fi
    fi
 
-   # Remove empty array elements    
+   # Remove empty array elements
    NEW=()
    for i in "${LABEL_CHECK_DEPLOY_LABELS[@]}"; do
       if [ -z "$i" ]; then
@@ -319,7 +319,7 @@ deploy_bigbang() {
    set -e
    for deploy_script in $(find ./${PIPELINE_REPO_DESTINATION}/scripts/deploy -type f -name '*.sh' | sort); do
      chmod +x ${deploy_script}
-     echo -e "\e[0Ksection_start:`date +%s`:${deploy_script##*/}[collapsed=true]\r\e[0K\e[33;1m${deploy_script##*/}\e[37m"  
+     echo -e "\e[0Ksection_start:`date +%s`:${deploy_script##*/}[collapsed=true]\r\e[0K\e[33;1m${deploy_script##*/}\e[37m"
      ./${deploy_script}
      echo -e "\e[0Ksection_end:`date +%s`:${deploy_script##*/}\r\e[0K"
    done
@@ -328,7 +328,7 @@ deploy_bigbang() {
 test_bigbang() {
    set -e
    for test_script in $(find ./${PIPELINE_REPO_DESTINATION}/scripts/tests -type f -name '*.sh' | sort); do
-     echo -e "\e[0Ksection_start:`date +%s`:${test_script##*/}[collapsed=true]\r\e[0K\e[33;1m${test_script##*/}\e[37m"        
+     echo -e "\e[0Ksection_start:`date +%s`:${test_script##*/}[collapsed=true]\r\e[0K\e[33;1m${test_script##*/}\e[37m"
      chmod +x ${test_script}
      echo "Executing ${test_script}..."
      ./${test_script} && export EXIT_CODE=$? || export EXIT_CODE=$?
@@ -352,7 +352,7 @@ pre_vars() {
    # Create the TF_VAR_env variable
    echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
    # Calculate a unique cidr range for vpc
-   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]]; then
+   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::airgap"* ]]; then
      export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
      export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
      export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
@@ -456,7 +456,7 @@ clone_bigbang_and_merge_templates() {
    cd ${BB_REPO_DESTINATION}
    if [[ $BB_VERSION != "latest" ]]; then
      git checkout ${BB_VERSION}
-   elif [[ $(yq e '. | has("bb-version")' ../tests/test-values.yaml) == "true" ]]; then 
+   elif [[ $(yq e '. | has("bb-version")' ../tests/test-values.yaml) == "true" ]]; then
      git checkout $(yq e '.bb-version' ../tests/test-values.yaml)
    else
      git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
@@ -472,15 +472,15 @@ clone_bigbang_and_merge_templates() {
      yq e -i ".${package}.git.branch = \"${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}\"" ../bigbang/values.yaml
    else
      yq e -i ".${package}.git.branch = \"${CI_DEFAULT_BRANCH}\"" ../bigbang/values.yaml
-   fi 
-   
+   fi
+
    # Pull the latest ingress certs from Big Bang's default branch.
    # When the ingress certs expire between releases, the integration stage fails due to having expired certs.
    BB_DEFAULT_BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
    git checkout ${BB_DEFAULT_BRANCH} -- chart/ingress-certs.yaml
 
-   yq eval-all 'select(fileIndex == 0) * select(filename == "chart/ingress-certs.yaml")' ${CI_VALUES_FILE} chart/ingress-certs.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE} 
-   yq eval-all 'select(fileIndex == 0) * select(filename == "../bigbang/values.yaml")' ${CI_VALUES_FILE} ../bigbang/values.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE} 
+   yq eval-all 'select(fileIndex == 0) * select(filename == "chart/ingress-certs.yaml")' ${CI_VALUES_FILE} chart/ingress-certs.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE}
+   yq eval-all 'select(fileIndex == 0) * select(filename == "../bigbang/values.yaml")' ${CI_VALUES_FILE} ../bigbang/values.yaml > tmpfile && mv tmpfile ${CI_VALUES_FILE}
    echo -e "\e[0Ksection_end:`date +%s`:clone_and_checkout_bigbang\r\e[0K"
 }
 
@@ -1311,39 +1311,39 @@ create_bigbang_merge_request() {
       echo "Skipping auto Big Bang merge request."
       exit
     fi
-    
+
     echo "Creating new Big Bang merge request..."
     ## Determine which package needs to be updated in the Big Bang chart
-    
+
     # Account for packages that have a different name in Big Bang's values file vs the name of the package repo
     # The package name is needed to edit the Big Bang chart/values.yaml
     if [[ ${CI_PROJECT_NAME} == "istio-controlplane" ]]; then
         package="istio"
-    elif [[ ${CI_PROJECT_NAME} == "istio-operator" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "istio-operator" ]]; then
         package="istiooperator"
-    elif [[ ${CI_PROJECT_NAME} == "cluster-auditor" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "cluster-auditor" ]]; then
         package="clusterAuditor"
-    elif [[ ${CI_PROJECT_NAME} == "policy" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "policy" ]]; then
         package="gatekeeper"
-    elif [[ ${CI_PROJECT_NAME} == "kyverno-policies" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "kyverno-policies" ]]; then
         package="kyvernopolicies"
-    elif [[ ${CI_PROJECT_NAME} == "elasticsearch-kibana" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "elasticsearch-kibana" ]]; then
         package="logging"
-    elif [[ ${CI_PROJECT_NAME} == "eck-operator" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "eck-operator" ]]; then
         package="eckoperator"
-    elif [[ ${CI_PROJECT_NAME} == "minio-operator" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "minio-operator" ]]; then
         package="minioOperator"
-    elif [[ ${CI_PROJECT_NAME} == "gitlab-runner" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "gitlab-runner" ]]; then
         package="gitlabRunner"
-    elif [[ ${CI_PROJECT_NAME} == "anchore-enterprise" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "anchore-enterprise" ]]; then
         package="anchore"
-    elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then
         package="mattermostoperator"
-    elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then 
+    elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then
         package="metricsServer"
     else
         package="${CI_PROJECT_NAME}"
-    fi 
+    fi
     ## GitLab API endpoint used to interact with project-level resources
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
 
@@ -1357,17 +1357,17 @@ create_bigbang_merge_request() {
 
     # Get the URL of the relevant package MR
     PACKAGE_MR_URL=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.web_url) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
-    
+
     # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
     BB_MR_REVIEWER_NAMES=( "micah.nagel" "BrandenCobb" "ryan.j.garcia" "rob.ferguson" )
 
     # Collect user IDs from /users API endpoint
     # Add "%2C" to the end of every user ID for URL encoding commas
-    for reviewer in "${BB_MR_REVIEWER_NAMES[@]}"; do 
+    for reviewer in "${BB_MR_REVIEWER_NAMES[@]}"; do
         BB_MR_REVIEWER_IDS+=$(curl -s "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id' | sed 's/$/%2C/')
-    done 
+    done
 
-    ## Pull down Big Bang repo, create a new branch, and configure git 
+    ## Pull down Big Bang repo, create a new branch, and configure git
     BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${LATEST_GIT_TAG}"
     git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION} 1>/dev/null
     cd ${BB_REPO_DESTINATION}
@@ -1376,7 +1376,7 @@ create_bigbang_merge_request() {
     git config user.name "mr.bot"
 
     # Avoiding MRing non-bb packages, will cancel out of potential MR
-    if [ $(yq e "has(\"$package\")" ${VALUES_FILE}) == "false" ] && [ $(yq e ".addons | has(\"$package\")" ${VALUES_FILE}) == "false" ]; then 
+    if [ $(yq e "has(\"$package\")" ${VALUES_FILE}) == "false" ] && [ $(yq e ".addons | has(\"$package\")" ${VALUES_FILE}) == "false" ]; then
       echo "\e[31mThis package is not a Big Bang core or addon package. Skipping auto Big Bang merge request.\e[0m"
       exit
     fi
@@ -1384,7 +1384,7 @@ create_bigbang_merge_request() {
     ## Bump git tag for updated package in Big Bang chart/values.yaml
     if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
         # yq strips blank lines from YAML files, make a patch file to re-add these
-        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
+        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
@@ -1396,7 +1396,7 @@ create_bigbang_merge_request() {
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".${package}.git.tag" ${VALUES_FILE})"
     elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
         # yq strips blank lines from YAML files, make a patch file to re-add these
-        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml 
+        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
@@ -1406,8 +1406,8 @@ create_bigbang_merge_request() {
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
 
         echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".addons.${package}.git.tag" ${VALUES_FILE})"
-    fi 
-    
+    fi
+
     ## Push changes and create merge request
     git add ${VALUES_FILE} 1>/dev/null
     git commit -m "Updated ${CI_PROJECT_NAME} git tag" 1>/dev/null
@@ -1418,8 +1418,8 @@ create_bigbang_merge_request() {
       -o merge_request.label="bot::mr"	\
       -o merge_request.label=${package} 1>/dev/null
 
-    
-    ## Update merge request with reviewers and a description 
+
+    ## Update merge request with reviewers and a description
 
     # Get ID of the MR that was just created
     BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=opened" | jq '.[].iid' | head -1)
@@ -1427,7 +1427,7 @@ create_bigbang_merge_request() {
     # Get description of MR and save it to a JSON file
     JSON_DESCRIPTION_FILE="/tmp/description.json"
     curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '.description' > ${JSON_DESCRIPTION_FILE}
-    
+
     # Edit the JSON file by adding curly brackets and "description" to make it a valid JSON request to the GitLab API
     sed -i 's|^|\{\"description\"\:|' ${JSON_DESCRIPTION_FILE}
     sed -i 's|$|\}|' ${JSON_DESCRIPTION_FILE}
@@ -1440,7 +1440,7 @@ create_bigbang_merge_request() {
 
     # Update description of MR with package changes from CHANGELOG.md and add reviewers
     curl -s --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}" 1>/dev/null
-    
+
     # MR Link
     echo "✅ Big Bang MR created: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/${BB_MR_ID}"
 
@@ -1455,7 +1455,7 @@ create_bigbang_merge_request() {
 cluster_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0K\e[33;1mIn Cluster Deprecation Check\e[37m"
    kubent -e || export EXIT_CODE=$?
-   if [ "$EXIT_CODE" == "200" ]; then 
+   if [ "$EXIT_CODE" == "200" ]; then
      echo -e "\e[31mNOTICE: API deprecations or removals were found.\e[0m"
      exit 200
    fi
@@ -1562,8 +1562,8 @@ get_log_dump(){
       kubectl -n "$namespace" logs --all-containers=true --prefix=true --ignore-errors=true "$pod" >> "pod_logs/$namespace/$pod.txt"
   done
   echo -e "\e[0Ksection_end:`date +%s`:log_dump\r\e[0K"
-}  
-      
+}
+
 describe_resources() {
   echo -e "\e[0Ksection_start:`date +%s`:describe_resources[collapsed=true]\r\e[0K\e[33;1mDescribe Cluster Resources\e[37m"
   echo -e "\e[31mNOTICE: Cluster resource describes can be found in artifacts kubectl_describes\e[0m"
@@ -1578,7 +1578,7 @@ describe_resources() {
         for namespace in ${namespaces}; do
           mkdir -p "kubectl_describes/namespaces/$namespace"
           kubectl -n $namespace describe $default_resource 2>/dev/null | sed '/^$/d;/^Name:.*/i ---' > "kubectl_describes/namespaces/$namespace/"$default_resource"s.yaml"
-        done 
+        done
   done
 
   echo "$custom_resources" | while read -r line; do
@@ -1593,8 +1593,8 @@ describe_resources() {
                 mkdir -p "kubectl_describes/namespaces/$namespace"
                 kubectl -n $namespace describe $crd 2>/dev/null | sed '/^$/d;/^Name:.*/i ---' > "kubectl_describes/namespaces/$namespace/$crd.yaml"
              done
-        fi 
-  done 
+        fi
+  done
 
   find kubectl_describes/ -empty -delete
 
@@ -1718,7 +1718,7 @@ get_cpumem(){
 
 renovate_download_external_deps() {
   mkdir -p "${CI_PROJECT_DIR}"/scripts/
-  
+
   curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
   curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
   curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
@@ -1728,14 +1728,14 @@ renovate_download_external_deps() {
 
 gitlab_triage_dryrun(){
     #!/bin/bash
-    for project in $(awk '{print $1}' project_whitelist.txt); do 
+    for project in $(awk '{print $1}' project_whitelist.txt); do
         gitlab-triage --dry-run --token $RO_RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
     done
 }
 
 gitlab_triage(){
     #!/bin/bash
-    for project in $(awk '{print $1}' project_whitelist.txt); do 
+    for project in $(awk '{print $1}' project_whitelist.txt); do
         gitlab-triage --token $RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
     done
 }

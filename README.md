@@ -42,12 +42,12 @@ Currently two testing types are supported in the library:
 
 - Script tests (Bash, Python, etc)
 
-- [Cypress](https://www.cypress.io/) for UI testing. 
+- [Cypress](https://www.cypress.io/) for UI testing.
 
-These two test types are described below along with examples of how to implement them. 
+These two test types are described below along with examples of how to implement them.
 
 NOTE: If your package can be interacted via a UI and a CLI
-both test types should be included. 
+both test types should be included.
 
 By default, UI tests execute before CLI tests, but this
 can be overridden as described below.
@@ -81,7 +81,7 @@ dependencies:
   - name: gluon
     version: "x.x.x"
     repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
-``` 
+```
 
 The gluon chart is packaged and released as an [OCI artifact](https://helm.sh/docs/topics/registries/)
 
@@ -175,7 +175,7 @@ wait_project() {
 You will need to check what sort of health status is available in the k8s object and update the jsonpath to check accordingly.
 
 The timeElapsed portion provides a timeout after 10 minutes. In most cases, you should only need to update the two commented lines
-in the script above. 
+in the script above.
 
 Some projects may have more than one custom resource (i.e. Elasticsearch has both elasticsearch and kibana) and in these situations you can add another `resourceHealth` line
 and change the `if` check to verify both.
@@ -214,7 +214,7 @@ variables:
 
 ## MR Title Keywords
 
-To easily adjust the pipeline behavior without a commit, keywords can be placed in the title of Merge Requests. 
+To easily adjust the pipeline behavior without a commit, keywords can be placed in the title of Merge Requests.
 
 Supported keywords:
 
@@ -238,6 +238,8 @@ Similar to the MR title keywords described above, gitlab labels can be added to 
 `<package-name>` -- Adding a package name as a label will enable that package.
 
 `test-ci::infra` -- Add stages to provision and destroy the cloud infrastructure where the tests will run.
+
+`test-ci::airgap` -- Add stages to provision and destroy a simulated airgap bb install.
 
 ##### Labels for bigbang and package MRs
 `test-ci::release` -- Test the release CI, which includes the package and release stages.
