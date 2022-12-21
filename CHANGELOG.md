@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.11] - 2022-12-20
+### Changed
+- Updated default values for require-image-signature to align with upstream documentation
+
 ## [1.0.1-bb.10] - 2022-12-5
 ### Changed
 - Changed values.yaml to fail images from ironbank that are not signed.

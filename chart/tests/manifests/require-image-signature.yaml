@@ -43,11 +43,26 @@ spec:
     image: ghcr.io/kyverno/test-verify-image:signed
     args: ["sleep", "infinity"]
 ---
-# Test 4: Unsigned images not in the required list are allowed
+# Test 4: Images not in the required list are allowed
 apiVersion: v1
 kind: Pod
 metadata:
   name: require-image-signature-4
+  namespace: default
+  annotations:
+    kyverno-policies-bbtest/type: validate
+    kyverno-policies-bbtest/expected: pass
+spec:
+  containers:
+  - name: c1
+    image: ghcr.io/kyverno/kyverno
+    args: ["sleep", "infinity"]
+---
+# Test 5: IronBank signed images are allowed
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-image-signature-5
   namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate

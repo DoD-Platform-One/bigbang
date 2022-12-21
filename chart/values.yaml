@@ -211,13 +211,21 @@ policies:
     validationFailureAction: enforce
     parameters:
       # -- List of images that must be signed and the public key to verify.  Use `kubectl explain clusterpolicy.spec.rules.verifyImages` for fields.
-      require: 
-      - image: "registry1.dso.mil/ironbank/*"
-        key: |-
-          -----BEGIN PUBLIC KEY-----
-          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
-          UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
-          -----END PUBLIC KEY-----
+      require:
+      - imageReferences:
+        - "registry1.dso.mil/ironbank/*"
+        attestors:
+        - count: 1
+          entries:
+          - keys:
+              publicKeys: |-
+                -----BEGIN PUBLIC KEY-----
+                MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
+                UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
+                -----END PUBLIC KEY-----
+        # Ironbank images are rebuilt nightly and tags are not immutable
+        mutateDigest: false
+        verifyDigest: false
 
   # -- Require Istio sidecar injection label on namespaces
   require-istio-on-namespaces:
