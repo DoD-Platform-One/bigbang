@@ -20,3 +20,6 @@ dependencies:
 annotations:
   bigbang.dev/applicationVersions: |
     - Mattermost Operator: 1.19.0
+  helm.sh/images: |
+    - name: mattermost-operator
+      image: registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator:v1.19.0
