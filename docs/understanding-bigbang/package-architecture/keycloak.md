@@ -243,13 +243,20 @@ Keycloak is available under the [Apache License 2.0](https://github.com/keycloak
 
 ## High Availability
 
-By default Big Bang deploys Keycloak with two replicas in a high availability cluster configuration.  It is already configured to support cache sharing, anti-affinity, failovers, and rolling updates.  If you wish to increase or decrease the number of replicas, you can set the following in `values.yaml`:
+By default Big Bang deploys Keycloak with two replicas in a high availability cluster configuration.  It is already configured to support cache sharing, anti-affinity, failovers, and rolling updates. If you wish to increase or decrease the number of replicas you must first make sure you are pointed to an external database, and then the replicas can be increased, all of which can be set in `values.yaml`:
 
 ```yaml
 addons:
   keycloak:
+    database:
+      host: ""
+      type: ""
+      port: ""
+      database: ""
+      username: ""
+      password: "in-encrypted-values"
     values:
-      replicas: 2
+      replicas: 3
 ```
 
 ## Dependent Packages
