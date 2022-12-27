@@ -38,6 +38,13 @@
       "extractVersionTemplate": "^v(?<version>.*)$",
       "depNameTemplate": "registry1.dso.mil/ironbank/opensource/mattermost/mattermost-operator",
       "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^chart/Chart\\.yaml$"],
+      "matchStrings": [
+        "image:[^\\S\\r\\n]+(?<depName>.+):(?<currentValue>.+)"
+      ],
+      "datasourceTemplate": "docker"
     }
   ]
 }
