@@ -13,7 +13,6 @@ spec:
   targetNamespace: neuvector
   chart:
     spec:
-      chart: {{ .Values.neuvector.git.path }}
       {{- if eq (include "checkGitRef" .Values.neuvector) "true" }}
       chart: {{ .Values.neuvector.git.path }}
       sourceRef:
