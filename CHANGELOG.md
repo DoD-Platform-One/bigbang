@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.1]
+### changed
+- logic in templates.sh to check for and auto-enable minioOperator when vault is enabled
+
 ## [2.5.0]
 ### added
 - Added Airgap IAC, cluster, and basic pipelines to interface with airgap cluster. No Big Bang install.
