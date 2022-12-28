@@ -1441,6 +1441,13 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
     values:
+      minio:
+        enabled: true
+        disableSSL: true
+        endpoint: minio
+        accessKey: "minio"
+        secretKey: "minio123"
+        bucketName: vault-data
       autoInit:
         enabled: true
       global:
