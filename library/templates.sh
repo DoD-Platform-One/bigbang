@@ -297,6 +297,15 @@ label_check() {
             echo "    Added minioOperator"
          fi
       fi
+      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
+         echo "  Checking vault"
+         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
+            echo "    minioOperator already enabled"
+         else
+            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
+            echo "    Added minioOperator"
+         fi
+      fi
    fi
 
    # Remove empty array elements
