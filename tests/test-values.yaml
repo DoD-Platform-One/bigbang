@@ -146,6 +146,9 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to not drop capabilities
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       allowedDockerRegistries:
         parameters:
           excludedResources:
@@ -153,6 +156,9 @@ gatekeeper:
           - istio-system/lb-port-.*
           # Allow argocd to deploy a test app in its cypress test
           - argocd/guestbook-ui.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       allowedHostFilesystem:
         parameters:
           excludedResources:
@@ -188,11 +194,17 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to have an undefined defined seccomp
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       allowedUsers:
         parameters:
           excludedResources:
           # Allows k3d load balancer containers to run as any user/group
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       bannedImageTags:
         parameters:
           excludedResources:
@@ -210,6 +222,7 @@ gatekeeper:
           # Allows k3d load balancer containers to mount host ports
           - istio-system/lb-port-.*
           # Allow kyverno test vectors for Helm test
+          - default/disallow-host-namespaces-.?
           - default/c.?
           - default/i.?
       noBigContainers:
@@ -217,11 +230,25 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to have undefined limits/requests
           - istio-system/lb-port-.*
+      noHostNamespace:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/disallow-host-namespaces-.?
+      noPrivilegedContainers:
+        parameters:
+          excludedResources:
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       noPrivilegedEscalation:
         parameters:
           excludedResources:
           # Allows k3d load balancer containers to have undefined security context
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       noSysctls:
         parameters:
           excludedResources:
@@ -232,16 +259,24 @@ gatekeeper:
           excludedResources:
           # Allows k3d load balancer containers to mount filesystems read/write
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       requiredLabels:
         parameters:
           excludedResources:
           # Allows k3d load balancer pods to not have required labels
           - istio-system/svclb-.*
+          # Allow kyverno test vectors for Helm test
+          - default/require-labels-.?
       requiredProbes:
         parameters:
           excludedResources:
           # Allows k3d load balancer containers to not have readiness/liveness probes
           - istio-system/lb-port-.*
+          # Allow kyverno test vectors for Helm test
+          - default/c.?
+          - default/i.?
       restrictedTaint:
         parameters:
           excludedResources:
@@ -362,12 +397,31 @@ kyvernopolicies:
       require-image-signature:
         parameters:
           require:
-          - image: ghcr.io/kyverno/test-verify-image:*
-            key: |-
-              -----BEGIN PUBLIC KEY-----
-              MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
-              5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
-              -----END PUBLIC KEY-----
+          - imageReferences:
+            - "registry1.dso.mil/ironbank/*"
+            attestors:
+            - count: 1
+              entries:
+              - keys:
+                  publicKeys: |-
+                    -----BEGIN PUBLIC KEY-----
+                    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
+                    UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
+                    -----END PUBLIC KEY-----
+            # Ironbank images are rebuilt nightly and tags are not immutable
+            mutateDigest: false
+            verifyDigest: false
+          - imageReferences:
+            - "ghcr.io/kyverno/test-verify-image:*"
+            attestors:
+            - count: 1
+              entries:
+              - keys:
+                  publicKeys: |-
+                    -----BEGIN PUBLIC KEY-----
+                    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+                    5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+                    -----END PUBLIC KEY-----
       require-labels:
         parameters:
           require:
