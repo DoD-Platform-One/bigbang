@@ -1496,7 +1496,7 @@ addons:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
     values:
       minio:
-        enabled: true
+        enabled: false
         disableSSL: true
         endpoint: minio
         accessKey: "minio"
