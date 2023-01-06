@@ -86,4 +86,9 @@ minio:
 elasticsearch:
   enabled: true
 {{- end }}
+
+mattermostEnvs:
+  # required for Keycloak >= 20.X to work with gitlab auth pointed to Keycloak
+  MM_GITLABSETTINGS_SCOPE: openid
+
 {{- end -}}

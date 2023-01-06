@@ -1437,53 +1437,111 @@ addons:
       replicas: 1
       resources:
         requests:
-          cpu: 10m
-          memory: 16Mi
+          cpu: 250m
+          memory: 250Mi
         limits: {}
-      # Disabling helm tests for keycloak until they are working on rke2
       bbtests:
         enabled: true
         cypress:
           envs:
             cypress_url: "https://keycloak.bigbang.dev"
+      command:
+        - "/opt/keycloak/bin/kc.sh"
+      args:
+        - "start"
+        - "--import-realm"
+      extraEnv: |-
+        - name: KC_HTTPS_CERTIFICATE_FILE
+          value: /opt/keycloak/conf/tls.crt
+        - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+          value: /opt/keycloak/conf/tls.key
+        - name: KC_HTTP_ENABLED
+          value: "true"
+        - name: KC_HTTP_RELATIVE_PATH
+          value: /auth
+        - name: KC_HTTPS_CLIENT_AUTH
+          value: request
+        - name: KC_PROXY
+          value: passthrough
+        - name: KC_HTTPS_TRUST_STORE_FILE
+          value: /opt/keycloak/conf/truststore.jks
+        - name: KC_HTTPS_TRUST_STORE_PASSWORD
+          value: password
+        - name: KC_HOSTNAME
+          value: keycloak.bigbang.dev
+        - name: KC_HOSTNAME_STRICT
+          value: "true"
+        - name: KC_HOSTNAME_STRICT_HTTPS
+          value: "true"
+        - name: KC_LOG_LEVEL
+          value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
+        - name: KC_CACHE
+          value: ispn
+        - name: KC_CACHE_STACK
+          value: kubernetes
       secrets:
         env:
           stringData:
-            CUSTOM_REGISTRATION_CONFIG: /opt/jboss/keycloak/customreg.yaml
-            KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm.json
-            X509_CA_BUNDLE: /etc/x509/https/cas.pem
-        certauthority:
-          stringData:
-            cas.pem: '{{ .Files.Get "resources/dev/dod_cas.pem" }}'
+            CUSTOM_REGISTRATION_CONFIG: /opt/keycloak/conf/customreg.yaml
         customreg:
           stringData:
-            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda-ci.yaml" }}'
         realm:
           stringData:
-            realm.json: '{{ .Files.Get "resources/dev/baby-yoda-ci.json" }}'
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+        truststore:
+          data:
+            truststore.jks: |-
+              {{ .Files.Get "resources/dev/truststore.jks" | b64enc }}
+        quarkusproperties:
+          stringData:
+            quarkus.properties: '{{ .Files.Get "resources/dev/quarkus.properties" }}'
+      extraInitContainers: |-
+        - name: plugin
+          image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.0.0
+          imagePullPolicy: Always
+          command:
+          - sh
+          - -c
+          - | 
+            cp /app/p1-keycloak-plugin.jar /init
+            ls -l /init
+          volumeMounts:
+          - name: plugin
+            mountPath: "/init"
       extraVolumes: |-
-        - name: certauthority
-          secret:
-            secretName: {{ include "keycloak.fullname" . }}-certauthority
         - name: customreg
           secret:
             secretName: {{ include "keycloak.fullname" . }}-customreg
         - name: realm
           secret:
             secretName: {{ include "keycloak.fullname" . }}-realm
+        - name: plugin
+          emptyDir: {}
+        - name: truststore
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-truststore
+        - name: quarkusproperties
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-quarkusproperties
+            defaultMode: 0777
       extraVolumeMounts: |-
-        - name: certauthority
-          mountPath: /etc/x509/https/cas.pem
-          subPath: cas.pem
-          readOnly: true
         - name: customreg
-          mountPath: /opt/jboss/keycloak/customreg.yaml
+          mountPath: /opt/keycloak/conf/customreg.yaml
           subPath: customreg.yaml
           readOnly: true
         - name: realm
-          mountPath: /opt/jboss/keycloak/realm.json
+          mountPath: /opt/keycloak/data/import/realm.json
           subPath: realm.json
-          readOnly: true
+        - name: plugin
+          mountPath: /opt/keycloak/providers/p1-keycloak-plugin.jar
+          subPath: p1-keycloak-plugin.jar
+        - name: truststore
+          mountPath: /opt/keycloak/conf/truststore.jks
+          subPath: truststore.jks
+        - name: quarkusproperties
+          mountPath: /opt/keycloak/conf/quarkus.properties
+          subPath: quarkus.properties
 
   vault:
     enabled: false
