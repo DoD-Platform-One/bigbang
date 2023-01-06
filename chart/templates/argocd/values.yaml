@@ -146,6 +146,15 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
+configs:
+  cm:
+    {{- $argocdHosts := (dig "istio" "argocd" "hosts" dict .Values.addons.argocd.values) }}
+    {{- if $argocdHosts }}
+    url: {{ tpl ($argocdHosts | first) $ }}
+    {{- else }}
+    url: https://argocd.{{ .Values.domain }}
+    {{- end }}
+
 {{- if .Values.addons.argocd.sso.enabled }}
 sso:
   enabled: {{ .Values.addons.argocd.sso.enabled }}
@@ -159,6 +168,10 @@ sso:
       clientID: {{ .Values.addons.argocd.sso.client_id }}
       clientSecret: $oidc.keycloak.clientSecret
       requestedScopes: ["openid","ArgoCD"]
+      {{- if .Values.sso.certificate_authority }}
+      rootCA: |
+        {{- .Values.sso.certificate_authority | nindent 8 }}
+      {{- end }}
 {{- end }}
 {{- end -}}
 
