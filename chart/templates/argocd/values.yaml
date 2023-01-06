@@ -159,7 +159,8 @@ configs:
 sso:
   enabled: {{ .Values.addons.argocd.sso.enabled }}
   rbac:
-    policy.csv: {{- toYaml .Values.addons.argocd.sso.groups | nindent 4 }}
+    policy.csv: |
+      {{- .Values.addons.argocd.sso.groups | nindent 6 }}
   keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
   config:
     oidc.config: |
