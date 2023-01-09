@@ -121,7 +121,7 @@ policies:
       {{- end }}
   {{- end }}
 
-{{- if or (.Values.addons.gitlab.enabled) (and (dig "console" "localVolumeUpgrade" false .Values.twistlock.values) (.Release.IsUpgrade)) }}
+{{- if or (.Values.addons.gitlab.enabled) (and (dig "console" "localVolumeUpgrade" false .Values.twistlock.values) (.Release.IsUpgrade)) .Values.addons.keycloak.enabled }}
   disallow-shared-subpath-volume-writes:
     # Subpath volumes can be used in combination with symlinks to break out into the host filesystem
     exclude:
@@ -133,6 +133,9 @@ policies:
           {{- end }}
           {{- if (dig "console" "localVolumeUpgrade" false .Values.twistlock.values) }}
           - twistlock
+          {{- end }}
+          {{- if .Values.addons.keycloak.enabled }}
+          - keycloak
           {{- end }}
           names:
           {{- if (dig "console" "localVolumeUpgrade" false .Values.twistlock.values) }}
@@ -189,6 +192,10 @@ policies:
           # values from a readOnly projected volume holding secrets/configmap items, into the shared
           # volume. The shared volume is mounted with subpaths pointing to specific files in the container.
           - gitlab-gitaly*
+          {{- end }}
+          {{- if .Values.addons.keycloak.enabled }}
+          # Volumes using emptyDir shared with initContainers to inject custom provider plugins or custom themes
+          - keycloak-*
           {{- end }}
   {{- end }}
 
