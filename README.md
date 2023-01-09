@@ -1,6 +1,6 @@
 # nexus-repository-manager
 
-![Version: 42.0.0-bb.4](https://img.shields.io/badge/Version-42.0.0--bb.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.42.0](https://img.shields.io/badge/AppVersion-3.42.0-informational?style=flat-square)
+![Version: 44.0.0-bb.0](https://img.shields.io/badge/Version-44.0.0--bb.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.44.0](https://img.shields.io/badge/AppVersion-3.44.0-informational?style=flat-square)
 
 Sonatype Nexus Repository Manager - Universal Binary repository
 
@@ -108,7 +108,7 @@ helm install nexus-repository-manager chart/
 | bbtests.cypress.secretEnvs[0].name | string | `"cypress_nexus_pass"` |  |
 | bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.name | string | `"nexus-repository-manager-secret"` |  |
 | bbtests.cypress.secretEnvs[0].valueFrom.secretKeyRef.key | string | `"admin.password"` |  |
-| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.12.0"` |  |
+| bbtests.scripts.image | string | `"registry1.dso.mil/ironbank/google/go-containerregistry/crane:v0.12.1"` |  |
 | bbtests.scripts.envs.docker_host | string | `"nexus-nexus-repository-manager-docker-5000:5000"` |  |
 | bbtests.scripts.envs.docker_user | string | `"admin"` |  |
 | bbtests.scripts.secretEnvs[0].name | string | `"docker_password"` |  |
@@ -117,7 +117,7 @@ helm install nexus-repository-manager chart/
 | statefulset | object | `{"enabled":false}` | End of BigBang Additions |
 | deploymentStrategy | string | `"Recreate"` |  |
 | image.repository | string | `"registry1.dso.mil/ironbank/sonatype/nexus/nexus"` |  |
-| image.tag | string | `"3.42.0-01"` |  |
+| image.tag | string | `"3.44.0-01"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | imagePullSecrets[0].name | string | `"private-registry"` |  |
 | nexus.affinity | object | `{}` |  |
