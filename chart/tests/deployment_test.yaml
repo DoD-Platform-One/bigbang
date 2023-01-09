@@ -36,7 +36,14 @@ tests:
           pattern: sonatype/nexus3:3\.\d+\.\d+
       - equal:
           path: spec.template.spec.containers[0].securityContext
-          value: null
+          value: 
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
       - equal:
           path: spec.template.spec.containers[0].imagePullPolicy
           value: IfNotPresent
