@@ -2,7 +2,7 @@ package main
 
 import data.lib.kubernetes
 
-registries_allow := ["registry1.dso.mil/ironbank", "registry.dso.mil"]
+registries_allow := ["registry1.dso.mil/ironbank", "registry1.dso.mil/bigbang-ci", "registry.dso.mil"]
 registries_warn := ["registry.dso.mil"]
 
 in_allowed_registries(image) {
