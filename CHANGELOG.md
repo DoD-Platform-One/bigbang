@@ -2,6 +2,10 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## [1.0.1-bb.12] - 2022-01-06
+### Changed
+- Added support for checking deprecated API policy for Kubernetes v1.27.
+
 ## [1.0.1-bb.11] - 2022-12-20
 ### Changed
 - Updated default values for require-image-signature to align with upstream documentation
