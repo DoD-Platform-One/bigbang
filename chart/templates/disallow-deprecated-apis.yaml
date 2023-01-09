@@ -123,4 +123,23 @@ spec:
         {{ "{{" }} request.object.apiVersion {{ "}}" }}/{{ "{{" }} request.object.kind {{ "}}" }} is deprecated and will be removed in v1.26.
         See: https://kubernetes.io/docs/reference/using-api/deprecation-guide/
       deny: {{ "{}" }}
+  - name: validate-v1-27-removals
+    {{- include "kyverno-policies.exclude" (merge (dict "name" $name) .) | indent 4 }}
+    match:
+      any:
+      - resources:
+          kinds:
+          - storage.k8s.io/*/CSIStorageCapacity
+    preconditions:
+      all:
+      {{- include "kyverno-policies.precondition.create-update-background" . | nindent 6 }}
+      - key: "{{ "{{" }}request.object.apiVersion{{ "}}" }}"
+        operator: AnyIn
+        value:
+        - storage.k8s.io/v1beta1
+    validate:
+      message: >-
+        {{ "{{" }} request.object.apiVersion {{ "}}" }}/{{ "{{" }} request.object.kind {{ "}}" }} is deprecated and will be removed in v1.27.
+        See: https://kubernetes.io/docs/reference/using-api/deprecation-guide/
+      deny: {{ "{}" }}
 {{- end -}}

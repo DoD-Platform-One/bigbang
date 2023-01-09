@@ -1,20 +1,11 @@
-# Test 1: APIs deprecated and removed in 1.25 are not allowed
-apiVersion: batch/v1beta1
-kind: CronJob
+# Test 1: APIs deprecated and removed in 1.27 are not allowed
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIStorageCapacity
 metadata:
-  name: disallow-deprecated-apis-1
+  name: disallow-deprecated-apis
   namespace: default
   annotations:
     kyverno-policies-bbtest/type: validate
     kyverno-policies-bbtest/expected: fail
-spec:
-  schedule: "0 0 29 2 *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: c1
-            image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal
-            args: ["sleep", "1"]
-          restartPolicy: Never
+storageClassName: local-path
+

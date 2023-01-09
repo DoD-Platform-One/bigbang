@@ -55,4 +55,13 @@ rules:
   - create
   - delete
   - get
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csistoragecapacities
+  verbs:
+  - watch
+  - list
+  - get
+  - create
 {{- end }}
