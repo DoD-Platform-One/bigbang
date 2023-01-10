@@ -882,35 +882,6 @@ package_structure() {
     echo -e "\e[0Ksection_end:`date +%s`:package_tree\r\e[0K"
 }
 
-global_policy_tests() {
-   echo -e "\e[0Ksection_start:`date +%s`:generic_policy_tests[collapsed=true]\r\e[0K\e[33;1mGlobal Policy Tests\e[37m"
-   if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
-     echo "Checking test values..."
-     helm conftest chart --policy ${GENERIC_POLICY_PATH} -f tests/test-values.y*ml
-     echo "Checking chart values..."
-     helm conftest chart --policy ${GENERIC_POLICY_PATH}
-   else
-     helm conftest chart --policy ${GENERIC_POLICY_PATH}
-   fi
-   echo -e "\e[0Ksection_end:`date +%s`:generic_policy_tests\r\e[0K"
-}
-
-package_policy_tests() {
-   echo -e "\e[0Ksection_start:`date +%s`:package_specific_tests[collapsed=true]\r\e[0K\e[33;1mPackage Specific Tests\e[37m"
-   if [ -d "tests/policy" ]; then
-     echo "App specific configuration validation tests:"
-     if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
-       echo "Checking test values..."
-       helm conftest chart --policy tests/policy -f tests/test-values.y*ml
-       echo "Checking chart values..."
-       helm conftest chart --policy tests/policy
-     else
-       helm conftest chart --policy tests/policy
-     fi
-   fi
-   echo -e "\e[0Ksection_end:`date +%s`:package_specific_tests\r\e[0K"
-}
-
 package_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:package_deprecation_check[collapsed=true]\r\e[0K\e[33;1mPackage API Deprecation Check\e[37m"
    API_EXIT_CODE=0

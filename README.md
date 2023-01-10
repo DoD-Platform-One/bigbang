@@ -19,18 +19,6 @@ Two or more stages will be executed in the pipeline, which are detailed below.
 
 &nbsp;
 
-### Conformance Tests (linting)
-
-This stage uses a `helm` plugin called [conftest](https://github.com/instrumenta/helm-conftest) to execute a set of commands and application specific validation on the package.
-
-The common conformance policies are located in the "policies"
-directory of this repository. These are Rego based policies.
-
-Additionally, package specific policies will be
-executed if there is a directory in the package repo named "policy".
-
-&nbsp;
-
 ### Functional Testing
 
 Functional smoke tests are executed via [Helm tests](https://helm.sh/docs/topics/chart_tests/).
@@ -179,6 +167,29 @@ in the script above.
 
 Some projects may have more than one custom resource (i.e. Elasticsearch has both elasticsearch and kibana) and in these situations you can add another `resourceHealth` line
 and change the `if` check to verify both.
+
+&nbsp;
+
+### Policy Validation
+
+The following pipelines execute a series of tests against [Kyverno](https://kyverno.io/) policies:
+- bigbang-package
+- sandbox
+- third-party
+
+The script located at `scripts/policies/kyverno_policy_tests.sh` contains the logic for these tests.
+
+This is performed as a linting operation prior to any resources being installed onto a Kubernetes cluster.
+
+Big Bang package helm charts are templated out into raw YAML manifests using `helm template` and `kyverno apply` is used to execute the validation policies against these Kubernetes resources prior to being installed onto a cluster.
+
+There are two functions in the script that will be executed for policy validation:
+
+- `global_policy_tests`
+  - Applies the policies located in the [kyverno-policies Big Bang package repo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies/-/tree/main/chart/templates) against Big Bang packages.
+
+- `package_policy_tests`
+  - Applies package-specific policies located in the `tests/policy` directory of a Big Bang package repository if it exists.
 
 &nbsp;
 

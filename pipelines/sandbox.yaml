@@ -43,15 +43,11 @@ configuration validation:
     - .generic-runner-tags
     - .util-image
     - .templates
-  variables:
-    GENERIC_POLICY_PATH: "${PIPELINE_REPO_DESTINATION}/policies"
   script:
     # Print Package Directory Structure
     - package_structure
-    # Global policy tests
-    - global_policy_tests
-    # Package specific tests
-    - package_policy_tests
+    # Kyverno policy tests
+    - bash ${PIPELINE_REPO_DESTINATION}/scripts/policies/kyverno_policy_tests.sh
     # Package API Deprecation Check
     - package_deprecation_check
   allow_failure: true

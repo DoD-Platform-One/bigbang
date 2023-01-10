@@ -1,10 +1,10 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.4.67
+# @Version bb-ci:2.5.3
 #
-# docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION} .
-# docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:{VERSION}
+# docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:${VERSION} .
+# docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:${VERSION}
 # Update library/templates.yaml -> .util-image -> image with the latest image
 
 FROM golang:1.13 AS builder
@@ -60,18 +60,18 @@ RUN mkdir /ms-playwright
 RUN npx playwright@1.24.2 install
 RUN chmod -R 777 /ms-playwright
 
-# Install Conftest
-ENV CONFTEST_VERSION='0.30.0'
-ADD https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
-RUN tar xzf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz conftest && mv conftest /usr/local/bin/  && chmod +x /usr/local/bin/conftest && rm -rf /conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz
+# Install Kyverno
+ENV KYVERNO_VERSION='v1.8.4'
+ADD https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
+RUN tar xzf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz \
+    && mv kyverno /usr/local/bin/ \
+    && chmod +x /usr/local/bin/kyverno \
+    && rm -rf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
 
 # Install Helm
-ENV HELM_VERSION='3.8.0'
+ENV HELM_VERSION='3.10.2'
 ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /helm-v${HELM_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64/helm && mv linux-amd64/helm /usr/local/bin/ && chmod +x /usr/local/bin/helm && rm -rf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64*
-
-# Install Conftest for helm plugin
-RUN helm plugin install https://github.com/instrumenta/helm-conftest
 
 # Install ArgoCD CLI
 ENV ARGO_VERSION='2.2.5'
