@@ -6,7 +6,7 @@
 
 {{- define "bigbang.defaults.kyvernopolicies" -}}
 
-{{- $deployRestic := (and .Values.addons.velero.enabled (dig "deployRestic" false .Values.addons.velero.values)) }}
+{{- $deployNodeAgent := (and .Values.addons.velero.enabled (dig "deployNodeAgent" false .Values.addons.velero.values)) }}
 
 waitforready:
   imagePullSecrets:
@@ -264,17 +264,17 @@ policies:
 
   require-non-root-group:
     validationFailureAction: audit
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
     exclude:
       any:
-      {{- if $deployRestic }}
-      # Velero.  The restic backup tool requires root group access to see the host's runtime pod directory which is
-      # mounted inside velero/restic pods.
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.
       - resources:
           namespaces:
           - velero
           names:
-          - restic*
+          - node-agent*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
@@ -326,17 +326,17 @@ policies:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployRestic .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.addons.gitlab.enabled }}
     exclude:
       any:
-      {{- if $deployRestic }}
-      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
-      # mounted inside velero/restic pods.
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.
       - resources:
           namespaces:
           - velero
           names:
-          - restic*
+          - node-agent*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
@@ -429,7 +429,7 @@ policies:
 
   restrict-host-path-mount:
     validationFailureAction: enforce
-    {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployRestic }}
+    {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployNodeAgent }}
     exclude:
       any:
       {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
@@ -495,15 +495,15 @@ policies:
           - neuvector-enforcer-pod*
           - neuvector-controller-pod*
       {{- end }}
-      {{- if $deployRestic }}
-      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
-      # mounted inside velero/restic pods.  Since the host's pod runtime directory may expose sensitive information, 
-      # it is better to exclude the restic pods than to add the path as allowable mounts
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.  Since the host's pod runtime directory may expose sensitive information, 
+      # it is better to exclude the node agent pods than to add the path as allowable mounts
       - resources:
           namespaces:
           - velero
           names:
-          - restic*
+          - node-agent*
       {{- end }}
     {{- end }}
 
@@ -597,22 +597,22 @@ policies:
       {{- end }}
   {{- end }}
   
-  {{- if $deployRestic }}
+  {{- if $deployNodeAgent }}
   restrict-user-id:
     exclude:
       any:
-      {{- if $deployRestic }}
-      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
-      # mounted inside velero/restic pods.
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.
       - resources:
           namespaces:
           - velero
           names:
-          - restic*
+          - node-agent*
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployRestic }}
+  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployNodeAgent }}
   restrict-volume-types:
     exclude:
       any:
@@ -660,14 +660,14 @@ policies:
           - neuvector-enforcer-pod*
           - neuvector-controller-pod*
       {{- end }}
-      {{- if $deployRestic }}
-      # Velero.  The restic backup tool requires root user access to the host's runtime pod directory which is
-      # mounted inside velero/restic pods.
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.
       - resources:
           namespaces:
           - velero
           names:
-          - restic*
+          - node-agent*
       {{- end }}
   {{- end }}
 

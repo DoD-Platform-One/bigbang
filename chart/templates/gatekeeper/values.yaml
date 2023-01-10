@@ -43,7 +43,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - registry1.dso.mil
         - registry.dso.mil
 
-  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic)}}
+  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent)}}
   allowedHostFilesystem:
     parameters:
       excludedResources:
@@ -67,9 +67,9 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
       - logging/logging-promtail-.*
       {{- end }}
-      {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
-      # Restic requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
-      - velero/restic-.*
+      {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent }}
+      # NodeAgent requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
+      - velero/node-agent-.*
       {{- end }}
   {{- end }}
 
@@ -160,7 +160,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic) }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.neuvector.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent) }}
   volumeTypes:
     parameters:
       excludedResources:
@@ -190,9 +190,9 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - neuvector/neuvector-enforcer-pod.*
         - neuvector/neuvector-controller-pod.*
        {{- end }}
-       {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployRestic }}
-        # Restic requires hostpath volume mounts in order to facilitate backing up cluster PV/C resources
-        - velero/restic-.*
+       {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent }}
+        # NodeAgent requires hostpath volume mounts in order to facilitate backing up cluster PV/C resources
+        - velero/node-agent-.*
        {{- end }}
   {{- end }}
 
