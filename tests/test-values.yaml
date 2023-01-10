@@ -395,6 +395,9 @@ kyvernopolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
+        # Policy needs to be disabled in CI when two matches/attestors are present due to a bug where all matching images are checked against all attestors
+        # https://github.com/kyverno/kyverno/pull/5956
+        enabled: false
         parameters:
           require:
           - imageReferences:
