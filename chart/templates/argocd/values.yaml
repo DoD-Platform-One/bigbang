@@ -98,6 +98,8 @@ redis-bb:
 server:
   image: 
     imagePullPolicy: {{ .Values.imagePullPolicy }}
+  autoscaling:
+    enabled: true
   config:
     # Must be enabled for plugins included in PlatformOne image.
     kustomize.buildOptions: "--enable-alpha-plugins"
@@ -116,6 +118,8 @@ server:
 repoServer:
   image: 
     imagePullPolicy: {{ .Values.imagePullPolicy }}
+  autoscaling:
+    enabled: true
   # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
   {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
   metrics:
