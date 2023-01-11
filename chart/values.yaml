@@ -134,7 +134,7 @@ deploymentStrategy: Recreate
 image:
   # IB Nexus Image
   repository: registry1.dso.mil/ironbank/sonatype/nexus/nexus
-  tag: 3.44.0-01
+  tag: 3.45.0-01
   pullPolicy: IfNotPresent
 imagePullSecrets:
   - name: private-registry

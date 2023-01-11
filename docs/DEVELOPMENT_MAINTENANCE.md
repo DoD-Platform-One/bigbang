@@ -23,7 +23,7 @@ The below details the steps required to update to a new version of the Nexus pac
 
 # How to test Nexus
 
-Big Bang has added several CaC (config as code) jobs to automate certain configurations that the upstream Nexus Helm chart does not support. Nexus upgrades could break the CaC jobs (which are not currently tested in CI). Note that you will need a license to test the SSO job. The CaC job for repo creation does not require a license. Big Bang has a license for development/testing purposes - you can request this license from one of the CODEOWNERS or reach out via the BB team channel.
+Big Bang has added several CaC (configuration as code) jobs to automate certain configurations that the upstream Nexus Helm chart does not support. Nexus upgrades could break the CaC jobs (which are not currently tested in CI). Note that you will need a license to test the SSO job. The CaC job for repo creation does not require a license. Big Bang has a license for development/testing purposes - you can request this license from one of the CODEOWNERS or reach out via the BB team channel.
 
 ## Test Basic Functionality, Repo Job, and Monitoring
 
@@ -208,6 +208,7 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
   reference original [commit](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/commit/cbdc94fbb2baffce8871ae8d4540e54532ec6944)
 - add extraLables to spec.template.metadata.labels
 - add spec.template.spec.affinity
+- add securityContext templating using: '$.Values.nexus.containerSecurityContext` to spec.template.spec.containers.securityContext
 - add volumemount for nexus-data/etc
   not sure why this is needed.
   could have been trial code that was accidentally committed
@@ -216,7 +217,7 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 - add subPath to the secret volumemount
 - add volume for license
 - add volume for admin password
-- add securityContext: '$.Values.nexus.containerSecurityContext` to containers:
+
 
 ## chart/templates/ingress.yaml
 - fix extraLabels indentation in 2 places to avoid templating errors with helm, fluxcd, etc.
@@ -245,6 +246,9 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 ## chart/tests/cypress/*
 - add cypress tests
 
+## chart/tests/scripts/*
+- add test script
+
 ##  chart/Chart.lock
 - add the lock file from ```helm dependency update ./chart```
 
@@ -252,7 +256,7 @@ This is a high-level list of modifications that Big Bang has made to the upstrea
 - changes for Big Bang version, gluon dependency, and annotations
 
 ## chart/Kptfile
-- add Kptfile
+- add Kptfile. update with new commit hash and git ref
 
 ## chart/values.yaml
 - Big Bang additions at the top of the values file

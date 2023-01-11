@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: 43580c8a5df2c14ab877c72da54a8502952c961a
+    commit: 7ef8c04eef1f1b78feb45b74fadca373b2a95b00
     repo: https://github.com/sonatype/nxrm3-helm-repository
     directory: /nexus-repository-manager
-    ref: 44.0.0
+    ref: 45.0.0
