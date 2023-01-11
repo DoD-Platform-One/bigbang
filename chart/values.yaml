@@ -147,11 +147,6 @@ policies:
       - user
       - role
 
-  # -- Prevent containers from mounting the same volume as writable and with a subpath (CVE-2021-25741)
-  disallow-shared-subpath-volume-writes:
-    enabled: true
-    validationFailureAction: enforce
-
   # -- Prevent tolerations that bypass specified taints
   disallow-tolerations:
     enabled: false
