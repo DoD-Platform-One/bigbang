@@ -1,6 +1,6 @@
 # kyverno-policies
 
-![Version: 1.0.1-bb.12](https://img.shields.io/badge/Version-1.0.1--bb.12-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.1.0-bb.0](https://img.shields.io/badge/Version-1.1.0--bb.0-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 Collection of Kyverno security and best-practice policies for Kyverno
 
@@ -70,7 +70,6 @@ helm install kyverno-policies chart/
 | policies.disallow-privileged-containers | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers that run as privileged |
 | policies.disallow-selinux-options | object | `{"enabled":true,"parameters":{"disallow":["user","role"]},"validationFailureAction":"enforce"}` | Prevent specified SELinux options from being used on pods. |
 | policies.disallow-selinux-options.parameters.disallow | list | `["user","role"]` | List of selinux options that are not allowed.  Valid values include `level`, `role`, `type`, and `user`. Defaults pulled from https://kubernetes.io/docs/concepts/security/pod-security-standards |
-| policies.disallow-shared-subpath-volume-writes | object | `{"enabled":true,"validationFailureAction":"enforce"}` | Prevent containers from mounting the same volume as writable and with a subpath (CVE-2021-25741) |
 | policies.disallow-tolerations | object | `{"enabled":false,"parameters":{"disallow":[{"key":"node-role.kubernetes.io/master"}]},"validationFailureAction":"audit"}` | Prevent tolerations that bypass specified taints |
 | policies.disallow-tolerations.parameters.disallow | list | `[{"key":"node-role.kubernetes.io/master"}]` | List of taints to protect from toleration.  Each entry can have `key`, `value`, and/or `effect`.  Wildcards '*' and '?' can be used If key, value, or effect are not defined, they are ignored in the policy rule |
 | policies.disallow-rbac-on-default-serviceaccounts | object | `{"enabled":false,"exclude":{"any":[{"resources":{"name":"system:service-account-issuer-discovery"}}]},"validationFailureAction":"audit"}` | Prevent additional RBAC permissions on default service accounts |
