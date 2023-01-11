@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [45.0.0-bb.0] - 2023-01-11
+### Changed
+- Updated chart to version: 45.0.0-bb.0 | appVersion: 3.45.0
+
 ## [44.0.0-bb.0] - 2022-12-28
 ### Changed
 - Updated chart to version: 44.0.0-bb.0 | appVersion: 3.44.0 | crane version v0.12.1
