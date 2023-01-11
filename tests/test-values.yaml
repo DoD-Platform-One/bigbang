@@ -998,7 +998,7 @@ addons:
         scripts:
           envs:
             GITLAB_REPOSITORY: https://gitlab.bigbang.dev
-            GITLAB_ORIGIN: https://testuser:12345678@gitlab.bigbang.dev
+            GITLAB_ORIGIN: https://testuser:Password123h56a78@gitlab.bigbang.dev
             GITLAB_REGISTRY: registry.bigbang.dev
 
   gitlabRunner:
