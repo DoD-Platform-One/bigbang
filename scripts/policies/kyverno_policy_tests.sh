@@ -11,11 +11,14 @@ set -e
 CI_VALUES_FILE="$(find tests/test-values.y*ml)"
 
 DEBUG="false"
+VERBOSE=""
 if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  || ${CI_MERGE_REQUEST_LABELS} == *"debug"* ]]; then
-  echo "DEBUG_ENABLED is set to true, setting -x in bash"
-  set -x
   DEBUG="true"
+  VERBOSE="-v 4"
+  set -x
 fi
+EXIT_CODE=0
+POLICY_FAILURE=false
 
 # Clone the kyverno-policies package repo
 # and render the kyverno-policies chart into raw YAML manifests
@@ -38,8 +41,8 @@ function get_kyverno_policy_manifests() {
       --namespace="${kyverno_policies_namespace}" \
       --output-dir="${POLICY_MANIFESTS_DIRECTORY}" > /dev/null
 
-   # An array of Kyverno policy file names to iterate over
-   POLICY_MANIFESTS=( $(find "${POLICY_MANIFESTS_DIRECTORY}"/kyverno-policies/templates/*.y*ml -type f) )
+   # An array of Kyverno file names to iterate over
+   POLICY_MANIFESTS=( $(find "${POLICY_MANIFESTS_DIRECTORY}"/kyverno-policies/templates -type f -name '*.y*ml') )
 }
 
 # TODO: Adding the warn annotation to all of the policy manifests
@@ -60,7 +63,10 @@ function add_warn_annotation() {
    fi
    for policy_manifest in "${POLICY_MANIFESTS[@]}"
    do
-      if [[ "${policy_manifest}" == "${POLICY_MANIFESTS_DIRECTORY}/kyverno-policies/templates/restrict-image-registries.yaml" ]]; then
+      if [[ ($(yq e '.kind' ${policy_manifest}) != "ClusterPolicy") && ($(yq e '.kind' ${policy_manifest}) != "Policy") ]]; then
+         # These are not policies, remove them to prevent errors
+         rm -rf ${policy_manifest}
+      elif [[ "${policy_manifest}" == "${POLICY_MANIFESTS_DIRECTORY}/kyverno-policies/templates/restrict-image-registries.yaml" ]]; then
          if ${DEBUG}; then
             echo "Not adding the warn annotation to ${policy_manifest}..."
             echo "${policy_manifest} policy is enforced and will fail the pipeline if it doesn't pass validation..."
@@ -81,20 +87,23 @@ function global_policy_tests() {
       helm template "${CI_PROJECT_NAME}" chart/ \
          --namespace="${CI_PROJECT_NAME}" \
          --values="${CI_VALUES_FILE}" \
-         | kyverno apply "${POLICY_MANIFESTS_DIRECTORY}" --resource -
+         | kyverno apply ${VERBOSE} "${POLICY_MANIFESTS_DIRECTORY}" --resource - \
+         && export EXIT_CODE=$? || export EXIT_CODE=$?
       echo -e "⬆️  \e[34mSee the policy test results above (tested using test values)\e[37m ⬆️"
-      echo "Executing Kyverno policy tests using the default values for the ${CI_PROJECT_NAME} chart..."
-      helm template "${CI_PROJECT_NAME}" chart/ \
-         --namespace="${CI_PROJECT_NAME}" \
-         | kyverno apply "${POLICY_MANIFESTS_DIRECTORY}" --resource -
-      echo -e "⬆️  \e[34mSee the policy test results above (tested using default values)\e[37m ⬆️"
    else
       echo "No Helm values file for CI overrides was found..."
-      echo "Executing Kyverno policy tests using the default values for the ${CI_PROJECT_NAME} chart..."
-      helm template "${CI_PROJECT_NAME}" chart/ \
-         --namespace="${CI_PROJECT_NAME}" \
-         | kyverno apply "${POLICY_MANIFESTS_DIRECTORY}" --resource -
-      echo -e "⬆️  \e[34mSee the policy test results above (tested using default values)\e[37m ⬆️"
+   fi
+   if [[ ${EXIT_CODE} -ne 0 ]]; then
+      POLICY_FAILURE=true
+   fi
+   echo "Executing Kyverno policy tests using the default values for the ${CI_PROJECT_NAME} chart..."
+   helm template "${CI_PROJECT_NAME}" chart/ \
+      --namespace="${CI_PROJECT_NAME}" \
+      | kyverno apply ${VERBOSE} "${POLICY_MANIFESTS_DIRECTORY}" --resource - \
+      && export EXIT_CODE=$? || export EXIT_CODE=$?
+   echo -e "⬆️  \e[34mSee the policy test results above (tested using default values)\e[37m ⬆️"
+   if [[ ${EXIT_CODE} -ne 0 ]]; then
+      POLICY_FAILURE=true
    fi
 }
 
@@ -115,18 +124,27 @@ function package_policy_tests() {
          helm template "${CI_PROJECT_NAME}" chart/ \
             --namespace="${CI_PROJECT_NAME}" \
             --values="${CI_VALUES_FILE}" \
-            | kyverno apply "${policy_directory}" --resource -
+            | kyverno apply ${VERBOSE} "${policy_directory}" --resource - \
+            && export EXIT_CODE=$? || export EXIT_CODE=$?
+         echo -e "⬆️  \e[34mSee the package policy test results above (tested using test values)\e[37m ⬆️"
       else
          echo "No Helm values file for CI overrides was found..."
-         echo "Executing package-specific Kyverno policy tests using the default values for the ${CI_PROJECT_NAME} chart..."
-         helm template "${CI_PROJECT_NAME}" chart/ \
-            --namespace="${CI_PROJECT_NAME}" \
-            | kyverno apply "${policy_directory}" --resource -
       fi
-      echo -e "⬆️  \e[34mSee the policy test results above\e[37m ⬆️"
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+         POLICY_FAILURE=true
+      fi
+      echo "Executing package-specific Kyverno policy tests using the default values for the ${CI_PROJECT_NAME} chart..."
+      helm template "${CI_PROJECT_NAME}" chart/ \
+         --namespace="${CI_PROJECT_NAME}" \
+         | kyverno apply ${VERBOSE} "${policy_directory}" --resource - \
+         && export EXIT_CODE=$? || export EXIT_CODE=$?
+      echo -e "⬆️  \e[34mSee the package policy test results above (tested using default values)\e[37m ⬆️"
+      if [[ ${EXIT_CODE} -ne 0 ]]; then
+         POLICY_FAILURE=true
+      fi
    else
       if ${DEBUG}; then
-         echo "A '${policy_directory}' directory with YAML policy manifests was not found in the ${CI_PROJECT_NAME} package repository...skipping..."
+         echo "A '${policy_directory}' directory with YAML policy manifests was not found in the ${CI_PROJECT_NAME} package repository..."
       fi
    fi
 }
@@ -141,6 +159,9 @@ function main() {
    rm -rf "${KYVERNO_POLICIES_DIRECTORY}"
    rm -rf "${POLICY_MANIFESTS_DIRECTORY}"
    echo -e "\e[0Ksection_end:$(date +%s):kyverno_policy_tests\r\e[0K"
+   if ${POLICY_FAILURE}; then
+      exit 1
+   fi
 }
 
 main
