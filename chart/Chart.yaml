@@ -45,3 +45,8 @@ dependencies:
 annotations:
   bigbang.dev/applicationVersions: |
     - Nexus: 3.45.0-01
+  helm.sh/images: |
+    - name: nexus
+      image: registry1.dso.mil/ironbank/sonatype/nexus/nexus:3.45.0-01
+    - name: ubi8-minimal
+      image: registry1.dso.mil/ironbank/redhat/ubi/ubi8-minimal:8.7
