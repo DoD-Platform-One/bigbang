@@ -1021,7 +1021,7 @@ addons:
             cypress_gitlab_last_name: "userrunner"
             cypress_gitlab_email: "gitlab@bigbang.dev"
             cypress_gitlab_username: "gitlabrunner_user"
-            cypress_gitlab_password: "gitlabrunner_pass"
+            cypress_gitlab_password: "Runner_PaSsw0rd123"
             cypress_gitlab_project: "runner-hello-world"
           secretEnvs:
             - name: cypress_adminpassword
