@@ -54,7 +54,7 @@ addons:
         -----END CERTIFICATE-----
 
     values:
-      replicas: 1
+      replicas: 3
       command:
         - "/opt/keycloak/bin/kc.sh"
       args:
@@ -190,5 +190,5 @@ addons:
           mountPath: /opt/keycloak/conf/quarkus.properties
           subPath: quarkus.properties
         - name: custom-theme
-          mountPath: /opt/keycloak/providers/custom-theme.jar
-          subPath: custom-theme.jar
+          mountPath: /opt/keycloak/providers/YOUR-CUSTOM-THEME-JAR-NAME.jar
+          subPath: YOUR-CUSTOM-THEME-JAR-NAME.jar
