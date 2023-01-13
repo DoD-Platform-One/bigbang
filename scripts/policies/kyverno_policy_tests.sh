@@ -8,7 +8,7 @@ set -e
 : "${KYVERNO_POLICIES_CHART_DIRECTORY:="${KYVERNO_POLICIES_DIRECTORY}/chart"}"
 : "${POLICY_MANIFESTS_DIRECTORY:="/tmp/policy-manifests"}"
 
-CI_VALUES_FILE="$(find tests/test-values.y*ml)"
+CI_VALUES_FILE="$(find tests/test-values.y*ml || true)"
 
 DEBUG="false"
 VERBOSE=""
