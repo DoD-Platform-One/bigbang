@@ -395,25 +395,8 @@ kyvernopolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
-        # Policy needs to be disabled in CI when two matches/attestors are present due to a bug where all matching images are checked against all attestors
-        # https://github.com/kyverno/kyverno/pull/5956
-        enabled: false
         parameters:
           require:
-          - imageReferences:
-            - "registry1.dso.mil/ironbank/*"
-            attestors:
-            - count: 1
-              entries:
-              - keys:
-                  publicKeys: |-
-                    -----BEGIN PUBLIC KEY-----
-                    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
-                    UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
-                    -----END PUBLIC KEY-----
-            # Ironbank images are rebuilt nightly and tags are not immutable
-            mutateDigest: false
-            verifyDigest: false
           - imageReferences:
             - "ghcr.io/kyverno/test-verify-image:*"
             attestors:
@@ -425,6 +408,20 @@ kyvernopolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
                     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
                     -----END PUBLIC KEY-----
+          # - imageReferences:
+          #   - "registry1.dso.mil/ironbank/*"
+          #   attestors:
+          #   - count: 1
+          #     entries:
+          #     - keys:
+          #         publicKeys: |-
+          #           -----BEGIN PUBLIC KEY-----
+          #           MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
+          #           UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
+          #           -----END PUBLIC KEY-----
+          #   # Ironbank images are rebuilt nightly and tags are not immutable
+          #   mutateDigest: false
+          #   verifyDigest: false
       require-labels:
         parameters:
           require:
