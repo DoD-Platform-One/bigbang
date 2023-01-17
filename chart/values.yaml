@@ -634,7 +634,7 @@ tempo:
     # Unencoded string data. This should be placed in the secret values and then encrypted
     accessSecret: ""
 
-    # -- Bucket Names for Loki as a comma delimited list.
+    # -- Bucket Name for Tempo
     # examples: "tempo-traces"
     bucket: ""
 
