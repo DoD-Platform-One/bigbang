@@ -56,6 +56,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       - logging/logging-fluent-bit-.*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
+      # Neuvector needs access to host to inspect network traffic
       - neuvector/neuvector-enforcer-pod.*
       - neuvector/neuvector-controller-pod.*
       {{- end }}
@@ -71,13 +72,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       # NodeAgent requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
       - velero/node-agent-.*
       {{- end }}
-  {{- end }}
-
-  {{- if .Values.neuvector.enabled }}
-  bannedImageTags:
-    parameters:
-      excludedResources:
-        - neuvector/neuvector-scanner-pod.*
   {{- end }}
 
   {{- if .Values.twistlock.enabled }}
@@ -99,6 +93,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - twistlock/twistlock-defender-ds-.*
         {{- end }}
         {{- if .Values.neuvector.enabled }}
+        # Neuvector needs access to host to inspect network traffic
         - neuvector/neuvector-enforcer-pod.*
         {{- end }}
   {{- end }}
@@ -116,6 +111,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
         - logging/fluent-bit
         {{- if .Values.neuvector.enabled }}
+        # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
         - neuvector/neuvector-enforcer-pod.*
         - neuvector/neuvector-controller-pod.*
         {{- end }}
@@ -185,7 +181,12 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - logging/logging-promtail-.*
        {{- end }}
        {{- if .Values.neuvector.enabled }}
-        # Neuvecotr requires hostpath volume types
+        # Neuvector requires hostpath volume types
+          # Neuvector mounts the following hostPaths:
+          # `/var/neuvector`: (as writable) for Neuvector's buffering and persistent state
+          # `/var/run`: communication to docker daemon
+          # `/proc`: monitoring of proccesses for malicious activity
+          # `/sys/fs/cgroup`: important files the controller wants to monitor for malicious content
         # https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/enforcer-daemonset.yaml#L108
         - neuvector/neuvector-enforcer-pod.*
         - neuvector/neuvector-controller-pod.*
