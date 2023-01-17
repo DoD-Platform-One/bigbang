@@ -68,7 +68,7 @@ The latest version can be found [here](https://repo1.dso.mil/platform-one/big-ba
 dependencies:
   - name: gluon
     version: "x.x.x"
-    repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
+    repository: "oci://registry1.dso.mil/bigbang"
 ```
 
 The gluon chart is packaged and released as an [OCI artifact](https://helm.sh/docs/topics/registries/)
