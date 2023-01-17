@@ -3,8 +3,8 @@
 #
 # @Version bb-ci:2.5.3
 #
-# docker build -t registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:${VERSION} .
-# docker push registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/bb-ci:${VERSION}
+# docker build -t registry1.dso.mil/bigbang-ci/bb-ci:${VERSION} .
+# docker push registry1.dso.mil/bigbang-ci/bb-ci:${VERSION}
 # Update library/templates.yaml -> .util-image -> image with the latest image
 
 FROM golang:1.13 AS builder
