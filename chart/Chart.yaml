@@ -19,3 +19,7 @@ dependencies:
 annotations:
   bigbang.dev/applicationVersions: |
     - Kyverno Policies: 1.1.0
+  # Kubectl image is used if waitforready.enabled or bbtests.enabled
+  helm.sh/images: |
+    - name: kubectl
+      image: registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:v1.25.5
