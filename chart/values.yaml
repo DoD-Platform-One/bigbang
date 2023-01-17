@@ -898,7 +898,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
       path: "./chart"
-      tag: "6.7.0-bb.2"
+      tag: "6.7.0-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
