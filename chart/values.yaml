@@ -720,7 +720,7 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
     path: "./chart"
-    tag: "0.11.4-bb.1"
+    tag: "0.11.4-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
