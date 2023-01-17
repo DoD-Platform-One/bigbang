@@ -30,6 +30,7 @@ policies:
           - twistlock-defender-ds*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
+      # Neuvector needs access to host to inspect network traffic
       - resources:
           namespaces:
           - neuvector
@@ -71,15 +72,6 @@ policies:
   disallow-image-tags:
     enabled: true
     validationFailureAction: enforce
-    {{- if .Values.neuvector.enabled }}
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - neuvector
-          names:
-          - neuvector-scanner-pod*
-    {{- end }}
 
   disallow-istio-injection-bypass:
     enabled: {{ .Values.istio.enabled }}
@@ -112,6 +104,7 @@ policies:
           - logging-fluent-bit*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
+      # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
       - resources:
           namespaces:
           - neuvector
@@ -415,6 +408,11 @@ policies:
           - twistlock-defender-ds*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
+      # Neuvector mounts the following hostPaths:
+      # `/var/neuvector`: for Neuvector's buffering and persistent state
+      # `/var/run`: communication to docker daemon
+      # `/proc`: monitoring of proccesses for malicious activity
+      # `/sys/fs/cgroup`: important files the controller wants to monitor for malicious content
       - resources:
           namespaces:
           - neuvector
@@ -462,6 +460,8 @@ policies:
           - twistlock-defender-ds*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
+      # Neuvector mounts the following hostPaths as writeable: 
+      # `/var/neuvector`: for Neuvector's buffering and persistent state
       - resources:
           namespaces:
           - neuvector
@@ -579,6 +579,11 @@ policies:
       {{- end }}
       {{- if .Values.neuvector.enabled }}
       # Neuvector requires HostPath volume types
+        # Neuvector mounts the following hostPaths:
+        # `/var/neuvector`: (as writable) for Neuvector's buffering and persistent state
+        # `/var/run`: communication to docker daemon
+        # `/proc`: monitoring of proccesses for malicious activity
+        # `/sys/fs/cgroup`: important files the controller wants to monitor for malicious content
       # https://github.com/neuvector/neuvector-helm/blob/master/charts/core/templates/enforcer-daemonset.yaml#L108
       - resources:
           namespaces:
