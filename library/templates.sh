@@ -1637,7 +1637,7 @@ bigbang_package_images() {
     gitrepo=${gitrepo//\//%2F}
 
     # Curl gitlab API to get project ID
-    projid=$(curl -s https://repo1.dso.mil/api/v4/projects/${gitrepo} | jq '.id')
+    projid=$(curl -Ls https://repo1.dso.mil/api/v4/projects/${gitrepo} | jq '.id')
     # Curl gitlab API + S3 file to get images list
     packageinfo=$(curl -s https://repo1.dso.mil/api/v4/projects/${projid}/releases/${version})
 
