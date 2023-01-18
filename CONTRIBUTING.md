@@ -12,6 +12,6 @@ We appreciate you taking time to contribute to Big Bang pipelines!
 
 - Each pipeline job is executed in an ephemeral Kubernetes pod
 
-- We build and manage [container images](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/tree/master/dockerfiles) that are used in our pipelines. These images provide the environment that most of our pipeline jobs are executed in
+- We build and manage [container images](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/tree/master/dockerfiles) that are used in our pipelines. These images provide the environment that most of our pipeline jobs are executed in
 
-- If you want to learn more about Big Bang pipelines, checkout the [readme](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/README.md) and this Big Bang developer [doc](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/developer/ci-workflow.md)
+- If you want to learn more about Big Bang pipelines, checkout the [readme](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/blob/master/README.md) and this Big Bang developer [doc](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/developer/ci-workflow.md)

@@ -177,7 +177,7 @@ function wait_crd(){
       continue
     fi
     printf "Checking for tests/wait.sh in %s:%s... " ${package} ${version}
-    if curl -f "${repourl%.git}/-/raw/${version}/tests/wait.sh?inline=false" 1>${package}.wait.sh 2>/dev/null; then
+    if curl -Lf "${repourl%.git}/-/raw/${version}/tests/wait.sh?inline=false" 1>${package}.wait.sh 2>/dev/null; then
       printf "found, running\n"
       . ./${package}.wait.sh
       wait_project

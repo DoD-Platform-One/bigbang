@@ -383,7 +383,7 @@ bigbang_additional_images() {
       if [[ -z "$version" || "$version" == "null" ]]; then
         continue
       fi
-      if curl -f "${repourl%.git}/-/raw/${version}/tests/images.txt?inline=false" 1>${package}.images.txt 2>/dev/null; then
+      if curl -Lf "${repourl%.git}/-/raw/${version}/tests/images.txt?inline=false" 1>${package}.images.txt 2>/dev/null; then
         cat ${package}.images.txt | sed -e '$a\' >> images.txt
       fi
     done
@@ -1043,7 +1043,7 @@ chart_update_check() {
    README_BRANCH_MATCH=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
    # Adds a new line to end of changelog for proper parsing
    if [ "$(tail -c 1 README.md)" != "" ]; then
-     echo -e "\e[31mNOTICE: README is missing a newline at the end of the file. This typically indicates you are using the wrong version of helm-docs, validate you are using the latest commands from https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+     echo -e "\e[31mNOTICE: README is missing a newline at the end of the file. This typically indicates you are using the wrong version of helm-docs, validate you are using the latest commands from https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
      EXIT="true"
    fi
    if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
@@ -1051,7 +1051,7 @@ chart_update_check() {
      EXIT="true"
    fi
    if [ -z "$README_BRANCH_MATCH" ]; then
-        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
         EXIT="true"
    fi
    if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ]; then
@@ -1184,7 +1184,7 @@ package_release_notes() {
    echo -e "\e[0Ksection_end:`date +%s`:notes\r\e[0K"
    echo -e "\e[0Ksection_start:`date +%s`:reqDependencies[collapsed=true]\r\e[0K\e[33;1mRequired Dependencies\e[37m"
    if [[ -f tests/dependencies.yaml ]]; then
-      printf "\nIf you are using the artifacts from this release, please note that you may need to install some dependencies. It is recommended to check the architecture document for this package under [Big Bang's charter](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/charter/packages) for the most accurate info about what may be required. The dependencies used in CI are:\n" >> release_notes.txt
+      printf "\nIf you are using the artifacts from this release, please note that you may need to install some dependencies. It is recommended to check the architecture document for this package under [Big Bang's charter](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/charter/packages) for the most accurate info about what may be required. The dependencies used in CI are:\n" >> release_notes.txt
       echo "Dependencies found:"
       keys=$(yq e 'keys' ./tests/dependencies.yaml)
       while read line; do
@@ -1422,7 +1422,7 @@ create_bigbang_merge_request() {
     curl -s --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}" 1>/dev/null
 
     # MR Link
-    echo "✅ Big Bang MR created: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests/${BB_MR_ID}"
+    echo "✅ Big Bang MR created: https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/${BB_MR_ID}"
 
     echo -e "\e[0Ksection_end:`date +%s`:create_bigbang_merge_request\r\e[0K"
 }
@@ -1699,9 +1699,9 @@ get_cpumem(){
 renovate_download_external_deps() {
   mkdir -p "${CI_PROJECT_DIR}"/scripts/
 
-  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
-  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
-  curl -s https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
+  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
+  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
+  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
 
   mkdir -p "${CI_PROJECT_DIR}"/renovate
 }

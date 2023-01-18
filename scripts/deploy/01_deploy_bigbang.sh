@@ -40,7 +40,7 @@ if [[ "${PIPELINE_TYPE}" == "BB" ]]; then
 fi
 
 # Get latest ingress certs and add to test values
-curl -sS $CERT_FILE_URL -o cert.yaml
+curl -LsS $CERT_FILE_URL -o cert.yaml
 if [[ -f cert.yaml ]]; then
   yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' $CI_VALUES_FILE cert.yaml > tmpfile && mv tmpfile $CI_VALUES_FILE
 else
