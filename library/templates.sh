@@ -1630,7 +1630,7 @@ bigbang_package_images() {
     version=$(yq e ".${pkg}.git.tag" "${VALUES_FILE}")
 
     # Remove prefix
-    gitrepo=${gitrepo#"https://repo1.dso.mil/"}
+    gitrepo=${gitrepo#"https://repo1.dso.mil/platform-one/"}
     # Remove suffix
     gitrepo=${gitrepo%".git"}
     # Replace `/` with `%2F`
