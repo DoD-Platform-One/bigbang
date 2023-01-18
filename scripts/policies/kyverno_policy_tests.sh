@@ -23,7 +23,7 @@ POLICY_FAILURE=false
 # Clone the kyverno-policies package repo
 # and render the kyverno-policies chart into raw YAML manifests
 function get_kyverno_policy_manifests() {
-   local kyverno_policies_url="https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git"
+   local kyverno_policies_url="https://repo1.dso.mil/big-bang/apps/sandbox/kyverno-policies.git"
    local kyverno_policies_release_name="kyverno-policies"
    local kyverno_policies_namespace="kyverno-policies"
 

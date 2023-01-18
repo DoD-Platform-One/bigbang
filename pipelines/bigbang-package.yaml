@@ -26,7 +26,7 @@ stages:
   - 🏷️ tag
 
 variables:
-  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO: https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
   PIPELINE_REPO_BRANCH: master
   IMAGE_LIST: images.txt
@@ -302,7 +302,7 @@ auto tag:
     # run tag stage on commits to default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   variables:
-    BB_REPO: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+    BB_REPO: https://repo1.dso.mil/big-bang/bigbang.git
     BB_REPO_DESTINATION: "./bigbang-repo"
     BB_PROJECT_ID: 2872
     VALUES_FILE: chart/values.yaml

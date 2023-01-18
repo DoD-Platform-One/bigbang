@@ -6,7 +6,7 @@ This repository provides Gitlab CI templates and additional tools / dependencies
 
 ## Setting Up Your Project with Pipelines
 
-Please refer to this Big Bang developer [doc](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/developer/package-integration/pipeline.md) to enable and configure pipelines for your Big Bang project
+Please refer to this Big Bang developer [doc](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/developer/package-integration/pipeline.md) to enable and configure pipelines for your Big Bang project
 
 &nbsp;
 
@@ -23,7 +23,7 @@ Two or more stages will be executed in the pipeline, which are detailed below.
 
 Functional smoke tests are executed via [Helm tests](https://helm.sh/docs/topics/chart_tests/).
 
-We use an internally developed [Helm library chart](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon) which can
+We use an internally developed [Helm library chart](https://repo1.dso.mil/big-bang/apps/library-charts/gluon) which can
 be used to simplify implementation of Helm tests in your package.
 
 Currently two testing types are supported in the library:
@@ -58,11 +58,11 @@ helm test my-release
 
 #### Including the Gluon Helm Test Library in Your Package
 
-Big Bang pipelines run helm tests found in each package by means of the Big Bang [gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart
+Big Bang pipelines run helm tests found in each package by means of the Big Bang [gluon](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart
 
 To include the gluon helm test library, you need to add a dependency to your package's Chart.yaml file
 
-The latest version can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)
+The latest version can be found [here](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)
 
 ```yaml
 dependencies:
@@ -81,7 +81,7 @@ helm dependency update chart
 
 The gluon chart will now be pulled into the `chart/charts` folder as an archive.
 
-**For more information on how to use this library see this [doc](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
+**For more information on how to use this library see this [doc](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
 
 &nbsp;
 
@@ -186,7 +186,7 @@ Big Bang package helm charts are templated out into raw YAML manifests using `he
 There are two functions in the script that will be executed for policy validation:
 
 - `global_policy_tests`
-  - Applies the policies located in the [kyverno-policies Big Bang package repo](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies/-/tree/main/chart/templates) against Big Bang packages.
+  - Applies the policies located in the [kyverno-policies Big Bang package repo](https://repo1.dso.mil/big-bang/apps/sandbox/kyverno-policies/-/tree/main/chart/templates) against Big Bang packages.
 
 - `package_policy_tests`
   - Applies package-specific policies located in the `tests/policy` directory of a Big Bang package repository if it exists.

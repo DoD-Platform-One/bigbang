@@ -8,7 +8,7 @@ variables:
   LOG_LEVEL: "debug"
   RENOVATE_LOG_FILE_LEVEL: "debug"
   RENOVATE_LOG_FILE: "renovate.log"
-  PIPELINE_REPO: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates.git
+  PIPELINE_REPO: https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates.git
   PIPELINE_REPO_DESTINATION: "../pipeline-repo"
   PIPELINE_REPO_BRANCH: master
 
