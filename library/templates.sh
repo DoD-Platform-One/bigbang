@@ -1629,10 +1629,12 @@ bigbang_package_images() {
     gitrepo=$(yq e ".${pkg}.git.repo" "${VALUES_FILE}")
     version=$(yq e ".${pkg}.git.tag" "${VALUES_FILE}")
 
-    # Remove prefix
-    gitrepo=${gitrepo#"https://repo1.dso.mil/platform-one/"}
     # Remove suffix
     gitrepo=${gitrepo%".git"}
+    # Curl + follow redirects to get the final URL
+    gitrepo=$(curl -Ls -o /dev/null -w %{url_effective} ${gitrepo})
+    # Remove prefix
+    gitrepo=${gitrepo#"https://repo1.dso.mil/"}
     # Replace `/` with `%2F`
     gitrepo=${gitrepo//\//%2F}
 
