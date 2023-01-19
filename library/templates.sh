@@ -133,7 +133,7 @@ check_changes() {
                       package="gitlabRunner"
                       CHANGED_PACKAGES+=("$package")
               elif [[ "$package" == "nexus-repository-manager" ]]; then
-                      package="nexus"
+                      package="nexusRepositoryManager"
                       CHANGED_PACKAGES+=("$package")
               elif [[ "$package" == "kyverno/policies" ]]; then
                       package="kyvernopolicies"
@@ -1321,6 +1321,8 @@ create_bigbang_merge_request() {
         package="mattermostoperator"
     elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then
         package="metricsServer"
+    elif [[ ${CI_PROJECT_NAME} == "nexus" ]]; then
+        package="nexusRepositoryManager"
     else
         package="${CI_PROJECT_NAME}"
     fi

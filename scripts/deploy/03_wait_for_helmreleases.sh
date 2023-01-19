@@ -15,7 +15,7 @@ ADD_ON_HELMRELEASES_MAP["haproxy"]="haproxy-sso"
 ADD_ON_HELMRELEASES_MAP["gitlabRunner"]="gitlab-runner"
 ADD_ON_HELMRELEASES_MAP["minioOperator"]="minio-operator"
 ADD_ON_HELMRELEASES_MAP["mattermostoperator"]="mattermost-operator"
-ADD_ON_HELMRELEASES_MAP["nexus"]="nexus-repository-manager"
+ADD_ON_HELMRELEASES_MAP["nexusRepositoryManager"]="nexus-repository-manager"
 ADD_ON_HELMRELEASES_MAP["metricsServer"]="metrics-server"
 
 ## Function to test an array contains an element
@@ -53,7 +53,7 @@ function check_if_hr_exist() {
     elif [ $1 == "mattermost-operator" ]; then
       check_package="mattermostoperator"
     elif [ $1 == "nexus-repository-manager" ]; then
-      check_package="nexus"
+      check_package="nexusRepositoryManager"
     elif [ $1 == "metrics-server" ]; then
       check_package="metricsServer"
     else

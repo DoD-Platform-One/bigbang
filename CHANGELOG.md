@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.12]
+### Changed
+- rename nexus to nexusRepositoryManager
+
 ## [2.5.11]
 ### Changed
 - Modify package image parsing to follow redirects properly
