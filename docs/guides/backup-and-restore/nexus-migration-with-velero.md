@@ -139,7 +139,7 @@ Also ensure an EBS volume snapshot has been created and the Snapshot status is `
 
 ```yaml
 addons:
-  nexus:
+  nexusRepositoryManager:
     enabled: true
     values:
       nexus:

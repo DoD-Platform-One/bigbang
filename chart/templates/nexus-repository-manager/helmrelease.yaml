@@ -1,5 +1,7 @@
-{{- $fluxSettingsNexus := merge .Values.addons.nexus.flux .Values.flux -}}
-{{- if .Values.addons.nexus.enabled }}
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- $fluxSettingsNexus := merge $nexusValues.flux .Values.flux -}}
+{{- if $nexusValues.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -14,27 +16,27 @@ spec:
   releaseName: nexus-repository-manager
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.nexus) "true" }}
-      chart: {{ .Values.addons.nexus.git.path }}
+      {{- if eq (include "checkGitRef" $nexusValues) "true" }}
+      chart: {{ $nexusValues.git.path }}
       sourceRef:
         kind: GitRepository
         name: nexus-repository-manager
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.nexus.oci.name }}
-      version: {{ .Values.addons.nexus.oci.tag }}
+      chart: {{ $nexusValues.oci.name }}
+      version: {{ $nexusValues.oci.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.nexus.oci.repo }}
+        name: {{ $nexusValues.oci.repo }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
 
   {{- toYaml $fluxSettingsNexus | nindent 2 }}
 
-  {{- if .Values.addons.nexus.postRenderers }}
+  {{- if $nexusValues.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.addons.nexus.postRenderers | nindent 4 }}
+  {{ toYaml $nexusValues.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-nexus-repository-manager-values

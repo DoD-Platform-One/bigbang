@@ -1,17 +1,21 @@
-{{- if .Values.addons.nexus.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.nexus "name" "nexus-repository-manager" "defaults" (include "bigbang.defaults.nexus-repository-manager" .)) }}
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- if $nexusValues.enabled  }}
+{{- include "values-secret" (dict "root" $ "package" $nexusValues "name" "nexus-repository-manager" "defaults" (include "bigbang.defaults.nexus-repository-manager" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.nexus-repository-manager" -}}
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 hostname: nexus
 istio:
   enabled: {{ .Values.istio.enabled }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.nexus }}
+  injection: {{ dig "istio" "injection" "enabled" $nexusValues }}
   nexus:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.nexus.ingress.gateway }}
+    - istio-system/{{ default "public" $nexusValues.ingress.gateway }}
 
 openshift: {{ .Values.openshift }}
 
@@ -36,7 +40,7 @@ monitoring:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.nexus.ingress.gateway }}
+    {{- $gateway := default "public" $nexusValues.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
@@ -47,38 +51,38 @@ nexus:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
-  {{- if .Values.addons.nexus.license_key }}
+  {{- if $nexusValues.license_key }}
   properties:
     override: true
     data: 
       nexus.licenseFile: /nexus-data/sonatype-license.lic
   {{- end }}
 
-license_key: "{{ .Values.addons.nexus.license_key }}"
+license_key: "{{ $nexusValues.license_key }}"
 
-{{- if .Values.addons.nexus.sso.enabled }}
+{{- if $nexusValues.sso.enabled }}
 sso:
-  enabled: {{ .Values.addons.nexus.sso.enabled }}
+  enabled: {{ $nexusValues.sso.enabled }}
   idp_data:
-    {{- if .Values.addons.nexus.sso.idp_data.entityId }}
-    entityId: {{ .Values.addons.nexus.sso.idp_data.entityId }}
+    {{- if $nexusValues.sso.idp_data.entityId }}
+    entityId: {{ $nexusValues.sso.idp_data.entityId }}
     {{- else }}
     entityId: "https://nexus.{{ $domainName }}/service/rest/v1/security/saml/metadata"
     {{- end }}
-    usernameAttribute: "{{ default "username" .Values.addons.nexus.sso.idp_data.username }}"
-    firstNameAttribute: "{{ default "firstName" .Values.addons.nexus.sso.idp_data.firstName }}"
-    lastNameAttribute: "{{ default "lastName" .Values.addons.nexus.sso.idp_data.lastName }}"
-    emailAttribute: "{{ default "email" .Values.addons.nexus.sso.idp_data.email }}"
-    groupsAttribute: "{{ default "groups" .Values.addons.nexus.sso.idp_data.groups }}"
+    usernameAttribute: "{{ default "username" $nexusValues.sso.idp_data.username }}"
+    firstNameAttribute: "{{ default "firstName" $nexusValues.sso.idp_data.firstName }}"
+    lastNameAttribute: "{{ default "lastName" $nexusValues.sso.idp_data.lastName }}"
+    emailAttribute: "{{ default "email" $nexusValues.sso.idp_data.email }}"
+    groupsAttribute: "{{ default "groups" $nexusValues.sso.idp_data.groups }}"
     validateResponseSignature: "true"
     validateAssertionSignature: "true"
-    idpMetadata: '{{ .Values.addons.nexus.sso.idp_data.idpMetadata }}'
+    idpMetadata: '{{ $nexusValues.sso.idp_data.idpMetadata }}'
   realm:
     - "NexusAuthenticatingRealm"
     - "NexusAuthorizingRealm"
     - "SamlRealm"
   role:
-    {{- range .Values.addons.nexus.sso.role }}
+    {{- range $nexusValues.sso.role }}
     - id: {{ .id | quote }}
       name: {{ .name | quote }}
       description: {{ .description | quote }}

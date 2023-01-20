@@ -179,3 +179,10 @@ DEPRECATION NOTICE:
   Please update your values override to use the "domain" key.
 {{- end }}
 
+{{- if .Values.addons.nexus }}
+DEPRECATION NOTICE:
+  .Values.addons.nexus has been deprecated and will be removed in a future Big Bang release.
+  Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager 
+{{- end }}
+
+
