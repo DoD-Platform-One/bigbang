@@ -432,7 +432,7 @@ addons:
               runAsGroup: 1001
               fsGroup: 1001
             
-  nexus:
+  nexusRepositoryManager:
     values:
       persistence:
         # Do NOT set this below 5Gi, nexus will fail to boot

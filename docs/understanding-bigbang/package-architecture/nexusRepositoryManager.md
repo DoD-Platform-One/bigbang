@@ -50,7 +50,7 @@ Nexus requires access to persistent storage for storing repos, docker registries
 
 ```yaml
 addons:
-  nexus:
+  nexusRepositoryManager:
     values:  
       persistence:
         storageSize: 8Gi
@@ -83,7 +83,7 @@ By default, Big Bang will deploy the unlicensed version of Nexus. If you need so
 
 ```yaml
 addons:
-  nexus:
+  nexusRepositoryManager:
     enabled: true
     license_key: |
       ehjgjhh...

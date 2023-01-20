@@ -1292,7 +1292,7 @@ addons:
           envs:
             cypress_url: https://chat.bigbang.dev
 
-  nexus:
+  nexusRepositoryManager:
     enabled: false
     # Nexus requires manual configuration in Keycloak client and cannot be tested with login.dso.mil
     # you must test with your own dev deployment.  Example: keycloak.bigbang.dev

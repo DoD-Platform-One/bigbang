@@ -1016,8 +1016,8 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
-  nexus:
-    # -- Toggle deployment of Nexus.
+  nexusRepositoryManager:
+    # -- Toggle deployment of Nexus Repository Manager.
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git

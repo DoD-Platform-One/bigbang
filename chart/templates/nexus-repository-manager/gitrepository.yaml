@@ -1,4 +1,6 @@
-{{- if and (eq (include "checkGitRef" .Values.addons.nexus) "true") .Values.addons.nexus.enabled  }}
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- if and (eq (include "checkGitRef" $nexusValues) "true") $nexusValues.enabled  }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
@@ -10,9 +12,9 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.nexus.git.repo }}
+  url: {{ $nexusValues.git.repo }}
   ref:
-    {{- include "validRef" .Values.addons.nexus.git | nindent 4 }}
+    {{- include "validRef" $nexusValues.git | nindent 4 }}
   {{ include "gitIgnore" . }}
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}

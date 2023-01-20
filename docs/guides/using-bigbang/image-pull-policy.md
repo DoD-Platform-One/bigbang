@@ -32,7 +32,7 @@ We have also documented the package overrides required if you want to set a sing
 | MinIO | `IfNotPresent` | <pre lang="yaml">addons:<br>  minio:<br>    values:<br>      tenants:<br>        image:<br>          pullPolicy: IfNotPresent</pre> |
 | Gitlab | None | <pre lang="yaml">addons:<br>  gitlab:<br>    values:<br>      global:<br>        image:<br>          pullPolicy: IfNotPresent</pre> |
 | Gitlab Runners | `IfNotPresent` | <pre lang="yaml">addons:<br>  gitlabRunner:<br>    values:<br>      imagePullPolicy: IfNotPresent</pre> |
-| Nexus | `IfNotPresent` | <pre lang="yaml">addons:<br>  nexus:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      job_image:<br>        pullPolicy: IfNotPresent</pre> |
+| Nexus | `IfNotPresent` | <pre lang="yaml">addons:<br>  nexusRepositoryManager:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      job_image:<br>        pullPolicy: IfNotPresent</pre> |
 | Sonarqube | `IfNotPresent` | <pre lang="yaml">addons:<br>  sonarqube:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent</pre> |
 | Anchore | `IfNotPresent` | <pre lang="yaml">addons:<br>  anchore:<br>    values:<br>      anchoreGlobal:<br>        imagePullPolicy: IfNotPresent<br>      anchoreEnterpriseGlobal:<br>        imagePullPolicy: IfNotPresent<br>      anchoreEnterpriseUi:<br>        imagePullPolicy: IfNotPresent</pre> |
 | Mattermost Operator | `IfNotPresent` | <pre lang="yaml">addons:<br>  mattermostoperator:<br>    values:<br>      image:<br>        imagePullPolicy: IfNotPresent</pre> |

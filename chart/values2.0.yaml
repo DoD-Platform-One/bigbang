@@ -179,7 +179,7 @@ addons:
       tag: "0.45.0-bb.3"
       repo: "registry1"
 
-  nexus:
+  nexusRepositoryManager:
     git: null
     oci:
       name: "nexus-repository-manager"
