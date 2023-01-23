@@ -4,7 +4,7 @@ site_url: !ENV [SITE_URL, "https://docs-bigbang.dso.mil"]
 site_author: Platform One
 
 repo_name: big-bang/bigbang
-repo_url: https://repo1.dso.mil/platform-one/big-bang/bigbang
+repo_url: https://repo1.dso.mil/big-bang/bigbang
 
 theme:
   name: material
