@@ -17,19 +17,7 @@ Usually, Helm charts come with a set of Helm tests that can be run to test the d
 
 Bigbang provides a library helm chart called [Gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon) to help simplify the process of creating both cypress and script helm tests.
 
-To use this library the following needs to be added to either your `chart/Chart.yaml` or `chart/requirements.yaml` (NOTE: the latest version can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/tags)):
-```yaml
-dependencies:
-- name: gluon
-  version: "0.2.5"
-  repository: "oci://registry.dso.mil/platform-one/big-bang/apps/library-charts/gluon"
-```
-Once this is saved the following commands need to be run on your helm chart to add the dependency:
-```shell
-export HELM_EXPERIMENTAL_OCI=1
-helm dependency update chart
-```
-(NOTE: helm cli version 3.7.0 or above is needed)
+To include this library as a subchart in your package repo follow the instructions provided in the pipeline repo [here](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#including-the-gluon-helm-test-library-in-your-package).
 
 Then in your chart/values.yaml add values for bbtests, any variables used, and default it to false:
 ```yaml
