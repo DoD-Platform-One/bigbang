@@ -1,4 +1,4 @@
-image: registry1.dso.mil/ironbank/opensource/gitlab-triage/gitlab-triage:1.23.1
+image: registry1.dso.mil/ironbank/opensource/gitlab-triage/gitlab-triage:1.28.0
 
 # Include templates
 include:
