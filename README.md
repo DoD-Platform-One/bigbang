@@ -73,9 +73,10 @@ dependencies:
 
 The gluon chart is packaged and released as an [OCI artifact](https://helm.sh/docs/topics/registries/)
 
-We recommend using `helm` v3.8.0 or newer to eliminiate potential issues with OCI artifacts
+We recommend using `helm` v3.8.0 or newer to eliminiate potential issues with OCI artifacts. You will need to first login to the registry1 registry with helm, then run a dependency update to bundle it into your package repo.
 
 ```bash
+helm registry login registry1.dso.mil # When prompted enter your registry1 username/cli token from Harbor
 helm dependency update chart
 ```
 
