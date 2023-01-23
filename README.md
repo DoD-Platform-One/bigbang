@@ -43,7 +43,7 @@ Options:
   -d, --dev          Run `mkdocs serve` after build
   -h, --help         Show this message and exit.
 
-  Built and maintained by @razzle
+  Built and maintained by Big Bang
 ```
 
 ### Usage Examples
@@ -82,7 +82,7 @@ python3 -m http.server --directory site
     npm test
     ```
 
-5. Review any failures, refactor tests if need be. Ping `@razzle` for assistance if needed.
+5. Review any failures, refactor tests if need be. Ping codeowners for assistance if needed.
 6. Once tests are passing, navigate to http://localhost:8000 and explore for a bit.
 7. Continue w/ release engineering, rerun steps 3-4 if any cherry-picks affect `docs`.
 

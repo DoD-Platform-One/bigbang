@@ -1,7 +1,5 @@
 # About
 
-_Author_: [`@razzle`](https://razzle.cloud)
-
 ## How it works
 
 1. Add `bigbang` as a Git submodule.

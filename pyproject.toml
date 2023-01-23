@@ -2,7 +2,7 @@
 name = "docs-compiler"
 version = "0.1.0"
 description = ""
-authors = ["razzle <harry@razzle.cloud>"]
+authors = ["Big Bang"]
 
 packages = [
     { include = "docs-compiler" }

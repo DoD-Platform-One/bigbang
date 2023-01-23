@@ -1,7 +1,7 @@
 {
   "name": "bb-docs-compiler",
-  "repository": "https://github.com/Noxsios/bb-docs-compiler.git",
-  "author": "razzle <harry@razzle.cloud>",
+  "repository": "https://repo1.dso.mil/big-bang/apps/product-tools/bb-docs-compiler.git",
+  "author": "Big Bang",
   "devDependencies": {
     "@playwright/test": "^1.24.2"
   },

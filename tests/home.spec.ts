@@ -6,14 +6,12 @@ test("homepage has `Big Bang Docs` in title and get started link linking to the 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Big Bang Docs/);
 
-  // create a locator
-  const getStarted = page.locator(".md-content >> text=Big Bang Docs");
 
-  // Expect an attribute "to be strictly equal" to the value.
-  await expect(getStarted).toHaveAttribute("href", "https://docs-bigbang.dso.mil");
+  // Locate link to developer docs
+  const devDocsLink = page.locator("text=Developer Contribution Documentation");
 
   // Click the get started link.
-  await getStarted.click();
+  await devDocsLink.click();
 
   // Expects the URL to contain intro.
   await expect(page).toHaveURL(/.*docs/);

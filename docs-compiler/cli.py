@@ -166,7 +166,7 @@ def compile(bb, tag):
 
 @click.command(
     context_settings={"help_option_names": ["-h", "--help"]},
-    epilog="Built and maintained by @razzle",
+    epilog="Built and maintained by Big Bang",
 )
 @click.option(
     "-t",
