@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [45.0.0-bb.2] - 2022-01-17
+### Added
+- Added pod and container security context for jobs
+
 ## [45.0.0-bb.1] - 2022-01-17
 ### Changed
 - Update gluon to new registry1 location + latest version (0.3.2)
