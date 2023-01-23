@@ -3,6 +3,17 @@
 networkPolicies:
   controlPlaneCidr: 10.0.0.0/8
 
+istio:
+  values:
+    values:
+      global: 
+        proxy:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits: null
+
 clusterAuditor:
   values:
     resources:
