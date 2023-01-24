@@ -8,6 +8,7 @@
     TF_ROOT: "${PIPELINE_REPO_DESTINATION}/clusters/airgap/dependencies/terraform"
     TF_VAR_ci_pipeline_id: $CI_PIPELINE_ID
     TF_VAR_airgap_env_name: bb-ci-airgap-$TF_VAR_env
+    BB_REPO: https://repo1.dso.mil/big-bang/bigbang.git
 
 .airgap up:
   extends:
@@ -18,8 +19,13 @@
     - ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:airgap_up[collapsed=true]\r\e[0K\e[33;1mAirgap Up\e[37m"
+    # get latest BB release tag to fetch artifacts
+    - git clone ${BB_REPO}
+    - export TF_VAR_bb_release=$(git -C ./bigbang describe --tags $(git -C ./bigbang rev-list --tags --max-count=1))
+    - echo "Testing Big Bang v$TF_VAR_bb_release"
     - echo "ec2_instance_name:$TF_VAR_airgap_env_name"
-    - echo $TF_VAR_env
+    - echo "$TF_VAR_env"
+    - aws ec2 create-key-pair --key-name $TF_VAR_env --query "KeyMaterial" --output text > airgap.pem
     # Loop to retry airgap up terraform apply due to issues locking terraform.state in s3
     - |
       set -e
@@ -34,7 +40,7 @@
         echo "❌ Attempt FAILED to apply will retry in 30 seconds"
         sleep 30
       done
-    # Wait for airgap kubeconfig to upload to s3
+    # Wait for airgap kubeconfig to upload to s3, kubeconfig is uploaded once the cluster is in the ready state
     - |
       set -e
       attempt_counter=0
@@ -52,6 +58,38 @@
     - mv ./airgap_kubeconfig.yaml ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml
     - echo -e "\e[0Ksection_end:`date +%s`:airgap_up\r\e[0K"
 
+.airgap bb:
+  extends:
+    - .airgap
+    - .util-image
+  before_script:
+    - export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
+    - export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
+    - export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
+    - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
+    - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - package_auth_setup
+    # verify images were unpacked and loaded into registry
+    - AIRGAP_NODE_IP=$(aws ec2 describe-instances --filters Name=tag:Name,Values="${TF_VAR_airgap_env_name}" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text)
+    - airgap_registry_check
+    - curl http://${AIRGAP_NODE_IP}:5000/v2/_catalog -k
+    # verify repos are available
+    - aws s3 cp s3://airgap-tf-states/airgap/${TF_VAR_env}/git.pem . && chmod 400 ./git.pem
+    - mkdir ~/.ssh/
+    - ssh-keyscan -p 22 "$AIRGAP_NODE_IP" >> ~/.ssh/known_hosts
+    - GIT_SSH_COMMAND='ssh -i ./git.pem -o IdentitiesOnly=yes' git clone git@${AIRGAP_NODE_IP}:/home/git/repos/bigbang
+    - AIRGAP_BB_VER=$(git -C ./bigbang describe --tags $(git -C ./bigbang rev-list --tags --max-count=1))
+    - echo "AirGap Big Bang Version $AIRGAP_BB_VER"
+    # get airgap kubeconfig and verify cluster ready
+    - mkdir -p ~/.kube
+    - cp ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml ~/.kube/config && chmod 0600 ~/.kube/config
+    - kubectl get all -A
+    - kubectl create ns flux-system
+    - |
+      flux create secret git ssh-auth \
+      --url=ssh://git@${AIRGAP_NODE_IP} \
+      --private-key-file=./git.pem
+
 .airgap down:
   extends:
     - .airgap
@@ -66,6 +104,7 @@
       attempt_counter=0
       max_attempts=2
       terraform destroy -auto-approve
+    - aws ec2 delete-key-pair --key-name $TF_VAR_env
     - echo -e "\e[0Ksection_end:`date +%s`:airgap_down\r\e[0K"
 
 .airgap cleanup:
