@@ -200,7 +200,7 @@ addons:
       tag: "1.20.0-bb.1"
       repo: "registry1"
 
-  mattermostoperator:
+  mattermostOperator:
     git: null
     oci:
       name: "mattermost-operator"

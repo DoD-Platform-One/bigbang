@@ -1247,7 +1247,7 @@ addons:
             MINIO_PORT: ''
             MINIO_HOST: 'https://minio-api.bigbang.dev'
 
-  mattermostoperator:
+  mattermostOperator:
     enabled: false
 
   mattermost:

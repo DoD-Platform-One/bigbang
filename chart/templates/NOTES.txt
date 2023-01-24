@@ -185,4 +185,8 @@ DEPRECATION NOTICE:
   Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager 
 {{- end }}
 
-
+{{- if .Values.addons.mattermostoperator }}
+DEPRECATION NOTICE:
+  .Values.addons.mattermostoperator has been deprecated and will be removed in a future Big Bang release.
+  Please reconfigure your values overrides to use .Values.addons.mattermostOperator 
+{{- end }}
