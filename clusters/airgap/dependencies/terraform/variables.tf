@@ -13,4 +13,7 @@ variable "airgap_env_name" {
   default     = "airgap_env_name"
 }
 
+variable "bb_release" {
+}
+
 variable "env" {}

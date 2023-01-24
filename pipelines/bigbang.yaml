@@ -496,7 +496,6 @@ aws/airgap up:
   extends:
     - .generic-runner-tags
     - .airgap up
-    - .airgap
   needs:
     - job: pre vars
       artifacts: true
@@ -515,36 +514,27 @@ aws/airgap/bigbang up:
   extends:
     - .generic-runner-tags
     - .kubectl-output
-    - .templates
-    - .airgap
+    - .airgap bb
   needs:
     - job: pre vars
       artifacts: true
     - job: aws/airgap up
       artifacts: true
   script:
-    - mkdir -p ~/.kube
-    - cp ${CI_PROJECT_DIR}/airgap_kubeconfig.yaml ~/.kube/config && chmod 0600 ~/.kube/config
+    # Operational up to this point, see "before script"
+    # flux install works, proving that the the airgap cluster is able to pull from the airgap registry
+    # Work is needed to create an airgap values.yaml
+    # must use the big bang chart pulled in the "before script" to prove repo artifacts (./bigbang)
     - kubectl get all -A
+    #- deploy_bigbang
+    #- test_bigbang
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-#  artifacts:
-#    paths:
-#      - events.txt
-#      - get_cpumem.txt
-#      - cluster_info_dump.txt
-#      - images.txt
-#      - pod_logs
-#      - kubectl_describes
-#      - "test-artifacts/"
-#    expire_in: 3 days
-#    when: always
 
 aws/airgap down:
   stage: 💣 airgap down
   extends:
     - .generic-runner-tags
-    - .airgap
     - .airgap down
     - .airgap cleanup
   needs:
@@ -561,4 +551,3 @@ aws/airgap down:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
-

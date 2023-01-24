@@ -1733,3 +1733,17 @@ gitlab_triage(){
         gitlab-triage --token $RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
     done
 }
+
+airgap_registry_check (){
+    attempt_counter=0
+    max_attempts=18
+    until [ $( curl http://${AIRGAP_NODE_IP}:5000/v2/_catalog -k | grep ironbank >/dev/null; echo $?) -eq 0 ]; do
+      if [ ${attempt_counter} -eq ${max_attempts} ];then
+        echo "Max attempts reached, airgap registry unavailable"
+        exit 1
+      fi
+      echo "Waiting for airgap registry to be ready"
+      attempt_counter=$(($attempt_counter+1))
+      sleep 10
+    done
+}
