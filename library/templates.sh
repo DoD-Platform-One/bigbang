@@ -156,12 +156,22 @@ check_changes() {
               elif [[ "$package" == "logging/promtail" ]]; then
                       package="promtail"
                       CHANGED_PACKAGES+=("$package")
+              # catches both versions of MM/operator (temporary)
+              # new version
+              elif [[ "$package" == "mattermost" ]]; then
+                      package="mattermost"
+                      CHANGED_PACKAGES+=("$package")
+              elif [[ "$package" == "mattermost-operator" ]]; then
+                      package="mattermostOperator"
+                      CHANGED_PACKAGES+=("$package")
+              # old version
               elif [[ "$package" == "mattermost/mattermost" ]]; then
                       package="mattermost"
                       CHANGED_PACKAGES+=("$package")
               elif [[ "$package" == "mattermost/operator" ]]; then
                       package="mattermostoperator"
                       CHANGED_PACKAGES+=("$package")
+              # ^ old version will be removed at a point in the future
               elif [[ "$package" == "minio/minio" ]]; then
                       package="minio"
                       CHANGED_PACKAGES+=("$package")
@@ -1318,7 +1328,7 @@ create_bigbang_merge_request() {
     elif [[ ${CI_PROJECT_NAME} == "anchore-enterprise" ]]; then
         package="anchore"
     elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then
-        package="mattermostoperator"
+        package="mattermostOperator"
     elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then
         package="metricsServer"
     elif [[ ${CI_PROJECT_NAME} == "nexus" ]]; then
