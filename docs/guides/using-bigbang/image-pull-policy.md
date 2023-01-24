@@ -35,7 +35,7 @@ We have also documented the package overrides required if you want to set a sing
 | Nexus | `IfNotPresent` | <pre lang="yaml">addons:<br>  nexusRepositoryManager:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      job_image:<br>        pullPolicy: IfNotPresent</pre> |
 | Sonarqube | `IfNotPresent` | <pre lang="yaml">addons:<br>  sonarqube:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent</pre> |
 | Anchore | `IfNotPresent` | <pre lang="yaml">addons:<br>  anchore:<br>    values:<br>      anchoreGlobal:<br>        imagePullPolicy: IfNotPresent<br>      anchoreEnterpriseGlobal:<br>        imagePullPolicy: IfNotPresent<br>      anchoreEnterpriseUi:<br>        imagePullPolicy: IfNotPresent</pre> |
-| Mattermost Operator | `IfNotPresent` | <pre lang="yaml">addons:<br>  mattermostoperator:<br>    values:<br>      image:<br>        imagePullPolicy: IfNotPresent</pre> |
+| Mattermost Operator | `IfNotPresent` | <pre lang="yaml">addons:<br>  mattermostOperator:<br>    values:<br>      image:<br>        imagePullPolicy: IfNotPresent</pre> |
 | Mattermost | `IfNotPresent` | <pre lang="yaml">addons:<br>  mattermost:<br>    values:<br>      image:<br>        imagePullPolicy: IfNotPresent</pre> |
 | Velero | `IfNotPresent` | <pre lang="yaml">addons:<br>  velero:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent</pre> |
 | Keycloak | `IfNotPresent` | <pre lang="yaml">addons:<br>  keycloak:<br>    values:<br>      image:<br>        pullPolicy: IfNotPresent<br>      pgchecker:<br>        image:<br>          pullPolicy: IfNotPresent</pre> |

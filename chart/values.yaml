@@ -1254,7 +1254,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Mattermost Operator and Instance
   #
-  mattermostoperator:
+  mattermostOperator:
     enabled: false
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git

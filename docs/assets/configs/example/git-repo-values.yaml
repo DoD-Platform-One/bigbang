@@ -160,7 +160,7 @@ addons:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
       path: "./chart"
       branch: "my-dev-branch"
-  mattermostoperator:
+  mattermostOperator:
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
       path: "./chart"
