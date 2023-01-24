@@ -10,7 +10,8 @@ domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
 {{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") .Values.istio.enabled) }}
-{{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint)) }}
+{{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
+{{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
 
 openshift: {{ .Values.openshift }}
 
@@ -68,9 +69,9 @@ postgresql:
   {{- end }}
 {{- end }}
 
-{{- if or .Values.addons.gitlab.objectStorage.region $istioInjection }}
+{{- if or $extObjStorageIsConfigured $istioInjection }}
 registry:
-  {{- if .Values.addons.gitlab.objectStorage.region }}
+  {{- if $extObjStorageIsConfigured }}
   storage:
     secret: gitlab-object-storage
     key: registry
@@ -98,9 +99,9 @@ registry:
 {{- end }}
 
 gitlab:
-  {{- if or .Values.addons.gitlab.objectStorage.region $istioInjection }}
+  {{- if or $extObjStorageIsConfigured $istioInjection }}
   toolbox:
-    {{- if .Values.addons.gitlab.objectStorage.region }}
+    {{- if $extObjStorageIsConfigured }}
     backups:
       objectStorage:
         config:
@@ -278,7 +279,7 @@ global:
     registry:
       name: {{ .Values.addons.gitlab.hostnames.registry }}.{{ $domainName }}
 
-  {{- if or (ne .Values.addons.gitlab.objectStorage.iamProfile "") .Values.addons.gitlab.objectStorage.region }}
+  {{- if or (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured }}
   minio:
     enabled: false
   {{- end }}
@@ -294,7 +295,7 @@ global:
       key: PGPASSWORD
   {{- end }}
 
-  {{- if .Values.addons.gitlab.objectStorage.region }}
+  {{- if $extObjStorageIsConfigured }}
   registry:
     {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
     bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-registry
@@ -303,7 +304,7 @@ global:
     {{- end }}
   {{- end }}
 
-  {{- if or .Values.addons.gitlab.sso.enabled .Values.addons.gitlab.objectStorage.region }}
+  {{- if or .Values.addons.gitlab.sso.enabled $extObjStorageIsConfigured }}
   appConfig:
     {{- end }}
 
@@ -329,7 +330,7 @@ global:
           key: gitlab-sso.json
     {{- end }}
 
-    {{- if .Values.addons.gitlab.objectStorage.region }}
+    {{- if $extObjStorageIsConfigured }}
     lfs:
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
       bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-lfs
@@ -341,7 +342,6 @@ global:
         secret: gitlab-object-storage
         key: rails
       {{- end }}
-    {{- end }}
 
     artifacts:
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
@@ -435,6 +435,7 @@ global:
       tmpBucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-backup-tmp
       {{- else }}
       tmpBucket: gitlab-backup-tmp
+    {{- end }}
   {{- end }}
 
   {{- if and (ne .Values.addons.gitlab.redis.password "") (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled) }}
