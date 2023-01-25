@@ -177,7 +177,7 @@ gatekeeper:
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
-          - argocd/argo-cd-cypress-test
+          - argocd/argocd-cypress-test
           - minio/minio-instance-cypress-test
           - neuvector/neuvector-cypress-test
           # Allow kyverno test vectors for Helm test
@@ -309,7 +309,7 @@ gatekeeper:
           - sonarqube/sonarqube-cypress-test
           - logging/logging-cypress-test
           - tempo/tempo-cypress-test
-          - argocd/argo-cd-cypress-test
+          - argocd/argocd-cypress-test
           - minio/minio-instance-cypress-test
           - neuvector/neuvector-cypress-test
           # Allow kyverno test vectors for Helm test
