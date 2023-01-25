@@ -1,6 +1,6 @@
-# kiali-operator
+# kiali
 
-![Version: 1.60.0-bb.1](https://img.shields.io/badge/Version-1.60.0--bb.1-informational?style=flat-square) ![AppVersion: 1.60.0](https://img.shields.io/badge/AppVersion-1.60.0-informational?style=flat-square)
+![Version: 1.60.0-bb.2](https://img.shields.io/badge/Version-1.60.0--bb.2-informational?style=flat-square) ![AppVersion: 1.60.0](https://img.shields.io/badge/AppVersion-1.60.0-informational?style=flat-square)
 
 Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
@@ -30,14 +30,14 @@ https://helm.sh/docs/intro/install/
 * Clone down the repository
 * cd into directory
 ```bash
-helm install kiali-operator chart/
+helm install kiali chart/
 ```
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| nameOverride | string | `""` |  |
+| nameOverride | string | `"kiali-operator"` |  |
 | fullnameOverride | string | `""` |  |
 | domain | string | `"bigbang.dev"` |  |
 | istio.enabled | bool | `false` |  |
