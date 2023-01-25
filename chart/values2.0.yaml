@@ -140,7 +140,7 @@ addons:
   argocd:
     git: null
     oci:
-      name: "argo-cd"
+      name: "argocd"
       tag: "5.5.7-bb.5"
       repo: "registry1"
 
