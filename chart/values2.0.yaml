@@ -90,7 +90,7 @@ eckoperator:
 fluentbit:
   git: null
   oci:
-    name: "fluent-bit"
+    name: "fluentbit"
     tag: "0.21.2-bb.0"
     repo: "registry1"
 
