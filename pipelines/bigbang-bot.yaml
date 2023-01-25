@@ -31,7 +31,7 @@ before_script:
 bb-bot:on-schedule-gitlab:
   stage: scheduled
   variables: 
-    gitlab_access_token: $RENOVATE_TOKEN
+    gitlab_token: $RENOVATE_TOKEN
   only:
     refs: 
       - schedules
@@ -50,7 +50,7 @@ bb-bot:on-schedule-gitlab:
 bb-bot:on-schedule-jira:
   stage: scheduled
   variables:
-    gitlab_access_token: $RO_RENOVATE_TOKEN
+    gitlab_token: $RENOVATE_TOKEN
     jira_access_token: $JIRA_TOKEN
   only:
     refs: 
@@ -70,7 +70,7 @@ bb-bot:on-schedule-jira:
 bb-bot-gitlab:
   stage: dry_run
   variables: 
-    gitlab_access_token: $RO_RENOVATE_TOKEN
+    gitlab_token: $RO_RENOVATE_TOKEN
   except:
     - schedules
   extends:
@@ -86,7 +86,7 @@ bb-bot-gitlab:
 bb-bot-jira:
   stage: dry_run
   variables: 
-    gitlab_access_token: $RO_RENOVATE_TOKEN
+    gitlab_token: $RO_RENOVATE_TOKEN
     jira_access_token: $RO_JIRA_TOKEN
   except:
     - schedules
