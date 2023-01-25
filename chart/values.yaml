@@ -1,4 +1,4 @@
-nameOverride: ""
+nameOverride: "kiali-operator"
 fullnameOverride: ""
 
 domain: bigbang.dev
