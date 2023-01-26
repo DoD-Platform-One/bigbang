@@ -166,7 +166,7 @@ gatekeeper:
           - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
-          - kiali/kiali-operator-cypress-test
+          - kiali/kiali-cypress-test
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-operator-cypress-test
@@ -298,7 +298,7 @@ gatekeeper:
           - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab/gitlab-runner-cypress-test
-          - kiali/kiali-operator-cypress-test
+          - kiali/kiali-cypress-test
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-operator-cypress-test

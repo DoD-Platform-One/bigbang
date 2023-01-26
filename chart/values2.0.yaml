@@ -34,7 +34,7 @@ jaeger:
 kiali:
   git: null
   oci:
-    name: "kiali-operator"
+    name: "kiali"
     tag: "1.59.1-bb.1"
     repo: "registry1"
 
