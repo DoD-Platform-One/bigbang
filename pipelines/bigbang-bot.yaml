@@ -85,6 +85,7 @@ bb-bot-gitlab:
 
 bb-bot-jira:
   stage: dry_run
+  allow_failure: true
   variables: 
     gitlab_token: $RO_RENOVATE_TOKEN
     jira_access_token: $RO_JIRA_TOKEN
