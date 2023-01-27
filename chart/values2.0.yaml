@@ -34,7 +34,7 @@ jaeger:
 kiali:
   git: null
   oci:
-    name: "kiali"
+    name: "kiali-operator"
     tag: "1.59.1-bb.1"
     repo: "registry1"
 
@@ -90,7 +90,7 @@ eckoperator:
 fluentbit:
   git: null
   oci:
-    name: "fluentbit"
+    name: "fluent-bit"
     tag: "0.21.2-bb.0"
     repo: "registry1"
 
@@ -140,7 +140,7 @@ addons:
   argocd:
     git: null
     oci:
-      name: "argocd"
+      name: "argo-cd"
       tag: "5.5.7-bb.5"
       repo: "registry1"
 
@@ -200,7 +200,7 @@ addons:
       tag: "1.20.0-bb.1"
       repo: "registry1"
 
-  mattermostOperator:
+  mattermostoperator:
     git: null
     oci:
       name: "mattermost-operator"
