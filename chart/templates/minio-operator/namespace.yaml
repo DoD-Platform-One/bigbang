@@ -5,7 +5,7 @@ metadata:
   name: minio-operator
   labels:
     istio-injection: enabled
-    app.kubernetes.io/name: minioOperator
+    app.kubernetes.io/name: minio-operator
     app.kubernetes.io/component: "application-utilities"
     {{- include "commonLabels" . | nindent 4}}
 {{- end }}
