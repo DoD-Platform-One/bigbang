@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [45.1.0-bb.0] - 2023-01-26
+### Changed
+- Updated chart to version: 45.1.0-bb.0 | appVersion: 3.45.1
+
 ## [45.0.0-bb.2] - 2022-01-17
 ### Added
 - Added pod and container security context for jobs

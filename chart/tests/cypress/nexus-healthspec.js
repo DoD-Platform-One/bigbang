@@ -4,6 +4,7 @@ describe('Basic Nexus', function() {
   })
   it('Visit the Nexus sign in page', function() {
     cy.visit(Cypress.env('nexus_url'))
+    cy.wait(5000) // wait 5 seconds for page to load and sign in to appear
     cy.contains("Sign in").click()
     cy.get('input[name="username"]').type(Cypress.env('nexus_user'))
     cy.get('input[name="password"]').type(Cypress.env('nexus_pass'))
