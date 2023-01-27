@@ -1,4 +1,6 @@
-{{- if and (eq (include "checkGitRef" .Values.addons.mattermostoperator) "true") (not .Values.offline) (or .Values.addons.mattermostoperator.enabled .Values.addons.mattermost.enabled) }}
+{{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
+{{- $mmOpValues := merge $mmOpOldValues .Values.addons.mattermostOperator -}}
+{{- if and (eq (include "checkGitRef" $mmOpValues) "true") (not .Values.offline) (or $mmOpValues.enabled .Values.addons.mattermost.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
@@ -10,9 +12,9 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.mattermostoperator.git.repo }}
+  url: {{ $mmOpValues.git.repo }}
   ref:
-    {{- include "validRef" .Values.addons.mattermostoperator.git | nindent 4 }}
+    {{- include "validRef" $mmOpValues.git | nindent 4 }}
   {{ include "gitIgnore" . }}
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}
