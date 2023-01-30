@@ -1335,7 +1335,7 @@ create_bigbang_merge_request() {
     PACKAGE_MR_URL=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.web_url) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
 
     # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
-    BB_MR_REVIEWER_NAMES=( "micah.nagel" "BrandenCobb" "ryan.j.garcia" "rob.ferguson" )
+    BB_MR_REVIEWER_NAMES=( "micah.nagel" "ryan.j.garcia" "rob.ferguson" )
 
     # Collect user IDs from /users API endpoint
     # Add "%2C" to the end of every user ID for URL encoding commas
