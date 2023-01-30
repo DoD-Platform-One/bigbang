@@ -207,6 +207,7 @@ echo "Using AMI image id ${AMI_ID}"
 ImageId="${AMI_ID}"
 
 # Create userdata.txt
+mkdir -p ~/aws
 cat << EOF > ~/aws/userdata.txt
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
