@@ -721,7 +721,9 @@ x.x.x.x  argocd.bigbang.dev
 
 ## Step 13: Visit a Webpage
 
-In a browser, visit one of the sites listed using the `kubectl get vs -A` command
+In a browser, visit one of the sites listed using the `kubectl get vs -A` command.
+
+Note, default credentials for Big Bang packages can be found [here](../using-bigbang/default-credentials.md).
 
 ## Step 14: Play
 
