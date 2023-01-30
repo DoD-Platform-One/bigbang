@@ -76,7 +76,7 @@ kyvernoreporter:
 logging:
   git: null
   oci:
-    name: "logging"
+    name: "elasticsearch-kibana"
     tag: "0.13.0-bb.0"
     repo: "registry1"
 
