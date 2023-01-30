@@ -175,7 +175,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
-          - logging/logging-cypress-test
+          - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
           - minio/minio-instance-cypress-test
@@ -307,7 +307,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
-          - logging/logging-cypress-test
+          - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
           - minio/minio-instance-cypress-test
