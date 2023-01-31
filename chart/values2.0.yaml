@@ -196,7 +196,7 @@ addons:
   anchore:
     git: null
     oci:
-      name: "anchore-engine"
+      name: "anchore"
       tag: "1.20.0-bb.1"
       repo: "registry1"
 
