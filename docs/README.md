@@ -26,7 +26,7 @@
 
 ## Value add gained by using BigBang
 
-* Compliant with the [DoD DevSecOps Reference Architecture Design](https://dodcio.defense.gov/Portals/0/Documents/Library/DoDRefDesignCloudGithub.pdf?ver=zXJ_uO5LfouVaysHo5Ejsw%3D%3D)
+* Compliant with the [DoD DevSecOps Reference Architecture Design](https://dodcio.defense.gov/Portals/0/Documents/Library/DoD%20Enterprise%20DevSecOps%20Reference%20Design%20-%20CNCF%20Kubernetes%20w-DD1910_cleared_20211022.pdf)
 * Can be used to check some but not all of the boxes needed to achieve a cATO (Continuous Authority to Operate.)
 * Uses hardened IronBank Container Images. (left shifted security concern)
 * GitOps adds security benefits, and BigBang leverages GitOps, and can be further extended using GitOps.
