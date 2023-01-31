@@ -18,6 +18,13 @@ if [[ $MULTI_NODE == "true" ]]; then
   yq -i e '.agents |= 3' ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config.yaml
 fi
 
+if [[ ! -z "$K3D_EXTRA_ARGS_VOLUME" ]]; then
+  # Setting the ARGS for k3d in one variable (for some unknown reason) doesn't work.
+  ## i.e. ARGS="--volume '/var/run/dir:/var/run/dir:shared:*;agent:*'" fails to create the cluster
+  ARGS="--volume "
+  ARGS+="$K3D_EXTRA_ARGS_VOLUME"
+fi
+
 # Conditionals for BB pipelines: metricsServer label, all-packages label, main pipeline, tag pipeline
 # Conditionals for Integration pipelines: metricsServer explicitly enabled in values
 # Conditionals for any pipeline: `METRICS_DISABLED` ENV set to "true"
@@ -28,8 +35,8 @@ if [[ "${PIPELINE_TYPE}" == "BB" && "${CI_DEPLOY_LABELS[*]}" =~ "metricsServer" 
    [[ "${PIPELINE_TYPE}" == "INTEGRATION" && "$(yq e ".addons.metricsServer.enabled" ${CI_PROJECT_DIR}/bigbang/values.yaml)" == "true" ]] || \
    [[ $METRICS_DISABLED == "true" ]]; then
   echo "Creating k3d cluster without default metric server"
-  k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config-no-metrics.yaml --network ${CI_JOB_ID}
+  k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config-no-metrics.yaml --network ${CI_JOB_ID} ${ARGS}
 else
   echo "Creating k3d cluster with default metrics server"
-  k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config.yaml --network ${CI_JOB_ID}
+  k3d cluster create ${CI_JOB_ID} --config ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/config.yaml --network ${CI_JOB_ID} ${ARGS}
 fi
