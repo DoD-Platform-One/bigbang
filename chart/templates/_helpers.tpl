@@ -218,5 +218,116 @@ bigbang.dev/istioVersion: {{ .Values.istio.oci.tag }}
 
 {{- /* Prints istio version */ -}}
 {{- define "istioVersion" -}}
-{{ regexReplaceAll "-bb.+$" (coalesce .Values.istio.git.semver .Values.istio.git.tag .Values.istio.git.branch) "" }}
+  {{- regexReplaceAll "-bb.+$" (coalesce .Values.istio.git.semver .Values.istio.git.tag .Values.istio.git.branch) "" -}}
+{{- end -}}
+
+{{- /* Returns an SSO host */ -}}
+{{- define "sso.host" -}}
+  {{- coalesce .Values.sso.oidc.host (regexReplaceAll ".*//([^/]*)/?.*" .Values.sso.url "${1}") -}}
+{{- end -}}
+
+{{- /* Returns an SSO realm */ -}}
+{{- define "sso.realm" -}}
+  {{- coalesce .Values.sso.oidc.realm (regexReplaceAll ".*/realms/([^/]*)" .Values.sso.url "${1}") (regexReplaceAll "\\W+" .Values.sso.name "") -}}
+{{- end -}}
+
+{{- /* Returns the SSO base URL */ -}}
+{{- define "sso.url" -}}
+  {{- if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "https://%s/auth/realms/%s" .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+  {{- else -}}
+    {{- tpl (default "" .Values.sso.url) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the SSO auth url (OIDC) */ -}}
+{{- define "sso.oidc.auth" -}}
+  {{- if .Values.sso.auth_url -}}
+    {{- tpl (default "" .Values.sso.auth_url) . -}}
+  {{- else if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/openid-connect/auth" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "oidc" "authorization" (printf "%s/protocol/openid-connect/auth" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the SSO token url (OIDC) */ -}}
+{{- define "sso.oidc.token" -}}
+  {{- if .Values.sso.token_url -}}
+    {{- tpl (default "" .Values.sso.token_url) . -}}
+  {{- else if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/openid-connect/token" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "oidc" "token" (printf "%s/protocol/openid-connect/token" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the SSO userinfo url (OIDC) */ -}}
+{{- define "sso.oidc.userinfo" -}}
+  {{- if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/openid-connect/userinfo" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "oidc" "userinfo" (printf "%s/protocol/openid-connect/userinfo" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the SSO jwks url (OIDC) */ -}}
+{{- define "sso.oidc.jwksuri" -}}
+  {{- if .Values.sso.jwks_uri -}}
+    {{- tpl (default "" .Values.sso.jwks_uri) . -}}
+  {{- else if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/openid-connect/certs" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "oidc" "jwksUri" (printf "%s/protocol/openid-connect/certs" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the SSO end session url (OIDC) */ -}}
+{{- define "sso.oidc.endsession" -}}
+  {{- if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/openid-connect/logout" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "oidc" "endSession" (printf "%s/protocol/openid-connect/logout" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the single sign on service (SAML) */ -}}
+{{- define "sso.saml.service" -}}
+  {{- if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/protocol/saml" (include "sso.url" .) -}}
+  {{- else -}}
+    {{- tpl (dig "saml" "service" (printf "%s/protocol/saml" (include "sso.url" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the single sign on entity descriptor (SAML) */ -}}
+{{- define "sso.saml.descriptor" -}}
+  {{- if and .Values.sso.oidc.host .Values.sso.oidc.realm -}}
+    {{- printf "%s/descriptor" (include "sso.saml.service" .) -}}
+  {{- else -}}
+    {{- tpl (dig "saml" "entityDescriptor" (printf "%s/descriptor" (include "sso.saml.service" .)) .Values.sso) . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the signing cert (no headers) from the SAML metadata */ -}}
+{{- define "sso.saml.cert" -}}
+  {{- $cert := dig "saml" "metadata" "" .Values.sso -}}
+  {{- if $cert -}}
+    {{- $cert := regexFind "<md:IDPSSODescriptor[\\s>][\\s\\S]*?</md:IDPSSODescriptor[\\s>]" $cert -}}
+    {{- $cert = regexFind "<md:KeyDescriptor[\\s>][^>]*?use=\"signing\"[\\s\\S]*?</md:KeyDescriptor[\\s>]" $cert -}}
+    {{- $cert = regexFind "<ds:KeyInfo[\\s>][\\s\\S]*?</ds:KeyInfo[\\s>]" $cert -}}
+    {{- $cert = regexFind "<ds:X509Data[\\s>][\\s\\S]*?</ds:X509Data[\\s>]" $cert -}}
+    {{- $cert = regexFind "<ds:X509Certificate[\\s>][\\s\\S]*?</ds:X509Certificate[\\s>]" $cert -}}
+    {{- $cert = regexReplaceAll "<ds:X509Certificate[^>]*?>\\s*([\\s\\S]*?)</ds:X509Certificate[\\s>]" $cert "${1}" -}}
+    {{- $cert = regexReplaceAll "\\s*" $cert "" -}}
+    {{- required "X.509 signing certificate could not be found in sso.saml.metadata!" $cert -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Returns the signing cert with headers from the SAML metadata */ -}}
+{{- define "sso.saml.cert.withheaders" -}}
+  {{- $cert := include "sso.saml.cert" . -}}
+  {{- if $cert -}}
+    {{- printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----" $cert -}}
+  {{- end -}}
 {{- end -}}

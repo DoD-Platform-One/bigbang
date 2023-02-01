@@ -7,6 +7,8 @@ A 54min speed run with explanations video walkthrough of this sso quickstart gui
 * [Google Drive - Video Mirror](https://drive.google.com/file/d/1xzRKhFQy4WXW97YWUFpixclLGAKfgA6Z/preview)
 * [Repo1 - Video Mirror](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/blob/master/big_bang/bigbang_sso_quickstart.mp4)
 
+> SSO values have changed since these videos were created.  The old values used in the videos should still work, but you will receive warnings that they have been deprecated.
+
 ## Blue Team Knowledge Drop
 
 Imagine <https://authdemo.bigbang.dev> represents a mock-up of a custom-built mission application that doesn't have SSO, Authentication, or Authorization built-in. Auth Service can add those to it which creates layers of defense/defense in depth in the form only allowing authenticated users the ability to even see the page, enforcing MFA of authenticated users, and requiring that authenticated users are authorized to access that service (they must be in the correct group of their Identity Provider, and this means you can safely enable self-registration of users without hurting security. Auth Service's Authentication Proxy has an additional benefit in regards to defense in depth. You can add it in front of most frontend applications to create an additional layer of defense. Example: Grafana, Kibana, ArgoCD, and others have baked in support for OIDC/SSO and AuthN/AuthZ functionality, so you may think what benefit could be had from adding an authentication proxy in front of them (it seems redundant at first glance). Let's say that a frontend service was reachable from the public internet and it had some zero-day vulnerability that allowed authentication bypass or unauthenticated remote code execution to occur via a network-level exploit / uniquely crafted packet. Well someone on the internet wouldn't even be able to exploit these hypothetical zero-day vulnerabilities since it'd be behind an AuthN/AuthZ proxy layer of defense which would prevent them from even touching the frontend. Bonus: Istio, AuthService, and Keycloak are all Free Open Source Software (FOSS) solutions and they work in internet disconnect environments, we'll even demonstrate it working using only Kubernetes DNS and workstation hostfile edits / without needing to configure LAN/Internet DNS.
@@ -103,11 +105,11 @@ Why 2 VMs? 2 reasons:
 
     ```shell
     # [admin@Laptop:~]
-   
+
     # Commented out directly below, is how to use a pinned version of BigBang:
-    # BIG_BANG_VERSION="1.30.1" 
+    # BIG_BANG_VERSION="1.30.1"
     # (Note: 1.30.1 was the last version this guide was tested against)
-    # 
+    #
     # The following will load the latest tagger version of BigBang into an environment variable
     BIG_BANG_VERSION=$(curl -s https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/base/gitrepository.yaml | grep 'tag:' | awk '{print $2}')
     echo "This script will install Big Bang version: $BIG_BANG_VERSION"
@@ -120,10 +122,10 @@ Why 2 VMs? 2 reasons:
     ```shell
     # [admin@Laptop:~]
     echo $REGISTRY1_PASSWORD | docker login https://registry1.dso.mil --username=$REGISTRY1_USERNAME --password-stdin | grep "Succeeded" ; echo $? | grep 0 && echo "This validation check shows your registry1 credentials are valid, please continue." || for i in {1..10}; do echo "Validation check shows error, fix your registry1 credentials before moving on."; done
-    
+
     export KEYCLOAK_IP=$(cat ~/.ssh/config | grep keycloak-cluster -A 1 | grep Hostname | awk '{print $2}')
     echo "\n\n\n$KEYCLOAK_IP is the IP of the k3d node that will host Keycloak on Big Bang"
-    
+
     export WORKLOAD_IP=$(cat ~/.ssh/config | grep workload-cluster -A 1 | grep Hostname | awk '{print $2}')
     echo "$WORKLOAD_IP is the IP of the k3d node that will host Workloads on Big Bang"
     echo "Please manually verify that the IPs of your keycloak and workload k3d VMs look correct before moving on."
@@ -134,8 +136,8 @@ Why 2 VMs? 2 reasons:
 
     ```shell
     # [admin@Laptop:~]
-    mkdir -p ~/qs   
-   
+    mkdir -p ~/qs
+
     cat << EOFkeycloak-k3d-prepwork-commandsEOF > ~/qs/keycloak-k3d-prepwork-commands.txt
     # Idempotent logic:
     sudo sed -i "/.*BIG_BANG_VERSION.*/d"      ~/.bashrc
@@ -148,14 +150,14 @@ Why 2 VMs? 2 reasons:
     lines_in_file+=( 'export K3D_IP="$KEYCLOAK_IP"' )
     lines_in_file+=( 'export REGISTRY1_USERNAME="$REGISTRY1_USERNAME"' )
     lines_in_file+=( 'export REGISTRY1_PASSWORD="$REGISTRY1_PASSWORD"' )
-    
+
     for line in "\${lines_in_file[@]}"; do
       grep -qF "\${line}" ~/.bashrc
       if [ \$? -ne 0 ]; then echo "\${line}" >> ~/.bashrc ; fi
     done
     EOFkeycloak-k3d-prepwork-commandsEOF
-    
-    
+
+
     cat << EOFworkload-k3d-prepwork-commandsEOF > ~/qs/workload-k3d-prepwork-commands.txt
     # Idempotent logic:
     sudo sed -i "/.*BIG_BANG_VERSION.*/d"      ~/.bashrc
@@ -168,7 +170,7 @@ Why 2 VMs? 2 reasons:
     lines_in_file+=( 'export K3D_IP="$WORKLOAD_IP"' )
     lines_in_file+=( 'export REGISTRY1_USERNAME="$REGISTRY1_USERNAME"' )
     lines_in_file+=( 'export REGISTRY1_PASSWORD="$REGISTRY1_PASSWORD"' )
-    
+
     for line in "\${lines_in_file[@]}"; do
       grep -qF "\${line}" ~/.bashrc
       if [ \$? -ne 0 ]; then echo "\${line}" >> ~/.bashrc ; fi
@@ -193,10 +195,10 @@ Why 2 VMs? 2 reasons:
     ```
 
     ```text
-    Explanation: (We are basically doing the equivalent of Ansible, without 
+    Explanation: (We are basically doing the equivalent of Ansible, without
     having to install Ansible and its dependencies.)
     ssh keycloak-cluster < ~/qs/keycloak-k3d-prepwork-commands.txt
-    ^-- runs script against remote VM 
+    ^-- runs script against remote VM
     & at the end of the command means to let it run in the background
     using it allows us to run the script against both machines in parallel.
     wait command waits for background processes to finish
@@ -207,13 +209,13 @@ Why 2 VMs? 2 reasons:
     ```shell
     # [admin@Laptop:~]
     # First a command to confirm ~/.bashrc was updated as expected
-    ssh keycloak-cluster 'tail ~/.bashrc' 
-    
+    ssh keycloak-cluster 'tail ~/.bashrc'
+
     # Then ssh in to see the differences
     ssh keycloak-cluster
     ```
 
-1. Notice the prompt makes it obvious which VM you ssh'ed into.  
+1. Notice the prompt makes it obvious which VM you ssh'ed into.
 
     ```shell
     # [ubuntu@keycloak-cluster:~$]
@@ -221,7 +223,7 @@ Why 2 VMs? 2 reasons:
     env | grep -i name
     env | grep IP
     exit
-    
+
     # [admin@Laptop:~]
     ```
 
@@ -231,7 +233,7 @@ Why 2 VMs? 2 reasons:
     ```shell
     # [admin@Laptop:~]
     # Note ? is escaped in some places in the form of \?, this prevents substitution
-    # by the local machine, which allows the remote VM to do the substituting. 
+    # by the local machine, which allows the remote VM to do the substituting.
     cat << EOFshared-k3d-prepwork-commandsEOF > ~/qs/shared-k3d-prepwork-commands.txt
     # Configure OS
     sudo sysctl -w vm.max_map_count=524288
@@ -244,32 +246,32 @@ Why 2 VMs? 2 reasons:
     sudo modprobe xt_statistic
     printf "xt_REDIRECT\nxt_owner\nxt_statistic\n" | sudo tee -a /etc/modules
     sudo swapoff -a
-    
+
     # Install git
     sudo apt install git -y
-    
+
     # Install docker (note we use escape some vars we want the remote linux to substitute)
     sudo apt update -y && sudo apt install apt-transport-https ca-certificates curl gnupg lsb-release -y
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor --yes -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt update -y && sudo apt install docker-ce docker-ce-cli containerd.io -y && sudo usermod --append --groups docker \$USER
-    
+
     # Install k3d
     wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.4.1/k3d-linux-amd64 > k3d
     echo 50f64747989dc1fcde5db5cb82f8ac132a174b607ca7dfdb13da2f0e509fda11 k3d | sha256sum -c | grep OK
     if [ \$? == 0 ]; then chmod +x k3d && sudo mv k3d /usr/local/bin/k3d ; fi
-    
+
     # Install kubectl
     wget -q -O - https://dl.k8s.io/release/v1.23.5/bin/linux/amd64/kubectl > kubectl
     echo 715da05c56aa4f8df09cb1f9d96a2aa2c33a1232f6fd195e3ffce6e98a50a879 kubectl | sha256sum -c | grep OK
     if [ \$? == 0 ]; then chmod +x kubectl && sudo mv kubectl /usr/local/bin/kubectl; fi
     sudo ln -s /usr/local/bin/kubectl /usr/local/bin/k || true
-    
+
     # Install kustomize
     wget -q -O - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.4/kustomize_v4.5.4_linux_amd64.tar.gz > kustomize.tar.gz
     echo 1159c5c17c964257123b10e7d8864e9fe7f9a580d4124a388e746e4003added3 kustomize.tar.gz | sha256sum -c | grep OK
-    if [ \$? == 0 ]; then tar -xvf kustomize.tar.gz && chmod +x kustomize && sudo mv kustomize /usr/local/bin/kustomize && rm kustomize.tar.gz ; fi    
-    
+    if [ \$? == 0 ]; then tar -xvf kustomize.tar.gz && chmod +x kustomize && sudo mv kustomize /usr/local/bin/kustomize && rm kustomize.tar.gz ; fi
+
     # Install helm
     wget -q -O - https://get.helm.sh/helm-v3.8.1-linux-amd64.tar.gz > helm.tar.gz
     echo d643f48fe28eeb47ff68a1a7a26fc5142f348d02c8bc38d699674016716f61cd helm.tar.gz | sha256sum -c | grep OK
@@ -284,7 +286,7 @@ Why 2 VMs? 2 reasons:
     # Run the above prereq script against both VMs
     ssh keycloak-cluster < ~/qs/shared-k3d-prepwork-commands.txt &
     ssh workload-cluster < ~/qs/shared-k3d-prepwork-commands.txt &
-    wait 
+    wait
     ```
 
    * Copy paste the following to run validation checks against both VMs
@@ -297,10 +299,10 @@ Why 2 VMs? 2 reasons:
     k3d version >> /dev/null ; echo \$? | grep 0 >> /dev/null && echo "SUCCESS: k3d installed" || echo "ERROR: issue with k3d install"
     kubectl version --client >> /dev/null ; echo \$? | grep 0 >> /dev/null && echo "SUCCESS: kubectl installed" || echo "ERROR: issue with kubectl install"
     kustomize version >> /dev/null ; echo \$? | grep 0 >> /dev/null && echo "SUCCESS: kustomize installed" || echo "ERROR: issue with kustomize install"
-    helm version >> /dev/null ; echo \$? | grep 0 >> /dev/null && echo "SUCCESS: helm installed" || echo "ERROR: issue with helm install" 
+    helm version >> /dev/null ; echo \$? | grep 0 >> /dev/null && echo "SUCCESS: helm installed" || echo "ERROR: issue with helm install"
     EOFshared-k3d-prepwork-verification-commandsEOF
-    
-    ssh keycloak-cluster < ~/qs/shared-k3d-prepwork-verification-commands.txt 
+
+    ssh keycloak-cluster < ~/qs/shared-k3d-prepwork-verification-commands.txt
     ssh workload-cluster < ~/qs/shared-k3d-prepwork-verification-commands.txt
     ```
 
@@ -312,7 +314,7 @@ Note: There's no need to copy paste commands from this text box,
 
 If you were to copy paste the following into your laptop/workstation's terminal.
 ssh keycloak-cluster 'env | grep K3D_IP'
-You'd receive blank text, this means that env vars defined in the remote VM's ~/.bashrc 
+You'd receive blank text, this means that env vars defined in the remote VM's ~/.bashrc
 are not populated when using non interactive shell copy paste automation method.
 
 That's why the script that runs on the remote machine has lines like this one:
@@ -340,7 +342,7 @@ k3d cluster create \$CLUSTER_NAME \
     --api-port 6443
 sed -i "s/0.0.0.0/\$K3D_IP/" ~/.kube/config
 # Explanation:
-# sed = stream editor 
+# sed = stream editor
 # -i s/.../.../   (i = inline), (s = substitution, basically cli find and replace)
 # / / / are delimiters the separate what to find and what to replace.
 # \$K3D_IP, is a variable with $ escaped, so the var will be processed by the remote VM.
@@ -442,7 +444,7 @@ logging:
           requests:
             cpu: 1m
             memory: 1Mi
-          limits: 
+          limits:
             cpu: null
             memory: null
 
@@ -606,12 +608,12 @@ istio:
     public-ingressgateway:
       type: "NodePort"
   values:
-    values: 
-      global: 
-        proxy: 
+    values:
+      global:
+        proxy:
           resources:
             requests:
-              cpu: 0m 
+              cpu: 0m
               memory: 0Mi
             limits:
               cpu: 0m
@@ -628,7 +630,7 @@ helm upgrade --install bigbang \$HOME/bigbang/chart \
   --namespace=bigbang --create-namespace
 EOFdeploy-keycloakEOF
 
-ssh keycloak-cluster < ~/qs/deploy-keycloak.txt 
+ssh keycloak-cluster < ~/qs/deploy-keycloak.txt
 ```
 
 ## Step 8: Edit your workstation's Hosts file to access the web pages hosted on the Big Bang Clusters
@@ -659,10 +661,10 @@ cat /etc/hosts
 
 ## Step 9: Make sure the clusters have had enough time to finish their deployments
 
-* Note:  
-  After copy pasting the following, you may need to wait up to 10 minutes. If you're too  
-  fast you may see a temporary error about pod keycloak-0 not found. It's recommended to  
-  copy paste this block of verification commands a 2nd time after 10 minutes have passed.  
+* Note:
+  After copy pasting the following, you may need to wait up to 10 minutes. If you're too
+  fast you may see a temporary error about pod keycloak-0 not found. It's recommended to
+  copy paste this block of verification commands a 2nd time after 10 minutes have passed.
 
 * Note when you run `kubectl get svc -n=istio-system`, against each cluster, verify that EXTERNAL-IP isn't stuck in pending.
 
@@ -670,14 +672,14 @@ cat /etc/hosts
 # [admin@Laptop:~]
 export KUBECONFIG=$HOME/.kube/keycloak-cluster
 kubectl get pods -A
-kubectl wait --for=condition=ready --timeout=10m pod/keycloak-0 -n=keycloak 
+kubectl wait --for=condition=ready --timeout=10m pod/keycloak-0 -n=keycloak
 # ^-- takes about 5min
 kubectl get hr -A
-kubectl get svc -n=istio-system 
+kubectl get svc -n=istio-system
 
 export KUBECONFIG=$HOME/.kube/workload-cluster
 kubectl get hr -A
-kubectl wait --for=condition=ready --timeout=15m hr/jaeger -n=bigbang 
+kubectl wait --for=condition=ready --timeout=15m hr/jaeger -n=bigbang
 # ^-- takes about 10-15mins
 kubectl get hr -A
 kubectl get svc -n=istio-system
@@ -696,10 +698,10 @@ kubectl get svc -n=istio-system
 cat << EOFdeploy-mock-mission-appEOF > ~/qs/deploy-mock-mission-app.txt
 
 #Creating demo namespace
-k create ns mock-mission-app 
+k create ns mock-mission-app
 
 #Adding namespace to the service mesh
-k label ns mock-mission-app istio-injection=enabled 
+k label ns mock-mission-app istio-injection=enabled
 
 # Adding dockercred to namespace so istio side car image pull will work.
 kubectl get secret private-registry -n=istio-system -o yaml | sed 's/namespace: .*/namespace: mock-mission-app/' | kubectl apply -f -
@@ -760,19 +762,19 @@ kubectl wait --for=condition=available deployment/podinfo --timeout=3m -n=mock-m
 1. Visit <https://keycloak.bigbang.dev/auth/admin>
 1. log in as a keycloak admin, using the default creds of admin:password
 1. In the GUI:
-   1. Navigate to: Manage/Groups > Impact Level 2 Authorized (double click)  
+   1. Navigate to: Manage/Groups > Impact Level 2 Authorized (double click)
       Notice the group UUID in the URL: 00eb8904-5b88-4c68-ad67-cec0d2e07aa6
 1. In the GUI:
    1. Navigate to: Configure/Clients > [Create]
    1. Set:
-      Client ID = "demo-env_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_authdemo"  
-      Client Protocol = openid-connect  
+      Client ID = "demo-env_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_authdemo"
+      Client Protocol = openid-connect
       Root URL = (blank)
    1. Save
 1. In the GUI:
    1. Navigate to: Configure/Clients > [Edit] demo-env_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_authdemo
    1. Under "Access Type": Change Public to Confidential
-   1. Under "Valid Redirect URIs": Add "https://authdemo.bigbang.dev/login/generic_oauth"  
+   1. Under "Valid Redirect URIs": Add "https://authdemo.bigbang.dev/login/generic_oauth"
       Note: /login/generic_oauth comes from auth service
    1. Save
    1. Scroll up to the top of the page and you'll see a newly added [Credentials] tab, click it.
@@ -785,18 +787,18 @@ kubectl wait --for=condition=available deployment/podinfo --timeout=3m -n=mock-m
 
 export AUTHDEMO_APP_ID_CLIENT_SECRET="pasted_value"
 # It should look similar to the following dynamically generated demo value
-# export AUTHDEMO_APP_ID_CLIENT_SECRET="fsCUSkwy2kaaSlgN4r4LPYOAvHCqzUk5" 
+# export AUTHDEMO_APP_ID_CLIENT_SECRET="fsCUSkwy2kaaSlgN4r4LPYOAvHCqzUk5"
 
 echo $AUTHDEMO_APP_ID_CLIENT_SECRET | grep "pasted_value" ; echo $? | grep 1 && echo "This validation check shows you remembered to update the pasted value." || ( for i in {1..10}; do echo "Validation check shows error, update the variable by pasting in the dynamically generated secret before moving on." ; done ; sleep 3 )
 
-# Note: 
+# Note:
 # JWKS: JSON Web Key Set is a public key used to verify JWT's issued by the IDP.
 # Every Instance of Keycloak will have a unique JWKS, auth service needs to verify JWTs issued by Keycloak
 # You find it by curling https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/certs
-# then to prep for usage escape double quotes and wrapping the value in single quotes. 
+# then to prep for usage escape double quotes and wrapping the value in single quotes.
 export KEYCLOAK_IDP_JWKS=$(curl https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/openid-connect/certs | sed 's@"@\\"@g')
 
-# Note: 
+# Note:
 # Authservice needs the CA-cert.pem that Keycloak's HTTPS cert was signed by, *.bigbang.dev is signed by Let's Encrypt Free CA
 export KEYCLOAK_CERTS_CA=$(curl https://letsencrypt.org/certs/isrgrootx1.pem)
 ```
@@ -823,18 +825,14 @@ kubectl patch deployment podinfo --type merge --patch "\$(cat ~/pods-in-deployme
 
 cat << EOF > ~/auth_service_demo_values.yaml
 sso:
-  oidc:
-    host: keycloak.bigbang.dev
-    realm: baby-yoda
-  token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
-  auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
-  jwks: '$KEYCLOAK_IDP_JWKS'
-  certificate_authority: |
-$(echo "$KEYCLOAK_CERTS_CA" | sed 's/^/    /')
-# sed 's/^/    /', indents 4 spaces
+  url: https://keycloak.bigbang.dev/auth/realms/baby-yoda
+  certificateAuthority:
+    cert: |
+$(echo "$KEYCLOAK_CERTS_CA" | sed 's/^/      /')
+# sed 's/^/      /', indents 6 spaces
 
 addons:
-  authservice: 
+  authservice:
     enabled: true
     values:
       chains:
@@ -867,8 +865,8 @@ ssh workload-cluster 'helm get values bigbang -n=bigbang' # You can eyeball this
 * Before we were taken straight to the mock mission app webpage
 * Now* (or 30-120 seconds after copy pasting the above block of commands into the terminal), when you create a new tab and try to visit this URL it immediately redirects to a KeyCloak Log in Prompt and if you log in with your demo user, you'll a message like this:
 
-> RBAC: access denied  
-> Your account has not been granted access to this application group yet.  
+> RBAC: access denied
+> Your account has not been granted access to this application group yet.
 
 ## Step 17: Update the group membership of the user
 
@@ -880,13 +878,13 @@ ssh workload-cluster 'helm get values bigbang -n=bigbang' # You can eyeball this
    1. Click Impact Level 2 Authorized
    1. Click [Join]
 
-> Note:  
-> If you try to repeat step 16 at this stage, you'll see either an infinite loading screen or message like this:  
-> `Access to authdemo.bigbang.dev was denied`  
-> `You don't have authorization to view this page.`  
-> `HTTP ERROR 403`  
-> The reason for this is that we configured our workstation's hostfile /etc/hosts to avoid needing to configure DNS. But the 2 k3d clusters are unable to resolve the DNS Names.  
-> AuthService pods on the Workload Cluster need to be able to resolve the DNS name of keycloak.bigbang.dev  
+> Note:
+> If you try to repeat step 16 at this stage, you'll see either an infinite loading screen or message like this:
+> `Access to authdemo.bigbang.dev was denied`
+> `You don't have authorization to view this page.`
+> `HTTP ERROR 403`
+> The reason for this is that we configured our workstation's hostfile /etc/hosts to avoid needing to configure DNS. But the 2 k3d clusters are unable to resolve the DNS Names.
+> AuthService pods on the Workload Cluster need to be able to resolve the DNS name of keycloak.bigbang.dev
 > Keycloak pod on the Keycloak Cluster needs to be able to resolve the DNS name of authdemo.bigbang.dev
 
 ## Step 18: Update Inner Cluster DNS on the Workload Cluster
@@ -898,7 +896,7 @@ ssh workload-cluster 'helm get values bigbang -n=bigbang' # You can eyeball this
 
 # The following tests DNS resolution from the perspective of a pod running in the cluster
 export KUBECONFIG=$HOME/.kube/workload-cluster
-kubectl run -it test --image=busybox:stable 
+kubectl run -it test --image=busybox:stable
 ```
 
 ```shell
@@ -912,7 +910,7 @@ exit
 ```shell
 # [admin@Laptop:~]
 kubectl exec -it test -- ping keycloak.bigbang.dev -c 1 | head -n 1
-# Notice it mentions resolution as 127.0.0.1, this comes from public internet DNS, 
+# Notice it mentions resolution as 127.0.0.1, this comes from public internet DNS,
 # The next steps will override the DNS resolution to suit the needs of this guide.
 ```
 

@@ -64,27 +64,38 @@ redis-bb:
       namespace: monitoring
 {{- end }}
 
+{{- $legacy := and .Values.sso.oidc.realm .Values.sso.oidc.host -}}
+{{- if not $legacy }}
+issuer_uri: {{ include "sso.url" . }}
+{{- end }}
+
 global:
   oidc:
-    host: {{ .Values.sso.oidc.host }}
-    realm: {{ .Values.sso.oidc.realm }}
+    host: {{ default (include "sso.host" .) .Values.sso.oidc.host }}
+    realm: {{ default (include "sso.realm" .) .Values.sso.oidc.realm }}
 
-  {{- if .Values.sso.jwks }}
-  jwks: "{{ .Values.sso.jwks }}"
-  {{- else if .Values.sso.jwks_uri }}
-  jwks_uri: "{{ .Values.sso.jwks_uri }}"
+  {{- if or .Values.sso.jwks_uri (dig "oidc" "jwksUri" false .Values.sso) }}
+  jwks_uri: {{ include "sso.oidc.jwksuri" . | quote }}
+  {{- else if or .Values.sso.jwks (dig "oidc" "jwks" false .Values.sso) }}
+  jwks: {{ default (dig "oidc" "jwks" "" .Values.sso) .Values.sso.jwks | quote }}
   {{- end }}
 
-  {{- if .Values.sso.client_id}}
-  client_id: {{ .Values.sso.client_id }}
+  {{- if or .Values.sso.client_id (dig "sso" "client_id" false .Values.addons.authservice) }}
+  client_id: {{ default (dig "sso" "client_id" "" .Values.addons.authservice) .Values.sso.client_id }}
   {{- end }}
 
-  {{- if .Values.sso.client_secret }}
-  client_secret: {{ .Values.sso.client_secret }}
+  {{- if or .Values.sso.client_secret (dig "sso" "client_secret" false .Values.addons.authservice) }}
+  client_secret: {{ default (dig "sso" "client_secret" "" .Values.addons.authservice) .Values.sso.client_secret }}
   {{- end }}
 
-  {{- if .Values.sso.certificate_authority }}
-  certificate_authority: {{ .Values.sso.certificate_authority | quote }}
+  {{- if (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+  certificate_authority: {{ (default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority) | quote }}
+  {{- end }}
+
+  {{- if not $legacy }}
+  authorization_uri: {{ include "sso.oidc.auth" . }}
+  token_uri: {{ include "sso.oidc.token" . }}
+  logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
   {{- end }}
 
   {{- $authserviceValues := .Values.addons.authservice.values | default dict }}
@@ -114,6 +125,11 @@ chains:
     {{- end }}
     client_id: "{{ .Values.jaeger.sso.client_id }}"
     client_secret: "{{ .Values.jaeger.sso.client_secret }}"
+    {{- if not $legacy }}
+    authorization_uri: {{ include "sso.oidc.auth" . }}
+    token_uri: {{ include "sso.oidc.token" . }}
+    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
+    {{- end }}
   {{- end }}
 
   {{- if and .Values.tempo.enabled .Values.tempo.sso.enabled }}
@@ -133,6 +149,11 @@ chains:
     {{- end }}
     client_id: "{{ .Values.tempo.sso.client_id }}"
     client_secret: "{{ .Values.tempo.sso.client_secret }}"
+    {{- if not $legacy }}
+    authorization_uri: {{ include "sso.oidc.auth" . }}
+    token_uri: {{ include "sso.oidc.token" . }}
+    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
+    {{- end }}
   {{- end }}
 
   {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
@@ -149,6 +170,11 @@ chains:
     {{- end }}
     client_id: {{ .Values.monitoring.sso.prometheus.client_id }}
     client_secret: "{{ .Values.monitoring.sso.prometheus.client_secret }}"
+    {{- if not $legacy }}
+    authorization_uri: {{ include "sso.oidc.auth" . }}
+    token_uri: {{ include "sso.oidc.token" . }}
+    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
+    {{- end }}
 
   alertmanager:
     match:
@@ -163,5 +189,10 @@ chains:
     {{- end }}
     client_id: {{ .Values.monitoring.sso.alertmanager.client_id }}
     client_secret: "{{ .Values.monitoring.sso.alertmanager.client_secret }}"
+    {{- if not $legacy }}
+    authorization_uri: {{ include "sso.oidc.auth" . }}
+    token_uri: {{ include "sso.oidc.token" . }}
+    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
+    {{- end }}
   {{- end }}
 {{- end -}}

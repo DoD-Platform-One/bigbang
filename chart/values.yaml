@@ -48,37 +48,53 @@ git:
     publicKey: ""
     knownHosts: ""
 
-# -- Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages.
+# -- Global SSO values used for BigBang deployments when sso is enabled
 sso:
+  # -- Name of the identity provider.  This is used by some packages as the SSO login label.
+  name: SSO
+  # -- Base URL for the identity provider. For OIDC, this is the issuer.  For SAML this is the entityID.
+  url: https://login.dso.mil/auth/realms/baby-yoda
+
+  # -- Certificate authority for the identity provider's certificates
+  certificateAuthority:
+    # -- The certificate authority public certificate in .pem format.  Populating this will create a secret in each namespace that enables SSO.
+    cert: "" # See docs/assets/configs/example/dev-sso-values.yaml for an example
+    # -- The secret name to use for the certificate authority.  Can be manually populated if cert is blank.
+    secretName: tls-ca-sso
+
+  saml:
+    # -- SAML entityDescriptor (metadata) path
+    entityDescriptor: "{{ .Values.sso.url }}/protocol/saml/descriptor"
+    # -- SAML SSO Service path
+    service: "{{ .Values.sso.url }}/protocol/saml"
+    # -- Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Nexus, Twistlock, or Sonarqube.
+    metadata: "" # See docs/assets/configs/example/dev-sso-values.yaml for an example
+    # NOTE: SAML attribute names may vary by package.  Use the package values to setup attribute names
+
+  # -- OIDC endpoints can be retrieved from `{{ .Values.sso.url }}/.well-known/openid-configuration`
   oidc:
-    # -- Domain for keycloak used for configuring SSO
-    host: login.dso.mil
-    # -- Keycloak realm containing clients
-    realm: baby-yoda
-
-  # -- Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see docs/assets/configs/example/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages
-  certificate_authority: ""
-
-  # -- Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs
-  jwks: ''
-
-  # -- Optional use of JWKS fetcher config for ease of use and automation. Fill in JWKS URI value of OIDC endpoint, can be found under the well known OpenID metadata configuration page of your provider.
-  jwks_uri: ""
-
-  # -- OIDC client ID used for packages authenticated through authservice
-  client_id: ""
-
-  # -- OIDC client secret used for packages authenticated through authservice
-  client_secret: ""
-
-  # -- OIDC token URL template string (to be used as default)
-  token_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"
-
-  # -- OIDC auth URL template string (to be used as default)
-  auth_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"
-
-  # -- Kubernetes Secret containing the sso.certificate_authority value for SSO enabled application namespaces
-  secretName: "tls-ca-sso"
+    # -- OIDC authorization path
+    authorization: "{{ .Values.sso.url }}/protocol/openid-connect/auth"
+    # -- OIDC logout / end session path
+    endSession: "{{ .Values.sso.url }}/protocol/openid-connect/logout"
+    # -- OIDC JSON Web Key Set (JWKS) path
+    jwksUri: "{{ .Values.sso.url }}/protocol/openid-connect/certs"
+    # -- OIDC token path
+    token: "{{ .Values.sso.url }}/protocol/openid-connect/token"
+    # -- OIDC user information path
+    userinfo: "{{ .Values.sso.url }}/protocol/openid-connect/userinfo"
+    # -- Literal OIDC JWKS data retrieved from JWKS Uri.  Only needed if `jwsksUri` is not defined.
+    jwks: ""
+    # -- Identity provider claim names that store metadata about the authenticated user.
+    claims:
+      # -- IdP's claim name used for the user's email address.
+      email: email
+      # -- IdP's claim name used for the user's full name
+      name: name
+      # -- IdP's claim name used for the username
+      username: preferred_username
+      # -- IdP's claim name used for the user's groups or roles
+      groups: groups
 
 # -- (Advanced) Flux reconciliation parameters.
 # The default values provided will be sufficient for the majority of workloads.
@@ -736,26 +752,12 @@ twistlock:
     # -- SAML client ID
     client_id: ""
 
-    # -- SAML Povider Alias (optional)
-    provider_name: ""
-
     # -- SAML Identity Provider. `shibboleth` is recommended by Twistlock support for Keycloak
+    # Possible values: okta, gsuite, ping, shibboleth, azure, adfs
     provider_type: "shibboleth"
-
-    # -- Identity Provider url with path to realm
-    issuer_uri: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}"
-
-    # -- SAML Identity Provider SSO URL
-    idp_url: "https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml"
-
-    # -- Console URL of the Twistlock app (optional)
-    console_url: "https://twistlock.{{ .Values.domain }}"
 
     # -- Groups attribute (optional)
     groups: ""
-
-    # -- X.509 Certificate from Identity Provider (i.e. Keycloak). See https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/KEYCLOAK.md for format. Use the `|-` syntax for multiline string.
-    cert: ""
 
   # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
   values: {}
@@ -799,9 +801,6 @@ addons:
 
       # -- ArgoCD OIDC client secret
       client_secret: ""
-
-      # -- ArgoCD SSO login text
-      provider_name: ""
 
       # -- ArgoCD SSO group roles, see docs for more details: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
       groups: |
@@ -918,23 +917,9 @@ addons:
       # -- Gitlab OIDC client secret
       client_secret: ""
 
-      # -- Gitlab SSO login button label
-      label: ""
-
       # -- Gitlab SSO Scopes, default is ["Gitlab"]
       scopes:
       - Gitlab
-
-      # -- GitLab SSO Issuer URI,
-      # Only needed if your SSO is non-Keycloak
-      issuer_uri: ""
-
-      # -- GitLab SSO End Session URI,
-      # Only needed if your SSO is non-Keycloak
-      end_session_uri: ""
-
-      # -- Gitlab SSO UID field
-      uid_field: preferred_username
 
     database:
       # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
@@ -1040,7 +1025,7 @@ addons:
 
       # -- NXRM SAML SSO Integration data
       idp_data:
-        # Nexus saml URL. example: "https://nexus.example.mil/service/rest/v1/security/saml/metadata"
+        # Nexus saml URL. example: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
         entityId: ""
 
         # -- IdP Field Mappings
@@ -1058,10 +1043,6 @@ addons:
 
         # -- NXRM groups attribute (optional)
         groups: ""
-
-        # -- IDP SAML Metadata XML as a single line string in single quotes
-        # -- this information is public and does not require a secret
-        idpMetadata: ''
 
       # -- NXRM Role
       role:
@@ -1103,13 +1084,6 @@ addons:
 
       # -- SonarQube SAML client ID
       client_id: ""
-
-      # -- SonarQube SSO login button label
-      provider_name: ""
-
-      # -- SonarQube plaintext SAML sso certificate.
-      # example: MITCAYCBFyIEUjNBkqhkiG9w0BA....
-      certificate: ""
 
       # -- SonarQube login sso attribute.
       login: login
@@ -1198,14 +1172,14 @@ addons:
       gateway: ""
 
     sso:
-      # -- Toggle OIDC SSO for Anchore on and off.
+      # -- Toggle SAML SSO for Anchore on and off.
       # Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license).
       enabled: false
 
-      # -- Anchore OIDC client ID
+      # -- Anchore SAML client ID
       client_id: ""
 
-      # -- Anchore OIDC client role attribute
+      # -- Anchore SAML client role attribute
       role_attribute: ""
 
     database:
@@ -1305,18 +1279,6 @@ addons:
 
       # -- Mattermost OIDC client secret
       client_secret: ""
-
-      # -- Mattermost OIDC auth endpoint
-      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
-      auth_endpoint: ""
-
-      # -- Mattermost OIDC token endpoint
-      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
-      token_endpoint: ""
-
-      # -- Mattermost OIDC user API endpoint
-      # To get endpoint values, see here: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md#helm-values
-      user_api_endpoint: ""
 
     database:
       # -- Hostname of a pre-existing PostgreSQL database to use for Mattermost.

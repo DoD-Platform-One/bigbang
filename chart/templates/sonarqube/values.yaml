@@ -44,10 +44,10 @@ sonarProperties:
   sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
   sonar.core.serverBaseURL: https://sonarqube.{{ $domainName }}
   sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
-  sonar.auth.saml.providerName: {{ .Values.addons.sonarqube.sso.provider_name | default .Values.addons.sonarqube.sso.label }}
-  sonar.auth.saml.providerId: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
-  sonar.auth.saml.loginUrl: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/saml
-  sonar.auth.saml.certificate.secured: {{ .Values.addons.sonarqube.sso.certificate }}
+  sonar.auth.saml.providerName: {{ coalesce .Values.addons.sonarqube.sso.provider_name .Values.addons.sonarqube.sso.label .Values.sso.name }}
+  sonar.auth.saml.providerId: {{ include "sso.url" . }}
+  sonar.auth.saml.loginUrl: {{ include "sso.saml.service" . }}
+  sonar.auth.saml.certificate.secured: {{ default (include "sso.saml.cert" .) .Values.addons.sonarqube.sso.certificate }}
   sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}
   sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}
   sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}

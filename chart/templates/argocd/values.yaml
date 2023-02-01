@@ -168,14 +168,14 @@ sso:
   keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
   config:
     oidc.config: |
-      name: {{ .Values.addons.argocd.sso.provider_name }}
-      issuer: https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}
+      name: {{ default .Values.sso.name .Values.addons.argocd.sso.provider_name }}
+      issuer: {{ include "sso.url" . }}
       clientID: {{ .Values.addons.argocd.sso.client_id }}
       clientSecret: $oidc.keycloak.clientSecret
       requestedScopes: ["openid","ArgoCD"]
-      {{- if .Values.sso.certificate_authority }}
+      {{- if (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
       rootCA: |
-        {{- .Values.sso.certificate_authority | nindent 8 }}
+        {{- default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | nindent 8 }}
       {{- end }}
 {{- end }}
 {{- end -}}

@@ -226,10 +226,12 @@ minio:
 {{- end }}
 
 global:
-  {{- if and .Values.addons.gitlab.sso.enabled .Values.sso.certificate_authority}}
+  {{- if and .Values.addons.gitlab.sso.enabled (or (dig "certificateAuthority" "secretName" false .Values.sso) .Values.sso.secretName) }}
   certificates:
     customCAs:
-      - secret: tls-ca-sso
+      {{- if or .Values.sso.secretName (dig "certificateAuthority" "secretName" false .Values.sso) }}
+      - secret: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
+      {{- end }}
       - secret: ca-certs-australian-defence-organisation-cross-cert-chain
       - secret: ca-certs-australian-defence-organisation-direct-trust-chain
       - secret: ca-certs-boeing
