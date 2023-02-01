@@ -99,7 +99,7 @@ addons:
 
       extraInitContainers: |-
         - name: plugin
-          image: registry.dso.mil/platform-one/big-bang/apps/product-tools/keycloak-p1-auth-plugin/init-container:X.X.X
+          image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:X.X.X
           imagePullPolicy: Always
           command:
           - sh
