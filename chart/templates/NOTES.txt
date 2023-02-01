@@ -185,6 +185,208 @@ DEPRECATION NOTICE:
   Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager 
 {{- end }}
 
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+
+{{- with .Values }}
+{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .logging.sso.issuer .logging.sso.auth_url .logging.sso.token_url .logging.sso.userinfo_url .logging.sso.jwkset_url .logging.sso.claims_principal .logging.sso.endsession_url .logging.sso.claims_group .logging.sso.claims_mail .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
+DEPRECATION NOTICE:
+  The following SSO keys have been deprecated.  Deprecated keys will continue to work, but will be removed in a future release.  Please update your overrides.
+    {{- if coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName }}
+    sso:
+      {{- if coalesce .sso.oidc.host .sso.oidc.realm }}
+      oidc:
+        {{- if .sso.oidc.host }}
+        # "host" removed.  It is now implicitly defined in "sso.url".
+        host: {{ .sso.oidc.host }}
+        {{- end }}
+        {{- if .sso.oidc.realm }}
+        # "realm" removed.  It is now implicitly defined in "sso.url".
+        realm: {{ .sso.oidc.realm }}
+        {{- end }}
+      {{- end }}
+      {{- if .sso.certificate_authority }}
+      # "certificate_authority" was moved to "sso.certificateAuthority.cert".
+      certificate_authority: {{ .sso.certificate_authority | trunc 27 }}
+      {{- end }}
+      {{- if .sso.jwks }}
+      # "jwks" was moved to "sso.oidc.jwks". If possible, switch to using "sso.oidc.jwksUri" to dynamically retrieve metadata instead
+      jwks: {{ .sso.jwks }}
+      {{- end }}
+      {{- if .sso.jwks_uri }}
+      # "jwks_uri" was moved to "sso.oidc.jwksUri"
+      jwks_uri: {{ .sso.jwks_uri }}
+      {{- end }}
+      {{- if .sso.client_id }}
+      # "client_id" was moved to "addons.authservice.sso.client_id"
+      client_id: {{ .sso.client_id }}
+      {{- end }}
+      {{- if .sso.client_secret }}
+      # "client_secret" was moved to "addons.authservice.sso.client_secret"
+      client_secret: {{ .sso.client_secret }}
+      {{- end }}
+      {{- if .sso.token_url }}
+      # "token_url" was moved to "sso.oidc.token"
+      token_url: {{ .sso.token_url }}
+      {{- end }}
+      {{- if .sso.auth_url }}
+      # "auth_url" was moved to "sso.oidc.authorization"
+      auth_url: {{ .sso.auth_url }}
+      {{- end }}
+      {{- if .sso.secretName }}
+      # "secretName" was moved to "sso.certificateAuthority.secretName"
+      secretName: {{ .sso.secretName }}
+      {{- end }}
+    {{- end }}
+    {{- if coalesce .logging.sso.issuer .logging.sso.auth_url .logging.sso.token_url .logging.sso.userinfo_url .logging.sso.jwkset_url .logging.sso.claims_principal .logging.sso.endsession_url .logging.sso.claims_group .logging.sso.claims_mail }}
+    logging:
+      sso:
+        {{- if .logging.sso.issuer }}
+        # "issuer" was moved to "sso.url"
+        issuer: {{ .logging.sso.issuer }}
+        {{- end }}
+        {{- if .logging.sso.auth_url }}
+        # "auth_url" was moved to "sso.oidc.authorization"
+        auth_url: {{ .logging.sso.auth_url }}
+        {{- end }}
+        {{- if .logging.sso.token_url }}
+        # "token_url" was moved to "sso.oidc.token"
+        token_url: {{ .logging.sso.token_url }}
+        {{- end }}
+        {{- if .logging.sso.userinfo_url }}
+        # "userinfo_url" was moved to "sso.oidc.userinfo"
+        userinfo_url: {{ .logging.sso.userinfo_url }}
+        {{- end }}
+        {{- if .logging.sso.jwkset_url }}
+        # "jwkset_url" was moved to "sso.oidc.jwksUrl"
+        jwkset_url: {{ .logging.sso.jwkset_url }}
+        {{- end }}
+        {{- if .logging.sso.claims_principal }}
+        # "claims_principal" was moved to "sso.oidc.claims.username"
+        claims_principal: {{ .logging.sso.claims_principal }}
+        {{- end }}
+        {{- if .logging.sso.endsession_url }}
+        # "endsession_url" was moved to "sso.oidc.endsession"
+        endsession_url: {{ .logging.sso.endsession_url }}
+        {{- end }}
+        {{- if .logging.sso.claims_group }}
+        # "claims_group" was moved to "sso.oidc.claims.groups"
+        claims_group: {{ .logging.sso.claims_group }}
+        {{- end }}
+        {{- if .logging.sso.claims_mail }}
+        # "claims_mail" was moved to "sso.oidc.claims.email"
+        claims_mail: {{ .logging.sso.claims_mail }}
+        {{- end }}
+    {{- end }}
+    {{- if coalesce .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url }}
+    monitoring:
+      sso:
+        grafana:
+          {{- if .monitoring.sso.grafana.auth_url }}
+          # "auth_url" moved to "sso.oidc.authorization"
+          auth_url: {{ .monitoring.sso.grafana.auth_url }}
+          {{- end }}
+          {{- if .monitoring.sso.grafana.token_url }}
+          # "token_url" moved to "sso.oidc.token"
+          token_url: {{ .monitoring.sso.grafana.token_url }}
+          {{- end }}
+          {{- if .monitoring.sso.grafana.api_url }}
+          # "api_url" moved to "sso.oidc.userinfo"
+          api_url: {{ .monitoring.sso.grafana.api_url }}
+          {{- end }}
+    {{- end }}
+    {{- if coalesce .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert }}
+    twistlock:
+      sso:
+        {{- if .twistlock.sso.provider_name }}
+        # "provider_name" moved to "sso.name"
+        provider_name: {{ .twistlock.sso.provider_name }}
+        {{- end }}
+        {{- if .twistlock.sso.issuer_uri }}
+        # "issuer_uri" moved to "sso.url"
+        issuer_uri: {{ .twistlock.sso.issuer_uri }}
+        {{- end }}
+        {{- if .twistlock.sso.idp_url }}
+        # "idp_url" moved to "sso.saml.service"
+        idp_url: {{ .twistlock.sso.idp_url }}
+        {{- end }}
+        {{- if .twistlock.sso.console_url }}
+        # "console_url" deprecated.  It will be created from "twistlock.values.istio.console.hosts" or "twistlock.<domain>"
+        console_url: {{ .twistlock.sso.console_url }}
+        {{- end }}
+        {{- if .twistlock.sso.cert }}
+        # "cert" is derived from "sso.saml.metadata"
+        cert: {{ .twistlock.sso.cert | trunc 27 }}
+        {{- end }}
+    {{- end }}
+    {{- if coalesce .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate }}
+    addons:
+      {{- if .addons.argocd.sso.provider_name }}
+      argocd:
+        sso:
+          # "provider_name" moved to "sso.name"
+          provider_name: {{ .addons.argocd.sso.provider_name }}
+      {{- end }}
+      {{- if coalesce .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field -}}
+      gitlab:
+        sso:
+          {{- if .addons.gitlab.sso.label }}
+          # "label" moved to "sso.name"
+          label: {{ .addons.gitlab.sso.label }}
+          {{- end }}
+          {{- if .addons.gitlab.sso.issuer_uri }}
+          # "issuer_uri" moved to "sso.url"
+          issuer_uri: {{ .addons.gitlab.sso.issuer_uri }}
+          {{- end }}
+          {{- if .addons.gitlab.sso.end_session_uri }}
+          # "end_session_uri" moved to "sso.oidc.endSession"
+          end_session_uri: {{ .addons.gitlab.sso.end_session_uri }}
+          {{- end }}
+          {{- if .addons.gitlab.sso.uid_field }}
+          # "uid_field" moved to "sso.oidc.claims.username"
+          uid_field: {{ .addons.gitlab.sso.uid_field }}
+          {{- end }}
+      {{- end }}
+      {{- if coalesce .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint }}
+      mattermost:
+        sso:
+          {{- if .addons.mattermost.sso.auth_endpoint }}
+          # "auth_endpoint" moved to "sso.oidc.authorization"
+          auth_endpoint: {{ .addons.mattermost.sso.auth_endpoint }}
+          {{- end }}
+          {{- if .addons.mattermost.sso.token_endpoint }}
+          # "token_endpoint" moved "sso.oidc.token"
+          token_endpoint: {{ .addons.mattermost.sso.token_endpoint }}
+          {{- end }}
+          {{- if .addons.mattermost.sso.user_api_endpoint }}
+          # "user_api_endpoint" moved to "sso.oidc.userinfo"
+          user_api_endpoint: {{ .addons.mattermost.sso.user_api_endpoint }}
+          {{- end }}
+      {{- end }}
+      {{- if coalesce $nexusValues.sso.idp_data.idpMetadata }}
+      nexus:
+        sso:
+          {{- if $nexusValues.sso.idp_data.idpMetadata }}
+          # idpMetadata moved to "sso.saml.metadata"
+          idpMetadata: {{ $nexusValues.sso.idp_data.idpMetadata | trunc 27 }}
+          {{- end }}
+      {{- end }}
+      {{- if coalesce .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate }}
+      sonarqube:
+        sso:
+          {{- if .addons.sonarqube.sso.provider_name }}
+          # "provider_name" moved to "sso.name"
+          provider_name: {{ .addons.sonarqube.sso.provider_name }}
+          {{- end }}
+          {{- if .addons.sonarqube.sso.certificate }}
+          # "certificate" derived from "sso.saml.metadata"
+          certificate: {{ .addons.sonarqube.sso.certificate | trunc 27 }}
+          {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
 {{- if .Values.addons.mattermostoperator }}
 DEPRECATION NOTICE:
   .Values.addons.mattermostoperator has been deprecated and will be removed in a future Big Bang release.

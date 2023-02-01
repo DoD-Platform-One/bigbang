@@ -130,9 +130,6 @@ addons:
       enabled: true
       client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost
       client_secret: no-secret
-      auth_endpoint: https://login.dso.mil/oauth/authorize
-      token_endpoint: https://login.dso.mil/oauth/token
-      user_api_endpoint: https://login.dso.mil/api/v4/user
 ```
 
 ## Licensing

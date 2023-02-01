@@ -36,17 +36,27 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | git.credentials.username | string | `""` | HTTP git credentials, both username and password must be provided |
 | git.credentials.caFile | string | `""` | HTTPS certificate authority file.  Required for any repo with a self signed certificate |
 | git.credentials.privateKey | string | `""` | SSH git credentials, privateKey, publicKey, and knownHosts must be provided |
-| sso | object | `{"auth_url":"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth","certificate_authority":"","client_id":"","client_secret":"","jwks":"","jwks_uri":"","oidc":{"host":"login.dso.mil","realm":"baby-yoda"},"secretName":"tls-ca-sso","token_url":"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"}` | Global SSO values used for BigBang deployments when sso is enabled, can be overridden by individual packages. |
-| sso.oidc.host | string | `"login.dso.mil"` | Domain for keycloak used for configuring SSO |
-| sso.oidc.realm | string | `"baby-yoda"` | Keycloak realm containing clients |
-| sso.certificate_authority | string | `""` | Keycloak's certificate authority (PEM Format). Entered using chomp modifier (see docs/assets/configs/example/dev-sso-values.yaml for example). Used by authservice to support SSO for various packages |
-| sso.jwks | string | `""` | Keycloak realm's json web key output, obtained at https://<keycloak-server>/auth/realms/<realm>/protocol/openid-connect/certs |
-| sso.jwks_uri | string | `""` | Optional use of JWKS fetcher config for ease of use and automation. Fill in JWKS URI value of OIDC endpoint, can be found under the well known OpenID metadata configuration page of your provider. |
-| sso.client_id | string | `""` | OIDC client ID used for packages authenticated through authservice |
-| sso.client_secret | string | `""` | OIDC client secret used for packages authenticated through authservice |
-| sso.token_url | string | `"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/token"` | OIDC token URL template string (to be used as default) |
-| sso.auth_url | string | `"https://{{ .Values.sso.oidc.host }}/auth/realms/{{ .Values.sso.oidc.realm }}/protocol/openid-connect/auth"` | OIDC auth URL template string (to be used as default) |
-| sso.secretName | string | `"tls-ca-sso"` | Kubernetes Secret containing the sso.certificate_authority value for SSO enabled application namespaces |
+| sso | object | `{"certificateAuthority":{"cert":null,"secretName":"tls-ca-sso"},"name":"SSO","oidc":{"authorization":"{{ .Values.sso.url }}/protocol/openid-connect/auth","claims":{"email":"email","groups":"groups","name":"name","username":"preferred_username"},"endSession":"{{ .Values.sso.url }}/protocol/openid-connect/logout","jwks":null,"jwksUri":"{{ .Values.sso.url }}/protocol/openid-connect/certs","token":"{{ .Values.sso.url }}/protocol/openid-connect/token","userinfo":"{{ .Values.sso.url }}/protocol/openid-connect/userinfo"},"saml":{"attributes":{"email":"email","groups":"groups","name":"name","username":"login"},"entityDescriptor":"{{ .Values.sso.url }}/protocol/saml/descriptor","metadata":null,"service":"{{ .Values.sso.url }}/protocol/saml"},"url":"https://login.dso.mil/auth/realms/baby-yoda"}` | Global SSO values used for BigBang deployments when sso is enabled |
+| sso.name | string | `"SSO"` | Name of the identity provider.  This is used by some packages as the SSO login label. |
+| sso.url | string | `"https://login.dso.mil/auth/realms/baby-yoda"` | Base URL for the identity provider. For OIDC, this is the issuer.  For SAML this is the entityID. |
+| sso.certificateAuthority | object | `{"cert":null,"secretName":"tls-ca-sso"}` | Certificate authority for the identity provider's certificates |
+| sso.certificateAuthority.cert | string | `nil` | The certificate authority public certificate in .pem format.  Populating this will create a secret in each namespace that enables SSO. |
+| sso.certificateAuthority.secretName | string | `"tls-ca-sso"` | The secret name to use for the certificate authority.  Can be manually populated if cert is blank. |
+| sso.saml.entityDescriptor | string | `"{{ .Values.sso.url }}/protocol/saml/descriptor"` | SAML entityDescriptor (metadata) path |
+| sso.saml.service | string | `"{{ .Values.sso.url }}/protocol/saml"` | SAML SSO Service path |
+| sso.saml.metadata | string | `nil` | Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Nexus, Twistlock, or Sonarqube. |
+| sso.oidc | object | `{"authorization":"{{ .Values.sso.url }}/protocol/openid-connect/auth","claims":{"email":"email","groups":"groups","name":"name","username":"preferred_username"},"endSession":"{{ .Values.sso.url }}/protocol/openid-connect/logout","jwks":null,"jwksUri":"{{ .Values.sso.url }}/protocol/openid-connect/certs","token":"{{ .Values.sso.url }}/protocol/openid-connect/token","userinfo":"{{ .Values.sso.url }}/protocol/openid-connect/userinfo"}` | OIDC endpoints can be retrieved from `{{ .Values.sso.url }}/.well-known/openid-configuration` |
+| sso.oidc.authorization | string | `"{{ .Values.sso.url }}/protocol/openid-connect/auth"` | OIDC authorization path |
+| sso.oidc.endSession | string | `"{{ .Values.sso.url }}/protocol/openid-connect/logout"` | OIDC logout / end session path |
+| sso.oidc.jwksUri | string | `"{{ .Values.sso.url }}/protocol/openid-connect/certs"` | OIDC JSON Web Key Set (JWKS) path |
+| sso.oidc.token | string | `"{{ .Values.sso.url }}/protocol/openid-connect/token"` | OIDC token path |
+| sso.oidc.userinfo | string | `"{{ .Values.sso.url }}/protocol/openid-connect/userinfo"` | OIDC user information path |
+| sso.oidc.jwks | string | `nil` | Literal OIDC JWKS data retrieved from JWKS Uri.  Only needed if `jwsksUri` is not defined. |
+| sso.oidc.claims | object | `{"email":"email","groups":"groups","name":"name","username":"preferred_username"}` | Identity provider claim names that store metadata about the authenticated user. |
+| sso.oidc.claims.email | string | `"email"` | IdP's claim name used for the user's email address. |
+| sso.oidc.claims.name | string | `"name"` | IdP's claim name used for the user's full name |
+| sso.oidc.claims.username | string | `"preferred_username"` | IdP's claim name used for the username |
+| sso.oidc.claims.groups | string | `"groups"` | IdP's claim name used for the user's groups or roles |
 | flux | object | `{"install":{"remediation":{"retries":-1}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
 | networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","enabled":true,"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled` |

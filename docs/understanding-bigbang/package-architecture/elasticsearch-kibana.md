@@ -97,13 +97,6 @@ logging:
 SSO integration for the eck stack requires a license (see below) and can be configured with the following values:
 
 ```yaml
-sso:
-  oidc:
-    # -- Domain for keycloak used for configuring SSO
-    host: login.dso.mil
-    # -- Keycloak realm containing clients
-    realm: baby-yoda
-
 logging:
   sso:
     # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.

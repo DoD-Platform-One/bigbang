@@ -127,11 +127,7 @@ kiali:
     enabled: true
     client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-kiali
     client_secret: your_client_secret_or_empty_string
-# Kiali inherits/uses the global SSO settings for the host/realm
-sso:
-  oidc:
-    host: login.dso.mil
-    realm: baby-yoda
+# Kiali inherits/uses the global SSO settings at .sso
 ```
 
 If you require a more advanced SSO configuration there are additional ways to customize that are detailed in the [upstream OIDC docs](https://kiali.io/docs/configuration/authentication/openid/). This doc includes details on how to configure username, scope, timeout, proxies, and more. It also lists some [SSO provider specifics](https://kiali.io/docs/configuration/authentication/openid/#_provider_specific_instructions) which may be needed for configuring with different providers. If you want to provide any further configuration than what is included in the `kiali.sso` block, you can override the BB pre-configured SSO and pass values via `kiali.values.cr.spec.auth`.

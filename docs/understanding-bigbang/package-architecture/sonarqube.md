@@ -84,19 +84,12 @@ addons:
 SSO integration can be configured by modifying the following settings in the bigbang chart.
 
 ```yaml
-sso:
-  oidc:
-    host: login.dso.mil
-    realm: baby-yoda
-
 addons:
   sonarqube:
     enabled: true
     sso:
       enabled: true
       client_id: ""
-      label: ""
-      certificate: ""
       login: login
       name: name
       email: email

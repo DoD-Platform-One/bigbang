@@ -4,7 +4,8 @@
 
 {{- define "bigbang.defaults.twistlock" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
-domain: {{ default .Values.domain .Values.hostname }}
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
@@ -52,12 +53,12 @@ console:
 sso:
   enabled: {{ .Values.twistlock.sso.enabled }}
   client_id: {{ .Values.twistlock.sso.client_id }}
-  provider_name: {{ .Values.twistlock.sso.provider_name }}
+  provider_name: {{ default .Values.sso.name .Values.twistlock.sso.provider_name }}
   provider_type: {{ .Values.twistlock.sso.provider_type }}
-  issuer_uri: {{ tpl .Values.twistlock.sso.issuer_uri . }}
-  idp_url: {{ tpl .Values.twistlock.sso.idp_url . }}
-  console_url: {{ tpl .Values.twistlock.sso.console_url . }}
+  issuer_uri: {{ default (include "sso.url" .) (tpl (default "" .Values.twistlock.sso.issuer_uri) .) }}
+  idp_url: {{ default (include "sso.saml.service" .) (tpl (default "" .Values.twistlock.sso.idp_url) .) }}
+  {{- $console := first (dig "istio" "console" "hosts" (list (printf "twistlock.%s" $domainName)) .Values.twistlock.values) }}
+  console_url: {{ tpl (default (printf "https://%s" $console) .Values.twistlock.sso.console_url) . }}
   groups: {{ .Values.twistlock.sso.groups }}
-  cert: {{ .Values.twistlock.sso.cert | quote }}
-
+  cert: {{ default (include "sso.saml.cert.withheaders" .) .Values.twistlock.sso.cert | quote }}
 {{- end -}}

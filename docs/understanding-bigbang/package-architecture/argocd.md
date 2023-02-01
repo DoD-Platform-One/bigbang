@@ -57,7 +57,6 @@ addons:
       enabled: true
       client_id:
       client_secret: ""
-      provider_name: ""
       groups: |
         g, Impact Level 2 Authorized, role:admin
 ```
