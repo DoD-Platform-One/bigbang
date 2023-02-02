@@ -42,7 +42,7 @@ You can override bigbang's helm values so istio will provision a service of type
 ## Kubernetes Distribution Specific Notes
 
 * Note: P1 has forks of various [Kubernetes Distribution Vendor Repos](https://repo1.dso.mil/platform-one/distros), there's nothing special about the P1 forks.
-* We recommend you leverage the Vendors upstream docs in addition to any docs found in P1 Repos; infact, the Vendor's upstream docs are far more likely to be up to date.
+* We recommend you leverage the Vendors upstream docs in addition to any docs found in P1 Repos; in fact, the Vendor's upstream docs are far more likely to be up to date.
 
 ### Kubernetes Version
 
