@@ -58,7 +58,7 @@ k3d-dev.sh -b -p -m -d -h
 The script uses the default AWS profile and defaults the VPC id and AMI id. 
 To change this default behavior you can export environment variables before running the script.  
 
-Run the script with a specifc AWS profile by first exporting the AWS_PROFILE environment variable
+Run the script with a specific AWS profile by first exporting the AWS_PROFILE environment variable
 ```shell
 export AWS_PROFILE=my-aws-profile
 ```

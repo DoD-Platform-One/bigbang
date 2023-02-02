@@ -4,7 +4,7 @@
 
 Argo CD is a declarative, [GitOps](https://www.gitops.tech/) continuous delivery tool for Kubernetes.
 
-ArgoCD is a kubernetes native tool that enables the delivery of GitOps practices.  It uses a git repository as a source of truth in defining the desired state.  It is implemented as a kubernetes controller continously montoring running applications and reconciling it against the desired state in the source git repository.
+ArgoCD is a kubernetes native tool that enables the delivery of GitOps practices.  It uses a git repository as a source of truth in defining the desired state.  It is implemented as a kubernetes controller continuously monitoring running applications and reconciling it against the desired state in the source git repository.
 
 
 Argo CD uses an Application Controller component to continuously watch applications that are executing.  Argo CD then differentiates the applications live state against the target state that resides in the Git repository. It supports a range of configuration management tools such as [Helm](https://helm.sh/), [kustomize](https://kustomize.io/), [ksonnet](https://ksonnet.io/get-started/), and [jsonnet](https://jsonnet.org/).

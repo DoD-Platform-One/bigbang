@@ -28,7 +28,7 @@ kubectl apply -f https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/maste
 
 > k apply -f flux.yaml, is equivalent to "flux install", but it installs a version of flux that's been tested and gone through IronBank.
 
-### Now You Can See New CRD Objects Types Inside of the Cluster
+### Now You Can See New CRD Objects Types Inside the Cluster
 
 ```shell
 kubectl get crds | grep flux
@@ -43,4 +43,4 @@ git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
 ./bigbang/scripts/install_flux.sh
 ```
 
-> **NOTE** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE mesage with required arguments needed to complete installation.
+> **NOTE** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE message with required arguments needed to complete installation.
