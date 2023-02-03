@@ -8,7 +8,7 @@ fi
 
 if [[ -z "${AMI_ID}" ]]; then
   # default
-  AMI_ID=ami-0126fb88475632215
+  AMI_ID=$(aws ec2 describe-images --filters Name=owner-alias,Values=aws-marketplace Name=architecture,Values=x86_64 Name=name,Values="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" --query 'sort_by(Images, &CreationDate)[].ImageId | [0]' --output text)
 fi
 
 #### Preflight Checks
