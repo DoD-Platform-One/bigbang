@@ -12,8 +12,8 @@ There is a script that automates the creation and teardown of a remote k3d devel
 
 ### Required Access
 
-- AWS GovCloud "coder" account - talk to your team lead for access
-- [BigBang repository](https://repo1.dso.mil/platform-one/big-bang/bigbang)
+- AWS GovCloud "Big Bang dev" account - talk to your team government lead for access
+- [BigBang repository](https://repo1.dso.mil/big-bang/bigbang)
 - [Iron Bank registry](https://registry1.dso.mil/)
 
 ### Local Utilities
@@ -23,5 +23,3 @@ There is a script that automates the creation and teardown of a remote k3d devel
 - [AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [jq](https://stedolan.github.io/jq/download/)
 - optional: [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
-
-> For additional installation details, see [Software Installation and Verification Commands to run from Bash](https://repo1.dso.mil/platform-one/onboarding/big-bang/engineering-cohort/-/blob/master/lab_guides/01-Preflight-Access-Checks/A-software-check.md)
