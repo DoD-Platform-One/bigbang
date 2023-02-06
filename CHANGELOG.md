@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.23]
+### Changed
+- gitlab-triage pipeline change to allow for modular code
+
 ## [2.5.22]
 ### Added
 - Add support for deploy_k3d extra args volume mounts

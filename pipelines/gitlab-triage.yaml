@@ -8,25 +8,99 @@ stages:
   - dry_run
   - scheduled
 
+workflow:
+  rules:
+    # skip pipeline for MRs with docs label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
+      when: never
+    # skip pipeline for MRs with disable-ci label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)disable-ci(,|$)/
+      when: never
+    # run pipeline for manual tag events
+    - if: $CI_COMMIT_TAG
+    # run pipeline on merge request events
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # run pipeline on commits to default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+variables:
+  PIPELINE_REPO: https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates
+  PIPELINE_REPO_BRANCH: master
+
 before_script:
   - gitlab-triage --version  # For debugging
-  - curl -L https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/raw/master/library/templates.sh -o templates.sh
+  - curl -L ${PIPELINE_REPO}/-/raw/${PIPELINE_REPO_BRANCH}/library/templates.sh -o templates.sh
   - source ./templates.sh
 
-gitlab-triage:
+gitlab-triage-issues:
   stage: dry_run
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      exists: 
+        - policies/issues/*
+      changes:
+        - policies/issues/*
   extends:
     - .generic-runner-tags
-  except:
-    - schedules
   script:
-    - gitlab_triage_dryrun
+    - gitlab_triage_dryrun $(find policies/issues -type f | awk '{print "--policies-file", $1}')
 
-gitlab-triage:on-schedule:
-  stage: scheduled
-  only:
-    - schedules
+gitlab-triage-merge-requests:
+  stage: dry_run
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      exists: 
+        - policies/merge_requests/*
+      changes:
+        - policies/merge_requests/*
   extends:
     - .generic-runner-tags
   script:
-    - gitlab_triage
+    - gitlab_triage_dryrun $(find policies/merge_requests -type f | awk '{print "--policies-file", $1}')
+
+gitlab-triage-branches:
+  stage: dry_run
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      exists: 
+        - policies/branches/*
+      changes:
+        - policies/branches/*
+  extends:
+    - .generic-runner-tags
+  script:
+    - gitlab_triage_dryrun $(find policies/branches -type f | awk '{print "--policies-file", $1}')
+
+gitlab-triage-issues:on-schedule:
+  stage: scheduled
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists: 
+        - policies/issues/*
+  extends:
+    - .generic-runner-tags
+  script:
+    - gitlab_triage $(find policies/issues -type f | awk '{print "--policies-file", $1}')
+
+gitlab-triage-merge-requests:on-schedule:
+  stage: scheduled
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists: 
+        - policies/merge_requests/*
+  extends:
+    - .generic-runner-tags
+  script:
+    - gitlab_triage_dryrun $(find policies/merge_requests -type f | awk '{print "--policies-file", $1}')
+
+gitlab-triage-branches:on-schedule:
+  stage: scheduled
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      exists: 
+        - policies/branches/*
+  extends:
+    - .generic-runner-tags
+  script:
+    - gitlab_triage_dryrun $(find policies/branches -type f | awk '{print "--policies-file", $1}')
+
