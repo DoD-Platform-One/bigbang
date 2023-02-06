@@ -9,6 +9,6 @@ spec:
     /**/*.txt
     /**/*.sh
   interval: 10m
-  url: https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+  url: https://repo1.dso.mil/big-bang/bigbang.git
   ref:
     tag: 1.52.0
