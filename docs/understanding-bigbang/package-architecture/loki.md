@@ -69,24 +69,14 @@ loki:
   strategy: scalable
 
   values:
-    global:
-      # -- Create Loki config for all sub-charts.
-      # Uses data within 'global.config' value
-      createGlobalConfig: true
-      # -- Secret which Pods will consume for config.
-      # Only use if 'global.createGlobalConfig' is true.
-      # Default: "loki-config"
-      existingSecretForConfig: "loki-config"
-    
-    loki-simple-scalable:
-      # Configuration for the write node(s)
-      write:
-        # -- Number of replicas for the write
-        replicas: 2
-      # Configuration for the read node(s)
-      read:
-        # -- Number of replicas for the read
-        replicas: 2
+    # Configuration for the write node(s)
+    write:
+      # -- Number of replicas for the write
+      replicas: 2
+    # Configuration for the read node(s)
+    read:
+      # -- Number of replicas for the read
+      replicas: 2
 ```
 
 ### UI
