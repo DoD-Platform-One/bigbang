@@ -229,7 +229,7 @@ global:
   {{- if and .Values.addons.gitlab.sso.enabled (or (dig "certificateAuthority" "secretName" false .Values.sso) .Values.sso.secretName) }}
   certificates:
     customCAs:
-      {{- if or .Values.sso.secretName (dig "certificateAuthority" "secretName" false .Values.sso) }}
+      {{- if and .Values.addons.gitlab.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
       - secret: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
       {{- end }}
       - secret: ca-certs-australian-defence-organisation-cross-cert-chain
