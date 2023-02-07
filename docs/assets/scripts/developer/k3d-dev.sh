@@ -194,15 +194,9 @@ fi
 
 ##### Launch Specification
 # Typical settings for Big Bang development
-AMIName="ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server*"
 InstanceType="${InstSize}"
 VolumeSize=120
 
-# Lookup the image name to find the latest version
-# echo -n Retrieving latest image ID matching ${AMIName} ...
-# ImageId=$(aws ec2 describe-images --output json --no-cli-pager --filters "Name=name,Values=${AMIName}" --query "reverse(sort_by(Images, &CreationDate))[:1].ImageId" --output text)
-#echo done
-# Hardcode the latest image instead of searching for it to avoid unexpected changes
 echo "Using AMI image id ${AMI_ID}"
 ImageId="${AMI_ID}"
 
@@ -344,9 +338,9 @@ echo
 
 echo
 echo "installing packages"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt remove -y docker docker-engine docker.io containerd runc"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt -y update"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get remove -y docker docker-engine docker.io containerd runc"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get -y update"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common"
 
 echo
 echo
@@ -362,7 +356,7 @@ echo
 echo
 # Install Docker
 echo "install Docker"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io kubectl jq tree vim"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io kubectl jq tree vim"
 
 echo
 echo
