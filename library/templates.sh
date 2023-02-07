@@ -1301,6 +1301,8 @@ create_bigbang_merge_request() {
         package="gatekeeper"
     elif [[ ${CI_PROJECT_NAME} == "kyverno-policies" ]]; then
         package="kyvernopolicies"
+    elif [[ ${CI_PROJECT_NAME} == "kyverno-reporter" ]]; then
+        package="kyvernoreporter"
     elif [[ ${CI_PROJECT_NAME} == "elasticsearch-kibana" ]]; then
         package="logging"
     elif [[ ${CI_PROJECT_NAME} == "eck-operator" ]]; then
