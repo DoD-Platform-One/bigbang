@@ -56,19 +56,20 @@ sonarProperties:
   {{- end }}
 {{- end }}
 
-# External Postgres config
 {{- with .Values.addons.sonarqube.database }}
-postgresql:
   {{- if and .host .username .password .database .port }}
+# External Postgres config
+jdbcOverwrite:
+  enable: true
+  jdbcUrl: "jdbc:postgresql://{{ .host }}:{{ .port }}/{{ .database }}?socketTimeout=1500"
+  jdbcUsername: {{ .username }}
+  jdbcSecretName: sonarqube-db-secret
+  jdbcSecretPasswordKey: postgresql-password
+postgresql:
   # Use external database
   enabled: false
-  postgresqlServer: {{ .host }}
-  postgresqlDatabase: {{ .database }}
-  postgresqlUsername: {{ .username }}
-  existingSecret: sonarqube-db-secret
-  service:
-    port: {{ .port }}
   {{- else }}
+postgresql:
   {{- if $istioInjection }}
   master:
     podAnnotations:
@@ -79,6 +80,8 @@ postgresql:
   {{- end }}
   # Use internal database, defaults are fine
   enabled: true
+  service:
+    port: {{ .port }}
   {{- end }}
 {{- end }}
 
