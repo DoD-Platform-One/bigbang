@@ -2,12 +2,18 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [1.1.1] - 2023-01-26
+---
+## [1.1.0-bb.2] - 2023-02-07
+### Changed
+- Updated kubectl to v1.26.1
+- Updated gluon to 0.3.2
+
+## [1.1.0-bb.1] - 2023-01-26
 ### Changed
 - Updated kubectl to v1.25.6
 - Updated gluon to 0.3.1
 
-## [1.1.0] - 2023-01-11
+## [1.1.0-bb.0] - 2023-01-11
 ### Changed
 - Removed `disallow-shared-subpath-volume-writes` policy (no longer beneficial for any non-EOL k8s versions)
 - Removed Ironbank key from test values
