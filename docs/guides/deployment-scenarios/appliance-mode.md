@@ -11,13 +11,13 @@ There is a values.yaml file in this same directory which provides an example of 
 | Flux | source, helm, kustomize & notification controllers |
 | Istio | Possibly too heavy for reduced compute but still able to run on above machine |
 | Jaeger | Not enough value to justify value and footprint above Tempo |
-| Tempo | integrated with grafana to provide tracing capability |
+| Tempo | tracing capability integrated with grafana |
 | Kiali | Not enough value to justify running in smaller footprint |
 | Monitoring | Prometheus/Alertmanager/Grafana for monitoring/alerting |
 | ECK | Too heavy for reduced compute |
 | Loki/Promtail | need logging |
 | Gatekeeper/Kyverno | Static environment on edge, compliance will be validated in development/cloud |
-| Cluster Auditor | Static environment on edge, compliance will be validated in development/cloud |
-| Twistlock | Runtime security at least |
+| Cluster Auditor/Kyerno Reporter | Static environment on edge, compliance will be validated in development/cloud |
+| Twistlock/Neuvector | Runtime security at least |
 
 Review and reference [the values file in the configs folder to deploy BigBang in Appliance Mode](../../assets/configs/appliance-mode/values.yaml).
