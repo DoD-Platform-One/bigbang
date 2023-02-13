@@ -9,11 +9,29 @@ domain: {{ $domainName }}
 
 enterprise: {{ .Values.istio.enterprise }}
 
-{{- if not (semverCompare "<1.19" .Capabilities.KubeVersion.GitVersion) }}
 istiod:
+{{- if not (semverCompare "<1.19" .Capabilities.KubeVersion.GitVersion) }}
   env: 
     - name: ENABLE_LEGACY_FSGROUP_INJECTION
       value: "false"
+{{- end }}
+# Change default hpaSpec to ensure generated HPA uses autoscaling/v2
+{{- if (semverCompare ">=1.23" .Capabilities.KubeVersion.GitVersion) }}
+  hpaSpec:
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 60
+{{- else }}
+  hpaSpec:
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          targetAverageUtilization: 60
 {{- end }}
 
 {{- if or .Values.jaeger.enabled .Values.tempo.enabled }}
