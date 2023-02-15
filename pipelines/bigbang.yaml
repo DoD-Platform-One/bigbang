@@ -85,6 +85,7 @@ pre vars:
     - pre_vars
     - check_changes
     - label_check
+    - package_lint
     - oscal_validate
 
   artifacts:
