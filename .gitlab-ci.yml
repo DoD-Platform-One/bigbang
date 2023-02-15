@@ -4,4 +4,4 @@ include:
     file: '/pipelines/bigbang-package.yaml' 
 variables:
   PIPELINE_REPO_BRANCH: 'mr-creation-updates' 
-  DEBUG_ENABLED: "false"
+  DEBUG_ENABLED: "true"
