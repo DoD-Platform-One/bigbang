@@ -1,7 +1,7 @@
 include:
-  - project: 'platform-one/big-bang/pipeline-templates/pipeline-templates'
-    ref: 'refactor-auto-bb-mr'
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: 'mr-creation-updates'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'refactor-auto-bb-mr' 
-  DEBUG_ENABLED: "true"
+  PIPELINE_REPO_BRANCH: 'mr-creation-updates' 
+  DEBUG_ENABLED: "false"
