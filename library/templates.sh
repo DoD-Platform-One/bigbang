@@ -870,10 +870,15 @@ package_upgrade_test() {
    echo -e "\e[0Ksection_end:`date +%s`:package_test2\r\e[0K"
 }
 
-package_structure() {
-    echo -e "\e[0Ksection_start:`date +%s`:package_tree[collapsed=true]\r\e[0K\e[33;1mPackage Directory Structure\e[37m"
-    tree .
-    echo -e "\e[0Ksection_end:`date +%s`:package_tree\r\e[0K"
+package_lint() {
+  echo -e "\e[0Ksection_start:`date +%s`:package_lint[collapsed=true]\r\e[0K\e[33;1mPackage Linting\e[37m"
+  echo "Linting with default values using `helm lint chart`..."
+  helm lint chart
+  if [ $(ls -1 tests/test-values.y*ml 2>/dev/null | wc -l) -gt 0 ]; then
+    echo "Linting with test values using `helm template chart -f tests/test-values.y*ml 1>/dev/null`..."
+    helm template chart -f tests/test-values.y*ml 1>/dev/null # Discard template stdout since we only care about the exit code/stderr
+  fi
+  echo -e "\e[0Ksection_end:`date +%s`:package_lint\r\e[0K"
 }
 
 package_deprecation_check() {

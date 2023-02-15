@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.25]
+### Changed
+- Removed `tree` command and replaced with `helm lint`/`helm template`
+- Add linting to BB pipeline
+
 ## [2.5.24]
 ### Changed
 - Fixed bug with kyverno reporter MR creation

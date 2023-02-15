@@ -44,8 +44,8 @@ configuration validation:
     - .util-image
     - .templates
   script:
-    # Print Package Directory Structure
-    - package_structure
+    # Basic linting check
+    - package_lint
     # Kyverno policy tests
     - bash ${PIPELINE_REPO_DESTINATION}/scripts/policies/kyverno_policy_tests.sh
     # Package API Deprecation Check
