@@ -41,7 +41,7 @@ This pipeline is triggered by the following for individual bigbang packages:
 
 ### Chart Update Check
 
-This stage validates that the required files have been updated; README, Changelog, and Chart.yaml. All of these are needed to ensure a package releases can be created. If changes are only documentation a 'SKUP UPDATE CHECK' can be added to the merge request title to skip this check.
+This stage validates that the required files have been updated; README, Changelog, and Chart.yaml. All of these are needed to ensure a package releases can be created. If changes are only documentation a 'SKIP UPDATE CHECK' can be added to the merge request title to skip this check.
 
 ### Configuration Validation
 
@@ -68,7 +68,7 @@ When there is a merge into the default branch of a package this stage is trigger
 
 ### Package 
 
-This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging the repo, preping release, publishing to the s3 bucket, and pulling release notes from the changelog.
+This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging the repo, prepping release, publishing to the s3 bucket, and pulling release notes from the changelog.
 
 ### Release
 
@@ -121,7 +121,7 @@ This stage is ran on every merge request event, and is a requirement for merging
 
 ### Package 
 
-This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging repos, preping release, publishing to the s3 bucket, and pulling release notes from the changelog.
+This stage is triggered when a protected tag is created. It is responsible for populating the image list, packaging repos, prepping release, publishing to the s3 bucket, and pulling release notes from the changelog.
 
 ### Release
 
@@ -131,7 +131,7 @@ Upon successful completion of the package stage this release stage will use thos
 
 Ultimately, BigBang is designed to deploy production ready workloads on real infrastructure.  While local and ephemeral clusters are excellent for fast feedback during development, changes must ultimately be tested on real clusters on real infrastructure.
 
-As part of BigBang's architecture, it is expected work on any CNCF conformant kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
+As part of Big Bang's architecture, it is expected work on any CNCF conformant Kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
 This requires adding `test-ci::infra` label to your MR. In addition, infrastructure testing pipeline is run nightly on a schedule.
 
 Note: Due to the amount of resources and time required for this pipeline, the `test-ci::infra` label should be used sparingly. The scheduled nightly run will ideally catch issues if they are already in master. The `test-ci::infra` label should mainly be used when:
