@@ -1,4 +1,7 @@
 {{- define "bigbang.defaults.neuvector" -}}
+# Includes suffix of "A1a" to ensure password always meets default minimum password requirements
+{{- $neuvectorMetricsPass := join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2))}}
+
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
 istio:
@@ -6,8 +9,38 @@ istio:
   neuvector:
     gateways:
     - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}
+{{- if .Values.monitoring.enabled }}
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: true
+
+controller:
+  podAnnotations:
+    checksum/metrics-pass: {{ sha256sum $neuvectorMetricsPass }}
+  secret:
+    enabled: true
+    data: 
+      # This configuration is read in at deploy time and users are created.
+      userinitcfg.yaml:
+        always_reload: true
+        users:
+        - username: metrics
+          password: {{ $neuvectorMetricsPass }}
+          role: reader
+          fullname: metrics
+    
+monitor:
+  install: true
+  exporter:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+    svc:
+      enabled: true
+      type: ClusterIP
+    CTRL_USERNAME: metrics
+    CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
+{{- end }}
+
 manager:
   env:
     ssl: false
