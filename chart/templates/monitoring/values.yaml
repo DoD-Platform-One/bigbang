@@ -183,6 +183,11 @@ grafana:
   envFromSecret: grafana-env-secret
   {{- end }}
 
+  {{- if .Values.tempo.enabled }}
+  env:
+    GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor tempoSearch tempoServiceGraph"
+  {{- end }}
+
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
     pullSecrets:
@@ -431,7 +436,6 @@ prometheusOperator:
       {{- if and (dig "additionalScrapeConfigs"  list $default) (dig "additionalScrapeConfigs"  list $overlay) }}
          {{ $_ := set $overlay "additionalScrapeConfigs" (concat $default.additionalScrapeConfigs $overlay.additionalScrapeConfigs) }}
       {{- end }}
-     
 
     {{- end }}
   {{- end }}
