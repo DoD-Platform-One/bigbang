@@ -4,11 +4,15 @@
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
+
+openshift: {{ .Values.openshift }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   neuvector:
     gateways:
     - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}
+
 {{- if .Values.monitoring.enabled }}
 monitoring:
   enabled: true
@@ -41,9 +45,19 @@ monitor:
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
 {{- end }}
 
+{{- if .Values.istio.enabled }}
 manager:
   env:
     ssl: false
+{{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.neuvector.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 {{- end }}
 
 {{- /* Create secret */ -}}
