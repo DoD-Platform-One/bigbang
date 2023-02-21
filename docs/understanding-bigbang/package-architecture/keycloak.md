@@ -259,6 +259,18 @@ addons:
       replicas: 3
 ```
 
+The Keycloak package also comes with a HorizontalPodAutoscaler resource which can be enabled. Enabling the HPA will overwrite the `replicas` key shown above:
+
+```yaml
+addons:
+  keycloak:
+    values:
+      autoscaling:
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 4
+```
+
 ## Dependent Packages
 
 - Istio for ingress
