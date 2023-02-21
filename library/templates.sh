@@ -1282,10 +1282,25 @@ create_tag() {
 
 create_bigbang_merge_request() {
     echo -e "\e[0Ksection_start:`date +%s`:create_bigbang_merge_request[collapsed=true]\r\e[0K\e[33;1mCreating Big Bang Merge Request\e[37m"
-    ## If MR contains "skip-bb-mr" dont create Big Bang merge request
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
-    BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.iid) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
-    MR_LABELS=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${BB_MR_ID}" | jq '"\(.labels)"')
+
+    # Get a list of most recently merged package MRs
+    curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged&sort_by=updated_at" > package_mr_list.json
+    # Filter to find the one with the same commit as this `main` pipeline
+    PACKAGE_MR_ID=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .iid' package_mr_list.json)
+    PACKAGE_MR_URL=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .web_url' package_mr_list.json)
+    PACKAGE_MR_ASSIGNEES=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .assignees[].id' package_mr_list.json)
+    BB_MR_ASSIGNEE=""
+    # Filter out 10368 (bigbang-bot user), convert to push options
+    for mr_assignee in $(echo ${PACKAGE_MR_ASSIGNEES}); do
+      if [[ "${mr_assignee}" != "10368" ]]; then
+        BB_MR_ASSIGNEE+="-o merge_request.assign=${mr_assignee} "
+      fi
+    done
+
+
+    ## If MR contains "skip-bb-mr" dont create Big Bang merge request
+    MR_LABELS=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${PACKAGE_MR_ID}" | jq '"\(.labels)"')
     if [[ "${MR_LABELS}" == *"skip-bb-mr"* ]]; then
       echo "Skipping auto Big Bang merge request."
       exit
@@ -1332,30 +1347,28 @@ create_bigbang_merge_request() {
 
     ## Data that will be used to create Big Bang MRs
 
-    # The latest git tag for the Big Bang package repo
-    LATEST_GIT_TAG=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/repository/tags" | jq '.[].name' | head -1 | sed 's/\"//g')
-
     # Get the URL of the latest CHANGELOG.md file
-    CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${LATEST_GIT_TAG}/CHANGELOG.md
-
-    # Get the URL of the relevant package MR
-    PACKAGE_MR_URL=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged" | jq '.[] | "\(.web_url) \(.merged_at)"' | sort -t ' ' -k2.1,2.4nr -k2.6,2.7nr -k2.9,2.10nr -k2.12,2.13nr -k2.15,2.16nr -k2.18,2.19nr -k2.21,2.23nr | head -1 | tr -d '"' |cut -d' ' -f1)
+    CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${TAG_VERSION}/CHANGELOG.md
 
     # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
     BB_MR_REVIEWER_NAMES=( "micah.nagel" "ryan.j.garcia" "rob.ferguson" )
+    BB_MR_REVIEWER_IDS=""
 
     # Collect user IDs from /users API endpoint
     # Add "%2C" to the end of every user ID for URL encoding commas
     for reviewer in "${BB_MR_REVIEWER_NAMES[@]}"; do
-        BB_MR_REVIEWER_IDS+=$(curl -s "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id' | sed 's/$/%2C/')
+      REVIEWER_ID=$(curl -s "https://repo1.dso.mil/api/v4/users?username=${reviewer}" | jq '.[].id')
+      if [[ ${BB_MR_ASSIGNEE} != *"${REVIEWER_ID}"* ]]; then
+        BB_MR_REVIEWER_IDS+=$(echo ${REVIEWER_ID} | sed 's/$/%2C/')
+      fi
     done
 
     ## Pull down Big Bang repo, create a new branch, and configure git
-    BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${LATEST_GIT_TAG}"
+    BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${TAG_VERSION}"
     git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION} 1>/dev/null
     cd ${BB_REPO_DESTINATION}
     git checkout -b ${BB_SOURCE_BRANCH} 1>/dev/null
-    git config user.email "mr.bot@automr.com"
+    git config user.email "mr.bot@bigbang.dev"
     git config user.name "mr.bot"
 
     # Avoiding MRing non-bb packages, will cancel out of potential MR
@@ -1371,7 +1384,7 @@ create_bigbang_merge_request() {
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
-        yq e -i ".${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE}
+        yq e -i ".${package}.git.tag = \"${TAG_VERSION}\"" ${VALUES_FILE}
 
         # Adding blank lines back to values file before pushing changes
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
@@ -1383,7 +1396,7 @@ create_bigbang_merge_request() {
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
-        yq e -i ".addons.${package}.git.tag = \"${LATEST_GIT_TAG}\"" ${VALUES_FILE}
+        yq e -i ".addons.${package}.git.tag = \"${TAG_VERSION}\"" ${VALUES_FILE}
 
         # Adding blank lines back to values file before pushing changes
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
@@ -1396,10 +1409,11 @@ create_bigbang_merge_request() {
     git commit -m "Updated ${CI_PROJECT_NAME} git tag" 1>/dev/null
     git push --set-upstream origin ${BB_SOURCE_BRANCH} \
       -o merge_request.create \
-      -o merge_request.title="Draft: Updated ${CI_PROJECT_NAME} git tag" \
+      -o merge_request.title="Draft: ${CI_PROJECT_NAME} update to ${TAG_VERSION}" \
       -o merge_request.label="status::review"	\
       -o merge_request.label="bot::mr"	\
-      -o merge_request.label=${package} 1>/dev/null
+      -o merge_request.label=${package} \
+      ${BB_MR_ASSIGNEE} 1>/dev/null
 
 
     ## Update merge request with reviewers and a description
