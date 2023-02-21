@@ -55,7 +55,11 @@ addons:
         -----END CERTIFICATE-----
 
     values:
-      replicas: 3
+      #replicas: 3
+      autoscaling:
+        enabled: true
+        minReplcias: 2
+        maxReplicas: 5
       command:
         - "/opt/keycloak/bin/kc.sh"
       args:
