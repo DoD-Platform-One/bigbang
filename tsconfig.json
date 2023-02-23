@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": false,
     "lib": ["es2015", "es2017"],
-    "module": "commonjs",
+    "module": "es2022",
     "moduleResolution": "node",
     "target": "es5",
     "noImplicitReturns": true,
@@ -12,7 +12,7 @@
     "strict": false,
     "sourceMap": true,
     "outDir": "./lib",
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
     "declaration": true
