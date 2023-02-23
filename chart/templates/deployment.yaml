@@ -19,6 +19,9 @@ spec:
         # required for the operator SDK metric service selector
         name: {{ include "kiali-operator.fullname" . }}
       {{- include "kiali-operator.labels" . | nindent 8 }}
+      {{- if .Values.podLabels }}
+      {{- toYaml .Values.podLabels | nindent 8 }}
+      {{- end }}
       annotations:
         prometheus.io/scrape: {{ .Values.metrics.enabled | quote }}
         {{- if .Values.podAnnotations }}
