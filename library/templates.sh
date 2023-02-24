@@ -1294,6 +1294,12 @@ create_bigbang_merge_request() {
     curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests?state=merged&sort_by=updated_at" > package_mr_list.json
     # Filter to find the one with the same commit as this `main` pipeline
     PACKAGE_MR_ID=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .iid' package_mr_list.json)
+    # If MR not found in Gitlab, exit with warnings
+    # Safeguard against pushes direct to `main`, etc
+    if [[ -z ${PACKAGE_MR_ID} ]]; then
+      echo "Package MR not found, skipping auto Big Bang merge request."
+      exit 201
+    fi
     PACKAGE_MR_URL=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .web_url' package_mr_list.json)
     PACKAGE_MR_ASSIGNEES=$(yq '.[] | select(.merge_commit_sha == strenv(CI_COMMIT_SHA)) | .assignees[].id' package_mr_list.json)
     BB_MR_ASSIGNEE=""
@@ -1303,7 +1309,6 @@ create_bigbang_merge_request() {
         BB_MR_ASSIGNEE+="-o merge_request.assign=${mr_assignee} "
       fi
     done
-
 
     ## If MR contains "skip-bb-mr" dont create Big Bang merge request
     MR_LABELS=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID}/merge_requests/${PACKAGE_MR_ID}" | jq '"\(.labels)"')
