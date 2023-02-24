@@ -624,16 +624,6 @@ fluentbit:
       privileged: true
     bbtests:
       enabled: true
-    config:
-      inputs: |
-        [INPUT]
-            Name tail
-            Path /var/log/containers/*flux-system*.log
-            Parser containerd
-            Tag kube.*
-            Mem_Buf_Limit 50MB
-            Skip_Long_Lines On
-            storage.type filesystem
 
 loki:
   enabled: false
