@@ -1099,17 +1099,23 @@ changelog_update_check() {
 }
 
 dependency_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Dependency Images\e[37m"
-   deps=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
-   echo $deps | jq -r '.images[].repoTags[0] | select(. != null)' | tee dependencies.txt
-   echo -e "\e[0Ksection_end:`date +%s`:dep_images\r\e[0K"
+  echo -e "\e[0Ksection_start:`date +%s`:dep_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Dependency Images\e[37m"
+  nodes=$(timeout 65 bash -c "until docker ps --format '{{.Names}}' | grep \"${CI_JOB_ID}-agent-\|${CI_JOB_ID}-server-\"; do sleep 10; done;")
+  for node in $nodes; do
+    images=$(timeout 65 bash -c "until docker exec -i $node crictl images -o json; do sleep 10; done;")
+    echo $images | jq -r '.images[].repoTags[0] | select(. != null)' >> dependencies.txt
+  done
+  echo -e "\e[0Ksection_end:`date +%s`:dep_images\r\e[0K"
 }
 
 installed_images() {
-   echo -e "\e[0Ksection_start:`date +%s`:inst_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Installed Images\e[37m"
-   images=$(timeout 65 bash -c "until docker exec -i k3d-${CI_JOB_ID}-server-0 crictl images -o json; do sleep 10; done;")
-   echo $images | jq -r '.images[].repoTags[0] | select(. != null)' | tee full-list.txt
-   echo -e "\e[0Ksection_end:`date +%s`:inst_images\r\e[0K"
+  echo -e "\e[0Ksection_start:`date +%s`:inst_images[collapsed=true]\r\e[0K\e[33;1mGetting List of Installed Images\e[37m"
+  nodes=$(timeout 65 bash -c "until docker ps --format '{{.Names}}' | grep \"${CI_JOB_ID}-agent-\|${CI_JOB_ID}-server-\"; do sleep 10; done;")
+  for node in $nodes; do
+    images=$(timeout 65 bash -c "until docker exec -i $node crictl images -o json; do sleep 10; done;")
+    echo $images | jq -r '.images[].repoTags[0] | select(. != null)' >> full-list.txt
+  done
+  echo -e "\e[0Ksection_end:`date +%s`:inst_images\r\e[0K"
 }
 
 image_list_creation() {
