@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.27]
+### Fixed
+- Modified image lists to pull from all nodes rather than just server
+
 ## [2.5.26]
 ### Changed
 - Modified logic surrounding BB MR creation to definitively grab the package MR
