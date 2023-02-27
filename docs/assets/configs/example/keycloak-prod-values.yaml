@@ -123,12 +123,16 @@ addons:
           stringData:
             quarkus.properties: |-
               quarkus.http.non-application-root-path=/
-              quarkus.kc-routing-redirects.urls./=/auth/realms/YOUR-REALM-NAME/account
-              quarkus.kc-routing-redirects.urls./auth=/auth/realms/YOUR-REALM-NAME/account
-              quarkus.kc-routing-redirects.urls./register=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/registrations?client_id=account&response_type=code
-              quarkus.kc-routing-redirects.path-prefixes./oauth/authorize=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/auth
-              quarkus.kc-routing-redirects.path-filters./api/v4/user=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/userinfo
-              quarkus.kc-routing-redirects.path-filters./oauth/token=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/token
+              # custom redirects
+              quarkus.kc-routing.path-redirect./=/auth/realms/baby-yoda/account
+              quarkus.kc-routing.path-redirect./auth=/auth/realms/baby-yoda/account
+              quarkus.kc-routing.path-redirect./register=/auth/realms/baby-yoda/protocol/openid-connect/registrations?client_id=account&response_type=code
+              quarkus.kc-routing.path-prefix./oauth/authorize=/auth/realms/baby-yoda/protocol/openid-connect/auth
+              quarkus.kc-routing.path-filter./api/v4/user=/auth/realms/baby-yoda/protocol/openid-connect/userinfo
+              quarkus.kc-routing.path-filter./oauth/token=/auth/realms/baby-yoda/protocol/openid-connect/token
+              # block metrics and health enpoints from being exposed through the istio ingress
+              quarkus.kc-routing.path-recursive-block./metrics=8443
+              quarkus.kc-routing.path-recursive-block./health=8443
 
 
       # This config includes an example of injecting a custom theme jar on startup
