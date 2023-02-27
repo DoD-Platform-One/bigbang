@@ -1,5 +1,5 @@
 {{- /* Used for GitOps of the BigBang package wrapper Helm chart.  Shared by all packages */ -}}
-{{- if and .Values.wrapper (omit (default dict .Values.packages) "sample") -}}
+{{- if and .Values.wrapper (eq (include "checkGitRef" .Values.wrapper) "true") (omit (default dict .Values.packages) "sample") -}}
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:

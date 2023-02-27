@@ -242,16 +242,22 @@ addons:
       tag: "3.8.0-bb.6"
       repo: "registry1"
 
-# -- Wrapper chart for integrating Big Bang into a package
+# -- Wrapper chart for integrating Big Bang into a package, default deployment with OCI HelmRepo
 wrapper:
+  oci:
+    # -- Name of the OCI chart in `repo`
+    name: wrapper
+    # -- Tag of the OCI chart in `repo`
+    tag: "0.1.1"
+    # -- Repository holding OCI chart, corresponding to `ociRepositories` name
+    repo: "registry1"
   git:
-    # -- Git repo holding the wrapper helm chart
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper
-    # -- Path inside of the git repo to find the helm chart
-    path: chart
-    # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
-    tag:
-    branch: main
+    # -- Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper
+    repo: ""
+    # -- Path inside of the git repo to find the helm chart, example: chart
+    path: ""
+    # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference), example: 0.0.2
+    tag: ""
 
 # -- Packages to deploy with Big Bang integration
 # @default - '{}'
@@ -265,8 +271,20 @@ packages:
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
 
+    # -- OCI source is supported and recommended for Helm deployments
+    oci:
+      # -- Name of the OCI chart in `repo`
+      # @default -- Uses package name/yaml key by default.
+      name:
+      # -- Tag of the OCI chart in `repo`, required if using OCI
+      tag:
+      # -- Repository holding OCI chart, corresponding to `ociRepositories` name
+      # @default -- Uses `registry1` Helm Repository if not specified
+      repo:
+
+    # -- Git source is supported for both Helm and Kustomize deployments
     git:
-      # -- (Required) Git repo URL holding the helm chart for this package
+      # -- Git repo URL holding the helm chart for this package, required if using git
       repo:
       # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
       commit:

@@ -19,13 +19,22 @@ spec:
   releaseName: {{ $pkg }}
   chart:
     spec:
+      {{- if eq (include "checkGitRef" $vals) "true" }}
       chart: {{ dig "git" "path" "chart" $vals }}
-      interval: {{ default "5m" $fluxSettings.interval }}
-      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: {{ $pkg }}
         namespace: {{ dig "namespace" "name" $pkg $vals }}
+      {{- else }}
+      chart: {{ dig "oci" "name" $pkg $vals }}
+      version: {{ dig "oci" "tag" nil $vals }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ dig "oci" "repo" "registry1" $vals }}
+        namespace: {{ $.Release.Namespace }}
+      {{- end }}
+      interval: {{ default "5m" $fluxSettings.interval }}
+      reconcileStrategy: Revision
   {{- toYaml $fluxSettings | nindent 2 }}
   {{- if $vals.postRenderers }}
   postRenderers:
