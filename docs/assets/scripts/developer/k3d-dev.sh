@@ -332,36 +332,35 @@ echo
 echo
 echo "starting instance config"
 
-echo "Instance will automatically terminate 8 hours from now unless you alter the crontab"
+echo "Instance will automatically terminate 8 hours from now unless you alter the root crontab"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo bash -c 'echo \"\$(date -u -d \"+8 hours\" +\"%M %H\") * * * /usr/sbin/shutdown -h now\" | crontab -'"
 echo
 
 echo
-echo "installing packages"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get remove -y docker docker-engine docker.io containerd runc"
+echo "updating packages"
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get -y update"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common"
 
 echo
-echo
+echo "installing docker"
+# install dependencies
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release gnupg-agent software-properties-common"
 # Add the Docker repository, we are installing from Docker and not the Ubuntu APT repo.
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-key fingerprint 0EBFCD88"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"'
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg'
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list'
-
-
-echo
-echo
-# Install Docker
-echo "install Docker"
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io kubectl jq tree vim"
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo mkdir -m 0755 -p /etc/apt/keyrings'
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg'
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo apt-get update && sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
 
 echo
 echo
 # Add your base user to the Docker group so that you do not need sudo to run docker commands
 ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "sudo usermod -aG docker ubuntu"
+echo
+
+# install kubectl
+echo Installing kubectl...
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo mv /home/ubuntu/kubectl /usr/local/bin/'
+ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo chmod +x /usr/local/bin/kubectl'
 
 echo
 echo
@@ -442,13 +441,6 @@ else  # default is to use public ip
   $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 fi
 
-# add tools
-echo Installing kubectl...
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo mv /home/ubuntu/kubectl /usr/local/bin/'
-ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} 'sudo chmod +x /usr/local/bin/kubectl'
-
-
 if [[ "$METAL_LB" == true ]]; then
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} <<- 'ENDSSH'
   # run this command on remote
@@ -471,7 +463,7 @@ echo "==========================================================================
 # ending instructions
 echo
 echo "SAVE THE FOLLOWING INSTRUCTIONS INTO A TEMPORARY TEXT DOCUMENT SO THAT YOU DON'T LOOSE THEM"
-echo "NOTE: The EC2 instance will automatically terminate 8 hours from the time of creation unless you delete the cron job"
+echo "NOTE: The EC2 instance will automatically terminate 8 hours from the time of creation unless you delete the root cron job"
 echo
 echo "ssh to instance:"
 echo "  ssh -i ~/.ssh/${KeyName}.pem -o IdentitiesOnly=yes ubuntu@${PublicIP}"
