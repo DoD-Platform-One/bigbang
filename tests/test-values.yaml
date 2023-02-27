@@ -779,6 +779,12 @@ neuvector:
   values:
     k3s:
       enabled: true
+    # run with a single replica to avoid CI issues https://repo1.dso.mil/big-bang/bigbang/-/issues/1445
+    controller:
+      replicas: 1
+    cve:
+      scanner:
+        replicas: 1
     bbtests:
       enabled: true
       cypress:
