@@ -15,13 +15,22 @@ spec:
   releaseName: {{ $pkg }}-wrapper
   chart:
     spec:
-      chart: {{ default "wrapper" $.Values.wrapper.git.path }}
-      interval: {{ default "5m" $fluxSettings.interval }}
-      reconcileStrategy: Revision
+      {{- if eq (include "checkGitRef" $.Values.wrapper) "true" }}
+      chart: {{ default "chart" $.Values.wrapper.git.path }}
       sourceRef:
         kind: GitRepository
         name: {{ $.Release.Name }}-wrapper
         namespace: {{ $.Release.Namespace }}
+      {{- else }}
+      chart: {{ $.Values.wrapper.oci.name }}
+      version: {{ $.Values.wrapper.oci.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ $.Values.wrapper.oci.repo }}
+        namespace: {{ $.Release.Namespace }}
+      {{- end }}
+      interval: {{ default "5m" $fluxSettings.interval }}
+      reconcileStrategy: Revision
   {{- toYaml $fluxSettings | nindent 2 }}
   valuesFrom:
     - name: {{ $pkg }}-wrapper-values
