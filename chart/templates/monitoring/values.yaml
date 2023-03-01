@@ -339,13 +339,22 @@ grafana:
       {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
     {{- end }}
 
-  {{- if and .Values.monitoring.sso.enabled .Values.monitoring.sso.grafana.client_id }}
+  {{- if and .Values.monitoring.sso.enabled (or .Values.monitoring.sso.grafana.client_id (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso))) }}
   extraSecretMounts:
+    {{- if .Values.monitoring.sso.grafana.client_id }}
     - name: auth-generic-oauth-secret
       mountPath: /etc/secrets/auth_generic_oauth
       secretName: grafana-sso
       defaultMode: 0440    
       readOnly: true
+    {{- end }}
+    {{- if (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+    - name: "oidc-ca-certificate"
+      mountPath: "/etc/oidc/ca.pem"
+      secretName: "tls-ca-sso"
+      readOnly: true
+      subPath: "ca.pem"
+    {{- end }}
   {{- end }}
 
   {{- if $istioInjection }}
@@ -420,8 +429,8 @@ prometheusOperator:
 {{- end }}
 
 {{- /* This function merges defaults in lists from above into overlays */ -}}
-{{- /* The end user will not have to replicate additionalScrapeConfigs from above when providing an overlay */ -}}
-{{- /* There is a hidden flag `skipOverlayMerge` that can be added to any additionalScrapeConfigs to ignore the defaults */ -}}
+{{- /* The end user will not have to replicate `prometheus.prometheusSpec.additionalScrapeConfigs` or `grafana.extraSecretMounts` from above when providing an overlay */ -}}
+{{- /* There is a hidden flag `skipOverlayMerge` that can be added to `prometheus.prometheusSpec` or `grafana` overlays to ignore the defaults */ -}}
 {{- define "bigbang.overlays.monitoring" }}
 
   {{- $defaults := fromYaml (include "bigbang.defaults.monitoring" .) }}
@@ -437,6 +446,22 @@ prometheusOperator:
          {{ $_ := set $overlay "additionalScrapeConfigs" (concat $default.additionalScrapeConfigs $overlay.additionalScrapeConfigs) }}
       {{- end }}
 
+    {{- end }}
+  {{- end }}
+  {{- range $monitoringConfig, $default := $defaults }}
+    {{- $overlay := (dig $monitoringConfig dict $overlays) }}
+    # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
+    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+
+      # Add any default extraSecretMounts to overlay
+      {{- if and (dig "extraSecretMounts" list $default) (dig "extraSecretMounts" list $overlay) }}
+         {{ $_ := set $overlay "extraSecretMounts" (concat $default.extraSecretMounts $overlay.extraSecretMounts) }}
+      {{- end }}
+
+      # Add any default additionalDataSources to overlay
+      {{- if and (dig "additionalDataSources" list $default) (dig "additionalDataSources" list $overlay) }}
+         {{ $_ := set $overlay "additionalDataSources" (concat $default.additionalDataSources $overlay.additionalDataSources) }}
+      {{- end }}
     {{- end }}
   {{- end }}
 {{ toYaml $overlays }}
