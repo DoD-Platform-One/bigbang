@@ -409,24 +409,31 @@ ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes u
 # Handle MetalLB cluster resource creation
 if [[ "$METAL_LB" == true ]]; then
   echo "installing MetalLB"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml"
-  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml"
+  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"
+	# Wait for controller to be live so that validating webhooks function when we apply the config
+	echo "waiting for MetalLB controller"
+	ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
 
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} <<- 'ENDSSH'
 	#run this command on remote
 	cat << EOF > metallb-config.yaml
-	apiVersion: v1
-	kind: ConfigMap
+	apiVersion: metallb.io/v1beta1
+	kind: IPAddressPool
 	metadata:
+	  name: default
 	  namespace: metallb-system
-	  name: config
-	data:
-	  config: |
-	    address-pools:
-	    - name: default
-	      protocol: layer2
-	      addresses:
-	      - 172.20.1.240-172.20.1.243
+	spec:
+	  addresses:
+	  - 172.20.1.240-172.20.1.243
+	---
+	apiVersion: metallb.io/v1beta1
+	kind: L2Advertisement
+	metadata:
+	  name: l2advertisement1
+	  namespace: metallb-system
+	spec:
+	  ipAddressPools:
+	  - default
 	EOF
 	ENDSSH
 
