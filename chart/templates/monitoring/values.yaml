@@ -91,6 +91,10 @@ prometheus:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if .Values.tempo.enabled }}
+    enableFeatures:
+      - remote-write-receiver
+    {{- end }}
     {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled }}
     podMetadata:
       {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) }}
@@ -284,6 +288,10 @@ grafana:
     url: http://tempo-tempo.tempo.svc:3100
     isDefault: false
     editable: true
+    jsonData:
+      httpMethod: GET
+      serviceMap:
+        datasourceUid: 'prometheus'
   {{- if .Values.loki.enabled }}
     jsonData:
       httpMethod: GET
