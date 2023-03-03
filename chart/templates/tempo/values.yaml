@@ -31,6 +31,12 @@ tempo:
 {{- end }}
 {{- end }}
 
+{{- if .Values.monitoring.enabled }}
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: "http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+{{- end }}
+
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
