@@ -20,5 +20,11 @@
   "include": [
     "src/**/*"
   ],
-  "compileOnSave": false
+  "exclude": ["test/**/*"],
+  "compileOnSave": false,
+  "ts-node": {
+    "moduleTypes": {
+      "jest.config.ts": "cjs"
+    }
+  },
 }
