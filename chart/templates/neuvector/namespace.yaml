@@ -8,6 +8,6 @@ metadata:
     app.kubernetes.io/component: "sandbox"
     {{- include "commonLabels" . | nindent 4}}
     {{- if .Values.istio.enabled }}
-    istio-injection: "disabled"
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.neuvector }}
     {{- end }}
 {{- end }}

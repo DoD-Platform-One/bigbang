@@ -7,11 +7,16 @@ domain: {{ default .Values.domain .Values.hostname }}
 
 openshift: {{ .Values.openshift }}
 
+{{ $istioInjection := (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   neuvector:
     gateways:
     - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}
+  injection: {{ ternary "enabled" "disabled" $istioInjection }}
+  mtls:
+    mode: PERMISSIVE
 
 {{- if .Values.monitoring.enabled }}
 monitoring:
