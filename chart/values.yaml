@@ -372,7 +372,7 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
-    tag: "3.11.0-bb.1"
+    tag: "3.11.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
