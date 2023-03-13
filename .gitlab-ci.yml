@@ -1,0 +1,8 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: 'BB_MR_OCI_and_3rd_party_expansion'
+    file: '/pipelines/bigbang-package.yaml' 
+variables:
+  PIPELINE_REPO_BRANCH: 'BB_MR_OCI_and_3rd_party_expansion' 
+  DEBUG_ENABLED: "true"
+  MULTI_NODE: "true"
