@@ -34,9 +34,6 @@ monitoring:
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
 
-istio:
-  enabled: {{ .Values.istio.enabled }}
-
 loki:
   storage:
     {{- if (eq .Values.loki.strategy "monolith") }}
@@ -68,6 +65,11 @@ loki:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
+
+{{- if (eq .Values.loki.strategy "scalable") }}
+singleBinary:
+  replicas: 0
+{{- end }}
 
 {{- with .Values.loki.objectStorage }}
 {{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .region)) }}
