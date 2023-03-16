@@ -1359,7 +1359,7 @@ create_bigbang_merge_request() {
     ## Data that will be used to create Big Bang MRs
 
     # Get the URL of the latest CHANGELOG.md file
-    CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${TAG_VERSION}/CHANGELOG.md
+    CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${CI_COMMIT_TAG}/CHANGELOG.md
 
     # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
     BB_MR_REVIEWER_NAMES=( "micah.nagel" "ryan.j.garcia" "rob.ferguson" )
@@ -1375,8 +1375,8 @@ create_bigbang_merge_request() {
     done
 
     ## Pull down Big Bang repo, create a new branch, and configure git
-    BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${TAG_VERSION}"
-    git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@repo1.dso.mil/platform-one/big-bang/bigbang.git" ${BB_REPO_DESTINATION} 1>/dev/null
+    BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${CI_COMMIT_TAG}"
+    git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@${BB_REPO}.git" ${BB_REPO_DESTINATION} 1>/dev/null
     cd ${BB_REPO_DESTINATION}
     git checkout -b ${BB_SOURCE_BRANCH} 1>/dev/null
     git config user.email "mr.bot@bigbang.dev"
@@ -1395,7 +1395,7 @@ create_bigbang_merge_request() {
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
-        yq e -i ".${package}.git.tag = \"${TAG_VERSION}\"" ${VALUES_FILE}
+        yq e -i ".${package}.git.tag = \"${CI_COMMIT_TAG}\"" ${VALUES_FILE}
 
         # Adding blank lines back to values file before pushing changes
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
@@ -1407,7 +1407,7 @@ create_bigbang_merge_request() {
         diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
 
         # Edit git tag for package
-        yq e -i ".addons.${package}.git.tag = \"${TAG_VERSION}\"" ${VALUES_FILE}
+        yq e -i ".addons.${package}.git.tag = \"${CI_COMMIT_TAG}\"" ${VALUES_FILE}
 
         # Adding blank lines back to values file before pushing changes
         patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
@@ -1420,7 +1420,7 @@ create_bigbang_merge_request() {
     git commit -m "Updated ${CI_PROJECT_NAME} git tag" 1>/dev/null
     git push --set-upstream origin ${BB_SOURCE_BRANCH} \
       -o merge_request.create \
-      -o merge_request.title="Draft: ${CI_PROJECT_NAME} update to ${TAG_VERSION}" \
+      -o merge_request.title="Draft: ${CI_PROJECT_NAME} update to ${CI_COMMIT_TAG}" \
       -o merge_request.label="status::review"	\
       -o merge_request.label="bot::mr"	\
       -o merge_request.label=${package} \
@@ -1450,7 +1450,7 @@ create_bigbang_merge_request() {
     curl -s --request PUT --header "Content-Type: application/json" --header "PRIVATE-TOKEN: ${BB_AUTO_MR_TOKEN}" --data "@${JSON_DESCRIPTION_FILE}" "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests/${BB_MR_ID}?reviewer_ids=${BB_MR_REVIEWER_IDS}" 1>/dev/null
 
     # MR Link
-    echo "✅ Big Bang MR created: https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/${BB_MR_ID}"
+    echo "✅ Big Bang MR created: https://${BB_REPO}/-/merge_requests/${BB_MR_ID}"
 
     echo -e "\e[0Ksection_end:`date +%s`:create_bigbang_merge_request\r\e[0K"
 }
