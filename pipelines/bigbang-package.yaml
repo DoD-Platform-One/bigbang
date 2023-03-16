@@ -42,6 +42,9 @@ variables:
   METRICS_DISABLED: "false"
   MULTI_NODE: "false"
   CHECKSUM_FILE: ${CI_PROJECT_NAME}-${CI_COMMIT_TAG}_checksums.txt
+  BB_REPO_DESTINATION: "./bigbang-repo"
+  BB_PROJECT_ID: 2872
+  BB_REPO: repo1.dso.mil/big-bang/bigbang
 
 configuration validation:
   stage: ⚙️ configuration validation
@@ -282,9 +285,14 @@ release:
     - if: '($CI_COMMIT_TAG && $RELEASE_AWS_ACCESS_KEY_ID) || ($CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::release(,|$)/)'
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
+    VALUES_FILE: chart/values.yaml
   script:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - package_release
+    - create_bigbang_merge_request
+  allow_failure:
+    exit_codes:
+      - 201
   retry:
     max: 2
     when:
@@ -301,18 +309,9 @@ auto tag:
   rules:
     # run tag stage on commits to default branch
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  variables:
-    BB_REPO: https://repo1.dso.mil/big-bang/bigbang.git
-    BB_REPO_DESTINATION: "./bigbang-repo"
-    BB_PROJECT_ID: 2872
-    VALUES_FILE: chart/values.yaml
   script:
     - get_chart_version
     - create_tag
-    - create_bigbang_merge_request
-  allow_failure:
-    exit_codes:
-      - 201
   retry:
     max: 2
     when:
