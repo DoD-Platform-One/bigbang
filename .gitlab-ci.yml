@@ -9,4 +9,5 @@ variables:
   BB_PROJECT_ID: 12985
   CI_PROJECT_NAME: "mattermost"
   BB_AUTO_MR_TOKEN: ${SNEKCODE_FORK_TOKEN}
-
+  FOO: "BAR"
+  CI_DEFAULT_BRANCH: "mnagel-mm-main"
