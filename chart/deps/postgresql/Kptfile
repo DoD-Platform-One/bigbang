@@ -1,0 +1,11 @@
+apiVersion: kpt.dev/v1alpha1
+kind: Kptfile
+metadata:
+  name: postgresql
+upstream:
+  type: git
+  git:
+    commit: c2ac165a579a8f06dede2b6fede2f4ec2bfea495
+    repo: https://github.com/bitnami/charts
+    directory: /bitnami/postgresql
+    ref: master

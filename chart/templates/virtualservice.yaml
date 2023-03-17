@@ -1,0 +1,32 @@
+{{- if and .Values.istio.enabled .Values.istio.chat.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ template "mattermost.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "mattermost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "chat"
+  {{- if .Values.istio.chat.labels }}
+    {{ toYaml .Values.istio.chat.labels | indent 4 }}
+  {{- end }}
+  {{- if .Values.istio.chat.annotations }}
+  annotations:
+    {{ toYaml .Values.istio.chat.annotations | indent 4 }}
+  {{- end }}
+spec:
+  gateways:
+  {{- range .Values.istio.chat.gateways }}
+    - {{ . }}
+  {{- end }}
+  hosts:
+  {{- range .Values.istio.chat.hosts }}
+    - {{ tpl . $ }}
+  {{- end }}
+  http:
+    - route:
+        - destination:
+            host: {{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+            port:
+              number: 8065  # hardcode this because the operator does
+{{- end }}

@@ -1,0 +1,24 @@
+{{- if and .Values.networkPolicies.enabled .Values.elasticsearch.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-elastic-egress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: mattermost
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            app.kubernetes.io/name: logging
+        podSelector:
+          matchLabels:
+            common.k8s.elastic.co/type: elasticsearch
+      ports:
+      - port: 9200
+        protocol: TCP
+{{- end }}

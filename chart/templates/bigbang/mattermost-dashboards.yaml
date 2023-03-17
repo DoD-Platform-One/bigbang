@@ -1,0 +1,12 @@
+{{- if and .Values.monitoring.enabled .Values.enterprise.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mattermost-grafana-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  mattermost-performance-monitoring-v2_rev2.json: |
+    {{ .Files.Get "dashboards/mattermost-performance-monitoring-v2_rev2.json" | nindent 4 }}
+{{- end }}

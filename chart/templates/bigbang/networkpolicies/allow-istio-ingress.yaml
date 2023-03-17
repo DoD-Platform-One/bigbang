@@ -1,0 +1,24 @@
+{{- if and .Values.networkPolicies.enabled .Values.istio.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-istio-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: mattermost
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            app.kubernetes.io/name: istio-controlplane
+        podSelector:
+          matchLabels:
+            {{- toYaml .Values.networkPolicies.ingressLabels | nindent 12 }}
+      ports:
+      - port: 8065
+        protocol: TCP
+{{- end }}

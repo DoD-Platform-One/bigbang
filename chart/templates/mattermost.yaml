@@ -1,0 +1,246 @@
+apiVersion: installation.mattermost.com/v1beta1
+kind: Mattermost
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "mattermost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "instance"
+spec:
+  image: {{ .Values.image.name }}
+  imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+  {{- with .Values.global.imagePullSecrets }}
+  imagePullSecrets:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+  size: {{ .Values.users }}users
+  version: {{ .Values.image.tag }}
+  {{- if .Values.enterprise.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- else }}
+  replicas: 1
+  {{- end }}
+
+  ingress:
+    enabled: {{ .Values.ingress.enabled }}
+    host: {{ .Values.ingress.host }}
+    annotations:
+      {{- toYaml .Values.ingress.annotations | nindent 6 }}
+    tlsSecret: {{ .Values.ingress.tlsSecret}}
+
+  {{- if and .Values.enterprise.enabled .Values.enterprise.license }}
+  licenseSecret: "mattermost-license"
+  {{- end }}
+
+  mattermostEnv:
+  - name: MM_SERVICESETTINGS_SITEURL
+    valueFrom:
+      secretKeyRef:
+        key: MM_SERVICESETTINGS_SITEURL
+        name: "mattermost-envs"
+  {{- if .Values.sso.enabled }}
+  - name: MM_GITLABSETTINGS_ENABLE
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_ENABLE
+        name: "mattermost-envs"
+  - name: MM_GITLABSETTINGS_ID
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_ID
+        name: "mattermost-envs"
+  - name: MM_GITLABSETTINGS_SECRET
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_SECRET
+        name: "mattermost-envs"
+  - name: MM_GITLABSETTINGS_AUTHENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_AUTHENDPOINT
+        name: "mattermost-envs"
+  - name: MM_GITLABSETTINGS_TOKENENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_TOKENENDPOINT
+        name: "mattermost-envs"
+  - name: MM_GITLABSETTINGS_USERAPIENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: MM_GITLABSETTINGS_USERAPIENDPOINT
+        name: "mattermost-envs"
+  {{- end }}
+  {{- if .Values.minio.install }}
+  - name: MM_FILESETTINGS_AMAZONS3SSL
+    valueFrom:
+      secretKeyRef:
+        key: MM_FILESETTINGS_AMAZONS3SSL
+        name: "mattermost-envs"
+  {{- end }}
+  {{- if .Values.elasticsearch.enabled }}
+  - name: MM_ELASTICSEARCHSETTINGS_CONNECTIONURL
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_CONNECTIONURL
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_ENABLEAUTOCOMPLETE
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_ENABLEAUTOCOMPLETE
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_ENABLEINDEXING
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_ENABLEINDEXING
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_INDEXPREFIX
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_INDEXPREFIX
+        name: "mattermost-envs"        
+  - name: MM_ELASTICSEARCHSETTINGS_BULKINDEXINGTIMEWINDOWSECONDS
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_BULKINDEXINGTIMEWINDOWSECONDS
+        name: "mattermost-envs"        
+  - name: MM_ELASTICSEARCHSETTINGS_ENABLESEARCHING
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_ENABLESEARCHING
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_SKIPTLSVERIFICATION
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_SKIPTLSVERIFICATION
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_SNIFF
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_SNIFF
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_USERNAME
+        name: "mattermost-envs"
+  - name: MM_ELASTICSEARCHSETTINGS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: MM_ELASTICSEARCHSETTINGS_PASSWORD
+        name: "mattermost-envs"             
+  {{- end }}
+  {{- range $k, $v := .Values.mattermostEnvs }}
+  - name: {{ $k }}
+    valueFrom:
+      secretKeyRef:
+        key: {{ $k }}
+        name: "mattermost-envs"
+  {{- end }}
+  {{- range .Values.existingSecretEnvs }}
+  - {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+
+  # Give MM enough time to keel over if needed
+  probes:
+    livenessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 120
+
+  scheduling:
+    {{- with .Values.resources }}
+    resources:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.affinity }}
+    affinity:
+      {{ toYaml .Values.affinity | nindent 6 }}
+    {{- end }}
+
+    {{- if .Values.nodeSelector }}
+    nodeSelector:
+      {{ toYaml .Values.nodeSelector | nindent 6 }}
+    {{- end }}  
+
+    {{- if .Values.tolerations}}
+    tolerations:
+      {{- toYaml .Values.tolerations | nindent 6 }}
+    {{- end }}
+
+  {{- with .Values.volumes }}
+  volumes:
+  {{- toYaml . | nindent 4}}
+  {{- end }}
+
+  {{- with .Values.volumeMounts }}
+  volumeMounts:
+  {{- toYaml . | nindent 4}}
+  {{- end }}
+
+  {{- if or .Values.podLabels .Values.podAnnotations .Values.securityContext .Values.containerSecurityContext }}
+  podTemplate:
+    {{- with .Values.podLabels }}
+    extraLabels: 
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.podAnnotations }}
+    extraAnnotations:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+    securityContext:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.containerSecurityContext }}
+    containerSecurityContext: 
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+  {{- end }}
+
+  database:
+    external:
+      secret: {{ .Values.database.secret | default (printf "%s-dbcreds" (include "mattermost.fullname" .)) }}
+    disableReadinessCheck: {{ .Values.database.readinessCheck.disableDefault }}
+
+  fileStore:
+    external:
+      url: {{ .Values.fileStore.url | default .Values.minio.service.nameOverride }}
+      bucket: {{ .Values.fileStore.bucket | default "mattermost" }}
+      secret: {{ .Values.fileStore.secret | default .Values.minio.secrets.name }}
+
+  podExtensions:
+    initContainers:
+      - command:
+        {{- toYaml .Values.database.readinessCheck.command | nindent 10 }}
+        image: {{ .Values.database.readinessCheck.image }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+        securityContext:
+          capabilities:
+            drop:
+              - ALL
+        name: db-readiness-check
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 50m
+        env:
+        {{- (tpl (toYaml .Values.database.readinessCheck.env) .) | nindent 10 }}
+
+  {{- if .Values.resourcePatch }}
+  resourcePatch:
+    {{- toYaml .Values.resourcePatch | nindent 4 }}
+  {{- end }}
+
+  updateJob:
+    disabled: {{ .Values.updateJob.disabled }}
+    {{- with .Values.updateJob.annotations }}
+    extraAnnotations: 
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.updateJob.labels }}
+    extraLabels: 
+      {{- toYaml . | nindent 6 }}
+    {{- end }}

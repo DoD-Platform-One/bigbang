@@ -1,0 +1,71 @@
+{{- if .Values.minio.install }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: default-minio-bucket-creation
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      name: default-minio-bucket-creation
+    spec:
+      imagePullSecrets:
+      {{- with .Values.global.imagePullSecrets }}
+      {{ . | toYaml | nindent 8 }}
+      {{- end }}
+      restartPolicy: Never
+      containers:
+        - name: minio-bucket-creation
+          image: {{ .Values.minio.bucketCreationImage }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -ex
+              attempt_counter=0
+              max_attempts=25
+              until [ $(mc config host add bigbang http://{{ .Values.minio.service.nameOverride }} {{ .Values.minio.secrets.accessKey }} {{ .Values.minio.secrets.secretKey }} >/dev/null; echo $?) -eq 0 ]; do
+               if [ ${attempt_counter} -eq ${max_attempts} ];then
+                  echo "Max attempts reached"
+                  {{- if eq .Values.istio.injection "enabled" }}
+                  until curl -fsI http://localhost:15021/healthz/ready; do
+                    echo "Waiting for Istio sidecar proxy..."
+                    sleep 3
+                  done
+                  sleep 5
+                  echo "Stopping the istio proxy..."
+                  curl -X POST http://localhost:15020/quitquitquit
+                  {{- end }}
+                  exit 1
+                fi
+                attempt_counter=$(($attempt_counter+1))
+                sleep 10
+              done
+              if [ $(mc ls bigbang/mattermost >/dev/null; echo $?) -eq 0 ]; then
+                echo "Default Bucket Exists"
+              else
+                mc mb bigbang/mattermost
+              fi
+              {{- if eq .Values.istio.injection "enabled" }}
+              until curl -fsI http://localhost:15021/healthz/ready; do
+                echo "Waiting for Istio sidecar proxy..."
+                sleep 3
+              done
+              sleep 5
+              echo "Stopping the istio proxy..."
+              curl -X POST http://localhost:15020/quitquitquit
+              {{- end }}
+              exit 0
+          securityContext: {{- toYaml .Values.minio.containerSecurityContext | nindent 12 }}
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 256Mi
+              cpu: 100m
+{{- end }}

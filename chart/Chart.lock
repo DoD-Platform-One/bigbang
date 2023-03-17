@@ -1,0 +1,12 @@
+dependencies:
+- name: postgresql
+  repository: file://./deps/postgresql
+  version: 10.3.5
+- name: minio-instance
+  repository: oci://registry1.dso.mil/bigbang
+  version: 4.5.4-bb.2
+- name: gluon
+  repository: oci://registry1.dso.mil/bigbang
+  version: 0.3.2
+digest: sha256:4826e20ab1e1cdbe95e2ccbddd969329c7e8646f276a95d2dbf1850882652de1
+generated: "2023-01-17T12:00:42.140338-07:00"

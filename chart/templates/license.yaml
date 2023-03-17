@@ -1,0 +1,15 @@
+{{- if and .Values.enterprise.enabled .Values.enterprise.license }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mattermost-license
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{ include "mattermost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: "license"
+  annotations:
+    "helm.sh/hook": "pre-install,pre-upgrade"
+type: Opaque
+data:
+  license: {{ .Values.enterprise.license | b64enc }}
+{{- end }}

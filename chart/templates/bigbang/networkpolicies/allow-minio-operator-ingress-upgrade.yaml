@@ -1,0 +1,24 @@
+{{- if and .Values.networkPolicies.enabled .Values.minio.install }}
+# this can be removed after the upgrade to 4.4.3
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-minio-operator-ingress-upgrade
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade  
+spec:
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            app.kubernetes.io/name: minioOperator
+      ports:
+      - port: 9000
+        protocol: TCP
+  podSelector:
+    matchLabels:
+      app: mattermost-minio
+  policyTypes:
+    - Ingress
+{{- end }}

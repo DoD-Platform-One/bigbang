@@ -1,0 +1,13 @@
+{{- include "gluon.tests.cypress-configmap.overrides" (list . "mattermost-test.cypress-configmap") }}
+{{- define "mattermost-test.cypress-configmap" }}
+metadata:
+  labels:
+    {{ include "mattermost.labels" . | nindent 4 }}
+{{- end }}
+---
+{{- include "gluon.tests.cypress-runner.overrides" (list . "mattermost-test.cypress-runner") -}}
+{{- define "mattermost-test.cypress-runner" -}}
+metadata:
+  labels:
+    {{ include "mattermost.labels" . | nindent 4 }}
+{{- end }}

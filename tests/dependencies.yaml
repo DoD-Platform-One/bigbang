@@ -1,0 +1,7 @@
+mattermostoperator:
+  git: "https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git"
+  namespace: "mattermost-operator"
+
+miniooperator:
+  git: "https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git"
+  namespace: "minio-operator"

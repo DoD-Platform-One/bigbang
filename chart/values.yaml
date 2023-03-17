@@ -1,0 +1,279 @@
+hostname: bigbang.dev
+
+istio:
+  # -- Toggle istio integration
+  enabled: false
+  chat:
+    # Toggle vs creation
+    enabled: true
+    annotations: {}
+    labels: {}
+    gateways:
+      - istio-system/main
+    hosts:
+      - chat.{{ .Values.hostname }}
+  injection: disabled
+
+# -- Specification to configure an Ingress with Mattermost
+ingress:
+  enabled: false
+  host: ""
+  annotations: {}
+  tlsSecret: ""
+
+# NOTE: Requires enterprise.enabled to have any effect
+monitoring:
+  enabled: false
+  namespace: monitoring
+
+networkPolicies:
+  enabled: false
+  ingressLabels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+  controlPlaneCidr: 0.0.0.0/0
+
+sso:
+  enabled: false
+  client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost
+  # Change to your client secret
+  client_secret: nothing
+  # Change to your respective IDP endpoints 
+  auth_endpoint: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/auth
+  token_endpoint: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/token
+  user_api_endpoint: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/userinfo
+
+# Repo and image tag
+image:
+  name: registry1.dso.mil/ironbank/opensource/mattermost/mattermost
+  tag: 7.7.1
+  imagePullPolicy: IfNotPresent
+
+global:
+  imagePullSecrets:
+  - name: private-registry
+
+# Mattermost instance desired replicas
+replicaCount: 1
+
+users: null # Allowable: 100, 1000, 5000, 10000, 25000
+
+enterprise:
+  enabled: false
+  license: ""
+  # Example:
+  # license: |
+  #   LICENSE HERE
+
+nameOverride: ""
+
+updateJob:
+  # -- Must be disabled when Istio injected
+  disabled: true
+  labels: {}
+  annotations: {}
+
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 2
+    memory: 4Gi
+
+affinity: {}
+  # podAntiAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     - topologyKey: "kubernetes.io/hostname"
+  #       labelSelector:
+  #         matchLabels:
+  #           dont-schedule-with: mattermost
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #     - matchExpressions:
+  #       - key: node-type
+  #         operator: In
+  #         values:
+  #         - "mattermost"
+
+nodeSelector: {}
+  # node-type: mattermost
+
+tolerations: {}
+# - key: "key1"
+#   operator: "Equal"
+#   value: "value1"
+#   effect: "NoSchedule"
+
+# Any ENVs provided here get put into a `mattermost-envs` secret and pulled into the env
+mattermostEnvs: {}
+  # MM_ENV_NAME: "{{ .Values.users }}"
+  # ANOTHER_ENV_NAME: "anothervalue"
+
+# Use this to point to pull in ENV values from existing secrets
+existingSecretEnvs: {}
+  # - name: MM_SQLSETTINGS_DATASOURCEREPLICAS
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: READER_DB_CONNECTION_STRING
+  #       name: '{{ .Values.database.secret | default (printf "%s-dbcreds" (include "mattermost.fullname" .)) }}'
+  # - name: MM_ANOTHER_VAR
+  #   valueFrom:
+  #     secretKeyRef:
+  #       key: DB_CONNECTION_CHECK_URL
+  #       name: "mysecretname"
+
+volumes: {}
+  # - name: ca-cert
+  #   secret:
+  #     secretName: ca-secret
+  #     defaultMode: 0644
+
+volumeMounts: {}
+  # - name: ca-cert
+  #   mountPath: /etc/ssl/certs
+  #   readOnly: true
+
+# -- Pod labels for Mattermost server pods
+podLabels: {}
+
+# -- Pod annotations for Mattermost server pods
+podAnnotations: {}
+
+# -- securityContext for Mattermost server pods
+securityContext: {}
+
+# -- containerSecurityContext for Mattermost server containers
+containerSecurityContext:
+  capabilities:
+    drop:
+      - ALL
+
+minio:
+  install: false
+  bucketCreationImage: "registry1.dso.mil/ironbank/opensource/minio/mc:RELEASE.2022-08-23T05-45-20Z"
+  # Override the minio service name for easier connection setup
+  service:
+    nameOverride: "minio.mattermost.svc.cluster.local"
+  secrets:
+    name: "mattermost-objstore-creds"
+    accessKey: "minio"
+    secretKey: "minio123" # default key, change this!
+  tenant:
+    metrics:
+      enabled: false
+      port: 9000
+  containerSecurityContext:
+    capabilities:
+      drop:
+        - ALL
+
+postgresql:
+  install: false
+
+  image:
+    registry: "registry1.dso.mil/ironbank"
+    repository: "opensource/postgres/postgresql11"
+    tag: "11.18-1"
+
+    pullSecrets:
+    - private-registry
+
+  postgresqlUsername: "mattermost"
+  postgresqlPassword: "bigbang" # default password, change this!
+  postgresqlDatabase: "mattermost"
+
+  fullnameOverride: "mattermost-postgresql" # Overrides the name used for resource creation
+
+  securityContext:
+    fsGroup: 26
+  containerSecurityContext:
+    runAsUser: 26
+    capabilities:
+      drop:
+        - ALL
+  #permissions for initContainers
+  volumePermissions:
+    securityContext:
+      capabilities:
+        drop:
+          - ALL
+
+  # Set the configs to allow listening and connecting from other pods
+  postgresqlConfiguration: {"listen_addresses": "*"}
+  pgHbaConfiguration: |-
+    local all all md5
+    host all all all md5
+
+database:
+  # Name of an existing secret to pull credentials from, leave empty for chart created database
+  # Must at minimum contain DB_CONNECTION_STRING
+  secret: ""
+  # Init container for DB readiness check
+  readinessCheck:
+    # Disable the default readiness check which uses a non-IB image
+    disableDefault: true
+    # Defaults to Ironbank postgres, can be changed for different DB types (MySQL)
+    image: registry1.dso.mil/ironbank/opensource/postgres/postgresql12:12.13
+    # Defaults to a readiness check for postgres, can be changed for different DB types
+    command:
+      - /bin/sh
+      - -c
+      - until pg_isready --dbname="$DB_CONNECTION_CHECK_URL"; do echo waiting for database; sleep 5; done;
+    # Pass in the credentials needed for the DB check
+    env:
+      - name: DB_CONNECTION_CHECK_URL
+        valueFrom:
+          secretKeyRef:
+            key: DB_CONNECTION_CHECK_URL
+            name: '{{ .Values.database.secret | default (printf "%s-dbcreds" (include "mattermost.fullname" .)) }}'
+
+fileStore:
+  # Name of an existing secret to pull credentials from, leave empty for chart created minio
+  secret: ""
+  # URL for existing file store, leave empty for chart created minio
+  url: ""
+  # Bucket for existing file store, leave empty for chart created minio
+  bucket: ""
+
+elasticsearch:
+  # NOTE: Elasticsearch settings can be defined, but will not work unless enterprise mode is enabled.
+  enabled: false
+  # The address of the Elasticsearch server, default is internal elasticsearch
+  connectionurl: "https://logging-ek-es-http.logging.svc.cluster.local:9200"
+  # if using BB elasticsearch leave user/pass blank
+  username: ""
+  password: ""
+  # When true, indexing of new posts occurs automatically. Search queries will use database search until "Enable Elasticsearch for search queries" is enabled.
+  enableindexing: true
+  # Elasticsearch index prefix
+  indexprefix: "mm-"
+  # When true, Mattermost will not require the Elasticsearch certificate to be signed by a trusted Certificate Authority
+  skiptlsverification: true
+  # Frequency to index to elasticsearch
+  bulkindexingtimewindowseconds: 3600
+  # When true, sniffing finds and connects to all data nodes in your cluster automatically.
+  sniff: false
+  # When true, Elasticsearch will be used for all search queries using the latest index. Search results may be incomplete until a bulk index of the existing post database is finished. When false, database search is used.
+  enablesearching: true
+  # When true, Elasticsearch will be used for all autocompletion queries on users and channels using the latest index. Autocompletion results may be incomplete until a bulk index of the existing users and channels database is finished. When false, database autocomplete is used.
+  enableautocomplete: true
+
+openshift: false
+
+# Custom patch on the Mattermost resources before applying
+resourcePatch: {}
+# Example: Patch a label onto the deployment:
+  # deployment:
+  #   patch: '[{"op":"add","path":"/spec/template/spec/metadata/labels","value":{"istio-version": "1.2.3"}}]'
+
+bbtests:
+  enabled: false
+  cypress:
+    artifacts: true
+    envs:
+      cypress_url: http://mattermost.mattermost.svc.cluster.local:8065
+      cypress_mm_email: "test@bigbang.dev"
+      cypress_mm_user: "bigbang"
+      cypress_mm_password: "Bigbang#123"

@@ -1,0 +1,54 @@
+{
+  "baseBranches": ["main"],
+  "configWarningReuseIssue": false,
+  "dependencyDashboard": "true",
+  "dependencyDashboardHeader": "- [ ] Follow steps in [package update docs](./docs/PACKAGE_UPDATES.md) to upgrade the package.",
+  "dependencyDashboardTitle": "Renovate: Upgrade Mattermost Package Dependencies",
+  "draftPR": true,
+  "enabledManagers": ["regex"],
+  "ignorePaths": ["chart/charts/**"],
+  "labels": ["mattermost","Package Sustainment","kind::maintenance"],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "Ironbank",
+      "registryUrls": ["https://registry1.dso.mil"],
+      "postUpgradeTasks": {
+        "commands": [
+            "match-chart-yaml-appversion",
+            "regenerate-helm-docs",
+            "bump-changelog '- {{{replace 'registry1.dso.mil/' '' depName}}} updated from {{{currentVersion}}} to {{{newVersion}}}'"
+        ],
+        "fileFilters": ["chart/Chart.yaml", "README.md", "CHANGELOG.md"]
+      }
+    }
+  ],
+  "separateMajorMinor": false,
+  "regexManagers": [
+    {
+      "fileMatch": ["^chart/values\\.yaml$"],
+      "matchStrings": [
+        "image:\\s+name:\\s+[^/]+/(?<depName>.+)\\s+tag:\\s+(?<currentValue>.+)"
+      ],
+      "depNameTemplate": "registry1.dso.mil/ironbank/opensource/mattermost/mattermost",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^chart/Chart\\.yaml$"],
+      "matchStrings": [
+        "- Mattermost:\\s+(?<currentValue>.+)",
+        "appVersion:\\s+(?<currentValue>.+)"
+      ],
+      "depNameTemplate": "registry1.dso.mil/ironbank/opensource/mattermost/mattermost",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": ["^chart/Chart\\.yaml$"],
+      "matchStrings": [
+        "image:[^\\S\\r\\n]+(?<depName>.+):(?<currentValue>.+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
+

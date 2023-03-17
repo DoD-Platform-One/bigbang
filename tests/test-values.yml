@@ -1,0 +1,22 @@
+minio:
+  install: true
+  tenant:
+    pools:
+      - servers: 1
+        volumesPerServer: 4
+        size: 256Mi
+        securityContext:
+          runAsUser: 1001
+          runAsGroup: 1001
+          fsGroup: 1001
+
+postgresql:
+  install: true
+
+networkPolicies:
+  enabled: true
+
+bbtests:
+  enabled: true
+  cypress:
+    image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
