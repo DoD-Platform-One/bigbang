@@ -1,0 +1,12 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: 'pipeline-template-branch'
+    file: '/pipelines/bigbang-package.yaml' 
+variables:
+  PIPELINE_REPO_BRANCH: 'pipeline-template-branch'
+  DEBUG_ENABLED: "true"
+  MULTI_NODE: "true"
+  BB_REPO: repo1.dso.mil/<username>/<bigbang_fork>
+  BB_PROJECT_ID: 12985
+  CI_PROJECT_NAME: "istio"
+  BB_AUTO_MR_TOKEN: ${USERNAME_FORK_TOKEN}
