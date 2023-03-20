@@ -286,6 +286,7 @@ release:
   variables:
     RELEASE_ENDPOINT: https://${RELEASE_BUCKET}.s3-${AWS_DEFAULT_REGION}.amazonaws.com/packages/${CI_PROJECT_NAME}/${CI_COMMIT_TAG}
     VALUES_FILE: chart/values.yaml
+    MAPPING_FILE: ${BB_REPO_DESTINATION}/tests/package-mapping.yaml
   script:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - package_release
