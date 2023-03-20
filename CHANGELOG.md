@@ -3,9 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.5.31]
+### Added
+- Added logic to auto-BB MR to bump OCI image tags in addition to git
+
 ## [2.5.30]
 ### Changed
 - Moved BB MR creation to execute after OCI image creation
+
 ## [2.5.29]
 ### Fixed
 - Hidden output for test values error

@@ -1388,32 +1388,14 @@ create_bigbang_merge_request() {
       exit
     fi
 
-    ## Bump git tag for updated package in Big Bang chart/values.yaml
-    if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-        # yq strips blank lines from YAML files, make a patch file to re-add these
-        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
-        diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
+    ## Bump git or OCI tag for updated package in Big Bang chart/values.yaml
+    ## Typically only one of the following tags will be defined and subsequently updated
+    tagRefs=(".${package}.git" ".addons.${package}.git" ".${package}.oci" ".addons.${package}.oci")
 
-        # Edit git tag for package
-        yq e -i ".${package}.git.tag = \"${CI_COMMIT_TAG}\"" ${VALUES_FILE}
-
-        # Adding blank lines back to values file before pushing changes
-        patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
-
-        echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".${package}.git.tag" ${VALUES_FILE})"
-    elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-        # yq strips blank lines from YAML files, make a patch file to re-add these
-        yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
-        diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
-
-        # Edit git tag for package
-        yq e -i ".addons.${package}.git.tag = \"${CI_COMMIT_TAG}\"" ${VALUES_FILE}
-
-        # Adding blank lines back to values file before pushing changes
-        patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
-
-        echo "Updated ${CI_PROJECT_NAME}'s git tag to: $(yq e ".addons.${package}.git.tag" ${VALUES_FILE})"
-    fi
+    for i in "${tagRefs[@]}"
+    do
+      update_package_tag "$i"
+    done
 
     ## Push changes and create merge request
     git add ${VALUES_FILE} 1>/dev/null
@@ -1479,6 +1461,23 @@ package_auth_setup() {
      --arg bb_docker_auth ${DOCKER_AUTH} > /root/.docker/config.json
 }
 
+update_package_tag() {
+  BASE_PATH=$1
+
+  if [[ $(yq e "${BASE_PATH} | select(. != null) | (path | .[-2])" "${VALUES_FILE}") =~ "${package}" ]]; then
+    # yq strips blank lines from YAML files, make a patch file to re-add these
+    yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
+    diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null
+
+    # Edit tag for package
+    yq e -i "${BASE_PATH}.tag = \"${CI_COMMIT_TAG}\"" ${VALUES_FILE}
+
+    # Adding blank lines back to values file before pushing changes
+    patch ${VALUES_FILE} /tmp/patch.diff || true 1>/dev/null
+
+    echo "Updated ${CI_PROJECT_NAME}'s tag at ${BASE_PATH} to: $(yq e "${BASE_PATH}.tag" ${VALUES_FILE})"
+  fi
+}
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
