@@ -15,8 +15,13 @@ metadata:
     {{- include "commonLabels" $ | nindent 4 }}
 type: Opaque
 stringData:
+  {{ if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
   values.yaml: |
-    {{- tpl (toYaml $vals.values) $ | nindent 4 }}
+  {{- tpl (toYaml $vals.values) $ | nindent 4 }}
+  {{ else }}
+  {{- tpl (toYaml $vals.values) $ | nindent 2 }}
+  {{ end }}
+  
 ---
 {{ end -}}
 {{- end -}}
