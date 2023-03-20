@@ -447,7 +447,7 @@ prometheusOperator:
   {{- range $prometheusConfig, $default := $defaults.prometheus }}
     {{- $overlay := (dig "prometheus" $prometheusConfig dict $overlays) }}
     # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
-    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+    {{- if and $overlay (kindIs "map" $overlay) (not $overlay.skipOverlayMerge) }}
 
       # Add any default additionalScrapeConfigs to overlay
       {{- if and (dig "additionalScrapeConfigs"  list $default) (dig "additionalScrapeConfigs"  list $overlay) }}
@@ -459,7 +459,7 @@ prometheusOperator:
   {{- range $monitoringConfig, $default := $defaults }}
     {{- $overlay := (dig $monitoringConfig dict $overlays) }}
     # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
-    {{- if and $overlay (not $overlay.skipOverlayMerge) }}
+    {{- if and $overlay (kindIs "map" $overlay) (not $overlay.skipOverlayMerge) }}
 
       # Add any default extraSecretMounts to overlay
       {{- if and (dig "extraSecretMounts" list $default) (dig "extraSecretMounts" list $overlay) }}
