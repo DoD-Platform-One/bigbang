@@ -168,7 +168,7 @@ gatekeeper:
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-cypress-test
-          - monitoring/kube-prometheus-stack-cypress-test
+          - monitoring/monitoring-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
@@ -300,7 +300,7 @@ gatekeeper:
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-cypress-test
-          - monitoring/kube-prometheus-stack-cypress-test
+          - monitoring/monitoring-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
