@@ -68,6 +68,52 @@ wait_daemonset(){
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
+# Mapping Functions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+map_filepath_to_values_key() {
+  filepath="$1"
+  if [[ ! (-f "$MAPPING_FILE") ]]; then
+    MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
+  fi
+  export valuesKey=$(yq e ".[] | select(.filePath == \"${filepath}\") | key" ${MAPPING_FILE})
+  if [[ -z "$valuesKey" || "$valuesKey" == "null" ]]; then
+    valuesKey=$filepath
+  fi
+}
+
+map_reponame_to_values_key() {
+  reponame="$1"
+  if [[ ! (-f "$MAPPING_FILE") ]]; then
+    MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
+  fi
+  export valuesKey=$(yq e ".[] | select(.repoName == \"${reponame}\") | key" ${MAPPING_FILE})
+  if [[ -z "$valuesKey" || "$valuesKey" == "null" ]]; then
+    valuesKey=$reponame
+  fi
+}
+
+map_values_key_to_hr() {
+  valuesKey="$1"
+  if [[ ! (-f "$MAPPING_FILE") ]]; then
+    MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
+  fi
+  export hrName=$(yq e ".${valuesKey}.hrName" ${MAPPING_FILE})
+  if [[ -z "$hrName" || "$hrName" == "null" ]]; then
+    hrName=$valuesKey
+  fi
+}
+
+get_dependencies_from_values_key() {
+  valuesKey="$1"
+  if [[ ! (-f "$MAPPING_FILE") ]]; then
+    MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
+  fi
+  export dependencies=$(yq e ".${valuesKey}.dependencies[]" ${MAPPING_FILE})
+}
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
 # Bigbang Functions
 #
 #-----------------------------------------------------------------------------------------------------------------------
@@ -80,7 +126,7 @@ check_changes() {
    echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
 
    ## Array of addon packages
-   CHECK_PACKAGES=($(yq e '(.*.git | select(. != null) | (path | .[-2]), .addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}"))
+   CHECK_PACKAGES=($(get_packages))
 
    ## Array of templates
    TEMPLATES=($(find chart/templates -type d | cut -b 17-))
@@ -128,46 +174,8 @@ check_changes() {
    ## Check for package changes in chart/templates
    for package in "${TEMPLATES[@]}"; do
         if [[ $(diff -r target-branch/templates/$package source-branch/templates/$package) ]]; then
-              # Rename packages in chart/templates to match chart/values.yaml and handle subdirectories
-              if [[ "$package" == "gitlab-runner" ]]; then
-                      package="gitlabRunner"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "nexus-repository-manager" ]]; then
-                      package="nexusRepositoryManager"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "kyverno/policies" ]]; then
-                      package="kyvernopolicies"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "kyverno/reporter" ]]; then
-                      package="kyvernoreporter"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "logging/elasticsearch-kibana" ]]; then
-                      package="logging"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "logging/eck-operator" ]]; then
-                      package="eckoperator"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "logging/fluentbit" ]]; then
-                      package="fluentbit"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "logging/loki" ]]; then
-                      package="loki"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "logging/promtail" ]]; then
-                      package="promtail"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "mattermost-operator" ]]; then
-                      package="mattermostOperator"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "minio-operator" ]]; then
-                      package="minioOperator"
-                      CHANGED_PACKAGES+=("$package")
-              elif [[ "$package" == "metrics-server" ]]; then
-                      package="metricsServer"
-                      CHANGED_PACKAGES+=("$package")
-              else
-                      CHANGED_PACKAGES+=("$package")
-              fi
+              map_filepath_to_values_key $package
+              CHANGED_PACKAGES+=("$valuesKey")
         fi
    done
 
@@ -205,101 +213,29 @@ label_check() {
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
       LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
    else
-      if [[ ${LABEL_CHECK_DEPLOY_LABELS[*]} != ${CI_MERGE_REQUEST_LABELS[*]} ]]; then
+      if [[ ! ${LABEL_CHECK_DEPLOY_LABELS[*]} =~ ${CI_MERGE_REQUEST_LABELS[*]} ]]; then
         LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
       fi
       echo "Initial MR labels: ${LABEL_CHECK_DEPLOY_LABELS[*]} "
       echo "Evaluating package dependencies..."
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermost" ]]; then
-         echo "  Checking mattermost"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "mattermostoperator" ]]; then
-            echo "    mattermostoperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("mattermostoperator")
-            echo "    Added mattermostoperator"
-         fi
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
-            echo "    minioOperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
-            echo "    Added minioOperator"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "promtail" ]]; then
-         echo "  Checking promtail"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
-            echo "    loki already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("loki")
-            echo "    Added loki"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "loki" ]]; then
-         echo "  Checking loki"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
-            echo "    minioOperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
-            echo "    Added minioOperator"
-         fi
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "promtail" ]]; then
-            echo "    promtail already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("promtail")
-            echo "    Added promtail"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"kyvernoreporter"(,|$) ]]; then
-         echo "  Checking kyvernoreporter"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "kyvernopolicies" ]]; then
-            echo "    kyvernopolicies already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("kyvernopolicies")
-            echo "    Added kyvernopolicies"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
-         echo "  Checking minio"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
-            echo "    minioOperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
-            echo "    Added minioOperator"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlabRunner"(,|$) ]]; then
-         echo "  Checking gitlabRunner"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"gitlab"(,|$) ]]; then
-            echo "    gitlab already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("gitlab")
-            echo "    Added gitlab"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "velero" ]]; then
-         echo "  Checking velero"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ (^|,)"minio"(,|$) ]]; then
-            echo "    minio already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minio")
-            echo "    Added minio"
-         fi
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
-            echo "    minioOperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
-            echo "    Added minioOperator"
-         fi
-      fi
-      if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "vault" ]]; then
-         echo "  Checking vault"
-         if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "minioOperator" ]]; then
-            echo "    minioOperator already enabled"
-         else
-            LABEL_CHECK_DEPLOY_LABELS+=("minioOperator")
-            echo "    Added minioOperator"
-         fi
-      fi
+
+      for label in "${LABEL_CHECK_DEPLOY_LABELS[@]}"; do
+        if [[ -z "$label" ]]; then
+          continue
+        fi
+        get_dependencies_from_values_key $label
+        if [[ -z "$dependencies" || "$dependencies" == "null" ]]; then
+          continue
+        fi
+        while IFS= read -r dependency; do
+          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "$dependency" ]]; then
+            echo "    $dependency already enabled"
+          else
+            LABEL_CHECK_DEPLOY_LABELS+=($dependency)
+            echo "    Added $dependency"
+          fi
+        done <<< "$dependencies"
+      done
    fi
 
    # Remove empty array elements
@@ -1318,41 +1254,7 @@ create_bigbang_merge_request() {
     fi
 
     echo "Creating new Big Bang merge request..."
-    ## Determine which package needs to be updated in the Big Bang chart
 
-    # Account for packages that have a different name in Big Bang's values file vs the name of the package repo
-    # The package name is needed to edit the Big Bang chart/values.yaml
-    if [[ ${CI_PROJECT_NAME} == "istio-controlplane" ]]; then
-        package="istio"
-    elif [[ ${CI_PROJECT_NAME} == "istio-operator" ]]; then
-        package="istiooperator"
-    elif [[ ${CI_PROJECT_NAME} == "cluster-auditor" ]]; then
-        package="clusterAuditor"
-    elif [[ ${CI_PROJECT_NAME} == "policy" ]]; then
-        package="gatekeeper"
-    elif [[ ${CI_PROJECT_NAME} == "kyverno-policies" ]]; then
-        package="kyvernopolicies"
-    elif [[ ${CI_PROJECT_NAME} == "kyverno-reporter" ]]; then
-        package="kyvernoreporter"
-    elif [[ ${CI_PROJECT_NAME} == "elasticsearch-kibana" ]]; then
-        package="logging"
-    elif [[ ${CI_PROJECT_NAME} == "eck-operator" ]]; then
-        package="eckoperator"
-    elif [[ ${CI_PROJECT_NAME} == "minio-operator" ]]; then
-        package="minioOperator"
-    elif [[ ${CI_PROJECT_NAME} == "gitlab-runner" ]]; then
-        package="gitlabRunner"
-    elif [[ ${CI_PROJECT_NAME} == "anchore-enterprise" ]]; then
-        package="anchore"
-    elif [[ ${CI_PROJECT_NAME} == "mattermost-operator" ]]; then
-        package="mattermostOperator"
-    elif [[ ${CI_PROJECT_NAME} == "metrics-server" ]]; then
-        package="metricsServer"
-    elif [[ ${CI_PROJECT_NAME} == "nexus" ]]; then
-        package="nexusRepositoryManager"
-    else
-        package="${CI_PROJECT_NAME}"
-    fi
     ## GitLab API endpoint used to interact with project-level resources
     GITLAB_PROJECTS_API_ENDPOINT="https://repo1.dso.mil/api/v4/projects"
 
@@ -1377,35 +1279,36 @@ create_bigbang_merge_request() {
     ## Pull down Big Bang repo, create a new branch, and configure git
     BB_SOURCE_BRANCH="update-${CI_PROJECT_NAME}-tag-${CI_COMMIT_TAG}"
     git clone "https://bb-ci:${BB_AUTO_MR_TOKEN}@${BB_REPO}.git" ${BB_REPO_DESTINATION} 1>/dev/null
+    map_reponame_to_values_key "${CI_PROJECT_NAME}"
     cd ${BB_REPO_DESTINATION}
     git checkout -b ${BB_SOURCE_BRANCH} 1>/dev/null
     git config user.email "mr.bot@bigbang.dev"
     git config user.name "mr.bot"
 
     # Avoiding MRing non-bb packages, will cancel out of potential MR
-    if [ $(yq e "has(\"$package\")" ${VALUES_FILE}) == "false" ] && [ $(yq e ".addons | has(\"$package\")" ${VALUES_FILE}) == "false" ]; then
+    if [ $(yq e "has(\"$valuesKey\")" ${VALUES_FILE}) == "false" ] && [ $(yq e ".addons | has(\"$valuesKey\")" ${VALUES_FILE}) == "false" ]; then
       echo "\e[31mThis package is not a Big Bang core or addon package. Skipping auto Big Bang merge request.\e[0m"
       exit
     fi
 
     ## Bump git or OCI tag for updated package in Big Bang chart/values.yaml
     ## Typically only one of the following tags will be defined and subsequently updated
-    tagRefs=(".${package}.git" ".addons.${package}.git" ".${package}.oci" ".addons.${package}.oci")
+    tagRefs=(".${valuesKey}.git" ".addons.${valuesKey}.git" ".${valuesKey}.oci" ".addons.${valuesKey}.oci")
 
     for i in "${tagRefs[@]}"
     do
-      update_package_tag "$i"
+      update_package_tag "$i" "$valuesKey"
     done
 
     ## Push changes and create merge request
     git add ${VALUES_FILE} 1>/dev/null
-    git commit -m "Updated ${CI_PROJECT_NAME} git tag" 1>/dev/null
+    git commit -m "Updated ${valuesKey} git tag" 1>/dev/null
     git push --set-upstream origin ${BB_SOURCE_BRANCH} \
       -o merge_request.create \
-      -o merge_request.title="Draft: ${CI_PROJECT_NAME} update to ${CI_COMMIT_TAG}" \
+      -o merge_request.title="Draft: ${valuesKey} update to ${CI_COMMIT_TAG}" \
       -o merge_request.label="status::review"	\
       -o merge_request.label="bot::mr"	\
-      -o merge_request.label=${package} \
+      -o merge_request.label=${valuesKey} \
       ${BB_MR_ASSIGNEE} 1>/dev/null
 
 
@@ -1442,6 +1345,10 @@ create_bigbang_merge_request() {
 # Re-Usable Functions
 #
 #-----------------------------------------------------------------------------------------------------------------------
+get_packages() {
+  yq e '(.[],.addons.[]) | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+}
+
 cluster_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0K\e[33;1mIn Cluster Deprecation Check\e[37m"
    kubent -e || export EXIT_CODE=$?
@@ -1463,8 +1370,9 @@ package_auth_setup() {
 
 update_package_tag() {
   BASE_PATH=$1
+  PACKAGE_KEY=$2
 
-  if [[ $(yq e "${BASE_PATH} | select(. != null) | (path | .[-2])" "${VALUES_FILE}") =~ "${package}" ]]; then
+  if [[ $(yq e "${BASE_PATH} | select(. != null) | (path | .[-2])" "${VALUES_FILE}") =~ "${PACKAGE_KEY}" ]]; then
     # yq strips blank lines from YAML files, make a patch file to re-add these
     yq e '.' ${VALUES_FILE} > /tmp/values-noblanks.yaml
     diff /tmp/values-noblanks.yaml ${VALUES_FILE} > /tmp/patch.diff || true 1>/dev/null

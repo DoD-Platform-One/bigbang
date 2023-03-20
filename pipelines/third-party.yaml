@@ -223,7 +223,9 @@ integration:
     BB_REPO: https://repo1.dso.mil/big-bang/bigbang.git
     BB_REPO_DESTINATION: "./bigbang-repo"
     CERT_FILE_URL: https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml
+    VALUES_FILE: "./chart/values.yaml"
     CI_VALUES_FILE: "./tests/test-values.yaml"
+    MAPPING_FILE: "./tests/package-mapping.yaml"
     PIPELINE_REPO_DESTINATION: "pipeline-repo"
     PIPELINE_TYPE: "INTEGRATION"
   script:

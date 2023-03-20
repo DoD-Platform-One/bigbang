@@ -63,6 +63,7 @@ variables:
   CHECKSUM_FILE: ${CI_PROJECT_NAME}-${CI_COMMIT_TAG}_checksums.txt
   VALUES_FILE: chart/values.yaml
   CI_VALUES_FILE: tests/test-values.yaml
+  MAPPING_FILE: tests/package-mapping.yaml
   REGISTRY1_USER: $REGISTRY1_USER
   PIPELINE_TYPE: "BB"
   DEBUG_ENABLED: "false"
