@@ -2,9 +2,12 @@
 {{- range $pkg, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) $vals.kustomize -}}
 {{- $pkg := include "resourceName" $pkg -}}
-{{- $vals := merge $vals ($.Files.Get (printf "defaults/%s.yaml" $pkg) | fromYaml).package }}
+{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
+{{- if $defaults -}}
+{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- end -}}
 {{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: {{ $pkg }}
@@ -13,37 +16,23 @@ metadata:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
 spec:
+  targetNamespace: {{ dig "namespace" "name" $pkg $vals }}
   path: {{ dig "git" "path" "" $vals }}
   sourceRef:
     kind: GitRepository
     name: {{ $pkg }}
     namespace: {{ dig "namespace" "name" $pkg $vals }}
-  {{- toYaml $fluxSettings | nindent 2 }}
+  interval: {{ dig "interval" "2m" $fluxSettings }}
+  timeout: {{ dig "timeout" "10m" $fluxSettings }}
+  force: {{ dig "force" false $fluxSettings }}
+  wait: {{ dig "wait" true $fluxSettings }}
+  retryInterval: {{ dig "retryInterval" "2m0s" $fluxSettings }}
+  prune: {{ dig "prune" true $fluxSettings }}
   postBuild:
     substituteFrom:
     - name: {{ $pkg }}-values
-        kind: Secret
+      kind: Secret
 
-  {{- /* Always wait on policy enforcement */ -}}
-  {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
-  {{- $kyvernoDep := $.Values.kyvernopolicies.enabled -}}
-  {{- /* Wait on istio if sidecar is enabled */ -}}
-  {{- $istioDep := (and $.Values.istio.enabled (dig "istio" "injection" true $vals)) -}}
-  {{- if or $gatekeeperDep $kyvernoDep $istioDep }}
-  dependsOn:
-    {{- if $gatekeeperDep }}
-    - name: gatekeeper
-      namespace: {{ default "bigbang" $.Values.namespace }}
-    {{- end }}
-    {{- if $kyvernoDep }}
-    - name: kyvernopolicies
-      namespace: {{ default "bigbang" $.Values.namespace }}
-    {{- end }}
-    {{- if $istioDep }}
-    - name: istio
-      namespace: {{ default "bigbang" $.Values.namespace }}
-    {{- end -}}
-  {{- end }}
 ---
 {{ end -}}
 {{- end -}}
