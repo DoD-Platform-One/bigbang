@@ -238,6 +238,8 @@ Supported keywords:
 
 `SKIP INTEGRATION` -- Skips the integration stage which is used in the third-party and sandbox pipelines.
 
+`SKIP CHECK CHANGES` -- Skips the changes check which fails the pipeline when there are conflicts with the master branch.
+
 &nbsp;
 
 ### MR Labels
