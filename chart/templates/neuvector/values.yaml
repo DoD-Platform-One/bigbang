@@ -34,6 +34,13 @@ controller:
           password: {{ $neuvectorMetricsPass }}
           role: reader
           fullname: metrics
+      oidcinitcfg.yaml:
+        always_reload: true
+        enable: {{ .Values.neuvector.sso.enabled }}
+        issuer: {{ default (include "sso.url" .) (tpl (default "" .Values.neuvector.sso.issuer) .) }}
+        client_id: {{ .Values.neuvector.sso.client_id }}
+        client_secret: {{ .Values.neuvector.sso.client_secret }}
+        default_role: {{ .Values.neuvector.sso.default_role }} 
     
 monitor:
   install: true
