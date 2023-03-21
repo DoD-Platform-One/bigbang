@@ -313,6 +313,9 @@ auto tag:
   script:
     - get_chart_version
     - create_tag
+  allow_failure:
+    exit_codes:
+      - 201
   retry:
     max: 2
     when:
