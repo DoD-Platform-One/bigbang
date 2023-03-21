@@ -1,0 +1,11 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: '79-kick-off-bb-docs-compiler-pipeline-after-bigbang-release-tag-is-created'
+    file: '/pipelines/bigbang-docs.yaml' 
+variables:
+  PIPELINE_REPO_BRANCH: '79-kick-off-bb-docs-compiler-pipeline-after-bigbang-release-tag-is-created' 
+  DEBUG_ENABLED: "true"
+  MULTI_NODE: "true"
+  CI_DEFAULT_BRANCH: "chris-bb-docs-master"
+  CI_DEBUG_TRACE: "true"
+  
