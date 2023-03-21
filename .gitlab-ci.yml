@@ -1,13 +1,13 @@
 include:
   - project: 'big-bang/pipeline-templates/pipeline-templates'
-    ref: 'BB_MR_OCI_and_3rd_party_expansion'
+    ref: '3rd_party_expansion'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'BB_MR_OCI_and_3rd_party_expansion' 
+  PIPELINE_REPO_BRANCH: '3rd_party_expansion' 
   DEBUG_ENABLED: "true"
   MULTI_NODE: "true"
   BB_REPO: repo1.dso.mil/snekcode/bigbang
   BB_PROJECT_ID: 12985
   CI_PROJECT_NAME: "istio"
   BB_AUTO_MR_TOKEN: ${SNEKCODE_FORK_TOKEN}
-  CI_DEFAULT_BRANCH: snekcode-master
+  CI_DEFAULT_BRANCH: snekcode-mattermost-operator-master
