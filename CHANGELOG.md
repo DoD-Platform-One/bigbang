@@ -3,6 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
+## [2.5.33]
+### Added
+- If helm repos exist in the cluster, wait for them to become ready.
+- Adding SKIP CHECK CHANGES to an MR title will skip the check which fails the pipeline if there are conflicts with the master branch.
+
 ## [2.5.32]
 ### Changed
 - Modified pipeline "mappings" to live in BB umbrella rather than pipeline code

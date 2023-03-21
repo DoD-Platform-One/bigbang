@@ -146,8 +146,17 @@ for package in "${PACKAGE_LIST[@]}"; do
   fi
 done
 
-echo "⏳ Waiting on GitRepositories"
-kubectl wait --for=condition=Ready --timeout 180s gitrepositories -n bigbang --all
+echo -n "Checking for git repos to wait on..."
+if [[ -n $(kubectl get GitRepository -A) ]]; then
+  echo "found, ⏳ Waiting on GitRepositories"
+  kubectl wait --for=condition=Ready --timeout 180s gitrepositories -n bigbang --all
+fi
+
+echo -n "Checking for helm repos to wait on..."
+if [[ -n $(kubectl get HelmRepository -A) ]]; then
+  echo "found, ⏳ Waiting on HelmRepositories"
+  kubectl wait --for=condition=Ready --timeout 180s HelmRepository -n bigbang --all
+fi
 
 for package in "${ENABLED_LIST[@]}";
 do
