@@ -98,7 +98,7 @@ map_values_key_to_hr() {
   if [[ ! (-f "$MAPPING_FILE") ]]; then
     MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
   fi
-  export hrName=$(yq e ".${valuesKey}.hrName" ${MAPPING_FILE})
+  export hrName=$(yq e ".\"${valuesKey}\".hrName" ${MAPPING_FILE})
   if [[ -z "$hrName" || "$hrName" == "null" ]]; then
     hrName=$valuesKey
   fi
@@ -109,7 +109,7 @@ get_dependencies_from_values_key() {
   if [[ ! (-f "$MAPPING_FILE") ]]; then
     MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
   fi
-  export dependencies=$(yq e ".${valuesKey}.dependencies[]" ${MAPPING_FILE})
+  export dependencies=$(yq e ".\"${valuesKey}\".dependencies[]" ${MAPPING_FILE})
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +202,7 @@ label_check() {
    ## Show current labels
    OLD_IFS=$IFS
    IFS=","
-   LABEL_CHECK_DEPLOY_LABELS+=("${CI_MERGE_REQUEST_LABELS[*]}")
+   LABEL_CHECK_DEPLOY_LABELS+=(${CI_MERGE_REQUEST_LABELS[@]})
 
    for package in ${CHANGED_PACKAGES[*]}; do
       if [[ ! "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "${package}" ]]; then
@@ -215,10 +215,10 @@ label_check() {
 
    if [[ "${CI_COMMIT_BRANCH}" == "${CI_DEFAULT_BRANCH}" ]] || [[ ! -z "$CI_COMMIT_TAG" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "all-packages" ]]; then
       echo "🌌 all-packages label enabled, or on default branch or tag, enabling all addons"
-      LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+      LABEL_CHECK_DEPLOY_LABELS+=(${CI_MERGE_REQUEST_LABELS[@]})
    else
       if [[ ! ${LABEL_CHECK_DEPLOY_LABELS[*]} =~ ${CI_MERGE_REQUEST_LABELS[*]} ]]; then
-        LABEL_CHECK_DEPLOY_LABELS+=( "${CI_MERGE_REQUEST_LABELS[*]}" )
+        LABEL_CHECK_DEPLOY_LABELS+=(${CI_MERGE_REQUEST_LABELS[@]})
       fi
       echo "Initial MR labels: ${LABEL_CHECK_DEPLOY_LABELS[*]} "
       echo "Evaluating package dependencies..."
@@ -232,7 +232,7 @@ label_check() {
           continue
         fi
         while IFS= read -r dependency; do
-          if [[ "${LABEL_CHECK_DEPLOY_LABELS[*]}" =~ "$dependency" ]]; then
+          if [[ " ${LABEL_CHECK_DEPLOY_LABELS[*]} " =~ " $dependency " ]]; then
             echo "    $dependency already enabled"
           else
             LABEL_CHECK_DEPLOY_LABELS+=($dependency)
