@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
-## [1.22.0-3rd-party] - 2022-12-06
+## [1.22.0-sandbox] - 2022-12-06
 ### Changed
 - stuff
 ## [1.22.0-bb.0] - 2022-12-06
