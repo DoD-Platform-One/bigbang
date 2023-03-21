@@ -1,7 +1,7 @@
 include:
   - project: 'big-bang/pipeline-templates/pipeline-templates'
     ref: '3rd_party_expansion'
-    file: '/pipelines/bigbang-package.yaml' 
+    file: '/pipelines/third-party.yaml' 
 variables:
   PIPELINE_REPO_BRANCH: '3rd_party_expansion' 
   DEBUG_ENABLED: "true"
@@ -10,4 +10,4 @@ variables:
   BB_PROJECT_ID: 12985
   CI_PROJECT_NAME: "istio"
   BB_AUTO_MR_TOKEN: ${SNEKCODE_FORK_TOKEN}
-  CI_DEFAULT_BRANCH: snekcode-mattermost-operator-master
+  CI_DEFAULT_BRANCH: snekcode-mattermost-operator-3rd-party
