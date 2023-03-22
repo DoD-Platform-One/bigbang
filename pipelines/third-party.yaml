@@ -23,6 +23,7 @@ stages:
   - 🤞 package tests
   - 🤝 integration test
   - 🏷️ tag
+  - 📦 package
 
 variables:
   BB_VERSION: "latest"
@@ -277,3 +278,8 @@ auto tag:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
+oci creation:
+  stage: 📦 package
+  extends:
+    - .oci-creation
