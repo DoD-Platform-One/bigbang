@@ -1421,6 +1421,12 @@ get_gitrepos() {
   echo -e "\e[0Ksection_end:`date +%s`:git_repos\r\e[0K"
 }
 
+get_helmrepos() {
+  echo -e "\e[0Ksection_start:`date +%s`:helm_repos[collapsed=true]\r\e[0K\e[33;1mHelmrepos\e[37m"
+  kubectl get helmrepository -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:helm_repos\r\e[0K"
+}
+
 get_hr() {
   echo -e "\e[0Ksection_start:`date +%s`:hr[collapsed=true]\r\e[0K\e[33;1mHelmreleases\e[37m"
   kubectl get helmrelease -A || true
@@ -1546,6 +1552,7 @@ get_debug() {
 bigbang_pipeline() {
   if [[ $PIPELINE_TYPE == "BB" ]] || [[ $PIPELINE_TYPE == "INTEGRATION" ]]; then
     get_gitrepos
+    get_helmrepos
     get_hr
     get_opa_violations
   else
