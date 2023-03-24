@@ -1353,6 +1353,53 @@ get_packages() {
   yq e '(.[],.addons.[]) | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
 }
 
+get_core_packages() {
+  yq e '.[] | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+}
+
+get_addons_packages() {
+  yq e '.addons.[] | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+}
+
+enable() {
+  local package="$1"
+  local path=$(get_package_path $package)
+
+  if [ -z "$path" ]; then
+    echo "Skipping non-package \"$package\""
+    return
+  fi
+
+  if [[ "$(yq e ".$path | has(\"enabled\")" $VALUES_FILE)" == "true" ]]; then
+    yq e ".${path}.enabled = "true"" $CI_VALUES_FILE > tmpfile && mv tmpfile $CI_VALUES_FILE
+    echo "Enabled \"$package\" at \"$path\""
+  else
+    echo "${path} does not exist in ${VALUES_FILE}"
+  fi
+}
+
+enable_core() {
+  local PACKAGES=($(get_core_packages))
+
+  for package in "${PACKAGES[@]}"; do
+    enable "${package}"
+  done
+}
+
+enable_addons() {
+  local PACKAGES=($(get_addons_packages))
+
+  for package in "${PACKAGES[@]}"; do
+    enable "${package}"
+  done
+}
+
+get_package_path() {
+  local package="$1"
+
+  yq e ".. | (select(has(\"git\")) or (select(has(\"oci\")))) | (path | join(\".\")) | select(. == \"*${package}\")" $VALUES_FILE
+}
+
 cluster_deprecation_check() {
    echo -e "\e[0Ksection_start:`date +%s`:kubent_check[collapsed=true]\r\e[0K\e[33;1mIn Cluster Deprecation Check\e[37m"
    kubent -e || export EXIT_CODE=$?
