@@ -85,9 +85,6 @@ monitor:
 enforcer:
   podAnnotations:
     {{ include "istioAnnotation" . }}
-manager:
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
 cve:
   updater:
     podAnnotations:
@@ -101,6 +98,10 @@ cve:
 manager:
   env:
     ssl: false
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
 {{- end }}
 
 networkPolicies:
