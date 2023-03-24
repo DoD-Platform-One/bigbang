@@ -16,17 +16,20 @@ istio:
     - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
-{{- if .Values.monitoring.enabled }}
 monitoring:
-  enabled: true
+  enabled: {{ .Values.monitoring.enabled }}
 
+{{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled }}
 controller:
+  {{- if $istioInjection }}
   podAnnotations:
-    checksum/metrics-pass: {{ sha256sum $neuvectorMetricsPass }}
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+  {{- if or .Values.monitoring.enabled .Values.neuvector.sso.enabled }}
   secret:
     enabled: true
     data: 
-      # This configuration is read in at deploy time and users are created.
+      {{- if .Values.monitoring.enabled }}
       userinitcfg.yaml:
         always_reload: true
         users:
@@ -34,22 +37,36 @@ controller:
           password: {{ $neuvectorMetricsPass }}
           role: reader
           fullname: metrics
+      {{- end }}
+      {{- if .Values.neuvector.sso.enabled }}
       oidcinitcfg.yaml:
         always_reload: true
         enable: {{ .Values.neuvector.sso.enabled }}
         issuer: {{ default (include "sso.url" .) (tpl (default "" .Values.neuvector.sso.issuer) .) }}
         client_id: {{ .Values.neuvector.sso.client_id }}
         client_secret: {{ .Values.neuvector.sso.client_secret }}
-        default_role: {{ .Values.neuvector.sso.default_role }} 
-    
+        default_role: {{ .Values.neuvector.sso.default_role }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+
 monitor:
-  install: true
+  install: {{ .Values.monitoring.enabled }}
   exporter:
-    enabled: true
+    enabled: {{ .Values.monitoring.enabled }}
+    {{- if or .Values.monitoring.enabled $istioInjection }}
+    podAnnotations:
+      {{- if .Values.monitoring.enabled }}
+      checksum/metrics-pass: {{ sha256sum $neuvectorMetricsPass }}
+      {{- end }}
+      {{- if $istioInjection }}
+      {{ include "istioAnnotation" . }}
+      {{- end }}
+    {{- end }}
     serviceMonitor:
-      enabled: true
+      enabled: {{ .Values.monitoring.enabled }}
       # conditional passes only for default istio: enabled, mTLS: SCRICT
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") }}
+      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") .Values.monitoring.enabled }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -58,10 +75,26 @@ monitor:
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
     svc:
-      enabled: true
+      enabled: {{ .Values.monitoring.enabled }}
       type: ClusterIP
     CTRL_USERNAME: metrics
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
+
+
+{{- if $istioInjection }}
+enforcer:
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+manager:
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+cve:
+  updater:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  scanner:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
 {{- end }}
 
 {{- if .Values.istio.enabled }}
