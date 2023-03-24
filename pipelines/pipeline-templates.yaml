@@ -18,6 +18,7 @@ include:
 
 stages:
   - 📝 changelog check
+  - 🤞 test
   - 🏷️ tag
 
 variables:
@@ -48,6 +49,19 @@ changelog check:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
+test:
+  stage: 🤞 test
+  extends:
+    - .generic-runner-tags
+    - .util-image
+    - .templates
+  rules:
+    - when: always
+  script:
+    - yum -y install  make
+    - npm install -g bats
+    - make
 
 auto tag:
   stage: 🏷️ tag
