@@ -368,7 +368,7 @@ clusterAuditor:
 #
 gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
-  enabled: true
+  enabled: false
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
     path: "./chart"
@@ -393,7 +393,7 @@ gatekeeper:
 #
 kyverno:
   # -- Toggle deployment of Kyverno.
-  enabled: false
+  enabled: true
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
     path: "./chart"
@@ -1001,9 +1001,11 @@ addons:
     # -- Toggle deployment of Gitlab Runner
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
-      tag: "0.49.1-bb.2"
+      # tag: "0.49.1-bb.3"
+      tag: null
+      branch: "55-create-networkpolicies-for-gitlab-runner"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}

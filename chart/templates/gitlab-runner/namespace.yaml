@@ -1,0 +1,11 @@
+{{- if .Values.addons.gitlabRunner.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: gitlab-runner
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlabRunner }}
+  name: gitlab-runner
+{{- end }}
