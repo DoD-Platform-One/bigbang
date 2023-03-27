@@ -1,6 +1,6 @@
 {{- /* Used for Helm chart deployment of Big Bang wrapper.  One per package. */ -}}
 {{- range $pkg, $vals := .Values.packages -}}
-{{- if (dig "enabled" true $vals) -}}
+{{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg = include "resourceName" $pkg -}}
 {{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1

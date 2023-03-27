@@ -57,11 +57,15 @@ The wrapper does not add anything additional to your deployment, unless you also
 ```yaml
 packages:
   podinfo:
+    enabled: true
+    wrapper:
+      enabled: true
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
       path: charts/podinfo
 ```
+NOTE: The wrapper is an opt-in feature.  Without enabling the wrapper, the `packages` will default to deploying flux object for your chart, without any wrapper-added configuration.
 
 The package also has OCI support for sourcing the artifacts; usage will be encouraged with the move to 2.0 and "first-class" support for `HelmRepository` resources.
 
@@ -69,7 +73,7 @@ With these values added you should have a very basic deployment of `podinfo` add
 
 ### Basic Overrides
 
-There are some basic ovveride values provides to modify your Helm chart installation. An example of these values is included below:
+There are some basic override values provided to modify your Helm chart installation. These do NOT require the `wrapper`. An example of these values is included below:
 
 ```yaml
 packages:
@@ -102,6 +106,8 @@ packages:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
       path: charts/podinfo
+    wrapper:
+      enabled: true
     istio:
       hosts:
         - names:
@@ -127,6 +133,8 @@ packages:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
       path: charts/podinfo
+    wrapper:
+      enabled: true
     monitor:
       services:
         - spec:
@@ -149,6 +157,8 @@ packages:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
       path: charts/podinfo
+    wrapper:
+      enabled: true
     network:
       allowControlPlaneEgress: true
 ```
@@ -168,6 +178,8 @@ packages:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
       path: charts/podinfo
+    wrapper:
+      enabled: true
     configMaps:
       - name: config
         data:
