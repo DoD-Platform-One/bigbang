@@ -432,7 +432,7 @@ kyvernoreporter:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
     path: ./chart
-    tag: "2.16.0-bb.0"
+    tag: "2.16.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
@@ -628,7 +628,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "1.0.0-bb.3"
+    tag: "1.0.2-bb.0"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
