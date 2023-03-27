@@ -1,9 +1,9 @@
 include:
   - project: 'big-bang/pipeline-templates/pipeline-templates'
-    ref: 'mapping-things'
+    ref: 'master'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'mapping-things'
+  PIPELINE_REPO_BRANCH: 'master'
   DEBUG_ENABLED: "true"
   BB_REPO: repo1.dso.mil/snekcode/bigbang
   BB_PROJECT_ID: 12985
