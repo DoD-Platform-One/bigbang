@@ -628,7 +628,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
     path: "./chart"
-    tag: "1.0.0-bb.3"
+    tag: "1.0.2-bb.0"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
