@@ -6,7 +6,7 @@ metadata:
   name: gitlab-runner
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: gitlab
+  targetNamespace: gitlab-runner
   releaseName: gitlab-runner
   chart:
     spec:
@@ -47,6 +47,10 @@ spec:
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyverno.enabled }}
+    - name: kyverno
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.kyvernopolicies.enabled }}
