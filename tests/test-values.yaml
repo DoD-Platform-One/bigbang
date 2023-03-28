@@ -320,7 +320,7 @@ gatekeeper:
       enabled: true
 
 kyverno:
-  enabled: false
+  enabled: true
   values:
     replicaCount: 1
     bbtests:
