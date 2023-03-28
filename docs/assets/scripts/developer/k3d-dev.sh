@@ -370,7 +370,7 @@ echo
 echo
 # install k3d on instance
 echo "Installing k3d on instance"
-run "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.8 bash"
+run "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.9 bash"
 echo
 echo "k3d version"
 run "k3d version"
