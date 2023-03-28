@@ -1003,9 +1003,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
-      # tag: "0.49.1-bb.3"
-      tag: null
-      branch: "55-create-networkpolicies-for-gitlab-runner"
+      tag: "0.49.1-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
