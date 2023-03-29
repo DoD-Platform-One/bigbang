@@ -16,19 +16,21 @@ POLICIES=($ENABLED_POLICIES)
 
 #######################################
 
-# Test for disabled cluster policies
-echo -e "${CYN}Test: Disabled cluster policies are not deployed${NC}"
-echo -n "- enabled policies >= deployed policies: "
-DEPLOYED_POLICIES=( $(kubectl get cpol --no-headers -o custom-columns=":metadata.name") )
-# Get deployed policies that are not in our enabled policies list
-DELTA=( $(echo ${POLICIES[@]} ${POLICIES[@]} ${DEPLOYED_POLICIES[@]} | tr ' ' '\n' | sort | uniq -u) )
-if [ -z $DELTA ]; then
-  echo -e "${GRN}PASS${NC}"
-  ((PASS+=1))
-else
-  echo -e "${RED}FAIL${NC}"
-  echo "Policies causing failure: ${DELTA[@]}"
-  ((FAIL+=1))
+# Test for disabled cluster policies for package level only
+if [[ $PACKAGE_LEVEL_TEST == "true" ]]; then
+  echo -e "${CYN}Test: Disabled cluster policies are not deployed${NC}"
+  echo -n "- enabled policies >= deployed policies: "
+  DEPLOYED_POLICIES=( $(kubectl get cpol --no-headers -o custom-columns=":metadata.name") )
+  # Get deployed policies that are not in our enabled policies list
+  DELTA=( $(echo ${POLICIES[@]} ${POLICIES[@]} ${DEPLOYED_POLICIES[@]} | tr ' ' '\n' | sort | uniq -u) )
+  if [ -z $DELTA ]; then
+    echo -e "${GRN}PASS${NC}"
+    ((PASS+=1))
+  else
+    echo -e "${RED}FAIL${NC}"
+    echo "Policies causing failure: ${DELTA[@]}"
+    ((FAIL+=1))
+  fi
 fi
 
 #######################################
