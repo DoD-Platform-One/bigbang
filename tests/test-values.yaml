@@ -1,5 +1,8 @@
 bbtests:
   enabled: true
+  scripts:
+    envs:
+      PACKAGE_LEVEL_TEST: "true"
 waitforready:
   imagePullSecrets:
   - name: private-registry
