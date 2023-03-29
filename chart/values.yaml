@@ -145,7 +145,7 @@ istio:
   enabled: true
 
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
     tag: "1.17.1-bb.0"
 
@@ -251,7 +251,7 @@ istio:
   # -- Flux reconciliation overrides specifically for the Istio Package
   flux: {}
 
-  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -261,14 +261,14 @@ istiooperator:
   # -- Toggle deployment of Istio Operator.
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
     tag: "1.17.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
 
-  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -276,9 +276,9 @@ istiooperator:
 
 jaeger:
   # -- Toggle deployment of Jaeger.
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
     path: "./chart"
     tag: "2.41.0-bb.0"
 
@@ -303,7 +303,7 @@ jaeger:
     # -- OIDC Client Secret to use for Jaeger
     client_secret: ""
 
-  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -313,7 +313,7 @@ kiali:
   # -- Toggle deployment of Kiali.
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
     tag: "1.64.0-bb.0"
 
@@ -334,7 +334,7 @@ kiali:
     # -- OIDC Client Secret to use for Kiali
     client_secret: ""
 
-  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
+  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/big-bang/product/packages/kiali
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -347,16 +347,16 @@ kiali:
 #
 clusterAuditor:
   # -- Toggle deployment of Cluster Auditor.
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
     tag: "1.5.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
 
-  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -370,7 +370,7 @@ gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
   enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
     tag: "3.11.0-bb.2"
 
@@ -381,7 +381,7 @@ gatekeeper:
     upgrade:
       crds: CreateReplace
 
-  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/big-bang/product/packages/policy.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -395,14 +395,14 @@ kyverno:
   # -- Toggle deployment of Kyverno.
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
     tag: "2.6.5-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+  # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -411,16 +411,16 @@ kyverno:
 
 kyvernopolicies:
   # -- Toggle deployment of Kyverno policies
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
     tag: "1.1.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+  # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -428,16 +428,16 @@ kyvernopolicies:
 
 kyvernoreporter:
   # -- Toggle deployment of Kyverno Reporter
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
     path: ./chart
     tag: "2.16.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
+  # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -450,9 +450,9 @@ kyvernoreporter:
 #
 logging:
   # -- Toggle deployment of Logging (EFK).
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
     tag: "1.1.0-bb.1"
 
@@ -479,10 +479,10 @@ logging:
     # -- Toggle trial license installation of elasticsearch.  Note that enterprise (non trial) is required for SSO to work.
     trial: false
 
-    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana#enterprise-license
+    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana#enterprise-license
     keyJSON: ""
 
-  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -490,30 +490,30 @@ logging:
 
 eckoperator:
   # -- Toggle deployment of ECK Operator.
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
     path: "./chart"
     tag: "2.6.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
 
-  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
   values: {}
 
 fluentbit:
   # -- Toggle deployment of Fluent-Bit.
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
     tag: "0.25.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
 
-  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -524,16 +524,16 @@ fluentbit:
 #
 promtail:
   # -- Toggle deployment of Promtail.
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
     tag: "6.8.1-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
 
-  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -541,9 +541,9 @@ promtail:
 
 loki:
   # -- Toggle deployment of Loki.
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
     tag: "4.8.0-bb.0"
 
@@ -574,7 +574,7 @@ loki:
     # admin: loki-admin
     bucketNames: {}
 
-  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/big-bang/product/packages/loki.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -586,9 +586,9 @@ loki:
 
 neuvector:
    # -- Toggle deployment of Neuvector.
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
     tag: "2.4.2-bb.5"
 
@@ -612,7 +612,7 @@ neuvector:
   # -- Flux reconciliation overrides specifically for the Neuvector Package
   flux: {}
   
-  # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+  # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -624,9 +624,9 @@ neuvector:
 
 tempo:
   # -- Toggle deployment of Tempo.
-  enabled: false
+  enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
     tag: "1.0.2-bb.0"
 
@@ -671,7 +671,7 @@ tempo:
     # storage on port 80/9000 set this value to true.
     insecure: false
 
-  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/big-bang/product/packages/tempo.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -686,7 +686,7 @@ monitoring:
   # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
     tag: "43.1.2-bb.4"
 
@@ -733,7 +733,7 @@ monitoring:
       role_attribute_path: "Viewer"
       # -- Other options available, see package Documentation.
 
-  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -745,9 +745,9 @@ monitoring:
 #
 twistlock:
   # -- Toggle deployment of Twistlock.
-  enabled: true
+  enabled: false
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
     tag: "0.12.0-bb.0"
 
@@ -759,7 +759,7 @@ twistlock:
     gateway: ""
 
   sso:
-    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/initialization.md
+    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/big-bang/product/packages/initialization.md
     enabled: false
 
     # -- SAML client ID
@@ -772,7 +772,7 @@ twistlock:
     # -- Groups attribute (optional)
     groups: ""
 
-  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -786,7 +786,7 @@ addons:
     # -- Toggle deployment of ArgoCD.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
       tag: "5.22.1-bb.2"
 
@@ -819,7 +819,7 @@ addons:
       groups: |
         g, Impact Level 2 Authorized, role:admin
 
-    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/big-bang/product/packages/argocd.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -835,14 +835,14 @@ addons:
     #       callback_uri: "https://somecallback"
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
       tag: "0.5.3-bb.5"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
 
-    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/big-bang/product/packages/authservice.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -858,14 +858,14 @@ addons:
     # -- Toggle deployment of minio operator and instance.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
       tag: "4.5.8-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
 
-    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -875,7 +875,7 @@ addons:
     # -- Toggle deployment of minio.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
       tag: "4.5.8-bb.0"
 
@@ -892,7 +892,7 @@ addons:
     # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
     secretkey: ""
 
-    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/big-bang/product/packages/minio.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -908,7 +908,7 @@ addons:
       registry: registry
 
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
       tag: "6.9.2-bb.1"
 
@@ -991,7 +991,7 @@ addons:
       # -- This needs to be set to a non-empty value in order for the Grafana Redis Datasource and Dashboards to be installed.
       password: ""
 
-    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1008,7 +1008,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
 
-    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1018,7 +1018,7 @@ addons:
     # -- Toggle deployment of Nexus Repository Manager.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
       tag: "47.1.0-bb.0"
 
@@ -1069,7 +1069,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Nexus Repository Manager Package
     flux: {}
 
-    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git
+    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/big-bang/product/packages/nexus.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1079,7 +1079,7 @@ addons:
     # -- Toggle deployment of SonarQube.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
       tag: "8.0.0-bb.1"
 
@@ -1126,7 +1126,7 @@ addons:
       # -- Database password for the username used to connect to the existing database.
       password: ""
 
-    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1137,7 +1137,7 @@ addons:
   #
   haproxy:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
       path: "./chart"
       tag: "1.12.0-bb.0"
 
@@ -1148,7 +1148,7 @@ addons:
     ingress:
       gateway: ""
 
-    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1158,7 +1158,7 @@ addons:
     # -- Toggle deployment of Anchore.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
       tag: "1.23.0-bb.0"
 
@@ -1176,7 +1176,7 @@ addons:
       enabled: false
 
       # -- License for Anchore Enterprise.
-      # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
+      # For formatting examples see https://repo1.dso.mil/big-bang/product/packages/CHART.md#enabling-enterprise-services
       licenseYaml: |
         FULL LICENSE
 
@@ -1214,7 +1214,7 @@ addons:
 
       # -- Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens).
       # Only required for enterprise edition of anchore.
-      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#handling-dependencies
+      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/big-bang/product/packages/CHART.md#handling-dependencies
       feeds_database: ""
 
     redis:
@@ -1232,7 +1232,7 @@ addons:
       # -- Password to connect to pre-existing Redis.
       password: ""
 
-    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1244,14 +1244,14 @@ addons:
   mattermostOperator:
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
       path: "./chart"
       tag: "1.20.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
     flux: {}
 
-    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1261,7 +1261,7 @@ addons:
     # -- Toggle deployment of Mattermost.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
       tag: "7.8.1-bb.0"
 
@@ -1332,12 +1332,12 @@ addons:
 
     # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
     # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
-    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/big-bang/product/packages/values.yaml
     elasticsearch:
       # -- Toggle interaction with Elastic for optimized search indexing
       enabled: false
 
-    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1348,7 +1348,7 @@ addons:
     enabled: false
 
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
       tag: "3.1.5-bb.0"
 
@@ -1359,7 +1359,7 @@ addons:
     plugins: []
     # - aws
 
-    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1376,7 +1376,7 @@ addons:
     # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
       tag: "18.4.0-bb.1"
 
@@ -1412,7 +1412,7 @@ addons:
       key: ""
       cert: ""
 
-    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1425,7 +1425,7 @@ addons:
     # -- Toggle deployment of Vault.
     enabled: false
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
       tag: "0.23.0-bb.2"
 
@@ -1440,7 +1440,7 @@ addons:
       key: ""
       cert: ""
 
-    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/big-bang/product/packages/vault.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1455,14 +1455,14 @@ addons:
     # true = enabled / false = disabled / auto = automatic (Installs only if metrics API endpoint is not present)
     enabled: auto
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
       tag: "3.8.4-bb.0"
 
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
 
-    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
