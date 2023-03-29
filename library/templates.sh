@@ -982,7 +982,7 @@ chart_update_check() {
    README_BRANCH_MATCH=$(cat README.md | grep "Version:\s${MR_BRANCH_VERSION}" || true)
    # Adds a new line to end of changelog for proper parsing
    if [ "$(tail -c 1 README.md)" != "" ]; then
-     echo -e "\e[31mNOTICE: README is missing a newline at the end of the file. This typically indicates you are using the wrong version of helm-docs, validate you are using the latest commands from https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+     echo -e "\e[31mNOTICE: README is missing a newline at the end of the file. This typically indicates you are using the wrong version of helm-docs, validate you are using the latest commands from https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
      EXIT="true"
    fi
    if [ "$MR_BRANCH_VERSION" == "$DEFAULT_BRANCH_VERSION" ]; then
@@ -990,7 +990,7 @@ chart_update_check() {
      EXIT="true"
    fi
    if [ -z "$README_BRANCH_MATCH" ]; then
-        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
+        echo -e "\e[31mNOTICE: You need to re-generate the README.md - for template and instructions, see: https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md\e[0m"
         EXIT="true"
    fi
    if [ "$(cat /tmp/CHANGELOG.md)" == "$(cat CHANGELOG.md)" ]; then
@@ -1694,9 +1694,9 @@ get_cpumem(){
 renovate_download_external_deps() {
   mkdir -p "${CI_PROJECT_DIR}"/scripts/
 
-  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
-  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
-  curl -Ls https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
+  curl -Ls https://repo1.dso.mil/big-bang/product/packages/gluon/-/raw/master/docs/README.md.gotmpl -o "${CI_PROJECT_DIR}"/scripts/README.md.gotmpl
+  curl -Ls https://repo1.dso.mil/big-bang/product/packages/gluon/-/raw/master/docs/.helmdocsignore -o "${CI_PROJECT_DIR}"/scripts/.helmdocsignore
+  curl -Ls https://repo1.dso.mil/big-bang/product/packages/gluon/-/raw/master/docs/_templates.gotmpl -o "${CI_PROJECT_DIR}"/scripts/_templates.gotmpl
 
   mkdir -p "${CI_PROJECT_DIR}"/renovate
 }

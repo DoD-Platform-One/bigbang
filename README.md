@@ -23,7 +23,7 @@ Two or more stages will be executed in the pipeline, which are detailed below.
 
 Functional smoke tests are executed via [Helm tests](https://helm.sh/docs/topics/chart_tests/).
 
-We use an internally developed [Helm library chart](https://repo1.dso.mil/big-bang/apps/library-charts/gluon) which can
+We use an internally developed [Helm library chart](https://repo1.dso.mil/big-bang/product/packages/gluon) which can
 be used to simplify implementation of Helm tests in your package.
 
 Currently two testing types are supported in the library:
@@ -58,11 +58,11 @@ helm test my-release
 
 #### Including the Gluon Helm Test Library in Your Package
 
-Big Bang pipelines run helm tests found in each package by means of the Big Bang [gluon](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) library chart
+Big Bang pipelines run helm tests found in each package by means of the Big Bang [gluon](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-tests.md) library chart
 
 To include the gluon helm test library, you need to add a dependency to your package's Chart.yaml file
 
-The latest version can be found [here](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/chart/Chart.yaml#L10)
+The latest version can be found [here](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/chart/Chart.yaml#L10)
 
 ```yaml
 dependencies:
@@ -82,7 +82,7 @@ helm dependency update chart
 
 The gluon chart will now be pulled into the `chart/charts` folder as an archive.
 
-**For more information on how to use this library see this [doc](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)**
+**For more information on how to use this library see this [doc](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-tests.md)**
 
 &nbsp;
 
