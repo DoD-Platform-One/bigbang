@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.6.9]
+### Fixed
+- Fixed dependency mapping to handle string things
+
 ## [2.6.8]
 ### Fixed
 - Fixed docs build to build from master for realz
