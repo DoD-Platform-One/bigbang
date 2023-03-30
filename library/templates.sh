@@ -98,7 +98,7 @@ map_values_key_to_hr() {
   if [[ ! (-f "$MAPPING_FILE") ]]; then
     MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
   fi
-  export hrName=$(yq e ".\"${valuesKey}\".hrName" ${MAPPING_FILE})
+  export hrName=$(yq e ".[\"${valuesKey}\"].hrName" ${MAPPING_FILE})
   if [[ -z "$hrName" || "$hrName" == "null" ]]; then
     hrName=$valuesKey
   fi
@@ -109,7 +109,7 @@ get_dependencies_from_values_key() {
   if [[ ! (-f "$MAPPING_FILE") ]]; then
     MAPPING_FILE=${PIPELINE_REPO_DESTINATION}/library/package-mapping.yaml
   fi
-  export dependencies=$(yq e ".\"${valuesKey}\".dependencies[]" ${MAPPING_FILE})
+  yq e ".[\"${valuesKey}\"].dependencies[]" ${MAPPING_FILE}
 }
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ label_check() {
         if [[ -z "$label" ]]; then
           continue
         fi
-        get_dependencies_from_values_key $label
+        dependencies=$(get_dependencies_from_values_key $label)
         if [[ -z "$dependencies" || "$dependencies" == "null" ]]; then
           continue
         fi
