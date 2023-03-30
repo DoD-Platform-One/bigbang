@@ -101,6 +101,8 @@ bb-docs:on-schedule-latest:
     - poetry run mike delete --branch docs "latest"
     - poetry run mike deploy --branch docs --update-aliases --template docs-compiler/templates/redirect.html "latest"
     - git checkout docs -- &>/dev/null
+    - jq -c 'sort_by(.version) | reverse' versions.json > versions.json.tmp && mv versions.json.tmp versions.json
+    - git add versions.json; git commit -m "update versions.json"
     - git show main:docs-compiler/templates/index.html > index.html
     - if git diff --name-only | grep --quiet index.html; then git add index.html; git commit -m "update index.html"; fi
     - git checkout main &>/dev/null
