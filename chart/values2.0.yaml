@@ -248,7 +248,7 @@ wrapper:
     # -- Name of the OCI chart in `repo`
     name: wrapper
     # -- Tag of the OCI chart in `repo`
-    tag: "0.1.1"
+    tag: "0.2.1"
     # -- Repository holding OCI chart, corresponding to `ociRepositories` name
     repo: "registry1"
   git:

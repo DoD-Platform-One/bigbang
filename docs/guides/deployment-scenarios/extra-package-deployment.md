@@ -161,6 +161,18 @@ packages:
       enabled: true
     network:
       allowControlPlaneEgress: true
+      additionalPolicies: []
+      # example of additional egress network policy
+      # - name: egress-additional
+      #   spec: 
+      #     podSelector: {}
+      #     policyTypes:
+      #     - Egress
+      #     egress:
+      #     - to:
+      #       ports:
+      #       - protocol:
+      #         port: 9999
 ```
 
 In this example we are allowing the package to have egress to the Kubernetes control plane (aka API). This particular setting can be beneficial for operators that may need to create Kubernetes resources. 
