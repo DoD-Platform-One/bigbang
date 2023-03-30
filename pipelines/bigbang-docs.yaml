@@ -98,6 +98,7 @@ bb-docs:on-schedule-latest:
         sleep 15
       done
     - PLAYWRIGHT_BROWSERS_PATH="/ms-playwright" npm test
+    - poetry run mike delete --branch docs "latest"
     - poetry run mike deploy --branch docs --update-aliases --template docs-compiler/templates/redirect.html "latest"
     - git checkout docs -- &>/dev/null
     - git show main:docs-compiler/templates/index.html > index.html
