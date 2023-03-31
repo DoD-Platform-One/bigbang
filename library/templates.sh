@@ -132,6 +132,13 @@ check_changes() {
    ## Array of addon packages
    CHECK_PACKAGES=($(get_packages))
 
+   ## Associative array of packages and their paths (requires bash 4+) 
+   ## to skip looping through get_package_path() multiple times
+   declare -A package_path
+   for package in "${CHECK_PACKAGES[@]}"; do 
+     package_path[$package]=$(get_package_path $package) 
+   done
+
    ## Array of templates
    TEMPLATES=($(find chart/templates -type d | cut -b 17-))
 
@@ -141,13 +148,8 @@ check_changes() {
    mkdir -p target-branch/templates
    cp -R chart/templates/* target-branch/templates
    for package in "${CHECK_PACKAGES[@]}"; do
-        # Save all top-level package configs to their own file
-        if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-              yq e ".$package" "${VALUES_FILE}" > target-branch/values/$package.yaml
-        # Save all package configs in .addons to their own file
-        elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-              yq e ".addons.$package" "${VALUES_FILE}" > target-branch/values/$package.yaml
-        fi
+     # Save all package configs to their own file
+     yq e ".${package_path[$package]}" "${VALUES_FILE}" > target-branch/values/$package.yaml
    done
 
    ## Collect package configurations on the source branch
@@ -159,13 +161,8 @@ check_changes() {
    mkdir -p source-branch/templates
    cp -R chart/templates/* source-branch/templates
    for package in "${CHECK_PACKAGES[@]}"; do
-        # Save all top-level package configs to their own file
-        if [[ $(yq e '(.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-              yq e ".$package" "${VALUES_FILE}" > source-branch/values/$package.yaml
-        # Save all package configs in .addons to their own file
-        elif [[ $(yq e '(.addons.*.git | select(. != null) | (path | .[-2])' "${VALUES_FILE}") =~ "${package}" ]]; then
-              yq e ".addons.$package" "${VALUES_FILE}" > source-branch/values/$package.yaml
-        fi
+     # Save all package configs to their own file
+     yq e ".${package_path[$package]}" "${VALUES_FILE}" > source-branch/values/$package.yaml
    done
 
    ## Check for package changes in chart/values.yaml
