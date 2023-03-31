@@ -8,11 +8,10 @@
 
 istio:
   repoName: "istio-controlplane"
-  filePath: "istio/controlplane"
-istiooperator:
+istioOperator:
   repoName: "istio-operator"
   hrName: "istio-operator"
-  filePath: "istio/operator"
+  filePath: "istio-operator"
 clusterAuditor:
   repoName: "cluster-auditor"
   hrName: "cluster-auditor"

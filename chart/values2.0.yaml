@@ -17,7 +17,7 @@ istio:
     tag: "1.15.3-bb.0"
     repo: "registry1"
 
-istiooperator:
+istioOperator:
   git: null
   oci:
     name: "istio-operator"

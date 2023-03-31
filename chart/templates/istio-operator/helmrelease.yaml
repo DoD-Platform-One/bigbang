@@ -1,5 +1,5 @@
-{{- $fluxSettingsIstioOperator := merge .Values.istiooperator.flux .Values.flux -}}
-{{- if .Values.istiooperator.enabled }}
+{{- $fluxSettingsIstioOperator := merge .Values.istioOperator.flux .Values.flux -}}
+{{- if .Values.istioOperator.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -13,27 +13,27 @@ spec:
   targetNamespace: istio-operator
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.istiooperator) "true" }}
-      chart: {{ .Values.istiooperator.git.path }}
+      {{- if eq (include "checkGitRef" .Values.istioOperator) "true" }}
+      chart: {{ .Values.istioOperator.git.path }}
       sourceRef:
         kind: GitRepository
         name: istio-operator
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.istiooperator.oci.name }}
-      version: {{ .Values.istiooperator.oci.tag }}
+      chart: {{ .Values.istioOperator.oci.name }}
+      version: {{ .Values.istioOperator.oci.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.istiooperator.oci.repo }}
+        name: {{ .Values.istioOperator.oci.repo }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
 
   {{- toYaml $fluxSettingsIstioOperator | nindent 2 }}
 
-  {{- if .Values.istiooperator.postRenderers }}
+  {{- if .Values.istioOperator.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.istiooperator.postRenderers | nindent 4 }}
+  {{ toYaml .Values.istioOperator.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-istio-operator-values

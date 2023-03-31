@@ -20,7 +20,7 @@ istio:
               cpu: 50m
               memory: 128Mi
 
-istiooperator:
+istioOperator:
   values:
     operator:
       resources:

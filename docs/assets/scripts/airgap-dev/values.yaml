@@ -34,7 +34,7 @@ istio:
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/istio-controlplane
 
-istiooperator:
+istioOperator:
   enabled: true
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/istio-operator
