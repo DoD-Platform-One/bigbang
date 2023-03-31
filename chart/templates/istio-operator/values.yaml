@@ -1,8 +1,8 @@
-{{- if .Values.istiooperator.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.istiooperator "name" "istio-operator" "defaults" (include "bigbang.defaults.istiooperator" .)) }}
+{{- if .Values.istioOperator.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.istioOperator "name" "istio-operator" "defaults" (include "bigbang.defaults.istioOperator" .)) }}
 {{- end }}
 
-{{- define "bigbang.defaults.istiooperator" -}}
+{{- define "bigbang.defaults.istioOperator" -}}
 createNamespace: false
 
 enterprise: {{ .Values.istio.enterprise }}

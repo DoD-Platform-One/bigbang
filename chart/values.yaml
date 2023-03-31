@@ -257,7 +257,7 @@ istio:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-istiooperator:
+istioOperator:
   # -- Toggle deployment of Istio Operator.
   enabled: true
   git:

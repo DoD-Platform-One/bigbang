@@ -143,7 +143,7 @@ Set the following in `bigbang/values.yaml` to enable Istio for integration testi
 
 ```yaml
 # Update existing values
-istiooperator:
+istioOperator:
   enabled: true
 istio:
   enabled: true

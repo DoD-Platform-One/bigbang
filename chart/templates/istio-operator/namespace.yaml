@@ -1,4 +1,4 @@
-{{- if .Values.istiooperator.enabled }}
+{{- if .Values.istioOperator.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:

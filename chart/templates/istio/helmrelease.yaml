@@ -17,7 +17,7 @@ spec:
       chart: {{ .Values.istio.git.path }}
       sourceRef:
         kind: GitRepository
-        name: istio-controlplane
+        name: istio
         namespace: {{ .Release.Namespace }}
       {{- else }}
       chart: {{ .Values.istio.oci.name }}

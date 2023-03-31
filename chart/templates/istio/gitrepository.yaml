@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
-  name: istio-controlplane
+  name: istio
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: istio-controlplane
