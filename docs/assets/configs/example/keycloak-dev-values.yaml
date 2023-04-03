@@ -78,6 +78,8 @@ addons:
           value: ispn
         - name: KC_CACHE_STACK
           value: kubernetes
+        - name: KC_METRICS_ENABLED
+          value: "true"
 
       secrets:
         env:
