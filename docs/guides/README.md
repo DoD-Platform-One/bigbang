@@ -23,6 +23,7 @@ The guides included here are not all inclusive of every situation. Please open a
 ### Airgap Deployments
 
 [Airgap Deployments](./airgap/README.md)
+[Airgap w/Zarf](./airgap-zarf/README.md)
 
 ## Backup and Restore
 
