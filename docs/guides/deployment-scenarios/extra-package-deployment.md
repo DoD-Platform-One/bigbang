@@ -95,6 +95,18 @@ In this example we are doing two things:
 
 We could also specify a `postRenderers` value here, which is documented well in [this document](../../understanding-bigbang/configuration/postrenderers.md).
 
+If you would like to have values for your extra package deployment adapt based on your Big Bang configuration you could do something like the below:
+
+```yaml
+packages:
+  podinfo:
+    values:
+      istio:
+        enabled: "{{ .Values.istio.enabled }}"
+```
+
+In this example, Istio will only be configured for podinfo if Istio is enabled for BigBang.
+
 ### Istio Configuration
 
 The wrapper chart provides a number of different ways to provide Istio configuration. The below is a basic example configuring some pieces for the `podinfo` application:
