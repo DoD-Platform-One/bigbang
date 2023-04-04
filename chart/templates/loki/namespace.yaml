@@ -1,10 +1,10 @@
-{{- if or .Values.loki.enabled .Values.promtail.enabled }}
+{{- if and .Values.loki.enabled (not .Values.logging.enabled) (not .Values.fluentbit.enabled) }}
 apiVersion: v1
 kind: Namespace
 metadata:
   name: logging
   labels:
-    app.kubernetes.io/name: logging
+    app.kubernetes.io/name: loki
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
     istio-injection: enabled
