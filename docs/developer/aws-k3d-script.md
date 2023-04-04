@@ -58,17 +58,27 @@ k3d-dev.sh -b -p -m -d -h
 The script uses the default AWS profile and defaults the VPC id and AMI id. 
 To change this default behavior you can export environment variables before running the script.  
 
-Run the script with a specific AWS profile by first exporting the AWS_PROFILE environment variable
+Run the script with a specific AWS profile by first exporting the AWS_PROFILE environment variable:
 ```shell
 export AWS_PROFILE=my-aws-profile
 ```
-To run the script with a specific VPC
+To run the script with a specific VPC:
 ```shell
 export VPC_ID=vpc-XXXXXXXXXXXX
 ```
-To run the script with a specific AMI
+To run the script with a specific AMI:
 ```shell
 export AMI_ID=ami-XXXXXXXXXX
+```
+To specify a specific Kubernetes version (the eligible choices are [here](https://hub.docker.com/r/rancher/k3s/tags)):
+```shell
+export K3S_IMAGE_TAG=sometag
+```
+
+You can also run these inline with the script, without exporting them to your environment.  Example:
+
+```shell
+K3S_IMAGE_TAG=v1.24.12-k3s1 ./docs/assets/scripts/developer/k3d-dev.sh
 ```
 
 ## After Running The Script
