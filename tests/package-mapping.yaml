@@ -38,11 +38,9 @@ fluentbit:
   hrName: "fluent-bit"
   filePath: "logging/fluentbit"
 promtail:
-  filePath: "logging/promtail"
   dependencies:
     - "loki"
 loki:
-  filePath: "logging/loki"
   dependencies:
     - "minioOperator"
     - "promtail"

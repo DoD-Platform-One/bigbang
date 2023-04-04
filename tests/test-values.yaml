@@ -704,6 +704,9 @@ tempo:
           cpu: 200m
           memory: 128Mi
 
+promtail:
+  enabled: true
+
 monitoring:
   enabled: true
   sso:

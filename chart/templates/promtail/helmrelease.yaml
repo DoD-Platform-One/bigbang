@@ -6,11 +6,11 @@ metadata:
   name: promtail
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: logging
+    app.kubernetes.io/name: promtail
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
-  targetNamespace: logging
+  targetNamespace: promtail
   chart:
     spec:
       {{- if eq .Values.promtail.sourceType "git" }}
