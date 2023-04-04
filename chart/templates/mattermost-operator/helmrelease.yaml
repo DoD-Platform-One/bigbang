@@ -15,7 +15,7 @@ spec:
   targetNamespace: mattermost-operator
   chart:
     spec:
-      {{- if eq (include "checkGitRef" $mmOpValues) "true" }}
+      {{- if (eq $mmOpValues.sourceType "git") }}
       chart: {{ $mmOpValues.git.path }}
       sourceRef:
         kind: GitRepository

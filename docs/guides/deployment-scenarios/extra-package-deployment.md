@@ -35,22 +35,17 @@ These pieces can typically be complicated to get setup correctly and connected t
 
 ## How to use it
 
-The first piece you need in order to make use of this extensibility is the addition of `wrapper` in your Big Bang values. As of this documentation revision that should look like the below:
+The first piece you will want in order to make use of this extensibility is the addition of `wrapper` in your Big Bang values. As of this documentation revision that should look like the below:
 
 ```yaml
-ociRepositories:
-  - name: "registry1"
-    repository: "oci://registry1.dso.mil/bigbang"
-    existingSecret: "private-registry"
-
 wrapper:
-  oci:
-    name: wrapper
-    tag: "0.1.0"
-    repo: "registry1"
+  git:
+    repo: "https://repo1.dso.mil/big-bang/product/packages/wrapper.git"
+    path: "chart"
+    tag: "0.2.1"
 ```
 
-In Big Bang 2.0 this will be included in the default values with an OCI source. The wrapper does not require any additional values (simply need to point to its "storage" location of git/helm repository as seen above).
+In Big Bang 2.0 this will be included in the default values. The wrapper does not require any additional values (simply need to point to its "storage" location of git/helm repository as seen above).
 
 The wrapper does not add anything additional to your deployment, unless you also specify a `packages` value which configures what package to deploy and what wrapper configuration is desired. A basic example of a package deployment could look like this:
 
@@ -65,6 +60,7 @@ packages:
       tag: 6.3.4
       path: charts/podinfo
 ```
+
 NOTE: The wrapper is an opt-in feature.  Without enabling the wrapper, the `packages` will default to deploying flux object for your chart, without any wrapper-added configuration.
 
 The package also has OCI support for sourcing the artifacts; usage will be encouraged with the move to 2.0 and "first-class" support for `HelmRepository` resources.

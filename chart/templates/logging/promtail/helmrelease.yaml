@@ -13,18 +13,18 @@ spec:
   targetNamespace: logging
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.promtail) "true" }}
+      {{- if eq .Values.promtail.sourceType "git" }}
       chart: {{ .Values.promtail.git.path }}
       sourceRef:
         kind: GitRepository
         name: promtail
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.promtail.oci.name }}
-      version: {{ .Values.promtail.oci.tag }}
+      chart: {{ .Values.promtail.helmRepo.chartName }}
+      version: {{ .Values.promtail.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.promtail.oci.repo }}
+        name: {{ .Values.promtail.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

@@ -13,18 +13,18 @@ spec:
   targetNamespace: istio-operator
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.istioOperator) "true" }}
+      {{- if eq .Values.istioOperator.sourceType "git" }}
       chart: {{ .Values.istioOperator.git.path }}
       sourceRef:
         kind: GitRepository
         name: istio-operator
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.istioOperator.oci.name }}
-      version: {{ .Values.istioOperator.oci.tag }}
+      chart: {{ .Values.istioOperator.helmRepo.chartName }}
+      version: {{ .Values.istioOperator.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.istioOperator.oci.repo }}
+        name: {{ .Values.istioOperator.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

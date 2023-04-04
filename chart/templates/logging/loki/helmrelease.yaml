@@ -14,18 +14,18 @@ spec:
   targetNamespace: logging
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.loki) "true" }}
+      {{- if eq .Values.loki.sourceType "git" }}
       chart: {{ .Values.loki.git.path }}
       sourceRef:
         kind: GitRepository
         name: loki
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.loki.oci.name }}
-      version: {{ .Values.loki.oci.tag }}
+      chart: {{ .Values.loki.helmRepo.chartName }}
+      version: {{ .Values.loki.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.loki.oci.repo }}
+        name: {{ .Values.loki.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

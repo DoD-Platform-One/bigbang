@@ -16,18 +16,18 @@ spec:
   targetNamespace: {{ $name }}
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.keycloak) "true" }}
+      {{- if eq .Values.addons.keycloak.sourceType "git" }}
       chart: {{ .Values.addons.keycloak.git.path }}
       sourceRef:
         kind: GitRepository
         name: {{ $name }}
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.keycloak.oci.name }}
-      version: {{ .Values.addons.keycloak.oci.tag }}
+      chart: {{ .Values.addons.keycloak.helmRepo.chartName }}
+      version: {{ .Values.addons.keycloak.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.keycloak.oci.repo }}
+        name: {{ .Values.addons.keycloak.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

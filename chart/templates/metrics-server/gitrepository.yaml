@@ -1,4 +1,4 @@
-{{- if (eq (include "checkGitRef" .Values.addons.metricsServer) "true") }}
+{{- if (eq .Values.addons.metricsServer.sourceType "git") }}
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "bigbang" "metrics-server") }}

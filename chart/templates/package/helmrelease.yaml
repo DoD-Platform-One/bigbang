@@ -19,18 +19,18 @@ spec:
   releaseName: {{ $pkg }}
   chart:
     spec:
-      {{- if eq (include "checkGitRef" $vals) "true" }}
+      {{- if (not (eq $vals.sourceType "helmRepo")) }}
       chart: {{ dig "git" "path" "chart" $vals }}
       sourceRef:
         kind: GitRepository
         name: {{ $pkg }}
         namespace: {{ dig "namespace" "name" $pkg $vals }}
       {{- else }}
-      chart: {{ dig "oci" "name" $pkg $vals }}
-      version: {{ dig "oci" "tag" nil $vals }}
+      chart: {{ dig "helmRepo" "chartName" $pkg $vals }}
+      version: {{ dig "helmRepo" "tag" nil $vals }}
       sourceRef:
         kind: HelmRepository
-        name: {{ dig "oci" "repo" "registry1" $vals }}
+        name: {{ dig "helmRepo" "repoName" "registry1" $vals }}
         namespace: {{ $.Release.Namespace }}
       {{- end }}
       interval: {{ default "5m" $fluxSettings.interval }}

@@ -13,18 +13,18 @@ spec:
   targetNamespace: kiali
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.kiali) "true" }}
+      {{- if eq .Values.kiali.sourceType "git" }}
       chart: {{ .Values.kiali.git.path }}
       sourceRef:
         kind: GitRepository
         name: kiali
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.kiali.oci.name }}
-      version: {{ .Values.kiali.oci.tag }}
+      chart: {{ .Values.kiali.helmRepo.chartName }}
+      version: {{ .Values.kiali.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.kiali.oci.repo }}
+        name: {{ .Values.kiali.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

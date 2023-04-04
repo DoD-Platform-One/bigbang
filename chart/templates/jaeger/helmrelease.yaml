@@ -13,18 +13,18 @@ spec:
   targetNamespace: jaeger
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.jaeger) "true" }}
+      {{- if eq .Values.jaeger.sourceType "git" }}
       chart: {{ .Values.jaeger.git.path }}
       sourceRef:
         kind: GitRepository
         name: jaeger
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.jaeger.oci.name }}
-      version: {{ .Values.jaeger.oci.tag }}
+      chart: {{ .Values.jaeger.helmRepo.chartName }}
+      version: {{ .Values.jaeger.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.jaeger.oci.repo }}
+        name: {{ .Values.jaeger.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

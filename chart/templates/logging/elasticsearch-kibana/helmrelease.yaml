@@ -13,18 +13,18 @@ spec:
   targetNamespace: logging
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.logging) "true" }}
+      {{- if eq .Values.logging.sourceType "git" }}
       chart: {{ .Values.logging.git.path }}
       sourceRef:
         kind: GitRepository
         name: elasticsearch-kibana
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.logging.oci.name }}
-      version: {{ .Values.logging.oci.tag }}
+      chart: {{ .Values.logging.helmRepo.chartName }}
+      version: {{ .Values.logging.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.logging.oci.repo }}
+        name: {{ .Values.logging.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

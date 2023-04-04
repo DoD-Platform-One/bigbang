@@ -10,18 +10,18 @@ spec:
   targetNamespace: anchore
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.anchore) "true" }}
+      {{- if eq .Values.addons.anchore.sourceType "git" }}
       chart: {{ .Values.addons.anchore.git.path }}
       sourceRef:
         kind: GitRepository
         name: anchore
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.anchore.oci.name }}
-      version: {{ .Values.addons.anchore.oci.tag }}
+      chart: {{ .Values.addons.anchore.helmRepo.chartName }}
+      version: {{ .Values.addons.anchore.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.anchore.oci.repo }}
+        name: {{ .Values.addons.anchore.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

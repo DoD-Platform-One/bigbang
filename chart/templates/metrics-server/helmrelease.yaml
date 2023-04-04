@@ -17,18 +17,18 @@ spec:
   targetNamespace: metrics-server
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.metricsServer) "true" }}
+      {{- if eq .Values.addons.metricsServer.sourceType "git" }}
       chart: {{ .Values.addons.metricsServer.git.path }}
       sourceRef:
         kind: GitRepository
         name: metrics-server
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.metricsServer.oci.name }}
-      version: {{ .Values.addons.metricsServer.oci.tag }}
+      chart: {{ .Values.addons.metricsServer.helmRepo.chartName }}
+      version: {{ .Values.addons.metricsServer.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.metricsServer.oci.repo }}
+        name: {{ .Values.addons.metricsServer.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

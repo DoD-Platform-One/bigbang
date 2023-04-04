@@ -9,18 +9,18 @@ spec:
   targetNamespace: minio
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.minio) "true" }}
+      {{- if eq .Values.addons.minio.sourceType "git" }}
       chart: {{ .Values.addons.minio.git.path }}
       sourceRef:
         kind: GitRepository
         name: minio
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.minio.oci.name }}
-      version: {{ .Values.addons.minio.oci.tag }}
+      chart: {{ .Values.addons.minio.helmRepo.chartName }}
+      version: {{ .Values.addons.minio.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.minio.oci.repo }}
+        name: {{ .Values.addons.minio.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

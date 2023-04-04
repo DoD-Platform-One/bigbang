@@ -13,18 +13,18 @@ spec:
   targetNamespace: authservice
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.authservice) "true" }}
+      {{- if eq .Values.addons.authservice.sourceType "git" }}
       chart: {{ .Values.addons.authservice.git.path }}
       sourceRef:
         kind: GitRepository
         name: authservice
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.authservice.oci.name }}
-      version: {{ .Values.addons.authservice.oci.tag }}
+      chart: {{ .Values.addons.authservice.helmRepo.chartName }}
+      version: {{ .Values.addons.authservice.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.authservice.oci.repo }}
+        name: {{ .Values.addons.authservice.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

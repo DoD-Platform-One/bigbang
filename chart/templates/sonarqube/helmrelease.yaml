@@ -15,18 +15,18 @@ spec:
   targetNamespace: sonarqube
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.sonarqube) "true" }}
+      {{- if eq .Values.addons.sonarqube.sourceType "git" }}
       chart: {{ .Values.addons.sonarqube.git.path }}
       sourceRef:
         kind: GitRepository
         name: sonarqube
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.sonarqube.oci.name }}
-      version: {{ .Values.addons.sonarqube.oci.tag }}
+      chart: {{ .Values.addons.sonarqube.helmRepo.chartName }}
+      version: {{ .Values.addons.sonarqube.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.sonarqube.oci.repo }}
+        name: {{ .Values.addons.sonarqube.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
