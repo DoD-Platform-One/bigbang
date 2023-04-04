@@ -272,13 +272,17 @@ addons:
           roles:
             - "nx-admin"
     # NexusNotes: |
-    #   Login to Nexus Admin UI and then get the x509 certificate from this path
+    #   get nexus x509 cert from Nexus Admin UI
     #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
-    #   copy and paste the nexus single line certificate into a text file and save it
+    #   copy and paste the nexus single line cert into a text file and save it
     #     vi nexus-x509.txt
     #     -----BEGIN CERTIFICATE-----
     #     put-single-line-nexus-x509-certificate-here
     #     -----END CERTIFICATE-----
     #   make a valid pem file with proper wrapping at 64 characters per line
     #     fold -w 64 nexus-x509.txt > nexus.pem
-    #   In Keycloak go to the nexus client and on the Keys tab import the nexus.pem file in two places
+    #   make a PKCS12 from nexus.pem
+    #     keytool -import -alias alias -file nexus.pem -keystore nexus.p12 -storetype PKCS12 -storepass password
+    #   In Keycloak go to the nexus client and on the Keys tab import PKCS12 using the nexus.p12 file in two places
+    #   key alias = alias
+    #   store password = password
