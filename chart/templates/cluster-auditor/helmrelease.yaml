@@ -13,18 +13,18 @@ spec:
   targetNamespace: cluster-auditor
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.clusterAuditor) "true" }}
+      {{- if eq .Values.clusterAuditor.sourceType "git" }}
       chart: {{ .Values.clusterAuditor.git.path }}
       sourceRef:
         kind: GitRepository
         name: cluster-auditor
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.clusterAuditor.oci.name }}
-      version: {{ .Values.clusterAuditor.oci.tag }}
+      chart: {{ .Values.clusterAuditor.helmRepo.chartName }}
+      version: {{ .Values.clusterAuditor.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.clusterAuditor.oci.repo }}
+        name: {{ .Values.clusterAuditor.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

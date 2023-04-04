@@ -13,18 +13,18 @@ spec:
   targetNamespace: neuvector
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.neuvector) "true" }}
+      {{- if eq .Values.neuvector.sourceType "git" }}
       chart: {{ .Values.neuvector.git.path }}
       sourceRef:
         kind: GitRepository
         name: neuvector
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.neuvector.oci.name }}
-      version: {{ .Values.neuvector.oci.tag }}
+      chart: {{ .Values.neuvector.helmRepo.chartName }}
+      version: {{ .Values.neuvector.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.neuvector.oci.repo }}
+        name: {{ .Values.neuvector.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

@@ -13,18 +13,18 @@ spec:
   targetNamespace: kyverno
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.kyverno) "true" }}
+      {{- if eq .Values.kyverno.sourceType "git" }}
       chart: {{ .Values.kyverno.git.path }}
       sourceRef:
         kind: GitRepository
         name: kyverno
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.kyverno.oci.name }}
-      version: {{ .Values.kyverno.oci.tag }}
+      chart: {{ .Values.kyverno.helmRepo.chartName }}
+      version: {{ .Values.kyverno.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.kyverno.oci.repo }}
+        name: {{ .Values.kyverno.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

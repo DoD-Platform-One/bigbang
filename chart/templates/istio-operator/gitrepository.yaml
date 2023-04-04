@@ -1,4 +1,4 @@
-{{- if and (eq (include "checkGitRef" .Values.istioOperator) "true") (not .Values.offline) .Values.istioOperator.enabled }}
+{{- if and (eq .Values.istioOperator.sourceType "git") (not .Values.offline) .Values.istioOperator.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

@@ -13,18 +13,18 @@ spec:
   targetNamespace: logging
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.fluentbit) "true" }}
+      {{- if eq .Values.fluentbit.sourceType "git" }}
       chart: {{ .Values.fluentbit.git.path }}
       sourceRef:
         kind: GitRepository
         name: fluentbit
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.fluentbit.oci.name }}
-      version: {{ .Values.fluentbit.oci.tag }}
+      chart: {{ .Values.fluentbit.helmRepo.chartName }}
+      version: {{ .Values.fluentbit.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.fluentbit.oci.repo }}
+        name: {{ .Values.fluentbit.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

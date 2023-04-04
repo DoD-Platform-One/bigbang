@@ -13,18 +13,18 @@ spec:
   targetNamespace: twistlock
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.twistlock) "true" }}
+      {{- if eq .Values.twistlock.sourceType "git" }}
       chart: {{ .Values.twistlock.git.path }}
       sourceRef:
         kind: GitRepository
         name: twistlock
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.twistlock.oci.name }}
-      version: {{ .Values.twistlock.oci.tag }}
+      chart: {{ .Values.twistlock.helmRepo.chartName }}
+      version: {{ .Values.twistlock.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.twistlock.oci.repo }}
+        name: {{ .Values.twistlock.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

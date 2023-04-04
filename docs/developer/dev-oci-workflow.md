@@ -81,7 +81,7 @@ TODO: Make this all happen with a flag in the dev script, this should not be too
 1. Configure your Big Bang values to setup an additional `HelmRepository` and point the package to that repository. Then install Flux and Big Bang as you normally would.
 
     ```yaml
-    ociRepositories:
+    helmRepositories:
     - name: "registry1"
       repository: "oci://registry1.dso.mil/bigbang"
       existingSecret: "private-registry"
@@ -90,8 +90,9 @@ TODO: Make this all happen with a flag in the dev script, this should not be too
 
     addons:
       anchore:
-        oci:
-          repo: "k3d"
+        helmRepo:
+          repoName: "k3d"
+          chartName: "anchore"
           tag: "1.19.7-bb.4"
     ```
 
@@ -119,18 +120,21 @@ One option is to push your OCI artifacts to the Big Bang Staging area of Registr
 1. Configure your Big Bang values to setup an additional `HelmRepository` and point the package to that repository. See example below:
 
     ```yaml
-    ociRepositories:
+    helmRepositores:
     - name: "registry1"
       repository: "oci://registry1.dso.mil/bigbang"
       existingSecret: "private-registry"
+      type: "oci"
     - name: "staging"
       repository: "oci://registry1.dso.mil/bigbang-staging"
       existingSecret: "private-registry"
-    
+      type: "oci"
+
     addons:
       anchore:
-        oci:
-          repo: "staging"
+        helmRepo:
+          repoName: "staging"
+          chartName: "anchore
           tag: "1.19.7-bb.4"
     ```
 

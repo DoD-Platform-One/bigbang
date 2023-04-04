@@ -1,4 +1,4 @@
-{{- range .Values.ociRepositories }}
+{{- range .Values.helmRepositories }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
@@ -6,7 +6,7 @@ metadata:
   namespace: {{ $.Release.Namespace }}
 spec:
   interval: {{ $.Values.flux.interval }}
-  type: "oci"
+  type: {{ .type | default "default" }}
   url: {{ .repository }}
   {{- if or .existingSecret (and .username .password) }}
   secretRef:

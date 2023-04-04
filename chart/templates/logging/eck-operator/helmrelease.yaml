@@ -13,18 +13,18 @@ spec:
   targetNamespace: eck-operator
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.eckoperator) "true" }}
+      {{- if eq .Values.eckoperator.sourceType "git" }}
       chart: {{ .Values.eckoperator.git.path }}
       sourceRef:
         kind: GitRepository
         name: eck-operator
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.eckoperator.oci.name }}
-      version: {{ .Values.eckoperator.oci.tag }}
+      chart: {{ .Values.eckoperator.helmRepo.chartName }}
+      version: {{ .Values.eckoperator.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.eckoperator.oci.repo }}
+        name: {{ .Values.eckoperator.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

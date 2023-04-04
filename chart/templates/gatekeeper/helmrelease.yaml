@@ -13,18 +13,18 @@ spec:
   targetNamespace: gatekeeper-system
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.gatekeeper) "true" }}
+      {{- if eq .Values.gatekeeper.sourceType "git" }}
       chart: {{ .Values.gatekeeper.git.path }}
       sourceRef:
         kind: GitRepository
         name: gatekeeper
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.gatekeeper.oci.name }}
-      version: {{ .Values.gatekeeper.oci.tag }}
+      chart: {{ .Values.gatekeeper.helmRepo.chartName }}
+      version: {{ .Values.gatekeeper.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.gatekeeper.oci.repo }}
+        name: {{ .Values.gatekeeper.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

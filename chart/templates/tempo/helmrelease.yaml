@@ -13,18 +13,18 @@ spec:
   targetNamespace: tempo
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.tempo) "true" }}
+      {{- if eq .Values.tempo.sourceType "git" }}
       chart: {{ .Values.tempo.git.path }}
       sourceRef:
         kind: GitRepository
         name: tempo
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.tempo.oci.name }}
-      version: {{ .Values.tempo.oci.tag }}
+      chart: {{ .Values.tempo.helmRepo.chartName }}
+      version: {{ .Values.tempo.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.tempo.oci.repo }}
+        name: {{ .Values.tempo.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

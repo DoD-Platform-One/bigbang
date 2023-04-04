@@ -13,18 +13,18 @@ spec:
   targetNamespace: monitoring
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.monitoring) "true" }}
+      {{- if eq .Values.monitoring.sourceType "git" }}
       chart: {{ .Values.monitoring.git.path }}
       sourceRef:
         kind: GitRepository
         name: monitoring
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.monitoring.oci.name }}
-      version: {{ .Values.monitoring.oci.tag }}
+      chart: {{ .Values.monitoring.helmRepo.chartName }}
+      version: {{ .Values.monitoring.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.monitoring.oci.repo }}
+        name: {{ .Values.monitoring.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

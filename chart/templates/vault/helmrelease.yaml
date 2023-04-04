@@ -14,18 +14,18 @@ spec:
   targetNamespace: vault
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.vault) "true" }}
+      {{- if eq .Values.addons.vault.sourceType "git" }}
       chart: {{ .Values.addons.vault.git.path }}
       sourceRef:
         kind: GitRepository
         name: vault
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.vault.oci.name }}
-      version: {{ .Values.addons.vault.oci.tag }}
+      chart: {{ .Values.addons.vault.helmRepo.chartName }}
+      version: {{ .Values.addons.vault.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.vault.oci.repo }}
+        name: {{ .Values.addons.vault.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

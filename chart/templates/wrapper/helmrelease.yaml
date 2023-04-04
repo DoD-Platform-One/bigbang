@@ -15,18 +15,18 @@ spec:
   releaseName: {{ $pkg }}-wrapper
   chart:
     spec:
-      {{- if eq (include "checkGitRef" $.Values.wrapper) "true" }}
+      {{- if (eq $.Values.wrapper.sourceType "git") }}
       chart: {{ default "chart" $.Values.wrapper.git.path }}
       sourceRef:
         kind: GitRepository
         name: {{ $.Release.Name }}-wrapper
         namespace: {{ $.Release.Namespace }}
       {{- else }}
-      chart: {{ $.Values.wrapper.oci.name }}
-      version: {{ $.Values.wrapper.oci.tag }}
+      chart: {{ $.Values.wrapper.helmRepo.chartName }}
+      version: {{ $.Values.wrapper.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ $.Values.wrapper.oci.repo }}
+        name: {{ $.Values.wrapper.helmRepo.repoName }}
         namespace: {{ $.Release.Namespace }}
       {{- end }}
       interval: {{ default "5m" $fluxSettings.interval }}

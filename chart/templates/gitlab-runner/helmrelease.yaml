@@ -10,18 +10,18 @@ spec:
   releaseName: gitlab-runner
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.gitlabRunner) "true" }}
+      {{- if eq .Values.addons.gitlabRunner.sourceType "git" }}
       chart: {{ .Values.addons.gitlabRunner.git.path }}
       sourceRef:
         kind: GitRepository
         name: gitlab-runner
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.gitlabRunner.oci.name }}
-      version: {{ .Values.addons.gitlabRunner.oci.tag }}
+      chart: {{ .Values.addons.gitlabRunner.helmRepo.chartName }}
+      version: {{ .Values.addons.gitlabRunner.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.gitlabRunner.oci.repo }}
+        name: {{ .Values.addons.gitlabRunner.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
