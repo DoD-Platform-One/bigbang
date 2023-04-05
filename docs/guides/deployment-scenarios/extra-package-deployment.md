@@ -80,13 +80,17 @@ packages:
       path: charts/podinfo
     flux:
       timeout: 5m
-    postRenderers: [] 
+    postRenderers: []
+    dependsOn:
+      - name: monitoring
+        namespace: bigbang
     values:
       replicaCount: 3
 ```
 
-In this example we are doing two things:
+In this example we are doing three things:
 - Overriding the Flux timeout on our `HelmRelease` to be 5 minutes
+- Adding a dependency on the `monitoring` HelmRelease in the `bigbang` namespace, to ensure `podinfo` doesn't deploy until after `monitoring`
 - Passing a value directly to the Podinfo chart to create 3 replicas
 
 We could also specify a `postRenderers` value here, which is documented well in [this document](../../understanding-bigbang/configuration/postrenderers.md).
