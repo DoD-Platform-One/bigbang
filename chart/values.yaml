@@ -1782,12 +1782,7 @@ packages:
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
 
-    # -- Choose source type of "git" or "helmRepo"
-    # If using `kustomize` "git" is the only supported option currently.
-    # @default -- Uses git if not specified
-    sourceType: "git"
-
-    # -- OCI HelmRepo source is supported and recommended for Helm deployments
+    # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     helmRepo:
       # -- Name of the HelmRepo specified in `helmRepositories`
       # @default -- Uses `registry1` Helm Repository if not specified
@@ -1798,7 +1793,7 @@ packages:
       # -- Tag of the chart in the Helm repo, required
       tag:
 
-    # -- Git source is supported for both Helm and Kustomize deployments
+    # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
       repo:
@@ -1820,6 +1815,9 @@ packages:
 
     # -- After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
     postRenderers: []
+
+    # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
+    dependsOn: []
 
     # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio: {}
