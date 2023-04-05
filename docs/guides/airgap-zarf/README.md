@@ -2,7 +2,7 @@
 
 > ⚠️ This is a work in-progress.
 
-> ⚠️ These instructions work specifically with Big Bang version 1.54.0.  Other versions are not yet supported.
+### Requires Big Bang 1.54.0 and greater.
 
 This section is currently purely devoted to building and testing packages on a development cluster.  The result could be a set of archives that can be used for moving across an airgap.  Essentially this automates a few of the steps indicated in this [documentation](https://github.com/defenseunicorns/zarf/blob/main/docs/13-walkthroughs/5-big-bang.md).
 
