@@ -1,10 +1,10 @@
-{{- $pkg := "kyvernopolicies" }}
+{{- $pkg := "kyvernoPolicies" }}
 
 {{- if (get .Values $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyvernopolicies" .))) "name" "kyvernopolicies" "defaults" (include "bigbang.defaults.kyvernopolicies" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyverno-policies" .))) "name" "kyverno-policies" "defaults" (include "bigbang.defaults.kyverno-policies" .)) }}
 {{- end }}
 
-{{- define "bigbang.defaults.kyvernopolicies" -}}
+{{- define "bigbang.defaults.kyverno-policies" -}}
 
 {{- $deployNodeAgent := (and .Values.addons.velero.enabled (dig "deployNodeAgent" false .Values.addons.velero.values)) }}
 
@@ -608,9 +608,9 @@ policies:
 {{- /* This function merges defaults in lists from above into overlays */ -}}
 {{- /* The end user will not have to replicate exclusions/repos from above when providing an overlay */ -}}
 {{- /* There is a hidden flag `skipOverlayMerge` that can be added to any policy to ignore the defaults */ -}}
-{{- define "bigbang.overlays.kyvernopolicies" -}}
-  {{- $defaults := fromYaml (include "bigbang.defaults.kyvernopolicies" .) -}}
-  {{- $overlays := dig "values" dict .Values.kyvernopolicies -}}
+{{- define "bigbang.overlays.kyverno-policies" -}}
+  {{- $defaults := fromYaml (include "bigbang.defaults.kyverno-policies" .) -}}
+  {{- $overlays := dig "values" dict .Values.kyvernoPolicies -}}
 
   {{- /* Global merge for exclude fields */ -}}
   {{- if and (dig "exclude" "any" list $defaults) (dig "exclude" "any" list $overlays) -}}
