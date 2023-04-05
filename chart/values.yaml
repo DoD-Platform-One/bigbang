@@ -476,7 +476,7 @@ kyverno:
   postRenderers: []
 
 
-kyvernopolicies:
+kyvernoPolicies:
   # -- Toggle deployment of Kyverno policies
   enabled: true
 
@@ -501,7 +501,7 @@ kyvernopolicies:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-kyvernoreporter:
+kyvernoReporter:
   # -- Toggle deployment of Kyverno Reporter
   enabled: true
 
@@ -600,6 +600,9 @@ eckoperator:
 
   # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 fluentbit:
   # -- Toggle deployment of Fluent-Bit.

@@ -50,7 +50,7 @@ spec:
 
   values:
 
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
   {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
@@ -60,8 +60,8 @@ spec:
     - name: istio
       namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.kyvernopolicies.enabled }}
-    - name: kyvernopolicies
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.monitoring.enabled }}

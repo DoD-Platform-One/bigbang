@@ -18,14 +18,16 @@ clusterAuditor:
   filePath: "cluster-auditor"
 gatekeeper:
   repoName: "policy"
-kyvernopolicies:
+kyvernoPolicies:
   repoName: "kyverno-policies"
+  hrName: "kyverno-policies"
   filePath: "kyverno/policies"
-kyvernoreporter:
+kyvernoReporter:
   repoName: "kyverno-reporter"
+  hrName: "kyverno-reporter"
   filePath: "kyverno/reporter"
   dependencies:
-    - "kyvernopolicies"
+    - "kyvernoPolicies"
 logging:
   repoName: "elasticsearch-kibana"
   hrName: "ek"

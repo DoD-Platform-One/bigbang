@@ -46,7 +46,7 @@ spec:
 
   {{- /* Always wait on policy enforcement */ -}}
   {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
-  {{- $kyvernoDep := $.Values.kyvernopolicies.enabled -}}
+  {{- $kyvernoDep := .Values.kyvernoPolicies.enabled -}}
   {{- /* Wait on istio if sidecar is enabled */ -}}
   {{- $istioDep := (and $.Values.istio.enabled (dig "istio" "injection" true $vals)) -}}
   {{- if or $gatekeeperDep $kyvernoDep $istioDep }}
@@ -56,7 +56,7 @@ spec:
       namespace: {{ default "bigbang" $.Values.namespace }}
     {{- end }}
     {{- if $kyvernoDep }}
-    - name: kyvernopolicies
+    - name: kyverno-policies
       namespace: {{ default "bigbang" $.Values.namespace }}
     {{- end }}
     {{- if $istioDep }}

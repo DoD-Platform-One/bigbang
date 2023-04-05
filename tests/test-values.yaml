@@ -325,7 +325,7 @@ kyverno:
     bbtests:
       enabled: true
 
-kyvernoreporter:
+kyvernoReporter:
   values:
     bbtests:
       cypress:
@@ -333,7 +333,7 @@ kyvernoreporter:
           cypress_grafana_url: https://grafana.bigbang.dev
           cypress_prometheus_url: https://prometheus.bigbang.dev
 
-kyvernopolicies:
+kyvernoPolicies:
   values:
     bbtests:
       enabled: true

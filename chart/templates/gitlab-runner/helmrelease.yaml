@@ -43,7 +43,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.gatekeeper.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
@@ -53,8 +53,8 @@ spec:
     - name: kyverno
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if .Values.kyvernopolicies.enabled }}
-    - name: kyvernopolicies
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}
