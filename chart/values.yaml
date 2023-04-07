@@ -589,11 +589,11 @@ eckoperator:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
     path: "./chart"
-    tag: "2.6.1-bb.0"
+    tag: "2.7.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "eck-operator"
-    tag: "2.6.1-bb.0"
+    tag: "2.7.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
@@ -1204,11 +1204,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
-      tag: "0.49.1-bb.3"
+      tag: "0.51.0-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab-runner"
-      tag: "0.49.1-bb.3"
+      tag: "0.51.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
