@@ -1065,6 +1065,39 @@ image_list_creation() {
    echo -e "\e[0Ksection_end:`date +%s`:image_fetch\r\e[0K"
 }
 
+image_annotation_validation() {
+  echo -e "\e[0Ksection_start:`date +%s`:image_annot[collapsed=true]\r\e[0K\e[33;1mImage Annotation Validation\e[37m"
+  # Only run this check if `helm.sh/images` annotation exists in the Chart
+  helm_image_annotation=$(yq e '.annotations."helm.sh/images"' chart/Chart.yaml)
+  ERROR="false"
+  if [[ ( ! -z $helm_image_annotation ) && ( "$helm_image_annotation" != "null" ) ]]; then
+    images=$(yq e '.annotations."helm.sh/images"' chart/Chart.yaml | yq e '.[].image')
+    # Validate that all images in images.txt are present in the annotation
+    for image in $(cat images.txt); do
+      if [[ "$images" == *"$image"* ]]; then
+        continue
+      else
+        ERROR="true"
+        echo "$image pulled in cluster but not found in helm.sh/images annotation in Chart.yaml."
+      fi
+    done
+    # Validate that all images in the annotation exist and are able to be pulled
+    for image in $images; do
+      if crane manifest $image &>/dev/null; then
+        continue
+      else
+        ERROR="true"
+        echo "$image from helm.sh/images annotation in Chart.yaml does not exist in the registry."
+      fi
+    done
+  fi
+  echo -e "\e[0Ksection_end:`date +%s`:image_annot\r\e[0K"
+  if [[ $ERROR == "true" ]]; then
+    echo -e "\e[31mOne or more issues were found with helm.sh/images annotation in Chart.yaml. Review the output above in the 'Image Annotation Validation' section for specific errors found.\e[0m"
+    exit 1
+  fi
+}
+
 synker_pull() {
    echo -e "\e[0Ksection_start:`date +%s`:synker[collapsed=true]\r\e[0K\e[33;1mRunning Synker and Tar\e[37m"
    cp ${PIPELINE_REPO_DESTINATION}/synker/synker.yaml ./synker.yaml

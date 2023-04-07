@@ -59,9 +59,9 @@ test:
   rules:
     - when: always
   script:
-    - yum -y install  make
-    - npm install -g bats
-    - make
+    - cd tests
+    - npm ci
+    - npm test
 
 auto tag:
   stage: 🏷️ tag
