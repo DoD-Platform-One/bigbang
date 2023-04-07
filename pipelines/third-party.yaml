@@ -111,6 +111,8 @@ clean install:
     - package_test
     # Run tests for API deprecations in cluster
     - cluster_deprecation_check
+    # Run a validation on helm.sh/image annotations
+    - image_annotation_validation
     - touch $CI_PROJECT_DIR/success
   artifacts:
     when: always
