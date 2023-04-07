@@ -118,17 +118,11 @@ get_dependencies_from_values_key() {
 #
 #-----------------------------------------------------------------------------------------------------------------------
 check_changes() {
-   # only run on MR events
-   if [[ $CI_PIPELINE_SOURCE != "merge_request_event" ]]; then
-     exit 0
-   fi
-   # skip the check for changes in the master branch (case insensitive)
-   if [[ $(echo $CI_MERGE_REQUEST_TITLE | tr '[:lower:]' '[:upper:]') == *"SKIP CHECK CHANGES"* ]]; then
-     exit 0
-   fi
-
-   echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
-
+  echo -e "\e[0Ksection_start:`date +%s`:check_changes[collapsed=true]\r\e[0K\e[33;1mCheck Changes\e[37m"
+  # only run on MR events
+  if [[ ( $CI_PIPELINE_SOURCE != "merge_request_event" ) || ( $(echo $CI_MERGE_REQUEST_TITLE | tr '[:lower:]' '[:upper:]') == *"SKIP CHECK CHANGES"* ) ]]; then
+   echo "Skipping check changes..."
+  else
    ## Array of addon packages
    CHECK_PACKAGES=($(get_packages))
 
@@ -185,8 +179,8 @@ check_changes() {
    else
         echo "✅ Changes have been made to these packages: ${CHANGED_PACKAGES[@]}"
    fi
-
-   echo -e "\e[0Ksection_end:`date +%s`:check_changes\r\e[0K"
+  fi
+  echo -e "\e[0Ksection_end:`date +%s`:check_changes\r\e[0K"
 }
 
 label_check() {

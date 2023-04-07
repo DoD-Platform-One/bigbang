@@ -374,10 +374,8 @@ aws/rke2/bigbang up:
     - mkdir -p ~/.kube
     - cp ${CI_PROJECT_DIR}/rke2.yaml ~/.kube/config && chmod 0600 ~/.kube/config
     # Deploy CSI/Storage Class for AWS EBS
-    - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.5"
+    - kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.17"
     - kubectl apply -f ${PIPELINE_REPO_DESTINATION}/clusters/rke2/dependencies/k8s-resources/aws/default-ebs-sc.yaml
-    # PodSecurityPolicy patch for Gatekeeper and Kyverno Helm tests
-    - kubectl patch psp global-unrestricted-psp -p '{"spec":{"allowedUnsafeSysctls":["*"]}}'
     - deploy_bigbang
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
