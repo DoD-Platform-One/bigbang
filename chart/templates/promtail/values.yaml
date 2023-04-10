@@ -13,6 +13,9 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ .Values.istio.enabled }}
 
+loki:
+  enabled: {{ .Values.loki.enabled }}
+
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
   # conditional passes only for default istio: enabled, mTLS: SCRICT

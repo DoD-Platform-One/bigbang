@@ -54,4 +54,4 @@ None. This service doesn't have a web interface.
 
 ## Dependencies
 
-Velero requires an object storage service available with the bucket details pre-configured. This can be block storage from block storage from AWS, Azure or other providers. `minio` and `miniooperator` can be enabled to provide this storage local to the cluster under the `addon` packages.
+Velero requires an object storage service available with the bucket details pre-configured. This can be block storage from block storage from AWS, Azure or other providers. `minio` and `minioOperator` can be enabled to provide this storage local to the cluster under the `addon` packages.

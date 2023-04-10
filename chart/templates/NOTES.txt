@@ -116,9 +116,9 @@ PLATFORM ONE ANCHORE WARNING:
 {{- end }}
 {{- end }}
 
-{{- if and $.Values.eckoperator.enabled $.Values.logging.enabled }}
-  {{- if $.Values.logging.sso.enabled }}
-    {{- if and (not $.Values.logging.license.trial) (not $.Values.logging.license.keyJSON) }}
+{{- if and $.Values.eckOperator.enabled $.Values.elasticsearchKibana.enabled }}
+  {{- if $.Values.elasticsearchKibana.sso.enabled }}
+    {{- if and (not $.Values.elasticsearchKibana.license.trial) (not $.Values.elasticsearchKibana.license.keyJSON) }}
 PLATFORM ONE LOGGING WARNING:
   You have enabled SSO but not provided an enterprise license configuration to use. SSO is not functional without a license.
   Edit the values for the eck-operator to specify a license key JSON or use the trial license for development.
@@ -126,10 +126,15 @@ PLATFORM ONE LOGGING WARNING:
   {{- end }}
 {{- end }}
 
-{{- if and (or $.Values.promtail.enabled $.Values.loki.enabled) .Values.logging.enabled }}
+{{- if and .Values.promtail.enabled .Values.fluentbit.enabled }}
 PLATFORM ONE LOGGING WARNING:
-  You have enabled both promtail/loki and efk logging.  This is permitted during beta testing of promtail/loki.
-  After the beta period, only one logging stack will be supported at one time, with the PLG stack becoming the default supported stack.
+  You have enabled both Promtail and Fluentbit (log forwarders). This is not a supported configuration and you may see conflicts as a result of both applications attempting to ship logs.
+{{- end }}
+
+{{- if and .Values.loki.enabled .Values.elasticsearchKibana.enabled }}
+PLATFORM ONE LOGGING WARNING:
+  You have enabled both Loki and Elastic (log storage). This is not a supported configuration and you may see issues as a result of running both applications.
+  If using Elastic for other functionality, deploying both applications is acceptable.
 {{- end }}
 
 {{- if and $.Values.loki.enabled (dig "values" "global" "createGlobalConfig" false $.Values.loki) }}
@@ -182,14 +187,14 @@ DEPRECATION NOTICE:
 {{- if .Values.addons.nexus }}
 DEPRECATION NOTICE:
   .Values.addons.nexus has been deprecated and will be removed in a future Big Bang release.
-  Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager 
+  Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager
 {{- end }}
 
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 
 {{- with .Values }}
-{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .logging.sso.issuer .logging.sso.auth_url .logging.sso.token_url .logging.sso.userinfo_url .logging.sso.jwkset_url .logging.sso.claims_principal .logging.sso.endsession_url .logging.sso.claims_group .logging.sso.claims_mail .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
+{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
 DEPRECATION NOTICE:
   The following SSO keys have been deprecated.  Deprecated keys will continue to work, but will be removed in a future release.  Please update your overrides.
     {{- if coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName }}
@@ -238,44 +243,44 @@ DEPRECATION NOTICE:
       secretName: {{ .sso.secretName }}
       {{- end }}
     {{- end }}
-    {{- if coalesce .logging.sso.issuer .logging.sso.auth_url .logging.sso.token_url .logging.sso.userinfo_url .logging.sso.jwkset_url .logging.sso.claims_principal .logging.sso.endsession_url .logging.sso.claims_group .logging.sso.claims_mail }}
-    logging:
+    {{- if coalesce .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail }}
+    elasticsearchKibana:
       sso:
-        {{- if .logging.sso.issuer }}
+        {{- if .elasticsearchKibana.sso.issuer }}
         # "issuer" was moved to "sso.url"
-        issuer: {{ .logging.sso.issuer }}
+        issuer: {{ .elasticsearchKibana.sso.issuer }}
         {{- end }}
-        {{- if .logging.sso.auth_url }}
+        {{- if .elasticsearchKibana.sso.auth_url }}
         # "auth_url" was moved to "sso.oidc.authorization"
-        auth_url: {{ .logging.sso.auth_url }}
+        auth_url: {{ .elasticsearchKibana.sso.auth_url }}
         {{- end }}
-        {{- if .logging.sso.token_url }}
+        {{- if .elasticsearchKibana.sso.token_url }}
         # "token_url" was moved to "sso.oidc.token"
-        token_url: {{ .logging.sso.token_url }}
+        token_url: {{ .elasticsearchKibana.sso.token_url }}
         {{- end }}
-        {{- if .logging.sso.userinfo_url }}
+        {{- if .elasticsearchKibana.sso.userinfo_url }}
         # "userinfo_url" was moved to "sso.oidc.userinfo"
-        userinfo_url: {{ .logging.sso.userinfo_url }}
+        userinfo_url: {{ .elasticsearchKibana.sso.userinfo_url }}
         {{- end }}
-        {{- if .logging.sso.jwkset_url }}
+        {{- if .elasticsearchKibana.sso.jwkset_url }}
         # "jwkset_url" was moved to "sso.oidc.jwksUrl"
-        jwkset_url: {{ .logging.sso.jwkset_url }}
+        jwkset_url: {{ .elasticsearchKibana.sso.jwkset_url }}
         {{- end }}
-        {{- if .logging.sso.claims_principal }}
+        {{- if .elasticsearchKibana.sso.claims_principal }}
         # "claims_principal" was moved to "sso.oidc.claims.username"
-        claims_principal: {{ .logging.sso.claims_principal }}
+        claims_principal: {{ .elasticsearchKibana.sso.claims_principal }}
         {{- end }}
-        {{- if .logging.sso.endsession_url }}
+        {{- if .elasticsearchKibana.sso.endsession_url }}
         # "endsession_url" was moved to "sso.oidc.endsession"
-        endsession_url: {{ .logging.sso.endsession_url }}
+        endsession_url: {{ .elasticsearchKibana.sso.endsession_url }}
         {{- end }}
-        {{- if .logging.sso.claims_group }}
+        {{- if .elasticsearchKibana.sso.claims_group }}
         # "claims_group" was moved to "sso.oidc.claims.groups"
-        claims_group: {{ .logging.sso.claims_group }}
+        claims_group: {{ .elasticsearchKibana.sso.claims_group }}
         {{- end }}
-        {{- if .logging.sso.claims_mail }}
+        {{- if .elasticsearchKibana.sso.claims_mail }}
         # "claims_mail" was moved to "sso.oidc.claims.email"
-        claims_mail: {{ .logging.sso.claims_mail }}
+        claims_mail: {{ .elasticsearchKibana.sso.claims_mail }}
         {{- end }}
     {{- end }}
     {{- if coalesce .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url }}
@@ -390,5 +395,5 @@ DEPRECATION NOTICE:
 {{- if .Values.addons.mattermostoperator }}
 DEPRECATION NOTICE:
   .Values.addons.mattermostoperator has been deprecated and will be removed in a future Big Bang release.
-  Please reconfigure your values overrides to use .Values.addons.mattermostOperator 
+  Please reconfigure your values overrides to use .Values.addons.mattermostOperator
 {{- end }}

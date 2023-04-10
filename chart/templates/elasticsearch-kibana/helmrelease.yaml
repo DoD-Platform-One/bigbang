@@ -1,39 +1,39 @@
-{{- $fluxSettingsEk := merge .Values.logging.flux .Values.flux -}}
-{{- if .Values.logging.enabled }}
+{{- $fluxSettingsEk := merge .Values.elasticsearchKibana.flux .Values.flux -}}
+{{- if .Values.elasticsearchKibana.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: ek
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: logging
+    app.kubernetes.io/name: elasticsearch-kibana
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
   targetNamespace: logging
   chart:
     spec:
-      {{- if eq .Values.logging.sourceType "git" }}
-      chart: {{ .Values.logging.git.path }}
+      {{- if eq .Values.elasticsearchKibana.sourceType "git" }}
+      chart: {{ .Values.elasticsearchKibana.git.path }}
       sourceRef:
         kind: GitRepository
         name: elasticsearch-kibana
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.logging.helmRepo.chartName }}
-      version: {{ .Values.logging.helmRepo.tag }}
+      chart: {{ .Values.elasticsearchKibana.helmRepo.chartName }}
+      version: {{ .Values.elasticsearchKibana.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.logging.helmRepo.repoName }}
+        name: {{ .Values.elasticsearchKibana.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
 
   {{- toYaml $fluxSettingsEk | nindent 2 }}
 
-  {{- if .Values.logging.postRenderers }}
+  {{- if .Values.elasticsearchKibana.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.logging.postRenderers | nindent 4 }}
+  {{ toYaml .Values.elasticsearchKibana.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-ek-values
@@ -46,7 +46,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{/* ECK and Logging _always_ depend on .Values.logging being enabled, so can assume they exist here */}}
+  {{/* ECK and Logging _always_ depend on .Values.elasticsearchKibana being enabled, so can assume they exist here */}}
   dependsOn:
     - name: eck-operator
       namespace: {{ .Release.Namespace }}

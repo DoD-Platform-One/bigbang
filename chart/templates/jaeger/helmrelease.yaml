@@ -46,7 +46,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.logging.enabled }}
+  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.elasticsearchKibana.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -60,7 +60,7 @@ spec:
     - name: authservice
       namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.logging.enabled }}
+  {{- if .Values.elasticsearchKibana.enabled }}
     - name: ek
       namespace: {{ .Release.Namespace }}
   {{- end }}

@@ -36,7 +36,7 @@ graph TB
 Persistent storage for both Elasticsearch Master and Data nodes can be configured with the following values:
 
 ```yaml
-logging:
+elasticsearchKibana:
   values:
     elasticsearch:
       master:
@@ -62,7 +62,7 @@ istio:
 These values get passed into the logging chart [here](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/templates/logging/elasticsearch-kibana/values.yaml#L6). This creates the Istio virtual service and maps to the main istio gateway for bigbang. The Kibana GUI is available behind this Istio VirtualService that is configured automatically at "kibana.{{ .Values.hostname }}" (value set above) and can be configured with the following values:
 
 ```yaml
-logging:
+elasticsearchKibana:
   values:
     istio:
       kibana:
@@ -81,7 +81,7 @@ logging:
 This can be accomplished by increasing the "count" or number of replicas in each deployment in the stack:
 
 ```yaml
-logging:
+elasticsearchKibana:
   values:
     kibana:
       count: 1
@@ -97,7 +97,7 @@ logging:
 SSO integration for the eck stack requires a license (see below) and can be configured with the following values:
 
 ```yaml
-logging:
+elasticsearchKibana:
   sso:
     # -- Toggle OIDC SSO for Kibana/Elasticsearch on and off.
     # Enabling this option will auto-create any required secrets.
@@ -114,7 +114,7 @@ Features like SSO integration, email/slack/Pagerduty alerting, FIPS 140-2 mode, 
 Licensing can be configured with the following values:
 
 ```yaml
-logging:
+elasticsearchKibana:
   license:
     trial: false
     keyJSON: |

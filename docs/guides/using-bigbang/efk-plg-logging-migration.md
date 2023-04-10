@@ -12,11 +12,11 @@ The EFK stack appears within the chart as follows:
 
 ```yaml
 
-logging:
+elasticsearchKibana:
   # -- Toggle deployment of Logging (Elastic/Kibana).
   enabled: true
 
-eckoperator:
+eckOperator:
   # -- Toggle deployment of ECK Operator.
   enabled: true
 
@@ -35,11 +35,11 @@ Currently, the way to switch from the default EFK stack to PLG is to set the fol
 
 ```yaml
 
-logging:
+elasticsearchKibana:
   # -- Toggle deployment of Logging (EFK).
   enabled: false // Disables the Elasticsearch Kibana deployment
 
-eckoperator:
+eckOperator:
   # -- Toggle deployment of ECK Operator.
   enabled: false // Do not need the eck operator either
 

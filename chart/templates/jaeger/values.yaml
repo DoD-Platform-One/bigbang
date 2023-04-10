@@ -8,7 +8,7 @@ imagePullSecrets:
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
-  
+
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -40,7 +40,7 @@ monitoring:
   {{- end }}
 
 elasticsearch:
-  enabled: {{ .Values.logging.enabled }}
+  enabled: {{ .Values.elasticsearchKibana.enabled }}
 
 sso:
   enabled: {{ .Values.jaeger.sso.enabled }}

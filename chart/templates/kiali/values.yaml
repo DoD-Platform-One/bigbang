@@ -26,7 +26,7 @@ podAnnotations:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:
-  enabled: {{ .Values.logging.enabled }}
+  enabled: {{ .Values.elasticsearchKibana.enabled }}
 cr:
   spec:
     deployment:

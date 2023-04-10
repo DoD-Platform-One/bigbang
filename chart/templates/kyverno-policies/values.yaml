@@ -99,9 +99,9 @@ policies:
       # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          - logging-fluent-bit*
+          - fluentbit-fluent-bit*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
       # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
@@ -122,9 +122,9 @@ policies:
       # Fluent bit needs to be able to run on all nodes to gather logs from the host for containers
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          - logging-fluent-bit*
+          - fluentbit-fluent-bit*
       {{- end }}
       {{- if .Values.monitoring.enabled }}
       # Prometheus Node Exporter needs to be able to run on all nodes, regardless of taint, to gather node metrics
@@ -149,7 +149,7 @@ policies:
     {{- if .Values.addons.gitlab.enabled }}
     exclude:
       any:
-      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened
       # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
       - resources:
           namespaces:
@@ -209,27 +209,27 @@ policies:
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
       # and then granting permissions recursively on /var/log.
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          - logging-fluent-bit*
+          - fluentbit-fluent-bit*
       {{- end }}
       {{- if .Values.promtail.enabled }}
       # promtail requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
       # and then granting permissions recursively on /var/log.
       # promtail requires access to /run/promtail for its buffering and persistent state.
       - resources:
           namespaces:
-          - logging
+          - promtail
           names:
-          - logging-promtail*
+          - promtail-promtail*
       {{- end }}
       {{- if .Values.addons.gitlab.enabled }}
-      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened
       # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
       - resources:
           namespaces:
@@ -242,7 +242,7 @@ policies:
   require-non-root-user:
     validationFailureAction: audit
     {{ if .Values.istio.enabled }}
-    parameters: 
+    parameters:
       excludeContainers:
         - istio-init
     {{- end }}
@@ -271,27 +271,27 @@ policies:
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
       # and then granting permissions recursively on /var/log.
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          - logging-fluent-bit*
+          - fluentbit-fluent-bit*
       {{- end }}
       {{- if .Values.promtail.enabled }}
       # promtail requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group 
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
       # and then granting permissions recursively on /var/log.
       # promtail requires access to /run/promtail for its buffering and persistent state.
       - resources:
           namespaces:
-          - logging
+          - promtail
           names:
-          - logging-promtail*
+          - promtail-promtail*
       {{- end }}
       {{- if .Values.addons.gitlab.enabled }}
-      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened 
+      # Gitlab Redis sub-chart does not have configurable securityContext values from upstream. An issue has been opened
       # upstream to add these capabilities: https://gitlab.com/gitlab-org/charts/gitlab/-/issues/3375
       - resources:
           namespaces:
@@ -352,12 +352,11 @@ policies:
     {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployNodeAgent }}
     exclude:
       any:
-      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      {{- if .Values.fluentbit.enabled }}
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          {{- if .Values.fluentbit.enabled }}
           # Fluent Bit mounts the following hostPaths:
           # - `/var/log`: to tail node logs (e.g. journal) and pod logs
           # - `/var/lib/docker/containers`: to tail container logs
@@ -365,17 +364,20 @@ policies:
           # - `/var/log/flb-storage`: for Fluent Bit's buffering and persistent state
           # Since logs can have sensitive information, it is better to exclude
           # FluentBit from the policy than add the paths as allowable mounts
-          - logging-fluent-bit*
-          {{- end }}
-          {{- if .Values.promtail.enabled }}
+          - fluentbit-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
           # Promtail mounts the following hostPaths:
           # - `/var/log/pods`: to tail pod logs
           # - `/var/lib/docker/containers`: to tail container logs
           # - `/run/promtail`: for Promtail's buffering and persistent state
           # Since logs can have sensitive information, it is better to exclude
           # Promtail from the policy than add the paths as allowable mounts
-          - logging-promtail*
-          {{- end }}
+      - resources:
+          namespaces:
+          - promtail
+          names:
+          - promtail-promtail*
       {{- end }}
       {{- if .Values.monitoring.enabled }}
       # Prometheus Node Exporter mounts the following hostPaths:
@@ -416,13 +418,13 @@ policies:
       - resources:
           namespaces:
           - neuvector
-          names: 
+          names:
           - neuvector-enforcer-pod*
           - neuvector-controller-pod*
       {{- end }}
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
-      # mounted inside velero/node agent pods.  Since the host's pod runtime directory may expose sensitive information, 
+      # mounted inside velero/node agent pods.  Since the host's pod runtime directory may expose sensitive information,
       # it is better to exclude the node agent pods than to add the path as allowable mounts
       - resources:
           namespaces:
@@ -460,7 +462,7 @@ policies:
           - twistlock-defender-ds*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
-      # Neuvector mounts the following hostPaths as writeable: 
+      # Neuvector mounts the following hostPaths as writeable:
       # `/var/neuvector`: for Neuvector's buffering and persistent state
       - resources:
           namespaces:
@@ -497,21 +499,23 @@ policies:
   restrict-selinux-type:
     exclude:
       any:
-      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      {{- if .Values.fluentbit.enabled }}
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          {{- if .Values.fluentbit.enabled }}
           # NEEDS FURTHER JUSTIFICATION
           # FluentBit needs selinux option type spc_t
-          - logging-fluent-bit*
-          {{- end }}
-          {{- if .Values.promtail.enabled }}
+          - fluentbit-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - promtail
+          names:
           # NEEDS FURTHER JUSTIFICATION
           # Promtail needs selinux option type spc_t
-          - logging-promtail*
-          {{- end }}
+          - promtail-promtail*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # NEEDS FURTHER JUSTIFICATION
@@ -523,7 +527,7 @@ policies:
           - twistlock-defender-ds*
       {{- end }}
   {{- end }}
-  
+
   {{- if $deployNodeAgent }}
   restrict-user-id:
     exclude:
@@ -543,22 +547,24 @@ policies:
   restrict-volume-types:
     exclude:
       any:
-      {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+      {{- if or .Values.fluentbit.enabled }}
       - resources:
           namespaces:
-          - logging
+          - fluentbit
           names:
-          {{- if .Values.fluentbit.enabled }}
           # Fluent bit containers requires HostPath volumes, to tail node and container logs.  It is also used for buffering
           # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-+-kubernetes-filter
-          - logging-fluent-bit*
+          - fluentbit-fluent-bit*
           {{- end }}
-          {{- if .Values.promtail.enabled }}
+      {{- if .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - promtail
+          names:
           # NEEDS FURTHER JUSTIFICATION
           # Promtail requires HostPath volume types
           # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-          - logging-promtail*
-          {{- end }}
+          - promtail-promtail*
       {{- end }}
       {{- if .Values.monitoring.enabled }}
       # Prometheus node exporter requires a HostPath volume to monitor host metrics in /proc and /sys

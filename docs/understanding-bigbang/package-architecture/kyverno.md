@@ -18,7 +18,7 @@ Data from Kyverno is not stored by the app directly, it is stored as objects in 
 When deploying to k3d, istio-system should be added from `excludedNamespaces` under the `allowedDockerRegistries` violations. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should not allow containers in the `istio-system` namespace to be pulled from outside of Registry1. 
 
 ```yaml
-kyvernopolicies:
+kyvernoPolicies:
   values:
     exclude:
       any:
@@ -48,14 +48,14 @@ Kyverno Reporter is an optional component providing two main reporting functions
 
 
 ```yaml
-kyvernoreporter:
+kyvernoReporter:
   enabled: true
 ```
 
 ### Kyverno Reporter UI
 While not yet officially supported by BigBang the Kyverno Reporter can be useful for inspecting policy results when other tools like Grafana are not available or in debugging scenarios.
 ```yaml
-kyvernoreporter:
+kyvernoReporter:
   enabled: true
 
   values:
@@ -81,4 +81,4 @@ None. This service doesn't have a web interface.
 
 ## Dependencies
 
-kyverno is a dependency of kyvernopolicies. KyvernoPolicies is a collection of Kyverno security and best-practice policies for Kyverno
+`kyverno` is a dependency of `kyvernoPolicies`. KyvernoPolicies is a collection of Kyverno security and best-practice policies for Kyverno
