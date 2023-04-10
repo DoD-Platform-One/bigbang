@@ -529,7 +529,7 @@ kyvernoReporter:
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Logging
+# Elasticsearch, Kibana, Fluentbit Logging stack
 #
 logging:
   # -- Toggle deployment of Logging (EFK).
@@ -630,7 +630,7 @@ fluentbit:
   postRenderers: []
 
 # ----------------------------------------------------------------------------------------------------------------------
-# BETA support of promtail/loki logging stack
+# Promtail / Loki Logging stack
 #
 promtail:
   # -- Toggle deployment of Promtail.
@@ -950,11 +950,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.27.1-bb.2"
+      tag: "5.28.0-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.27.1-bb.2"
+      tag: "5.28.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
