@@ -1,18 +1,18 @@
-{{- if and (eq .Values.logging.sourceType "git") (not .Values.offline) ( .Values.logging.enabled ) }}
+{{- if and (eq .Values.eckOperator.sourceType "git") (not .Values.offline) (or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
-  name: elasticsearch-kibana
+  name: eck-operator
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: logging
+    app.kubernetes.io/name: eck-operator
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.logging.git.repo }}
+  url: {{ .Values.eckOperator.git.repo }}
   ref:
-    {{- include "validRef" .Values.logging.git | nindent 4 }}
+    {{- include "validRef" .Values.eckOperator.git | nindent 4 }}
   {{ include "gitIgnore" . }}
   {{- include "gitCreds" . | nindent 2 }}
 {{- end }}

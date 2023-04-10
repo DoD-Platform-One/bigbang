@@ -290,9 +290,9 @@ To validate that the Helm chart is working, perform the following steps to deplo
      enabled: false
 
    # Logging
-   eckoperator:
+   eckOperator:
      enabled: false
-   logging:
+   elasticsearchKibana:
      enabled: false
    fluentbit:
      enabled: false

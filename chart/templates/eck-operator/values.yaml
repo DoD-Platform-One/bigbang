@@ -1,16 +1,16 @@
-{{- if or .Values.eckoperator.enabled .Values.logging.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.eckoperator "name" "eck-operator" "defaults" (include "bigbang.defaults.eck-operator" .)) }}
+{{- if or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.eckOperator "name" "eck-operator" "defaults" (include "bigbang.defaults.eck-operator" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.eck-operator" -}}
 license:
-  trial: {{ .Values.logging.license.trial }}
+  trial: {{ .Values.elasticsearchKibana.license.trial }}
   keyJSON: |
-    {{ .Values.logging.license.keyJSON | nindent 4 }}
+    {{ .Values.elasticsearchKibana.license.keyJSON | nindent 4 }}
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
-  
+
 {{- if .Values.istio.enabled }}
 podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"

@@ -169,7 +169,7 @@ Virtual services use full URL host and path information to route incoming traffi
 monitoring:
   ingress:
     gateway: "private"
-logging:
+elasticsearchKibana:
   ingress:
     gateway: "private"
 addons:

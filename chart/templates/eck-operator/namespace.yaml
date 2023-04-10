@@ -1,4 +1,4 @@
-{{- if or .Values.eckoperator.enabled .Values.logging.enabled }}
+{{- if or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:

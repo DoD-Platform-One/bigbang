@@ -531,7 +531,7 @@ kyvernoReporter:
 # ----------------------------------------------------------------------------------------------------------------------
 # Logging
 #
-logging:
+elasticsearchKibana:
   # -- Toggle deployment of Logging (EFK).
   enabled: false
 
@@ -541,11 +541,11 @@ logging:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.1.0-bb.1"
+    tag: "1.2.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.1.0-bb.1"
+    tag: "1.2.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -579,7 +579,7 @@ logging:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-eckoperator:
+eckOperator:
   # -- Toggle deployment of ECK Operator.
   enabled: false
 
@@ -614,11 +614,11 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
-    tag: "0.25.0-bb.0"
+    tag: "0.25.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "fluentbit"
-    tag: "0.25.0-bb.0"
+    tag: "0.25.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -642,11 +642,11 @@ promtail:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
-    tag: "6.8.1-bb.2"
+    tag: "6.8.1-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "promtail"
-    tag: "6.8.1-bb.2"
+    tag: "6.8.1-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
@@ -733,7 +733,7 @@ neuvector:
   sso:
     # -- Toggle SSO for Neuvector on and off
     enabled: true
-    
+
     # -- OIDC Client ID to use for Neuvector
     client_id: ""
 
@@ -745,7 +745,7 @@ neuvector:
 
   # -- Flux reconciliation overrides specifically for the Neuvector Package
   flux: {}
-  
+
   # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
 

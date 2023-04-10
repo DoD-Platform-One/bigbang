@@ -417,7 +417,7 @@ registryCredentials:
 EOF
 
 cat << EOF > ~/demo_values.yaml
-logging:
+elasticsearchKibana:
   values:
     kibana:
       count: 1
@@ -587,9 +587,9 @@ registryCredentials:
 EOF
 
 cat << EOF > ~/keycloak_qs_demo_values.yaml
-eckoperator:
+eckOperator:
   enabled: false
-logging:
+elasticsearchKibana:
   enabled: false
 fluentbit:
   enabled: false
