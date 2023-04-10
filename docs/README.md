@@ -65,3 +65,7 @@ The following is a general overview of the process, the [deployment guides](./gu
 ## New User Orientation
 
 * New users are encouraged to read through the Useful Background Contextual Information present in the [understanding-bigbang folder](./understanding-bigbang)
+
+## Frequently Asked Questions
+
+You can view answers to a number of frequently asked questions [here](FAQ.md).
