@@ -7,5 +7,5 @@ metadata:
     app.kubernetes.io/name: fluentbit
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.fluentbit }}
+    istio-injection: enabled
 {{- end }}
