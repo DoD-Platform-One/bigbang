@@ -21,11 +21,11 @@ gatekeeper:
 kyvernoPolicies:
   repoName: "kyverno-policies"
   hrName: "kyverno-policies"
-  filePath: "kyverno/policies"
+  filePath: "kyverno-policies"
 kyvernoReporter:
   repoName: "kyverno-reporter"
   hrName: "kyverno-reporter"
-  filePath: "kyverno/reporter"
+  filePath: "kyverno-reporter"
   dependencies:
     - "kyvernoPolicies"
 elasticsearchKibana:
