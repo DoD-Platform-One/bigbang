@@ -8,14 +8,14 @@ offline: false
 # -- List of Helm repositories/credentials to pull helm charts from.
 # OCI Type: Must specify username/password or existingSecret if repository requires auth. Using "private-registry" for existingSecret will reuse credentials from registryCredentials above.
 # Default Type: Must specify existingSecret with auth - see https://fluxcd.io/flux/components/source/helmrepositories/#secret-reference for details on secret data required.
-helmRepositories:
-  - name: "registry1"
-    repository: "oci://registry1.dso.mil/bigbang"
-    existingSecret: "private-registry"
-    type: "oci"
-    username: ""
-    password: ""
-    email: ""
+helmRepositories: []
+# - name: "registry1"
+#   repository: "oci://registry1.dso.mil/bigbang"
+#   existingSecret: "private-registry"
+#   type: "oci"
+#   username: ""
+#   password: ""
+#   email: ""
 
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
