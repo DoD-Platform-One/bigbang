@@ -72,6 +72,12 @@ networkPolicies:
 
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
+{{- if or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)}}
+values:
+  pilot:
+    jwksResolverExtraRootCA: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | quote }}
+{{- end }}
+
 {{- if .Values.istio.ingressGateways }}
 ingressGateways:
   istio-ingressgateway:
