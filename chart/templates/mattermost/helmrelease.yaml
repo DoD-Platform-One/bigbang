@@ -58,7 +58,7 @@ spec:
     {{- end }}
     {{- end }}
 
-    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.logging.enabled }}
+    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.elasticsearchKibana.enabled }}
     - name: ek
       namespace: {{ $.Release.Namespace }}
     {{- end }}
