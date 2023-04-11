@@ -1,0 +1,13 @@
+kiali:
+  sourceType: "helmRepo"
+
+  helmRepo:
+    repoName: "registry1"
+    chartName: "kiali"
+    tag: "1.65.0-bb.0"
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+    path: "./chart"
+    tag: null
+    commit: "1234"
