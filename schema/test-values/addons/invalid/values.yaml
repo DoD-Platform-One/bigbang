@@ -1,0 +1,6 @@
+addons:
+  gitlab:
+    sourceType: "git"
+    
+    git:
+      tag: null

@@ -1,0 +1,12 @@
+kiali:
+  # -- Toggle deployment of Kiali.
+  enabled: true
+
+  sourceType: "helmRepo"
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+    path: "./chart"
+    tag: "1.65.0-bb.0"
+
+  helmRepo: null
