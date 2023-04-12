@@ -2,7 +2,6 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    commit: "1234"
     branch: "foo"
     tag: null
 
@@ -10,6 +9,5 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    commit: "1234"
     branch: "foo"
     tag: ""

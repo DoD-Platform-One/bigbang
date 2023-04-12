@@ -1393,36 +1393,44 @@
         "repo",
         "path"
       ],
-      "oneOf": [
+      "anyOf": [
         {
           "required": [
             "tag"
           ],
-          "not": {
-            "required": [
-              "branch"
-            ]
+          "properties": {
+            "branch": {
+              "maxLength": 0
+            },
+            "commit": {
+              "maxLength": 0
+            }
           }
         },
         {
           "required": [
             "branch"
           ],
-          "not": {
-            "required": [
-              "tag"
-            ]
+          "properties": {
+            "tag": {
+              "maxLength": 0
+            }
           }
         },
         {
           "required": [
             "semver"
           ],
-          "not": {
-            "required": [
-              "tag",
-              "branch"
-            ]
+          "properties": {
+            "branch": {
+              "maxLength": 0
+            },
+            "commit": {
+              "maxLength": 0
+            },
+            "tag": {
+              "maxLength": 0
+            }
           }
         }
       ],
@@ -1455,6 +1463,7 @@
           ]
         },
         "branch": {
+          "minLength": 1,
           "type": [
             "string",
             "null"
