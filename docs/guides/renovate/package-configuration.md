@@ -1,4 +1,4 @@
-# Renovate Configuration for Big Bang Consumer Template
+# Renovate Configuration for Big Bang Customer Template
 
 ## Package Configuration
 
