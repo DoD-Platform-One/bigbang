@@ -2,5 +2,6 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: null
-    branch: branch
+    semver: "1.65.^"
+    branch: "foobar"
+    commit: "foo"
