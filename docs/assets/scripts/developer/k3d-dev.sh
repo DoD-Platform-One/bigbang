@@ -292,14 +292,16 @@ EOF
   echo "Creating device_mappings.json ..."
   mkdir -p ~/aws
 
+  # gp3 volumes are 20% cheaper than gp2 and comes with 3000 Iops baseline and 125 MiB/s baseline throughput for free.
   cat << EOF > ~/aws/device_mappings.json
 [
   {
     "DeviceName": "/dev/sda1",
     "Ebs": {
       "DeleteOnTermination": true,
-      "VolumeType": "gp2",
-      "VolumeSize": ${VolumeSize}
+      "VolumeType": "gp3",
+      "VolumeSize": ${VolumeSize},
+      "Encrypted": true
     }
   }
 ]
