@@ -1,0 +1,5 @@
+registryCredentials:
+  - registry: registry1.dso.mil
+    username: ""
+    password: ""
+    email: ""

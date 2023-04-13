@@ -1,0 +1,72 @@
+{{- $pkg := "kyvernoReporter" }}
+
+{{- if (get .Values $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" ($pkg | kebabcase) "defaults" (include (printf "bigbang.defaults.%s" $pkg | kebabcase) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.kyverno-reporter" -}}
+
+global:
+  fullnameOverride: kyverno-reporter
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+imagePullSecrets:
+- name: private-registry
+
+{{- if .Values.istio.enabled }}
+istio:
+  enabled: true
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+kyvernoPlugin:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
+ui:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+  {{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+  grafana:
+    namespace: monitoring
+  {{- if .Values.istio.enabled }}
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  kyverno:
+    serviceMonitor:
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+openshift: {{ .Values.openshift }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- end -}}

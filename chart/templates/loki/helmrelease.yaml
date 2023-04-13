@@ -1,0 +1,74 @@
+{{- $fluxSettingsLoki := merge .Values.loki.flux .Values.flux -}}
+{{- if .Values.loki.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  releaseName: {{ default "logging-loki" .Values.loki.releaseName }}
+  targetNamespace: logging
+  chart:
+    spec:
+      {{- if eq .Values.loki.sourceType "git" }}
+      chart: {{ .Values.loki.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: loki
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.loki.helmRepo.chartName }}
+      version: {{ .Values.loki.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.loki.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsLoki | nindent 2 }}
+
+  {{- if .Values.loki.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.loki.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-loki-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-loki-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-loki-values
+      kind: Secret
+      valuesKey: "overlays"
+  {{- if or .Values.monitoring.enabled .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled }}
+  dependsOn:
+    {{- if  .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if  .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- with .Values.loki.objectStorage }}
+    {{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .bucketNames)) }}
+    - name: minio-operator
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

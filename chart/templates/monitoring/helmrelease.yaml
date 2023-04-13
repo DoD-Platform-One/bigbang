@@ -13,18 +13,18 @@ spec:
   targetNamespace: monitoring
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.monitoring) "true" }}
+      {{- if eq .Values.monitoring.sourceType "git" }}
       chart: {{ .Values.monitoring.git.path }}
       sourceRef:
         kind: GitRepository
         name: monitoring
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.monitoring.oci.name }}
-      version: {{ .Values.monitoring.oci.tag }}
+      chart: {{ .Values.monitoring.helmRepo.chartName }}
+      version: {{ .Values.monitoring.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.monitoring.oci.repo }}
+        name: {{ .Values.monitoring.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -47,7 +47,7 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.addons.vault.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.addons.vault.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -57,8 +57,8 @@ spec:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.kyvernopolicies.enabled }}
-    - name: kyvernopolicies
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.addons.vault.enabled }}

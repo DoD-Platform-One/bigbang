@@ -1,0 +1,12 @@
+{{- $pkg := "kyvernoReporter" }}
+{{- if (get .Values $pkg).enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ $pkg | kebabcase }}
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+  name: kyverno-reporter
+{{- end }}

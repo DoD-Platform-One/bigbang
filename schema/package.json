@@ -1,0 +1,7 @@
+{
+  "name": "schema",
+  "dependencies": {
+    "bats": "^1.9.0",
+    "bats-assert": "^2.0.0"
+  }
+}

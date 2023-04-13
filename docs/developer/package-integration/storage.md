@@ -136,7 +136,7 @@ addons:
 For testing with the CI pipeline, create a `tests/dependencies.yaml` and include Minio.
 
 ```yaml
-miniooperator:
+minioOperator:
   git:
     repo: "https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git"
     tag: "4.2.3-bb.2"

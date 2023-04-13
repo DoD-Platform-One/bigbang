@@ -28,7 +28,7 @@ monitoring:
       scopes: "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
       allowed_domains: <allowed_domains>
       signout_redirect_url: https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=https://grafana.bigbang.dev
-logging:
+elasticsearchKibana:
   sso:
     enabled: true
     client_secret: "<client_secret>"

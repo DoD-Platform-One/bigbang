@@ -1,4 +1,4 @@
-{{- if and (eq (include "checkGitRef" .Values.kyverno) "true") (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernopolicies.enabled .Values.kyvernoreporter.enabled) }}
+{{- if and (eq .Values.kyverno.sourceType "git") (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled) }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

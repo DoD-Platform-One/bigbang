@@ -5,6 +5,18 @@ domain: bigbang.dev
 # All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false
 
+# -- List of Helm repositories/credentials to pull helm charts from.
+# OCI Type: Must specify username/password or existingSecret if repository requires auth. Using "private-registry" for existingSecret will reuse credentials from registryCredentials above.
+# Default Type: Must specify existingSecret with auth - see https://fluxcd.io/flux/components/source/helmrepositories/#secret-reference for details on secret data required.
+helmRepositories: []
+# - name: "registry1"
+#   repository: "oci://registry1.dso.mil/bigbang"
+#   existingSecret: "private-registry"
+#   type: "oci"
+#   username: ""
+#   password: ""
+#   email: ""
+
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
   registry: registry1.dso.mil
@@ -144,9 +156,16 @@ istio:
   # -- Toggle deployment of Istio.
   enabled: true
 
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
+    tag: "1.17.1-bb.1"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio"
     tag: "1.17.1-bb.1"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
@@ -251,24 +270,32 @@ istio:
   # -- Flux reconciliation overrides specifically for the Istio Package
   flux: {}
 
-  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-istiooperator:
+istioOperator:
   # -- Toggle deployment of Istio Operator.
   enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
+    tag: "1.17.1-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio-operator"
     tag: "1.17.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
 
-  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -276,10 +303,18 @@ istiooperator:
 
 jaeger:
   # -- Toggle deployment of Jaeger.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
     path: "./chart"
+    tag: "2.41.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "jaeger"
     tag: "2.41.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Jaeger Package
@@ -303,7 +338,7 @@ jaeger:
     # -- OIDC Client Secret to use for Jaeger
     client_secret: ""
 
-  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -312,9 +347,17 @@ jaeger:
 kiali:
   # -- Toggle deployment of Kiali.
   enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
+    tag: "1.65.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "kiali"
     tag: "1.65.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
@@ -334,7 +377,7 @@ kiali:
     # -- OIDC Client Secret to use for Kiali
     client_secret: ""
 
-  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali
+  # -- Values to pass through to Kiali chart: https://repo1.dso.mil/big-bang/product/packages/kiali
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -347,16 +390,24 @@ kiali:
 #
 clusterAuditor:
   # -- Toggle deployment of Cluster Auditor.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
+    tag: "1.5.0-bb.2"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "cluster-auditor"
     tag: "1.5.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
 
-  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+  # -- Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -368,10 +419,18 @@ clusterAuditor:
 #
 gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
+    tag: "3.11.0-bb.3"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "gatekeeper"
     tag: "3.11.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
@@ -381,7 +440,7 @@ gatekeeper:
     upgrade:
       crds: CreateReplace
 
-  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/big-bang/product/packages/policy.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -393,51 +452,75 @@ gatekeeper:
 #
 kyverno:
   # -- Toggle deployment of Kyverno.
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
+    tag: "2.6.5-bb.3"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "kyverno"
     tag: "2.6.5-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+  # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
 
-kyvernopolicies:
+kyvernoPolicies:
   # -- Toggle deployment of Kyverno policies
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
+    tag: "1.1.0-bb.5"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "kyverno-policies"
     tag: "1.1.0-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+  # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-kyvernoreporter:
+kyvernoReporter:
   # -- Toggle deployment of Kyverno Reporter
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
     path: ./chart
+    tag: "2.16.0-bb.1"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "kyverno-reporter"
     tag: "2.16.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
 
-  # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter.git
+  # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -446,15 +529,23 @@ kyvernoreporter:
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Logging
+# Elasticsearch, Kibana, Fluentbit Logging stack
 #
-logging:
+elasticsearchKibana:
   # -- Toggle deployment of Logging (EFK).
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.1.0-bb.1"
+    tag: "1.2.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "elasticsearch-kibana"
+    tag: "1.2.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -479,61 +570,88 @@ logging:
     # -- Toggle trial license installation of elasticsearch.  Note that enterprise (non trial) is required for SSO to work.
     trial: false
 
-    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana#enterprise-license
+    # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana#enterprise-license
     keyJSON: ""
 
-  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+  # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-eckoperator:
+eckOperator:
   # -- Toggle deployment of ECK Operator.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
     path: "./chart"
+    tag: "2.7.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "eck-operator"
     tag: "2.7.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the ECK Operator Package
   flux: {}
 
-  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+  # -- Values to passthrough to the eck-operator chart: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
   values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 fluentbit:
   # -- Toggle deployment of Fluent-Bit.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
-    tag: "0.25.0-bb.0"
+    tag: "0.25.0-bb.3"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "fluentbit"
+    tag: "0.25.0-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
 
-  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  # -- Values to passthrough to the fluentbit chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
 # ----------------------------------------------------------------------------------------------------------------------
-# BETA support of promtail/loki logging stack
+# Promtail / Loki Logging stack
 #
 promtail:
   # -- Toggle deployment of Promtail.
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
+    tag: "6.10.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "promtail"
     tag: "6.10.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
 
-  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+  # -- Values to passthrough to the promtail chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -541,10 +659,18 @@ promtail:
 
 loki:
   # -- Toggle deployment of Loki.
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
+    tag: "4.10.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "loki"
     tag: "4.10.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
@@ -574,7 +700,7 @@ loki:
     # admin: loki-admin
     bucketNames: {}
 
-  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+  # -- Values to passthrough to the Loki chart: https://repo1.dso.mil/big-bang/product/packages/loki.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -586,10 +712,18 @@ loki:
 
 neuvector:
    # -- Toggle deployment of Neuvector.
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
+    tag: "2.4.2-bb.6"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "neuvector"
     tag: "2.4.2-bb.6"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
@@ -599,7 +733,7 @@ neuvector:
   sso:
     # -- Toggle SSO for Neuvector on and off
     enabled: true
-    
+
     # -- OIDC Client ID to use for Neuvector
     client_id: ""
 
@@ -611,8 +745,8 @@ neuvector:
 
   # -- Flux reconciliation overrides specifically for the Neuvector Package
   flux: {}
-  
-  # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+
+  # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -624,10 +758,18 @@ neuvector:
 
 tempo:
   # -- Toggle deployment of Tempo.
-  enabled: false
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
+    tag: "1.0.2-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "tempo"
     tag: "1.0.2-bb.0"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
@@ -671,7 +813,7 @@ tempo:
     # storage on port 80/9000 set this value to true.
     insecure: false
 
-  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+  # -- Values to passthrough to the Tempo chart: https://repo1.dso.mil/big-bang/product/packages/tempo.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -685,9 +827,17 @@ tempo:
 monitoring:
   # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
+    tag: "43.1.2-bb.4"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "monitoring"
     tag: "43.1.2-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
@@ -733,7 +883,7 @@ monitoring:
       role_attribute_path: "Viewer"
       # -- Other options available, see package Documentation.
 
-  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+  # -- Values to passthrough to the monitoring chart: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -745,10 +895,18 @@ monitoring:
 #
 twistlock:
   # -- Toggle deployment of Twistlock.
-  enabled: true
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
+    tag: "0.12.0-bb.0"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "twistlock"
     tag: "0.12.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
@@ -759,7 +917,7 @@ twistlock:
     gateway: ""
 
   sso:
-    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/initialization.md
+    # -- Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/big-bang/product/packages/initialization.md
     enabled: false
 
     # -- SAML client ID
@@ -772,7 +930,7 @@ twistlock:
     # -- Groups attribute (optional)
     groups: ""
 
-  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+  # -- Values to passthrough to the twistlock chart: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
@@ -785,9 +943,17 @@ addons:
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
+      tag: "5.28.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "argocd"
       tag: "5.28.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
@@ -819,7 +985,7 @@ addons:
       groups: |
         g, Impact Level 2 Authorized, role:admin
 
-    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+    # -- Values to passthrough to the argocd chart: https://repo1.dso.mil/big-bang/product/packages/argocd.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -834,15 +1000,23 @@ addons:
     #     minimal:
     #       callback_uri: "https://somecallback"
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
+      tag: "0.5.3-bb.5"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "authservice"
       tag: "0.5.3-bb.5"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
 
-    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+    # -- Values to passthrough to the authservice chart: https://repo1.dso.mil/big-bang/product/packages/authservice.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -857,15 +1031,23 @@ addons:
   minioOperator:
     # -- Toggle deployment of minio operator and instance.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
+      tag: "4.5.8-bb.1"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "minio-operator"
       tag: "4.5.8-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
 
-    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+    # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -874,9 +1056,17 @@ addons:
   minio:
     # -- Toggle deployment of minio.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
+      tag: "4.5.8-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "minio-instance"
       tag: "4.5.8-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
@@ -892,7 +1082,7 @@ addons:
     # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
     secretkey: ""
 
-    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+    # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/big-bang/product/packages/minio.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -907,9 +1097,16 @@ addons:
       gitlab: gitlab
       registry: registry
 
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
+      tag: "6.9.2-bb.1"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "gitlab"
       tag: "6.9.2-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
@@ -991,7 +1188,7 @@ addons:
       # -- This needs to be set to a non-empty value in order for the Grafana Redis Datasource and Dashboards to be installed.
       password: ""
 
-    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+    # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1000,15 +1197,23 @@ addons:
   gitlabRunner:
     # -- Toggle deployment of Gitlab Runner
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
+      tag: "0.51.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "gitlab-runner"
       tag: "0.51.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
 
-    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+    # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1017,9 +1222,17 @@ addons:
   nexusRepositoryManager:
     # -- Toggle deployment of Nexus Repository Manager.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
+      tag: "47.1.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "nexus-repository-manager"
       tag: "47.1.0-bb.0"
 
     # -- Base64 encoded license file.
@@ -1069,7 +1282,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Nexus Repository Manager Package
     flux: {}
 
-    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/nexus.git
+    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/big-bang/product/packages/nexus.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1078,9 +1291,17 @@ addons:
   sonarqube:
     # -- Toggle deployment of SonarQube.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
+      tag: "8.0.0-bb.1"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "sonarqube"
       tag: "8.0.0-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
@@ -1126,7 +1347,7 @@ addons:
       # -- Database password for the username used to connect to the existing database.
       password: ""
 
-    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+    # -- Values to passthrough to the sonarqube chart: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1136,9 +1357,16 @@ addons:
   # Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
   #
   haproxy:
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
       path: "./chart"
+      tag: "1.12.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "haproxy"
       tag: "1.12.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the HAProxy Package
@@ -1148,7 +1376,7 @@ addons:
     ingress:
       gateway: ""
 
-    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1157,9 +1385,17 @@ addons:
   anchore:
     # -- Toggle deployment of Anchore.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
+      tag: "1.23.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "anchore"
       tag: "1.23.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
@@ -1176,7 +1412,7 @@ addons:
       enabled: false
 
       # -- License for Anchore Enterprise.
-      # For formatting examples see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#enabling-enterprise-services
+      # For formatting examples see https://repo1.dso.mil/big-bang/product/packages/CHART.md#enabling-enterprise-services
       licenseYaml: |
         FULL LICENSE
 
@@ -1214,7 +1450,7 @@ addons:
 
       # -- Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens).
       # Only required for enterprise edition of anchore.
-      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/main/docs/CHART.md#handling-dependencies
+      # By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/big-bang/product/packages/CHART.md#handling-dependencies
       feeds_database: ""
 
     redis:
@@ -1232,7 +1468,7 @@ addons:
       # -- Password to connect to pre-existing Redis.
       password: ""
 
-    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+    # -- Values to passthrough to the anchore chart: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1242,16 +1478,25 @@ addons:
   # Mattermost Operator and Instance
   #
   mattermostOperator:
+    # -- Toggle deployment of Mattermost Operator.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
       path: "./chart"
+      tag: "1.20.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "mattermost-operator"
       tag: "1.20.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
     flux: {}
 
-    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1260,9 +1505,17 @@ addons:
   mattermost:
     # -- Toggle deployment of Mattermost.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
+      tag: "7.9.1-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "mattermost"
       tag: "7.9.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
@@ -1332,12 +1585,12 @@ addons:
 
     # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
     # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
-    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/big-bang/product/packages/values.yaml
     elasticsearch:
       # -- Toggle interaction with Elastic for optimized search indexing
       enabled: false
 
-    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1347,9 +1600,16 @@ addons:
     # -- Toggle deployment of Velero.
     enabled: false
 
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
+      tag: "3.1.5-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "velero"
       tag: "3.1.5-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
@@ -1359,7 +1619,7 @@ addons:
     plugins: []
     # - aws
 
-    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/chart/values.yaml
+    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1375,9 +1635,17 @@ addons:
     # if you enable Keycloak you should uncomment the istio passthrough configurations above
     # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
+      tag: "18.4.0-bb.2"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "keycloak"
       tag: "18.4.0-bb.2"
 
     database:
@@ -1412,7 +1680,7 @@ addons:
       key: ""
       cert: ""
 
-    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1424,9 +1692,17 @@ addons:
   vault:
     # -- Toggle deployment of Vault.
     enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
+      tag: "0.23.0-bb.4"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "vault"
       tag: "0.23.0-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
@@ -1440,7 +1716,7 @@ addons:
       key: ""
       cert: ""
 
-    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+    # -- Values to passthrough to the vault chart: https://repo1.dso.mil/big-bang/product/packages/vault.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1454,16 +1730,112 @@ addons:
     # Acceptable options are enabled: true, enabled: false, enabled: auto
     # true = enabled / false = disabled / auto = automatic (Installs only if metrics API endpoint is not present)
     enabled: auto
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
+      tag: "3.9.0-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "metrics-server"
       tag: "3.9.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
 
-    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+    # -- Values to passthrough to the metrics server chart: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
+
+# -- Wrapper chart for integrating Big Bang components alongside a package
+wrapper:
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
+  helmRepo:
+    # -- Repository holding OCI chart, corresponding to `helmRepositories` name
+    repoName: "registry1"
+    # -- Name of the OCI chart in `repo`
+    chartName: wrapper
+    # -- Tag of the OCI chart in `repo`
+    tag: "0.4.0"
+  git:
+    # -- Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper
+    repo: "https://repo1.dso.mil/big-bang/product/packages/wrapper.git"
+    # -- Path inside of the git repo to find the helm chart, example: chart
+    path: "chart"
+    # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference), example: 0.0.2
+    tag: "0.4.0"
+
+# -- Packages to deploy with Big Bang
+# @default - '{}'
+packages:
+  # -- Package name.  Each package will be independently wrapped for Big Bang integration.
+  # @default -- Uses `defaults/<package name>.yaml` for defaults.  See `package` Helm chart for additional values that can be set.
+  sample:
+    # -- Toggle deployment of this package
+    # @default -- true
+    enabled: false
+
+    # -- Use a kustomize deployment rather than Helm
+    kustomize: false
+
+    # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    helmRepo:
+      # -- Name of the HelmRepo specified in `helmRepositories`
+      # @default -- Uses `registry1` Helm Repository if not specified
+      repoName:
+      # -- Name of the chart stored in the Helm repository
+      # @default -- Uses values key/package name if not specified
+      chartName:
+      # -- Tag of the chart in the Helm repo, required
+      tag:
+
+    # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    git:
+      # -- Git repo URL holding the helm chart for this package, required if using git
+      repo:
+      # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      commit:
+      # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      semver:
+      # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      tag:
+      # -- Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference).
+      # @default -- When no other reference is specified, `master` branch is used
+      branch:
+      # -- Path inside of the git repo to find the helm chart or kustomize
+      # @default -- For Helm charts `chart`.  For Kustomize `/`.
+      path:
+
+    # -- Override flux settings for this package
+    flux: {}
+
+    # -- After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+    postRenderers: []
+
+    # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
+    dependsOn: []
+
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    istio: {}
+
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    monitor: {}
+
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    network: {}
+
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    secrets: {}
+
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    configMaps: {}
+
+    # -- Values to pass through to package Helm chart
+    values: {}

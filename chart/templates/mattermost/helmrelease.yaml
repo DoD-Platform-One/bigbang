@@ -14,18 +14,18 @@ spec:
   targetNamespace: mattermost
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.mattermost) "true" }}
+      {{- if eq .Values.addons.mattermost.sourceType "git" }}
       chart: {{ .Values.addons.mattermost.git.path }}
       sourceRef:
         kind: GitRepository
         name: mattermost
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.mattermost.oci.name }}
-      version: {{ .Values.addons.mattermost.oci.tag }}
+      chart: {{ .Values.addons.mattermost.helmRepo.chartName }}
+      version: {{ .Values.addons.mattermost.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.mattermost.oci.repo }}
+        name: {{ .Values.addons.mattermost.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -58,7 +58,7 @@ spec:
     {{- end }}
     {{- end }}
 
-    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.logging.enabled }}
+    {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.elasticsearchKibana.enabled }}
     - name: ek
       namespace: {{ $.Release.Namespace }}
     {{- end }}

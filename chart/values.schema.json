@@ -1,0 +1,1746 @@
+{
+  "$id": "http://bigbang.dev/bigbang.json",
+  "type": "object",
+  "default": {},
+  "title": "Big Bang Root Schema",
+  "required": [
+    "domain",
+    "offline",
+    "helmRepositories",
+    "registryCredentials",
+    "openshift",
+    "git",
+    "sso",
+    "flux",
+    "networkPolicies",
+    "imagePullPolicy",
+    "istio",
+    "istioOperator",
+    "jaeger",
+    "kiali",
+    "clusterAuditor",
+    "gatekeeper",
+    "kyverno",
+    "kyvernoPolicies",
+    "kyvernoReporter",
+    "elasticsearchKibana",
+    "eckOperator",
+    "fluentbit",
+    "promtail",
+    "loki",
+    "neuvector",
+    "tempo",
+    "monitoring",
+    "twistlock",
+    "addons"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "domain": {
+      "type": "string"
+    },
+    "offline": {
+      "type": "boolean"
+    },
+    "registryCredentials": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/registryCredential"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/registryCredential"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "helmRepositories": {
+      "$ref": "#/$defs/helmRepositories"
+    },
+    "openshift": {
+      "type": "boolean"
+    },
+    "git": {
+      "type": "object",
+      "properties": {
+        "existingSecret": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "caFile": {
+              "type": "string"
+            },
+            "privateKey": {
+              "type": "string"
+            },
+            "publicKey": {
+              "type": "string"
+            },
+            "knownHosts": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "anyOf": [
+            {
+              "required": [
+                "username",
+                "password"
+              ]
+            },
+            {
+              "required": [
+                "privateKey",
+                "publicKey",
+                "knownHosts"
+              ]
+            }
+          ],
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "existingSecret"
+          ]
+        },
+        {
+          "required": [
+            "credentials"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "sso": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "certificateAuthority": {
+          "type": "object",
+          "properties": {
+            "cert": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "saml": {
+          "type": "object",
+          "properties": {
+            "entityDescriptor": {
+              "type": "string"
+            },
+            "service": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "oidc": {
+          "type": "object",
+          "properties": {
+            "authorization": {
+              "type": "string"
+            },
+            "endSession": {
+              "type": "string"
+            },
+            "jwksUri": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "userinfo": {
+              "type": "string"
+            },
+            "jwks": {
+              "type": "string"
+            },
+            "claims": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                },
+                "groups": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "flux": {
+      "$ref": "#/$defs/flux"
+    },
+    "networkPolicies": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "controlPlaneCidr": {
+          "type": "string"
+        },
+        "nodeCidr": {
+          "type": "string"
+        },
+        "vpcCidr": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
+    "imagePullPolicy": {
+      "type": "string",
+      "enum": [
+        "Never",
+        "Always",
+        "IfNotPresent"
+      ]
+    },
+    "istio": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "enterprise": {
+          "type": "boolean"
+        },
+        "ingressGateways": {
+          "type": "object"
+        },
+        "gateways": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "istioOperator": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "jaeger": {
+      "required": [
+        "sso",
+        "ingress"
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "sso": {
+          "$ref": "#/$defs/sso"
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "kiali": {
+      "required": [
+        "sso",
+        "ingress"
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "sso": {
+          "$ref": "#/$defs/sso"
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "clusterAuditor": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "gatekeeper": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "kyverno": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "kyvernoPolicies": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "kyvernoReporter": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "elasticsearchKibana": {
+      "required": [
+        "sso",
+        "ingress"
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "sso": {
+          "$ref": "#/$defs/sso"
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
+        "license": {
+          "properties": {
+            "trial": {
+              "type": "boolean"
+            },
+            "keyJSON": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "eckOperator": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "fluentbit": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "promtail": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": false
+    },
+    "loki": {
+      "required": [
+        "strategy",
+        "objectStorage"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "monolith",
+            "scalable"
+          ]
+        },
+        "objectStorage": {
+          "type": "object",
+          "required": [
+            "endpoint",
+            "region",
+            "accessKey",
+            "accessSecret",
+            "bucketNames"
+          ],
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "accessKey": {
+              "type": "string"
+            },
+            "accessSecret": {
+              "type": "string"
+            },
+            "bucketNames": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "neuvector": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "istio": { "$ref": "#/$defs/istio"  },
+        "ingress": { "$ref": "#/$defs/ingress"  },
+        "sso": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "client_id",
+            "client_secret"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "default_role": {
+              "type": "string"
+            },
+            "issuer": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "tempo": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "sso": {
+          "$ref": "#/$defs/sso"
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
+        "objectStorage": {
+          "type": "object",
+          "required": [
+            "endpoint",
+            "region",
+            "accessKey",
+            "accessSecret",
+            "bucket",
+            "insecure"
+          ],
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "accessKey": {
+              "type": "string"
+            },
+            "accessSecret": {
+              "type": "string"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "insecure": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "monitoring": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "istio": { 
+          "$ref": "#/$defs/istio"  
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
+        "sso": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "prometheus": {
+              "type": "object",
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "alertmanager": {
+              "type": "object",
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "grafana": {
+              "type": "object",
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                },
+                "scopes": {
+                  "type": "string"
+                },
+                "allow_sign_up": {
+                  "type": "string"
+                },
+                "role_attribute_path": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "twistlock": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "sso": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "client_id",
+            "provider_type"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "provider_type": {
+              "type": "string"
+            },
+            "provider_name": {
+              "type": "string"
+            },
+            "groups": {
+              "type": "string"
+            },
+            "issuer_uri": {
+              "type": "string"
+            },
+            "idp_url": {
+              "type": "string"
+            },
+            "console_url": {
+              "type": "string"
+            },
+            "cert": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        }
+      },
+      "additionalProperties": false
+    },
+    "addons": {
+      "type": "object",
+      "properties": {
+        "argocd": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "authservice": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "minioOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "minio": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "gitlab": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "gitlabRunner": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "nexusRepositoryManager": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "sonarqube": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "haproxy": {
+          "type": "object",
+          "required": [
+            "git",
+            "flux",
+            "values"
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/git"
+            },
+            "flux": {
+              "ref": "#/$defs/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/values"
+            }
+          }
+        },
+        "anchore": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "mattermostOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "mattermost": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "velero": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "keycloak": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "vault": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "metricsServer": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "git",
+            "flux",
+            "values"
+          ],
+          "properties": {
+            "enabled": {
+              "type": [
+                "boolean",
+                "string"
+              ],
+              "examples": [
+                true,
+                false,
+                "auto"
+              ]
+            },
+            "git": {
+              "$ref": "#/$defs/git"
+            },
+            "flux": {
+              "ref": "#/$defs/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/values"
+            }
+          }
+        }
+      }
+    },
+    "wrapper": {
+      "type": "object",
+      "properties": {
+        "sourceType": {
+          "$ref": "#/$defs/sourceType"
+        },
+        "git": {
+          "$ref": "#/$defs/git"
+        },
+        "helmRepo": {
+          "$ref": "#/$defs/helmRepo"
+        }
+      },
+      "additionalProperties": false
+    },
+    "packages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "kustomize": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "registryCredential": {
+      "type": "object",
+      "properties": {
+        "registry": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "registry",
+        "username",
+        "password"
+      ],
+      "additionalProperties": false
+    },
+    "helmRepositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "repository": {
+            "type": "string",
+            "format": "uri"
+          },
+          "existingSecret": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "oci",
+              "default"
+            ]
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "existingSecret"
+            ]
+          },
+          {
+            "required": [
+              "username",
+              "password"
+            ]
+          }
+        ],
+        "required": [
+          "name",
+          "repository"
+        ]
+      }
+    },
+    "basePackage": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "sourceType",
+        "flux",
+        "values",
+        "postRenderers"
+      ],
+      "if": {
+        "properties": {
+          "sourceType": { "const": "git" }
+        }
+      },
+      "then": {
+        "properties": {
+          "git": {
+            "$ref": "#/$defs/git"
+          }
+        },
+        "required": ["git"]
+      },
+      "else": {
+        "properties": {
+          "helmRepo": {
+            "$ref": "#/$defs/helmRepo"
+          }
+        },
+        "required": ["helmRepo"]
+      },
+      "properties": {
+        "enabled": {
+          "$ref": "#/$defs/enabled"
+        },
+        "sourceType": {
+          "enum": ["git", "helmRepo"]
+        },
+        "flux": {
+          "$ref": "#/$defs/flux"
+        },
+        "values": {
+          "$ref": "#/$defs/values"
+        },
+        "postRenderers": {
+          "$ref": "#/$defs/postRenderers"
+        }
+      }
+    },
+    "values": {
+      "type": "object",
+      "default": {},
+      "required": [],
+      "properties": {}
+    },
+    "flux": {
+      "install": {
+        "description": "Install holds the configuration for Helm install actions for this HelmRelease.",
+        "type": "object",
+        "properties": {
+          "crds": {
+            "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Create` and if omitted CRDs are installed but not updated. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are applied (installed) during Helm install action. With this option users can opt-in to CRD replace existing CRDs on Helm install actions, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+            "type": "string",
+            "enum": [
+              "Skip",
+              "Create",
+              "CreateReplace"
+            ]
+          },
+          "createNamespace": {
+            "description": "CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.",
+            "type": "boolean"
+          },
+          "disableHooks": {
+            "description": "DisableHooks prevents hooks from running during the Helm install action.",
+            "type": "boolean"
+          },
+          "disableOpenAPIValidation": {
+            "description": "DisableOpenAPIValidation prevents the Helm install action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+            "type": "boolean"
+          },
+          "disableWait": {
+            "description": "DisableWait disables the waiting for resources to be ready after a Helm install has been performed.",
+            "type": "boolean"
+          },
+          "disableWaitForJobs": {
+            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm install has been performed.",
+            "type": "boolean"
+          },
+          "remediation": {
+            "description": "Remediation holds the remediation configuration for when the Helm install action for the HelmRelease fails. The default is to not perform any action.",
+            "type": "object",
+            "properties": {
+              "ignoreTestFailures": {
+                "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an install action but fail. Defaults to 'Test.IgnoreFailures'.",
+                "type": "boolean"
+              },
+              "remediateLastFailure": {
+                "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false'.",
+                "type": "boolean"
+              },
+              "retries": {
+                "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using an uninstall, is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                "type": "integer"
+              }
+            }
+          },
+          "replace": {
+            "description": "Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.",
+            "type": "boolean"
+          },
+          "skipCRDs": {
+            "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present. \n Deprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
+            "type": "boolean"
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          }
+        }
+      },
+      "interval": {
+        "description": "Interval at which to reconcile the Helm release.",
+        "type": "string",
+        "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+      },
+      "kubeConfig": {
+        "description": "KubeConfig for reconciling the HelmRelease on a remote cluster. When used in combination with HelmReleaseSpec.ServiceAccountName, forces the controller to act on behalf of that Service Account at the target cluster. If the --default-service-account flag is set, its value will be used as a controller level fallback for when HelmReleaseSpec.ServiceAccountName is empty.",
+        "type": "object",
+        "properties": {
+          "secretRef": {
+            "description": "SecretRef holds the name to a secret that contains a key with the kubeconfig file as the value. If no key is specified the key will default to 'value'. The secret must be in the same namespace as the HelmRelease. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling the HelmRelease.",
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "key": {
+                "description": "Key in the Secret, when not specified an implementation-specific default key is used.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Name of the Secret.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "maxHistory": {
+        "description": "MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.",
+        "type": "integer"
+      },
+      "releaseName": {
+        "description": "ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.",
+        "type": "string",
+        "maxLength": 53,
+        "minLength": 1
+      },
+      "rollback": {
+        "description": "Rollback holds the configuration for Helm rollback actions for this HelmRelease.",
+        "type": "object",
+        "properties": {
+          "cleanupOnFail": {
+            "description": "CleanupOnFail allows deletion of new resources created during the Helm rollback action when it fails.",
+            "type": "boolean"
+          },
+          "disableHooks": {
+            "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+            "type": "boolean"
+          },
+          "disableWait": {
+            "description": "DisableWait disables the waiting for resources to be ready after a Helm rollback has been performed.",
+            "type": "boolean"
+          },
+          "disableWaitForJobs": {
+            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm rollback has been performed.",
+            "type": "boolean"
+          },
+          "force": {
+            "description": "Force forces resource updates through a replacement strategy.",
+            "type": "boolean"
+          },
+          "recreate": {
+            "description": "Recreate performs pod restarts for the resource if applicable.",
+            "type": "boolean"
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          }
+        }
+      },
+      "serviceAccountName": {
+        "description": "The name of the Kubernetes service account to impersonate when reconciling this HelmRelease.",
+        "type": "string"
+      },
+      "storageNamespace": {
+        "description": "StorageNamespace used for the Helm storage. Defaults to the namespace of the HelmRelease.",
+        "type": "string",
+        "maxLength": 63,
+        "minLength": 1
+      },
+      "suspend": {
+        "description": "Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.",
+        "type": "boolean"
+      },
+      "test": {
+        "description": "Test holds the configuration for Helm test actions for this HelmRelease.",
+        "type": "object",
+        "properties": {
+          "enable": {
+            "description": "Enable enables Helm test actions for this HelmRelease after an Helm install or upgrade action has been performed.",
+            "type": "boolean"
+          },
+          "ignoreFailures": {
+            "description": "IgnoreFailures tells the controller to skip remediation when the Helm tests are run but fail. Can be overwritten for tests run after install or upgrade actions in 'Install.IgnoreTestFailures' and 'Upgrade.IgnoreTestFailures'.",
+            "type": "boolean"
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation during the performance of a Helm test action. Defaults to 'HelmReleaseSpec.Timeout'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          }
+        }
+      },
+      "timeout": {
+        "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm action. Defaults to '5m0s'.",
+        "type": "string",
+        "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+      },
+      "uninstall": {
+        "description": "Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.",
+        "type": "object",
+        "properties": {
+          "disableHooks": {
+            "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+            "type": "boolean"
+          },
+          "disableWait": {
+            "description": "DisableWait disables waiting for all the resources to be deleted after a Helm uninstall is performed.",
+            "type": "boolean"
+          },
+          "keepHistory": {
+            "description": "KeepHistory tells Helm to remove all associated resources and mark the release as deleted, but retain the release history.",
+            "type": "boolean"
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          }
+        }
+      },
+      "upgrade": {
+        "description": "Upgrade holds the configuration for Helm upgrade actions for this HelmRelease.",
+        "type": "object",
+        "properties": {
+          "cleanupOnFail": {
+            "description": "CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.",
+            "type": "boolean"
+          },
+          "crds": {
+            "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Skip` and if omitted CRDs are neither installed nor upgraded. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are not applied during Helm upgrade action. With this option users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+            "type": "string",
+            "enum": [
+              "Skip",
+              "Create",
+              "CreateReplace"
+            ]
+          },
+          "disableHooks": {
+            "description": "DisableHooks prevents hooks from running during the Helm upgrade action.",
+            "type": "boolean"
+          },
+          "disableOpenAPIValidation": {
+            "description": "DisableOpenAPIValidation prevents the Helm upgrade action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+            "type": "boolean"
+          },
+          "disableWait": {
+            "description": "DisableWait disables the waiting for resources to be ready after a Helm upgrade has been performed.",
+            "type": "boolean"
+          },
+          "disableWaitForJobs": {
+            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm upgrade has been performed.",
+            "type": "boolean"
+          },
+          "force": {
+            "description": "Force forces resource updates through a replacement strategy.",
+            "type": "boolean"
+          },
+          "preserveValues": {
+            "description": "PreserveValues will make Helm reuse the last release's values and merge in overrides from 'Values'. Setting this flag makes the HelmRelease non-declarative.",
+            "type": "boolean"
+          },
+          "remediation": {
+            "description": "Remediation holds the remediation configuration for when the Helm upgrade action for the HelmRelease fails. The default is to not perform any action.",
+            "type": "object",
+            "properties": {
+              "ignoreTestFailures": {
+                "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an upgrade action but fail. Defaults to 'Test.IgnoreFailures'.",
+                "type": "boolean"
+              },
+              "remediateLastFailure": {
+                "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false' unless 'Retries' is greater than 0.",
+                "type": "boolean"
+              },
+              "retries": {
+                "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using 'Strategy', is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                "type": "integer"
+              },
+              "strategy": {
+                "description": "Strategy to use for failure remediation. Defaults to 'rollback'.",
+                "type": "string",
+                "enum": [
+                  "rollback",
+                  "uninstall"
+                ]
+              }
+            }
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          }
+        }
+      },
+      "values": {
+        "description": "Values holds the values for this Helm release.",
+        "x-kubernetes-preserve-unknown-fields": true
+      }
+    },
+    "git": {
+      "type": "object",
+      "required": [
+        "repo",
+        "path"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "tag"
+          ],
+          "properties": {
+            "branch": {
+              "maxLength": 0
+            },
+            "commit": {
+              "maxLength": 0
+            }
+          }
+        },
+        {
+          "required": [
+            "branch"
+          ],
+          "properties": {
+            "tag": {
+              "maxLength": 0
+            }
+          }
+        },
+        {
+          "required": [
+            "semver"
+          ],
+          "properties": {
+            "branch": {
+              "maxLength": 0
+            },
+            "commit": {
+              "maxLength": 0
+            },
+            "tag": {
+              "maxLength": 0
+            }
+          }
+        }
+      ],
+      "dependentRequired": {
+        "commit": [
+          "branch"
+        ]
+      },
+      "properties": {
+        "repo": {
+          "type": "string",
+          "examples": [
+            "https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "examples": [
+            "./chart"
+          ]
+        },
+        "tag": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": false,
+          "examples": [
+            "4.8.0-bb.0"
+          ]
+        },
+        "branch": {
+          "minLength": 1,
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": false,
+          "examples": [
+            "feature-branch"
+          ]
+        },
+        "commit": {
+          "type": "string"
+        },
+        "semver": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "repo": "https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git",
+          "path": "./chart",
+          "tag": "4.8.0-bb.0"
+        }
+      ]
+    },
+    "postRenderers": {
+      "description": "PostRenderers holds an array of Helm PostRenderers, which will be applied in order of their definition.",
+      "type": "array",
+      "items": {
+        "description": "PostRenderer contains a Helm PostRenderer specification.",
+        "type": "object",
+        "properties": {
+          "kustomize": {
+            "description": "Kustomization to apply as PostRenderer.",
+            "type": "object",
+            "properties": {
+              "images": {
+                "description": "Images is a list of (image name, new name, new tag or digest) for changing image names, tags or digests. This can also be achieved with a patch, but this operator is simpler to specify.",
+                "type": "array",
+                "items": {
+                  "description": "Image contains an image name, a new name, a new tag or digest, which will replace the original name and tag.",
+                  "type": "object",
+                  "required": [
+                    "name"
+                  ],
+                  "properties": {
+                    "digest": {
+                      "description": "Digest is the value used to replace the original image tag. If digest is present NewTag value is ignored.",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Name is a tag-less image name.",
+                      "type": "string"
+                    },
+                    "newName": {
+                      "description": "NewName is the value used to replace the original name.",
+                      "type": "string"
+                    },
+                    "newTag": {
+                      "description": "NewTag is the value used to replace the original tag.",
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "patches": {
+                "description": "Strategic merge and JSON patches, defined as inline YAML objects, capable of targeting objects based on kind, label and annotation selectors.",
+                "type": "array",
+                "items": {
+                  "description": "Patch contains an inline StrategicMerge or JSON6902 patch, and the target the patch should be applied to.",
+                  "type": "object",
+                  "properties": {
+                    "patch": {
+                      "description": "Patch contains an inline StrategicMerge patch or an inline JSON6902 patch with an array of operation objects.",
+                      "type": "string"
+                    },
+                    "target": {
+                      "description": "Target points to the resources that the patch document should be applied to.",
+                      "type": "object",
+                      "properties": {
+                        "annotationSelector": {
+                          "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                          "type": "string"
+                        },
+                        "group": {
+                          "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "labelSelector": {
+                          "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name to match resources with.",
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "description": "Namespace to select resources from.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "patchesJson6902": {
+                "description": "JSON 6902 patches, defined as inline YAML objects.",
+                "type": "array",
+                "items": {
+                  "description": "JSON6902Patch contains a JSON6902 patch and the target the patch should be applied to.",
+                  "type": "object",
+                  "required": [
+                    "patch",
+                    "target"
+                  ],
+                  "properties": {
+                    "patch": {
+                      "description": "Patch contains the JSON6902 patch document with an array of operation objects.",
+                      "type": "array",
+                      "items": {
+                        "description": "JSON6902 is a JSON6902 operation object. https://datatracker.ietf.org/doc/html/rfc6902#section-4",
+                        "type": "object",
+                        "required": [
+                          "op",
+                          "path"
+                        ],
+                        "properties": {
+                          "from": {
+                            "description": "From contains a JSON-pointer value that references a location within the target document where the operation is performed. The meaning of the value depends on the value of Op, and is NOT taken into account by all operations.",
+                            "type": "string"
+                          },
+                          "op": {
+                            "description": "Op indicates the operation to perform. Its value MUST be one of \"add\", \"remove\", \"replace\", \"move\", \"copy\", or \"test\". https://datatracker.ietf.org/doc/html/rfc6902#section-4",
+                            "type": "string",
+                            "enum": [
+                              "test",
+                              "remove",
+                              "add",
+                              "replace",
+                              "move",
+                              "copy"
+                            ]
+                          },
+                          "path": {
+                            "description": "Path contains the JSON-pointer value that references a location within the target document where the operation is performed. The meaning of the value depends on the value of Op.",
+                            "type": "string"
+                          },
+                          "value": {
+                            "description": "Value contains a valid JSON structure. The meaning of the value depends on the value of Op, and is NOT taken into account by all operations.",
+                            "x-kubernetes-preserve-unknown-fields": true
+                          }
+                        }
+                      }
+                    },
+                    "target": {
+                      "description": "Target points to the resources that the patch document should be applied to.",
+                      "type": "object",
+                      "properties": {
+                        "annotationSelector": {
+                          "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                          "type": "string"
+                        },
+                        "group": {
+                          "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "labelSelector": {
+                          "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name to match resources with.",
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "description": "Namespace to select resources from.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "patchesStrategicMerge": {
+                "description": "Strategic merge patches, defined as inline YAML objects.",
+                "type": "array",
+                "items": {
+                  "x-kubernetes-preserve-unknown-fields": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false,
+      "examples": [
+        false
+      ]
+    },
+    "sso": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "client_id",
+        "client_secret"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "client_id": {
+          "type": "string"
+        },
+        "client_secret": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "gateway": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "helmRepo": {
+      "type": "object",
+      "properties": {
+        "repoName": {
+          "type": "string"
+        },
+        "chartName": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "repoName",
+        "chartName",
+        "tag"
+      ],
+      "additionalProperties": false
+    },
+    "sourceType": {
+      "enum": ["helmRepo", "git"]
+    },
+    "istio": {
+      "type": "object",
+      "properties": {
+        "injection": {
+          "enum": ["enabled", "disabled"]
+        }
+      }
+    }
+  }
+}

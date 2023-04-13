@@ -13,18 +13,18 @@ spec:
   targetNamespace: argocd
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.argocd) "true" }}
+      {{- if eq .Values.addons.argocd.sourceType "git" }}
       chart: {{ .Values.addons.argocd.git.path }}
       sourceRef:
         kind: GitRepository
         name: argocd
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.argocd.oci.name }}
-      version: {{ .Values.addons.argocd.oci.tag }}
+      chart: {{ .Values.addons.argocd.helmRepo.chartName }}
+      version: {{ .Values.addons.argocd.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.argocd.oci.repo }}
+        name: {{ .Values.addons.argocd.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

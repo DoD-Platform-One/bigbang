@@ -1,4 +1,4 @@
-{{- if and (eq (include "checkGitRef" .Values.twistlock) "true") (not .Values.offline) .Values.twistlock.enabled }}
+{{- if and (eq .Values.twistlock.sourceType "git") (not .Values.offline) .Values.twistlock.enabled }}
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:

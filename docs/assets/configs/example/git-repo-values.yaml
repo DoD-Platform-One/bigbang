@@ -24,7 +24,7 @@ istio:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
     path: "./chart"
     branch: "my-dev-branch"
-istiooperator:
+istioOperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
     path: "./chart"
@@ -54,22 +54,22 @@ kyverno:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
     path: "./chart"
     branch: "my-dev-branch"
-kyvernopolicies:
+kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
     path: ./chart
     branch: "my-dev-branch"
-kyvernoreporter:
+kyvernoReporter:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter
     path: ./chart
     branch: "my-dev-branch"
-logging:
+elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
     path: "./chart"
     branch: "my-dev-branch"
-eckoperator:
+eckOperator:
   git:
     repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
     path: "./chart"

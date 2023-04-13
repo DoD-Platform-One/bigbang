@@ -501,7 +501,7 @@ EOF
 
 
 cat << EOF > ~/demo_values.yaml
-logging:
+elasticsearchKibana:
   values:
     kibana:
       count: 1

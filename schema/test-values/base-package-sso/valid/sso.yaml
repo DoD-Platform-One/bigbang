@@ -1,0 +1,11 @@
+jaeger:
+  sso:
+    enabled: true
+    client_id: "id"
+    client_secret: "1234"
+
+neuvector:
+  sso: 
+    enabled: true
+    client_id: "id"
+    client_secret: "string"

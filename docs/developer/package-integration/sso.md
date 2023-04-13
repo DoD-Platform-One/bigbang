@@ -40,7 +40,7 @@ For SSO integration using OIDC, at a minimum this usually requires `sso.client_i
 
 * If configuration isn't destined for a secret and the package supports SSO options directly via helm values we can create and reference the necessary options from the `<package>.sso` values block. For example, elasticsearch documentation specifies a few [values required to enable and configure OIDC](https://www.elastic.co/guide/en/elasticsearch/reference/master/oidc-guide.html#oidc-enable-token) that we can configure and set to be conditional on `<package>.sso.enabled`.
 
-    Example: [ECK Values template](../../../chart/templates/logging/elasticsearch-kibana/values.yaml)
+    Example: [ECK Values template](../../../chart/templates/elasticsearch-kibana/values.yaml)
 
 #### SAML
 

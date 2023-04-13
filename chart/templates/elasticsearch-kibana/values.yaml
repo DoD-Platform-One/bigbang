@@ -1,0 +1,223 @@
+{{- if .Values.elasticsearchKibana.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.elasticsearchKibana "name" "ek" "defaults" (include "bigbang.defaults.logging" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.logging" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  kibana:
+    gateways:
+    - istio-system/{{ default "public" .Values.elasticsearchKibana.ingress.gateway }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.elasticsearchKibana.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+{{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.addons.mattermost.enabled }}
+mattermost:
+  enabled: true
+{{- end }}
+
+{{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
+{{- if and .Values.fluentbit.enabled (not $disableDefaultFLB) }}
+fluentbit:
+  enabled: true
+{{- end }}
+
+{{- with .Values.elasticsearchKibana.sso }}
+{{- if .enabled }}
+sso:
+  enabled: {{ .enabled }}
+  client_id: {{ .client_id | quote }}
+  client_secret: {{ .client_secret | default "no-secret" }}
+  oidc:
+    host: {{ default (include "sso.host" $) (dig "oidc" "host" "" .) | quote }}
+    realm: {{ default (include "sso.realm" $) (dig "oidc" "realm" "" .) | quote }}
+  {{- /* Optional fields should be nil checked */ -}}
+  {{- $legacy := and (not (empty $.Values.sso.oidc.realm)) (not (empty $.Values.sso.oidc.host)) -}}
+  {{- list "issuer" (default (ternary nil (include "sso.url" $) $legacy) .issuer) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "auth_url" (default (ternary nil (include "sso.oidc.auth" $) $legacy) .auth_url) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "token_url" (default (ternary nil (include "sso.oidc.token" $) $legacy) .token_url) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "userinfo_url" (default (ternary nil (include "sso.oidc.userinfo" $) $legacy) .userinfo_url) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "jwkset_url" (default (ternary nil (include "sso.oidc.jwksuri" $) $legacy) .jwkset_url) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_principal" (default (ternary nil (dig "oidc" "claims" "username" nil $.Values.sso) $legacy) .claims_principal) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_principal_pattern" .claims_principal_pattern | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "requested_scopes" .requested_scopes | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "signature_algorithm" .signature_algorithm | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "endsession_url" (default (ternary nil (include "sso.oidc.endsession" $) $legacy) .endsession_url) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_group" (default (ternary nil (dig "oidc" "claims" "groups" nil $.Values.sso) $legacy) .claims_group) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "claims_mail" (default (ternary nil (dig "oidc" "claims" "email" nil $.Values.sso) $legacy) .claims_mail) | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "cert_authorities" .cert_authorities | include "bigbang.addValueIfSet" | indent 2 }}
+{{- end }}
+{{- end }}
+
+kibana:
+  imagePullSecrets:
+    - name: private-registry
+{{- if .Values.istio.enabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+metrics:
+  enabled: {{ .Values.monitoring.enabled }}
+  {{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana) "enabled") .Values.istio.enabled) }}
+  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.elasticsearchKibana.values) "STRICT") $istioInjection }}
+  serviceMonitor:
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+  {{- end }}
+
+elasticsearch:
+  imagePullSecrets:
+    - name: private-registry
+  master:
+    initContainers:
+      - name: elastic-internal-init-filesystem
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      - name: elastic-internal-suspend
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- if .Values.elasticsearchKibana.sso.enabled }}
+      - name: elastic-internal-init-keystore
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
+    {{- if .Values.istio.enabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+  data:
+    initContainers:
+      - name: elastic-internal-init-filesystem
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      - name: elastic-internal-suspend
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- if .Values.elasticsearchKibana.sso.enabled }}
+      - name: elastic-internal-init-keystore
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
+    {{- if .Values.istio.enabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+  ingest:
+    initContainers:
+      - name: elastic-internal-init-filesystem
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      - name: elastic-internal-suspend
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- if .Values.elasticsearchKibana.sso.enabled }}
+      - name: elastic-internal-init-keystore
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
+    {{- if .Values.istio.enabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+  ml:
+    initContainers:
+      - name: elastic-internal-init-filesystem
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      - name: elastic-internal-suspend
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- if .Values.elasticsearchKibana.sso.enabled }}
+      - name: elastic-internal-init-keystore
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
+    {{- if .Values.istio.enabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+  coord:
+    initContainers:
+      - name: elastic-internal-init-filesystem
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      - name: elastic-internal-suspend
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- if .Values.elasticsearchKibana.sso.enabled }}
+      - name: elastic-internal-init-keystore
+        securityContext:
+          privileged: false
+          capabilities:
+            drop:
+              - ALL
+      {{- end }}
+    {{- if .Values.istio.enabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+{{- end -}}

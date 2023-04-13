@@ -1,0 +1,51 @@
+{{- $pkg := "kyvernoPolicies" }}
+{{- $fluxSettings := merge (get .Values $pkg).flux .Values.flux -}}
+{{- if (get .Values $pkg).enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: {{ $pkg | kebabcase }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ $pkg | kebabcase }}
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: kyverno
+  chart:
+    spec:
+      {{- if (eq (get .Values $pkg).sourceType "git") }}
+      chart: {{ (get .Values $pkg).git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: {{ $pkg | kebabcase }}
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ (get .Values $pkg).helmRepo.chartName }}
+      version: {{ (get .Values $pkg).helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ (get .Values $pkg).helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettings | nindent 2 }}
+
+  {{- if (get .Values $pkg).postRenderers }}
+  postRenderers:
+  {{ toYaml (get .Values $pkg).postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-{{ $pkg | kebabcase }}-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-{{ $pkg | kebabcase }}-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-{{ $pkg | kebabcase }}-values
+      kind: Secret
+      valuesKey: "overlays"
+  dependsOn:
+    - name: kyverno
+      namespace: {{ .Release.Namespace }}
+{{- end }}

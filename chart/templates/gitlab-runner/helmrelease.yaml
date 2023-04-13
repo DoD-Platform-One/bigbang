@@ -6,22 +6,22 @@ metadata:
   name: gitlab-runner
   namespace: {{ .Release.Namespace }}
 spec:
-  targetNamespace: gitlab
+  targetNamespace: gitlab-runner
   releaseName: gitlab-runner
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.gitlabRunner) "true" }}
+      {{- if eq .Values.addons.gitlabRunner.sourceType "git" }}
       chart: {{ .Values.addons.gitlabRunner.git.path }}
       sourceRef:
         kind: GitRepository
         name: gitlab-runner
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.gitlabRunner.oci.name }}
-      version: {{ .Values.addons.gitlabRunner.oci.tag }}
+      chart: {{ .Values.addons.gitlabRunner.helmRepo.chartName }}
+      version: {{ .Values.addons.gitlabRunner.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.gitlabRunner.oci.repo }}
+        name: {{ .Values.addons.gitlabRunner.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -43,14 +43,18 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.gatekeeper.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if .Values.kyvernopolicies.enabled }}
-    - name: kyvernopolicies
+    {{- if .Values.kyverno.enabled }}
+    - name: kyverno
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}

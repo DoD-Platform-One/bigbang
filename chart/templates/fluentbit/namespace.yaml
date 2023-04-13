@@ -1,0 +1,11 @@
+{{- if .Values.fluentbit.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fluentbit
+  labels:
+    app.kubernetes.io/name: fluentbit
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+{{- end }}

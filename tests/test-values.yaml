@@ -74,7 +74,7 @@ istio:
           strategy: "anonymous"
 
 jaeger:
-  enabled: true
+  enabled: false
   sso:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
@@ -112,7 +112,7 @@ kiali:
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
 
 clusterAuditor:
-  enabled: true
+  enabled: false
   values:
     resources:
       requests:
@@ -128,7 +128,7 @@ clusterAuditor:
           cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
 
 gatekeeper:
-  enabled: true
+  enabled: false
   values:
     replicas: 1
     controllerManager:
@@ -163,6 +163,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
+          - gitlab-runner/gitlab-runner-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-cypress-test
           - mattermost/mattermost-cypress-test
@@ -295,6 +296,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - gitlab/gitlab-cypress-test
+          - gitlab-runner/gitlab-runner-cypress-test
           - gitlab/gitlab-runner-cypress-test
           - kiali/kiali-cypress-test
           - mattermost/mattermost-cypress-test
@@ -318,14 +320,12 @@ gatekeeper:
       enabled: true
 
 kyverno:
-  enabled: false
   values:
     replicaCount: 1
     bbtests:
       enabled: true
 
-kyvernoreporter:
-  enabled: false
+kyvernoReporter:
   values:
     bbtests:
       cypress:
@@ -333,8 +333,7 @@ kyvernoreporter:
           cypress_grafana_url: https://grafana.bigbang.dev
           cypress_prometheus_url: https://prometheus.bigbang.dev
 
-kyvernopolicies:
-  enabled: false
+kyvernoPolicies:
   values:
     bbtests:
       enabled: true
@@ -440,6 +439,7 @@ kyvernopolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               - kiali
               - cluster-auditor
               - mattermost
@@ -472,6 +472,7 @@ kyvernopolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               - kiali
               - cluster-auditor
               - mattermost
@@ -514,6 +515,7 @@ kyvernopolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               - kiali
               - cluster-auditor
               - mattermost
@@ -544,7 +546,7 @@ kyvernopolicies:
       require-drop-all-capabilities:
         exclude:
           any:
-          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
           # is only recommended for Dev/CI environments.
           - resources:
               namespaces:
@@ -554,7 +556,7 @@ kyvernopolicies:
       require-non-root-group:
         exclude:
           any:
-          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
           # is only recommended for Dev/CI environments.
           - resources:
               namespaces:
@@ -564,7 +566,7 @@ kyvernopolicies:
       require-non-root-user:
         exclude:
           any:
-          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation 
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
           # is only recommended for Dev/CI environments.
           - resources:
               namespaces:
@@ -576,8 +578,8 @@ kyvernopolicies:
           disallow:
           - bigbang
 
-logging:
-  enabled: true
+elasticsearchKibana:
+  enabled: false
   sso:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kibana
@@ -618,7 +620,7 @@ logging:
           cypress_kibana_url: "https://kibana.bigbang.dev"
 
 fluentbit:
-  enabled: true
+  enabled: false
   values:
     securityContext:
       privileged: true
@@ -626,7 +628,6 @@ fluentbit:
       enabled: true
 
 loki:
-  enabled: false
   strategy: scalable
   values:
     minio:
@@ -664,7 +665,6 @@ loki:
           LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
 
 tempo:
-  enabled: false
   values:
     istio:
       tempoQuery:
@@ -703,6 +703,9 @@ tempo:
         requests:
           cpu: 200m
           memory: 128Mi
+
+promtail:
+  enabled: true
 
 monitoring:
   enabled: true
@@ -775,7 +778,6 @@ monitoring:
           cypress_check_istio_dashboards: 'true'
 
 neuvector:
-  enabled: false
   values:
     k3s:
       enabled: true
@@ -787,7 +789,7 @@ neuvector:
           cypress_url: https://neuvector.bigbang.dev
 
 twistlock:
-  enabled: true
+  enabled: false
   sso:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
@@ -999,6 +1001,17 @@ addons:
         limits: {}
       runners:
         protected: false
+      networkPolicies:
+        additionalPolicies:
+        - name: egress-runner-jobs
+          spec:
+            podSelector: {}
+            policyTypes:
+            - Egress
+            egress:
+            - to:
+              - ipBlock:
+                  cidr: 0.0.0.0/0
       bbtests:
         enabled: true
         cypress:
@@ -1201,7 +1214,7 @@ addons:
       curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.0.0
 
   minioOperator:
-    enabled: false
+    enabled: true # Minio Operator is required for Loki in default core
 
   minio:
     enabled: false
@@ -1283,7 +1296,7 @@ addons:
 
   nexusRepositoryManager:
     enabled: false
-    # Nexus requires manual configuration in Keycloak client and cannot be tested with 
+    # Nexus requires manual configuration in Keycloak client and cannot be tested with
     # you must test with your own dev deployment.  Example: keycloak.bigbang.dev
     # See more info in Nexus Package docs /docs/keycloak.md
     # Nexus SSO is behind a paywall. You must have a valid license to enable SSO
@@ -1488,7 +1501,7 @@ addons:
           command:
           - sh
           - -c
-          - | 
+          - |
             cp /app/p1-keycloak-plugin.jar /init
             ls -l /init
           volumeMounts:

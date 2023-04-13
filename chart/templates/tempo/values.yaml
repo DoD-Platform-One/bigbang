@@ -60,7 +60,7 @@ networkPolicies:
 istio:
   enabled: {{ .Values.istio.enabled }}
   tempoQuery:
-    # During BETA Period set TempoQuery UI to "tempo." instead of soon to be default "tracing."
+    # Set TempoQuery UI to "tempo." if Jaeger is enabled
     {{- if .Values.jaeger.enabled }}
     hosts:
       - "tempo.{{ .Values.domain }}"

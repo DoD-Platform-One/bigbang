@@ -1,0 +1,65 @@
+{{- $fluxSettingsEk := merge .Values.elasticsearchKibana.flux .Values.flux -}}
+{{- if .Values.elasticsearchKibana.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ek
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: elasticsearch-kibana
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: logging
+  chart:
+    spec:
+      {{- if eq .Values.elasticsearchKibana.sourceType "git" }}
+      chart: {{ .Values.elasticsearchKibana.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: elasticsearch-kibana
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.elasticsearchKibana.helmRepo.chartName }}
+      version: {{ .Values.elasticsearchKibana.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.elasticsearchKibana.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsEk | nindent 2 }}
+
+  {{- if .Values.elasticsearchKibana.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.elasticsearchKibana.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-ek-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{/* ECK and Logging _always_ depend on .Values.elasticsearchKibana being enabled, so can assume they exist here */}}
+  dependsOn:
+    - name: eck-operator
+      namespace: {{ .Release.Namespace }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

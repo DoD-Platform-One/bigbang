@@ -1,0 +1,18 @@
+{{- if and (eq .Values.elasticsearchKibana.sourceType "git") (not .Values.offline) ( .Values.elasticsearchKibana.enabled ) }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: elasticsearch-kibana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: elasticsearch-kibana
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.elasticsearchKibana.git.repo }}
+  ref:
+    {{- include "validRef" .Values.elasticsearchKibana.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCreds" . | nindent 2 }}
+{{- end }}
