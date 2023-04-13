@@ -1321,7 +1321,7 @@ create_bigbang_merge_request() {
 
     ## Bump git or OCI tag for updated package in Big Bang chart/values.yaml
     ## Typically only one of the following tags will be defined and subsequently updated
-    tagRefs=(".${valuesKey}.git" ".addons.${valuesKey}.git" ".${valuesKey}.oci" ".addons.${valuesKey}.oci")
+    tagRefs=(".${valuesKey}.git" ".addons.${valuesKey}.git" ".${valuesKey}.helmRepo" ".addons.${valuesKey}.helmRepo")
 
     for i in "${tagRefs[@]}"
     do
@@ -1374,15 +1374,15 @@ create_bigbang_merge_request() {
 #
 #-----------------------------------------------------------------------------------------------------------------------
 get_packages() {
-  yq e '(.[],.addons.[]) | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+  yq e '(.[],.addons.[]) | select(. | (has("git") or has("helmRepo"))) | path | .[-1]' ${VALUES_FILE}
 }
 
 get_core_packages() {
-  yq e '.[] | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+  yq e '.[] | select(. | (has("git") or has("helmRepo"))) | path | .[-1]' ${VALUES_FILE}
 }
 
 get_addons_packages() {
-  yq e '.addons.[] | select(. | (has("git") or has("oci"))) | path | .[-1]' ${VALUES_FILE}
+  yq e '.addons.[] | select(. | (has("git") or has("helmRepo"))) | path | .[-1]' ${VALUES_FILE}
 }
 
 enable() {
@@ -1421,7 +1421,7 @@ enable_addons() {
 get_package_path() {
   local package="$1"
 
-  yq e ".. | (select(has(\"git\")) or (select(has(\"oci\")))) | (path | join(\".\")) | select(. == \"*${package}\")" $VALUES_FILE
+  yq e ".. | (select(has(\"git\")) or (select(has(\"helmRepo\")))) | (path | join(\".\")) | select(. == \"*${package}\")" $VALUES_FILE
 }
 
 cluster_deprecation_check() {

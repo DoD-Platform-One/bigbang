@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.6.13]
+### Changed
+- OCI -> HelmRepo change for yq things
+
 ## [2.6.12]
 ### Changed
 - Update RKE2 nightly version to 1.26.3
