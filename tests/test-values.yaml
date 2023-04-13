@@ -643,6 +643,17 @@ loki:
         requests:
           cpu: 200m
           memory: 400Mi
+    backend:
+      replicas: 1
+      persistence:
+        size: 2Gi
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 200m
+          memory: 400Mi
     read:
       replicas: 1
       persistence:
