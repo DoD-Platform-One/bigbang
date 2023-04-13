@@ -60,4 +60,4 @@ This is a change in the underlying architecture of Big Bang, but it will be offe
 
 Big Bang's 2.0 epic is a great place to start [here](https://repo1.dso.mil/groups/big-bang/-/epics/217). Beyond this we encourage users to get involved via the [BBTOC](https://repo1.dso.mil/platform-one/bbtoc).
 
-Continue reading about Big Bang 2.0 in [part 2 of this series]((./2-0-breaking-changes.md), which is focused specifically on the breaking changes included in 2.0.
+Continue reading about Big Bang 2.0 in [part 2 of this series](./2-0-breaking-changes.md), which is focused specifically on the breaking changes included in 2.0.
