@@ -13,18 +13,18 @@ spec:
   targetNamespace: jaeger
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.jaeger) "true" }}
+      {{- if eq .Values.jaeger.sourceType "git" }}
       chart: {{ .Values.jaeger.git.path }}
       sourceRef:
         kind: GitRepository
         name: jaeger
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.jaeger.oci.name }}
-      version: {{ .Values.jaeger.oci.tag }}
+      chart: {{ .Values.jaeger.helmRepo.chartName }}
+      version: {{ .Values.jaeger.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.jaeger.oci.repo }}
+        name: {{ .Values.jaeger.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -46,7 +46,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.logging.enabled }}
+  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.elasticsearchKibana.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -60,7 +60,7 @@ spec:
     - name: authservice
       namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.logging.enabled }}
+  {{- if .Values.elasticsearchKibana.enabled }}
     - name: ek
       namespace: {{ .Release.Namespace }}
   {{- end }}

@@ -1,0 +1,88 @@
+# Each package in `chart/values.yaml` should be present in this file. The top level key should match the values key in values.yaml, all other keys should follow the guide below.
+# package:
+#   repoName: A string matching the `CI_PROJECT_NAME` in repo1. Typically this is the URL/path for the repo.
+#   hrName: A string matching the helmrelease name in `chart/templates/package/helmrelease.yaml`.
+#   filePath: A string matching the filePath for the package directory in `chart/templates`. This is typically just `package`.
+#   dependencies: A list of all packages that should also be deployed in CI if this one is enabled. These names should match the other package(s) values keys.
+# Note: For any locations where the value matches the top level key, these can be left blank.
+
+istio:
+  repoName: "istio-controlplane"
+istioOperator:
+  repoName: "istio-operator"
+  hrName: "istio-operator"
+  filePath: "istio-operator"
+clusterAuditor:
+  repoName: "cluster-auditor"
+  hrName: "cluster-auditor"
+  filePath: "cluster-auditor"
+gatekeeper:
+  repoName: "policy"
+kyvernoPolicies:
+  repoName: "kyverno-policies"
+  hrName: "kyverno-policies"
+  filePath: "kyverno-policies"
+kyvernoReporter:
+  repoName: "kyverno-reporter"
+  hrName: "kyverno-reporter"
+  filePath: "kyverno-reporter"
+  dependencies:
+    - "kyvernoPolicies"
+elasticsearchKibana:
+  repoName: "elasticsearch-kibana"
+  hrName: "ek"
+  filePath: "elasticsearch-kibana"
+eckOperator:
+  repoName: "eck-operator"
+  hrName: "eck-operator"
+  filePath: "eck-operator"
+fluentbit:
+  hrName: "fluentbit"
+  filePath: "fluentbit"
+promtail:
+  dependencies:
+    - "loki"
+loki:
+  dependencies:
+    - "minioOperator"
+    - "promtail"
+minioOperator:
+  repoName: "minio-operator"
+  hrName: "minio-operator"
+  filePath: "minio-operator"
+minio:
+  dependencies:
+    - "minioOperator"
+gitlabRunner:
+  repoName: "gitlab-runner"
+  hrName: "gitlab-runner"
+  filePath: "gitlab-runner"
+  dependencies:
+    - "gitlab"
+nexusRepositoryManager:
+  repoName: "nexus"
+  hrName: "nexus-repository-manager"
+  filePath: "nexus-repository-manager"
+haproxy:
+  hrName: "haproxy-sso"
+anchore:
+  repoName: "anchore-enterprise"
+mattermostOperator:
+  repoName: "mattermost-operator"
+  hrName: "mattermost-operator"
+  filePath: "mattermost-operator"
+mattermost:
+  dependencies:
+    - "mattermostOperator"
+    - "minioOperator"
+velero:
+  dependencies:
+    - "minio"
+    - "minioOperator"
+vault:
+  dependencies:
+    - "minioOperator"
+metricsServer:
+  repoName: "metrics-server"
+  hrName: "metrics-server"
+  filePath: "metrics-server"

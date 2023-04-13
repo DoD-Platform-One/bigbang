@@ -20,7 +20,7 @@ istio:
               cpu: 50m
               memory: 128Mi
 
-istiooperator:
+istioOperator:
   values:
     operator:
       resources:
@@ -72,7 +72,7 @@ kyverno:
         cpu: 350m
         memory: 512Mi
 
-kyvernoreporter:
+kyvernoReporter:
   enabled: true
   values:
     resources:
@@ -83,13 +83,13 @@ kyvernoreporter:
         cpu: 50m
         memory: 100Mi
 
-kyvernopolicies:
+kyvernoPolicies:
   enabled: true 
 
-logging:
+elasticsearchKibana:
   enabled: false
 
-eckoperator:
+eckOperator:
   enabled: false
 
 fluentbit:

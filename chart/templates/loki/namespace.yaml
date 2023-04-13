@@ -1,0 +1,11 @@
+{{- if and .Values.loki.enabled (not .Values.elasticsearchKibana.enabled) (not .Values.fluentbit.enabled) }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logging
+  labels:
+    app.kubernetes.io/name: logging
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+{{- end }}

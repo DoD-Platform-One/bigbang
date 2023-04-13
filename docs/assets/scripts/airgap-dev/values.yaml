@@ -15,7 +15,7 @@ flux:
     cleanupOnFail: false
 
 
-eckoperator:
+eckOperator:
   enabled: true
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/eck-operator
@@ -24,7 +24,7 @@ fluentbit:
   enabled: true
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/fluentbit
-logging:
+elasticsearchKibana:
   enabled: true
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/elasticsearch-kibana
@@ -34,7 +34,7 @@ istio:
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/istio-controlplane
 
-istiooperator:
+istioOperator:
   enabled: true
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/istio-operator

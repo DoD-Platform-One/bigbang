@@ -9,6 +9,11 @@ imagePullPolicy: {{ .Values.imagePullPolicy }}
 imagePullSecrets:
 - name: private-registry
 
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlabRunner }}
+
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
 
@@ -27,5 +32,11 @@ podAnnotations:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+
+# autoRegister requires kyverno
+{{- if and .Values.kyverno.enabled .Values.addons.gitlab.enabled }}
+autoRegister:
+  enabled: {{ dig  "autoRegister" "enabled" "true" .Values.addons.gitlabRunner }}
+{{- end }}
 
 {{- end -}}

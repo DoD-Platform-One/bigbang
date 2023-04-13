@@ -13,18 +13,18 @@ spec:
   targetNamespace: neuvector
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.neuvector) "true" }}
+      {{- if eq .Values.neuvector.sourceType "git" }}
       chart: {{ .Values.neuvector.git.path }}
       sourceRef:
         kind: GitRepository
         name: neuvector
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.neuvector.oci.name }}
-      version: {{ .Values.neuvector.oci.tag }}
+      chart: {{ .Values.neuvector.helmRepo.chartName }}
+      version: {{ .Values.neuvector.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.neuvector.oci.repo }}
+        name: {{ .Values.neuvector.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -46,7 +46,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
@@ -56,8 +56,8 @@ spec:
     - name: istio
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if .Values.kyvernopolicies.enabled }}
-    - name: kyvernopolicies
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}

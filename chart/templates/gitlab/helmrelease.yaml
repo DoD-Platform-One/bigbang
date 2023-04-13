@@ -14,18 +14,18 @@ spec:
   targetNamespace: gitlab
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.gitlab) "true" }}
+      {{- if eq .Values.addons.gitlab.sourceType "git" }}
       chart: {{ .Values.addons.gitlab.git.path }}
       sourceRef:
         kind: GitRepository
         name: gitlab
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.gitlab.oci.name }}
-      version: {{ .Values.addons.gitlab.oci.tag }}
+      chart: {{ .Values.addons.gitlab.helmRepo.chartName }}
+      version: {{ .Values.addons.gitlab.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.gitlab.oci.repo }}
+        name: {{ .Values.addons.gitlab.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -48,7 +48,7 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
   {{- if .Values.gatekeeper.enabled }}
   - name: gatekeeper
@@ -58,8 +58,8 @@ spec:
   - name: istio
     namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.kyvernopolicies.enabled }}
-  - name: kyvernopolicies
+  {{- if .Values.kyvernoPolicies.enabled }}
+  - name: kyverno-policies
     namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.monitoring.enabled }}

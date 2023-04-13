@@ -1,0 +1,61 @@
+{{- if .Values.promtail.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.promtail "name" "promtail" "defaults" (include "bigbang.defaults.promtail" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.promtail" -}}
+hostname: {{ .Values.hostname }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+openshift: {{ .Values.openshift }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+loki:
+  enabled: {{ .Values.loki.enabled }}
+
+serviceMonitor:
+  enabled: {{ .Values.monitoring.enabled }}
+  # conditional passes only for default istio: enabled, mTLS: SCRICT
+  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.promtail.values) "STRICT") }}
+  scheme: https
+  tlsConfig:
+    caFile: /etc/prom-certs/root-cert.pem
+    certFile: /etc/prom-certs/cert-chain.pem
+    keyFile: /etc/prom-certs/key.pem
+    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+imagePullSecrets:
+  - name: private-registry
+
+{{- if .Values.loki.enabled }}
+config:
+  clients:
+    {{- if eq .Values.loki.strategy "monolith" }}
+    - url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
+    {{- else }}
+    - url: http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push
+    {{- end }}
+{{- end }}
+# If loki is disabled and promtail is not
+{{- if and (not .Values.loki.enabled) (.Values.promtail.enabled) }}
+# Promtail must have config.clients provided
+{{- if or (empty .Values.promtail.values.config) (empty .Values.promtail.values.config.clients) }}
+{{- fail "If Promtail is enabled and Loki is disabled, at least one client must be provided via '.Values.promtail.values.config.clients'"}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

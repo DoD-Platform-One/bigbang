@@ -1,0 +1,10 @@
+kiali:
+  enabled: true
+
+  sourceType: "helmRepo"
+
+  helmRepo:
+    repoName: null
+    chartName: "kiali"
+    tag: "1.65.0-bb.0"
+    extra: key

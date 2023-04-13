@@ -1,0 +1,4 @@
+neuvector:
+  enabled: true
+  istio:
+    injection:  "enabled"

@@ -53,7 +53,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit pods need access to host to get log files
-      - logging/logging-fluent-bit-.*
+      - fluentbit/fluentbit-fluent-bit-.*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
       # Neuvector needs access to host to inspect network traffic
@@ -66,7 +66,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- if .Values.promtail.enabled }}
       # promtail requires hostpath volume mounts
       # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-      - logging/logging-promtail-.*
+      - promtail/promtail-promtail-.*
       {{- end }}
       {{- if and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent }}
       # NodeAgent requires hostpath volume mount access in order to facilitate backing up cluster PV/C resources
@@ -84,7 +84,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # be created for network monitoring in Twistlock, so it is  important to make sure at least one is enabled.
         - twistlock/twistlock-defender-ds-.*
   {{- end }}
-  
+
   {{- if or .Values.twistlock.enabled .Values.neuvector.enabled }}
   noHostNamespace:
     parameters:
@@ -109,7 +109,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     parameters:
       excludedResources:
         # Fluentbit needs privileged to read and store the buffer for tailing logs from the nodes
-        - logging/fluent-bit
+        - fluentbit/fluent-bit
         {{- if .Values.neuvector.enabled }}
         # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
         - neuvector/neuvector-enforcer-pod.*
@@ -144,7 +144,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       excludedResources:
       {{- if .Values.fluentbit.enabled }}
       # FluentBit needs selinux option type spc_t
-      - logging/fluent-bit
+      - fluentbit/fluent-bit
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # Twistlock Defenders need selinux option type spc_t
@@ -152,7 +152,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
       {{- if .Values.promtail.enabled }}
       # Promtail needs selinux option type spc_t
-      - logging/promtail
+      - promtail/promtail
       {{- end }}
   {{- end }}
 
@@ -163,7 +163,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
        {{- if .Values.fluentbit.enabled }}
         # fluent-bit container requires certain host level access to ship logs and for keep track of state
         # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-kubernetes-filter
-        - logging/logging-fluent-bit-.*
+        - fluentbit/fluentbit-fluent-bit-.*
        {{- end }}
        {{- if .Values.twistlock.enabled }}
         # Twistlock requires /dev/log for its syslog daemon.
@@ -178,7 +178,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
        {{- if .Values.promtail.enabled }}
         # Promtail requires hostpath volume types
         # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-        - logging/logging-promtail-.*
+        - promtail/promtail-promtail-.*
        {{- end }}
        {{- if .Values.neuvector.enabled }}
         # Neuvector requires hostpath volume types

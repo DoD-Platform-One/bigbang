@@ -41,7 +41,7 @@ kyverno:
         cpu: 500m
         memory: 384Mi
 
-logging:
+elasticsearchKibana:
   values:
     elasticsearch:
       master:

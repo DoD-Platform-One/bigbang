@@ -1,0 +1,161 @@
+{{- if .Values.fluentbit.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.fluentbit "name" "fluentbit" "defaults" (include "bigbang.defaults.fluentbit" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.fluentbit" -}}
+{{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
+
+{{- if (not $disableDefault) }}
+loki:
+  enabled: {{ .Values.loki.enabled }}
+
+elasticsearchKibana:
+  enabled: {{.Values.elasticsearchKibana.enabled }}
+
+{{- if .Values.elasticsearchKibana.enabled }}
+env:
+  - name: FLUENT_ELASTICSEARCH_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: logging-ek-es-elastic-user
+        key: elastic
+
+extraVolumes:
+  - hostPath:
+      path: /var/log/flb-storage/
+      type: DirectoryOrCreate
+    name: flb-storage
+  - secret:
+      secretName: logging-ek-es-http-certs-public
+    name: elasticsearch-certs
+
+extraVolumeMounts:
+  - mountPath: /var/log/flb-storage/
+    name: flb-storage
+    readOnly: false
+  - mountPath: /etc/elasticsearch/certs/
+    name: elasticsearch-certs
+{{- end }}
+{{- if or .Values.elasticsearchKibana.enabled .Values.loki.enabled }}
+config:
+  outputs: |
+    {{- if .Values.elasticsearchKibana.enabled }}
+    [OUTPUT]
+        Name                     es
+        Match                    kube.*
+        Host                     {{ dig "elasticsearch" "name" "logging-ek" .Values.fluentbit.values }}-es-http.logging
+        HTTP_User                elastic
+        HTTP_Passwd              ${FLUENT_ELASTICSEARCH_PASSWORD}
+        Logstash_Format          On
+        Suppress_Type_Name       On
+        Retry_Limit              False
+        Replace_Dots             On
+        tls                      On
+        tls.verify               On
+        tls.ca_file              /etc/elasticsearch/certs/ca.crt
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+    [OUTPUT]
+        Name                     es
+        Match                    host.*
+        Host                     {{ dig "elasticsearch" "name" "logging-ek" .Values.fluentbit.values }}-es-http.logging
+        HTTP_User                elastic
+        HTTP_Passwd              ${FLUENT_ELASTICSEARCH_PASSWORD}
+        Logstash_Format          On
+        Suppress_Type_Name       On
+        Logstash_Prefix          node
+        Retry_Limit              False
+        tls                      On
+        tls.verify               On
+        tls.ca_file              /etc/elasticsearch/certs/ca.crt
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+    {{- end }}
+
+    {{- if .Values.loki.enabled }}
+    [OUTPUT]
+        name                   loki
+        match                  kube.*
+        labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
+        {{- if eq .Values.loki.strategy "monolith" }}
+        host                   logging-loki.logging
+        {{- else }}
+        host                   logging-loki-write.logging
+        {{- end }}
+        port                   3100
+        auto_kubernetes_labels on
+        Retry_Limit            False
+        tls                    Off
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+    [OUTPUT]
+        name                   loki
+        match                  host.*
+        labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
+        {{- if eq .Values.loki.strategy "monolith" }}
+        host                   logging-loki.logging
+        {{- else }}
+        host                   logging-loki-write.logging
+        {{- end }}
+        port                   3100
+        auto_kubernetes_labels on
+        Retry_Limit            False
+        tls                    Off
+        storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
+    {{- end }}
+{{- end }}
+{{- end }}
+
+imagePullSecrets:
+  - name: private-registry
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+openShift:
+  enabled: {{ .Values.openshift }}
+
+{{- if .Values.monitoring.enabled }}
+serviceMonitor:
+  enabled: true
+  namespace: monitoring
+  interval: 10s
+  scrapeTimeout: 10s
+  selector:
+    prometheus: monitoring-monitoring-kube-prometheus
+  # conditional passes only if all conditionals are true:
+  # - istio: enabled
+  # - mTLS: SCRICT
+  # - istio injection: enabled (for logging ns)
+  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.fluentbit.values) "STRICT") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana.values) "enabled") }}
+  scheme: https
+  tlsConfig:
+    caFile: /etc/prom-certs/root-cert.pem
+    certFile: /etc/prom-certs/cert-chain.pem
+    keyFile: /etc/prom-certs/key.pem
+    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
+dashboards:
+  enabled: true
+  labelKey: grafana_dashboard
+  namespace: monitoring
+{{- end }}
+
+{{- if .Values.istio.enabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+openshift: {{ .Values.openshift }}
+
+{{- if .Values.openshift }}
+podSecurityContext:
+  seLinuxOptions:
+    type: "spc_t"
+{{- end }}
+{{- end -}}

@@ -1,6 +1,6 @@
 {{- /* Used for GitOps on a package's Helm chart */ -}}
 {{- range $pkg, $vals := .Values.packages -}}
-{{- if and (dig "enabled" true $vals) (eq (include "checkGitRef" $vals) "true") -}}
+{{- if and (dig "enabled" true $vals) ($vals.git) -}}
 {{- $pkg = include "resourceName" $pkg -}}
 {{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
 {{- if $defaults -}}

@@ -1,0 +1,82 @@
+{{- $fluxSettingsFluentbit := merge .Values.fluentbit.flux .Values.flux -}}
+{{- if .Values.fluentbit.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: fluentbit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: fluentbit
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: fluentbit
+  releaseName: fluentbit
+  chart:
+    spec:
+      {{- if eq .Values.fluentbit.sourceType "git" }}
+      chart: {{ .Values.fluentbit.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: fluentbit
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.fluentbit.helmRepo.chartName }}
+      version: {{ .Values.fluentbit.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.fluentbit.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsFluentbit | nindent 2 }}
+
+  {{- if .Values.fluentbit.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.fluentbit.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-fluentbit-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{/* To support a "standalone" fluentbit for shipping to central location we conditionally depend on logging enabled */}}
+  {{- if or .Values.elasticsearchKibana.enabled .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.kyverno.enabled .Values.monitoring.enabled }}
+  dependsOn:
+    {{- if .Values.elasticsearchKibana.enabled }}
+    - name: ek
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if  .Values.loki.enabled }}
+    - name: loki
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyverno.enabled }}
+    - name: kyverno
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

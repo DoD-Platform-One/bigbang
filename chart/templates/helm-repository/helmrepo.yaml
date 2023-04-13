@@ -1,0 +1,16 @@
+{{- range .Values.helmRepositories }}
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  interval: {{ $.Values.flux.interval }}
+  type: {{ .type | default "default" }}
+  url: {{ .repository }}
+  {{- if or .existingSecret (and .username .password) }}
+  secretRef:
+    name: {{ .existingSecret | default (printf "%s-secret" .name) }}
+  {{- end }}
+---
+{{- end }}

@@ -16,7 +16,7 @@ spec:
   releaseName: nexus-repository-manager
   chart:
     spec:
-      {{- if eq (include "checkGitRef" $nexusValues) "true" }}
+      {{- if (eq $nexusValues.sourceType "git") }}
       chart: {{ $nexusValues.git.path }}
       sourceRef:
         kind: GitRepository

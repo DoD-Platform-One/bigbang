@@ -1,0 +1,66 @@
+{{- $fluxSettingsPromtail := merge .Values.promtail.flux .Values.flux -}}
+{{- if .Values.promtail.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: promtail
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  targetNamespace: promtail
+  chart:
+    spec:
+      {{- if eq .Values.promtail.sourceType "git" }}
+      chart: {{ .Values.promtail.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: promtail
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.promtail.helmRepo.chartName }}
+      version: {{ .Values.promtail.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.promtail.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsPromtail | nindent 2 }}
+
+  {{- if .Values.promtail.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.promtail.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-promtail-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    {{- if .Values.loki.enabled }}
+    - name: loki
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if  .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+{{- end }}

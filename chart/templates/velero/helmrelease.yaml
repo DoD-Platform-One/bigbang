@@ -13,18 +13,18 @@ spec:
   targetNamespace: velero
   chart:
     spec:
-      {{- if eq (include "checkGitRef" .Values.addons.velero) "true" }}
+      {{- if eq .Values.addons.velero.sourceType "git" }}
       chart: {{ .Values.addons.velero.git.path }}
       sourceRef:
         kind: GitRepository
         name: velero
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.velero.oci.name }}
-      version: {{ .Values.addons.velero.oci.tag }}
+      chart: {{ .Values.addons.velero.helmRepo.chartName }}
+      version: {{ .Values.addons.velero.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.velero.oci.repo }}
+        name: {{ .Values.addons.velero.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
@@ -45,14 +45,14 @@ spec:
     - name: {{ .Release.Name }}-velero-values
       kind: Secret
       valuesKey: "overlays"
-  {{- if or .Values.istio.enabled .Values.kyvernopolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if .Values.istio.enabled }}  
     - name: istio
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if .Values.kyvernopolicies.enabled }}  
-    - name: kyvernopolicies
+    {{- if .Values.kyvernoPolicies.enabled }}  
+    - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}
