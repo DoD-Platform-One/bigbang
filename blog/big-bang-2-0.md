@@ -1,3 +1,9 @@
+---
+revision_date: Last edited April 13, 2023
+tags:
+  - blog
+---
+
 # Big Bang 2.0
 
 What is Big Bang 2.0? Why are we doing it? 2.0 is the second major release since Big Bang 1.0 released in December 2020. This blog post should provide you with both the why behind what we're doing as well as what the changes involved are - and what that means for you as a user.
@@ -53,3 +59,5 @@ This is a change in the underlying architecture of Big Bang, but it will be offe
 ## Where can I learn more?
 
 Big Bang's 2.0 epic is a great place to start [here](https://repo1.dso.mil/groups/big-bang/-/epics/217). Beyond this we encourage users to get involved via the [BBTOC](https://repo1.dso.mil/platform-one/bbtoc).
+
+Continue reading about Big Bang 2.0 in [part 2 of this series]((./2-0-breaking-changes.md), which is focused specifically on the breaking changes included in 2.0.
