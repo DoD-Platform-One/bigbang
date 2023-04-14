@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
+  # Use a non-persistent client to allow for Gatekeeper CRD *magic*
+  persistentClient: false
   targetNamespace: gatekeeper-system
   chart:
     spec:
