@@ -139,7 +139,13 @@ if [ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 1 ]; then
   echo "REGISTRY_URL: $REGISTRY_URL"
   echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
 
-  kubectl create namespace flux-system || true
+  echo "Creating flux-system namespace so that the docker-registry secret can be added first."
+  kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flux-system
+EOF
 
   echo "Creating secret $FLUX_SECRET in namespace flux-system"
   kubectl create secret docker-registry "$FLUX_SECRET" -n flux-system \
@@ -154,7 +160,7 @@ fi
 # install flux
 #
 echo "Installing flux from kustomization"
-KUBECTL_VERSION=$(kubectl version --client --short | awk -F "v" '{print $NF}')
+KUBECTL_VERSION=$(kubectl version --client --output=yaml | awk '/gitVersion:/ {print $2}' | cut -c2-)
 KUBECTL_MIN_VERSION="1.21.0"
 
 if [ "$(printf '%s\n' "$KUBECTL_MIN_VERSION" "$KUBECTL_VERSION" | sort -V | head -n1)" = "$KUBECTL_MIN_VERSION" ]; then
