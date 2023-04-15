@@ -16,7 +16,7 @@ istiod:
       value: "false"
 {{- end }}
 # Change default hpaSpec to ensure generated HPA uses autoscaling/v2
-{{- if (semverCompare ">=1.23" .Capabilities.KubeVersion.GitVersion) }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
   hpaSpec:
     metrics:
       - type: Resource
