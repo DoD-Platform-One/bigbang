@@ -3,6 +3,10 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ---
+## [1.1.0-bb.6] - 2023-04-15
+### Changed
+- ironbank/opensource/kubernetes/kubectl updated from v1.26.3 to v1.26.4
+
 ## [1.1.0-bb.5] - 2023-03-30
 ### Changed
 - ironbank/opensource/kubernetes/kubectl updated from v1.26.2 to v1.26.3
