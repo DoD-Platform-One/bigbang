@@ -1,5 +1,5 @@
 ---
-revision_date: Last edited April 13, 2023
+revision_date: Last edited April 14, 2023
 tags:
   - blog
 ---
@@ -19,7 +19,7 @@ As mentioned in the first post, a number of values keys will be changing in orde
 - `mattermostoperator` -> `mattermostOperator`
 - `nexus` -> `nexusRepositoryManager`
 
-Note that your upgrade to 2.0 will fail if you do not modify your values as seen above. Big Bang is now maintaining a [values schema](https://helm.sh/docs/topics/charts/#schema-files) to enforce strict adherence to the allowed/required keys within Big Bang. For reference Big Bang's values schema is located [here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.schema.json).
+Note that your upgrade to 2.0 will fail if you do not modify your values as seen above. Big Bang is now maintaining a [values schema](https://helm.sh/docs/topics/charts/#schema-files) to enforce strict adherence to the allowed/required keys within Big Bang. For reference Big Bang's values schema is located [here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.schema.json). You can also leverage the script in `/scripts/values-translate-2-0.sh <values file path>` to perform these translations for you (note that this is a relatively simple script and may not work for your use case).
 
 ## Namespace Changes
 
@@ -49,7 +49,7 @@ As mentioned in the previous post - Big Bang will deploy by default with a new o
 - Gatekeeper: Set `gatekeeper.enabled` and `clusterAuditor.enabled` to true; set `kyverno.enabled`, `kyvernoReporter.enabled`, and `kyvernoPolicies.enabled` to false
 - Jaeger: Set `jaeger.enabled` to true; set `tempo.enabled` to false
 
-Provided you make the above adjustments you will be able to deploy with the same set of packages you were using in 1.x.
+Provided you make the above adjustments you will be able to deploy with the same set of packages you were using in 1.x. Example values for each of the above are provided in a reference file [here](../docs/assets/configs/example/core-packages-1-x.yaml).
 
 ## HelmRelease / GitRepository Name Changes
 
