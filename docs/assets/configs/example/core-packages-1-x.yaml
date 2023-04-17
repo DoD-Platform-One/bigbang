@@ -1,0 +1,35 @@
+# Runtime Security
+twistlock:
+  enabled: true
+neuvector:
+  enabled: false
+
+# Log Forwarding
+fluentbit:
+  enabled: true
+promtail:
+  enabled: false
+
+# Log Storage
+elasticsearchKibana:
+  enabled: true
+loki:
+  enabled: false
+
+# Policy Enforcement
+gatekeeper:
+  enabled: true
+clusterAuditor:
+  enabled: true
+kyverno:
+  enabled: false
+kyvernoReporter:
+  enabled: false
+kyvernoPolicies:
+  enabled: false
+
+# Tracing
+jaeger:
+  enabled: true
+tempo:
+  enabled: false
