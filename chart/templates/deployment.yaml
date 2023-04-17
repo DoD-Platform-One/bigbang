@@ -24,6 +24,8 @@ spec:
       {{- end }}
       annotations:
         prometheus.io/scrape: {{ .Values.metrics.enabled | quote }}
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8080"
         {{- if .Values.podAnnotations }}
         {{- toYaml .Values.podAnnotations | nindent 8 }}
     {{- end }}
