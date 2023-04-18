@@ -26,7 +26,15 @@
         {
             "fileMatch": ["^chart/Chart\\.yaml$"],
             "matchStrings": [
-                "- Nexus:\\s+(?<currentValue>.+)",
+                "- Nexus:\\s+(?<currentValue>.+)"
+            ],
+            "registryUrlTemplate": "https://registry1.dso.mil",
+            "depNameTemplate": "ironbank/sonatype/nexus/nexus",
+            "datasourceTemplate": "docker"
+        },
+        {
+            "fileMatch": ["^chart/Chart\\.yaml$"],
+            "matchStrings": [
                 "appVersion:[^\\S\\r\\n]+(?<currentValue>.+)"
             ],
             "registryUrlTemplate": "https://registry1.dso.mil",
