@@ -14,6 +14,7 @@ setup() {
   CI_VALUES_FILE=$BATS_SUITE_TMPDIR/values.yaml
   VALUES_FILE=$BATS_SUITE_TMPDIR/values.yaml
   MAPPING_FILE=../library/package-mapping.yaml
+  PACKAGE_IMAGE_FILE=$BATS_SUITE_TMPDIR/package-images.yaml
 }
 
 # Test the get_package_path function
@@ -69,4 +70,18 @@ setup() {
   run -0 get_dependencies_from_values_key velero
   expected=$'minio\nminioOperator'
   assert_equal "$output" "$expected"
+}
+
+@test "get generating package image file" {
+  run -0 bigbang_package_images
+  istio_image_count="$(yq e '.package-image-list.istio.images | length' $PACKAGE_IMAGE_FILE)"
+  istio_has_version="$(yq e '.package-image-list.istio | has("version")' $PACKAGE_IMAGE_FILE)"
+  package_count="$(yq e '.package-image-list | length' $PACKAGE_IMAGE_FILE)"
+
+  # Spot check istio
+  [ "$istio_image_count" -gt 2 ]
+  assert_equal "$istio_has_version" "true"
+
+  # Should have lots of packages
+  [ "$package_count" -gt 5 ]
 }
