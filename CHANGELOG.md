@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.6.17]
+### Changed
+- Add nightly scheduled job to bb pipeline to test helmRepo/oci clean install of core packages using tests/oci-values.yaml
+
 ## [2.6.16]
 ### Fixed
 - Fix edge case where images list contains no images (library charts, etc)

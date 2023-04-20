@@ -36,6 +36,7 @@ include:
 #  -
 stages:
   - 🔥 smoke tests
+  - 🤞 oci artifact tests
   - 🔌 network up
   - ⚓ cluster up
   - 🌌 bigbang up
@@ -217,6 +218,55 @@ upgrade:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
+clean install oci:
+  stage: 🤞 oci artifact tests
+  needs:
+    - job: pre vars
+      artifacts: true
+  extends:
+    - .bigbang-runner-tags
+    - .k3d-ci
+  variables:
+    CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}-oci"
+    CI_VALUES_OVERRIDES_FILE: tests/oci-values.yaml
+  rules:
+    # Run on scheduled jobs OR when `test-ci` label is assigned
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+      when: never
+  script:
+    - dependency_images
+    - deploy_bigbang
+    # Fetch list of all images ran (retry crictl up to 6x)
+    - installed_images
+    - image_list_creation
+    - bigbang_additional_images
+    - test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
+  artifacts:
+    paths:
+      - events.txt
+      - get_cpumem.txt
+      - cluster_info_dump.txt
+      - images.txt
+      - pod_logs
+      - kubectl_describes
+      - "test-artifacts/"
+    expire_in: 3 days
+    when: always
+  allow_failure:
+    exit_codes: 123
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
