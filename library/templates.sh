@@ -1639,7 +1639,7 @@ bigbang_package_images() {
 
   ALL_PACKAGES=($(get_packages))
   for pkg in "${ALL_PACKAGES[@]}"; do
-    local package_path=$(get_package_path $pkg)
+    package_path=$(get_package_path $pkg)
 
     gitrepo=$(yq e ".${package_path}.git.repo" "${VALUES_FILE}")
     version=$(yq e ".${package_path}.git.tag" "${VALUES_FILE}")
@@ -1672,7 +1672,12 @@ bigbang_package_images() {
       continue
     fi
 
-    pkg=${pkg#"addons."}
+    # Validate images present in artifact
+    images=$(curl -s "${repoimagelist}" | yq 'split(" ")')
+    if [[ -z "${images}" ]]; then
+      echo "No images needed for repo ${pkg}"
+      continue
+    fi
 
     # inplace edit package-image-list to add the version
     version_path=".package-image-list.$pkg.version" \
@@ -1680,8 +1685,8 @@ bigbang_package_images() {
      yq -i 'eval(strenv(version_path)) = strenv(version)' $PACKAGE_IMAGE_FILE
 
     # inplace edit package-image-list to add images.txt
-    images_path=".package-image-list.$pkg.images" \
     images=$(curl -s "${repoimagelist}" | yq 'split(" ")') \
+    images_path=".package-image-list.$pkg.images" \
      yq -i 'eval(strenv(images_path)) = env(images)' $PACKAGE_IMAGE_FILE
 
   done
