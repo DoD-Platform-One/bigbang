@@ -1638,8 +1638,8 @@ bigbang_package_images() {
   declare -a errors_list
 
   ALL_PACKAGES=($(get_packages))
-  for package in "${ALL_PACKAGES[@]}"; do
-    local package_path=$(get_package_path $package)
+  for pkg in "${ALL_PACKAGES[@]}"; do
+    local package_path=$(get_package_path $pkg)
 
     gitrepo=$(yq e ".${package_path}.git.repo" "${VALUES_FILE}")
     version=$(yq e ".${package_path}.git.tag" "${VALUES_FILE}")
