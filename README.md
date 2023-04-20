@@ -43,6 +43,10 @@ Additional information can be found in the [contributing guide](./CONTRIBUTING.m
 - Big Bang releases every 2 weeks with a minor release number. In order to stay current with all features and security updates ensure you are no more than `n-2` releases behind.
   - To see what is on the roadmap please see our [project milestones](https://repo1.dso.mil/groups/platform-one/big-bang/-/milestones)
 
+## Community
+
+The Big Bang Universe Community Slack workspace is a great place to go to get involved, interact with the community, and ask for help. You can join the workspace with [this invite link](https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/zt-1tnh3mq5u-a6u4BmxXBDiMwBKNiH25Bg).
+
 ## Navigating our documentation
 
 Big Bang Documentation is located in the following locations:
