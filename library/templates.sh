@@ -324,13 +324,11 @@ bigbang_package_repos() {
    # "Package" ourselves
    # Do it this way on purpose (instead of cp or rsync) to ensure this never includes any unwanted "build" artifacts
    git -C repos/ clone -b ${CI_COMMIT_REF_NAME} ${CI_PROJECT_URL}
-   # Clone core
-   yq e ".*.git.repo | select(. != null) | path | .[-3] " "${VALUES_FILE}" | while IFS= read -r package; do
-     git -C repos/ clone --no-checkout $(yq e ".${package}.git.repo" "${VALUES_FILE}")
-   done
-   # Clone addons
-   yq e ".addons.*.git.repo | select(. != null) | path | .[-3]" "${VALUES_FILE}" | while IFS= read -r package; do
-     git -C repos/ clone --no-checkout $(yq e ".addons.${package}.git.repo" "${VALUES_FILE}")
+   # Clone repos
+   ALL_PACKAGES=($(get_packages))
+   for package in "${ALL_PACKAGES[@]}"; do
+    local package_path=$(get_package_path $package)
+    git -C repos/ clone --no-checkout $(yq e ".${package_path}.git.repo" "${VALUES_FILE}")
    done
    tar -czf $REPOS_PKG repos/
    echo -e "\e[0Ksection_end:`date +%s`:package_repos\r\e[0K"
@@ -1639,12 +1637,12 @@ bigbang_package_images() {
 
   declare -a errors_list
 
-  packages=$(yq e '.. | select(has("git")) | (path | join("."))' $VALUES_FILE)
+  ALL_PACKAGES=($(get_packages))
+  for package in "${ALL_PACKAGES[@]}"; do
+    local package_path=$(get_package_path $package)
 
-  for pkg in $packages
-  do
-    gitrepo=$(yq e ".${pkg}.git.repo" "${VALUES_FILE}")
-    version=$(yq e ".${pkg}.git.tag" "${VALUES_FILE}")
+    gitrepo=$(yq e ".${package_path}.git.repo" "${VALUES_FILE}")
+    version=$(yq e ".${package_path}.git.tag" "${VALUES_FILE}")
 
     # Remove suffix
     gitrepo=${gitrepo%".git"}
