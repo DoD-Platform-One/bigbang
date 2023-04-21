@@ -39,7 +39,7 @@ In order to enable logging this can only be done via the console UI. Logging can
 
 In Bigbang the  twistlock defender is installed manual.
 Follow the document to install defender as a daemonset.
-<https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/README.md>
+<https://repo1.dso.mil/big-bang/product/packages/twistlock/-/blob/main/README.md>
 
 ### Storage
 
@@ -88,7 +88,7 @@ Twistlock uses orchestrators built-in high availability capabilities.
 ## Single Sign on (SSO)
 
 SSO can be configured for twistlock  manually using the documentation provided. \
-[Twistlock SSO Integration](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/blob/main/docs/KEYCLOAK.md)
+[Twistlock SSO Integration](https://repo1.dso.mil/big-bang/product/packages/twistlock/-/blob/main/docs/KEYCLOAK.md)
 
 ## Licensing
 

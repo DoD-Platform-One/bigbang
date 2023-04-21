@@ -117,7 +117,7 @@ addons:
           replicas: 3
 ```
 
-For additional information for Vault configuration for High Availability within Big Bang reference the following, [Vault HA](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/-/blob/main/docs/production-ha.md)
+For additional information for Vault configuration for High Availability within Big Bang reference the following, [Vault HA](https://repo1.dso.mil/big-bang/product/packages/vault/-/blob/main/docs/production.md)
 
 ### UI
 
@@ -145,7 +145,7 @@ For more information, see [Vault Loggers](https://www.vaultproject.io/api-docs/s
 
 The `/sys/metrics` endpoint is used to get telemetry metrics for Vault. This endpoint returns the telemetry metrics for Vault. It can be used by metrics collections systems like Prometheus that use a pull model for metrics collection. The Big Bang Vault Helm chart has been modified to use your `monitoring:` values in Big Bang to automatically toggle metrics on/off.
 
-Within Big Bang there is additional setup required to configure Vault and monitoring. For more information see, [Vault with Prometheus](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/-/blob/main/docs/PROMETHEUS.md)
+Within Big Bang there is additional setup required to configure Vault and monitoring. For more information see, [Vault with Prometheus](https://repo1.dso.mil/big-bang/product/packages/vault/-/blob/main/docs/PROMETHEUS.md)
 
 ### Health Checks
 

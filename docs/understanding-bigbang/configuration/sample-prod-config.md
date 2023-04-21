@@ -115,7 +115,7 @@ addons:
 
 ### Kubernetes resource request/limit settings
 
-K8s resource requests/limits for webservice and gitaly workloads should be increased from the defaults. Gitlab engineers state predicting Gitaly's resource consumption is very difficult, and will require testing to find the applicable limits/requests for each individual installation. See this [Gitlab Epic](https://gitlab.com/groups/gitlab-org/-/epics/6127) for more information. See the [gitlab/docs/k8s-resources.md](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/blob/main/docs/k8s-resources.md) for a list of all possible configuration values. Use BigBang values overrides to change the Gitlab resource settings.  
+K8s resource requests/limits for webservice and gitaly workloads should be increased from the defaults. Gitlab engineers state predicting Gitaly's resource consumption is very difficult, and will require testing to find the applicable limits/requests for each individual installation. See this [Gitlab Epic](https://gitlab.com/groups/gitlab-org/-/epics/6127) for more information. See the [gitlab/docs/k8s-resources.md](https://repo1.dso.mil/big-bang/apps/developer-tools/gitlab/-/blob/main/docs/k8s-resources.md) for a list of all possible configuration values. Use BigBang values overrides to change the Gitlab resource settings.  
 Recommended starting point:
 
 ```yaml
@@ -191,7 +191,7 @@ kubectl get secret/gitlab-rails-secret -n gitlab -o yaml > cya.yaml
 
 ## Vault
 
-This section provides suggested settings for Vault operational/production environments. Vault is a large complicated application and has many options that cannot adequately be covered here. Vault has significant security risks if not properly configured and administrated. Please consult the upstream [Vault documentation](https://learn.hashicorp.com/tutorials/vault/kubernetes-raft-deployment-guide?in=vault/kubernetes#configure-vault-helm-chart) as the ultimate authority. The following is an example operational/production config using a passthrough istio ingress gateway, high availability, auto-unseal, and raft for distributed filesystem persistence. Consult the BigBang Vault Package helm repo [/docs/production-ha.md](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault/-/blob/main/docs/production-ha.md) for more information.
+This section provides suggested settings for Vault operational/production environments. Vault is a large complicated application and has many options that cannot adequately be covered here. Vault has significant security risks if not properly configured and administrated. Please consult the upstream [Vault documentation](https://learn.hashicorp.com/tutorials/vault/kubernetes-raft-deployment-guide?in=vault/kubernetes#configure-vault-helm-chart) as the ultimate authority. The following is an example operational/production config using a passthrough istio ingress gateway, high availability, auto-unseal, and raft for distributed filesystem persistence. Consult the BigBang Vault Package helm repo [/docs/production.md](https://repo1.dso.mil/big-bang/product/packages/vault/-/blob/main/docs/production.md) for more information.
 
 ```yaml
 istio:

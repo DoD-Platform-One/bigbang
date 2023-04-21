@@ -45,7 +45,7 @@ graph LR
 
 ### Licensing
 
-[Authservice](https://github.com/istio-ecosystem/authservice) utilizes an Apache-2.0 License. The Iron Bank repo for the hardened authservice image can be found [here](https://repo1.dso.mil/dsop/istio-ecosystem/authservice) and the Big Bang repo for the authservice Helm Chart can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice).
+[Authservice](https://github.com/istio-ecosystem/authservice) utilizes an Apache-2.0 License. The Iron Bank repo for the hardened authservice image can be found [here](https://repo1.dso.mil/dsop/istio-ecosystem/authservice) and the Big Bang repo for the authservice Helm Chart can be found [here](https://repo1.dso.mil/big-bang/product/packages/authservice).
 
 ### Single Sign On
 
@@ -83,7 +83,7 @@ addons:
 ```
 
 The corresponding chain loaded in to authservice via the values in the Big Bang chart:
-For more information see the [README.md](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/README.md) in the Authservice package.
+For more information see the [README.md](https://repo1.dso.mil/big-bang/product/packages/authservice/-/blob/main/README.md) in the Authservice package.
 
 ```yaml
 addons:
@@ -149,7 +149,7 @@ Within Big Bang, logs are captured by fluentbit and shipped to elastic by defaul
 
 ### Health Checks
 
-The authservice Dockerfile includes a [healthcheck](https://repo1.dso.mil/dsop/istio-ecosystem/authservice/-/blob/master/Dockerfile#L23-24) and the authservice Helm Chart includes [liveness & readiness probes](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice/-/blob/main/chart/templates/deployment.yaml#L42-47) in its deployment:
+The authservice Dockerfile includes a [healthcheck](https://repo1.dso.mil/dsop/istio-ecosystem/authservice/-/blob/master/Dockerfile#L23-24) and the authservice Helm Chart includes [liveness & readiness probes](https://repo1.dso.mil/big-bang/product/packages/authservice/-/blob/main/chart/templates/deployment.yaml#L42-47) in its deployment:
 
 ```yaml
 livenessProbe:

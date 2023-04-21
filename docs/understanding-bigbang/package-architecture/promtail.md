@@ -19,7 +19,8 @@ graph TB
 
 ```
 
-### Architecture: 
+### Architecture:
+
 - [Promtail Client](https://grafana.com/docs/loki/latest/clients/promtail/)
 
 ### Storage
@@ -35,7 +36,7 @@ istio:
   enabled: true
 ```
 
-These values get passed into the promtail chart [here](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail/-/blob/main/chart/values.yaml#L428). 
+These values get passed into the promtail chart [here](https://repo1.dso.mil/big-bang/product/packages/promtail/-/blob/main/chart/values.yaml#L428).
 
 ## High Availability
 
@@ -44,7 +45,6 @@ By default, Promtail runs as a `daemonset` with a pod on each node.
 ## Single Sign on (SSO)
 
 None. This service doesn't have a web interface.
-
 
 ## Licensing
 

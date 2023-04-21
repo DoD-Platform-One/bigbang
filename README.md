@@ -2,7 +2,7 @@
 
 Big Bang is a declarative, continuous delivery tool for deploying DoD hardened and approved packages into a Kubernetes cluster.
 
-> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/platform-one/big-bang/bigbang](https://repo1.dso.mil/platform-one/big-bang/bigbang)_
+> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
 ## Usage & Scope
 
@@ -24,7 +24,7 @@ Additional information can be found at [Big Bang Docs](https://docs-bigbang.dso.
 
 ## Getting Started
 
-- You will need to instantiate a Big Bang environment tailored to your needs. [The Big Bang customer template](https://repo1.dso.mil/big-bang/customers/template/) is provided for you to copy into your own Git repository and begin modifications.
+- You will need to instantiate a Big Bang environment tailored to your needs.  [The Big Bang customer template](https://repo1.dso.mil/big-bang/customers/template) is provided for you to copy into your own Git repository and begin modifications.
 
 ## Contributing to Big Bang
 
@@ -34,7 +34,7 @@ There are 3 main ways to contribute to Big Bang:
 - [Contribute to open-source projects under the Big Bang Technical Oversight Committee (BBTOC)](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/master/CONTRIBUTING.md)
 - [Submit new package proposals](https://repo1.dso.mil/big-bang/product/bbtoc/-/issues/new?issue%5Bmilestone_id%5D=)
   - Please review the [package integration guide](./docs/developer/package-integration/README.md) if you are interested in submitting a new package
-  - A shepherd will be assigned to the project to create a repo in the [BB sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox)
+  - A shepherd will be assigned to the project to create a repo in the [Big Bang Community Packages](https://repo1.dso.mil/big-bang/product/community)
 
 Additional information can be found in the [contributing guide](./CONTRIBUTING.md).
 
@@ -90,4 +90,4 @@ Big Bang Documentation is located in the following locations:
 - [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)
 - [User Guides for Big Bang](./docs/guides/README.md)
 - [Big Bang Prerequisites](./docs/prerequisites/README.md)
-- [Big Bang Example Configurations](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/assets/configs/example/)
+- [Big Bang Example Configurations](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/assets/configs/example)
