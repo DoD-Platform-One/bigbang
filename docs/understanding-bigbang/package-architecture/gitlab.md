@@ -6,7 +6,7 @@
 
 Big Bang's implementation uses the [Gitlab Helm Chart](https://docs.gitlab.com/charts/) to provide custom resources and manage the application.
 
-A more detail view of Big Bang's implementation of Gitlab can be found in the [package docs](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/tree/main/chart/doc).
+A more detail view of Big Bang's implementation of Gitlab can be found in the [package docs](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/tree/main/chart/doc).
 
 ## Big Bang Touch Points
 
@@ -105,7 +105,7 @@ addons:
 
 ## Single Sign On (SSO)
 
-Gitlab can be integrated with Keycloak for single sign on. Full documentation can be found in the package docs [here](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab/-/blob/main/docs/keycloak.md).
+Gitlab can be integrated with Keycloak for single sign on. Full documentation can be found in the package docs [here](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/blob/main/docs/keycloak.md).
 
 ## Licensing
 

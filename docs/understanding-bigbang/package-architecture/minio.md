@@ -7,11 +7,11 @@ built for the demands of the hybrid cloud.
 
 The package is offered up as three individual packages that make up the MinIO ecosystem.
 
-Big Bang's implementation uses the [MinIO operator](https://github.com/minio/operator) to provide custom resources and manage the different tenents of MinIO. The official package for MinIO Operator can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator)
+Big Bang's implementation uses the [MinIO operator](https://github.com/minio/operator) to provide custom resources and manage the different tenents of MinIO. The official package for MinIO Operator can be found [here](https://repo1.dso.mil/big-bang/product/packages/minio-operator)
 
-The MinIO tenants are created using the [MinIO package](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio). This package is used to set up individual MinIO instances for applications to use (e.g. Gitlab).
+The MinIO tenants are created using the [MinIO package](https://repo1.dso.mil/big-bang/product/packages/minio). This package is used to set up individual MinIO instances for applications to use (e.g. Gitlab).
 
-The final package is the MinIO console. This is a graphical user interface that allows management of an individual tenant. The official package can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio).
+The final package is the MinIO console. This is a graphical user interface that allows management of an individual tenant. The official package can be found [here](https://repo1.dso.mil/big-bang/product/packages/minio).
 
 [Tenant Architecture](https://raw.githubusercontent.com/minio/operator/master/docs/images/architecture.png)
 

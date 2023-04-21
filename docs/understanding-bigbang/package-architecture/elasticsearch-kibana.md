@@ -59,7 +59,7 @@ istio:
   enabled: true
 ```
 
-These values get passed into the logging chart [here](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/templates/elasticsearch-kibana/values.yaml#L6). This creates the Istio virtual service and maps to the main istio gateway for bigbang. The Kibana GUI is available behind this Istio VirtualService that is configured automatically at "kibana.{{ .Values.hostname }}" (value set above) and can be configured with the following values:
+These values get passed into the logging chart [here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/elasticsearch-kibana/values.yaml#L6). This creates the Istio virtual service and maps to the main istio gateway for bigbang. The Kibana GUI is available behind this Istio VirtualService that is configured automatically at "kibana.{{ .Values.hostname }}" (value set above) and can be configured with the following values:
 
 ```yaml
 elasticsearchKibana:

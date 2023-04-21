@@ -75,7 +75,7 @@ Nexus provides a helpful upstream guide on resiliency and high availability [her
 
 ## Single Sign on (SSO)
 
-SSO can be configured for Nexus by the following the instructions from the package documentation [here](https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus/-/blob/main/docs/keycloak.md)
+SSO can be configured for Nexus by the following the instructions from the package documentation [here](https://repo1.dso.mil/big-bang/product/packages/nexus/-/blob/main/docs/keycloak.md)
 
 ## Licensing
 
