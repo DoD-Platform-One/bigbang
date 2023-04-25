@@ -36,7 +36,6 @@ include:
 #  -
 stages:
   - 🔥 smoke tests
-  - 🤞 oci artifact tests
   - 🔌 network up
   - ⚓ cluster up
   - 🌌 bigbang up
@@ -49,6 +48,7 @@ stages:
   - 💣 airgap down
   - 📦 package
   - 🚀 release
+  - 🤞 oci artifact tests
 
 variables:
   PIPELINE_REPO: https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates.git
@@ -218,6 +218,12 @@ upgrade:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# OCI/HelmRepo tests
+#
+#-----------------------------------------------------------------------------------------------------------------------
 
 clean install oci:
   stage: 🤞 oci artifact tests
