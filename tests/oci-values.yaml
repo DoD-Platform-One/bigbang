@@ -1,0 +1,90 @@
+helmRepositories:
+  - name: "registry1"
+    repository: "oci://registry1.dso.mil/bigbang"
+    existingSecret: "private-registry"
+    type: "oci"
+    username: ""
+    password: ""
+    email: ""
+
+istio:
+  sourceType: "helmRepo"
+
+istioOperator:
+  sourceType: "helmRepo"
+
+kiali:
+  sourceType: "helmRepo"
+
+kyverno:
+  sourceType: "helmRepo"
+
+kyvernoPolicies:
+  sourceType: "helmRepo"
+
+kyvernoReporter:
+  sourceType: "helmRepo"
+
+promtail:
+  sourceType: "helmRepo"
+
+loki:
+  sourceType: "helmRepo"
+
+neuvector:
+  sourceType: "helmRepo"
+
+tempo:
+  sourceType: "helmRepo"
+
+monitoring:
+  sourceType: "helmRepo"
+
+addons:
+  argocd:
+    sourceType: "helmRepo"
+  
+  authservice:
+    sourceType: "helmRepo"
+
+  minioOperator:
+    sourceType: "helmRepo"
+
+  minio:
+    sourceType: "helmRepo"
+
+  gitlab:
+    sourceType: "helmRepo"
+
+  gitlabRunner:
+    sourceType: "helmRepo"
+
+  nexusRepositoryManager:
+    sourceType: "helmRepo"
+  
+  sonarqube:
+    sourceType: "helmRepo"
+
+  haproxy:
+    sourceType: "helmRepo"
+
+  anchore:
+    sourceType: "helmRepo"
+
+  mattermostOperator:
+    sourceType: "helmRepo"
+
+  mattermost:
+    sourceType: "helmRepo"
+
+  velero:
+    sourceType: "helmRepo"
+    
+  keycloak:
+    sourceType: "helmRepo"
+
+  vault:
+    sourceType: "helmRepo"
+
+  metricsServer:
+    sourceType: "helmRepo"

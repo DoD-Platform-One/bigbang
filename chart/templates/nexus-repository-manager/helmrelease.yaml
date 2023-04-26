@@ -23,11 +23,11 @@ spec:
         name: nexus-repository-manager
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ $nexusValues.oci.name }}
-      version: {{ $nexusValues.oci.tag }}
+      chart: {{ $nexusValues.helmRepo.chartName }}
+      version: {{ $nexusValues.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ $nexusValues.oci.repo }}
+        name: {{ $nexusValues.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m

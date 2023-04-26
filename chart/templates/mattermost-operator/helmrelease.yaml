@@ -22,11 +22,11 @@ spec:
         name: mattermost-operator
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ $mmOpValues.oci.name }}
-      version: {{ $mmOpValues.oci.tag }}
+      chart: {{ $mmOpValues.helmRepo.chartName }}
+      version: {{ $mmOpValues.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ $mmOpValues.oci.repo }}
+        name: {{ $mmOpValues.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- end }}
       interval: 5m
