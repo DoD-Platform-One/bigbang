@@ -106,3 +106,9 @@ invalid() {
     assert_equal "$status" "1"
   done
 }
+
+# Test monitoring schema validation
+@test "helm template validate monitoring schema" {
+  valid monitoring
+  invalid monitoring
+}
