@@ -41,11 +41,50 @@ monitoring:
   sourceType: "helmRepo"
 
 addons:
-  metricsServer:
+  argocd:
+    sourceType: "helmRepo"
+  
+  authservice:
     sourceType: "helmRepo"
 
-  ### Loki dependency
   minioOperator:
-    enabled: true
+    sourceType: "helmRepo"
 
+  minio:
+    sourceType: "helmRepo"
+
+  gitlab:
+    sourceType: "helmRepo"
+
+  gitlabRunner:
+    sourceType: "helmRepo"
+
+  nexusRepositoryManager:
+    sourceType: "helmRepo"
+  
+  sonarqube:
+    sourceType: "helmRepo"
+
+  haproxy:
+    sourceType: "helmRepo"
+
+  anchore:
+    sourceType: "helmRepo"
+
+  mattermostOperator:
+    sourceType: "helmRepo"
+
+  mattermost:
+    sourceType: "helmRepo"
+
+  velero:
+    sourceType: "helmRepo"
+    
+  keycloak:
+    sourceType: "helmRepo"
+
+  vault:
+    sourceType: "helmRepo"
+
+  metricsServer:
     sourceType: "helmRepo"
