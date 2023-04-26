@@ -878,7 +878,7 @@ monitoring:
       # -- Grafana OIDC client scopes, comma separated, see https://grafana.com/docs/grafana/latest/auth/generic-oauth/
       scopes: ""
 
-      allow_sign_up: "true"
+      allow_sign_up: true
 
       role_attribute_path: "Viewer"
       # -- Other options available, see package Documentation.

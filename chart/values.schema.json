@@ -721,9 +721,33 @@
                   "type": "string"
                 },
                 "allow_sign_up": {
-                  "type": "string"
+                  "type": "boolean"
                 },
                 "role_attribute_path": {
+                  "type": "string"
+                },
+                "token_url": {
+                  "type": "string"
+                },
+                "auth_url": {
+                  "type": "string"
+                },
+                "api_url": {
+                  "type": "string"
+                },
+                "tls_client_ca": {
+                  "type": "string"
+                },
+                "tls_skip_verify_insecure": {
+                  "type": "boolean"
+                },
+                "tls_client_cert": {
+                  "type": "string"
+                },
+                "tls_client_key": {
+                  "type": "string"
+                },
+                "allowed_domains": {
                   "type": "string"
                 }
               },
