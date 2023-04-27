@@ -1,7 +1,13 @@
 #!/bin/bash
 
+K3D_VERSION="5.4.9"
+
 function run() {
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "$@"
+}
+
+function getPrivateIP2() {
+  echo `aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress'`
 }
 
 #### Global variables - These allow the script to be run by non-bigbang devs easily
@@ -66,6 +72,7 @@ SGname="${AWSUSERNAME}-dev"
 # Identify which VPC to create the spot instance in
 VPC="${VPC_ID}"  # default VPC
 RESET_K3D=false
+ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
 
 while [ -n "$1" ]; do # while loop starts
 
@@ -75,12 +82,26 @@ while [ -n "$1" ]; do # while loop starts
       BIG_INSTANCE=true
   ;;
 
-  -p) echo "-p option passed to create k3d cluster with private ip" 
-      PRIVATE_IP=true
+  -p) echo "-p option passed to create k3d cluster with private ip"
+      if [[ "${ATTACH_SECONDARY_IP}" = false ]]; then
+        PRIVATE_IP=true
+      else
+        echo "Disabling -p option because -a was specified."
+      fi
   ;;
 
-  -m) echo "-m option passed to install MetalLB" 
-      METAL_LB=true
+  -m) echo "-m option passed to install MetalLB"
+      if [[ "${ATTACH_SECONDARY_IP}" = false ]]; then
+        METAL_LB=true
+      else
+        echo "Disabling -m option because -a was specified."
+      fi
+  ;;
+
+  -a) echo "-a option passed to create secondary public IP (-p and -m flags are skipped if set)"
+      PRIVATE_IP=false
+      METAL_LB=false
+      ATTACH_SECONDARY_IP=true
   ;;
 
   -d) echo "-d option passed to destroy the AWS resources"
@@ -100,7 +121,7 @@ while [ -n "$1" ]; do # while loop starts
         fi
 
         aws ec2 terminate-instances --instance-ids ${AWSINSTANCEIDs} &>/dev/null
-        echo -n "waiting for instance termination..."
+        echo -n "Waiting for instance termination..."
         aws ec2 wait instance-terminated --instance-ids ${AWSINSTANCEIDs} &> /dev/null
         echo "done"
       else
@@ -110,15 +131,23 @@ while [ -n "$1" ]; do # while loop starts
       aws ec2 delete-security-group --group-name=${SGname} &> /dev/null
       echo "KeyPair to be deleted: ${KeyName}"
       aws ec2 delete-key-pair --key-name ${KeyName} &> /dev/null
+      ALLOCATIONIDs=(`aws ec2 describe-addresses --output text --filter "Name=tag:Owner,Values=${AWSUSERNAME}" --query "Addresses[].AllocationId"`)
+      for i in "${ALLOCATIONIDs[@]}"
+      do
+         echo -n "Releasing Elastic IP $i ..."
+         aws ec2 release-address --allocation-id $i
+         echo "done"
+      done
       exit 0 
   ;;
 
   -h) echo "Usage:"
-      echo "k3d-dev.sh -b -p -m -d -h"
+      echo "k3d-dev.sh -b -p -m -a -d -h"
       echo ""
       echo " -b   use BIG M5 instance. Default is t3.2xlarge"
       echo " -p   use private IP for security group and k3d cluster"
       echo " -m   create k3d cluster with metalLB"
+      echo " -a   attach secondary Public IP (overrides -p and -m flags)"
       echo " -d   destroy related AWS resources"
       echo " -h   output help"
       exit 0
@@ -137,7 +166,8 @@ InstId=`aws ec2 describe-instances \
         --filters "Name=tag:Name,Values=${AWSUSERNAME}-dev" "Name=instance-state-name,Values=running"`
   if [[ ! -z "${InstId}" ]]; then
     PublicIP=`aws ec2 describe-instances --output text --no-cli-pager --instance-id ${InstId} --query "Reservations[].Instances[].PublicIpAddress"`
-    echo "Existing cluster found running on instance ${InstId} on ${PublicIP}"
+    PrivateIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PrivateIpAddress'`
+    echo "Existing cluster found running on instance ${InstId} on ${PublicIP} / ${PrivateIP}"
     echo "💣 Big Bang Cluster Management 💣"
     PS3="Please select an option: "
     options=("Re-create K3D cluster" "Recreate the EC2 instance from scratch" "Quit")
@@ -153,7 +183,14 @@ InstId=`aws ec2 describe-instances \
             exit 1
           fi
           RESET_K3D=true
+          SecondaryIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .Association.PublicIp'`
+          PrivateIP2=$(getPrivateIP2)
+          if [[ "${ATTACH_SECONDARY_IP}" == true && -z "${SecondaryIP}" ]]; then
+            echo "Secondary IP didn't exist at the time of creation of the instance, so cannot attach one without re-creating it with the -a flag selected."
+            exit 1
+          fi
           run "k3d cluster delete"
+          run "docker ps -aq | xargs docker stop | xargs docker rm"
           break;;
         2)
           read -p "Are you sure you want to destroy this instance ${InstId}, and create a new one in its place (y/n)? " -r
@@ -165,6 +202,11 @@ InstId=`aws ec2 describe-instances \
 
           aws ec2 terminate-instances --instance-ids ${InstId} &>/dev/null
           echo -n "Instance is being terminated..."
+          if [[ "${ATTACH_SECONDARY_IP}" == true ]]; then
+            echo -n "Waiting for instance termination..."
+            aws ec2 wait instance-terminated --instance-ids ${InstId} &> /dev/null
+            echo "done"
+          fi
           break;;
         3)
           echo "Bye."
@@ -187,6 +229,15 @@ if [[ "${RESET_K3D}" == false ]]; then
     SpotPrice="0.35"
   fi
 
+
+  #### Cleaning up unused Elastic IPs
+  ALLOCATIONIDs=(`aws ec2 describe-addresses --filter "Name=tag:Owner,Values=${AWSUSERNAME}" --query "Addresses[?AssociationId==null]" | jq -r '.[].AllocationId'`)
+  for i in "${ALLOCATIONIDs[@]}"
+  do
+     echo -n "Releasing Elastic IP $i ..."
+     aws ec2 release-address --allocation-id $i
+     echo "done"
+  done
 
   #### SSH Key Pair
   # Create SSH key if it doesn't exist
@@ -231,7 +282,7 @@ if [[ "${RESET_K3D}" == false ]]; then
     echo -e "missing\nAdding ${WorkstationIP} to security group ${SGname} ..."
     if [[ "$PRIVATE_IP" == true ]];
     then
-        aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
     else  # all protocols to all ports is the default
       aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
     fi
@@ -326,6 +377,12 @@ EOF
   # NOTE: t3a.2xlarge spot price is 0.35 m5a.4xlarge is 0.69
   echo "Running spot instance ..."
 
+  # If we are using a Secondary IP, don't use an auto-assigned IP, and also generate a 2nd private address for EIPs allocation.
+  additional_create_instance_options=""
+  if [[ "${ATTACH_SECONDARY_IP}" == true ]]; then
+    additional_create_instance_options+=" --no-associate-public-ip-address --secondary-private-ip-address-count 1"
+  fi
+
   InstId=`aws ec2 run-instances \
     --output json --no-paginate \
     --count 1 --image-id "${ImageId}" \
@@ -335,7 +392,7 @@ EOF
     --instance-initiated-shutdown-behavior "terminate" \
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
-    --instance-market-options file://$HOME/aws/spot_options.json \
+    --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
@@ -351,11 +408,67 @@ EOF
   aws ec2 wait instance-running --output json --no-cli-pager --instance-ids ${InstId} &> /dev/null
 
   # allow some extra seconds for the instance to be fully initiallized
-  echo "Wait a little longer..."
+  echo "Almost there, 15 seconds to go..."
   sleep 15
 
-  # Get the public IP address of our instance
-  PublicIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PublicIpAddress'`
+  ## IP Address Allocation and Attachment
+  CURRENT_EPOCH=`date +'%s'`
+
+  # Get the private IP address of our instance
+  PrivateIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PrivateIpAddress'`
+
+  # Use Elastic IPs if a Secondary IP is required, instead of the auto assigned one.
+  if [[ "${ATTACH_SECONDARY_IP}" == false ]]; then
+    PublicIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PublicIpAddress'`
+  else
+    echo "Checking to see if an Elastic IP is already allocated and not attached..."
+    PublicIP=`aws ec2 describe-addresses --filter "Name=tag:Name,Values=${AWSUSERNAME}-EIP1" --query 'Addresses[?AssociationId==null]' | jq -r '.[0].PublicIp // ""'`
+    if [[ -z "${PublicIP}" ]]; then
+      echo "Allocating a new/another primary elastic IP..."
+      PublicIP=`aws ec2 allocate-address --output json --no-cli-pager --tag-specifications="ResourceType=elastic-ip,Tags=[{Key=Name,Value=${AWSUSERNAME}-EIP1},{Key=Owner,Value=${AWSUSERNAME}}]" | jq -r '.PublicIp'`
+    else
+      echo "Previously allocated primary Elastic IP ${PublicIP} found."
+    fi
+
+    echo -n "Associating IP ${PublicIP} address to instance ${InstId} ..."
+    EIP1_ASSOCIATION_ID=`aws ec2 associate-address --output json --no-cli-pager --instance-id ${InstId} --private-ip ${PrivateIP} --public-ip $PublicIP | jq -r '.AssociationId'`
+    echo "${EIP1_ASSOCIATION_ID}"
+    EIP1_ID=`aws ec2 describe-addresses --public-ips ${PublicIP} | jq -r '.Addresses[].AllocationId'`
+    aws ec2 create-tags --resources ${EIP1_ID} --tags Key="lastused",Value="${CURRENT_EPOCH}"
+
+    PrivateIP2=$(getPrivateIP2)
+    echo "Checking to see if a Secondary Elastic IP is already allocated and not attached..."
+    SecondaryIP=`aws ec2 describe-addresses --filter "Name=tag:Name,Values=${AWSUSERNAME}-EIP2" --query 'Addresses[?AssociationId==null]' | jq -r '.[0].PublicIp // ""'`
+    if [[ -z "${SecondaryIP}" ]]; then
+      echo "Allocating a new/another secondary elastic IP..."
+      SecondaryIP=`aws ec2 allocate-address --output json --no-cli-pager --tag-specifications="ResourceType=elastic-ip,Tags=[{Key=Name,Value=${AWSUSERNAME}-EIP2},{Key=Owner,Value=${AWSUSERNAME}}]" | jq -r '.PublicIp'`
+    else
+      echo "Previously allocated secondary Elastic IP ${SecondaryIP} found."
+    fi
+    echo -n "Associating Secondary IP ${SecondaryIP} address to instance ${InstId}..."
+    EIP2_ASSOCIATION_ID=`aws ec2 associate-address --output json --no-cli-pager --instance-id ${InstId} --private-ip ${PrivateIP2} --public-ip $SecondaryIP | jq -r '.AssociationId'`
+    echo "${EIP2_ASSOCIATION_ID}"
+    EIP2_ID=`aws ec2 describe-addresses --public-ips ${SecondaryIP} | jq -r '.Addresses[].AllocationId'`
+    aws ec2 create-tags --resources ${EIP2_ID} --tags Key="lastused",Value="${CURRENT_EPOCH}"
+    echo "Secondary public IP is ${SecondaryIP}"
+  fi
+
+  echo
+  echo "Instance ${InstId} is ready!"
+  echo "Instance Public IP is ${PublicIP}"
+  echo "Instance Private IP is ${PrivateIP}"
+  echo
+
+  # Remove previous keys related to this IP from your SSH known hosts so you don't end up with a conflict
+  ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${PublicIP}"
+
+  echo "ssh init"
+  # this is a do-nothing remote ssh command just to initialize ssh and make sure that the connection is working
+  until run "hostname"; do
+    sleep 5
+    echo "Retry ssh command.."
+  done
+  echo
 
   ##### Configure Instance
   ## TODO: replace these individual commands with userdata when the spot instance is created?
@@ -393,31 +506,11 @@ EOF
   run 'sudo mv /home/ubuntu/kubectl /usr/local/bin/'
   run 'sudo chmod +x /usr/local/bin/kubectl'
 
-  # Get the private IP address of our instance
-  PrivateIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PrivateIpAddress'`
-
-  echo
-  echo "Instance ${InstId} is ready!"
-  echo "Instance private IP is ${PrivateIP}"
-  echo "Instance public IP is ${PublicIP}"
-  echo
-
-  # Remove previous keys related to this IP from your SSH known hosts so you don't end up with a conflict
-  ssh-keygen -f "${HOME}/.ssh/known_hosts" -R "${PublicIP}"
-
-  echo "ssh init"
-  # this is a do-nothing remote ssh command just to initialize ssh and make sure that the connection is working
-  until run "hostname"; do
-    sleep 5
-    echo "Retry ssh command.."
-  done
-  echo
-
   echo
   echo
   # install k3d on instance
   echo "Installing k3d on instance"
-  run "wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.9 bash"
+  run "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v${K3D_VERSION} bash"
   echo
   echo "k3d version"
   run "k3d version"
@@ -428,14 +521,18 @@ fi
 
 # Shared k3d settings across all options
 # 1 server, 3 agents
-k3d_command="k3d cluster create --servers 1  --agents 3"
+k3d_command="k3d cluster create --servers 1 --agents 3"
 # Volumes to support Twistlock defenders
 k3d_command+=" -v /etc:/etc@server:*\;agent:* -v /dev/log:/dev/log@server:*\;agent:* -v /run/systemd/private:/run/systemd/private@server:*\;agent:*"
 # Disable traefik and metrics-server
-k3d_command+=" --k3s-arg \"--disable=traefik@server:0\"  --k3s-arg \"--disable=metrics-server@server:0\""
-# Port mappings to support Istio ingress + API access
-k3d_command+=" --port 80:80@loadbalancer --port 443:443@loadbalancer --api-port 6443"
+k3d_command+=" --k3s-arg \"--disable=traefik@server:0\" --k3s-arg \"--disable=metrics-server@server:0\""
 
+# Port mappings to support Istio ingress + API access
+if [[ -z "${PrivateIP2}" ]]; then
+  k3d_command+=" --port ${PrivateIP}:80:80@loadbalancer --port ${PrivateIP}:443:443@loadbalancer --api-port 6443"
+fi
+
+# Selecting K8S version through the use of a K3S image tag
 K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
 if [[ ! -z "$K3S_IMAGE_TAG" ]]; then
   echo "Using custom K3S image tag $K3S_IMAGE_TAG..."
@@ -443,7 +540,7 @@ if [[ ! -z "$K3S_IMAGE_TAG" ]]; then
 fi
 
 # Add MetalLB specific k3d config
-if [[ "$METAL_LB" == true ]]; then
+if [[ "$METAL_LB" == true || "$ATTACH_SECONDARY_IP" == true ]]; then
   # create docker network for k3d cluster
   echo "creating docker network for k3d cluster"
   run "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
@@ -460,43 +557,10 @@ else
 fi
 
 # Create k3d cluster
+echo "Creating k3d cluster with command: ${k3d_command}"
 run "${k3d_command}"
 run "kubectl config use-context k3d-k3s-default"
 run "kubectl cluster-info"
-
-# Handle MetalLB cluster resource creation
-if [[ "$METAL_LB" == true ]]; then
-  echo "installing MetalLB"
-  run "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"
-	# Wait for controller to be live so that validating webhooks function when we apply the config
-	echo "waiting for MetalLB controller"
-	run "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
-
-  run <<- 'ENDSSH'
-	#run this command on remote
-	cat << EOF > metallb-config.yaml
-	apiVersion: metallb.io/v1beta1
-	kind: IPAddressPool
-	metadata:
-	  name: default
-	  namespace: metallb-system
-	spec:
-	  addresses:
-	  - 172.20.1.240-172.20.1.243
-	---
-	apiVersion: metallb.io/v1beta1
-	kind: L2Advertisement
-	metadata:
-	  name: l2advertisement1
-	  namespace: metallb-system
-	spec:
-	  ipAddressPools:
-	  - default
-	EOF
-	ENDSSH
-
-  run "kubectl create -f metallb-config.yaml"
-fi
 
 echo "copying kubeconfig to workstation..."
 scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
@@ -506,12 +570,136 @@ else  # default is to use public ip
   $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
 fi
 
+# Handle MetalLB cluster resource creation
+if [[ "${METAL_LB}" == true || "${ATTACH_SECONDARY_IP}" == true ]]; then
+  echo "Installing MetalLB..."
+  run "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"
+	# Wait for controller to be live so that validating webhooks function when we apply the config
+	echo "Waiting for MetalLB controller..."
+	run "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
+  echo "MetalLB is installed."
+
+  if [[ "$METAL_LB" == true ]]; then
+    echo "Building MetalLB configuration for -m mode."
+    run <<- 'ENDSSH'
+#run this command on remote
+cat << EOF > metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+  - 172.20.1.240-172.20.1.243
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement1
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default
+EOF
+ENDSSH
+  elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
+    echo "Building MetalLB configuration for -a mode."
+    run <<ENDSSH
+#run this command on remote
+cat <<EOF > metallb-config.yaml
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: primary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP"
+    publicIp: "$PublicIP"
+spec:
+  addresses:
+  - "172.20.1.241/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [public-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: secondary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP2"
+    publicIp: "$SecondaryIP"
+spec:
+  addresses:
+  - "172.20.1.240/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [passthrough-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: primary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - primary
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: secondary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - secondary
+EOF
+ENDSSH
+
+    run <<ENDSSH
+cat <<EOF > primaryProxy.yaml
+ports:
+  443.tcp:
+    - 172.20.1.241
+settings:
+  workerConnections: 1024
+EOF
+ENDSSH
+
+    run <<ENDSSH
+cat <<EOF > secondaryProxy.yaml
+ports:
+  443.tcp:
+    - 172.20.1.240
+settings:
+  workerConnections: 1024
+EOF
+ENDSSH
+
+    run "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/ubuntu/primaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+    run "docker run -d --name=secondaryProxy --network=k3d-network -p $PrivateIP2:443:443 -v /home/ubuntu//secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+  fi
+
+  run "kubectl create -f metallb-config.yaml"
+fi
+
 if [[ "$METAL_LB" == true ]]; then
   run <<- 'ENDSSH'
   # run this command on remote
   # fix /etc/hosts for new cluster
   sudo sed -i '/bigbang.dev/d' /etc/hosts
-  sudo bash -c "echo '## begin bigbang.dev section' >> /etc/hosts"
+  sudo bash -c "echo '## begin bigbang.dev section (METAL_LB)' >> /etc/hosts"
   sudo bash -c "echo 172.20.1.240  keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
   sudo bash -c "echo 172.20.1.241 anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
   sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
@@ -519,6 +707,19 @@ if [[ "$METAL_LB" == true ]]; then
   kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
   kubectl delete pod -n kube-system -l k8s-app=kube-dns
 	ENDSSH
+elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
+  run <<ENDSSH
+    # run this command on remote
+    # fix /etc/hosts for new cluster
+    sudo sed -i '/bigbang.dev/d' /etc/hosts
+    sudo bash -c "echo '## begin bigbang.dev section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
+    sudo bash -c "echo $PrivateIP2  keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
+    sudo bash -c "echo $PrivateIP anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
+    sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+    kubectl delete pod -n kube-system -l k8s-app=kube-dns
+ENDSSH
 fi
 
 echo
@@ -541,10 +742,8 @@ then
 fi
 echo
 
-if [[ "$METAL_LB" == true ]] # using MetalLB
-then
-  if [[ "$PRIVATE_IP" == true ]]
-  then   # using MetalLB and private IP
+if [[ "$METAL_LB" == true ]]; then # using MetalLB
+  if [[ "$PRIVATE_IP" == true ]]; then # using MetalLB and private IP
     echo "Start sshuttle in a separate terminal window:"
     echo "  sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem -D 127.0.0.1:12345'"
     echo "Do not edit /etc/hosts on your local workstation."
@@ -569,23 +768,28 @@ then
     echo "OPTION 2: ACCESS APPLICATIONS WITH WEB BROWSER AND COMMAND LINE"
     echo "To access apps from browser and from the workstation command line start sshuttle in a separate terminal window."
     echo "  sshuttle --dns -vr ubuntu@${PublicIP} 172.20.1.0/24 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem'"
-    echo "Edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-system servcies with application hostnames."
+    echo "Edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with application hostnames."
     echo "Here is an example. You might have to change this depending on the number of gateways you configure for k8s cluster."
     echo "  # METALLB ISTIO INGRESS IPs"
     echo "  172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev"
     echo "  172.20.1.241 sonarqube.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev gitlab.bigbang.dev"
   fi
-elif [[ "$PRIVATE_IP" == true ]]  # not using MetalLB
-then	# Not using MetalLB and using private IP
+elif [[ "$PRIVATE_IP" == true ]]; then  # not using MetalLB
+	# Not using MetalLB and using private IP
   echo "Start sshuttle in a separate terminal window:"
   echo "  sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem'"
   echo
   echo "To access apps from a browser edit your /etc/hosts to add the private IP of your EC2 instance with application hostnames. Example:"
-  echo "  ${PrivateIP}	gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
-  echo
+  echo "  ${PrivateIP}  gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
+  echo 
 else   # Not using MetalLB and using public IP. This is the default
   echo "To access apps from a browser edit your /etc/hosts to add the public IP of your EC2 instance with application hostnames."
   echo "Example:"
-  echo "  ${PublicIP}	gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
+  echo "  ${PublicIP} gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
   echo
+
+  if [[ ! -z "${SecondaryIP}" ]]; then
+    echo "A secondary IP is available for use if you wish to have a passthrough ingress for Istio along with a public Ingress Gateway, this maybe useful for Keycloak x509 mTLS authentication."
+    echo "  ${SecondaryIP}  keycloak.bigbang.dev"
+  fi
 fi
