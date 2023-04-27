@@ -1,5 +1,5 @@
 locals {
-  name = "umbrella-${var.env}"
+  name = "umb-${var.env}"
 
   # Bigbang specific OS tuning
   os_prep = <<EOF
@@ -84,7 +84,7 @@ data "aws_ami" "cisal2" {
 }
 
 module "rke2" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v2.1.0"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git?ref=v2.3.2"
 
   cluster_name          = local.name
   vpc_id                = var.vpc_id
@@ -114,7 +114,7 @@ module "rke2" {
 }
 
 module "generic_agents" {
-  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v2.1.0"
+  source = "git::https://repo1.dso.mil/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//modules/agent-nodepool?ref=v2.3.2"
 
   name                 = "generic-agent"
   vpc_id               = var.vpc_id
