@@ -1187,6 +1187,11 @@ addons:
       # with a random password.
       # -- This needs to be set to a non-empty value in order for the Grafana Redis Datasource and Dashboards to be installed.
       password: ""
+  
+    # -- Rails plain text secret to define. If empty (""), the gitlab charts will create the gitlab-rails-secret with randomized data.
+    # Read the following for more information on setting Gitlab rails secrets: https://docs.gitlab.com/charts/installation/secrets#gitlab-rails-secret
+    railsSecret: ""
+
 
     # -- Values to passthrough to the gitlab chart: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
     values: {}

@@ -452,6 +452,12 @@ global:
       secret: "gitlab-smtp-password"
   {{- end }}
 
+  {{- if .Values.addons.gitlab.railsSecret }}
+  railsSecret:
+    secret: "gitlab-rails-secret-bb"
+  {{- end }}
+
+
 {{- if ne .Values.addons.gitlab.objectStorage.iamProfile "" }}
 use_iam_profile: true
 {{- end }}
