@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.6.19]
+### Changed
+- Updated tf modules to 2.3.2 for RKE2
+
 ## [2.6.18]
 ### Changed
 - Enable helmRepo source for all Helm Releases including addons for nightly bb pipeline test. Add fix to 01_virtualservices.sh to allow for k3d cluster testing during nightly/scheduled runs of clean install jobs.

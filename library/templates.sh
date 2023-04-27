@@ -284,7 +284,7 @@ test_bigbang() {
 
 pre_vars() {
    # Create the TF_VAR_env variable
-   echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-7)-$(echo $CI_COMMIT_SHA | cut -c 1-7)" >> variables.env
+   echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-5)-$(echo $CI_COMMIT_SHA | cut -c 1-5)" >> variables.env
    # Calculate a unique cidr range for vpc
    if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::airgap"* ]]; then
      export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
