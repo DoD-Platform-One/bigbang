@@ -16,13 +16,13 @@ Be sure to export your Registry1 credentials next as seen below:
 
 ```shell
 export REGISTRY1_USERNAME=<username>
-export REGISTRY1_CLI_SECRET=<password>
+export REGISTRY1_PASSWORD=<password>
 ```
 
-Now you can execute the following: 
+Now you can execute the following, which will automatically detect your SSH key location, name and Public IP, based off the current `AWS_PROFILE` declared locally: 
 
 ```shell
-KeyName=<KeyName> PublicIP=<Ip> docs/assets/scripts/airgap-zarf/zarf-dev.sh
+docs/assets/scripts/airgap-zarf/zarf-dev.sh
 ```
 
 The above will clone the latest  `main` branch of the [defenseunicorns/zarf](https://github.com/defenseunicorns/zarf) repository and execute the stock `examples/big-bang/zarf.yaml`.  If you want to use a different `zarf.yaml`, you can override this by setting any of these variables ahead of time, either by exporting them or setting them as part of the command.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-ZARF_VERSION=v0.25.2
-BIGBANG_VERSION=1.57.1
+ZARF_VERSION=v0.26.1
+BIGBANG_VERSION=2.0.0
 
 # Choices: warn, info, debug, trace
 # Currently set only for zarf package deploy
@@ -9,10 +9,18 @@ ZARF_LOG_LEVEL=${ZARF_LOG_LEVEL:=info}
 
 # Prerequisites: REGISTRY1_USERNAME and REGISTRY1_PASSWORD must be exported locally.
 # Configurable: ZARF_TEST_REPO, ZARF_TEST_REPO_BRANCH, ZARF_TEST_REPO_DIRECTORY all define where to pick up the zarf.yaml file.
-# Example with configuration: KeyName=<KeyName> PublicIP=<Ip> ZARF_TEST_REPO=https://repo1.dso.mil/some-repo.git ZARF_TEST_REPO_BRANCH=development docs/assets/scripts/airgap-zarf/zarf-dev.sh
+# Example with configuration: ZARF_TEST_REPO=https://repo1.dso.mil/some-repo.git ZARF_TEST_REPO_BRANCH=development docs/assets/scripts/airgap-zarf/zarf-dev.sh
+
+AWSUSERNAME=${AWSUSERNAME:=`aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/'`}
+echo "Username: $AWSUSERNAME"
+KeyName=${AWSUSERNAME}-dev
+PublicIP=`aws ec2 describe-instances --output text \
+              --query "Reservations[].Instances[].PublicIpAddress" \
+              --filters "Name=tag:Name,Values=${AWSUSERNAME}-dev" "Name=instance-state-name,Values=running"`
+echo "Public IP: ${PublicIP}"
 
 ZARF_TEST_REPO=${ZARF_TEST_REPO:=https://github.com/defenseunicorns/zarf}
-ZARF_TEST_REPO_BRANCH=${ZARF_TEST_REPO_BRANCH:=ZARF_VERSION}
+ZARF_TEST_REPO_BRANCH=${ZARF_TEST_REPO_BRANCH:=$ZARF_VERSION}
 ZARF_TEST_REPO_DIRECTORY=${ZARF_TEST_REPO_DIRECTORY:=zarf/examples/big-bang}
 
 function run() {
@@ -20,7 +28,7 @@ function run() {
 }
 
 # install zarf
-echo Installing zarf...
+echo "Installing Zarf ${ZARF_VERSION}"...
 run "curl -LO https://github.com/defenseunicorns/zarf/releases/download/${ZARF_VERSION}/zarf_${ZARF_VERSION}_Linux_amd64"
 run "sudo mv /home/ubuntu/zarf_${ZARF_VERSION}_Linux_amd64 /usr/local/bin/zarf"
 run "sudo chmod +x /usr/local/bin/zarf"
