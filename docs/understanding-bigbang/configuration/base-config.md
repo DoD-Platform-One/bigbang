@@ -300,7 +300,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | monitoring.sso.grafana.client_id | string | `""` | Grafana OIDC client ID |
 | monitoring.sso.grafana.client_secret | string | `""` | Grafana OIDC client secret |
 | monitoring.sso.grafana.scopes | string | `""` | Grafana OIDC client scopes, comma separated, see https://grafana.com/docs/grafana/latest/auth/generic-oauth/ |
-| monitoring.sso.grafana.allow_sign_up | string | `"true"` |  |
+| monitoring.sso.grafana.allow_sign_up | bool | `true` |  |
 | monitoring.sso.grafana.role_attribute_path | string | `"Viewer"` |  |
 | monitoring.values | object | `{}` | Values to passthrough to the monitoring chart: https://repo1.dso.mil/big-bang/product/packages/monitoring.git |
 | monitoring.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -381,10 +381,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"6.10.0-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"6.10.0-bb.1"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"6.10.0-bb.0"` |  |
+| addons.gitlab.helmRepo.tag | string | `"6.10.0-bb.1"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
@@ -411,10 +411,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlabRunner.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlabRunner.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git"` |  |
 | addons.gitlabRunner.git.path | string | `"./chart"` |  |
-| addons.gitlabRunner.git.tag | string | `"0.51.0-bb.0"` |  |
+| addons.gitlabRunner.git.tag | string | `"0.51.0-bb.1"` |  |
 | addons.gitlabRunner.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlabRunner.helmRepo.chartName | string | `"gitlab-runner"` |  |
-| addons.gitlabRunner.helmRepo.tag | string | `"0.51.0-bb.0"` |  |
+| addons.gitlabRunner.helmRepo.tag | string | `"0.51.0-bb.1"` |  |
 | addons.gitlabRunner.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Runner Package |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git |
 | addons.gitlabRunner.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
