@@ -6,7 +6,6 @@ include:
 variables:
   DEBUG_ENABLED: "true"
   MULTI_NODE: "true"
-  BB_AUTO_MR_TOKEN: ${SNEKCODE_FORK_TOKEN}
   BB_DOCS_PROJECT_ID: 12461
   BB_DOCS_SCHEDULED_ID: 1329
   CI_DEFAULT_BRANCH: "snekcode-bigbang"
