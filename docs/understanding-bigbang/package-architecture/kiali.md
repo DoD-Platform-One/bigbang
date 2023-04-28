@@ -92,7 +92,11 @@ monitoring:
 
 ## High Availability
 
-HA can be accomplished for Kiali via two methods. You can directly control the replicas required or have Kiali create and use a horizontal pod autoscaler and set a min/max number of replicas for the deployment. Both methods are shown below:
+HA can be accomplished for Kiali via two methods. You can directly control the replicas required or have Kiali create and use a horizontal pod autoscaler and set a min/max number of replicas for the deployment. 
+
+Big Bang uses the horizontal pod autoscaler by default with `minReplicas: 1` and `maxReplicas: 2`.  
+
+Both methods are shown below:
 
 - Specific number of replicas
 ```yaml

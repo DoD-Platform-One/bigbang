@@ -35,6 +35,11 @@ cr:
       pod_annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
+      hpa:
+        spec:
+          maxReplicas: 2
+          minReplicas: 1
+          targetCPUUtilizationPercentage: 80
     server:
       web_port: "443"
     auth:
