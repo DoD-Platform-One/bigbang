@@ -211,7 +211,9 @@ To test your package against any pipeline contributions you've made, you will ne
 
 #### Testing Big Bang With Your CI Contributions
 
-To test Big Bang against any pipeline contributions you've made, you can simply configure the `.gitlab-ci.yml` as shown below:
+To test Big Bang against any pipeline contributions you've made, navigate to the Package Pipeline Validations project repository. Detailed instructions for testing a bb pipeline change are in https://repo1.dso.mil/big-bang/pipeline-templates/package-validation/-/blob/master/README.md
+
+You can test package pipelines by changing your package git project remote origin to Package Pipeline Validations. Push your package git project to a new branch in Package Pipeline Validations. Then create a .gitlab-ci.yml as shown below: 
 
 ```yaml
 include:
@@ -252,6 +254,8 @@ Similar to the MR title keywords described above, gitlab labels can be added to 
 `<package-name>` -- Adding a package name as a label will enable that package.
 
 `test-ci::infra` -- Add stages to provision and destroy the cloud infrastructure where the tests will run.
+
+`test-ci::oci` -- Run a pipeline job that installs bb core packages using OCI Artifacts/HelmRepositories instead of GitRepositories. This job runs during our nightly bb pipeline.
 
 `test-ci::airgap` -- Add stages to provision and destroy a simulated airgap bb install.
 
