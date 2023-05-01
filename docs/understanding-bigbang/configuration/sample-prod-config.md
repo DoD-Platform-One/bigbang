@@ -144,7 +144,7 @@ addons:
 ### Backup and rename gitlab-rails-secret
 
 An operational deployment of Gitlab should backup and re-create the Gitlab Rails Encryption information as a secret with a different name as [documented here](https://docs.gitlab.com/charts/installation/secrets.html#gitlab-rails-secret). Using a custom secret name can help prevent accidental overwriting.
-To make the secret creation easier, the existing secret can be copied and modified with a different name.
+The existing secret can be copied and modified with a different name and is recommended to be stored in your environments GitOps configuration as a SOPS encrypted secret.
 
 ```bash
 kubectl get secret/gitlab-rails-secret -n gitlab -o yaml > gitlab-rails-custom-secret.yaml
@@ -159,8 +159,24 @@ metadata:
   name: gitlab-rails-custom-secret
 ```
 
-Use GitOps configuration as code (CaC) and commit the custom rails secret to your GitOps repository. You should encrypt the custom rails secret keys in the GitOps repository to preserve security.
-Then the following Gitlab helm chart value `global.railsSecrets.secret` can be overridden to point to the custom rails secret.
+Use GitOps configuration as code (CaC) and commit the custom rails secret to your GitOps repository. You should SOPs encrypt the custom rails secret keys in the GitOps repository to preserve security.
+
+To make the secret creation easier, BigBang has a value `addons.gitlab.railsSecret` where a chomp modifier can be used to have the data from the `gitlab-rails-secret` placed into a secret as part of the umbrella:
+
+```yaml
+addons:
+  gitlab:
+    ...
+    railsSecret: |
+      production:
+        secret_key_base: XXXXXX
+        otp_key_base: XXXXXX
+        ...
+```
+
+This `railsSecret` value should be committed to a SOPs encrypted values file as the data is very sensitive. 
+
+Once the secret is pushed up to GitOps, the following Gitlab helm chart value `global.railsSecrets.secret` can be overridden to point to the custom rails secret or if using the `railsSecret` value BigBang will auto point to the secret it controls via the value above.
 
 ```yaml
 addons:
