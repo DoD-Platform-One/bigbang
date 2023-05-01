@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [2.6.18]
 ### Changed
+- Bigbang Release now kicks off the BB Docs Compiler Pipeline
+## [2.6.18]
+### Changed
 - Enable helmRepo source for all Helm Releases including addons for nightly bb pipeline test. Add fix to 01_virtualservices.sh to allow for k3d cluster testing during nightly/scheduled runs of clean install jobs.
 
 ## [2.6.17]
