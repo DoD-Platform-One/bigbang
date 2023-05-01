@@ -1,7 +1,7 @@
 # pipelines/bigbang.yaml@big-bang/pipeline-templates/pipeline-templates:master
 include:
   - project: 'big-bang/pipeline-templates/pipeline-templates'
-    ref: 'bb_release_branch'
+    ref: 'bb_release_branch_but_.x'
     file: '/pipelines/bigbang.yaml' 
 variables:
   DEBUG_ENABLED: "true"
@@ -10,4 +10,4 @@ variables:
   BB_DOCS_PROJECT_ID: 12461
   BB_DOCS_SCHEDULED_ID: 1329
   CI_DEFAULT_BRANCH: "snekcode-bigbang"
-  PIPELINE_REPO_BRANCH: 'bb_release_branch'
+  PIPELINE_REPO_BRANCH: 'bb_release_branch_but_.x'
