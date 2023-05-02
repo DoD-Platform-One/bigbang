@@ -75,6 +75,7 @@ mattermost:
   dependencies:
     - "mattermostOperator"
     - "minioOperator"
+    - "elasticsearchKibana"
 velero:
   dependencies:
     - "minio"
