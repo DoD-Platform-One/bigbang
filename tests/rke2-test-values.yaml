@@ -415,7 +415,10 @@ addons:
             runAsGroup: 1001
             fsGroup: 1001
             runAsNonRoot: true
-
+          containerSecurityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
 
   mattermost:
     values:
@@ -428,7 +431,7 @@ addons:
           memory: 256Mi
         limits: null
       minio:
-        tenants:
+        tenant:
           pools:
           - servers: 1
             volumesPerServer: 4
@@ -442,6 +445,11 @@ addons:
               runAsUser: 1001
               runAsGroup: 1001
               fsGroup: 1001
+              runAsNonRoot: true
+            containerSecurityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
             
   nexusRepositoryManager:
     values:
