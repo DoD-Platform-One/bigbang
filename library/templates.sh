@@ -729,6 +729,8 @@ post_install_wait() {
 package_test() {
    echo -e "\e[0Ksection_start:`date +%s`:package_test[collapsed=true]\r\e[0K\e[33;1mPackage Test\e[37m"
    if [ -d "chart/templates/tests" ]; then
+     rm -rf /cypress/screenshots
+     rm -rf /cypress/videos
      helm test -n ${PACKAGE_NAMESPACE} ${PACKAGE_HELM_NAME} && export EXIT_CODE=$? || export EXIT_CODE=$?
      echo "***** Start Helm Test Logs *****"
      kubectl logs --all-containers=true --tail=-1 -n ${PACKAGE_NAMESPACE} -l helm-test=enabled
