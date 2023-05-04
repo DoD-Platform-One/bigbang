@@ -453,7 +453,7 @@ global:
   {{- end }}
 
   {{- if .Values.addons.gitlab.railsSecret }}
-  railsSecret:
+  railsSecrets:
     secret: "gitlab-rails-secret-bb"
   {{- end }}
 
