@@ -69,7 +69,8 @@ postgresql:
   postgresUser: {{ .Values.addons.anchore.database.username }}
   postgresPassword: {{ .Values.addons.anchore.database.password }}
   postgresDatabase: {{ .Values.addons.anchore.database.database }}
-  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}"
+  postgresPort: {{ .Values.addons.anchore.database.port }}
   {{- end }}
 
 anchoreGlobal:
@@ -96,7 +97,8 @@ anchore-feeds-db:
   postgresUser: {{ .Values.addons.anchore.database.username }}
   postgresPassword: {{ .Values.addons.anchore.database.password }}
   postgresDatabase: {{ .Values.addons.anchore.database.feeds_database }}
-  externalEndpoint: "{{ .Values.addons.anchore.database.host }}:{{ .Values.addons.anchore.database.port }}"
+  externalEndpoint: "{{ .Values.addons.anchore.database.host }}"
+  postgresPort: {{ .Values.addons.anchore.database.port }}
   {{- end }}
 
 anchoreEnterpriseUi:
