@@ -232,10 +232,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | loki.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | loki.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/loki.git"` |  |
 | loki.git.path | string | `"./chart"` |  |
-| loki.git.tag | string | `"5.0.0-bb.1"` |  |
+| loki.git.tag | string | `"5.0.0-bb.2"` |  |
 | loki.helmRepo.repoName | string | `"registry1"` |  |
 | loki.helmRepo.chartName | string | `"loki"` |  |
-| loki.helmRepo.tag | string | `"5.0.0-bb.1"` |  |
+| loki.helmRepo.tag | string | `"5.0.0-bb.2"` |  |
 | loki.flux | object | `{}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
 | loki.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
@@ -478,10 +478,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.anchore.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.anchore.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
 | addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"1.24.1-bb.0"` |  |
+| addons.anchore.git.tag | string | `"1.24.1-bb.3"` |  |
 | addons.anchore.helmRepo.repoName | string | `"registry1"` |  |
 | addons.anchore.helmRepo.chartName | string | `"anchore"` |  |
-| addons.anchore.helmRepo.tag | string | `"1.24.1-bb.0"` |  |
+| addons.anchore.helmRepo.tag | string | `"1.24.1-bb.3"` |  |
 | addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchore.enterprise | object | `{"enabled":false,"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
