@@ -642,11 +642,11 @@ promtail:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
-    tag: "6.10.0-bb.1"
+    tag: "6.11.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "promtail"
-    tag: "6.10.0-bb.1"
+    tag: "6.11.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Promtail Package
   flux: {}
