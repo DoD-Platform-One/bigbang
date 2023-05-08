@@ -48,6 +48,7 @@ stages:
   - 💣 airgap down
   - 📦 package
   - 🚀 release
+  - 🚀 release branch
   - 🤞 oci artifact tests
 
 variables:
@@ -70,6 +71,7 @@ variables:
   DEBUG_ENABLED: "false"
   METRICS_DISABLED: "false"
   MULTI_NODE: "false"
+  JOB_TYPE: "default"
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -78,6 +80,10 @@ variables:
 #-----------------------------------------------------------------------------------------------------------------------
 pre vars:
   stage: .pre
+  # Never run if this is not one of the scheduled job types below
+  except:
+    variables:
+      - $JOB_TYPE == "cut_release"
   extends:
     - .generic-runner-tags
     - .util-image
@@ -89,7 +95,6 @@ pre vars:
     - label_check
     - package_lint
     - oscal_validate
-
   artifacts:
     reports:
       dotenv: variables.env
@@ -127,7 +132,11 @@ clean install:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}"
   rules:
     # Always run a clean installation test unless we are deploying the AWS cluster installation during a scheduled test (nightly main test)
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
     - *chart_changes
   script:
@@ -237,10 +246,12 @@ clean install oci:
     CLUSTER_NAME: "clean-${CI_COMMIT_SHORT_SHA}-oci"
     CI_VALUES_OVERRIDES_FILE: tests/oci-values.yaml
   rules:
-    # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
+    - if: '$JOB_TYPE == "cut_release"'
+      when: never
+    # Run on scheduled jobs OR when `test-ci` label is assigned
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
   script:
     - dependency_images
     - deploy_bigbang
@@ -347,6 +358,23 @@ release:
   allow_failure:
     exit_codes: 123
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Release Cut
+#
+#-----------------------------------------------------------------------------------------------------------------------
+cut_release:
+  stage: 🚀 release branch
+  rules:
+    - if: '$JOB_TYPE == "cut_release"'
+  extends:
+    - .generic-runner-tags
+    - .util-image
+    - .templates
+  script:
+    - bigbang_cut_release $RELEASE_TYPE
+
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Infrastructure: Networking
@@ -355,8 +383,8 @@ release:
 aws/network up:
   extends:
     - .generic-runner-tags
-    - .infra fork
     - .network up
+    - .infra_fork
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     auto_stop_in: 1 hour
@@ -370,8 +398,8 @@ aws/network up:
 aws/network down:
   extends:
     - .generic-runner-tags
-    - .infra cleanup
     - .network down
+    - .infra_cleanup
   needs:
     - job: pre vars
       artifacts: true
@@ -397,8 +425,8 @@ aws/rke2/cluster up:
   stage: ⚓ cluster up
   extends:
     - .generic-runner-tags
-    - .infra create
     - .rke2 up
+    - .infra_create
   needs:
     - job: aws/network up
     - job: pre vars
@@ -417,9 +445,9 @@ aws/rke2/bigbang up:
   stage: 🌌 bigbang up
   extends:
     - .generic-runner-tags
-    - .infra create
     - .kubectl-output
     - .templates
+    - .infra_create
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -453,9 +481,9 @@ aws/rke2/bigbang test:
   stage: 🤞 test
   extends:
     - .generic-runner-tags
-    - .infra create
     - .kubectl-output
     - .templates
+    - .infra_create
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -490,9 +518,9 @@ aws/rke2/bigbang down:
   stage: 💣 bigbang down
   extends:
     - .generic-runner-tags
-    - .infra cleanup
     - .kubectl-output
     - .templates
+    - .infra_cleanup
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -527,8 +555,8 @@ aws/rke2/cluster down:
   stage: 💣 cluster down
   extends:
     - .generic-runner-tags
-    - .infra cleanup
     - .rke2 down
+    - .infra_cleanup
   needs:
     - job: aws/rke2/bigbang down
     - job: pre vars
