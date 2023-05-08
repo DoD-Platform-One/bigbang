@@ -9,7 +9,7 @@ keywords:
   - platform1
   - bigbang
 
-home: https://p1.dso.mil/#/products/big-bang
+home: https://p1.dso.mil/products/big-bang
 sources:
   - https://repo1.dso.mil/big-bang/bigbang
 
@@ -20,5 +20,7 @@ maintainers:
     email: micah.nagel@defenseunicorns.com
   - name: Rob Ferguson
     email: rob.ferguson@defenseunicorns.com
+  - name: Chris O'Connell
+    email: coconnell@bridgephase.com
 
 icon: https://p1.dso.mil/img/Big_Bang_Color_Logo_White_text.b04263b1.png
