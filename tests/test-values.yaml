@@ -1248,8 +1248,8 @@ addons:
             fsGroup: 1001
             runAsNonRoot: true
           containerSecurityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 1001
+            runAsGroup: 1001
             runAsNonRoot: true
       bbtests:
         # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
@@ -1304,8 +1304,8 @@ addons:
               fsGroup: 1001
               runAsNonRoot: true
             containerSecurityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
+              runAsUser: 1001
+              runAsGroup: 1001
               runAsNonRoot: true
       bbtests:
         enabled: true
