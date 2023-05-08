@@ -382,6 +382,58 @@ bigbang_release_check() {
    echo -e "\e[0Ksection_end:`date +%s`:bb_release_check\r\e[0K"
 }
 
+bigbang_cut_release(){
+  # create a branch for the release that increments the semvar found in chart/Chart.yaml version
+  # get version from chart/Chart.yaml
+  version=$(yq e '.version' chart/Chart.yaml)
+
+  echo $version
+  # Use sed to extract the major, minor, and patch components
+  major=$(echo $version | sed 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\1/')
+  minor=$(echo $version | sed 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\2/')
+  patch=$(echo $version | sed 's/\([0-9]\+\)\.\([0-9]\+\)\.\([0-9]\+\)/\3/')
+
+
+  echo "Current version: $version"
+  echo "Requested version bump: $1"
+  # $1 will be a string "major" "minor" or "patch"
+  # Increment the appropriate field
+    case $1 in
+        "major")
+            ((major+=1))
+            minor=0
+            patch=0
+            ;;
+        "minor")
+            ((minor+=1))
+            patch=0
+            ;;
+        "patch")
+            ((patch+=1))
+            ;;
+        *)
+            echo "Error: invalid RELEASE_TYPE specified. Please use major, minor, or patch"
+            return 1
+            ;;
+    esac
+
+  
+  version="$major.$minor.$patch"
+  echo "New version: $version"
+  
+  git config --global user.email "release.bot@bigbang.dev"
+  git config --global user.name "release.bot"
+
+  branch_name="release-$version"
+
+  git checkout -b $branch_name
+  yq e -i ".version = \"$version\"" chart/Chart.yaml
+  git add chart/Chart.yaml
+  git commit -m "Bump version to $version"
+  git push https://root:$RENOVATE_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git $branch_name
+  echo "Release branch created: $branch_name"
+}
+
 # https://docs.gitlab.com/ee/api/pipeline_schedules.html#run-a-scheduled-pipeline-immediately
 bigbang_docs_compile(){
   echo -e "\e[0Ksection_start:`date +%s`:bb_docs_compile[collapsed=true]\r\e[0K\e[33;1mDocs Compiler Pipeline Trigger\e[37m"
