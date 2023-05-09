@@ -86,11 +86,13 @@ bb-bot-gitlab:
 bb-bot-jira:
   stage: dry_run
   allow_failure: true
+  rules:
+    - when: never
   variables: 
     gitlab_token: $RO_RENOVATE_TOKEN
     jira_access_token: $RO_JIRA_TOKEN
-  except:
-    - schedules
+  # except:
+  #   - schedules
   extends:
     - .generic-runner-tags
   artifacts:
