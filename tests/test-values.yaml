@@ -901,6 +901,8 @@ addons:
             size: 256Mi
         replica:
           replicaCount: 0
+          autoscaling:
+            enabled: false  
           persistence:
             size: 256Mi
 
@@ -1178,6 +1180,8 @@ addons:
         enabled: true
         replica:
           replicaCount: 0
+          autoscaling:
+            enabled: false 
       bbtests:
         enabled: true
         scripts:

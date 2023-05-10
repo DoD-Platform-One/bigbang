@@ -950,11 +950,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.28.0-bb.0"
+      tag: "5.28.0-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.28.0-bb.0"
+      tag: "5.28.0-bb.2"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -1007,11 +1007,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
-      tag: "0.5.3-bb.7"
+      tag: "0.5.3-bb.8"
     helmRepo:
       repoName: "registry1"
       chartName: "authservice"
-      tag: "0.5.3-bb.7"
+      tag: "0.5.3-bb.8"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
@@ -1397,11 +1397,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.24.1-bb.3"
+      tag: "1.24.1-bb.4"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "1.24.1-bb.3"
+      tag: "1.24.1-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
