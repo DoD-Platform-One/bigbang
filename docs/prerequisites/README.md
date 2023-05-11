@@ -1,4 +1,4 @@
-# Prerequisits
+# Prerequisites
 
 [[_TOC_]]
 
@@ -8,9 +8,9 @@
 
 ## Software Requirements
 
-[Operating System Preconfiguration](./os-preconfiguration.md)
-[Kubernetes Preconfiguration](./kubernetes-preconfiguration.md)
-[Flux Installation](./install-flux.md)
+[Operating System Preconfiguration](./os-preconfiguration.md) |
+[Kubernetes Preconfiguration](./kubernetes-preconfiguration.md) |
+[Flux Installation](./install-flux.md) |
 [Default Storageclass](./default-storageclass.md)
 
 ## Licensing Requirements
