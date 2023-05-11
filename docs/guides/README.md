@@ -8,24 +8,24 @@ The guides included here are not all inclusive of every situation. Please open a
 
 ## Using Big Bang
 
-[Chart Values Guide](./using-bigbang/values-guide.md)
-[Default Credentials](./using-bigbang/default-credentials.md)
-[Image Pull Policy](./using-bigbang/image-pull-policy.md)
-[Pod Usage in Graphana](./using-bigbang/pod-usage-in-grafana.md)
+[Chart Values Guide](./using-bigbang/values-guide.md) |
+[Default Credentials](./using-bigbang/default-credentials.md) |
+[Image Pull Policy](./using-bigbang/image-pull-policy.md) |
+[Pod Usage in Grafana](./using-bigbang/pod-usage-in-grafana.md) |
 [Migrating Logging from ELK to PLG](./using-bigbang/efk-plg-logging-migration.md)
 
 ## Deployment Scenarios
 
-[Quickstart](./deployment-scenarios/quickstart.md)
-[Multiple Ingress](./deployment-scenarios/multiple-ingress.md)
+[Quickstart](./deployment-scenarios/quickstart.md) |
+[Multiple Ingress](./deployment-scenarios/multiple-ingress.md) |
 [SSO Quickstart](./deployment-scenarios/sso-quickstart.md)
 
 ### Airgap Deployments
 
-[Airgap Deployments](./airgap/README.md)
+[Airgap Deployments](./airgap/README.md) |
 [Airgap w/Zarf](./airgap-zarf/README.md)
 
 ## Backup and Restore
 
-[GitLab Backup and Restore](./backup-and-restore/gitlab-backup-restore.md)
+[GitLab Backup and Restore](./backup-and-restore/gitlab-backup-restore.md) |
 [Nexus Migration with Velero](./backup-and-restore/nexus-migration-with-velero.md)
