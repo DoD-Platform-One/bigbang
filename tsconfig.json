@@ -2,9 +2,8 @@
   "compilerOptions": {
     "allowJs": false,
     "lib": ["es2015", "es2017"],
-    "module": "es2022",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es2022",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -23,6 +22,7 @@
   "exclude": ["test/**/*"],
   "compileOnSave": false,
   "ts-node": {
+    "esm": true,
     "moduleTypes": {
       "jest.config.ts": "cjs"
     }

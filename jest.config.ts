@@ -7,12 +7,12 @@ dotenv.config({
 
 // Sync object
 const config: Config.InitialOptions = {
-  roots: ['<rootDir>/src/', '<rootDir>/test/'],
+  roots: ['<rootDir>/test/'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
   },
   testMatch: [
-    "**/test/*.+(ts|tsx|js)"
+    "**/test/*.test.+(ts|tsx|js)"
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ["dotenv/config"],
