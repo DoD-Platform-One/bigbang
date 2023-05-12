@@ -116,8 +116,11 @@ gateways:
         protocol: HTTPS
       {{- end }}
       tls:
+        {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $servervalues) }}
+        mode: {{ $tlsMode }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $index }}-{{ $name }}-cert
-        mode: {{ dig "tls" "mode" "SIMPLE" $servervalues }}
+        {{- end }}
       {{- end }}
     {{- else if ($values.ports) }}
     {{- range $values.ports }}
@@ -126,8 +129,11 @@ gateways:
       port:
       {{- tpl ( . | default (list) | toYaml) $ | nindent 8 }}
       tls:
+        {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $values) }}
+        mode: {{ $tlsMode }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $name }}-cert
-        mode: {{ dig "tls" "mode" "SIMPLE" $values }}
+        {{- end }}
     {{- end }}
     {{- else }}
     - hosts:
@@ -137,8 +143,11 @@ gateways:
         number: 8443
         protocol: HTTPS
       tls:
+        {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $values) }}
+        mode: {{ $tlsMode }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $name }}-cert
-        mode: {{ dig "tls" "mode" "SIMPLE" $values }}
+        {{- end }}
     {{- end }}
     {{- end }}
 
