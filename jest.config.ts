@@ -12,7 +12,7 @@ const config: Config.InitialOptions = {
     '^.+\\.tsx?$': 'ts-jest'
   },
   testMatch: [
-    "**/test/*.test.+(ts|tsx|js)"
+    "**/*.test.+(ts|tsx|js)"
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ["dotenv/config"],
