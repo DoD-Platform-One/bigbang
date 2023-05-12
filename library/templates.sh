@@ -1354,7 +1354,7 @@ create_bigbang_merge_request() {
     CHANGELOG_URL=$(curl -s ${GITLAB_PROJECTS_API_ENDPOINT}/${CI_PROJECT_ID} | jq '.web_url' | sed 's/"//g')/-/blob/${CI_COMMIT_TAG}/CHANGELOG.md
 
     # GitLab usernames of Big Bang codeowners that will be assigned as MR reviewers
-    BB_MR_REVIEWER_NAMES=( "micah.nagel" "ryan.j.garcia" "rob.ferguson" )
+    BB_MR_REVIEWER_NAMES=( "ryan.j.garcia" "chris.oconnell" )
     BB_MR_REVIEWER_IDS=""
 
     # Collect user IDs from /users API endpoint
