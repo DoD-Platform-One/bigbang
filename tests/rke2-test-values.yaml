@@ -96,6 +96,8 @@ tempo:
 
 monitoring:
   values:
+    vault:
+      enabled: false
     prometheus:
       prometheusSpec:
         resources:
