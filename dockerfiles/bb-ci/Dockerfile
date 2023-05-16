@@ -147,6 +147,10 @@ ENV KUSTOMIZE_VERSION='v4.5.2'
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz kustomize && mv kustomize /usr/local/bin/ && chmod +x /usr/local/bin/kustomize && rm -rf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 
+ENV ZARF_VERSION='v0.26.3'
+ADD https://github.com/defenseunicorns/zarf/releases/download/${ZARF_VERSION}/zarf_${ZARF_VERSION}_Linux_amd64 /usr/local/bin/zarf
+RUN chmod +x /usr/local/bin/zarf
+
 # Install aws cli
 RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/awscliv2.zip && \
     unzip -qq -d /tmp /tmp/awscliv2.zip && \
