@@ -4,6 +4,29 @@ networkPolicies:
   controlPlaneCidr: 10.0.0.0/8
 
 istio:
+  ingressGateways:
+    public-ingressgateway:
+      type: "LoadBalancer"
+      kubernetesResourceSpec:
+        serviceAnnotations:
+          # Ensure mission apps have internal load balancer only
+          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+          # Enable cross zone load balancing
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+          # Set to Network ELB for AWS
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      nodePortBase: 30000
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+      kubernetesResourceSpec:
+        serviceAnnotations:
+          # Ensure mission apps have internal load balancer only
+          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+          # Enable cross zone load balancing
+          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+          # Set to Network ELB for AWS
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      nodePortBase: 30100
   values:
     values:
       global: 
@@ -96,8 +119,6 @@ tempo:
 
 monitoring:
   values:
-    vault:
-      enabled: false
     prometheus:
       prometheusSpec:
         resources:
