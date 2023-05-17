@@ -1580,7 +1580,7 @@ get_gateways(){
 
 get_virtualservices(){
   echo -e "\e[0Ksection_start:`date +%s`:virtual_services[collapsed=true]\r\e[0K\e[33;1mVirtual Services\e[37m"
-  kubectl get vs -A || true
+  kubectl get virtualservices -A || true
   echo -e "\e[0Ksection_end:`date +%s`:virtual_services\r\e[0K"
 }
 
