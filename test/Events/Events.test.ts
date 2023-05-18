@@ -1,4 +1,4 @@
-import {emitter, on, parseGitHubEventName, onIssueCommentCreated, onPullRequestClosed, onPullRequestOpened} from '../../src/Events/eventManager'
+import {emitter, parseGitHubEventName, onGitHubEvent } from '../../src/Events/eventManager'
 
 
 describe('Parse GitHub EventName', () => {
@@ -38,40 +38,8 @@ describe('Event Emmiter Tests', () => {
     const callback = (context: string) => {
         arrayCheck.push(context)
     }
-    onIssueCommentCreated(callback)
+    onGitHubEvent("issue_comment.created" ,callback)
     emitter.emit("issue_comment.created", "testContext")
     expect(arrayCheck).toStrictEqual(["testContext"])
   })
-
-  it('Test onPullRequestOpened', () => {
-    const arrayCheck: string[] = []
-    const callback = (context: string) => {
-        arrayCheck.push(context)
-    }
-    onPullRequestOpened(callback)
-    emitter.emit("pull_request.opened", "testContext")
-    expect(arrayCheck).toStrictEqual(["testContext"])
-  })
-
-  it('Test onPullRequestClosed', () => {
-    const arrayCheck: string[] = []
-    const callback = (context: string) => {
-        arrayCheck.push(context)
-    }
-    onPullRequestClosed(callback)
-    emitter.emit("pull_request.closed", "testContext")
-    expect(arrayCheck).toStrictEqual(["testContext"])
-  })
-
-  // test generic on function
-  it('Test on', () => {
-    const arrayCheck: string[] = []
-    const callback = (context: string) => {
-        arrayCheck.push(context)
-    }
-    on("testOnFunction", callback)
-    emitter.emit("testOnFunction", "testContext")
-    expect(arrayCheck).toStrictEqual(["testContext"])
-  })
-
 })
