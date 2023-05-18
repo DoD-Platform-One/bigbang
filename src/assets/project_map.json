@@ -2,6 +2,7 @@
     "Projects": {
         "bigbang":{
             "gitlab": {
+                "default_branch": "main",
                 "id": 2782,
                 "url": "blah.com",
                 "requests": {

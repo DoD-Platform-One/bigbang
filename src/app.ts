@@ -4,6 +4,9 @@ import adminRouter from './routes/admin';
 import fs from 'fs'
 import path from 'path'
 
+import {emitter} from './events/eventManager'
+import "./events/pullRequest"
+
 // App
 const app = express();
 
@@ -26,7 +29,14 @@ app.use(validatePayload)
 //Validate payload middleware
 
 app.post('/Repo_Sync', (req,res) => {
-  console.log(req.body);
+  // github resource . req.body.action
+  const event = req.headers['x-github-event']
+  const action = req.body.action
+  console.log(`${event}.${action}`);
+  
+  // pre build job / setup octokit (Github Easy API button)
+  // create a conteaxt object {payload: req.body, octokit: octokit}
+  emitter.emit(`${event}.${action}`, req.body)
   
   res.send("Hello Repo Sync")
 })
