@@ -233,10 +233,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | loki.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | loki.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/loki.git"` |  |
 | loki.git.path | string | `"./chart"` |  |
-| loki.git.tag | string | `"5.0.0-bb.3"` |  |
+| loki.git.tag | string | `"5.0.0-bb.4"` |  |
 | loki.helmRepo.repoName | string | `"registry1"` |  |
 | loki.helmRepo.chartName | string | `"loki"` |  |
-| loki.helmRepo.tag | string | `"5.0.0-bb.3"` |  |
+| loki.helmRepo.tag | string | `"5.0.0-bb.4"` |  |
 | loki.flux | object | `{}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
 | loki.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
@@ -266,10 +266,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | tempo.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | tempo.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/tempo.git"` |  |
 | tempo.git.path | string | `"./chart"` |  |
-| tempo.git.tag | string | `"1.2.0-bb.0"` |  |
+| tempo.git.tag | string | `"1.2.0-bb.1"` |  |
 | tempo.helmRepo.repoName | string | `"registry1"` |  |
 | tempo.helmRepo.chartName | string | `"tempo"` |  |
-| tempo.helmRepo.tag | string | `"1.2.0-bb.0"` |  |
+| tempo.helmRepo.tag | string | `"1.2.0-bb.1"` |  |
 | tempo.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | tempo.flux | object | `{}` | Flux reconciliation overrides specifically for the Tempo Package |
 | tempo.sso.enabled | bool | `false` | Toggle SSO for Tempo on and off |
@@ -287,10 +287,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | monitoring.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"43.1.2-bb.5"` |  |
+| monitoring.git.tag | string | `"45.27.2-bb.1"` |  |
 | monitoring.helmRepo.repoName | string | `"registry1"` |  |
 | monitoring.helmRepo.chartName | string | `"monitoring"` |  |
-| monitoring.helmRepo.tag | string | `"43.1.2-bb.5"` |  |
+| monitoring.helmRepo.tag | string | `"45.27.2-bb.1"` |  |
 | monitoring.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
