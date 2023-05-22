@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/loki/values.yaml") . | sha256sum }}
 spec:
   releaseName: {{ default "logging-loki" .Values.loki.releaseName }}
   targetNamespace: logging

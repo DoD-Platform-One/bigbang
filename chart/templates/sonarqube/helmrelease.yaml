@@ -9,7 +9,8 @@ metadata:
     app.kubernetes.io/name: sonarqube
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/sonarqube/values.yaml") . | sha256sum }}
 spec:
   releaseName: sonarqube
   targetNamespace: sonarqube

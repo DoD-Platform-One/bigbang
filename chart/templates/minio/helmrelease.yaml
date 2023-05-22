@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: minio
   namespace: {{ .Release.Namespace }}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: minio
   chart:

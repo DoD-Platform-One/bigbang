@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/name: vault
     app.kubernetes.io/component: "security-tools"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/vault/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: vault
   chart:

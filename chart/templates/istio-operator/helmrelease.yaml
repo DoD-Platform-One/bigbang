@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: istio-operator
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: istio-operator
   chart:

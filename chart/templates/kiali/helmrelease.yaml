@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: kiali
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/kiali/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kiali
   chart:

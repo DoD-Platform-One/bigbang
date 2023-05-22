@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: tempo
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/tempo/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: tempo
   chart:

@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: kyverno
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/kyverno/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kyverno
   chart:
