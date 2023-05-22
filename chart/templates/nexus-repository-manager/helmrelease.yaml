@@ -11,6 +11,8 @@ metadata:
     app.kubernetes.io/name: "nexus-repository-manager"
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/nexus-repository-manager/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: nexus-repository-manager
   releaseName: nexus-repository-manager

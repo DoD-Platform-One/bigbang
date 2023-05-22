@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/name: haproxy
     app.kubernetes.io/component: "developer-tools"
   {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/haproxy/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: authservice
   chart:

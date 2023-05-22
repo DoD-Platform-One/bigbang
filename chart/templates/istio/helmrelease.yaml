@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: istio-controlplane
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: istio-system
   chart:

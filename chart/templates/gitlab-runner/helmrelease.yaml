@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: gitlab-runner
   namespace: {{ .Release.Namespace }}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/gitlab-runner/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: gitlab-runner
   releaseName: gitlab-runner

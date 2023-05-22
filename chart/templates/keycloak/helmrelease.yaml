@@ -11,6 +11,8 @@ metadata:
     app.kubernetes.io/name: {{ $name }}
     app.kubernetes.io/component: {{ $component }}
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/keycloak/values.yaml") . | sha256sum }}
 spec:
   releaseName: {{ $name }}
   targetNamespace: {{ $name }}

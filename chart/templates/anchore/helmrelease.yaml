@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: anchore
   namespace: {{ .Release.Namespace }}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/anchore/values.yaml") . | sha256sum }}
 spec:
   releaseName: anchore
   targetNamespace: anchore

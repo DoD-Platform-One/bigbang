@@ -1787,6 +1787,11 @@ packages:
     # @default -- true
     enabled: false
 
+    # -- Toggle wrapper functionality. See https://docs-bigbang.dso.mil/latest/docs/guides/deployment-scenarios/extra-package-deployment/#Wrapper-Deployment for more details.
+    # @default -- false
+    wrapper:
+      enabled: false
+
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
 

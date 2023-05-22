@@ -12,6 +12,8 @@ metadata:
     app.kubernetes.io/name: metrics-server
     app.kubernetes.io/component: "cluster-utilities"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/metrics-server/values.yaml") . | sha256sum }}
 spec:
   releaseName: metrics-server
   targetNamespace: metrics-server

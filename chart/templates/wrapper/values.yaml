@@ -15,8 +15,8 @@ stringData:
     {{- $merged := merge $overlays $defaults }}
     package:
       name: {{ $pkg }}
-      {{- if (omit $merged.package "git" "flux" "postRenderers") }}
-      {{- tpl (toYaml (omit $merged.package "git" "flux" "postRenderers")) $ | nindent 6 }}
+      {{- if (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn") }}
+      {{- tpl (toYaml (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn")) $ | nindent 6 }}
       {{- end }}
     bigbang:
       {{- toYaml (pick $merged.bigbang "domain" "openshift") | nindent 6 -}}

@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: twistlock
     app.kubernetes.io/component: "security"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/twistlock/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: twistlock
   chart:

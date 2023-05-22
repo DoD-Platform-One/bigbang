@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/name: neuvector
     app.kubernetes.io/component: "sandbox"
     {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/neuvector/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: neuvector
   chart:
