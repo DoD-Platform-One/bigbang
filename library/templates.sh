@@ -460,6 +460,11 @@ clone_bigbang_and_merge_templates() {
    package=$(yq e '. | keys | .[0]' ../bigbang/values.yaml)
    if [[ $(yq ".${package}.git | has(\"tag\")" ../bigbang/values.yaml) == "true" ]]; then
      yq e -i "del(.${package}.git.tag)" ../bigbang/values.yaml
+     # Add root value to schema 
+     jq '.required += ["'$package'"]' chart/values.schema.json > chart/values.schema.json.1
+     mv chart/values.schema.json.1 chart/values.schema.json
+     jq '.properties += {"'$package'": { "type": "object"}}' chart/values.schema.json > chart/values.schema.json.1
+     mv chart/values.schema.json.1 chart/values.schema.json
    fi
 
    if [[ ! -z ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ]]; then
