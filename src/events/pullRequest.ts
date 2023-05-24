@@ -6,7 +6,7 @@ import {signPayloadJWT} from '../appcrypto'
 import dotenv from 'dotenv'
 dotenv.config();
   
-onGitHubEvent('pull_request.opened', async (payload) => {
+onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
         const PRNumber = payload.pull_request.number
         // if(context.isBot){
         //   return
@@ -97,7 +97,7 @@ onGitHubEvent('pull_request.opened', async (payload) => {
             permissions:{issues:"write", pull_requests: "write"}})
 
         const installationId = payload.installation.id
-        const jwt = await signPayloadJWT()
+        const jwt = await signPayloadJWT(appID)
         // --header "Accept: application/vnd.github+json"
         const access_token_request = await axios.post(
             `https://api.github.com/app/installations/${installationId}/access_tokens`, 

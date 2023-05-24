@@ -32,11 +32,12 @@ app.post('/Repo_Sync', (req,res) => {
   // github resource . req.body.action
   const event = req.headers['x-github-event']
   const action = req.body.action
+  const appID = req.headers['X-GitHub-Hook-Installation-Target-ID']
   console.log(`${event}.${action}`);
   
   // pre build job / setup octokit (Github Easy API button)
   // create a conteaxt object {payload: req.body, octokit: octokit}
-  emitter.emit(`${event}.${action}`, req.body)
+  emitter.emit(`${event}.${action}`, {payload:req.body, appID:appID})
   
   res.send("Hello Repo Sync")
 })

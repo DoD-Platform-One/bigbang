@@ -16,15 +16,20 @@ export const parseGitHubEventName = (headers: Record<string, string>, action: st
 
 type GitHubEvents = "pull_request.opened" | "pull_request.closed" | "issue_comment.created" | "issue_comment.edited" | "issue_comment.deleted";
 type GitLabEvents = "merge_request.opened" | "merge_request.closed" | "issue_comment.created";
+interface IContext{
+    appID:string,
+    payload:any
+}
 
-export const onGitHubEvent = (event: GitHubEvents, callback: (context: any) => void) => {
+
+export const onGitHubEvent = (event: GitHubEvents, callback: (context: IContext) => void) => {
     emitter.on(event, callback);
 }
 
-export const OnGitlabEvent = (event: GitLabEvents, callback: (context: any) => void) => {
+export const OnGitlabEvent = (event: GitLabEvents, callback: (context: IContext) => void) => {
     emitter.on(event, callback);
 }
 
-export const emitGitHubEvent = (event: string, context: any) => {
+export const emitGitHubEvent = (event: string, context: IContext) => {
     emitter.emit(event, context);
 }
