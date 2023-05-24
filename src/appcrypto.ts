@@ -17,10 +17,9 @@ const gitHubSecret = process.env.GITHUB_WEBHOOK_SECRET ?? "";
 const gitLabSecret = process.env.GITLAB_WEBHOOK_SECRET ?? "";
 const adminDefaultSecret = ""
 const adminSecret = process.env.ADMIN_TOKEN ?? adminDefaultSecret;
-const appId = process.env.APP_ID ?? "";
 
 
-export const signPayloadJWT = () => {
+export const signPayloadJWT = (appId:string) => {
   
   const payload = {
     // Issued at time
