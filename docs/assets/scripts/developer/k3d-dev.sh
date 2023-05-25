@@ -1,9 +1,19 @@
 #!/bin/bash
 
-K3D_VERSION="5.4.9"
+K3D_VERSION="5.5.1"
 
 function run() {
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "$@"
+}
+
+function runwithexitcode() {
+  ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "$@"
+  exitcode=$?
+  [ $exitcode -eq 0 ]
+}
+
+function runwithreturn() {
+  echo $(ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "$@")
 }
 
 function getPrivateIP2() {
@@ -499,25 +509,17 @@ EOF
   # Add your base user to the Docker group so that you do not need sudo to run docker commands
   run "sudo usermod -aG docker ubuntu"
   echo
-
-  # install kubectl
-  echo Installing kubectl...
-  run 'curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
-  run 'sudo mv /home/ubuntu/kubectl /usr/local/bin/'
-  run 'sudo chmod +x /usr/local/bin/kubectl'
-
-  echo
-  echo
-  # install k3d on instance
-  echo "Installing k3d on instance"
-  run "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v${K3D_VERSION} bash"
-  echo
-  echo "k3d version"
-  run "k3d version"
-  echo
-
-  echo "creating k3d cluster"
 fi
+
+# install k3d on instance
+echo "Installing k3d on instance"
+run "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v${K3D_VERSION} bash"
+echo
+echo "k3d version"
+run "k3d version"
+echo
+
+echo "creating k3d cluster"
 
 # Shared k3d settings across all options
 # 1 server, 3 agents
@@ -559,8 +561,25 @@ fi
 # Create k3d cluster
 echo "Creating k3d cluster with command: ${k3d_command}"
 run "${k3d_command}"
+
+# install kubectl
+echo Installing kubectl based on k8s version...
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+if [[ ! -z "$K3S_IMAGE_TAG" ]]; then
+  KUBECTL_VERSION=$(echo $K3S_IMAGE_TAG | cut -d'-' -f1)
+  echo "Using specified kubectl version $KUBECTL_VERSION based on k3s image tag."
+else
+  KUBECTL_VERSION=$(runwithreturn "k3d version -o json" | jq -r '.k3s' | cut -d'-' -f1)
+  echo "Using k3d default k8s version $KUBECTL_VERSION."
+fi
+KUBECTL_CHECKSUM=`curl -sL https://dl.k8s.io/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256`
+run "curl -LO https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+runwithexitcode "echo ${KUBECTL_CHECKSUM}  kubectl | sha256sum --check" && echo "Good checksum" || { echo "Bad checksum" ; exit 1; }
+run 'sudo mv /home/ubuntu/kubectl /usr/local/bin/'
+run 'sudo chmod +x /usr/local/bin/kubectl'
+
 run "kubectl config use-context k3d-k3s-default"
-run "kubectl cluster-info"
+run "kubectl cluster-info && kubectl get nodes"
 
 echo "copying kubeconfig to workstation..."
 scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
