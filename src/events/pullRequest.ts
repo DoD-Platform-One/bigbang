@@ -4,13 +4,11 @@ import axios from 'axios'
 import {signPayloadJWT} from '../appcrypto'
 
 import dotenv from 'dotenv'
+import { UpdateConfigMapping } from '../assets/projectMap'
 dotenv.config();
   
 onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
         const PRNumber = payload.pull_request.number
-        // if(context.isBot){
-        //   return
-        // }
         
         // repo one bot steps
         const github_url = payload.repository.clone_url
@@ -46,12 +44,8 @@ onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
         execSync(`git config --global core.askPass ${process.env.GITLAB_PASSWORD}`)
         execSync(`git config --global credential.helper cache`) 
 
-        
-
         execSync(`git push mirror PR-${PRNumber}`, execOptions)
         
-
-
         // clean up tmp/repo name folder
         execSync(`rm -rf ${currentWorkingDirectory}`)
 
@@ -119,20 +113,17 @@ onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
 
         console.log(`comment posted to github PR ${payload.pull_request.comments_url}`);
         
-
-        // get Repo 1 pipeline URL
-        //console.log(`fetching pipeline for Project ${ProjectID}`)
-        //const response = await axios.get(`https://repo1.dso.mil/api/v4/projects/${ProjectID}/repository/commits/PR-${PRNumber}`)
-        
-        //console.log(response.data.last_pipeline.web_url);
-        
-        // // console.log(response)
-        // let issueComment = undefined
-        // if(response.data.last_pipeline){
-        //   issueComment = context.issue({ body: response.data.last_pipeline.web_url })
-        // }else{
-        //   issueComment = context.issue({ body: "There was an error retrieving the pipeline" })
-        // }
-        
-        // context.octokit.issues.createComment(issueComment)
+        // update config mapping for new MR and PR relationship 
+        UpdateConfigMapping({
+            projectName: payload.repository.name,
+            gitHubDefaultBranch: payload.repository.default_branch,
+            gitHubIssueNumber: payload.number,
+            gitHubProjectId: payload.repository.id,
+            gitHubProjectUrl: payload.repository.url,
+            // gitlab v
+            gitLabMergeRequestNumber: response.data.iid,
+            gitLabProjectId: ProjectID,
+            gitLabProjectUrl: repo1Project.data.web_url,
+            gitLabDefaultBranch: defaultBranchName
+        })
     })

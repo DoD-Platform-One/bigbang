@@ -32,7 +32,7 @@ app.post('/Repo_Sync', (req,res) => {
   // github resource . req.body.action
   const event = req.headers['x-github-event']
   const action = req.body.action
-  const appID = req.headers['X-GitHub-Hook-Installation-Target-ID']
+  const appID = req.headers['x-github-hook-installation-target-id']
   console.log(`${event}.${action}`);
   
   // pre build job / setup octokit (Github Easy API button)
