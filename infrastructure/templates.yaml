@@ -40,7 +40,7 @@ include:
 #-----------------------------------------------------------------------------------------------------------------------
 .terraformer:
   image:
-    name: registry1.dso.mil/bigbang-ci/terraform:0.13.5
+    name: registry1.dso.mil/bigbang-ci/terraform:1.4.6
     entrypoint:
       - /usr/bin/env
       - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
