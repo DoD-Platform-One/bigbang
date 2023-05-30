@@ -321,7 +321,7 @@ gatekeeper:
 
 kyverno:
   values:
-    replicaCount: 1
+    replicaCount: 3
     bbtests:
       enabled: true
 
