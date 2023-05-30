@@ -165,6 +165,9 @@ kiali:
 loki:
   enabled: {{ .Values.loki.enabled }}
 
+tempo:
+  enabled: {{ .Values.tempo.enabled }}
+
 {{- if or $gitlabRedis $authserviceRedisEnabled $redisDatasource }}
 redis:
   enabled: true
