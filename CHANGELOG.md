@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.7.9]
+### Changed
+- Updated bb-ci image to latest version `2.7.7`
+
 ## [2.7.8]
 ### Changed
 - Upgrade VPC module in nightly scheduled AWS network up stage
