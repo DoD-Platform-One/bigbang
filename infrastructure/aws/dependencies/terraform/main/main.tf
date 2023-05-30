@@ -39,7 +39,7 @@ locals {
 #
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = "2.78.0"
+  version = "5.0.0"
 
   name = local.name
   cidr = var.vpc_cidr
@@ -53,34 +53,6 @@ module "vpc" {
   single_nat_gateway   = true
   enable_dns_hostnames = true
   enable_dns_support   = true
-
-  # Use AWS VPC private endpoints to mirror functionality on airgapped (T)C2S environments
-  #   S3: for some vendors cluster bootstrapping/artifact storage
-  #   STS: for caller identity checks
-  #   EC2: for cloud manager type requests (such as auto ebs provisioning)
-  #   ASG: for cluster autoscaler
-  #   ELB: for auto elb provisioning
-  enable_s3_endpoint                   = true
-  enable_sts_endpoint                  = true
-  enable_ec2_endpoint                  = true
-  enable_ec2_autoscaling_endpoint      = true
-  enable_elasticloadbalancing_endpoint = true
-
-  ec2_endpoint_security_group_ids  = [aws_security_group.endpoints.id]
-  ec2_endpoint_subnet_ids          = module.vpc.intra_subnets
-  ec2_endpoint_private_dns_enabled = true
-
-  ec2_autoscaling_endpoint_security_group_ids  = [aws_security_group.endpoints.id]
-  ec2_autoscaling_endpoint_subnet_ids          = module.vpc.intra_subnets
-  ec2_autoscaling_endpoint_private_dns_enabled = true
-
-  elasticloadbalancing_endpoint_security_group_ids  = [aws_security_group.endpoints.id]
-  elasticloadbalancing_endpoint_subnet_ids          = module.vpc.intra_subnets
-  elasticloadbalancing_endpoint_private_dns_enabled = true
-
-  sts_endpoint_security_group_ids  = [aws_security_group.endpoints.id]
-  sts_endpoint_subnet_ids          = module.vpc.intra_subnets
-  sts_endpoint_private_dns_enabled = true
 
   # Prevent creation of EIPs for NAT gateways
   reuse_nat_ips = false
@@ -103,6 +75,52 @@ module "vpc" {
   tags = merge({
     "kubernetes.io/cluster/${local.name}" = "shared"
   }, local.tags)
+}
+
+module "endpoints" {
+  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+
+  vpc_id             = module.vpc.vpc_id
+  security_group_ids = [aws_security_group.endpoints.id]
+
+  # Use AWS VPC private endpoints to mirror functionality on airgapped (T)C2S environments
+  #   S3: for some vendors cluster bootstrapping/artifact storage
+  #   STS: for caller identity checks
+  #   EC2: for cloud manager type requests (such as auto ebs provisioning)
+  #   ASG: for cluster autoscaler
+  #   ELB: for auto elb provisioning
+
+  endpoints = {
+    s3 = {
+      # interface endpoint
+      service             = "s3"
+    },
+    ec2 = {
+      service             = "ec2"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.intra_subnets
+      security_group_ids  = [aws_security_group.endpoints.id]
+    },
+    sts = {
+      service             = "sts"
+      private_dns_enabled = "true"
+      subnet_ids          = module.vpc.intra_subnets
+      security_group_ids  = [aws_security_group.endpoints.id]
+    }
+    autoscaling = {
+      service             = "autoscaling"
+      private_dns_enabled = "true"
+      subnet_ids          = module.vpc.intra_subnets
+      security_group_ids  = [aws_security_group.endpoints.id]      
+    }
+    elasticloadbalancing = {
+      service             = "elasticloadbalancing"
+      private_dns_enabled = "true"
+      subnet_ids          = module.vpc.intra_subnets
+      security_group_ids  = [aws_security_group.endpoints.id]
+    }
+  }
+
 }
 
 # Shared Private Endpoint Security Group
