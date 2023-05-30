@@ -7,7 +7,7 @@ include:
 
 # Single place to update image used for pipelines
 .util-image:
-  image: registry1.dso.mil/bigbang-ci/bb-ci:2.5.3
+  image: registry1.dso.mil/bigbang-ci/bb-ci:2.7.7
 
 # Runner tags
 .bigbang-runner-tags:
