@@ -1,0 +1,9 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: 'repo_sync'
+    file: '/pipelines/repo-sync.yaml' 
+variables:
+  PIPELINE_REPO_BRANCH: 'repo_sync'
+  DEBUG_ENABLED: "true"
+  MULTI_NODE: "true"
+  PORT: 8080
