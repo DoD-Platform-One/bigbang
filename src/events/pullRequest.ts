@@ -1,7 +1,7 @@
 import { execSync } from 'child_process'
 import {onGitHubEvent} from './eventManager'
 import axios from 'axios'
-import {signPayloadJWT} from '../appcrypto'
+import {getGitHubAppAccessToken} from '../appcrypto'
 
 import dotenv from 'dotenv'
 import { UpdateConfigMapping } from '../assets/projectMap'
@@ -9,14 +9,13 @@ dotenv.config();
   
 onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
         const PRNumber = payload.pull_request.number
-        
         // repo one bot steps
         const github_url = payload.repository.clone_url
         
         // TODO Figure out how to get repo 1 git url
         const repo_1_url = payload.repository.homepage
         
-        const currentWorkingDirectory = `../tmp/${payload.repository.name}`
+        const currentWorkingDirectory = `./tmp/${payload.repository.name}`
         const execOptions = {cwd: currentWorkingDirectory}
 
         // clone github repo
@@ -83,33 +82,18 @@ onGitHubEvent('pull_request.opened', async ({payload, appID}) => {
 
         console.log(response.data.web_url)
 
+        //update mapping here
         // i need an app installation access token for creating a comment on a pull request
         // body that defines the scope of the access token
         // TODO make the access token process a function
-        const access_token_request_body = JSON.stringify({
-            repository: payload.repository.name,
-            permissions:{issues:"write", pull_requests: "write"}})
-
-        const installationId = payload.installation.id
-        const jwt = await signPayloadJWT(appID)
-        // --header "Accept: application/vnd.github+json"
-        const access_token_request = await axios.post(
-            `https://api.github.com/app/installations/${installationId}/access_tokens`, 
-            access_token_request_body, 
-            {
-                headers : {Authorization : `Bearer ${jwt}`,
-                            Accept : "application/vnd.github+json"
-                        }
-            })
+        const access_token = await getGitHubAppAccessToken(appID, payload.repository.name, payload.installation.id)
         
         const comment = "Merge Request Created: " + response.data.web_url
         const body = {
             "body": comment
         }
-        // generate jwt token for comment
-        // send comment to github pr request
         
-        await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${access_token_request.data.token}`}});
+        await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${access_token}`}});
 
         console.log(`comment posted to github PR ${payload.pull_request.comments_url}`);
         
