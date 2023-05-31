@@ -1,4 +1,5 @@
-import {emitter, parseGitHubEventName, onGitHubEvent } from '../../src/Events/eventManager'
+import {emitter, parseGitHubEventName, onGitHubEvent, IContext } from '../../src/Events/eventManager'
+
 
 
 describe('Parse GitHub EventName', () => {
@@ -35,11 +36,16 @@ describe('Event Emmiter Tests', () => {
 
   it('Test onIssueCommentCreated', () => {
     const arrayCheck: string[] = []
-    const callback = (context: string) => {
-        arrayCheck.push(context)
+    // make a callback of type IContext
+    const callback = (context: IContext) => {
+        arrayCheck.push(context.payload)
     }
+
+    // const callback = ({: string, }) => {
+    //     arrayCheck.push(context)
+    // }
     onGitHubEvent("issue_comment.created" ,callback)
-    emitter.emit("issue_comment.created", "testContext")
+    emitter.emit("issue_comment.created", {payload: "testContext"})
     expect(arrayCheck).toStrictEqual(["testContext"])
   })
 })

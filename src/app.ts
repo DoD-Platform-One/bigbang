@@ -43,7 +43,7 @@ app.post('/Repo_Sync', (req,res) => {
   res.send("Hello Repo Sync")
 })
 
-app.post('/record', (req, res) => {
+app.post('/record', (req) => {
   const filename = `${req.headers['x-github-event']}.${req.body.action}.json`
   // make a path to the root director of the project and then add the path to the test/fixtures folder
   const filepath = path.join(__dirname, '..', 'test', 'fixtures', filename)

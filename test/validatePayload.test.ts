@@ -30,20 +30,20 @@ describe('auth failure', () => {
 
 describe('auth success', () => {
 
-  const github_secret = process.env.GITHUB_WEBHOOK_SECRET ?? "test";
-  const gitlab_token = process.env.GITLAB_WEBHOOK_SECRET ?? "test";
+  const githubSecret = process.env.GITHUB_WEBHOOK_SECRET ?? "test";
+  const gitlabToken = process.env.GITLAB_WEBHOOK_SECRET ?? "test";
 
-  var jsonstring = JSON.parse(fs.readFileSync('./test/fixtures/object.json', 'utf-8'))
-  var issuecreated = JSON.stringify(jsonstring)
+  const jsonstring = JSON.parse(fs.readFileSync('./test/fixtures/object.json', 'utf-8'))
+  const issuecreated = JSON.stringify(jsonstring)
 
-  const hmac = crypto.createHmac('SHA256', github_secret)
+  const hmac = crypto.createHmac('SHA256', githubSecret)
   const signatureComputed = Buffer.from("sha256=" + hmac.update(issuecreated).digest('hex'), 'utf8')
   // const hmac = crypto.createHmac('SHA256', github_secret)
   // const signatureComputed = Buffer.from("" + hmac.update(jsonbody).digest('hex'), 'utf8')
 
   it ('GITHUB: SHA256', () => {
     const github_computed_sha = "sha256=61c73ef7677a402b5942e66ed7985b03efc1fd2219767badb1d8aca47fb79857"
-    expect(github_secret).toBe('1234567890')
+    expect(githubSecret).toBe('1234567890')
     expect(signatureComputed.toString()).toBe(github_computed_sha)
   })
 
@@ -59,7 +59,7 @@ describe('auth success', () => {
     request(app)
     .post(`/test`)
     .set('Content-type', 'application/json')
-    .set(gitlabTokenHeaderName, gitlab_token)
+    .set(gitlabTokenHeaderName, gitlabToken)
     .expect(200, done)
   })
 })

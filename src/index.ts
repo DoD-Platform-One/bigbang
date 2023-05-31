@@ -11,5 +11,5 @@ export const handler = serverless(app)
 
 if (serverType == "express"){
     console.log("starting application to listen on port: " + port);
-    app.listen(port, () => {})
+    app.listen(port)
 }
