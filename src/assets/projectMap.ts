@@ -80,10 +80,14 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
 
 
 // NOTE: Add a function that gets the respective merge request or issue number from the mapping
-export const GetDownstreamRequestNumber = (projectName: string, issueNumber: number) => {
+export const GetUpstreamRequestNumber = (projectName: string, issueNumber: number) => {
     return mapping[projectName].github.requests[issueNumber]
 }
 
-export const GetUpstreamRequestNumber = (projectName: string, mergeRequestNumber: number) => {
+export const GetDownstreamRequestNumber = (projectName: string, mergeRequestNumber: number) => {
     return mapping[projectName].gitlab.requests[mergeRequestNumber]
+}
+
+export const GetMapping = () => {
+    return mapping
 }

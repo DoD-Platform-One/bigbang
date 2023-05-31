@@ -6,6 +6,7 @@ import path from 'path'
 
 import {emitter} from './events/eventManager'
 import "./events/pullRequest"
+import "./events/comment"
 
 // App
 const app = express();
