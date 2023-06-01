@@ -11,7 +11,11 @@ export const githubSigHeaderName = "X-Hub-Signature-256";
 export const gitlabTokenHeaderName = "X-Gitlab-Token";
 export const adminTokenHeaderName = "X-Admin-Token";
 
-const privateKey = fs.readFileSync("privatekey.pem");
+let privateKey: string | Buffer = "";
+// check if privatekey.pem exists
+if (fs.existsSync("privatekey.pem")) {
+ privateKey = fs.readFileSync("privatekey.pem");
+}
 
 const sigPrefix = "sha256="; //set this to your signature prefix if any
 const gitHubSecret = process.env.GITHUB_WEBHOOK_SECRET ?? "";
