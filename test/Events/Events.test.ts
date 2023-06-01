@@ -1,4 +1,4 @@
-import {emitter, parseGitHubEventName, onGitHubEvent, IContext } from '../../src/Events/eventManager'
+import {emitter, parseGitHubEventName, onGitHubEvent, IContext } from '../../src/events/eventManager'
 
 
 
