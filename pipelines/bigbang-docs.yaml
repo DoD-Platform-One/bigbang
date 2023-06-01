@@ -10,7 +10,7 @@ include:
   - local: '/library/templates.yaml'
 
 before_script:
-  - poetry install --no-dev
+  - poetry install --only main
   - npm install --global prettier
   - npm ci
 
@@ -35,7 +35,7 @@ bb-docs:on-schedule-tag:
     - cd scheduled-build
     - git checkout docs
     - git checkout main
-    - poetry install --no-dev
+    - poetry install --only main
     - npm ci
     - git config user.email "docs.gen@bigbang.dev"
     - git config user.name "docs.gen"
@@ -80,7 +80,7 @@ bb-docs:on-schedule-latest:
     - cd scheduled-build
     - git checkout docs
     - git checkout main
-    - poetry install --no-dev
+    - poetry install --only main
     - npm ci
     - git config user.email "docs.gen@bigbang.dev"
     - git config user.name "docs.gen"
