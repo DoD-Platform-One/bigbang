@@ -47,7 +47,7 @@ RUN yum -y install git docker-ce-cli unzip jq bind-utils findutils python39 pyth
 RUN pip3 install boto3==1.21.14 requests==2.27.1 urllib3==1.26.5 jsonschema==4.0.0
 
 # Install Poetry
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.1.13 python3 -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.5.1 python3 -
 RUN ln -s /root/.local/bin/poetry /usr/bin/poetry
 RUN poetry config virtualenvs.in-project true
 
