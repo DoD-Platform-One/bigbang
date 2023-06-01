@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.8.2]
+### Changed
+- Removed deprecated poetry `--no-dev` flag, and replaced with `--only main`.
+
+
 ## [2.8.1]
 ### Changed
 - Updated poetry to `1.5.1` to fix dependency issue discovered in [pipeline-templates#137](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/issues/137).
