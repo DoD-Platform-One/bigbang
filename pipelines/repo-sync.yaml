@@ -1,0 +1,25 @@
+image: registry1.dso.mil/ironbank/opensource/nodejs/nodejs18:18.16.0-slim
+
+variables:
+  PORT: 8080
+
+include:
+  - local: '/library/templates.yaml'
+
+stages:
+  - test
+  - lint
+
+before_script:
+  # set script shell to default
+  - rm ./.npmrc
+  - npm config list
+  - npm install
+
+npm-lint:
+  script:
+    - npm run lint
+
+npm-test:
+  script:
+    - npm run test
