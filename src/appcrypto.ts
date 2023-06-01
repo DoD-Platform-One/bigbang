@@ -58,7 +58,7 @@ export const getGitHubAppAccessToken = async (
   return access_token_request.data.token;
 };
 
-export const processWebHookSignature = function (body: any, signature: any) {
+export const processWebHookSignature = function (body: string, signature: string) {
   const hmac = crypto.createHmac("SHA256", gitHubSecret);
   const signatureComputed = Buffer.from(
     sigPrefix + hmac.update(body).digest("hex"),

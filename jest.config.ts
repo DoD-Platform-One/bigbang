@@ -1,4 +1,4 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
 import type {Config} from '@jest/types';
 
 dotenv.config({

@@ -1,4 +1,4 @@
-import {onGitHubEvent, OnGitlabEvent} from './eventManager'
+import {onGitHubEvent} from './eventManager'
 import { GetMapping, GetUpstreamRequestNumber } from '../assets/projectMap';
 import axios from 'axios';
 import dotenv from 'dotenv';
@@ -54,5 +54,5 @@ await axios.post(payload.comment.url + "/reactions", body, {headers : {"Authoriz
 // GITLAB / REPO1
 ///////////////////////////////
 
-OnGitlabEvent('issue_comment.created', async (payload) => {
-})
+// OnGitlabEvent('issue_comment.created', async (payload) => {
+// })

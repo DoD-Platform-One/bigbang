@@ -16,9 +16,10 @@ export const parseGitHubEventName = (headers: Record<string, string>, action: st
 
 type GitHubEvents = "pull_request.opened" | "pull_request.closed" | "issue_comment.created" | "issue_comment.edited" | "issue_comment.deleted";
 type GitLabEvents = "merge_request.opened" | "merge_request.closed" | "issue_comment.created";
-interface IContext{
+export interface IContext{
     appID:string,
-    payload:any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    payload: any
 }
 
 

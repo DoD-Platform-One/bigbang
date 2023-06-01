@@ -4,7 +4,7 @@ import adminRouter from './routes/admin';
 import fs from 'fs'
 import path from 'path'
 
-import {emitter} from './events/eventManager'
+import {emitGitHubEvent} from './events/eventManager'
 import "./events/pullRequest"
 import "./events/comment"
 
@@ -33,17 +33,17 @@ app.post('/Repo_Sync', (req,res) => {
   // github resource . req.body.action
   const event = req.headers['x-github-event']
   const action = req.body.action
-  const appID = req.headers['x-github-hook-installation-target-id']
+  const appID = req.headers['x-github-hook-installation-target-id'] as string
   console.log(`${event}.${action}`);
   
   // pre build job / setup octokit (Github Easy API button)
   // create a conteaxt object {payload: req.body, octokit: octokit}
-  emitter.emit(`${event}.${action}`, {payload:req.body, appID:appID})
+  emitGitHubEvent(`${event}.${action}`, {payload:req.body, appID: appID})
   
   res.send("Hello Repo Sync")
 })
 
-app.post('/record', (req, res) => {
+app.post('/record', (req) => {
   const filename = `${req.headers['x-github-event']}.${req.body.action}.json`
   // make a path to the root director of the project and then add the path to the test/fixtures folder
   const filepath = path.join(__dirname, '..', 'test', 'fixtures', filename)
