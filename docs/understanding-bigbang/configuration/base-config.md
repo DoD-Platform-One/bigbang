@@ -479,10 +479,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.anchore.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.anchore.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
 | addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"1.24.1-bb.5"` |  |
+| addons.anchore.git.tag | string | `"1.24.1-bb.4"` |  |
 | addons.anchore.helmRepo.repoName | string | `"registry1"` |  |
 | addons.anchore.helmRepo.chartName | string | `"anchore"` |  |
-| addons.anchore.helmRepo.tag | string | `"1.24.1-bb.5"` |  |
+| addons.anchore.helmRepo.tag | string | `"1.24.1-bb.4"` |  |
 | addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchore.enterprise | object | `{"enabled":false,"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
