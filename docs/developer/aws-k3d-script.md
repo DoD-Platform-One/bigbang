@@ -51,6 +51,7 @@ k3d-dev.sh -b -p -m -d -h
  -b   use big M5 instance. Default is t3.2xlarge
  -p   use private IP for security group and k3d cluster
  -m   create k3d cluster with metalLB
+ -a   attach secondary Public IP (overrides -p and -m flags)
  -d   destroy related AWS resources
  -h   output help
 ```
@@ -105,6 +106,10 @@ Overrides can be supplemented by adding references to the specific yaml file, th
 ```shell
 -f ../other-overrides.yaml
 ```
+
+## Testing Keycloak
+
+Refer to this [documentation](package-integration/sso.md#Prerequisites) for various options for testing Keycloak which requires two ingresses on the same EC2 instance.
 
 ## Troubleshooting
 

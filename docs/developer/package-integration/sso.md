@@ -4,7 +4,7 @@ Big Bang has configuration for Single Sign-On (SSO) authentication using an iden
 
 ## Prerequisites
 
-The development environment can be set up in one of two ways: 
+The development environment can be set up in one of three ways: 
 1. Two k3d clusters with keycloak in one cluster and Big Bang and all other apps in the second cluster (see [this quick start guide](../../guides/deployment-scenarios/sso-quickstart.md) for more information)
 2. One k3d cluster using MetalLB to have Keycloak, Big Bang, and all other apps in the one cluster (see [this example config](../../assets/configs/example/keycloak-dev-values.yaml) for more information)
 3. Use a single K3D cluster with two Public IP addresses and the `-a` option on the `k3d-dev.sh` script.  This will provision two Elastic IPs, MetalLB, and two specialized `k3d-proxy` containers for connecting the Elastic IPs to the MetalLB IPs.  This allows for both a Public and Passthrough Istio Gateway to work simultaneously, specifically to allow for x509 mTLS authentication with Keycloak.  Keep in mind that `keycloak.bigbang.dev` will need to point to the Secondary IP in your `/etc/hosts` file.  The `k3d-dev.sh` script will inform you of this and return the SecondaryIP.
