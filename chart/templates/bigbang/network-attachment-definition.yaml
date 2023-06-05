@@ -1,0 +1,7 @@
+{{- if and .Values.istio.enabled .Values.openshift }}
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: istio-cni
+  namespace: {{ .Release.Namespace }}
+{{- end }}
