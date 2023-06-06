@@ -5,9 +5,11 @@ variables:
 # If the bb-bot needs different permissions than renovate, we'll need to generate a token specifically for that function.
 # - @gabe.scarberry
   gitlab_group_id: $BB_BOT_GROUP
+  gitlab_project_id: $BB_PROJECT_ID
   jira_username: $JIRA_USERNAME
   jira_url: $JIRA_URL
   gitlab_url: $GITLAB_URL
+
 
 # workflow:
 #   rules:
