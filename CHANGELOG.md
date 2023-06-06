@@ -1,9 +1,13 @@
 # Changelog
 
 ---
-## [51.0.0-bb.0] - 2023-04-06
+## [53.1.0-bb.0] - 2023-05-22
 ### Changed
-- Updated chart to version: 51.0.0-bb.0 | appVersion: 3.52.0
+- Updated chart to version: 53.1.0-bb.0 | appVersion: 3.53.1
+
+## [52.0.0-bb.0] - 2023-04-06
+### Changed
+- Updated chart to version: 52.0.0-bb.0 | appVersion: 3.52.0
 
 ## [51.0.0-bb.0] - 2023-04-06
 ### Changed
