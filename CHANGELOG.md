@@ -1,6 +1,10 @@
 # Changelog
 
 ---
+## [53.1.0-bb.1] - 2023-06-06
+### Changed
+- Updated crane to v0.15.2
+
 ## [53.1.0-bb.0] - 2023-05-22
 ### Changed
 - Updated chart to version: 53.1.0-bb.0 | appVersion: 3.53.1
