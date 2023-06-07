@@ -121,6 +121,10 @@ gateways:
         {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $index }}-{{ $name }}-cert
         {{- end }}
+        {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
+        {{- if $tlsMinVersion }}
+        minProtocolVersion: {{ $tlsMinVersion }}
+        {{- end }}
       {{- end }}
     {{- else if ($values.ports) }}
     {{- range $values.ports }}
@@ -133,6 +137,10 @@ gateways:
         mode: {{ $tlsMode }}
         {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $name }}-cert
+        {{- end }}
+        {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
+        {{- if $tlsMinVersion }}
+        minProtocolVersion: {{ $tlsMinVersion }}
         {{- end }}
     {{- end }}
     {{- else }}
@@ -147,6 +155,10 @@ gateways:
         mode: {{ $tlsMode }}
         {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
         credentialName: {{ $name }}-cert
+        {{- end }}
+        {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
+        {{- if $tlsMinVersion }}
+        minProtocolVersion: {{ $tlsMinVersion }}
         {{- end }}
     {{- end }}
     {{- end }}

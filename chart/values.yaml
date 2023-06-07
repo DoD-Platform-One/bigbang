@@ -206,6 +206,7 @@ istio:
       tls:
         key: ""
         cert: ""
+        minProtocolVersion: ""
     # private:
     #   ingressGateway: "private-ingressgateway"
     #   hosts:
@@ -223,6 +224,7 @@ istio:
     #   tls:
     #     key: ""
     #     cert: ""
+    #     minProtocolVersion: ""
     # passthrough:
     #   ingressGateway: "passthrough-ingressgateway"
     #   hosts:
@@ -245,6 +247,7 @@ istio:
     #     tls:
     #       key: ""
     #       cert: ""
+    #       minProtocolVersion: ""
     #   - hosts:
     #     - "example.bigbang.dev"
     #     port:
@@ -257,6 +260,7 @@ istio:
     #     tls:
     #       key: ""
     #       cert: ""
+    #       minProtocolVersion: ""
     # passthrough:
     #   ingressGateway: "passthrough-ingressgateway"
     #   hosts:
