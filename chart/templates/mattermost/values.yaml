@@ -32,6 +32,18 @@ updateJob:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+    # conditional passes only for default istio: enabled, mTLS: STRICT
+    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mattermost) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+
 {{- with .Values.addons.mattermost.sso }}
 sso:
   enabled: {{ .enabled }}
