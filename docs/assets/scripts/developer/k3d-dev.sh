@@ -293,6 +293,7 @@ if [[ "${RESET_K3D}" == false ]]; then
     if [[ "$PRIVATE_IP" == true ]];
     then
       aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
     else  # all protocols to all ports is the default
       aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
     fi
