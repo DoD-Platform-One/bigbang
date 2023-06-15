@@ -1,17 +1,19 @@
 import fs from 'fs'
-
-interface IProject {
+//verfiy project_map.json matches the interface
+export interface IProject {
     gitlab: {
-        default_branch: string,
-        id: number,
+        defaultBranch: string,
+        projectID: number,
         url: string,
         requests: {
             [key: number]: number
         }
     },
     github: {
-        default_branch: string,
-        id: number,
+        defaultBranch: string,
+        projectID: number,
+        appID: number,
+        installationID: number,
         url: string,
         requests: {
             [key: number]: number
@@ -19,14 +21,28 @@ interface IProject {
     },
 }
 
-interface IMapping {
+export interface IMapping {
     [key: string]: IProject
 }
 
 // if in the future we need more than just "Projects" in the mapping we can update the definition of the ^ Mapping
+//if .env ENVIROMENT variable is set to "development" then use the development mapping file called project_map_dev.json else use project_map.json
+// mappingFilePath if Environment is production
+let mappingFilePath = './src/assets/project_map.json'
+if (process.env.ENVIRONMENT === "development") {
+    mappingFilePath = './src/assets/project_map_dev.json'
+}
+// mappingFilePath if Environment is testing
+if (process.env.ENVIRONMENT === "test") {
+    mappingFilePath = './test/fixtures/project_map_test.json'
+}
+const mappingFile = () => fs.readFileSync(mappingFilePath, 'utf8')
 
-const mappingFile = fs.readFileSync('./src/assets/project_map.json', 'utf8')
-const mapping: IMapping = JSON.parse(mappingFile)
+
+//parse the mapping file into a JSON object
+let mapping: IMapping = JSON.parse(mappingFile())
+
+
 
 
 interface IMappingContext {
@@ -39,6 +55,8 @@ interface IMappingContext {
     gitHubProjectId: number,
     gitHubProjectUrl: string,
     gitHubDefaultBranch: string,
+    installationID: number,
+    appID: number
 }
 
 // clean up time
@@ -56,16 +74,18 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
     else {
         mapping[projectName] = {
             gitlab: {
-                default_branch: gitLabDefaultBranch, 
-                id:gitLabProjectId, 
+                defaultBranch: gitLabDefaultBranch, 
+                projectID:gitLabProjectId, 
                 url: gitLabProjectUrl, 
                 requests: {
                     [gitLabMergeRequestNumber]: gitHubIssueNumber
                 },
             },
             github: {
-                default_branch: gitHubDefaultBranch, 
-                id: gitHubProjectId, 
+                defaultBranch: gitHubDefaultBranch, 
+                projectID: gitHubProjectId, 
+                appID: context.appID,
+                installationID: context.installationID,
                 url: gitHubProjectUrl, 
                 requests: {
                     [gitHubIssueNumber]: gitLabMergeRequestNumber
@@ -75,7 +95,7 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
     }
 
     // lets write it back to the disk
-    fs.writeFileSync('./src/assets/project_map.json', JSON.stringify(mapping, null, 2)) // idk what 2 does lol
+    fs.writeFileSync(mappingFilePath, JSON.stringify(mapping, null, 2)) // idk what 2 does lol
 }
 
 
@@ -89,5 +109,6 @@ export const GetDownstreamRequestNumber = (projectName: string, mergeRequestNumb
 }
 
 export const GetMapping = () => {
+    mapping = JSON.parse(mappingFile())
     return mapping
 }

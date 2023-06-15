@@ -1,19 +1,21 @@
-{
+import { IssueCommentPayload } from "../../src/types/github/objects";
+
+export const payload: IssueCommentPayload = {
     "action": "created",
     "issue": {
       "url": "https://api.github.com/repos/SnekCode/podinfo/issues/6",
       "repository_url": "https://api.github.com/repos/SnekCode/podinfo",
-      "labels_url": "https://api.github.com/repos/SnekCode/podinfo/issues/6/labels{/name}",
-      "comments_url": "https://api.github.com/repos/SnekCode/podinfo/issues/6/comments",
-      "events_url": "https://api.github.com/repos/SnekCode/podinfo/issues/6/events",
-      "html_url": "https://github.com/SnekCode/podinfo/pull/6",
-      "id": 1720356772,
+      "labels_url": "https://api.github.com/repos/SnekCode/podinfo/issues/2/labels{/name}",
+      "comments_url": "https://api.github.com/repos/SnekCode/podinfo/issues/2/comments",
+      "events_url": "https://api.github.com/repos/SnekCode/podinfo/issues/2/events",
+      "html_url": "https://github.com/SnekCode/podinfo/pull/2",
+      "id": 2,
       "node_id": "PR_kwDOJhhFnc5RDaaE",
       "number": 6,
       "title": "make commits great again",
       "user": {
         "login": "SnekCode",
-        "id": 46388252,
+        "id": 99,
         "node_id": "MDQ6VXNlcjQ2Mzg4MjUy",
         "avatar_url": "https://avatars.githubusercontent.com/u/46388252?v=4",
         "gravatar_id": "",
@@ -76,11 +78,11 @@
       "url": "https://api.github.com/repos/SnekCode/podinfo/issues/comments/1558033703",
       "html_url": "https://github.com/SnekCode/podinfo/pull/6#issuecomment-1558033703",
       "issue_url": "https://api.github.com/repos/SnekCode/podinfo/issues/6",
-      "id": 1558033703,
+      "id": 3,
       "node_id": "IC_kwDOJhhFnc5c3bUn",
       "user": {
         "login": "repo-one-bot[bot]",
-        "id": 118478394,
+        "id": 99,
         "node_id": "BOT_kgDOBw_WOg",
         "avatar_url": "https://avatars.githubusercontent.com/in/262992?v=4",
         "gravatar_id": "",
@@ -245,7 +247,7 @@
       "site_admin": false
     },
     "installation": {
-      "id": 34507893,
+      "id": 1,
       "node_id": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uMzQ1MDc4OTM="
     }
   }

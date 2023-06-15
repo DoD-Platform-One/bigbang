@@ -3,8 +3,6 @@ import {githubSigHeaderName, gitlabTokenHeaderName} from '../src/appcrypto'
 import app from '../src/app'
 import crypto from 'crypto'
 
-import fs from 'fs'
-
 
 describe('auth failure', () => {
   it('NO TOKEN', done => {
@@ -32,8 +30,7 @@ describe('auth success', () => {
 
   const githubSecret = process.env.GITHUB_WEBHOOK_SECRET ?? "test";
   const gitlabToken = process.env.GITLAB_WEBHOOK_SECRET ?? "test";
-
-  const jsonstring = JSON.parse(fs.readFileSync('./test/fixtures/object.json', 'utf-8'))
+  const jsonstring = {"action":"created"}
   const issuecreated = JSON.stringify(jsonstring)
 
   const hmac = crypto.createHmac('SHA256', githubSecret)

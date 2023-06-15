@@ -1,4 +1,4 @@
-import serverless from 'serverless-http'  
+import serverless from 'serverless-http'
 import app from './app'
 
 import dotenv from 'dotenv'
@@ -9,7 +9,7 @@ const port = process.env.PORT ?? "8080"
 
 export const handler = serverless(app)
 
-if (serverType == "express"){
+if (serverType == "express") {
     console.log("starting application to listen on port: " + port);
     app.listen(port)
 }

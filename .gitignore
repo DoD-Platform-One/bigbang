@@ -43,3 +43,5 @@ package-lock.json
 coverage
 lib
 Repo_Sync.zip
+
+/src/assets/project_map_dev.json
