@@ -1,2 +1,5 @@
 # default codeowners/project maintainers
 * @ryan.thompson.44 @ryan.j.garcia @chris.oconnell
+
+# documentation codeowners/maintainers 
+/docs/ @aperkins @ryan.thompson.44 @ryan.j.garcia @chris.oconnell
