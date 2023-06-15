@@ -11,10 +11,19 @@ export const githubSigHeaderName = "X-Hub-Signature-256";
 export const gitlabTokenHeaderName = "X-Gitlab-Token";
 export const adminTokenHeaderName = "X-Admin-Token";
 
+// generate a private key if one does not exist
 let privateKey: string | Buffer = "";
 // check if privatekey.pem exists
 if (fs.existsSync("privatekey.pem")) {
- privateKey = fs.readFileSync("privatekey.pem");
+  privateKey = fs.readFileSync("privatekey.pem");
+}
+// if not, generate one
+else {
+  privateKey = crypto.generateKeyPairSync("rsa", {
+    modulusLength: 4096,
+    publicKeyEncoding: { type: "spki", format: "pem" },
+    privateKeyEncoding: { type: "pkcs8", format: "pem" },
+  }).privateKey
 }
 
 const sigPrefix = "sha256="; //set this to your signature prefix if any
@@ -23,7 +32,7 @@ const gitLabSecret = process.env.GITLAB_WEBHOOK_SECRET ?? "";
 const adminDefaultSecret = "";
 const adminSecret = process.env.ADMIN_TOKEN ?? adminDefaultSecret;
 
-export const signPayloadJWT = (appId: string) => {
+export const signPayloadJWT = (appId: number) => {
   const payload = {
     // Issued at time
     iat: Math.floor(Date.now() / 1000),
@@ -37,14 +46,16 @@ export const signPayloadJWT = (appId: string) => {
 };
 
 export const getGitHubAppAccessToken = async (
-  appID: string,
+  appID: number,
   name: string,
-  installationId: string
+  installationId: number
 ) => {
   const access_token_request_body = JSON.stringify({
     repository: name,
     permissions: { issues: "write", pull_requests: "write" },
   });
+
+
 
   const jwt = await signPayloadJWT(appID);
   // --header "Accept: application/vnd.github+json"
@@ -62,7 +73,8 @@ export const getGitHubAppAccessToken = async (
   return access_token_request.data.token;
 };
 
-export const processWebHookSignature = function (body: string, signature: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const processWebHookSignature = function (body: any, signature: string) {
   const hmac = crypto.createHmac("SHA256", gitHubSecret);
   const signatureComputed = Buffer.from(
     sigPrefix + hmac.update(body).digest("hex"),

@@ -5,6 +5,8 @@ dotenv.config({
     path: "./.test.env"
 });
 
+process.env.ENVIRONMENT = 'test';
+
 // Sync object
 const config: Config.InitialOptions = {
   roots: ['<rootDir>/test/'],
@@ -16,6 +18,7 @@ const config: Config.InitialOptions = {
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFiles: ["dotenv/config"],
+  globalTeardown: './test/teardown.ts'
 };
 
 export default config;
