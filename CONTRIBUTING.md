@@ -39,7 +39,7 @@ k3d cluster create --k3s-arg "--no-deploy=metrics-server,traefik@server:*" -p 80
 
 For development, it is quicker to test changes without having to push to Git.  To do this, we can bypass Flux2 and deploy Big Bang directly with its Helm chart.
 
-Start by creating `myvalues.yaml` to configure your local Big Bang.  The Big Bang template repository contains a starter [development values.yaml](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/blob/main/dev/configmap.yaml).
+Start by creating `myvalues.yaml` to configure your local Big Bang.  The Big Bang template repository contains a starter [development values.yaml](https://repo1.dso.mil/big-bang/customers/template/-/blob/main/package-strategy/configmap.yaml).
 
 Configure `myvalues.yaml` to suit your needs.
 
