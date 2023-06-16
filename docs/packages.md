@@ -64,7 +64,7 @@
 
 | Package | Status | Monitoring | Tracing | Network Policies | mTLS |
 |----|----|----|----|----|----|
-| [Mattermost](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost) |  ![Mattermost Build](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost/badges/main/pipeline.svg) | Yes \* | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/515) | Yes (Permissive) |
+| [Mattermost](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost) |  ![Mattermost Build](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost/badges/main/pipeline.svg) | Yes \* | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/515) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2800) |
 | [Mattermost Operator](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost-operator) |  ![Mattermost Operator Build](https://repo1.dso.mil/big-bang/apps/collaboration-tools/mattermost-operator/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/499) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1531) |
 
 > `*` Monitoring/metrics are only available for enterprise (licensed) deployments of Mattermost
