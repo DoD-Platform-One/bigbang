@@ -91,16 +91,15 @@ gitlab-triage-merge-requests:on-schedule:
   extends:
     - .generic-runner-tags
   script:
-    - gitlab_triage_dryrun $(find policies/merge_requests -type f | awk '{print "--policies-file", $1}')
+    - gitlab_triage $(find policies/merge_requests -type f | awk '{print "--policies-file", $1}')
 
 gitlab-triage-branches:on-schedule:
   stage: scheduled
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-      exists: 
+      exists:
         - policies/branches/*
   extends:
     - .generic-runner-tags
   script:
-    - gitlab_triage_dryrun $(find policies/branches -type f | awk '{print "--policies-file", $1}')
-
+    - gitlab_triage $(find policies/branches -type f | awk '{print "--policies-file", $1}')
