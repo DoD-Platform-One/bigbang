@@ -120,7 +120,7 @@ while [ -n "$1" ]; do # while loop starts
         --query "Reservations[].Instances[].InstanceId" \
         --filters "Name=tag:Name,Values=${AWSUSERNAME}-dev" "Name=instance-state-name,Values=running" )
       # If instance exists then terminate it 
-      if [[ ! -z "${AWSINSTANCEIDs}" ]]; then 
+      if [[ $AWSINSTANCEIDs ]]; then 
         echo "aws instances being terminated: ${AWSINSTANCEIDs}"
         
         read -p "Are you sure you want to delete these instances (y/n)? " -r
@@ -174,7 +174,7 @@ InstId=`aws ec2 describe-instances \
         --output text \
         --query "Reservations[].Instances[].InstanceId" \
         --filters "Name=tag:Name,Values=${AWSUSERNAME}-dev" "Name=instance-state-name,Values=running"`
-  if [[ ! -z "${InstId}" ]]; then
+  if [[ $InstId ]]; then
     PublicIP=`aws ec2 describe-instances --output text --no-cli-pager --instance-id ${InstId} --query "Reservations[].Instances[].PublicIpAddress"`
     PrivateIP=`aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].PrivateIpAddress'`
     echo "Existing cluster found running on instance ${InstId} on ${PublicIP} / ${PrivateIP}"
@@ -537,7 +537,7 @@ fi
 
 # Selecting K8S version through the use of a K3S image tag
 K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
-if [[ ! -z "$K3S_IMAGE_TAG" ]]; then
+if [[ $K3S_IMAGE_TAG ]]; then
   echo "Using custom K3S image tag $K3S_IMAGE_TAG..."
   k3d_command+=" --image docker.io/rancher/k3s:$K3S_IMAGE_TAG"
 fi
@@ -566,7 +566,7 @@ run "${k3d_command}"
 # install kubectl
 echo Installing kubectl based on k8s version...
 K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
-if [[ ! -z "$K3S_IMAGE_TAG" ]]; then
+if [[ $K3S_IMAGE_TAG ]]; then
   KUBECTL_VERSION=$(echo $K3S_IMAGE_TAG | cut -d'-' -f1)
   echo "Using specified kubectl version $KUBECTL_VERSION based on k3s image tag."
 else
@@ -808,8 +808,8 @@ else   # Not using MetalLB and using public IP. This is the default
   echo "  ${PublicIP} gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
   echo
 
-  if [[ ! -z "${SecondaryIP}" ]]; then
+  if [[ $SecondaryIP ]]; then
     echo "A secondary IP is available for use if you wish to have a passthrough ingress for Istio along with a public Ingress Gateway, this maybe useful for Keycloak x509 mTLS authentication."
-    echo "  ${SecondaryIP}  keycloak.bigbang.dev"
+    echo "  $SecondaryIP  keycloak.bigbang.dev"
   fi
 fi
