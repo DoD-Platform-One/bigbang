@@ -1,7 +1,7 @@
 import { ExecSyncOptions, execSync } from 'child_process'
 import {onGitHubEvent} from './eventManager'
 import axios from 'axios'
-import {cloneUrl, setUpLogin} from '../utils/gitlabSignIn'
+import {cloneUrl} from '../utils/gitlabSignIn'
 
 import dotenv from 'dotenv'
 import { UpdateConfigMapping } from '../assets/projectMap'
@@ -31,7 +31,6 @@ onGitHubEvent('pull_request.opened', async (context) => {
         //check out branch
         execSync(`git checkout PR-${PRNumber}`, execOptions)
         
-        setUpLogin(execOptions)
         execSync(`git push mirror PR-${PRNumber}`, execOptions)
         
         // clean up tmp/repo name folder
