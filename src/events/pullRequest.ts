@@ -13,16 +13,14 @@ onGitHubEvent('pull_request.opened', async (context) => {
         // repo one bot steps
         const github_url = payload.repository.clone_url
         
-        const repo_1_url = payload.repository.homepage
-        
         const currentWorkingDirectory = `./tmp/${projectName}`
         const execOptions: ExecSyncOptions = {cwd: currentWorkingDirectory}
 
         // clone github repo
         cloneUrl(github_url, projectName)
         // create remote mirror
-
-        
+        // repo1 url set up with username and access token embedded
+        const repo_1_url = payload.repository.homepage.replace('https://', `https://${process.env.GITLAB_USERNAME}:${process.env.GITLAB_PASSWORD}@`)
         execSync(`git remote add mirror ${repo_1_url}`, execOptions)
         
         // get PR number
