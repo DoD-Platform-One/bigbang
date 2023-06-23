@@ -116,7 +116,7 @@ pre vars:
 # Pre Stage Job.   This executes before any infrastructure pipeline is run.
 #
 #-----------------------------------------------------------------------------------------------------------------------
-pre infra vars:
+pre vars infra:
   stage: .pre
   # Never run if this is not one of the scheduled job types below
   rules:
@@ -281,7 +281,7 @@ upgrade:
 clean install oci:
   stage: 🤞 oci artifact tests
   needs:
-    - job: pre vars
+    - job: pre vars infra
       artifacts: true
   extends:
     - .bigbang-runner-tags
@@ -430,7 +430,7 @@ aws/network up:
     - .infra aws fork
     - .network up
   needs:
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -448,7 +448,7 @@ aws/network down:
     - .infra aws cleanup
     - .network down
   needs:
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
     - job: aws/rke2/cluster down
       optional: true
@@ -479,7 +479,7 @@ aws/rke2/cluster up:
     - .rke2 up
   needs:
     - job: aws/network up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -501,7 +501,7 @@ aws/rke2/bigbang up:
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   variables:
     CI_VALUES_OVERRIDES_FILE: tests/rke2-test-values.yaml
@@ -538,7 +538,7 @@ aws/rke2/bigbang test:
     - job: aws/rke2/cluster up
       artifacts: true
     - job: aws/rke2/bigbang up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   script:
     - mkdir -p ~/.kube
@@ -615,7 +615,7 @@ aws/rke2/cluster down:
     - .rke2 down
   needs:
     - job: aws/rke2/bigbang down
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -639,7 +639,7 @@ aws/eks/cluster up:
     - .eks up
   needs:
     - job: aws/network up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -661,7 +661,7 @@ aws/eks/bigbang up:
   needs:
     - job: aws/eks/cluster up
       artifacts: true
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   variables:
     CI_VALUES_OVERRIDES_FILE: tests/eks-test-values.yaml
@@ -701,7 +701,7 @@ aws/eks/bigbang test:
     - job: aws/eks/cluster up
       artifacts: true
     - job: aws/eks/bigbang up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   script:
     # Ensure that the proper AWS account is being used.
@@ -740,7 +740,7 @@ aws/eks/bigbang down:
     - job: aws/eks/cluster up
       artifacts: true
     - job: aws/eks/bigbang up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
     - job: aws/eks/bigbang test
   script:
@@ -785,7 +785,7 @@ aws/eks/cluster down:
   needs:
     - job: aws/eks/bigbang down
     - job: aws/eks/cluster up
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -803,7 +803,7 @@ aws/airgap up:
     - .generic-runner-tags
     - .airgap up
   needs:
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -822,7 +822,7 @@ aws/airgap/bigbang up:
     - .kubectl-output
     - .airgap bb
   needs:
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
     - job: aws/airgap up
       artifacts: true
@@ -844,7 +844,7 @@ aws/airgap down:
     - .airgap down
     - .airgap cleanup
   needs:
-    - job: pre infra vars
+    - job: pre vars infra
       artifacts: true
     - job: aws/airgap/bigbang up
       artifacts: true
