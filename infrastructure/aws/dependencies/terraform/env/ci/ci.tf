@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket               = "nightly-rke2-tf-states"
+    bucket               = "nightly-tf-states"
     key                  = "terraform.tfstate"
     region               = "us-gov-west-1"
-    dynamodb_table       = "nightly-rke2-tf-states-lock"
+    dynamodb_table       = "nightly-vpc-tf-states-lock"
     workspace_key_prefix = "aws-networking"
   }
 }

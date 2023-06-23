@@ -253,7 +253,9 @@ Similar to the MR title keywords described above, gitlab labels can be added to 
 
 `<package-name>` -- Adding a package name as a label will enable that package.
 
-`test-ci::infra` -- Add stages to provision and destroy the cloud infrastructure where the tests will run.
+`test-ci::rke2` -- Add stages to provision and destroy the aws cloud infrastructure for an rke2 test cluster.
+
+`test-ci::eks` -- Add stages to provision and destroy the aws cloud infrastructure for an eks test cluster.
 
 `test-ci::oci` -- Run a pipeline job that installs bb core packages using OCI Artifacts/HelmRepositories instead of GitRepositories. This job runs during our nightly bb pipeline.
 

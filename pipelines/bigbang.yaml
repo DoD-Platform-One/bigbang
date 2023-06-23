@@ -33,7 +33,6 @@ include:
 
 # Pipeline stages
 #  - Smoke tests are executed for all pipelines except scheduled nightly runs.
-#  -
 stages:
   - 🔥 smoke tests
   - 🔌 network up
@@ -75,22 +74,28 @@ variables:
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
-# Pre Stage Jobs.   This executes before any job is run.
+# Pre Stage Job.   This executes before any clean install or upgrade job is run.
 #
 #-----------------------------------------------------------------------------------------------------------------------
 pre vars:
   stage: .pre
   # Never run if this is not one of the scheduled job types below
-  except:
-    variables:
-      - $JOB_TYPE == "cut_release"
+  rules:
+    - if: $JOB_TYPE == "cut_release"
+      when: never
+    - if: $JOB_TYPE == "nightly"
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+      when: never
   extends:
     - .generic-runner-tags
     - .util-image
     - .templates
   script:
-    # Create the TF_VAR_env variable
-    - pre_vars
     - check_changes
     - label_check
     - package_lint
@@ -105,6 +110,40 @@ pre vars:
       - stuck_or_timeout_failure
       - runner_system_failure
 
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Pre Stage Job.   This executes before any infrastructure pipeline is run.
+#
+#-----------------------------------------------------------------------------------------------------------------------
+pre infra vars:
+  stage: .pre
+  # Never run if this is not one of the scheduled job types below
+  rules:
+    - if: $JOB_TYPE == "cut_release"
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+    - if: $JOB_TYPE == "nightly"
+  extends:
+    - .generic-runner-tags
+    - .util-image
+    - .templates
+  script:
+    # Create the TF_VAR_env variable
+    - pre_vars
+    - label_check
+    - package_lint
+    - oscal_validate
+  artifacts:
+    reports:
+      dotenv: variables.env
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -135,6 +174,10 @@ clean install:
     - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)'
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
+      when: never
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
@@ -180,8 +223,8 @@ upgrade:
     - .bigbang-runner-tags
     - .k3d-ci
   rules:
-    # skip job for nightly main and "test-ci::infra" labeled pipelines
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+    # skip job for nightly main and "test-ci::rke2" labeled pipelines
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
     # skip job when MR title starts with 'SKIP UPGRADE'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
@@ -383,8 +426,11 @@ cut_release:
 aws/network up:
   extends:
     - .generic-runner-tags
+    - .infra aws fork
     - .network up
-    - .infra_fork
+  needs:
+    - job: pre infra vars
+      artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     auto_stop_in: 1 hour
@@ -398,12 +444,15 @@ aws/network up:
 aws/network down:
   extends:
     - .generic-runner-tags
+    - .infra aws cleanup
     - .network down
-    - .infra_cleanup
   needs:
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
     - job: aws/rke2/cluster down
+      optional: true
+    - job: aws/eks/cluster down
+      optional: true
   stage: 💣 network down
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -414,6 +463,7 @@ aws/network down:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -426,10 +476,9 @@ aws/rke2/cluster up:
   extends:
     - .generic-runner-tags
     - .rke2 up
-    - .infra_create
   needs:
     - job: aws/network up
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -445,13 +494,13 @@ aws/rke2/bigbang up:
   stage: 🌌 bigbang up
   extends:
     - .generic-runner-tags
+    - .rke2 activated
     - .kubectl-output
     - .templates
-    - .infra_create
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
   variables:
     CI_VALUES_OVERRIDES_FILE: tests/rke2-test-values.yaml
@@ -481,14 +530,14 @@ aws/rke2/bigbang test:
   stage: 🤞 test
   extends:
     - .generic-runner-tags
+    - .rke2 activated
     - .kubectl-output
     - .templates
-    - .infra_create
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
     - job: aws/rke2/bigbang up
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
   script:
     - mkdir -p ~/.kube
@@ -518,9 +567,9 @@ aws/rke2/bigbang down:
   stage: 💣 bigbang down
   extends:
     - .generic-runner-tags
+    - .rke2 cleanup
     - .kubectl-output
     - .templates
-    - .infra_cleanup
   needs:
     - job: aws/rke2/cluster up
       artifacts: true
@@ -531,9 +580,16 @@ aws/rke2/bigbang down:
     # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
+    # To fix issue with kyverno svc webhook timeouts on helm uninstall
+    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
+    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
+    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
+    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 3
+    # Sleep to be sure webhook configurations are gone
+    - sleep 2m
     # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
     # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
-    - helm uninstall -n bigbang bigbang --wait --timeout 5m0s
+    - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
@@ -556,10 +612,9 @@ aws/rke2/cluster down:
   extends:
     - .generic-runner-tags
     - .rke2 down
-    - .infra_cleanup
   needs:
     - job: aws/rke2/bigbang down
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -569,6 +624,171 @@ aws/rke2/cluster down:
       - unknown_failure
       - stuck_or_timeout_failure
       - runner_system_failure
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Infrastructure: AWS EKS
+#
+#-----------------------------------------------------------------------------------------------------------------------
+# Create EKS cluster on AWS
+aws/eks/cluster up:
+  stage: ⚓ cluster up
+  extends:
+    - .generic-runner-tags
+    - .eks up
+  needs:
+    - job: aws/network up
+    - job: pre infra vars
+      artifacts: true
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+# Install BigBang on eks cluster on AWS
+aws/eks/bigbang up:
+  stage: 🌌 bigbang up
+  extends:
+    - .generic-runner-tags
+    - .eks activated
+    - .kubectl-output
+    - .templates
+  needs:
+    - job: aws/eks/cluster up
+      artifacts: true
+    - job: pre infra vars
+      artifacts: true
+  variables:
+    CI_VALUES_OVERRIDES_FILE: tests/eks-test-values.yaml
+  script:
+    # Ensure that the proper AWS account is being used.
+    - pre_vars
+    # Load the kube configure file
+    - get_eks_kubeconfig
+    - kubectl apply -f ${PIPELINE_REPO_DESTINATION}/clusters/eks/dependencies/k8s-resources/aws/default-ebs-sc.yaml
+    # Delete gp2 storage class
+    - kubectl delete storageclass gp2
+    - kubectl get storageclass -o yaml
+    - deploy_bigbang
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  artifacts:
+    paths:
+      - events.txt
+      - get_cpumem.txt
+      - cluster_info_dump.txt
+      - images.txt
+      - pod_logs
+      - kubectl_describes
+      - "test-artifacts/"
+    expire_in: 3 days
+    when: always
+
+# Run tests on BigBang on eks cluster on AWS
+aws/eks/bigbang test:
+  stage: 🤞 test
+  extends:
+    - .generic-runner-tags
+    - .eks activated
+    - .kubectl-output
+    - .templates
+  needs:
+    - job: aws/eks/cluster up
+      artifacts: true
+    - job: aws/eks/bigbang up
+    - job: pre infra vars
+      artifacts: true
+  script:
+    # Ensure that the proper AWS account is being used.
+    - pre_vars
+    # Load the kube config file
+    - get_eks_kubeconfig
+    - test_bigbang
+    - |
+      if [[ $EXIT_FLAG -eq 1 ]]; then
+        exit 123
+      fi
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  allow_failure:
+    exit_codes: 123
+  artifacts:
+    paths:
+      - events.txt
+      - get_cpumem.txt
+      - cluster_info_dump.txt
+      - pod_logs
+      - kubectl_describes
+      - "test-artifacts/"
+    expire_in: 3 days
+    when: always
+
+# Uninstall BigBang on eks cluster on AWS
+aws/eks/bigbang down:
+  stage: 💣 bigbang down
+  extends:
+    - .generic-runner-tags
+    - .eks cleanup
+    - .kubectl-output
+    - .templates
+  needs:
+    - job: aws/eks/cluster up
+      artifacts: true
+    - job: aws/eks/bigbang up
+    - job: pre infra vars
+      artifacts: true
+    - job: aws/eks/bigbang test
+  script:
+    # Ensure that the proper AWS account is being used.
+    - pre_vars
+    # Load the kube config file
+    - get_eks_kubeconfig
+    # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
+    # Allow failure here since Istio might not be up
+    - kubectl delete hr istio -n bigbang --wait || true
+    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
+    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
+    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
+    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 3
+    # Sleep to be sure webhook configurations are gone
+    - sleep 2m
+    # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
+    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
+    - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  artifacts:
+    paths:
+      - events.txt
+      - get_cpumem.txt
+      - cluster_info_dump.txt
+      - pod_logs
+      - kubectl_describes
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
+# Destroy eks cluster on AWS
+aws/eks/cluster down:
+  stage: 💣 cluster down
+  extends:
+    - .generic-runner-tags
+    - .eks down
+  needs:
+    - job: aws/eks/bigbang down
+    - job: aws/eks/cluster up
+    - job: pre infra vars
+      artifacts: true
+  environment:
+    name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 #
@@ -582,7 +802,7 @@ aws/airgap up:
     - .generic-runner-tags
     - .airgap up
   needs:
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
@@ -601,7 +821,7 @@ aws/airgap/bigbang up:
     - .kubectl-output
     - .airgap bb
   needs:
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
     - job: aws/airgap up
       artifacts: true
@@ -623,7 +843,7 @@ aws/airgap down:
     - .airgap down
     - .airgap cleanup
   needs:
-    - job: pre vars
+    - job: pre infra vars
       artifacts: true
     - job: aws/airgap/bigbang up
       artifacts: true

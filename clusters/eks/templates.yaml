@@ -1,0 +1,96 @@
+.eks cluster info:
+  variables:
+    TF_VAR_cluster_name: "bigbang-${TF_VAR_env}-cluster"
+
+.eks tf:
+  extends:
+  - .terraformer
+  - .eks cluster info
+  variables:
+    TF_ROOT: "${PIPELINE_REPO_DESTINATION}/clusters/eks/dependencies/terraform/env/ci"
+
+# Rules used to determine which job are included
+.eks activated:
+  extends: .eks cluster info
+  rules:
+    # Run on scheduled jobs OR when `test-ci` label is assigned
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+    # skip job when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
+
+.eks cleanup:
+  extends: .eks cluster info
+  rules:
+    # Run on scheduled jobs
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+      allow_failure: true
+      when: always
+
+.eks up:
+  extends:
+  - .eks tf
+  - .eks activated
+  script:
+    - echo -e "\e[0Ksection_start:`date +%s`:eks_up[collapsed=true]\r\e[0K\e[33;1mEKS Up\e[37m"
+    # Loop to retry eks terraform apply
+    - |
+      set -ex
+      attempt_counter=0
+      max_attempts=2
+      if [ $DEBUG_ENABLED == "true" ]; then
+        echo "labels = $CI_MERGE_REQUEST_LABELS[*]"
+      fi
+      LABELS="$CI_MERGE_REQUEST_LABELS[*]"
+      until [ $(terraform apply -input=false -auto-approve >/dev/null; echo $?) -eq 0 ]; do
+        if [ ${attempt_counter} == ${max_attempts} ];then
+          echo "Error applying eks cluster up terraform"
+          exit 1
+        fi
+        attempt_counter=$(($attempt_counter+1))
+        echo "❌ Attempt FAILED to apply will retry in 30 seconds"
+        sleep 30
+      done
+    - aws eks update-kubeconfig --region us-gov-west-1 --name ${TF_VAR_cluster_name}
+    - cat ~/.kube/config
+    - mv ~/.kube/config ${CI_PROJECT_DIR}/eks-config.yaml
+    - chmod a+rw ${CI_PROJECT_DIR}/eks-config.yaml
+    - wget -O - "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    - mv /tmp/eksctl /usr/local/bin
+    - eksctl utils associate-iam-oidc-provider --cluster ${TF_VAR_cluster_name} --approve
+    - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster ${TF_VAR_cluster_name} --attach-policy-arn arn:aws-us-gov:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
+    - eksctl create addon --name aws-ebs-csi-driver --cluster ${TF_VAR_cluster_name} --service-account-role-arn arn:aws-us-gov:iam::141025336883:role/AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name} --force
+    - echo -e "\e[0Ksection_end:`date +%s`:eks_up\r\e[0K"
+  artifacts:
+    paths:
+      - ${CI_PROJECT_DIR}/eks-config.yaml
+
+.eks down:
+  extends:
+    - .eks tf
+    - .eks cleanup
+    - .terraform destroy workspace
+  script:
+    # Cleanup OIDC Provider
+    - oidc_id=$(aws eks describe-cluster --name ${TF_VAR_cluster_name} --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5)
+    - oidc_arn=$(aws iam list-open-id-connect-providers --output text | grep $oidc_id | awk -F ' ' '{print $2}')
+    - aws iam delete-open-id-connect-provider --open-id-connect-provider-arn $oidc_arn
+    - echo -e "\e[0Ksection_start:`date +%s`:eks_down[collapsed=true]\r\e[0K\e[33;1mEKS Down\e[37m"
+    # Loop to retry eks terraform destroy
+    - |
+      set -e
+      attempt_counter=0
+      max_attempts=2
+      until [ $(terraform destroy -input=false -auto-approve >/dev/null; echo $?) -eq 0 ]; do
+        if [ ${attempt_counter} == ${max_attempts} ];then
+          echo "Error destroying eks cluster terraform"
+          exit 1
+        fi
+        attempt_counter=$(($attempt_counter+1))
+        echo "❌ Attempt FAILED to destroy will retry in 30 seconds"
+        sleep 30
+      done
+    # Detach IAM policy from IAM role and cleanup EBS CSI driver role
+    - aws iam detach-role-policy --policy-arn arn:aws-us-gov:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
+    - aws iam delete-role --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
+    - echo -e "\e[0Ksection_end:`date +%s`:eks_down\r\e[0K"
