@@ -57,7 +57,9 @@ include:
   - .util-image
   after_script:
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
+    - pre_vars
     - get_all
+    - get_storage
     - get_events
     - bigbang_pipeline
     - get_debug

@@ -3,8 +3,8 @@ terraform {
     bucket               = "nightly-tf-states"
     key                  = "terraform.tfstate"
     region               = "us-gov-west-1"
-    dynamodb_table       = "nightly-rke2-tf-states-lock"
-    workspace_key_prefix = "rke2"
+    dynamodb_table       = "nightly-eks-tf-states-lock"
+    workspace_key_prefix = "eks"
   }
 }
 
@@ -23,7 +23,9 @@ module "ci" {
   source = "../../main"
 
   env             = var.env
-  rke2_config    = var.rke2_config
+  region          = var.aws_region
+  cluster_name    = "bigbang-${var.env}-cluster"
+  k8s_version     = var.k8s_version
   ci_pipeline_url = var.ci_pipeline_url
   vpc_id          = data.terraform_remote_state.networking.outputs.vpc_id
   private_subnets = data.terraform_remote_state.networking.outputs.private_subnets

@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.8.5]
+### added
+- Support for EKS based pipelines in bigbang.yaml
+- Restructured S3 storage for nightly runs to allows for different deployments (e.g., EKS, Openshift. etc.)
+
 ## [2.8.4]
 ### Changed
 - Turning off Dry Run for all Gitlab Triage Scheduled Jobs
@@ -11,11 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 - Added BB_PROJECT_ID envar for bb-bot audit_gitlab_permissions
 
-
 ## [2.8.2]
 ### Changed
 - Removed deprecated poetry `--no-dev` flag, and replaced with `--only main`.
-
 
 ## [2.8.1]
 ### Changed
@@ -296,6 +299,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.5.2]
 ### Added
 - Added BB CI registry to allowed list of registries
+
 
 ## [2.5.1]
 ### changed

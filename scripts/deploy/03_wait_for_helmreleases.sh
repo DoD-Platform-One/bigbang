@@ -25,7 +25,7 @@ function wait_all_hr() {
         hrready=$(kubectl get hr -n bigbang -o jsonpath='{.items[*].status.conditions[0].status}')
         # HR ArtifactFailed, retry
         artifactfailedcounter=0
-        while [[ $artifactfailedcounter -lt 50 ]]; do
+        while [[ $artifactfailedcounter -lt 75 ]]; do
             if [[ ! "$hrstatus" =~ ArtifactFailed ]]; then
               break
             else

@@ -3,8 +3,25 @@
   variables:
     TF_ROOT: "${PIPELINE_REPO_DESTINATION}/clusters/rke2/dependencies/terraform/env/ci"
 
+.rke2 activated:
+  rules:
+    # Run on scheduled jobs OR when `test-ci` label is assigned
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
+    # skip job when branch name starts with "hotfix" or "patch"
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
+      when: never
+
+.rke2 cleanup:
+  rules:
+    # Run on scheduled jobs
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
+      allow_failure: true
+      when: always
+
 .rke2 up:
-  extends: .rke2 tf
+  extends:
+    - .rke2 tf
+    - .rke2 activated
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:rke2_up[collapsed=true]\r\e[0K\e[33;1mRKE2 Up\e[37m"
     # Loop to retry rke2 terraform apply
@@ -58,6 +75,7 @@
 .rke2 down:
   extends:
     - .rke2 tf
+    - .rke2 cleanup
     - .terraform destroy workspace
   script:
     - echo -e "\e[0Ksection_start:`date +%s`:rke2_down[collapsed=true]\r\e[0K\e[33;1mRKE2 Down\e[37m"

@@ -16,8 +16,8 @@ fi
 
 if [[ $DEBUG_ENABLED == "true" || "$CI_MERGE_REQUEST_TITLE" == *"DEBUG"*  || ${CI_MERGE_REQUEST_LABELS} == *"debug"* ]]; then
   echo "DEBUG_ENABLED is set to true, setting -x in bash"
-  set -x
   DEBUG="true"
+  set -x
 fi
 
 trap 'echo ❌ exit at ${0}:${LINENO}, command was: ${BASH_COMMAND} 1>&2' ERR
@@ -283,16 +283,35 @@ test_bigbang() {
 }
 
 pre_vars() {
-   # Create the TF_VAR_env variable
-   echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-5)-$(echo $CI_COMMIT_SHA | cut -c 1-5)" >> variables.env
-   # Calculate a unique cidr range for vpc
-   if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::infra"* ]] || [[ "$CI_MERGE_REQUEST_LABELS" = *"test-ci::airgap"* ]]; then
-     export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
-     export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
-     export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
-     echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
-   fi
-   cat variables.env
+  # Create the TF_VAR_env variable
+  echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-5)-$(echo $CI_COMMIT_SHA | cut -c 1-5)" >> variables.env
+  # Calculate a unique cidr range for vpc
+  if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "rke2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
+    export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
+  elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "eks" ]]; then
+    export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+  fi
+  echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
+  cat variables.env
+}
+
+load_aws_creds() {
+  echo "Setting AWS Access Keys according to rules"
+  if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "rke2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
+    echo "Using RKE2 IAM User AWS Access Keys"
+    export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
+  elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "eks" ]]; then
+    echo "Using EKS IAM User AWS Access Keys"
+    export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+  fi
 }
 
 bigbang_additional_images() {
@@ -1589,6 +1608,18 @@ get_virtualservices(){
   echo -e "\e[0Ksection_end:`date +%s`:virtual_services\r\e[0K"
 }
 
+
+get_storage(){
+  echo -e "\e[0Ksection_start:`date +%s`:pv_and_pvc_storage[collapsed=true]\r\e[0K\e[33;1mPV and PVC Storage\e[37m"
+  echo -e "PV storage"
+  kubectl get pv -A || true
+  echo -e "PVC Storage"
+  kubectl get pvc -A || true
+  echo -e "Describe PVCs"
+  kubectl describe pvc -A || true
+  echo -e "\e[0Ksection_end:`date +%s`:pv_and_pvc_storage\r\e[0K"
+}
+
 get_hosts() {
   echo -e "\e[0Ksection_start:`date +%s`:hosts[collapsed=true]\r\e[0K\e[33;1mHosts File Contents\e[37m"
   cat /etc/hosts
@@ -1823,4 +1854,11 @@ airgap_registry_check (){
       attempt_counter=$(($attempt_counter+1))
       sleep 10
     done
+}
+
+get_eks_kubeconfig(){
+    #!/bin/bash
+    # Load the kube configure file
+    mkdir -p ~/.kube
+    aws eks update-kubeconfig --name ${TF_VAR_cluster_name}
 }

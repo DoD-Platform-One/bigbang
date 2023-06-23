@@ -1,7 +1,7 @@
 import boto3
 import operator
 import ipaddress
-initial_cidr = "10.10.0.0/24"
+initial_cidr = "10.10.0.0/22"
 client = boto3.client('ec2', region_name='us-gov-west-1')
 res = client.describe_vpcs(Filters=[{}])
 vpcIds = list(map(operator.itemgetter("CidrBlock"), res["Vpcs"]))
@@ -30,7 +30,7 @@ while not unique_cidr:
             sys.exit(2)
     else:
         try:
-            initial_cidr = str(ipaddress.ip_address(initial_cidr.split("/")[0]) + 65536) + "/24"
+            initial_cidr = str(ipaddress.ip_address(initial_cidr.split("/")[0]) + 65536) + "/22"
         except:
             logger.error("Couldn't update cidr of " + str(initial_cidr))
             sys.exit(2)

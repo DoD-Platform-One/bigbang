@@ -9,27 +9,27 @@ include:
 #
 #-----------------------------------------------------------------------------------------------------------------------
 # Abstract for job manually triggering infrastructure builds
-.infra_fork:
+.infra aws fork:
   stage: 🔌 network up
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
       allow_failure: false
 
 # Abstract for jobs responsible for creating infrastructure
-.infra_create:
+.infra aws create:
   rules:
     # skip job when branch name starts with "hotfix" or "patch"
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
 
 # Abstract for jobs responsible for cleaning up infrastructure OR when `test-ci` label is assigned
-.infra_cleanup:
+.infra aws cleanup:
   rules:
     # Run on scheduled jobs
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::infra(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
       allow_failure: true
       when: always
 
@@ -54,11 +54,27 @@ include:
     - echo "$TF_VAR_env"
     - echo "$TF_VAR_vpc_cidr"
     - cd ${TF_ROOT}
-    # Fetch dependencies
-    - apk add bash aws-cli
-    - export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
-    - export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
-    - export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
+    # Fetch 
+    - apk add bash aws-cli curl
+    - |
+      set -
+      echo "Setting AWS Access Keys according to rules"
+      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
+        echo "Using RKE2 IAM User AWS Access Keys"
+        export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
+        export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
+        export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
+      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
+        echo "Using EKS IAM User AWS Access Keys"
+        export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
+        export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
+        export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+      else
+        echo "Failed to export AWS Credentials. Rules did not match"
+      fi
+    # - export AWS_ACCESS_KEY_ID=${PROD_AWS_ACCESS_KEY_ID}
+    # - export AWS_SECRET_ACCESS_KEY=${PROD_AWS_SECRET_ACCESS_KEY}
+    # - export AWS_REGION=${PROD_AWS_DEFAULT_REGION}
     - terraform version
     - terraform init -input=false
     # Loop to retry terraform workspace creation due to issues locking terraform.state in s3
@@ -80,21 +96,36 @@ include:
 .terraform destroy workspace:
   after_script:
     - echo -e "\e[0Ksection_start:`date +%s`:terraform_destroy_workspace[collapsed=true]\r\e[0K\e[33;1mTerraform Destroy Workspace\e[37m"
+    - |
+      set -
+      echo "Setting AWS Access Keys according to rules"
+      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
+        echo "Using RKE2 IAM User AWS Access Keys"
+        export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
+        export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
+        export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
+      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
+        echo "Using EKS IAM User AWS Access Keys"
+        export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
+        export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
+        export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+      else
+        echo "Failed to export AWS Credentials. Rules did not match"
+      fi
     - cd ${TF_ROOT}
     # Loop to retry terraform workspace destroy
     - |
       set -e
       attempt_counter=0
       max_attempts=2
-      terraform workspace select default
-      terraform workspace delete "${TF_VAR_env}"
-     #until [ $(terraform workspace select default >/dev/null && terraform workspace delete "${TF_VAR_env}" >/dev/null; echo $?) -eq 0 ]; do
-     #  if [ ${attempt_counter} == ${max_attempts} ];then
-     #    echo "Error destroying terraform workspace"
-     #    exit 1
-     #  fi
-     #  attempt_counter=$(($attempt_counter+1))
-     #  echo "❌ Attempt FAILED to destroy workspace will retry in 30 seconds"
-     #  sleep 30
-     #done
+      terraform workspace new example
+      until [ $(terraform workspace delete "${TF_VAR_env}" >/dev/null; echo $?) -eq 0 ]; do
+        if [ ${attempt_counter} == ${max_attempts} ];then
+          echo "Error destroying terraform workspace"
+          exit 1
+        fi
+        attempt_counter=$(($attempt_counter+1))
+        echo "❌ Attempt FAILED to destroy workspace will retry in 30 seconds"
+        sleep 30
+      done
     - echo -e "\e[0Ksection_end:`date +%s`:terraform_destroy_workspace\r\e[0K"
