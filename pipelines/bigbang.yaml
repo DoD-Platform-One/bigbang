@@ -91,6 +91,7 @@ pre vars:
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
+    - when: on_success
   extends:
     - .generic-runner-tags
     - .util-image
