@@ -1,0 +1,36 @@
+kind: ZarfPackageConfig
+metadata:
+  name: big-bang
+  description: "Deploy Big Bang Core"
+  version: BIGBANG_VERSION
+  url: https://p1.dso.mil/products/big-bang
+  architecture: amd64
+
+variables:
+  - name: DOMAIN
+    default: "bigbang.dev"
+    prompt: false
+
+components:
+  - name: metallb
+    required: false
+    import:
+      path: metallb
+  - name: bigbang
+    required: true
+    extensions:
+      bigbang:
+        version: BIGBANG_VERSION
+        valuesFiles:
+          - ../../../../chart/ingress-certs.yaml
+          - config/kyverno.yaml
+          - config/custom.yaml
+  - name: gitea-virtual-service
+    description: >
+      Expose the internal Zarf Gitea server through the Big Bang Istio deployment via a virtual service.
+      (only applies if you are using the Zarf-provided Gitea deployment - not an externally configured git host)
+    manifests:
+      - name: gitea
+        namespace: zarf
+        files:
+          - virtualservices/gitea.yaml

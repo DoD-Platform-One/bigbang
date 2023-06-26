@@ -4,7 +4,7 @@ Big Bang is a declarative, continuous delivery tool for deploying DoD hardened a
 
 > _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
-## Usage & Scope
+## Usage & Scope 
 
 Big Bang's scope is to provide publicly available installation manifests for packages required to adhere to the DoD DevSecOps Reference Architecture and additional useful utilities. Big Bang packages are broken into three categories:
 
