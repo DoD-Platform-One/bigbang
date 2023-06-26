@@ -1,0 +1,5 @@
+monitoring:
+  enabled: false
+
+neuvector:
+  enabled: false

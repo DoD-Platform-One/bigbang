@@ -1,0 +1,26 @@
+kind: ZarfPackageConfig
+metadata:
+  name: metallb
+  description: "Deploy MetalLB"
+  version: 1.0.0
+  url: https://bigbang.dso.mil
+  architecture: amd64
+
+variables:
+  - name: PRIVATE_IP_1
+#  - name: PRIVATE_IP_2
+
+components:
+  - name: metallb
+    manifests:
+      - name: metallb-baseline
+        namespace: metallb-system
+        files:
+          - metallb-native-0.13.9.yaml
+      - name: metallb-config
+        namespace: metallb-system
+        files:
+          - config.yaml
+    images:
+      - quay.io/metallb/speaker:v0.13.9
+      - quay.io/metallb/controller:v0.13.9
