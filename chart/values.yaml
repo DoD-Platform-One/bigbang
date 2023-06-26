@@ -954,11 +954,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.33.1-bb.2"
+      tag: "5.36.1-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.33.1-bb.2"
+      tag: "5.36.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
