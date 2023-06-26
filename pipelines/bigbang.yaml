@@ -34,6 +34,7 @@ include:
 # Pipeline stages
 #  - Smoke tests are executed for all pipelines except scheduled nightly runs.
 stages:
+  - 🎛 prevar
   - 🔥 smoke tests
   - 🔌 network up
   - ⚓ cluster up
@@ -72,17 +73,33 @@ variables:
   MULTI_NODE: "false"
   JOB_TYPE: "default"
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Pre Stage Job to add manual check for opensource contributions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+#
+approve opensource:
+  stage: .pre
+  script:
+    - echo $CI_COMMIT_REF_NAME =~ /^PR-\d+$/
+  extends:
+    - .opensource
+
+
 #-----------------------------------------------------------------------------------------------------------------------
 #
 # Pre Stage Job.   This executes before any clean install or upgrade job is run.
 #
 #-----------------------------------------------------------------------------------------------------------------------
 pre vars:
-  stage: .pre
+  stage: 🎛 prevar
   # Never run if this is not one of the scheduled job types below
   rules:
     - if: $JOB_TYPE == "cut_release"
       when: never
+      allow_failure: false
     - if: $JOB_TYPE == "nightly"
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
@@ -117,7 +134,7 @@ pre vars:
 #
 #-----------------------------------------------------------------------------------------------------------------------
 pre vars infra:
-  stage: .pre
+  stage: 🎛 prevar
   # Never run if this is not one of the scheduled job types below
   rules:
     - if: $JOB_TYPE == "cut_release"

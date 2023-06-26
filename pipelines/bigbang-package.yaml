@@ -46,6 +46,18 @@ variables:
   BB_PROJECT_ID: 2872
   BB_REPO: repo1.dso.mil/big-bang/bigbang
 
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Pre Stage Job to add manual check for opensource contributions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+approve opensource:
+  stage: .pre
+  script:
+    - echo $CI_COMMIT_REF_NAME =~ /^PR-\d+$/
+  extends:
+    - .opensource
+
 configuration validation:
   stage: ⚙️ configuration validation
   extends:

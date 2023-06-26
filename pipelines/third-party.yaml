@@ -38,6 +38,20 @@ variables:
   METRICS_DISABLED: "false"
   MULTI_NODE: "false"
 
+
+#-----------------------------------------------------------------------------------------------------------------------
+#
+# Pre Stage Job to add manual check for opensource contributions
+#
+#-----------------------------------------------------------------------------------------------------------------------
+# 
+approve opensource:
+  stage: .pre
+  script:
+    - echo $CI_COMMIT_REF_NAME =~ /^PR-\d+$/
+  extends:
+    - .opensource
+
 configuration validation:
   stage: ⚙️ configuration validation
   extends:
