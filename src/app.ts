@@ -1,14 +1,14 @@
 import express from 'express'
-import { validatePayload } from "./appcrypto"
-import adminRouter from './routes/admin';
+import { validatePayload } from "./appcrypto.js"
+import adminRouter from './routes/admin.js';
 import fs from 'fs'
 import path from 'path'
 
 import {format} from 'prettier'
 
-import { createContext, emitter } from './events/eventManager'
-import "./events/pullRequest"
-import "./events/comment"
+import { createContext, emitter } from './events/eventManager.js'
+import "./events/pullRequest.js"
+import "./events/comment.js"
 
 // App
 const app = express();
@@ -33,18 +33,20 @@ app.use(validatePayload)
 
 //Gitlab webhook events
 
-app.post('/repo-sync', async (req) => {
+app.post('/repo-sync', async (req, res) => {
   // crete the context object for webhook consumption
   const context = await createContext(req.headers, req.body)
   if (!context){
-    return
+    res.send("Not Supported")
   }
 
   // for events
   if (context.instance == 'github' || context.instance == 'gitlab') {
     emitter.emit(context.event, context)
+    res.send("OK")
   }
 
+  res.send("Not Supported")
 })
 
 app.post('/record', async (req) => {

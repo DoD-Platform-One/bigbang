@@ -1,10 +1,10 @@
 import { ExecSyncOptions, execSync } from 'child_process'
-import {onGitHubEvent} from './eventManager'
+import {onGitHubEvent} from './eventManager.js'
 import axios from 'axios'
-import {cloneUrl} from '../utils/gitlabSignIn'
+import {cloneUrl} from '../utils/gitlabSignIn.js'
 
 import dotenv from 'dotenv'
-import { UpdateConfigMapping } from '../assets/projectMap'
+import { UpdateConfigMapping } from '../assets/projectMap.js'
 dotenv.config();
 
 onGitHubEvent('pull_request.opened', async (context) => {

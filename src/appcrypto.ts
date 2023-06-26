@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { Response, NextFunction } from "express";
-import { AppRequest } from "./app";
+import { AppRequest } from "./app.js";
 import dotenv from "dotenv";
 import fs from "fs";
 import jwt from "jsonwebtoken";

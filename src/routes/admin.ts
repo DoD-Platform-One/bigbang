@@ -1,4 +1,4 @@
-import {AppRequest} from '../app'
+import {AppRequest} from '../app.js'
 import {Router} from 'express'
 import fs from 'fs'
 import path from 'path' 

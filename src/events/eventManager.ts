@@ -1,7 +1,7 @@
 import EventEmitter from "events";
 import { IncomingHttpHeaders } from "http";
-import { GetMapping, IProject } from "../assets/projectMap";
-import { getGitHubAppAccessToken } from "../appcrypto";
+import { GetMapping, IProject } from "../assets/projectMap.js";
+import { getGitHubAppAccessToken } from "../appcrypto.js";
 
 // using node events create a function takes in an expected event and a callback function
 

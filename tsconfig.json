@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "lib": ["es2015", "es2017"],
-    "moduleResolution": "node",
-    "target": "es2022",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "target": "ES2022",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,

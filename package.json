@@ -4,7 +4,8 @@
   "homepage": "https://repo1.dso.mil/platform-one/big-bang/apps/product-tools/repo-sync",
   "version": "1.0.0",
   "license": "ISC",
-  "main": "index.ts",
+  "main": "./lib/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.test.ts\" --exec \"npm start\"",

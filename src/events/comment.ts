@@ -1,5 +1,5 @@
-import {onGitHubEvent, onGitlabEvent} from './eventManager';
-import {GetDownstreamRequestNumber, GetUpstreamRequestNumber } from '../assets/projectMap';
+import {onGitHubEvent, onGitlabEvent} from './eventManager.js';
+import {GetDownstreamRequestNumber, GetUpstreamRequestNumber } from '../assets/projectMap.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -61,7 +61,7 @@ onGitlabEvent('note.MergeRequest', async (context) => {
     //create variable for project name 
     const userName = payload.user.username as string;
     //create variable for username  
-    if(userName.includes("_bot_")){
+    if(userName.includes(`project_${payload.project.id}_bot`)){
         console.log("Bot Comment, Ignoring");
         return
     }
@@ -100,6 +100,4 @@ onGitlabEvent('note.MergeRequest', async (context) => {
         {name: emoji},
         {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
     );
-   
-
 })
