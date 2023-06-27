@@ -918,8 +918,11 @@ oscal_validate() {
    yq eval oscal-component.yaml -o=json > tmp_oscal-component.json
    jsonschema -i tmp_oscal-component.json ${PIPELINE_REPO_DESTINATION}/oscal/oscal_component_schema.json -o pretty || export OSCAL_EXIT_CODE=$?
    if [[ ${OSCAL_EXIT_CODE} -ne 0 ]]; then
-     echo "OSCAL is not valid."
-     OSCAL_EXIT_CODE=4
+     echo "❌ OSCAL is not valid."
+     #exit code to fail pipelines if invalid
+     exit 1
+     #exit code to allow pipeline to continue if invalid 
+     #OSCAL_EXIT_CODE=4
    else
      echo "OSCAL is valid."
    fi
