@@ -26,7 +26,11 @@ if [[ -z "${VPC_ID}" ]]; then
   VPC_ID=vpc-065ffa1c7b2a2b979
 fi
 
-if [[ -z "${AMI_ID}" ]]; then
+# If the user is using her own AMI, then respect that and do not update it.
+APT_UPDATE="true"
+if [[ $AMI_ID ]]; then
+  APT_UPDATE="false"
+else
   # default
   AMI_ID=$(aws ec2 describe-images --filters Name=owner-alias,Values=aws-marketplace Name=architecture,Values=x86_64 Name=name,Values="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" --query 'max_by(Images, &CreationDate).ImageId' --output text)
 fi
@@ -491,9 +495,11 @@ EOF
   run "sudo bash -c 'echo \"\$(date -u -d \"+8 hours\" +\"%M %H\") * * * /usr/sbin/shutdown -h now\" | crontab -'"
   echo
 
-  echo
-  echo "updating packages"
-  run "sudo apt-get -y update"
+  if [[ $APT_UPDATE = "true" ]]; then
+    echo
+    echo "updating packages"
+    run "sudo apt-get update && sudo apt-get upgrade -y"
+  fi
 
   echo
   echo "installing docker"
