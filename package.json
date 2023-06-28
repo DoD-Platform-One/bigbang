@@ -14,6 +14,8 @@
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change --coverage",
     "smee:start": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -P /Repo-Sync",
+    "smee:ssl": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -t https://localhost/repo-sync",
+
     "smee:record": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -P /record"
   },
   "dependencies": {
