@@ -69,6 +69,11 @@ include:
         export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
         export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+      elif [[ "$CLUSTER_TYPE" == "AIRGAP" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
+        echo "Using EKS IAM User AWS Access Keys"
+        export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
+        export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
+        export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
       else
         echo "Failed to export AWS Credentials. Rules did not match"
       fi

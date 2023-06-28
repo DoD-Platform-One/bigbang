@@ -13,7 +13,11 @@ variable "airgap_env_name" {
   default     = "airgap_env_name"
 }
 
-variable "bb_release" {
+variable "bb_release" {}
+
+variable "zarf_version" {
+  type = string
+  default = "v0.27.0"
 }
 
 variable "env" {}

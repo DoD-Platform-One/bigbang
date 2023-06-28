@@ -294,7 +294,13 @@ pre_vars() {
     export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
     export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
     export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+  elif [[ "$CLUSTER_TYPE" == "AIRGAP" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
+    echo "Using AIRGAP IAM User AWS Access Keys"
+    export AWS_ACCESS_KEY_ID=${AIRGAP_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${AIRGAP_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${AIRGAP_AWS_DEFAULT_REGION}
   fi
+
   echo "TF_VAR_vpc_cidr=$(python3 ${PIPELINE_REPO_DESTINATION}/infrastructure/aws/dependencies/get-vpc.py | tr -d '\n' | tr -d '\r')" >> variables.env
   cat variables.env
 }
@@ -311,6 +317,11 @@ load_aws_creds() {
     export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
     export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
     export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
+  elif [[ "$CLUSTER_TYPE" == "AIRGAP" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
+    echo "Using AIRGAP IAM User AWS Access Keys"
+    export AWS_ACCESS_KEY_ID=${AIRGAP_AWS_ACCESS_KEY_ID}
+    export AWS_SECRET_ACCESS_KEY=${AIRGAP_AWS_SECRET_ACCESS_KEY}
+    export AWS_REGION=${AIRGAP_AWS_DEFAULT_REGION}
   fi
 }
 
@@ -1842,20 +1853,6 @@ gitlab_triage(){
     #!/bin/bash
     for project in $(awk '{print $1}' project_whitelist.txt); do
         gitlab-triage $@ --token $RENOVATE_TOKEN --host-url $CI_SERVER_URL --source-id $project --source projects
-    done
-}
-
-airgap_registry_check (){
-    attempt_counter=0
-    max_attempts=18
-    until [ $( curl http://${AIRGAP_NODE_IP}:5000/v2/_catalog -k | grep ironbank >/dev/null; echo $?) -eq 0 ]; do
-      if [ ${attempt_counter} -eq ${max_attempts} ];then
-        echo "Max attempts reached, airgap registry unavailable"
-        exit 1
-      fi
-      echo "Waiting for airgap registry to be ready"
-      attempt_counter=$(($attempt_counter+1))
-      sleep 10
     done
 }
 

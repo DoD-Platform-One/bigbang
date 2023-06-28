@@ -1,6 +1,6 @@
-# Bigbang CI pipelines defintiions
+# Bigbang CI pipelines definitions
 # There are 4 different use-cases/pipelines that are supported by this file:
-#   1) Build and test changes made from a Merge Reuqest using a docker-in-docker (DIND) K3D cluster deployment inside the
+#   1) Build and test changes made from a Merge Request using a docker-in-docker (DIND) K3D cluster deployment inside the
 #      gitlab runner.
 #   2) Build and test a commit to the main branch (default branch) using a AWS created K3S cluster which is deployed
 #       using Terraform
@@ -43,6 +43,7 @@ stages:
   - 💣 bigbang down
   - 💣 cluster down
   - 💣 network down
+  - 📦 airgap packager
   - ⚓ airgap up
   - 🌌 bigbang airgap up
   - 💣 airgap down
@@ -142,7 +143,7 @@ pre vars infra:
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
-    - if: $JOB_TYPE == "nightly"
+#    - if: $JOB_TYPE == "nightly"
   extends:
     - .generic-runner-tags
     - .util-image
@@ -814,6 +815,24 @@ aws/eks/cluster down:
 #
 #-----------------------------------------------------------------------------------------------------------------------
 
+aws/airgap packager:
+  stage: 📦 airgap packager
+  extends:
+    - .generic-runner-tags
+    - .airgap packager
+  needs:
+    - job: pre vars infra
+      artifacts: true
+  environment:
+    name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    auto_stop_in: 1 hour
+  retry:
+    max: 2
+    when:
+      - unknown_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+
 aws/airgap up:
   stage: ⚓ airgap up
   extends:
@@ -845,7 +864,7 @@ aws/airgap/bigbang up:
       artifacts: true
   script:
     # Operational up to this point, see "before script"
-    # flux install works, proving that the the airgap cluster is able to pull from the airgap registry
+    # flux install works, proving that the airgap cluster is able to pull from the airgap registry
     # Work is needed to create an airgap values.yaml
     # must use the big bang chart pulled in the "before script" to prove repo artifacts (./bigbang)
     - kubectl get all -A
