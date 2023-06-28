@@ -1,0 +1,63 @@
+#!/bin/bash
+set -e
+
+sudo bash -c 'sysctl -w vm.max_map_count=524288; \
+  echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf; \
+  sysctl -w fs.nr_open=13181252; \
+  echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf; \
+  sysctl -w fs.file-max=13181250; \
+  echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf; \
+  echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf; \
+  sysctl -w fs.inotify.max_user_instances=1024; \
+  echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf; \
+  sysctl -w fs.inotify.max_user_watches=1048576; \
+  echo "fs.may_detach_mounts=1" >> /etc/sysctl.d/fs-may_detach_mounts.conf; \
+  sysctl -w fs.may_detach_mounts=1; \
+  sysctl -p; \
+  echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+  echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
+  modprobe br_netfilter; \
+  modprobe nf_nat_redirect; \
+  modprobe xt_REDIRECT; \
+  modprobe xt_owner; \
+  modprobe xt_statistic; \
+  echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "nf_nat_redirect" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf; \
+  echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf'
+
+sudo yum update -y
+sudo yum install -y \
+      yum-utils \
+      unzip \
+      git
+
+# install awscli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip -q awscliv2.zip
+sudo ./aws/install
+rm -rf ~/*aws*
+sudo chmod -R 755 /usr/local/aws-cli
+
+# allow kubeapi
+sudo iptables -A INPUT -p tcp -m tcp --dport 6443 -m state --state NEW -j ACCEPT
+sudo service iptables save
+
+LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
+echo "Installing zarf and getting init package..."
+curl -LO https://github.com/defenseunicorns/zarf/releases/download/${zarf_version}/zarf_${zarf_version}_Linux_amd64
+sudo mv zarf_${zarf_version}_Linux_amd64 /usr/local/bin/zarf
+sudo chmod +x /usr/local/bin/zarf
+echo "Retrieving zarf init package..."
+curl -LO https://github.com/defenseunicorns/zarf/releases/download/${zarf_version}/zarf-init-amd64-${zarf_version}.tar.zst
+
+sudo /usr/local/bin/zarf init --components=k3s,git-server --confirm --set K3S_ARGS="--disable=traefik --disable=metrics-server --disable=servicelb"
+
+# verify k3s is ready
+sleep 30
+KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl wait --for=condition=Ready --timeout=120s pods --all --all-namespaces
+sed -i "s/127.0.0.1/$LOCALIP/g" /etc/rancher/k3s/k3s.yaml
+sudo /usr/local/bin/aws s3 cp /etc/rancher/k3s/k3s.yaml s3://airgap-tf-states/airgap/${env}/airgap_kubeconfig.yaml

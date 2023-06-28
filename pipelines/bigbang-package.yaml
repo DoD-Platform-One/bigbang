@@ -222,11 +222,9 @@ upgrade:
     paths:
       - events.txt
       - get_cpumem.txt
-      - images.txt
       - pod_logs
       - cluster_info_dump.txt
       - kubectl_describes
-      - cypress-artifacts
     expire_in: 3 days
   allow_failure:
     exit_codes:
