@@ -19,6 +19,14 @@ RUN git clone https://repo1.dso.mil/platform-one/hagrid/sync.git synker && \
     cd synker && \
     make binary-local-static DISABLE_CGO=1
 
+FROM golang:1.19 AS oscal-build
+
+# Clone BigBang OSCAL Aggregator
+ENV BB_OSCAL_VERSION='v0.1.0-alpha'
+RUN git clone -b ${BB_OSCAL_VERSION} https://github.com/defenseunicorns/bigbang-oscal-component-generator.git \
+    && cd bigbang-oscal-component-generator \
+    && make build
+
 FROM registry.access.redhat.com/ubi8/ubi:8.4
 
 # This dockerfile will download all the needed tools to run a docker in docker k3d cluster
@@ -26,6 +34,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.4
 # Add registry and synker
 COPY --from=registry:2 /bin/registry /usr/local/bin/registry
 COPY --from=builder /go/synker/synker /usr/local/bin/synker
+COPY --from=oscal-build /go/bigbang-oscal-component-generator/bin/bb-oscal /usr/local/bin/bb-oscal
 
 RUN yum -y update && yum clean all
 
