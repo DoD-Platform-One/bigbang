@@ -98,9 +98,6 @@ pre vars:
   stage: 🎛 prevar
   # Never run if this is not one of the scheduled job types below
   rules:
-    - if: $JOB_TYPE == "cut_release"
-      when: never
-      allow_failure: false
     - if: $JOB_TYPE == "nightly"
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/'
@@ -823,6 +820,9 @@ aws/airgap packager:
   needs:
     - job: pre vars infra
       artifacts: true
+  rules:
+    - if: '$JOB_TYPE == "cut_release"'
+      when: never
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     auto_stop_in: 1 hour
@@ -841,6 +841,9 @@ aws/airgap up:
   needs:
     - job: pre vars infra
       artifacts: true
+  rules:
+    - if: '$JOB_TYPE == "cut_release"'
+      when: never
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     auto_stop_in: 1 hour
@@ -862,6 +865,9 @@ aws/airgap/bigbang up:
       artifacts: true
     - job: aws/airgap up
       artifacts: true
+  rules:
+    - if: '$JOB_TYPE == "cut_release"'
+      when: never
   script:
     # Operational up to this point, see "before script"
     # flux install works, proving that the airgap cluster is able to pull from the airgap registry
@@ -884,6 +890,9 @@ aws/airgap down:
       artifacts: true
     - job: aws/airgap/bigbang up
       artifacts: true
+  rules:
+    - if: '$JOB_TYPE == "cut_release"'
+      when: never
   environment:
     name: review/aws-airgap-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     action: stop
