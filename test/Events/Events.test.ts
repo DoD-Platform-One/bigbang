@@ -4,7 +4,7 @@ import {payload as pullRequestPayload} from '../fixtures/pullRequest'
 import {gitlabNoteMergeRequest} from '../fixtures/gitlab-note.MergeRequest'
 import { mockApi } from '../mocks/mocks'
 import { UpdateConfigMapping } from '../../src/assets/projectMap'
-import teardown from '../teardown'
+import {clearMapping} from '../teardown'
 
 const setupConfig = () => UpdateConfigMapping({
   projectName: pullRequestPayload.repository.name,
@@ -71,7 +71,7 @@ describe ('Create GitLab Context', () => {
 
   beforeEach(() => {
     // ensure config mapping is empty
-    teardown()
+    clearMapping()
     mockApi("github","post", "/app/installations/1/access_tokens", {token: "testToken"})
   })
 

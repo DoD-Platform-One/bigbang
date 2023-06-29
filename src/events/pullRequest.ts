@@ -49,9 +49,11 @@ onGitHubEvent('pull_request.opened', async (context) => {
 
         const repo1Project = await axios.get(`https://repo1.dso.mil/api/v4/projects/${ProjectID}`)
         const defaultBranchName = repo1Project.data.default_branch
+    
+        const MREditedDescription = `${payload.pull_request.body}\n\n<hr/>\n# This Merge Request is associated with A GitHub PR: ${payload.pull_request.html_url} ### Please Use caution before running the pipeline.`
 
         // create Merge Request in gitlab
-        const createMergeRequestURL = `https://repo1.dso.mil/api/v4/projects/${ProjectID}/merge_requests?source_branch=PR-${PRNumber}&target_branch=${defaultBranchName}&title=PR-${PRNumber}&remove_source_branch=true&squash=true`
+        const createMergeRequestURL = `https://repo1.dso.mil/api/v4/projects/${ProjectID}/merge_requests?source_branch=PR-${PRNumber}&target_branch=${defaultBranchName}&title=PR-${PRNumber}&remove_source_branch=true&squash=true&description=${MREditedDescription}`
         const response = await axios.post(createMergeRequestURL, undefined, {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}});
    
         const comment = "Merge Request Created: " + response.data.web_url
@@ -63,7 +65,6 @@ onGitHubEvent('pull_request.opened', async (context) => {
 
         console.log(`comment posted to github PR ${payload.pull_request.comments_url}`);
         
-
         // update config mapping for new MR and PR relationship
         UpdateConfigMapping({
             projectName: payload.repository.name,

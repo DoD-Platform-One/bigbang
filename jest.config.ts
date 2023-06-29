@@ -13,7 +13,9 @@ const config: Config.InitialOptions = {
   testMatch: ["**/*.test.+(ts|tsx|js)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   setupFiles: ["dotenv/config"],
+  globalSetup: "./test/setup.ts",
   globalTeardown: "./test/teardown.ts",
+  watchPathIgnorePatterns: ["<rootDir>/test/fixtures"],
   // Needed for ECMAScript Modules aka import name.js
   moduleNameMapper: {
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1"
