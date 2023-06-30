@@ -37,16 +37,17 @@ app.post('/repo-sync', async (req, res) => {
   // crete the context object for webhook consumption
   const context = await createContext(req.headers, req.body)
   if (!context){
-    res.send("Not Supported")
+    return res.send("Not Supported")
   }
 
   // for events
   if (context.instance == 'github' || context.instance == 'gitlab') {
     emitter.emit(context.event, context)
-    res.send("OK")
+    // TODO invoke res.send in each event handler
+    return res.send("OK")
+  }else{
+    return res.send("Not Supported")
   }
-
-  res.send("Not Supported")
 })
 
 app.post('/record', async (req) => {
@@ -54,7 +55,8 @@ app.post('/record', async (req) => {
   if (!context){
     return
   }
-  const filepath = path.join(__dirname, '..', 'test', 'fixtures', `${context.instance}-${context.event}.json`)
+  const __dirname = path.resolve(path.dirname(''));
+  const filepath = path.join(__dirname, 'test', 'fixtures', `${context.instance}-${context.event}.json`)
   const data = format(JSON.stringify(req.body), { parser: "json" })
   fs.writeFileSync(filepath, data, { flag: 'w' });
 })

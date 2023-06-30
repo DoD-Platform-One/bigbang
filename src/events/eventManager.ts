@@ -50,7 +50,7 @@ export const createContext = async (headers: IncomingHttpHeaders, payload: any) 
         if (key.toLowerCase() === "x-gitlab-event") {
             state["instance"] = "gitlab"
             const event = payload.object_kind
-            const action = payload?.object_attributes?.action ?? payload?.object_attributes?.noteable_type ?? undefined
+            const action = payload?.object_attributes?.state ?? payload?.object_attributes?.noteable_type ?? undefined
 
 
             if (action){
