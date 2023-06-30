@@ -9,7 +9,7 @@ export const emitter = new EventEmitter();
 
 // TODO validate these are correct via API docs
 type GitHubEvents = "pull_request.opened" | "pull_request.closed" | "issue_comment.created" | "issue_comment.edited" | "issue_comment.deleted";
-type GitLabEvents = "note.MergeRequest" | "merge_request.approved" | "merge_request.update" | "merge_request.opened" | "merge_request.closed" | "push" | 'build' | 'pipeline';
+type GitLabEvents = "note.MergeRequest" | "merge_request.approved" | "merge_request.update" | "merge_request.opened" | "merge_request.closed" |"merge_request.state"| "push" | 'build' | 'pipeline';
 
 export interface IEventContextObject {
     instance: "github" | "gitlab",

@@ -100,4 +100,27 @@ onGitlabEvent('note.MergeRequest', async (context) => {
         {name: emoji},
         {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
     );
+ 
 })
+
+// PR close in Github when MR is closed in Gitlab
+onGitlabEvent('merge_request.closed', async (context) => {
+    console.log("merge request closed")
+    const {projectName, payload} = context
+    console.log(payload)
+    const MRNumber = payload.object_attributes.iid
+    const downstreamRequestNumber = GetDownstreamRequestNumber(projectName, MRNumber)
+    const userName = payload.user.username as string;
+
+    // create variable for comment bod to be posted to github
+    const closeMR = `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.state}`
+    console.log(closeMR)
+    const response = await axios.patch(
+        `${context.mapping.github.url}/issues/${downstreamRequestNumber}`,
+        {state: "closed"},
+        {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}}
+    );
+    console.log(response)
+})      
+
+
