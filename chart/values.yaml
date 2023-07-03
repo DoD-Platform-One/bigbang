@@ -315,11 +315,11 @@ jaeger:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
     path: "./chart"
-    tag: "2.45.0-bb.2"
+    tag: "2.46.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "jaeger"
-    tag: "2.45.0-bb.2"
+    tag: "2.46.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Jaeger Package
   flux:
