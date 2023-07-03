@@ -1,0 +1,11 @@
+{{- if .Values.oidcCaCert  }}
+# Kiali needs a specifically named configmap.
+# https://kiali.io/docs/configuration/authentication/openid/#using-an-openid-provider-with-a-self-signed-certificate
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kiali-cabundle
+  namespace: {{ .Release.Namespace }}
+data:
+  openid-server-ca.crt: {{ .Values.oidcCaCert | quote }}
+{{- end }}

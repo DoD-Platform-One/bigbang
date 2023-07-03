@@ -1,7 +1,6 @@
 # kiali
 
-![Version: 1.68.0-bb.0](https://img.shields.io/badge/Version-1.68.0--bb.0-informational?style=flat-square) ![AppVersion: 1.68.0](https://img.shields.io/badge/AppVersion-1.68.0-informational?style=flat-square)
-
+![Version: 1.68.0-bb.1](https://img.shields.io/badge/Version-1.68.0--bb.1-informational?style=flat-square) ![AppVersion: 1.68.0](https://img.shields.io/badge/AppVersion-1.68.0-informational?style=flat-square)
 
 Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
@@ -56,10 +55,10 @@ helm install kiali chart/
 | podLabels | object | `{}` |  |
 | env | list | `[]` |  |
 | tolerations | list | `[]` |  |
-| resources.requests.cpu | string | `"100m"` |  |
-| resources.requests.memory | string | `"512Mi"` |  |
-| resources.limits.cpu | string | `"100m"` |  |
-| resources.limits.memory | string | `"512Mi"` |  |
+| resources.requests.cpu | string | `"200m"` |  |
+| resources.requests.memory | string | `"1200Mi"` |  |
+| resources.limits.cpu | string | `"200m"` |  |
+| resources.limits.memory | string | `"1200Mi"` |  |
 | affinity | object | `{}` |  |
 | replicaCount | int | `1` |  |
 | priorityClassName | string | `""` |  |
@@ -82,6 +81,7 @@ helm install kiali chart/
 | allowSecurityContextOverride | bool | `false` |  |
 | allowAllAccessibleNamespaces | bool | `true` |  |
 | accessibleNamespacesLabel | string | `""` |  |
+| oidcCaCert | string | `""` |  |
 | cr.create | bool | `true` |  |
 | cr.name | string | `"kiali"` |  |
 | cr.namespace | string | `""` |  |

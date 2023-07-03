@@ -120,6 +120,11 @@ allowAllAccessibleNamespaces: true
 # of the Istio control plane namespace (which is typically, but not necessarily, "istio-system").
 accessibleNamespacesLabel: ""
 
+# oidcCaCert gives Kiali a CA certificate to use when communicating with the OIDC Identity Provider.
+# This is not a feature provided by Kiali out of the box, so it must be provisioned manually outside of the CR spec.
+# See https://kiali.io/docs/configuration/authentication/openid/#using-an-openid-provider-with-a-self-signed-certificate
+oidcCaCert: ""
+
 # For what a Kiali CR spec can look like, see:
 # https://github.com/kiali/kiali-operator/blob/master/deploy/kiali/kiali_cr.yaml
 cr:
