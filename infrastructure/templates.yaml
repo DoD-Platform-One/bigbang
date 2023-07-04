@@ -13,7 +13,7 @@ include:
   stage: 🔌 network up
   rules:
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
       allow_failure: false
 
 # Abstract for jobs responsible for creating infrastructure
@@ -23,13 +23,13 @@ include:
     - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^(hotfix|patch)/'
       when: never
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
 
 # Abstract for jobs responsible for cleaning up infrastructure OR when `test-ci` label is assigned
 .infra aws cleanup:
   rules:
     # Run on scheduled jobs
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $JOB_TYPE == "nightly") || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/'
       allow_failure: true
       when: always
 
@@ -59,12 +59,12 @@ include:
     - |
       set -
       echo "Setting AWS Access Keys according to rules"
-      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
+      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
         echo "Using RKE2 IAM User AWS Access Keys"
         export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
         export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
-      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
+      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
         echo "Using EKS IAM User AWS Access Keys"
         export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
@@ -104,12 +104,12 @@ include:
     - |
       set -
       echo "Setting AWS Access Keys according to rules"
-      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
+      if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "rke2" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "airgap" ]]; then
         echo "Using RKE2 IAM User AWS Access Keys"
         export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
         export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
-      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
+      elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] || [[ "$CI_MERGE_REQUEST_LABELS" =~ "eks" ]]; then
         echo "Using EKS IAM User AWS Access Keys"
         export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
         export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}

@@ -286,11 +286,11 @@ pre_vars() {
   # Create the TF_VAR_env variable
   echo "TF_VAR_env=$(echo $CI_COMMIT_REF_SLUG | cut -c 1-5)-$(echo $CI_COMMIT_SHA | cut -c 1-5)" >> variables.env
   # Calculate a unique cidr range for vpc
-  if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "rke2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
+  if [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CLUSTER_TYPE" == "RKE2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "rke2" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "airgap" ]]; then
     export AWS_ACCESS_KEY_ID=${RKE2_AWS_ACCESS_KEY_ID}
     export AWS_SECRET_ACCESS_KEY=${RKE2_AWS_SECRET_ACCESS_KEY}
     export AWS_REGION=${RKE2_AWS_DEFAULT_REGION}
-  elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] && [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "eks" ]]; then
+  elif [[ "$CLUSTER_TYPE" == "EKS" ]] && [[ "$CI_PIPELINE_SOURCE" == "schedule" ]] || [[ ${CI_MERGE_REQUEST_LABELS[*]} =~ "eks" ]]; then
     export AWS_ACCESS_KEY_ID=${EKS_AWS_ACCESS_KEY_ID}
     export AWS_SECRET_ACCESS_KEY=${EKS_AWS_SECRET_ACCESS_KEY}
     export AWS_REGION=${EKS_AWS_DEFAULT_REGION}
