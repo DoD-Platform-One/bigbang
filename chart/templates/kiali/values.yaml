@@ -23,6 +23,10 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
+{{- if and .Values.kiali.enabled .Values.kiali.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso))  }}
+oidcCaCert: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | quote }}
+{{- end }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 elasticsearch:
