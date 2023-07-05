@@ -109,7 +109,6 @@ onGitlabEvent('merge_request.closed', async (context) => {
     const MRNumber = payload.object_attributes.iid
     const downstreamRequestNumber = GetDownstreamRequestNumber(projectName, MRNumber)
     // const userName = payload.user.username as string;
-    // const comment= `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.state}`
 
     // PR closed to github
     await axios.patch(
