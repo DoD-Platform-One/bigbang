@@ -100,4 +100,36 @@ onGitlabEvent('note.MergeRequest', async (context) => {
         {name: emoji},
         {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
     );
+ 
+})
+
+// PR close in Github when MR is closed in Gitlab
+onGitlabEvent('merge_request.closed', async (context) => {
+    const {projectName, payload} = context
+    const MRNumber = payload.object_attributes.iid
+    const downstreamRequestNumber = GetDownstreamRequestNumber(projectName, MRNumber)
+    // const userName = payload.user.username as string;
+
+    // PR closed to github
+    await axios.patch(
+        `${context.mapping.github.url}/issues/${downstreamRequestNumber}`,
+        {state: "closed"},
+        {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}}
+        );
+})
+
+    //MR close in gitlab when PR is closed in github
+    onGitHubEvent('pull_request.closed', async (context) => {
+        const {projectName, payload} = context
+        const PRNumber = payload.pull_request.number;
+        const upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber)
+        //MR closed to gitlab
+        await axios.put(
+            `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${upstreamRequestNumber}`,
+             {state_event: "close"}, 
+            {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
+            );
+            
+        
+    
 })
