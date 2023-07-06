@@ -8,8 +8,10 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "postbuild": "cp ./.env ./lib/.env",
     "dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.test.ts\" --exec \"npm start\"",
     "start": "ts-node ./src/index.ts",
+    "prod-start": "npm run build && node ./lib/index.js",
     "lint": "eslint --ext .ts .",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change --coverage",
