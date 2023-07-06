@@ -79,6 +79,40 @@ loki:
       replicas: 2
 ```
 
+You can also optionally use HPA with Loki for each component. There are additional options for the target memory and scaling behavior that you can reference in the [package chart values](https://repo1.dso.mil/big-bang/product/packages/loki/-/blob/main/chart/values.yaml).
+
+```yaml
+loki:
+  values:
+    write:
+      autoscaling:
+        enabled: true
+        # -- Minimum autoscaling replicas for the write.
+        minReplicas: 1
+        # -- Maximum autoscaling replicas for the write.
+        maxReplicas: 3
+        # -- Target CPU utilization percentage for the write.
+        targetCPUUtilizationPercentage: 80
+    read:
+      autoscaling:
+        enabled: true
+        # -- Minimum autoscaling replicas for the write.
+        minReplicas: 1
+        # -- Maximum autoscaling replicas for the write.
+        maxReplicas: 3
+        # -- Target CPU utilization percentage for the write.
+        targetCPUUtilizationPercentage: 80
+    backend:
+      autoscaling:
+        enabled: true
+        # -- Minimum autoscaling replicas for the write.
+        minReplicas: 1
+        # -- Maximum autoscaling replicas for the write.
+        maxReplicas: 3
+        # -- Target CPU utilization percentage for the write.
+        targetCPUUtilizationPercentage: 80
+```
+
 ### UI
 
 Loki has no UI packaged with it. Grafana is the frontend to view logs which are ingested by Loki.
