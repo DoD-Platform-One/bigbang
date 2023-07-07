@@ -1,135 +1,416 @@
-import {onGitHubEvent, onGitlabEvent} from './eventManager.js';
-import {GetDownstreamRequestNumber, GetUpstreamRequestNumber } from '../assets/projectMap.js';
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
+import {
+  GetDownstreamRequestNumber,
+  GetUpstreamRequestNumber,
+} from "../assets/projectMap.js";
+import MappingError from "../errors/MappingError.js";
+import { getDiscussionId } from "../queries/discussion.js";
+import githubReplyParser from "../utils/githubReply.js";
+import gitlabReplyParser from "../utils/gitlabReply.js";
+import { onGitHubEvent, onGitLabEvent } from "./eventManagerTypes.js";
 dotenv.config();
 
 ///////////////////////////////
 // GITHUB
 ///////////////////////////////
 
-onGitHubEvent('issue_comment.created', async (context) => {
-const {payload, mapping, projectName} = context
-//create variable for issue number
-const PRNumber = payload.issue.number;
+onGitHubEvent("issue_comment.created", async (context) => {
+  const { payload, mapping, projectName, next, isBot, userName } = context;
+  //create variable for issue number
+  const PRNumber = payload.issue.number;
 
-//create variable for user type
-const userType = payload.comment.user.type;
+  //verify comment is not from a bot and end process if it is
+  if (isBot) {
+    context.response.status(403);
+    return context.response.send("Bot comment detected, ignoring");
+  }
+  let upstreamRequestNumber: number;
+  try {
+    upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber);
+  } catch (err) {
+    githubCommentReaction(
+      400,
+      payload.comment.url,
+      context.gitHubAccessToken
+    )
+    return next(
+      new MappingError(`Project ${projectName} does not exist in the mapping`)
+    );
+  }
 
-//verify comment is not from a bot and end process if it is
-if(userType === "Bot"){
-    console.log("Bot Comment, Ignoring");
-    return
-}
+  //format comment to be posted to gitlab
 
-const upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber)
-const userName = payload.comment.user.login;
+  const [isReply, noteId, strippedComment] = githubReplyParser(
+    payload.comment.body
+  );
 
-//format comment to be posted to gitlab
-const comment = `#### ${userName} [commented](${payload.comment.html_url}): <hr> \n\n  ${payload.comment.body}`
+  const githubCommentUrl = payload.comment.html_url;
+  let response;
 
+  // this structure set up the comment to look like
+  // GitHub Comment Mirrored Here(<link>)<hr/>
+  // #### <username> commented: <hr/>
+  //<comment>
+  const githubComment = `[Github Comment Mirrored Here](${githubCommentUrl})`;
+  const commentBy = `#### ${userName} [commented](${githubCommentUrl}): <hr/>`;
+  const editedGitlabComment = `${githubComment}\r\n${commentBy}`;
+  if (isReply && noteId) {
+    // the top link is used to back reference replies to the original comment
+    response = await createGitlabReply(
+      noteId,
+      editedGitlabComment + strippedComment,
+      mapping.gitlab.projectID,
+      upstreamRequestNumber
+    );
+  } else {
+    // axios post to gitlab api to create a comment on the merge request, using auth header with gitlab token
+    response = await createGitlabComment(
+      editedGitlabComment + payload.comment.body,
+      mapping.gitlab.projectID,
+      upstreamRequestNumber
+    );
+  }
 
-// axios post to gitlab api to create a comment on the merge request, using auth header with gitlaboken
-const response = await axios.post(
-    `https://repo1.dso.mil/api/v4/projects/${mapping.gitlab.projectID}/merge_requests/${upstreamRequestNumber}/notes`, 
-    {body: comment}, 
-    {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
-);
+  // axios post to github api to add an emoji to the comment sent to this event handler.
+  githubCommentReaction(
+    response.status,
+    payload.comment.url,
+    context.gitHubAccessToken
+  );
 
-// axios post to github api to add an emoji to the comment sent to this event handler.  Checkmark if response is ok and X if not
-const emoji = response.status === 201 ? "+1" : "-1"
-const body = {
-    "content": emoji
-}
-await axios.post(payload.comment.url + "/reactions", body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
-})
+  // edit the github comment to include a link to the gitlab comment if the comment is not a reply to another comment
 
-//post message to gitlab pull request when a comment is created on a github pull request
+  if (isReply) {
+    context.response.status(200);
+    return context.response.send("Reply detected, ignoring");
+  }
+
+  // e.g https://repo1.dso.mil/snekcode/podinfo/-/merge_requests/24#note_1374700
+  // This is needed to enable the reply to comment feature
+  //comment: string, noteId: string, MRNumber: string, gitlabUrl: string, gitHubUrl: string, gitHubAccessToken: string
+
+  updateGitHubCommentWithMirrorLink(
+    payload.comment.body,
+    response.data.id,
+    upstreamRequestNumber,
+    mapping.gitlab.url,
+    payload.comment.url,
+    context.gitHubAccessToken
+  );
+  context.response.status(200);
+  return context.response.send("Comment created");
+});
+
+//
+//
+//
+//
+//
+//
+//
+
+//
+//
+//
+//
+//
+//
+//
 
 ///////////////////////////////
 // GITLAB / REPO1
 ///////////////////////////////
 
-onGitlabEvent('note.MergeRequest', async (context) => {
-    const {projectName, payload} = context
-    
-    //view payload in console
-    
-    // //create variable for payload merge_request number
-    const MRNumber = payload.merge_request.iid
-    
-    //create variable for project name 
-    const userName = payload.user.username as string;
-    //create variable for username  
-    if(userName.includes(`project_${payload.project.id}_bot`)){
-        console.log("Bot Comment, Ignoring");
-        return
-    }
-    
+onGitLabEvent("note.created", async (context) => {
+  const { projectName, payload, isBot, userName, next } = context;
 
-    //get downstream request number
-    const downstreamRequestNumber = GetDownstreamRequestNumber(projectName, MRNumber)
+  if (isBot) {
+    context.response.status(403);
+    return context.response.send("Bot comment detected, ignoring");
+  }
 
-    //create variable for projectID
-    const projectID = payload.project.id;
+  const noteId = payload.object_attributes.id;
 
-   
-        
-    // create variable for comment bod to be posted to github
-    const comment = `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.note}`
-    //create variable for installationID
+  // //create variable for payload merge_request number
+  const MRNumber = payload.merge_request.iid;
 
-    
-    const response = await axios.post(
-        `${context.mapping.github.url}/issues/${downstreamRequestNumber}/comments`,
-        {body: comment},
-        {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}}
+  //get downstream request number
+  let downstreamRequestNumber;
+  try{
+    downstreamRequestNumber = GetDownstreamRequestNumber(
+      projectName,
+      MRNumber
     );
-    
-    //verify response is ok and post emoji to gitlab comment
-    const emoji = response.status === 201 ? "thumbsup" : "thumbsdown"
-    
-    //create variable for note id from response
-    const note_id = payload.object_attributes.id;
-    //
-
-    ///projects/:id/issues/:issue_iid/notes/:note_id/award_emoji
-    
-    axios.post(
-        `https://repo1.dso.mil/api/v4/projects/${projectID}/merge_requests/${MRNumber}/notes/${note_id}/award_emoji`, 
-        {name: emoji},
-        {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
+  } catch {
+    gitlabNoteReaction(
+      400,
+      noteId,
+      payload.project.id,
+      MRNumber
+    )
+    return next(
+      new MappingError(`Project ${projectName} does not exist in the mapping`)
     );
- 
-})
+  }
 
-// PR close in Github when MR is closed in Gitlab
-onGitlabEvent('merge_request.closed', async (context) => {
-    const {projectName, payload} = context
-    const MRNumber = payload.object_attributes.iid
-    const downstreamRequestNumber = GetDownstreamRequestNumber(projectName, MRNumber)
-    // const userName = payload.user.username as string;
+  //create variable for projectID
+  const projectID = payload.project.id;
 
-    // PR closed to github
-    await axios.patch(
-        `${context.mapping.github.url}/issues/${downstreamRequestNumber}`,
-        {state: "closed"},
-        {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}}
-        );
-})
+  // create variable for comment bod to be posted to github
+  const comment = `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.note}`;
 
-    //MR close in gitlab when PR is closed in github
-    onGitHubEvent('pull_request.closed', async (context) => {
-        const {projectName, payload} = context
-        const PRNumber = payload.pull_request.number;
-        const upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber)
-        //MR closed to gitlab
-        await axios.put(
-            `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${upstreamRequestNumber}`,
-             {state_event: "close"}, 
-            {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
-            );
-            
-        
-    
-})
+  const response = await createGitlabNote(
+    context.mapping.github.url,
+    downstreamRequestNumber,
+    comment,
+    context.gitHubAccessToken
+  );
+
+  //verify response is ok and post emoji to gitlab comment
+  gitlabNoteReaction(response.status, noteId, projectID, MRNumber);
+
+  // edit the gitlab comment to include a link to the github comment
+  // https://github.com/SnekCode/podinfo/pull/24#issuecomment-1613471346
+  await updateGitLabNoteWithMirrorLink(
+    response.data.html_url,
+    payload.object_attributes.note,
+    projectID,
+    MRNumber,
+    noteId
+  );
+  context.response.status(200);
+  return context.response.send("OK");
+});
+
+//
+//
+//
+//
+//
+//
+//
+//
+
+//
+//
+//
+//
+//
+//
+//
+
+//
+//
+//
+//
+//
+//
+//
+
+onGitLabEvent("note.reply", async (context) => {
+  const { mapping, payload, isBot, userName } = context;
+
+  if (isBot) {
+    context.response.status(403);
+    return context.response.send("Bot comment detected, ignoring");
+  }
+  const originalComment = payload.object_attributes.note;
+  // get the discussion id from the object attributes
+  const discussionId = payload.object_attributes.discussion_id;
+  // get the MR number from payload
+  const MRNumber = payload.merge_request.iid;
+  // get top level note from the discussion
+  const discussion = await getGitlabDiscussion(
+    mapping.gitlab.projectID,
+    MRNumber,
+    discussionId
+  );
+
+  // get number of notes in the discussion
+  const numberOfNotes = discussion.data.notes.length;
+  // get the previous note in the discussion
+  const previousNote = discussion.data.notes[numberOfNotes - 2].body;
+  
+  // get the issuecomment id from the top level note's embedded link
+  const [isReply, githubIssueCommentId] = gitlabReplyParser(previousNote);
+
+  // if the top level note is not a reply, return
+  if (!isReply && !githubIssueCommentId) {
+    gitlabNoteReaction(
+      500,
+      payload.object_attributes.id,
+      mapping.gitlab.projectID,
+      MRNumber
+    );
+    context.response.status(400);
+    context.response.send("Top level note is not a reply, ignoring");
+    return context.next();
+  }
+
+  // get the issuecomment value from the github api
+  // add > to the beginning of each line to make it a quote
+  const issueCommentResponse = await axios.get(
+    `${context.mapping.github.url}/issues/comments/${githubIssueCommentId}`,
+    { headers: { Authorization: `Bearer ${context.gitHubAccessToken}` } }
+  );
+  const issueComment = issueCommentResponse.data;
+
+  const quote = issueComment.body
+    .split("\n")
+    .map((line: string) => `> ${line}`)
+    .join("\n");
+
+  // create the comment to be posted to gitlab
+  const githubComment = `${quote}\n\n#### ${userName} [replied](${payload.object_attributes.url}) <hr> \n\n ${originalComment}`;
+
+  // post the comment to github
+  const githubResponse = await axios.post(
+    `${issueComment.issue_url}/comments`,
+    { body: githubComment },
+    { headers: { Authorization: `Bearer ${context.gitHubAccessToken}` } }
+  );
+
+  updateGitLabNoteWithMirrorLink(
+    githubResponse.data.html_url,
+    originalComment,
+    mapping.gitlab.projectID,
+    MRNumber,
+    payload.object_attributes.id
+  );
+
+  context.response.status(200);
+  return context.response.send("Reply posted to github");
+});
+
+//
+//
+//
+//
+//
+//
+//
+
+//
+//
+//
+//
+//
+//
+//
+
+///////////////////////////////
+// HELPER FUNCTIONS
+///////////////////////////////
+
+async function getGitlabDiscussion(
+  projectId: number,
+  MRNumber: number | string,
+  discussionId: number | string
+) {
+  return await axios.get(
+    `https://repo1.dso.mil/api/v4/projects/${projectId}/merge_requests/${MRNumber}/discussions/${discussionId}`,
+    { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
+  );
+}
+
+async function updateGitLabNoteWithMirrorLink(
+  gitHubUrl: string,
+  comment: string,
+  projectID: number,
+  MRNumber: number,
+  noteId: number | string
+) {
+  const githubComment = `[Github Comment Mirrored Here](${gitHubUrl})`;
+  const editedGitlabComment = `${githubComment}<hr/>${comment}`;
+  await axios.put(
+    `https://repo1.dso.mil/api/v4/projects/${projectID}/merge_requests/${MRNumber}/notes/${noteId}`,
+    { body: editedGitlabComment },
+    { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
+  );
+}
+
+async function createGitlabNote(
+  githubUrl: string,
+  downstreamRequestNumber: number,
+  comment: string,
+  gitHubAccessToken: string
+) {
+  return await axios.post(
+    `${githubUrl}/issues/${downstreamRequestNumber}/comments`,
+    { body: comment },
+    { headers: { Authorization: `Bearer ${gitHubAccessToken}` } }
+  );
+}
+
+export async function gitlabNoteReaction(
+  status: number,
+  noteId: number,
+  projectID: number,
+  MRNumber: number
+) {
+  const emoji = status === 201 ? "thumbsup" : "thumbsdown";
+
+  ///projects/:id/issues/:issue_iid/notes/:note_id/award_emoji
+  await axios.post(
+    `https://repo1.dso.mil/api/v4/projects/${projectID}/merge_requests/${MRNumber}/notes/${noteId}/award_emoji`,
+    { name: emoji },
+    { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
+  );
+}
+
+async function githubCommentReaction(
+  status: number,
+  url: string,
+  gitHubAccessToken: string
+) {
+  const emoji = status === 201 ? "+1" : "-1";
+  const body = {
+    content: emoji,
+  };
+  await axios.post(url + "/reactions", body, {
+    headers: { Authorization: `Bearer ${gitHubAccessToken}` },
+  });
+}
+
+async function createGitlabReply(
+  noteId: string,
+  comment: string,
+  projectId: number,
+  MRNumber: number
+) {
+  const discussionId = await getDiscussionId(noteId);
+  return axios.post(
+    `https://repo1.dso.mil/api/v4/projects/${projectId}/merge_requests/${MRNumber}/discussions/${discussionId}/notes`,
+    { body: comment },
+    { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
+  );
+}
+
+async function createGitlabComment(
+  comment: string,
+  projectId: number,
+  MRNumber: number,
+) {
+  return await axios.post(
+    `https://repo1.dso.mil/api/v4/projects/${projectId}/merge_requests/${MRNumber}/notes`,
+    { body: comment },
+    { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
+  );
+}
+async function updateGitHubCommentWithMirrorLink(
+  comment: string,
+  noteId: string,
+  MRNumber: number,
+  gitlabUrl: string,
+  gitHubUrl: string,
+  gitHubAccessToken: string
+) {
+  const gitlabLink = `[Gitlab Comment Mirrored Here](${gitlabUrl}/-/merge_requests/${MRNumber}#note_${noteId})`;
+  const editedGithubComment = `${gitlabLink}<hr/>\r\n${comment}`;
+  return axios.patch(
+    gitHubUrl,
+    { body: editedGithubComment },
+    { headers: { Authorization: `Bearer ${gitHubAccessToken}` } }
+  );
+}

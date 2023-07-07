@@ -1,10 +1,11 @@
 import { ExecSyncOptions, execSync } from 'child_process'
-import {onGitHubEvent} from './eventManager.js'
 import axios from 'axios'
 import {cloneUrl} from '../utils/gitlabSignIn.js'
 
 import dotenv from 'dotenv'
-import { UpdateConfigMapping } from '../assets/projectMap.js'
+import { GetUpstreamRequestNumber, UpdateConfigMapping } from '../assets/projectMap.js'
+import { onGitHubEvent } from './eventManagerTypes.js'
+import MappingError from '../errors/MappingError.js'
 dotenv.config();
 
 onGitHubEvent('pull_request.opened', async (context) => {
@@ -81,3 +82,31 @@ onGitHubEvent('pull_request.opened', async (context) => {
             installationID: installationID
         })
     })
+
+//MR close in gitlab when PR is closed in github
+onGitHubEvent('pull_request.closed', async (context) => {
+    const {projectName, payload, isBot, next} = context
+
+    if (isBot) {
+      context.response.status(403);
+      return context.response.send("Bot comment detected, ignoring");
+    }
+
+    const PRNumber = payload.pull_request.number;
+    let upstreamRequestNumber;
+    try {
+        upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber)
+    }catch {
+        return next(
+            new MappingError(`Project ${projectName} does not exist in the mapping`)
+          );
+    }
+    //MR closed to gitlab
+    await axios.put(
+        `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${upstreamRequestNumber}`,
+         {state_event: "close"}, 
+        {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
+        );
+
+    return context.response.send("OK");
+})

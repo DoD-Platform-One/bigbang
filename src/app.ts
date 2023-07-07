@@ -6,9 +6,11 @@ import path from 'path'
 
 import {format} from 'prettier'
 
-import { createContext, emitter } from './events/eventManager.js'
+import { createContext, emitEvent } from './events/eventManager.js'
 import "./events/pullRequest.js"
+import "./events/mergeRequests.js"
 import "./events/comment.js"
+import ResponseError from './errors/ResponseError.js';
 
 // App
 const app = express();
@@ -29,30 +31,14 @@ app.use(
 //Validate payload middleware
 app.use(validatePayload)
 
-
-
 //Gitlab webhook events
-
-app.post('/repo-sync', async (req, res) => {
-  // crete the context object for webhook consumption
-  const context = await createContext(req.headers, req.body)
-  if (!context){
-    return res.send("Not Supported")
-  }
-
-  // for events
-  if (context.instance == 'github' || context.instance == 'gitlab') {
-    emitter.emit(context.event, context)
-    // TODO invoke res.send in each event handler
-    return res.send("OK")
-  }else{
-    return res.send("Not Supported")
-  }
+app.post('/repo-sync', async (req, res, next) => {
+  emitEvent(req, res, next)  
 })
 
 
-app.post('/record', async (req) => {
-  const context = await createContext(req.headers, req.body)
+app.post('/record', async (req, res, next) => {
+  const context = await createContext(req.headers, req.body, res, next)
   if (!context){
     return
   }
@@ -67,5 +53,17 @@ app.post('/test', (req, res) => {
 })
 
 app.use(adminRouter)
+
+// Error handler
+app.use((err: Error | ResponseError, req: AppRequest, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof ResponseError) {
+    res.status(err.status).send(err.message)
+    return next()
+  }else {  
+    res.status(500).send('Something broke!')
+    return next()
+  }
+})
+
 
 export default app

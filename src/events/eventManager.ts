@@ -1,95 +1,173 @@
-import EventEmitter from "events";
 import { IncomingHttpHeaders } from "http";
-import { GetMapping, IProject } from "../assets/projectMap.js";
+import { GetMapping } from "../assets/projectMap.js";
 import { getGitHubAppAccessToken } from "../appcrypto.js";
+import { NextFunction, Request, Response } from "express";
+import {
+  IEventContextObject,
+  emitter,
+  PayloadType,
+  EventMap,
+  onGitHubEvent,
+  onGitLabEvent
+} from "./eventManagerTypes.js";
+import { MergeRequest, Push } from "../types/gitlab/objects.js";
+import { PullRequestPayload } from "../types/github/objects.js";
+import { gitlabNoteReaction } from "./comment.js";
+import { GitHubEventTypes, PullRequestOpen } from "../types/github/events.js";
+import { NoteCreated, NoteReply, GitlabEventTypes, PushEvent } from "../types/gitlab/events.js";
 
-// using node events create a function takes in an expected event and a callback function
+export {onGitHubEvent, onGitLabEvent}
 
-export const emitter = new EventEmitter();
+export async function createContext(
+  headers: IncomingHttpHeaders,
+  payload: PayloadType,
+  response: Response,
+  next: NextFunction
+): Promise<IEventContextObject> {
+  const state = {} as IEventContextObject;
+  state["payload"] = payload as never;
+  state["response"] = response;
+  state["next"] = next;
 
-// TODO validate these are correct via API docs
-type GitHubEvents = "pull_request.opened" | "pull_request.closed" | "issue_comment.created" | "issue_comment.edited" | "issue_comment.deleted" | "pull_request.reopened";
-type GitLabEvents = "note.MergeRequest" | "merge_request.approved" | "merge_request.update" | "merge_request.opened" | "merge_request.closed" | "push" | 'build' | 'pipeline';
+  for (const key in headers) {
+    if (key.toLowerCase() === "x-github-event") {
+      state["instance"] = "github";
+      const event = headers[key];
+      const action = (payload as PullRequestPayload).action;
+      const appID = headers["x-github-hook-installation-target-id"] as string;
+      isGitHubBot(payload as GitHubEventTypes, state);
 
-export interface IEventContextObject {
-    instance: "github" | "gitlab",
-    event: GitHubEvents | GitLabEvents,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    payload: any,
-    appID?: number,
-    installationID?: number,
-    mapping: IProject,
-    projectName: string,
-    gitHubAccessToken: string
-}
+      state["installationID"] = (payload as PullRequestOpen).installation.id;
+      state["appID"] = +appID;
+      state["event"] = `${event}.${action}` as keyof EventMap;
+      state["projectName"] = payload.repository.name.toLowerCase();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const createContext = async (headers: IncomingHttpHeaders, payload: any) => {
+      state["mapping"] = GetMapping()[state.projectName];
 
-    const state = {} as IEventContextObject
-    state['payload'] = payload
-
-    for (const key in headers) {
-        if (key.toLowerCase() === "x-github-event") {
-            state["instance"] = "github"
-            const event = headers[key]
-            const action = payload.action
-            const appID = headers['x-github-hook-installation-target-id'] as string;
-
-            state['installationID'] = payload.installation.id
-            state['appID'] = +appID
-            state['event'] = `${event}.${action}` as GitHubEvents
-            state['projectName'] = payload.repository.name.toLowerCase()
-
-            state['mapping'] = GetMapping()[state.projectName]
-
-            console.log("This is a Github event", state.event)
-            break
-        }
-
-        if (key.toLowerCase() === "x-gitlab-event") {
-            state["instance"] = "gitlab"
-            const event = payload.object_kind
-            const action = payload?.object_attributes?.state ?? payload?.object_attributes?.noteable_type ?? undefined
-
-
-            if (action){
-                state['event'] = `${event}.${action}` as GitLabEvents
-            } else {
-                state['event'] = event as GitLabEvents
-            }
-
-            // check for project attribute on payload
-            if (payload.project) {
-                state['projectName'] = payload.project.name.toLowerCase()
-            } else if (payload.repository) {
-                state['projectName'] = payload.repository.name.toLowerCase()
-            }
-
-            state['mapping'] = GetMapping()[state.projectName]
-
-            try {
-                state['appID'] = state.mapping.github.appID
-                state['installationID'] = state.mapping.github.installationID
-            } catch {
-                console.log("Gitlab Project Name Not in Config Map");
-                return undefined
-            }
-
-            console.log("This is a GitLab event", state.event)
-            break
-        }
+      console.log("This is a Github event", state.event);
+      break;
     }
 
-    state['gitHubAccessToken'] = await getGitHubAppAccessToken(state.appID, state.projectName, state.installationID )
+    //
+    //
+    //
+    // Gitlab Events
+    //
+    //
 
-    return state;
+    if (key.toLowerCase() === "x-gitlab-event") {
+      state["instance"] = "gitlab";
+      const event = (payload as NoteCreated).object_kind;
+      let action =
+        (payload as Push).action ??
+        (payload as MergeRequest)?.object_attributes?.state ??
+        (payload as NoteReply)?.object_attributes?.type ??
+        undefined;
+      isGitlabBot(payload as GitlabEventTypes, state);
+
+      // rules for notes
+      if (event === "note" && !action) {
+        action = "created";
+      }
+      if (
+        event === "note" &&
+        (payload as NoteCreated)?.object_attributes?.type === "Note"
+      ) {
+        action = "created";
+      }
+
+      if (
+        event === "note" &&
+        (payload as NoteReply)?.object_attributes?.type === "DiscussionNote"
+      ) {
+        action = "reply";
+      }
+
+      if (action) {
+        state["event"] = `${event}.${action}` as keyof EventMap;
+      } else {
+        state["event"] = event as keyof EventMap;
+      }
+
+      // check for project attribute on payload
+      if ((payload as MergeRequest).project) {
+        state["projectName"] = (
+          payload as MergeRequest
+        ).project.name.toLowerCase();
+      } else if (payload.repository) {
+        state["projectName"] = payload.repository.name.toLowerCase();
+      }
+
+      state["mapping"] = GetMapping()[state.projectName];
+
+      try {
+        state["appID"] = state.mapping.github.appID;
+        state["installationID"] = state.mapping.github.installationID;
+      } catch {
+        console.log("Gitlab Project Name Not in Config Map");
+        state["isFailed"] = true;
+        return state;
+      }
+      // don't care about bots
+      if (state.isBot) {
+        break;
+      }
+      console.log("This is a GitLab event", state.event);
+      break;
+    }
+  }
+
+  state["gitHubAccessToken"] = await getGitHubAppAccessToken(
+    state.appID,
+    state.projectName,
+    state.installationID
+  );
+
+  return state;
 }
 
-export const onGitHubEvent = (event: GitHubEvents, callback: (context: IEventContextObject) => void) => {
-    emitter.on(event, callback);
+export const emitEvent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any> => {
+  const context = await createContext(req.headers, req.body, res, next);
+
+  if (context.isFailed) {
+    if (context.event === "note.created" || context.event === "note.reply") {
+      const note = context.payload as NoteCreated;
+      gitlabNoteReaction(
+        400,
+        note.object_attributes.id,
+        note.project_id,
+        note.merge_request.iid
+      );
+    }
+    res.status(400);
+    return res.send("Invalid Event");
+  }
+
+  const event = context.event;
+  emitter.emit(event, context);
+};
+
+
+
+// helper functions
+
+function isGitlabBot(payload: GitlabEventTypes, state: IEventContextObject) {
+  const userName =
+    (payload as MergeRequest)?.user?.username ??
+    (payload as PushEvent)?.user_username;
+
+  state["isBot"] = userName.includes("_bot");
+  state["userName"] = userName;
 }
 
-export const onGitlabEvent = (event: GitLabEvents, callback: (context: IEventContextObject) => void) => {
-    emitter.on(event, callback);
+function isGitHubBot(payload: GitHubEventTypes, state: IEventContextObject) {
+  const userType = payload.sender.type;
+  const userName = payload.sender.login;
+  state["isBot"] = userType === "Bot";
+  state["userName"] = userName;
 }
