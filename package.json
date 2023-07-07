@@ -13,18 +13,19 @@
     "start": "ts-node ./src/index.ts",
     "prod-start": "npm run build && node ./lib/index.js",
     "lint": "eslint --ext .ts .",
-    "test": "jest",
-    "test:watch": "jest --watch --notify --notifyMode=change --coverage",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch --coverage",
     "smee:start": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -P /Repo-Sync",
     "smee:ssl": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -t https://localhost/repo-sync",
-
     "smee:record": "source ./.env && smee -u https://smee.io/$SMEE -p $PORT -P /record"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "graphql-request": "^6.1.0",
     "jsonwebtoken": "^9.0.0",
+    "msw": "^1.2.2",
     "serverless-http": "^3.2.0",
     "ts-node": "^10.9.1"
   },
