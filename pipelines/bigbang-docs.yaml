@@ -31,7 +31,7 @@ bb-docs:on-schedule-tag:
       - $TAG == "true"
   script:
     - cd ..
-    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/product-tools/bb-docs-compiler.git" scheduled-build
+    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/big-bang/team/tools/bb-docs-compiler.git" scheduled-build
     - cd scheduled-build
     - git checkout docs
     - git checkout main
@@ -76,7 +76,7 @@ bb-docs:on-schedule-latest:
       - $LATEST == "true"
   script:
     - cd ..
-    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/platform-one/big-bang/apps/product-tools/bb-docs-compiler.git" scheduled-build
+    - git clone "https://docs.gen:${DOCS_GEN_TOKEN}@repo1.dso.mil/big-bang/team/tools/bb-docs-compiler.git" scheduled-build
     - cd scheduled-build
     - git checkout docs
     - git checkout main
