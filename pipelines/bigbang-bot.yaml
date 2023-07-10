@@ -1,5 +1,3 @@
-image: registry1.dso.mil/ironbank/opensource/python/python38:3.8
-
 variables:
 # So long as the token permissions are the same, we are going to use the renovate token for the bb-bot. 
 # If the bb-bot needs different permissions than renovate, we'll need to generate a token specifically for that function.
@@ -25,10 +23,10 @@ stages:
   - scheduled
 
 before_script:
-  - python --version  # For debugging
-  - python -m venv ./venv
+  - python3 --version  # For debugging
+  - python3 -m venv ./venv
   - source venv/bin/activate
-  - python -m pip install -r requirements.txt
+  - python3 -m pip install -r requirements.txt
 
 bb-bot:on-schedule-gitlab:
   stage: scheduled
@@ -40,6 +38,7 @@ bb-bot:on-schedule-gitlab:
     variables: 
       - $GITLAB == "true"
   extends:
+    - .util-image
     - .generic-runner-tags
   artifacts:
     when: always
@@ -47,7 +46,7 @@ bb-bot:on-schedule-gitlab:
     paths:
       - "*.log"
   script:
-    - python bigbang_bot.py --no-dry-run --gitlab-url https://repo1.dso.mil run-all-modules
+    - python3 bigbang_bot.py --no-dry-run --gitlab-url https://repo1.dso.mil run-all-modules
 
 bb-bot:on-schedule-jira:
   stage: scheduled
@@ -60,6 +59,7 @@ bb-bot:on-schedule-jira:
     variables: 
       - $JIRA == "true"
   extends:
+    - .util-image
     - .generic-runner-tags
   artifacts:
     when: always
@@ -67,7 +67,7 @@ bb-bot:on-schedule-jira:
     paths:
       - "*.log"
   script:
-    - python bigbang_bot.py --no-dry-run --gitlab-url https://repo1.dso.mil sync-jira-issues
+    - python3 bigbang_bot.py --no-dry-run --gitlab-url https://repo1.dso.mil sync-jira-issues
 
 bb-bot-gitlab:
   stage: dry_run
@@ -76,6 +76,7 @@ bb-bot-gitlab:
   except:
     - schedules
   extends:
+    - .util-image
     - .generic-runner-tags
   artifacts:
     when: always
@@ -83,7 +84,7 @@ bb-bot-gitlab:
     paths:
       - "*.log"
   script:
-    - python bigbang_bot.py --gitlab-url https://repo1.dso.mil run-all-modules
+    - python3 bigbang_bot.py --gitlab-url https://repo1.dso.mil run-all-modules
 
 bb-bot-jira:
   stage: dry_run
@@ -96,6 +97,7 @@ bb-bot-jira:
   # except:
   #   - schedules
   extends:
+    - .util-image
     - .generic-runner-tags
   artifacts:
     when: always
@@ -103,12 +105,13 @@ bb-bot-jira:
     paths:
       - "*.log"
   script:
-    - python bigbang_bot.py --gitlab-url https://repo1.dso.mil sync-jira-issues
+    - python3 bigbang_bot.py --gitlab-url https://repo1.dso.mil sync-jira-issues
 
 test:
   stage: test
   extends:
+    - .util-image
     - .generic-runner-tags
   script:
-    - python -m pip install -r requirements-test.txt
+    - python3 -m pip install -r requirements-test.txt
     - pytest . 
