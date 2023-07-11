@@ -629,13 +629,12 @@ aws/rke2/bigbang down:
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
     # To fix issue with kyverno svc webhook timeouts on helm uninstall
+    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
+    # Sleep to be sure kyverno is not running.. Kyverno pods will add the validatingwebhooksconfigurations back
+    - sleep 2m
     - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
     - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
-    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
-    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 3
-    # Sleep to be sure webhook configurations are gone
-    - sleep 2m
-    # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
+    # Helm uninstall + wait (max of 7 minutes) - we don't actually care if BB is completely down
     # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
     - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
   environment:
@@ -825,12 +824,11 @@ aws/eks/bigbang down:
     # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
-    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
-    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
     - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
-    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 3
     # Sleep to be sure webhook configurations are gone
     - sleep 2m
+    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
+    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
     # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
     # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
     - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
