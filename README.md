@@ -2,9 +2,9 @@
 
 Big Bang is a declarative, continuous delivery tool for deploying DoD hardened and approved packages into a Kubernetes cluster.
 
-> _If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
+> If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
-## Usage & Scope 
+## Usage & Scope
 
 Big Bang's scope is to provide publicly available installation manifests for packages required to adhere to the DoD DevSecOps Reference Architecture and additional useful utilities. Big Bang packages are broken into three categories:
 
@@ -20,7 +20,7 @@ Big Bang also builds tooling around the testing and validation of Big Bang packa
 
 Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, monitoring, etc. are handled via Big Bang.  Additional packages (e.g. ArgoCD, GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
 
-Additional information can be found at [Big Bang Docs](https://docs-bigbang.dso.mil) and [here](./docs/README.md).
+Additional information can be found in the [Big Bang Docs](./docs/README.md).
 
 ## Getting Started
 
@@ -40,41 +40,31 @@ Additional information can be found in the [contributing guide](./CONTRIBUTING.m
 
 ## Release Schedule
 
-- Big Bang releases adopt a standardized versioning based on and loosely following the [Semantic Versioning 2.0.0 guidelines](https://semver.org/spec/v2.0.0.html) (major.minor.patch). These releases aren't based on a fixed schedule and instead the specifics in the scheme are as follows:
+- Big Bang releases adopt a standardized versioning based on and loosely following the [Semantic Versioning 2.0.0 guidelines](https://semver.org/spec/v2.0.0.html) (major.minor.patch). These releases are not based on a fixed schedule and instead the specifics in the following scheme.
 
 ### Patch Version
-A patch version increment is performed when there is a change in the tag (version number) of a Big Bang core package or a
-bug fix for a Big Bang template or values files.
-A change in the patch version number should be backwards compatible
-with previous patch changes within a minor version.  If there is a significant functionality change in the
-a core package that requires adjustments to Big Bang templates, this would require a change in the minor or major version
-depending on the impact to the values and secrets used to integrated the package with Big Bang.
 
-NOTE: Patch versions would not typically be created for addon package updates, rather customers would be expected to be 
-updating those packages via `git.tag`/`helmRepo.tag` changes directly, or "inheriting" those updates through another version.
+A patch version increment is performed when there is a change in the tag (version number) of a Big Bang core package or a bug fix for a Big Bang template or values files. A change in the patch version number should be backwards compatible with previous patch changes within a minor version.  If there is a significant functionality change in the a core package that requires adjustments to Big Bang templates, this would require a change in the minor or major version depending on the impact to the values and secrets used to integrated the package with Big Bang.
+
+NOTE: Patch versions would not typically be created for addon package updates, rather customers would be expected to be updating those packages via `git.tag`/`helmRepo.tag` changes directly, or "inheriting" those updates through another version.
 
 ### Minor Version
 
-A minor version increment is required when there is a change in the integration of Big Bang with core or addon packages.
-As examples the following changes warrant a Minor version change:
+A minor version increment is required when there is a change in the integration of Big Bang with core or addon packages. As examples the following changes warrant a Minor version change:
 
-  - Change in the umbrella values.yaml (except for changes to package version keys)
-  - Change in any Big Bang templates (non bug fix changes)
+- Change in the umbrella values.yaml (except for changes to package version keys)
+- Change in any Big Bang templates (non bug fix changes)
 
 Minor version changes should be backwards compatible.
 
 ### Major Version
 
-A major version increment indicates a release that has significant changes, which could potentially break
-compatibility with previous versions. A major change is required when there are changes to the architecture of Big Bang or
-critical values file keys.  For example removing a core package or changing significant values that propagate to all core
-and add-on packages are considered major version changes. As examples of major version changes:
+A major version increment indicates a release that has significant changes, which could potentially break compatibility with previous versions. A major change is required when there are changes to the architecture of Big Bang or critical values file keys. For example removing a core package or changing significant values that propagate to all core and add-on packages are considered major version changes. As examples of major version changes:
 
-  - Removal or renaming of Big Bang values.yaml top level keys (e.g., istio, git repository values, etc.)
-  - Change to the structure of chart/templates files or key values.
-  - Additional integration between core/add-on packages that require change to the charts of all packages.
-  - Modification of Big Bang GitOps engine (i.e. switching from FluxCD -> ArgoCD)
-
+- Removal or renaming of Big Bang values.yaml top level keys (e.g., istio, git repository values, etc.)
+- Change to the structure of chart/templates files or key values.
+- Additional integration between core/add-on packages that require change to the charts of all packages.
+- Modification of Big Bang GitOps engine (i.e. switching from FluxCD -> ArgoCD)
 
 To see what is on the roadmap or included in a given release you can still review our [project milestones](https://repo1.dso.mil/groups/big-bang/-/milestones)
 
@@ -82,9 +72,11 @@ To see what is on the roadmap or included in a given release you can still revie
 
 The Big Bang Universe Community Slack workspace is a great place to go to get involved, interact with the community, and ask for help. You can join the workspace with [this invite link](https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/zt-1tnh3mq5u-a6u4BmxXBDiMwBKNiH25Bg).
 
-## Navigating our documentation
+## Navigating our Documentation
 
-Big Bang Documentation is located in the following locations:
+> All Big Bang documentation is also provided at [https://docs-bigbang.dso.mil](https://docs-bigbang.dso.mil) offering a better experience and improved searchability.
+
+The following list are useful starting points in the Big Bang documentation.
 
 - [Developer Contribution Documentation](./docs/developer/README.md)
 - [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)
