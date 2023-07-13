@@ -581,6 +581,19 @@ istio:
 
 twistlock:
   enabled: false # twistlock requires a license to work, so we're disabling it
+
+# to set all Kyverno policies to audit only
+kyvernoPolicies:
+  enabled: true
+  values:
+    validationFailureAction: "audit"
+
+# under Neuvector section
+neuvector:
+  enabled: true
+  values:
+    k3s:
+      enabled: true
 EOF
 ```
 
@@ -802,3 +815,28 @@ After completing step 5, if you are unable to connect to external DNS providers 
 * k3d - https://k3d.io/v5.4.3/usage/k3s/
 * Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
 * Helm - https://helm.sh/docs/helm/helm/
+
+### NeuVector "Failed to get container"
+If the NeuVector pods come online but give errors like:
+
+```shell
+ERRO|AGT|container.(*containerdDriver).GetContainer: Failed to get container - error=container "4d9a6e20883271ed9f921e86c7816549e9731fbd74cefa987025f27b4ad59fa1" in namespace "k8s.io │
+ERRO|AGT|main.main: Failed to get local device information - error=container "4d9a6e20883271ed9f921e86c7816549e9731fbd74cefa987025f27b4ad59fa1" in namespace "k8s.io": not found 
+```
+
+It could be because Ubuntu prior to 21 ships with cgroup v1 by default, and NeuVector on cgroup v1 with containerd doesn't work well. To check if your installation is running cgroup v1, run:
+
+```shell
+cat /sys/fs/cgroup/cgroup.controllers
+```
+
+If you get a "No such file or directory", that means its running v1, and needs to be running v2. Follow the documentation here - https://rootlesscontaine.rs/getting-started/common/cgroup2/#checking-whether-cgroup-v2-is-already-enabled to enable v2
+
+### "Too many open files"
+If the NeuVector pods fail to open, and you look at the K8s logs only to find that it's giving the "too many open files" error, you'll need to increase your inotify max's. Consider grabbing your current fs.inotify.max values and increasing them like the following
+
+```shell
+sudo sysctl fs.inotify.max_queued_events=616384
+sudo sysctl fs.inotify.max_user_instances=512
+sudo sysctl fs.inotify.max_user_watches=501208
+```
