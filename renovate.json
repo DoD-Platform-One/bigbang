@@ -1,1 +1,35 @@
-{}
+{
+    "baseBranches": [
+        "main"
+    ],
+    "configWarningReuseIssue": false,
+    "dependencyDashboard": "true",
+    "dependencyDashboardTitle": "Renovate: Upgrade RepoSync Server Dependencies",
+    "draftPR": true,
+    "labels": [
+        "Package Sustainment",
+        "kind::maintenance"
+    ],
+    "packageRules": [
+        {
+            "matchDepTypes": [
+                "devDependencies",
+                "dependencies"
+            ],
+            "matchUpdateTypes": [
+                "patch"
+            ],
+            "groupName": "(dev) dependencies (patch)"
+        },
+        {
+            "matchDepTypes": [
+                "devDependencies",
+                "dependencies"
+            ],
+            "matchUpdateTypes": [
+                "minor"
+            ],
+            "groupName": "(dev) dependencies (minor)"
+        }
+    ]
+}
