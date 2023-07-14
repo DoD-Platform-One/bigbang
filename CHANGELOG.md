@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.70.0-bb.0] - 2023-07-12
+### Added
+- Updated to 1.70.0 images (latest in IB)
+
 ## [1.68.0-bb.1] - 2023-06-30
 ### Added
 - Added `oidcCaCert` value to enable a custom CA cert from an OIDC IdP.
