@@ -24,12 +24,12 @@ usage: $(basename "$0") <arguments>
 -r|--registry-url        - (optional, default: registry1.dso.mil) registry url to use for flux installation
 -s|--use-existing-secret - (optional) use existing private-registry secret 
 -u|--registry-username   - (required) registry username to use for flux installation
--p|--registry-password   - (required) registry password to use for flux installation
+-p|--registry-password   - (optional, prompted if no existing secret) registry password to use for flux installation
 -w|--wait-timeout        - (optional, default: 120) how long to wait; in seconds, for each key flux resource component
 EOF
 }
 
-# script check for existing pull secret
+# check for existing pull secret
 function check_secrets {
   if kubectl get secrets/"$FLUX_SECRET" -n flux-system >/dev/null 2>&1; then
     #the secret exists
@@ -40,6 +40,19 @@ function check_secrets {
   fi
 }
 
+# securely prompt for the Registry1 password
+function get_password {
+  until [[ $REGISTRY_PASSWORD ]]; do
+    read -s -p "Please enter your Registry1 password: " REGISTRY_PASSWORD
+  done
+}
+
+# prompt for the Registry1 username
+function get_username {
+  until [[ $REGISTRY_USERNAME ]]; do
+    read -p "Please enter your Registry1 username: " REGISTRY_USERNAME
+  done
+}
 #
 # cli parsing
 #
@@ -53,9 +66,8 @@ while (("$#")); do
       REGISTRY_USERNAME=$2
       shift 2
     else
-      echo "Error: Argument for $1 is missing" >&2
-      help
-      exit 1
+      get_username
+      shift
     fi
     ;;
   # registry password required argument
@@ -64,9 +76,8 @@ while (("$#")); do
       REGISTRY_PASSWORD=$2
       shift 2
     else
-      echo "Error: Argument for $1 is missing" >&2
-      help
-      exit 1
+      get_password
+      shift
     fi
     ;;
   # registry email required argument
@@ -126,13 +137,15 @@ while (("$#")); do
   esac
 done
 
-# check if secret exists
+# if secret doesn't exist, create it
 if [ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 1 ]; then
 
   # check required arguments
-  if [ -z "$REGISTRY_USERNAME" ] || [ -z "$REGISTRY_PASSWORD" ]; then
-    help
-    exit 1
+  if [ -z "$REGISTRY_USERNAME" ]; then
+    get_username
+  fi
+  if [ -z "$REGISTRY_PASSWORD" ]; then
+    get_password
   fi
 
   # debug print cli args
