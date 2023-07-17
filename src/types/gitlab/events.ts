@@ -8,6 +8,9 @@ export type MergeRequestOpened = MergeRequest & {
 export type MergeRequestClosed = MergeRequest & {
   type: "merge_request.closed";
 };
+export type MergeRequestUpdate = MergeRequest & {
+  type: "merge_request.update";
+};
 export type PushEvent = Push & { type: "push" };
 
 export type GitlabEventTypes =
@@ -15,6 +18,7 @@ export type GitlabEventTypes =
   | NoteCreated
   | MergeRequestOpened
   | MergeRequestClosed
+  | MergeRequestUpdate
   | PushEvent;
 
 export type GithLabEventMap = {

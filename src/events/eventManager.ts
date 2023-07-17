@@ -36,7 +36,7 @@ export async function createContext(
       const action = (payload as PullRequestPayload).action;
       const appID = headers["x-github-hook-installation-target-id"] as string;
       isGitHubBot(payload as GitHubEventTypes, state);
-
+          
       state["installationID"] = (payload as PullRequestOpen).installation.id;
       state["appID"] = +appID;
       state["event"] = `${event}.${action}` as keyof EventMap;
@@ -44,9 +44,8 @@ export async function createContext(
 
       state["mapping"] = GetMapping()[state.projectName];
 
-      console.log("This is a Github event", state.event);
-      break;
-    }
+            break;
+  }
 
     //
     //
@@ -60,7 +59,7 @@ export async function createContext(
       const event = (payload as NoteCreated).object_kind;
       let action =
         (payload as Push).action ??
-        (payload as MergeRequest)?.object_attributes?.state ??
+        (payload as MergeRequest)?.object_attributes?.action ??
         (payload as NoteReply)?.object_attributes?.type ??
         undefined;
       isGitlabBot(payload as GitlabEventTypes, state);
@@ -108,11 +107,6 @@ export async function createContext(
         state["isFailed"] = true;
         return state;
       }
-      // don't care about bots
-      if (state.isBot) {
-        break;
-      }
-      console.log("This is a GitLab event", state.event);
       break;
     }
   }
@@ -133,6 +127,10 @@ export const emitEvent = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
   const context = await createContext(req.headers, req.body, res, next);
+
+  if (!context.isBot) {
+    console.log(`This is a ${context.instance} event: ${context.event}`);
+  }
 
   if (context.isFailed) {
     if (context.event === "note.created" || context.event === "note.reply") {
