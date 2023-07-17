@@ -9,6 +9,7 @@ export interface PullRequestPayload {
 
 type IssueActions = "created" | "edited" | "deleted";
 
+
  export interface IssueCommentPayload {
     action: IssueActions;
     issue: Issue;
@@ -287,3 +288,54 @@ interface Issue {
     type: string;
     site_admin: boolean;
   }
+
+  //create interface for the response of the github api for push payload
+  export interface PullRequestSyncPayload {
+    action: string;
+    number: number;
+    ref: string;
+    before: string;
+    after: string;
+    created: boolean;
+    pull_request: Pullrequest
+    deleted: boolean;
+    forced: boolean;
+    base_ref?: string | null;
+    installation?: Installation | null;
+    compare: string;
+    commits: Commit[];
+    head_commit: Commit;
+    repository: Repository;
+    sender: Sender;
+  }
+
+  interface Commit {
+    id: string;
+    tree_id: string;
+    distinct: boolean;
+    message: string;
+    timestamp: Date;
+    url: string;
+  }
+
+  interface Sender {
+    login: string;
+    id: number;
+    node_id: string;
+    avatar_url: string;
+    gravatar_id: string;
+    url: string;
+    html_url: string;
+    followers_url: string;
+    following_url: string;
+    gists_url: string;
+    starred_url: string;
+    subscriptions_url: string;
+    organizations_url: string;
+    repos_url: string;
+    events_url: string;
+    received_events_url: string;
+    type: string;
+    site_admin: boolean;
+  }
+

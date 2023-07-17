@@ -110,3 +110,45 @@ onGitHubEvent('pull_request.closed', async (context) => {
 
     return context.response.send("OK");
 })
+
+////create on github when Pull request is syncronized
+onGitHubEvent('pull_request.synchronize', async (context) => {
+    const {payload, projectName} = context
+    const PRNumber = payload.pull_request.number
+    // repo one bot steps
+    const github_url = payload.repository.clone_url
+    
+    const currentWorkingDirectory = `./tmp/${projectName}`
+    const execOptions: ExecSyncOptions = {cwd: currentWorkingDirectory}
+
+    // clone github repo
+    cloneUrl(github_url, projectName)
+    // create remote mirror
+    // repo1 url set up with username and access token embedded
+    const repo_1_url = payload.repository.homepage.replace('https://', `https://${process.env.GITLAB_USERNAME}:${process.env.GITLAB_PASSWORD}@`)
+    execSync(`git remote add mirror ${repo_1_url}`, execOptions)
+    
+    // get PR number
+    // make a new branch off the PR ref
+    
+    execSync(`git fetch origin pull/${PRNumber}/head:PR-${PRNumber}`,execOptions)
+    
+    //check out branch
+    execSync(`git checkout PR-${PRNumber}`, execOptions)
+    
+    execSync(`git push mirror PR-${PRNumber}`, execOptions)
+    
+    // clean up tmp/repo name folder
+    execSync(`rm -rf ${currentWorkingDirectory}`)
+
+    const comment = `Merge Request synchronized with commit ${payload.pull_request.html_url}/commits/${payload.pull_request.head.sha}` 
+    const body = {
+        "body": comment
+    }
+    
+    const commentResponse = await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
+
+    console.log(`Comment posted to github PR ${commentResponse.data.html_url}`);
+})
+
+//MR close in gitlab when PR is closed in github

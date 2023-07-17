@@ -29,7 +29,7 @@
   "object_attributes": {
     "assignee_id": null,
     "author_id": 27310,
-    "created_at": "2023-07-14 18:54:57 UTC",
+    "created_at": "2023-07-14T18:54:57.138Z",
     "description": "null<hr/>",
     "head_pipeline_id": 1970359,
     "id": 146614,
@@ -39,7 +39,7 @@
     "merge_commit_sha": null,
     "merge_error": null,
     "merge_params": { "force_remove_source_branch": true },
-    "merge_status": "cannot_be_merged_recheck",
+    "merge_status": "cannot_be_merged",
     "merge_user_id": null,
     "merge_when_pipeline_succeeds": false,
     "milestone_id": null,
@@ -50,7 +50,7 @@
     "target_project_id": 13340,
     "time_estimate": 0,
     "title": "PR-16",
-    "updated_at": "2023-07-14 21:01:45 UTC",
+    "updated_at": "2023-07-14T20:33:20.864Z",
     "updated_by_id": null,
     "url": "https://repo1.dso.mil/alfredodiaz53/podinfo/-/merge_requests/10",
     "source": {
@@ -90,11 +90,11 @@
       "http_url": "https://repo1.dso.mil/alfredodiaz53/podinfo.git"
     },
     "last_commit": {
-      "id": "01ea9da27e9efd3d6fc37eb507e1993a3e02a219",
-      "message": "777777",
-      "title": "777777",
-      "timestamp": "2023-07-14T21:01:44+00:00",
-      "url": "https://repo1.dso.mil/alfredodiaz53/podinfo/-/commit/01ea9da27e9efd3d6fc37eb507e1993a3e02a219",
+      "id": "6e55bc082dcacd7890940fc1d0c870523bc5cd22",
+      "message": "9999000",
+      "title": "9999000",
+      "timestamp": "2023-07-14T20:33:19+00:00",
+      "url": "https://repo1.dso.mil/alfredodiaz53/podinfo/-/commit/6e55bc082dcacd7890940fc1d0c870523bc5cd22",
       "author": {
         "name": "Alfredo Diaz",
         "email": "alfredo.diaz@omnifederal.com"
@@ -112,17 +112,10 @@
     "state": "opened",
     "blocking_discussions_resolved": true,
     "first_contribution": true,
-    "detailed_merge_status": "mergeable",
-    "action": "update",
-    "oldrev": "6e55bc082dcacd7890940fc1d0c870523bc5cd22"
+    "detailed_merge_status": "broken_status"
   },
   "labels": [],
-  "changes": {
-    "updated_at": {
-      "previous": "2023-07-14 20:33:20 UTC",
-      "current": "2023-07-14 21:01:45 UTC"
-    }
-  },
+  "changes": {},
   "repository": {
     "name": "Podinfo",
     "url": "git@repo1.dso.mil:alfredodiaz53/podinfo.git",
