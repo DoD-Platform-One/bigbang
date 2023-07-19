@@ -204,7 +204,9 @@ clean install:
       when: never
     - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
       when: never
-    - if: $JOB_TYPE == "nightly"
+    - if: '$CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
+      when: never
+    - if: '($JOB_TYPE == "nightly" || $JOB_TYPE == "oci_clean_install")'
       when: never
     - *chart_changes
   script:
@@ -248,13 +250,13 @@ upgrade:
     - .bigbang-runner-tags
     - .k3d-ci
   rules:
-    # skip job for nightly main and "test-ci::rke2" labeled pipelines
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/'
+    # skip job for nightly scheduled infra jobs and MR infra jobs
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::rke2(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::eks(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::airgap(,|$)/ || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
       when: never
     # skip job when MR title starts with 'SKIP UPGRADE'
     - if: '$CI_MERGE_REQUEST_TITLE =~ /SKIP UPGRADE/'
       when: never
-    - if: $JOB_TYPE == "nightly"
+    - if: '($JOB_TYPE == "nightly" || $JOB_TYPE == "clean_install_oci")'
       when: never
     # run pipeline on merge request events
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -307,7 +309,7 @@ upgrade:
 clean install oci:
   stage: 🤞 oci artifact tests
   needs:
-    - job: pre vars infra
+    - job: pre vars
       artifacts: true
   extends:
     - .bigbang-runner-tags
@@ -321,7 +323,7 @@ clean install oci:
     - if: '$JOB_TYPE == "cut_release"'
       when: never
     # Run on scheduled jobs OR when `test-ci` label is assigned
-    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
+    - if: '($CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $JOB_TYPE == "clean_install_oci" ) || $CI_MERGE_REQUEST_LABELS =~ /(^|,)test-ci::oci(,|$)/'
   script:
     - dependency_images
     - deploy_bigbang
@@ -628,15 +630,26 @@ aws/rke2/bigbang down:
     # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
-    # To fix issue with kyverno svc webhook timeouts on helm uninstall
+    # To fix issue with kyverno svc webhook timeouts on helm uninstall. Scaling down replicaSet removes Kyverno validatingwebhooksconfigurations
     - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
-    # Sleep to be sure kyverno is not running.. Kyverno pods will add the validatingwebhooksconfigurations back
+    # Sleep to be sure kyverno is not running.. Running Kyverno pods will add the validatingwebhooksconfigurations back
     - sleep 2m
-    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
-    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
-    # Helm uninstall + wait (max of 7 minutes) - we don't actually care if BB is completely down
-    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
-    - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
+    # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
+    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted. Also want to delete all PVs.
+    - helm uninstall -n bigbang bigbang --wait --timeout 5m0s 2> error.txt || true
+    # Logic to pass stage if error is expected timeout. Fail if error == anything else
+    - >
+      timeoutError="Error: uninstallation completed with 1 error(s): timed out waiting for the condition";
+      if [[ $(cat error.txt) == $timeoutError ]]; then 
+        echo -e "\e[31mHelm uninstall error was expected timeout\e[0m";
+        echo -e "\e[31m$(cat error.txt)\e[0m";
+      elif [[ $(cat error.txt) == "" ]]; then
+        echo "No errors caught with Helm uninstall";
+      else
+        echo -e "\e[31mHelm uninstall error is: \e[0m";
+        echo -e "\e[31m$(cat error.txt)\e[0m";
+        exit 1;
+      fi;
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
@@ -824,14 +837,26 @@ aws/eks/bigbang down:
     # Delete Istio HR first so that Istio Operator cleans up child resources (ELB from service)
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
+    # To fix issue with kyverno svc webhook timeouts on helm uninstall. Scaling down replicaSet removes Kyverno validatingwebhooksconfigurations
     - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
-    # Sleep to be sure webhook configurations are gone
+    # Sleep to be sure kyverno is not running.. Running Kyverno pods will add the validatingwebhooksconfigurations back
     - sleep 2m
-    - kubectl delete validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg
-    - kubectl delete mutatingwebhookconfiguration kyverno-policy-mutating-webhook-cfg kyverno-verify-mutating-webhook-cfg kyverno-resource-mutating-webhook-cfg monitoring-monitoring-kube-admission
     # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
-    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted
-    - helm uninstall -n bigbang bigbang --wait --timeout 7m0s
+    # Goal is to make sure that at minimum LoadBalancer services are destroyed so that their ELBs are deleted. Also want to delete all PVs.
+    - helm uninstall -n bigbang bigbang --wait --timeout 5m0s 2> error.txt || true
+    # Logic to pass stage if error is expected timeout. Fail if error == anything else
+    - >
+      timeoutError="Error: uninstallation completed with 1 error(s): timed out waiting for the condition";
+      if [[ $(cat error.txt) == $timeoutError ]]; then 
+        echo -e "\e[31mHelm uninstall error was expected timeout\e[0m";
+        echo -e "\e[31m$(cat error.txt)\e[0m";
+      elif [[ $(cat error.txt) == "" ]]; then
+        echo "No errors caught with Helm uninstall";
+      else
+        echo -e "\e[31mHelm uninstall error is: \e[0m";
+        echo -e "\e[31m$(cat error.txt)\e[0m";
+        exit 1;
+      fi;
   environment:
     name: review/aws-${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
