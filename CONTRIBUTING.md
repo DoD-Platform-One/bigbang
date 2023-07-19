@@ -82,3 +82,9 @@ Follow instructions in the [Big Bang encryption guide](./docs/understanding-bigb
 The merge request process is provided as an overview of the pipeline stages required to get a commit merged.
 
 Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specific details on the pipeline stages.
+
+## Security Considerations
+- To report a cybersecurity concern, follow this [link](https://jira.il2.dso.mil/servicedesk/customer/portal/81).
+- Never push secrets or certificates into our repository.
+
+
