@@ -39,8 +39,11 @@ if (process.env.ENVIRONMENT === "test") {
 const mappingFile = () => fs.readFileSync(mappingFilePath, 'utf8')
 
 
-//parse the mapping file into a JSON object
+//parse the mapping file into a JSON object 
 let mapping: IMapping = JSON.parse(mappingFile())
+
+
+
 
 
 
