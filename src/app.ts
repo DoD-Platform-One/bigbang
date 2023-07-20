@@ -1,5 +1,5 @@
 import express from 'express'
-import { validatePayload } from "./appcrypto.js"
+import validatePayload from "./crypto/validatePayload.js"
 import adminRouter from './routes/admin.js';
 import fs from 'fs'
 import path from 'path'
@@ -10,6 +10,7 @@ import { createContext, emitEvent } from './events/eventManager.js'
 import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
 import "./events/comment.js"
+import "./events/pipeline.js"
 import ResponseError from './errors/ResponseError.js';
 
 // App

@@ -233,3 +233,224 @@ export interface Push {
     push_options: PushOptions,
     repository: Repository,
   }
+
+  export interface Pipeline  {
+    object_kind: string,
+    object_attributes: {
+      id: number,
+      iid: number,
+      ref: string,
+      tag: false,
+      sha: string,
+      before_sha: string,
+      source: Project,
+      status: string,
+      detailed_status: string,
+      stages: string[],
+      created_at: string,
+      finished_at: string,
+      duration: string | null,
+      queued_duration: string | null,
+      variables: []
+      
+    },
+    merge_request: {
+      id: number,
+      iid: number,
+      title: string,
+      source_branch: string,
+      source_project_id: number,
+      target_branch: string,
+      target_project_id: number,
+      state: string,
+      merge_status: string,
+      detailed_merge_status: string,
+      url: string
+    },
+    user: {
+      id: number,
+      name: string,
+      username: string,
+      avatar_url: string,
+      email: string
+    },
+    project: {
+      id: number,
+      name: string,
+      description: string,
+      web_url: string,
+      avatar_url: string,
+      git_ssh_url: string,
+      git_http_url: string,
+      namespace: string,
+      visibility_level: number,
+      path_with_namespace: string,
+      default_branch: string,
+      ci_config_path: string
+    },
+    commit: {
+      id: string,
+      message: string,
+      title: string,
+      timestamp: string,
+      url: string,
+      author: {
+        name: string,
+        email: string
+      }
+    },
+    builds: [
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: string | null;
+        failure_reason: string | null;
+        when: string,
+        manual: string,
+        allow_failure: string,
+        user: {
+          id: number
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      },
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: string | null;
+        failure_reason: string | null;
+        when: string,
+        manual: false,
+        allow_failure: true,
+        user: {
+          id: number,
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      },
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: string | null;
+        failure_reason: string | null;
+        when: string,
+        manual: string,
+        allow_failure: string,
+        user: {
+          id: number,
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      },
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: string | null;
+        failure_reason: string | null;
+        when: string,
+        manual: false,
+        allow_failure: false,
+        user: {
+          id: number,
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      },
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: string | null;
+        failure_reason: string | null;
+        when: string,
+        manual: string,
+        allow_failure: string,
+        user: {
+          id: number,
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      },
+      {
+        id: number,
+        stage: string,
+        name: string,
+        status: string,
+        created_at: string,
+        started_at: string | null;
+        finished_at: string,
+        duration: string | null;
+        queued_duration: number,
+        failure_reason: string | null;
+        when: string,
+        manual: string,
+        allow_failure: string,
+        user: {
+          id: number,
+          name: string,
+          username: string,
+          avatar_url: string,
+          email: string
+        },
+        runner: string | null;
+        artifacts_file: { "filename": null; "size": null },
+        environment: null
+      }
+    ]
+  }
+   
+  

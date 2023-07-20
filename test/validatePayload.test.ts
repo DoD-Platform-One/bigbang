@@ -1,5 +1,5 @@
 import request from 'supertest'
-import {githubSigHeaderName, gitlabTokenHeaderName} from '../src/appcrypto'
+import {githubSigHeaderName, gitlabTokenHeaderName} from '../src/crypto/appcrypto'
 import app from '../src/app'
 import crypto from 'crypto'
 

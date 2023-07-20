@@ -1,6 +1,6 @@
 import { IncomingHttpHeaders } from "http";
 import { GetMapping } from "../assets/projectMap.js";
-import { getGitHubAppAccessToken } from "../appcrypto.js";
+import { getGitHubAppAccessToken } from "../crypto/appcrypto.js";
 import { NextFunction, Request, Response } from "express";
 import {
   IEventContextObject,
@@ -10,11 +10,11 @@ import {
   onGitHubEvent,
   onGitLabEvent
 } from "./eventManagerTypes.js";
-import { MergeRequest, Push } from "../types/gitlab/objects.js";
+import { MergeRequest, Push, Pipeline } from "../types/gitlab/objects.js";
 import { PullRequestPayload } from "../types/github/objects.js";
 import { gitlabNoteReaction } from "./comment.js";
 import { GitHubEventTypes, PullRequestOpen } from "../types/github/events.js";
-import { NoteCreated, NoteReply, GitlabEventTypes, PushEvent } from "../types/gitlab/events.js";
+import { NoteCreated, NoteReply, GitlabEventTypes, PushEvent, PipelineEvent } from "../types/gitlab/events.js";
 
 export {onGitHubEvent, onGitLabEvent}
 
@@ -40,7 +40,7 @@ export async function createContext(
       state["installationID"] = (payload as PullRequestOpen).installation.id;
       state["appID"] = +appID;
       state["event"] = `${event}.${action}` as keyof EventMap;
-      state["projectName"] = payload.repository.name.toLowerCase();
+      state["projectName"] = (payload as PullRequestOpen).repository.name.toLowerCase();
 
       state["mapping"] = GetMapping()[state.projectName];
 
@@ -61,6 +61,7 @@ export async function createContext(
         (payload as Push).action ??
         (payload as MergeRequest)?.object_attributes?.action ??
         (payload as NoteReply)?.object_attributes?.type ??
+        (payload as Pipeline)?.object_attributes?.status ??
         undefined;
       isGitlabBot(payload as GitlabEventTypes, state);
 
@@ -87,14 +88,25 @@ export async function createContext(
       } else {
         state["event"] = event as keyof EventMap;
       }
+       
+      if (action) {
+        state["event"] = `${event}.${action}` as keyof EventMap;
+      } else {
+        state["event"] = event as keyof EventMap;
+      }
+
+        if ((payload as PipelineEvent).project) {
+          state["projectName"] = (payload as Pipeline).project.name.toLowerCase();
+
+        }
 
       // check for project attribute on payload
       if ((payload as MergeRequest).project) {
         state["projectName"] = (
           payload as MergeRequest
         ).project.name.toLowerCase();
-      } else if (payload.repository) {
-        state["projectName"] = payload.repository.name.toLowerCase();
+      } else if ((payload as PushEvent).repository) {
+        state["projectName"] = (payload as PushEvent).repository.name.toLowerCase();
       }
 
       state["mapping"] = GetMapping()[state.projectName];

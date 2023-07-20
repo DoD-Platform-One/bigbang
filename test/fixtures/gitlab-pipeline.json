@@ -1,0 +1,222 @@
+{
+  "object_kind": "pipeline",
+  "object_attributes": {
+    "id": 1927724,
+    "iid": 5,
+    "ref": "PR-36",
+    "tag": false,
+    "sha": "eb00d37f174c556ff040800f064b23ef83f627eb",
+    "before_sha": "0000000000000000000000000000000000000000",
+    "source": "merge_request_event",
+    "status": "canceled",
+    "detailed_status": "canceled",
+    "stages": [
+      ".pre",
+      "⚙️ configuration validation",
+      "🤞 package tests",
+      "🤝 integration test"
+    ],
+    "created_at": "2023-06-30T15:10:31.898Z",
+    "finished_at": "2023-07-10T16:07:08.011Z",
+    "duration": null,
+    "queued_duration": null,
+    "variables": []
+  },
+  "merge_request": {
+    "id": 144596,
+    "iid": 5,
+    "title": "PR-36",
+    "source_branch": "PR-36",
+    "source_project_id": 13341,
+    "target_branch": "main",
+    "target_project_id": 13341,
+    "state": "closed",
+    "merge_status": "can_be_merged",
+    "detailed_merge_status": "not_open",
+    "url": "https://repo1.dso.mil/sumathir74/podinfo/-/merge_requests/5"
+  },
+  "user": {
+    "id": 26011,
+    "name": "Sumathi Rajendran",
+    "username": "sumathir74",
+    "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+    "email": "[REDACTED]"
+  },
+  "project": {
+    "id": 13341,
+    "name": "Podinfo",
+    "description": "Tiny web application that showcases best practices of running microservices",
+    "web_url": "https://repo1.dso.mil/sumathir74/podinfo",
+    "avatar_url": "https://repo1.dso.mil/uploads/-/system/project/avatar/13341/podinfo.jpg",
+    "git_ssh_url": "git@repo1.dso.mil:sumathir74/podinfo.git",
+    "git_http_url": "https://repo1.dso.mil/sumathir74/podinfo.git",
+    "namespace": "Sumathi Rajendran",
+    "visibility_level": 20,
+    "path_with_namespace": "sumathir74/podinfo",
+    "default_branch": "main",
+    "ci_config_path": "pipelines/sandbox.yaml@big-bang/pipeline-templates/pipeline-templates:master"
+  },
+  "commit": {
+    "id": "eb00d37f174c556ff040800f064b23ef83f627eb",
+    "message": "Update CHANGELOG.md",
+    "title": "Update CHANGELOG.md",
+    "timestamp": "2023-06-30T11:10:00-04:00",
+    "url": "https://repo1.dso.mil/sumathir74/podinfo/-/commit/eb00d37f174c556ff040800f064b23ef83f627eb",
+    "author": {
+      "name": "sromni",
+      "email": "133275185+sromni@users.noreply.github.com"
+    }
+  },
+  "builds": [
+    {
+      "id": 23287267,
+      "stage": "⚙️ configuration validation",
+      "name": "chart update check",
+      "status": "canceled",
+      "created_at": "2023-07-07T19:21:44.159Z",
+      "started_at": null,
+      "finished_at": "2023-07-07T19:22:08.458Z",
+      "duration": null,
+      "queued_duration": null,
+      "failure_reason": null,
+      "when": "on_success",
+      "manual": false,
+      "allow_failure": true,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    },
+    {
+      "id": 23287268,
+      "stage": "🤞 package tests",
+      "name": "clean install",
+      "status": "canceled",
+      "created_at": "2023-07-07T19:21:44.212Z",
+      "started_at": null,
+      "finished_at": "2023-07-07T19:22:08.464Z",
+      "duration": null,
+      "queued_duration": null,
+      "failure_reason": null,
+      "when": "on_success",
+      "manual": false,
+      "allow_failure": true,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    },
+    {
+      "id": 23287269,
+      "stage": "🤞 package tests",
+      "name": "upgrade",
+      "status": "canceled",
+      "created_at": "2023-07-07T19:21:44.266Z",
+      "started_at": null,
+      "finished_at": "2023-07-07T19:22:08.469Z",
+      "duration": null,
+      "queued_duration": null,
+      "failure_reason": null,
+      "when": "on_success",
+      "manual": false,
+      "allow_failure": true,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    },
+    {
+      "id": 23287270,
+      "stage": "🤝 integration test",
+      "name": "integration",
+      "status": "canceled",
+      "created_at": "2023-07-07T19:21:44.315Z",
+      "started_at": null,
+      "finished_at": "2023-07-07T19:22:08.476Z",
+      "duration": null,
+      "queued_duration": null,
+      "failure_reason": null,
+      "when": "on_success",
+      "manual": false,
+      "allow_failure": false,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    },
+    {
+      "id": 23287266,
+      "stage": "⚙️ configuration validation",
+      "name": "configuration validation",
+      "status": "canceled",
+      "created_at": "2023-07-07T19:21:44.095Z",
+      "started_at": null,
+      "finished_at": "2023-07-07T19:22:08.451Z",
+      "duration": null,
+      "queued_duration": null,
+      "failure_reason": null,
+      "when": "on_success",
+      "manual": false,
+      "allow_failure": true,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    },
+    {
+      "id": 23369075,
+      "stage": ".pre",
+      "name": "approve opensource",
+      "status": "canceled",
+      "created_at": "2023-07-10T15:57:43.109Z",
+      "started_at": null,
+      "finished_at": "2023-07-10T16:07:07.961Z",
+      "duration": null,
+      "queued_duration": 4560.018018297,
+      "failure_reason": null,
+      "when": "manual",
+      "manual": true,
+      "allow_failure": false,
+      "user": {
+        "id": 26011,
+        "name": "Sumathi Rajendran",
+        "username": "sumathir74",
+        "avatar_url": "https://repo1.dso.mil/uploads/-/system/user/avatar/26011/avatar.png",
+        "email": "[REDACTED]"
+      },
+      "runner": null,
+      "artifacts_file": { "filename": null, "size": null },
+      "environment": null
+    }
+  ]
+}
