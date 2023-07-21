@@ -1,4 +1,4 @@
-FROM registry1.dso.mil/ironbank/opensource/nodejs/nodejs18:18.16.1 AS builder
+FROM registry1.dso.mil/ironbank/opensource/nodejs/nodejs18:18.17.0 AS builder
 
 # Create app directory
 USER root
