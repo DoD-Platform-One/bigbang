@@ -194,7 +194,7 @@ DEPRECATION NOTICE:
 {{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 
 {{- with .Values }}
-{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
+{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .grafana.sso.grafana.auth_url .grafana.sso.grafana.token_url .grafana.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
 DEPRECATION NOTICE:
   The following SSO keys have been deprecated.  Deprecated keys will continue to work, but will be removed in a future release.  Please update your overrides.
     {{- if coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName }}
@@ -283,21 +283,21 @@ DEPRECATION NOTICE:
         claims_mail: {{ .elasticsearchKibana.sso.claims_mail }}
         {{- end }}
     {{- end }}
-    {{- if coalesce .monitoring.sso.grafana.auth_url .monitoring.sso.grafana.token_url .monitoring.sso.grafana.api_url }}
-    monitoring:
+    {{- if coalesce .grafana.sso.grafana.auth_url .grafana.sso.grafana.token_url .grafana.sso.grafana.api_url }}
+    grafana:
       sso:
         grafana:
-          {{- if .monitoring.sso.grafana.auth_url }}
+          {{- if .grafana.sso.grafana.auth_url }}
           # "auth_url" moved to "sso.oidc.authorization"
-          auth_url: {{ .monitoring.sso.grafana.auth_url }}
+          auth_url: {{ .grafana.sso.grafana.auth_url }}
           {{- end }}
-          {{- if .monitoring.sso.grafana.token_url }}
+          {{- if .grafana.sso.grafana.token_url }}
           # "token_url" moved to "sso.oidc.token"
-          token_url: {{ .monitoring.sso.grafana.token_url }}
+          token_url: {{ .grafana.sso.grafana.token_url }}
           {{- end }}
-          {{- if .monitoring.sso.grafana.api_url }}
+          {{- if .grafana.sso.grafana.api_url }}
           # "api_url" moved to "sso.oidc.userinfo"
-          api_url: {{ .monitoring.sso.grafana.api_url }}
+          api_url: {{ .grafana.sso.grafana.api_url }}
           {{- end }}
     {{- end }}
     {{- if coalesce .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert }}
@@ -397,3 +397,4 @@ DEPRECATION NOTICE:
   .Values.addons.mattermostoperator has been deprecated and will be removed in a future Big Bang release.
   Please reconfigure your values overrides to use .Values.addons.mattermostOperator
 {{- end }}
+

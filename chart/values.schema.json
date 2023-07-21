@@ -31,6 +31,7 @@
     "neuvector",
     "tempo",
     "monitoring",
+    "grafana",
     "twistlock",
     "addons"
   ],
@@ -707,6 +708,83 @@
                 }
               },
               "additionalProperties": false
+            },
+            "grafana": {
+              "type": "object",
+              "properties": {
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                },
+                "scopes": {
+                  "type": "string"
+                },
+                "allow_sign_up": {
+                  "type": "boolean"
+                },
+                "role_attribute_path": {
+                  "type": "string"
+                },
+                "token_url": {
+                  "type": "string"
+                },
+                "auth_url": {
+                  "type": "string"
+                },
+                "api_url": {
+                  "type": "string"
+                },
+                "tls_client_ca": {
+                  "type": "string"
+                },
+                "tls_skip_verify_insecure": {
+                  "type": "boolean"
+                },
+                "tls_client_cert": {
+                  "type": "string"
+                },
+                "tls_client_key": {
+                  "type": "string"
+                },
+                "allowed_domains": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "grafana": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "istio": { 
+          "$ref": "#/$defs/istio"  
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
+        "sso": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
             },
             "grafana": {
               "type": "object",
@@ -1768,3 +1846,4 @@
     }
   }
 }
+
