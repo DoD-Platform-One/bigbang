@@ -322,6 +322,13 @@ gatekeeper:
 kyverno:
   values:
     replicaCount: 3
+    resources:
+      limits:
+        cpu: 768m
+        memory: 768Mi
+      requests:
+        cpu: 768m
+        memory: 768Mi
     bbtests:
       enabled: true
 
@@ -720,15 +727,20 @@ promtail:
 
 monitoring:
   enabled: true
+  flux:
+    timeout: 20m
+    install:
+      disableOpenAPIValidation: true
+      crds: CreateReplace
+    upgrade:
+      disableOpenAPIValidation: true
+      crds: CreateReplace
   sso:
     enabled: false
     prometheus:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_prometheus
     alertmanager:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
-    grafana:
-      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_grafana
-      scopes: "Grafana"
   values:
     prometheus:
       prometheusSpec:
@@ -749,35 +761,6 @@ monitoring:
           cpu: 100m
           memory: 30Mi
         limits: {}
-    grafana:
-      testFramework:
-        enabled: false
-      dashboards:
-        default:
-          k8s-deployment:
-            gnetId: 741
-            revision: 1
-            datasource: Prometheus
-      downloadDashboards:
-        resources:
-          limits:
-            cpu: 20m
-            memory: 20Mi
-          requests:
-            cpu: 20m
-            memory: 20Mi
-      dashboardProviders:
-        dashboardproviders.yaml:
-          apiVersion: 1
-          providers:
-          - name: 'default'
-            orgId: 1
-            folder: ''
-            type: file
-            disableDeletion: false
-            editable: true
-            options:
-              path: /var/lib/grafana/dashboards
     bbtests:
       enabled: true
       cypress:
@@ -787,6 +770,47 @@ monitoring:
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
           cypress_check_istio_dashboards: 'true'
+
+grafana:
+  enabled: true
+  sso:
+    enabled: false
+    grafana:
+      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_grafana
+      scopes: "openid Grafana"
+  values:
+    dashboards:
+      default:
+        k8s-deployment:
+          gnetId: 741
+          revision: 1
+          datasource: Prometheus
+    downloadDashboards:
+      resources:
+        limits:
+          cpu: 20m
+          memory: 20Mi
+        requests:
+          cpu: 20m
+          memory: 20Mi
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards
+    bbtests:
+      enabled: true
+      cypress:
+        image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
+        envs:
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
 
 neuvector:
   values:
@@ -1664,3 +1688,4 @@ addons:
       replicas: 1
       bbtests:
         enabled: true
+
