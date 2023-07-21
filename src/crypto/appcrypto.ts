@@ -47,7 +47,6 @@ export const getGitHubAppAccessToken = async (
 ) => {
   const access_token_request_body = JSON.stringify({
     repository: name,
-    permissions: { issues: "write", pull_requests: "write" },
   });
 
   const jwt = await signPayloadJWT(appID);

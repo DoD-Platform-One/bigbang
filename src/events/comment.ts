@@ -1,8 +1,9 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import {
-  GetDownstreamRequestNumber,
-  GetUpstreamRequestNumber,
+  GetDownstreamRequestFor,
+  GetUpstreamRequestFor,
+  IRequestMap,
 } from "../assets/projectMap.js";
 import MappingError from "../errors/MappingError.js";
 import { getDiscussionId } from "../queries/discussion.js";
@@ -25,9 +26,9 @@ onGitHubEvent("issue_comment.created", async (context) => {
     context.response.status(403);
     return context.response.send("Bot comment detected, ignoring");
   }
-  let upstreamRequestNumber: number;
+  let requestMap: IRequestMap;
   try {
-    upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber);
+    requestMap = GetUpstreamRequestFor(projectName, PRNumber);
   } catch (err) {
     githubCommentReaction(
       400,
@@ -61,14 +62,14 @@ onGitHubEvent("issue_comment.created", async (context) => {
       noteId,
       editedGitlabComment + strippedComment,
       mapping.gitlab.projectID,
-      upstreamRequestNumber
+      requestMap.reciprocalNumber
     );
   } else {
     // axios post to gitlab api to create a comment on the merge request, using auth header with gitlab token
     response = await createGitlabComment(
       editedGitlabComment + payload.comment.body,
       mapping.gitlab.projectID,
-      upstreamRequestNumber
+      requestMap.reciprocalNumber
     );
   }
 
@@ -93,7 +94,7 @@ onGitHubEvent("issue_comment.created", async (context) => {
   updateGitHubCommentWithMirrorLink(
     payload.comment.body,
     response.data.id,
-    upstreamRequestNumber,
+    requestMap.reciprocalNumber,
     mapping.gitlab.url,
     payload.comment.url,
     context.gitHubAccessToken
@@ -136,9 +137,9 @@ onGitLabEvent("note.created", async (context) => {
   const MRNumber = payload.merge_request.iid;
 
   //get downstream request number
-  let downstreamRequestNumber;
+  let requestMap;
   try{
-    downstreamRequestNumber = GetDownstreamRequestNumber(
+    requestMap = GetDownstreamRequestFor(
       projectName,
       MRNumber
     );
@@ -161,8 +162,8 @@ onGitLabEvent("note.created", async (context) => {
   const comment = `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.note}`;
 
   const response = await createGitlabNote(
-    context.mapping.github.url,
-    downstreamRequestNumber,
+    context.mapping.github.apiUrl,
+    requestMap.reciprocalNumber,
     comment,
     context.gitHubAccessToken
   );
@@ -251,7 +252,7 @@ onGitLabEvent("note.reply", async (context) => {
   // get the issuecomment value from the github api
   // add > to the beginning of each line to make it a quote
   const issueCommentResponse = await axios.get(
-    `${context.mapping.github.url}/issues/comments/${githubIssueCommentId}`,
+    `${context.mapping.github.apiUrl}/issues/comments/${githubIssueCommentId}`,
     { headers: { Authorization: `Bearer ${context.gitHubAccessToken}` } }
   );
   const issueComment = issueCommentResponse.data;

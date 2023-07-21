@@ -1,12 +1,12 @@
 import fs from 'fs'
-//verfiy project_map.json matches the interface
+//verify project_map.json matches the interface
 export interface IProject {
     gitlab: {
         defaultBranch: string,
         projectID: number,
         url: string,
         requests: {
-            [key: number]: number
+            [key: number]: IRequestMap
         }
     },
     github: {
@@ -14,19 +14,26 @@ export interface IProject {
         projectID: number,
         appID: number,
         installationID: number,
-        url: string,
+        cloneUrl: string,
+        apiUrl: string,
         requests: {
-            [key: number]: number
+            [key: number]: IRequestMap
         }
     },
 }
+
+export interface IRequestMap {
+    reciprocalNumber: number,
+    reciprocalBranch: string,
+}
+
 
 export interface IMapping {
     [key: string]: IProject
 }
 
 // if in the future we need more than just "Projects" in the mapping we can update the definition of the ^ Mapping
-//if .env ENVIROMENT variable is set to "development" then use the development mapping file called project_map_dev.json else use project_map.json
+//if .env ENVIRONMENT variable is set to "development" then use the development mapping file called project_map_dev.json else use project_map.json
 // mappingFilePath if Environment is production
 let mappingFilePath = './src/assets/project_map.json'
 if (process.env.ENVIRONMENT === "development") {
@@ -55,9 +62,12 @@ interface IMappingContext {
     gitLabProjectId: number,
     gitLabProjectUrl: string,
     gitLabDefaultBranch: string,
+    gitLabSourceBranch: string,
     gitHubProjectId: number,
-    gitHubProjectUrl: string,
+    gitHubApiUrl: string,
+    gitHubCloneUrl: string,
     gitHubDefaultBranch: string,
+    gitHubSourceBranch: string,
     installationID: number,
     appID: number
 }
@@ -66,22 +76,22 @@ interface IMappingContext {
 
 export const UpdateConfigMapping = (context: IMappingContext) => {
     // Object destructure the context
-    const {projectName, gitHubDefaultBranch, gitHubIssueNumber, gitHubProjectId, gitHubProjectUrl, gitLabDefaultBranch, gitLabMergeRequestNumber, gitLabProjectId, gitLabProjectUrl} = context
+    const {projectName, gitHubDefaultBranch, gitHubSourceBranch, gitHubIssueNumber, gitHubProjectId, gitHubApiUrl, gitHubCloneUrl: gitHubGitUrl, gitLabDefaultBranch, gitLabSourceBranch, gitLabMergeRequestNumber, gitLabProjectId, gitLabProjectUrl} = context
     
     // if the project already exists in the mapping, add the new merge request and issue number to the mapping
     if (mapping[projectName]) {
-        mapping[projectName].github.requests[gitHubIssueNumber] = gitLabMergeRequestNumber
-        mapping[projectName].gitlab.requests[gitLabMergeRequestNumber] = gitHubIssueNumber
+        mapping[projectName].github.requests[gitHubIssueNumber] = {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch}
+        mapping[projectName].gitlab.requests[gitLabMergeRequestNumber] = {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch}
     } 
     // if the project does not exist in the mapping, create a new project in the mapping
     else {
         mapping[projectName] = {
             gitlab: {
-                defaultBranch: gitLabDefaultBranch, 
+                defaultBranch: gitLabDefaultBranch,
                 projectID:gitLabProjectId, 
                 url: gitLabProjectUrl, 
                 requests: {
-                    [gitLabMergeRequestNumber]: gitHubIssueNumber
+                    [gitLabMergeRequestNumber]: {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch} 
                 },
             },
             github: {
@@ -89,9 +99,10 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
                 projectID: gitHubProjectId, 
                 appID: context.appID,
                 installationID: context.installationID,
-                url: gitHubProjectUrl, 
+                cloneUrl: gitHubGitUrl,
+                apiUrl: gitHubApiUrl,
                 requests: {
-                    [gitHubIssueNumber]: gitLabMergeRequestNumber
+                    [gitHubIssueNumber]: {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch}
                 },
             }
         }
@@ -103,11 +114,11 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
 
 
 // NOTE: Add a function that gets the respective merge request or issue number from the mapping
-export const GetUpstreamRequestNumber = (projectName: string, issueNumber: number) => {
+export const GetUpstreamRequestFor = (projectName: string, issueNumber: number) => {
     return mapping[projectName].github.requests[issueNumber]
 }
 
-export const GetDownstreamRequestNumber = (projectName: string, mergeRequestNumber: number) => {
+export const GetDownstreamRequestFor = (projectName: string, mergeRequestNumber: number) => {
     return mapping[projectName].gitlab.requests[mergeRequestNumber]
 }
 

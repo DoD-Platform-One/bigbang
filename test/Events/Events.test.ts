@@ -13,7 +13,10 @@ const setupConfig = () => UpdateConfigMapping({
   gitHubDefaultBranch: pullRequestPayload.repository.default_branch,
   gitHubIssueNumber: pullRequestPayload.number,
   gitHubProjectId: pullRequestPayload.repository.id,
-  gitHubProjectUrl: pullRequestPayload.repository.url,
+  gitHubApiUrl: pullRequestPayload.repository.url,
+  gitHubCloneUrl: pullRequestPayload.repository.clone_url,
+  gitHubSourceBranch: pullRequestPayload.pull_request.head.ref,
+  gitLabSourceBranch: pullRequestPayload.pull_request.head.ref,
   // gitlab v
   gitLabMergeRequestNumber: 12,
   gitLabProjectId: 1234,
