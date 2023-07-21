@@ -1,0 +1,72 @@
+{{- $fluxSettingsMonitoring := merge .Values.grafana.flux .Values.flux -}}
+{{- if .Values.grafana.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/grafana/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: monitoring
+  chart:
+    spec:
+      {{- if eq .Values.grafana.sourceType "git" }}
+      chart: {{ .Values.grafana.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: grafana
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.grafana.helmRepo.chartName }}
+      version: {{ .Values.grafana.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.grafana.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
+
+  {{- if .Values.grafana.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.grafana.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-grafana-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-grafana-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-grafana-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # TODO: DRY this up
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+
