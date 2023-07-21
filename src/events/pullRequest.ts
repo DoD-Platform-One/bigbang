@@ -3,7 +3,7 @@ import axios from 'axios'
 import {cloneUrl} from '../utils/gitlabSignIn.js'
 
 import dotenv from 'dotenv'
-import { GetUpstreamRequestNumber, UpdateConfigMapping } from '../assets/projectMap.js'
+import { GetUpstreamRequestFor, UpdateConfigMapping } from '../assets/projectMap.js'
 import { onGitHubEvent } from './eventManagerTypes.js'
 import MappingError from '../errors/MappingError.js'
 dotenv.config();
@@ -63,21 +63,22 @@ onGitHubEvent('pull_request.opened', async (context) => {
         }
         
         await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
-
-        console.log(`comment posted to github PR ${payload.pull_request.comments_url}`);
         
         // update config mapping for new MR and PR relationship
         UpdateConfigMapping({
             projectName: payload.repository.name,
             gitHubDefaultBranch: payload.repository.default_branch,
+            gitHubSourceBranch: payload.pull_request.head.ref,
             gitHubIssueNumber: payload.number,
             gitHubProjectId: payload.repository.id,
-            gitHubProjectUrl: payload.repository.url,
+            gitHubApiUrl: payload.repository.url,
+            gitHubCloneUrl: payload.repository.clone_url,
             // gitlab v
             gitLabMergeRequestNumber: response.data.iid,
             gitLabProjectId: ProjectID,
             gitLabProjectUrl: repo1Project.data.web_url,
             gitLabDefaultBranch: defaultBranchName,
+            gitLabSourceBranch: `PR-${PRNumber}`,
             appID: appID,
             installationID: installationID
         })
@@ -93,9 +94,9 @@ onGitHubEvent('pull_request.closed', async (context) => {
     }
 
     const PRNumber = payload.pull_request.number;
-    let upstreamRequestNumber;
+    let requestMap;
     try {
-        upstreamRequestNumber = GetUpstreamRequestNumber(projectName, PRNumber)
+        requestMap = GetUpstreamRequestFor(projectName, PRNumber)
     }catch {
         return next(
             new MappingError(`Project ${projectName} does not exist in the mapping`)
@@ -103,7 +104,7 @@ onGitHubEvent('pull_request.closed', async (context) => {
     }
     //MR closed to gitlab
     await axios.put(
-        `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${upstreamRequestNumber}`,
+        `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${requestMap.reciprocalNumber}`,
          {state_event: "close"}, 
         {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
         );
@@ -111,9 +112,15 @@ onGitHubEvent('pull_request.closed', async (context) => {
     return context.response.send("OK");
 })
 
-////create on github when Pull request is syncronized
+////create on github when Pull request is synchronized
 onGitHubEvent('pull_request.synchronize', async (context) => {
-    const {payload, projectName} = context
+    const {payload, projectName, isBot} = context
+
+    if (isBot) {
+        context.response.status(403);
+        return context.response.send("Bot comment detected, ignoring");
+      }
+    
     const PRNumber = payload.pull_request.number
     // repo one bot steps
     const github_url = payload.repository.clone_url
@@ -125,7 +132,7 @@ onGitHubEvent('pull_request.synchronize', async (context) => {
     cloneUrl(github_url, projectName)
     // create remote mirror
     // repo1 url set up with username and access token embedded
-    const repo_1_url = payload.repository.homepage.replace('https://', `https://${process.env.GITLAB_USERNAME}:${process.env.GITLAB_PASSWORD}@`)
+    const repo_1_url = context.mapping.gitlab.url.replace('https://', `https://${process.env.GITLAB_USERNAME}:${process.env.GITLAB_PASSWORD}@`)
     execSync(`git remote add mirror ${repo_1_url}`, execOptions)
     
     // get PR number
@@ -136,7 +143,7 @@ onGitHubEvent('pull_request.synchronize', async (context) => {
     //check out branch
     execSync(`git checkout PR-${PRNumber}`, execOptions)
     
-    execSync(`git push mirror PR-${PRNumber}`, execOptions)
+    execSync(`git push mirror PR-${PRNumber} --force`, execOptions)
     
     // clean up tmp/repo name folder
     execSync(`rm -rf ${currentWorkingDirectory}`)
@@ -146,9 +153,10 @@ onGitHubEvent('pull_request.synchronize', async (context) => {
         "body": comment
     }
     
-    const commentResponse = await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
+    await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
 
-    console.log(`Comment posted to github PR ${commentResponse.data.html_url}`);
+    return context.response.send("OK");
+
 })
 
 //MR close in gitlab when PR is closed in github

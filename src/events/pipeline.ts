@@ -1,7 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import {
-  GetDownstreamRequestNumber,
+  GetDownstreamRequestFor,
   } from "../assets/projectMap.js";
 import {onGitLabEvent} from "./eventManagerTypes.js";
 dotenv.config();
@@ -27,14 +27,14 @@ onGitLabEvent("pipeline.running", async (context) => {
   const mapping = context.mapping;
   const pipelineId = payload.object_attributes.id;
   const gitlabUrl = mapping.gitlab.url;
-  const gitHubUrl = mapping.github.url;
-  const PRNumber = GetDownstreamRequestNumber(
+  const gitHubUrl = mapping.github.apiUrl;
+  const requestMap = GetDownstreamRequestFor(
     context.projectName,
     payload.merge_request.iid
   );
   
   await createGitlabPipelineComment(
-    PRNumber,
+    requestMap.reciprocalNumber,
     pipelineId,
     gitlabUrl,
     gitHubUrl,
