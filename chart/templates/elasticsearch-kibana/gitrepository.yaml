@@ -1,5 +1,5 @@
 {{- if and (eq .Values.elasticsearchKibana.sourceType "git") (not .Values.offline) ( .Values.elasticsearchKibana.enabled ) }}
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: elasticsearch-kibana

@@ -1,5 +1,5 @@
 {{- if and .Values.monitoring.enabled (dig "grafana" "enabled" true .Values.monitoring.values) }}
-apiVersion: notification.toolkit.fluxcd.io/v1beta2
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:
   name: grafana
