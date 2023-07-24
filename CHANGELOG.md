@@ -4,6 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [1.71.0-bb.0] - 2023-07-21
+### Added
+- Updated to 1.71.0 images (latest in IB)
+
 ## [1.70.0-bb.0] - 2023-07-12
 ### Added
 - Updated to 1.70.0 images (latest in IB)
