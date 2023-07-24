@@ -1,5 +1,5 @@
 {{- if and (eq .Values.kyverno.sourceType "git") (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled) }}
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: kyverno

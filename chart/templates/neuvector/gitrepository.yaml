@@ -1,5 +1,5 @@
 {{- if and (not .Values.offline) (eq .Values.neuvector.sourceType "git") .Values.neuvector.enabled }}
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: neuvector

@@ -7,7 +7,7 @@
 {{- $vals := merge $vals ($defaults | fromYaml).package -}}
 {{- end -}}
 {{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: {{ $pkg }}
