@@ -104,7 +104,7 @@ Big Bang needs to know how to retrieve the private key so it can deploy the encr
 By default, the `Kustomization` resource uses a Secret named `sops-gpg` for the private key as shown here:
 
 ```yaml
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: environment
@@ -120,7 +120,7 @@ spec:
 Configure the `Kustomization` resource to use sops for decryption:
 
 ```yaml
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: environment

@@ -1,7 +1,7 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- if and (eq $nexusValues.sourceType "git") $nexusValues.enabled  }}
-apiVersion: source.toolkit.fluxcd.io/v1beta2
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: nexus-repository-manager
