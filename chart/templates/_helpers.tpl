@@ -153,14 +153,14 @@ Annotation for Istio version
 {{- define "istioAnnotation" -}}
 {{- if (eq .Values.istio.sourceType "git") -}}
 {{- if .Values.istio.git.semver -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.semver | trimSuffix (regexFind "-bb.*" .Values.istio.git.semver) }}
+bigbang.dev/istioVersion: {{ .Values.istio.git.semver | trimSuffix (regexFind "-bb.*" .Values.istio.git.semver) }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
 {{- else if .Values.istio.git.tag -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.tag | trimSuffix (regexFind "-bb.*" .Values.istio.git.tag) }}
+bigbang.dev/istioVersion: {{ .Values.istio.git.tag | trimSuffix (regexFind "-bb.*" .Values.istio.git.tag) }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
 {{- else if .Values.istio.git.branch -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.branch }}
+bigbang.dev/istioVersion: {{ .Values.istio.git.branch }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
 {{- end -}}
 {{- else -}}
-bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}
+bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
 {{- end -}}
 {{- end -}}
 
