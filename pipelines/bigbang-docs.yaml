@@ -12,6 +12,7 @@ include:
 before_script:
   - poetry install --only main
   - npm install --global prettier
+  - npm install --global markdownlint-cli
   - npm ci
 
 stages:
