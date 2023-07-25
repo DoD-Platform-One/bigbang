@@ -1798,6 +1798,49 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Harbor
+  #
+  harbor:
+    # -- Toggle deployment of harbor
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+      tag: "1.12.2-bb.5"
+      path: "./chart"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "harbor"
+      tag: "1.12.2-bb.5"
+
+    # -- Flux reconciliation overrides specifically for the Jaeger Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SSO for Harbor on and off
+      enabled: false
+
+      # -- OIDC Client ID to use for Harbor
+      client_id: ""
+
+      # -- OIDC Client Secret to use for Harbor
+      client_secret: ""
+
+    # -- Values to pass through to Habor chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
+
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"
