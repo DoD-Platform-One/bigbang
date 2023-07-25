@@ -174,6 +174,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
+          - harbor/harbor-cypress-test
           - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
@@ -307,6 +308,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
+          - harbor/harbor-cypress-test
           - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
@@ -463,6 +465,7 @@ kyvernoPolicies:
               - argocd
               - minio
               - neuvector
+              - harbor
               names:
               - "*-cypress-test*"
         parameters:
@@ -496,6 +499,7 @@ kyvernoPolicies:
               - argocd
               - minio
               - neuvector
+              - harbor
               names:
               - "*-cypress-test*"
         parameters:
@@ -539,6 +543,7 @@ kyvernoPolicies:
               - argocd
               - minio
               - neuvector
+              - harbor
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -1689,3 +1694,166 @@ addons:
       bbtests:
         enabled: true
 
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Harbor
+  #
+  harbor:
+    # -- Toggle deployment of harbor
+    enabled: false
+
+    # -- Values to pass through to Habor chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+    values: 
+      redis:
+        external: 
+          addr: "harbor-redis-bb-headless:6379"
+      expose:
+        type: clusterIP
+        tls:
+          enabled: false
+      internalTLS:
+        enabled: false
+      externalURL: https://harbor.bigbang.dev
+      nginx:
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      portal:
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      core:
+        secretName: "ci-only"
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      jobservice:
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      registry:
+        registry:
+          resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+        controller:
+          resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      chartmuseum:
+        resources:
+        requests:
+          memory: 200Mi
+          cpu: 80m
+        limits:
+          cpu: 80m
+          memory: 200Mi
+      trivy:
+        resources:
+          requests:
+            cpu: 80m
+            memory: 200Mi
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      notary:
+        server:
+          resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+        signer:
+          resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+      database:
+        type: external
+        internal:
+          resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            cpu: 80m
+            memory: 200Mi
+          initContainer:
+            migrator: {}
+            resources:
+            requests:
+              memory: 100Mi
+              cpu: 80m
+            limits:
+              cpu: 80m
+              memory: 100Mi
+            permissions: {}
+            resources:
+            requests:
+              memory: 100Mi
+              cpu: 80m
+            limits:
+              cpu: 80m
+              memory: 100Mi
+      postgresql:
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "200Mi"
+          limits:
+            cpu: "200m"
+            memory: "200Mi"
+      redis:
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 80m
+          limits:
+            memory: 200Mi
+            cpu: 80m
+      exporter:
+        resources:
+        requests:
+          memory: 200Mi
+          cpu: 80m
+        limits:
+          cpu: 80m
+          memory: 200Mi
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: "https://harbor.bigbang.dev"
+        scripts:
+          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          envs:
+            HARBOR_REGISTRY: "harbor.bigbang.dev"
