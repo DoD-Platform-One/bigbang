@@ -3,6 +3,6 @@ include:
     ref: '2.9.5-beta.0'
     file: '/pipelines/bigbang-package.yaml' 
 variables:
-  PIPELINE_REPO_BRANCH: 'pipeline-template-branch'
+  PIPELINE_REPO_BRANCH: '2.9.5-beta.0'
   MULTI_NODE: "true"
-  CI_DEFAULT_BRANCH: 'mmartin-test'
+  CI_DEFAULT_BRANCH: 'mmartin-test-nexus'
