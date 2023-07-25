@@ -37,6 +37,9 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "comments": {
+      "type": "string"
+    },
     "domain": {
       "type": "string"
     },
