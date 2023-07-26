@@ -2,6 +2,9 @@
 
 K3D_VERSION="5.5.1"
 
+# get the current script dir
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 function run() {
   ssh -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP} "$@"
 }
@@ -158,13 +161,18 @@ while [ -n "$1" ]; do # while loop starts
   -h) echo "Usage:"
       echo "k3d-dev.sh -b -p -m -a -d -h"
       echo ""
-      echo " -b   use BIG M5 instance. Default is t3.2xlarge"
+      echo " -b   use BIG M5 instance. Default is m5a.4xlarge"
       echo " -p   use private IP for security group and k3d cluster"
       echo " -m   create k3d cluster with metalLB"
       echo " -a   attach secondary Public IP (overrides -p and -m flags)"
       echo " -d   destroy related AWS resources"
+      echo " -w   install the weave CNI instead of the default flannel CNI"
       echo " -h   output help"
       exit 0
+  ;;
+
+  -w) echo "-w option passed to use Weave CNI" 
+      USE_WEAVE=true
   ;;
 
   *) echo "Option $1 not recognized" ;; # In case a non-existent option is submitted
@@ -548,12 +556,15 @@ if [[ $K3S_IMAGE_TAG ]]; then
   k3d_command+=" --image docker.io/rancher/k3s:$K3S_IMAGE_TAG"
 fi
 
+# create docker network for k3d cluster
+echo "creating docker network for k3d cluster"
+run "docker network remove k3d-network"
+run "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
+k3d_command+=" --network k3d-network"
+
 # Add MetalLB specific k3d config
 if [[ "$METAL_LB" == true || "$ATTACH_SECONDARY_IP" == true ]]; then
-  # create docker network for k3d cluster
-  echo "creating docker network for k3d cluster"
-  run "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
-  k3d_command+=" --k3s-arg \"--disable=servicelb@server:0\" --network k3d-network"
+  k3d_command+=" --k3s-arg \"--disable=servicelb@server:0\""
 fi
 
 # Add Public/Private IP specific k3d config
@@ -563,6 +574,30 @@ if [[ "$PRIVATE_IP" == true ]]; then
 else
   echo "using public ip for k3d"
   k3d_command+=" --k3s-arg \"--tls-san=${PublicIP}@server:0\""
+fi
+
+# use weave instead of flannel -- helps with large installs
+# we match the 172.x subnets used by CI for consistency
+if [[ "$USE_WEAVE" == true ]]; then
+
+  run "if [[ ! -f /opt/cni/bin/loopback ]]; then sudo mkdir -p /opt/cni/bin && sudo curl -s -L https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz  | sudo tar xvz -C /opt/cni/bin; fi"
+
+  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/weave/* ubuntu@${PublicIP}:/tmp/
+
+  # network settings  
+  k3d_command+=" --k3s-arg \"--flannel-backend=none@server:*\""
+  k3d_command+=" --k3s-arg \"--disable-network-policy@server:*\""
+  k3d_command+=" --k3s-arg \"--cluster-cidr=172.21.0.0/16@server:*\""
+  k3d_command+=" --k3s-arg \"--service-cidr=172.20.0.0/16@server:*\""
+  k3d_command+=" --k3s-arg \"--cluster-dns=172.20.0.10@server:*\""
+
+  # volume mounts
+  k3d_command+=" --volume \"/tmp/weave.yaml:/var/lib/rancher/k3s/server/manifests/weave.yaml@server:*\""
+  k3d_command+=" --volume /tmp/machine-id-server-0:/etc/machine-id@server:0"
+  k3d_command+=" --volume /tmp/machine-id-agent-0:/etc/machine-id@agent:0"
+  k3d_command+=" --volume /tmp/machine-id-agent-1:/etc/machine-id@agent:1"
+  k3d_command+=" --volume /tmp/machine-id-agent-2:/etc/machine-id@agent:2"
+  k3d_command+=" --volume /opt/cni/bin:/opt/cni/bin@all:*"
 fi
 
 # Create k3d cluster
