@@ -175,7 +175,7 @@ cr:
 
       grafana:
         enabled: true
-        in_cluster_url: "http://monitoring-monitoring-grafana.monitoring.svc.cluster.local:80"
+        in_cluster_url: "http://monitoring-grafana.monitoring.svc.cluster.local:80"
         url: "https://grafana.bigbang.dev"
         auth:
           username: "admin"

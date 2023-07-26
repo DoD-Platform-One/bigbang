@@ -1,6 +1,6 @@
 # kiali
 
-![Version: 1.71.0-bb.0](https://img.shields.io/badge/Version-1.71.0--bb.0-informational?style=flat-square) ![AppVersion: 1.71.0](https://img.shields.io/badge/AppVersion-1.71.0-informational?style=flat-square)
+![Version: 1.71.0-bb.1](https://img.shields.io/badge/Version-1.71.0--bb.1-informational?style=flat-square) ![AppVersion: 1.71.0](https://img.shields.io/badge/AppVersion-1.71.0-informational?style=flat-square)
 
 Kiali is an open source project for service mesh observability, refer to https://www.kiali.io for details.
 
@@ -104,7 +104,7 @@ helm install kiali chart/
 | cr.spec.external_services.custom_dashboards.enabled | bool | `true` |  |
 | cr.spec.external_services.prometheus.url | string | `"http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090"` |  |
 | cr.spec.external_services.grafana.enabled | bool | `true` |  |
-| cr.spec.external_services.grafana.in_cluster_url | string | `"http://monitoring-monitoring-grafana.monitoring.svc.cluster.local:80"` |  |
+| cr.spec.external_services.grafana.in_cluster_url | string | `"http://monitoring-grafana.monitoring.svc.cluster.local:80"` |  |
 | cr.spec.external_services.grafana.url | string | `"https://grafana.bigbang.dev"` |  |
 | cr.spec.external_services.grafana.auth.username | string | `"admin"` |  |
 | cr.spec.external_services.grafana.auth.password | string | `"prom-operator"` |  |
