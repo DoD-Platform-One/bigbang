@@ -62,18 +62,18 @@ cr:
       {{- end }}
     external_services:
       grafana:
-        enabled: {{ dig "grafana" "enabled" true .Values.monitoring.values }}
-        {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.monitoring.values) }}
+        enabled: {{ .Values.grafana.enabled }}
+        {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.grafana.values) }}
         url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
-        {{- if (dig "grafana" "enabled" true .Values.monitoring.values) }}
+        {{- if .Values.grafana.enabled }}
         auth:
-          {{- if (dig "grafana" "admin" "existingSecret" "" .Values.monitoring.values) }}
-          {{- $userKey := (dig "grafana" "admin" "userKey" "admin-user" .Values.monitoring.values) }}
-          {{- with lookup "v1" "Secret" "monitoring" .Values.monitoring.values.grafana.admin.existingSecret }}
+          {{- if (dig "admin" "existingSecret" "" .Values.grafana.values) }}
+          {{- $userKey := (dig "admin" "userKey" "admin-user" .Values.grafana.values) }}
+          {{- with lookup "v1" "Secret" "monitoring" .Values.grafana.values.admin.existingSecret }}
           username: {{ (get .data $userKey | b64dec) | default "admin" }}
           {{- end }}
           {{- else }}
-          username: {{ dig "grafana" "adminUser" "admin" .Values.monitoring.values }}
+          username: {{ dig "adminUser" "admin" .Values.grafana.values }}
           {{- end }}
           password: "secret:grafana-auth:password"
         {{- end }}
