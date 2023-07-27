@@ -1,6 +1,5 @@
 import express from 'express'
 import validatePayload from "./crypto/validatePayload.js"
-import adminRouter from './routes/admin.js';
 import { emitEvent } from './events/eventManager.js'
 import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
@@ -36,8 +35,6 @@ app.post('/test', (_, res) => {
   res.status(200)
   res.send("hello world")
 })
-
-app.use(adminRouter)
 
 // Error handler
 app.use((err: Error | ResponseError, req: AppRequest, res: express.Response, next: express.NextFunction) => {
