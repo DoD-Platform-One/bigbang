@@ -1,12 +1,7 @@
 import express from 'express'
 import validatePayload from "./crypto/validatePayload.js"
 import adminRouter from './routes/admin.js';
-import fs from 'fs'
-import path from 'path'
-
-import {format} from 'prettier'
-
-import { createContext, emitEvent } from './events/eventManager.js'
+import { emitEvent } from './events/eventManager.js'
 import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
 import "./events/comment.js"
@@ -37,19 +32,8 @@ app.post('/repo-sync', async (req, res, next) => {
   emitEvent(req, res, next)  
 })
 
-
-app.post('/record', async (req, res, next) => {
-  const context = await createContext(req.headers, req.body, res, next)
-  if (!context){
-    return
-  }
-  const __dirname = path.resolve(path.dirname(''));
-  const filepath = path.join(__dirname, 'test', 'fixtures', `${context.instance}-${context.event}.json`)
-  const data = format(JSON.stringify(req.body), { parser: "json" })
-  fs.writeFileSync(filepath, data, { flag: 'w' });
-})
-
-app.post('/test', (req, res) => {
+app.post('/test', (_, res) => {
+  res.status(200)
   res.send("hello world")
 })
 
