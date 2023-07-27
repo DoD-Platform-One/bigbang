@@ -141,7 +141,7 @@ export const emitEvent = async (
   const context = await createContext(req.headers, req.body, res, next);
 
   if (!context.isBot) {
-    console.log(`This is a ${context.instance} event: ${context.event}`);
+    console.log(`${context.instance} : ${context.event}`);
   }
 
   if (context.isFailed) {
