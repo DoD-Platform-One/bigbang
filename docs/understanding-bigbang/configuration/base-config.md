@@ -114,10 +114,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | kiali.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kiali.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"1.70.0-bb.0"` |  |
+| kiali.git.tag | string | `"1.71.0-bb.1"` |  |
 | kiali.helmRepo.repoName | string | `"registry1"` |  |
 | kiali.helmRepo.chartName | string | `"kiali"` |  |
-| kiali.helmRepo.tag | string | `"1.70.0-bb.0"` |  |
+| kiali.helmRepo.tag | string | `"1.71.0-bb.1"` |  |
 | kiali.flux | object | `{}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
