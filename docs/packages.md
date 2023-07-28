@@ -57,6 +57,7 @@
 | [Gitlab Runner](https://repo1.dso.mil/big-bang/apps/developer-tools/gitlab-runner) |  ![Gitlab Runner Build](https://repo1.dso.mil/big-bang/apps/developer-tools/gitlab-runner/badges/main/pipeline.svg) | Yes | Yes \* | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/522) \* | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1724) \* |
 | [Nexus](https://repo1.dso.mil/big-bang/apps/developer-tools/nexus) |  ![Nexus](https://repo1.dso.mil/big-bang/apps/developer-tools/nexus/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/544) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1605) |
 | [Sonarqube](https://repo1.dso.mil/big-bang/apps/developer-tools/sonarqube) |  ![Sonarqube](https://repo1.dso.mil/big-bang/apps/developer-tools/sonarqube/badges/main/pipeline.svg) | N/A | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/503) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1508) |
+| [Harbor](https://https://repo1.dso.mil/big-bang/product/packages/harbor) |  ![Harbor](https://https://repo1.dso.mil/big-bang/product/packages/harbor/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2939) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2939) |
 
 > `*` inherited from Gitlab when installed in the same namespace.
 
