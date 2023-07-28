@@ -878,6 +878,9 @@ addons:
           persistence:
             size: 512Mi
         replica:
+          replicaCount: 0
+          autoscaling:
+            enabled: false
           persistence:
             size: 512Mi
       redis:
@@ -1205,7 +1208,7 @@ addons:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchore-ui-redis:
+      ui-redis:
         enabled: true
         replica:
           replicaCount: 0
