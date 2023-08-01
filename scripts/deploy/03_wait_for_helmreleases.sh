@@ -41,6 +41,7 @@ function wait_all_hr() {
             failed=$(echo "${state}" | grep "Failed")
             echo "❌ Found FAILED Helm Release(s). Exiting now."
             echo "❌ ${failed}"
+            kubectl get pods -A
             failed_hrs=$(echo "{$failed}" | awk  '{print $2}')
             for hr in $failed_hrs; do
                 kubectl describe hr -n bigbang $hr
@@ -53,8 +54,10 @@ function wait_all_hr() {
                 break
             fi
         fi
-        sleep 5
-        timeElapsed=$(($timeElapsed+5))
+        sleep 30
+        timeElapsed=$(($timeElapsed+30))
+        kubectl get hr -A --sort-by={.metadata.name}
+        kubectl get pods -A --sort-by={.metadata.namespace}
         if [[ $timeElapsed -ge 3600 ]]; then
             echo "❌ Timed out while waiting for hr's to be ready."
             exit 1

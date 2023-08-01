@@ -488,6 +488,7 @@ clone_bigbang_and_merge_templates() {
    cp -r ../bigbang/templates/* ./chart/templates/
    PIPELINE_REPO_DESTINATION="../pipeline-repo"
    package=$(yq e '. | keys | .[0]' ../bigbang/values.yaml)
+
    # Add root value to schema 
    jq '.required += ["'$package'"]' chart/values.schema.json > chart/values.schema.json.1
    mv chart/values.schema.json.1 chart/values.schema.json

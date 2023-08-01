@@ -15,6 +15,7 @@
     DOCKER_TLS_VERIFY: 1
     DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
     DOCKER_DRIVER: overlay2
+    USE_WEAVE: "true"
   before_script:
     - echo -e "\e[0Ksection_start:`date +%s`:k3d_up[collapsed=true]\r\e[0K\e[33;1mK3D Cluster Create\e[37m"
     - git clone -b ${PIPELINE_REPO_BRANCH} ${PIPELINE_REPO} ${PIPELINE_REPO_DESTINATION}
@@ -22,12 +23,12 @@
     - package_auth_setup
     # Give docker-in-docker time to come alive
     - i=0; while [ "$i" -lt 12 ]; do docker info &>/dev/null && break; sleep 5; i=$(( i + 1 )) ; done
-    - docker network create --opt com.docker.network.bridge.name=${CI_JOB_ID} ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.20.0.0/15 --gateway 172.20.0.1
+    - docker network create --opt com.docker.network.bridge.name=${CI_JOB_ID} ${CI_JOB_ID} --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.20.0.0/16 --gateway 172.20.0.1
     - chmod +x ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh; echo "Executing ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh..."; ./${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/k3d/deploy_k3d.sh
     - until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done
     - chmod +x ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh; echo "Executing ${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh..."; ./${PIPELINE_REPO_DESTINATION}/clusters/k3d/dependencies/metallb/install_metallb.sh
     - get_all
-    - echo -e "\e[0Ksection_end:`date +%s`:k3d_up\r\e[0K"    
+    - echo -e "\e[0Ksection_end:`date +%s`:k3d_up\r\e[0K"
   after_script:
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
     - get_ns
