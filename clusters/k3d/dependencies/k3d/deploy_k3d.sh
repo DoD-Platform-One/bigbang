@@ -51,9 +51,12 @@ if [[ "$USE_WEAVE" == "true" ]]; then
   ARGS+=" --volume ${SCRIPT_DIR}/weave.yaml:/var/lib/rancher/k3s/server/manifests/weave.yaml@server:*"
   
   ARGS+=" --volume ${SCRIPT_DIR}/machine-id-server-0:/etc/machine-id@server:0"
-  ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-0:/etc/machine-id@agent:0"
-  ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-1:/etc/machine-id@agent:1"
-  ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-2:/etc/machine-id@agent:2"
+  
+  if [[ $MULTI_NODE == "true" ]]; then
+    ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-0:/etc/machine-id@agent:0"
+    ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-1:/etc/machine-id@agent:1"
+    ARGS+=" --volume ${SCRIPT_DIR}/machine-id-agent-2:/etc/machine-id@agent:2"
+  fi
   
   ARGS+=" --volume /opt/cni/bin:/opt/cni/bin@all:*"
 else
