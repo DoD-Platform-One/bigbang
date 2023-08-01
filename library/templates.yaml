@@ -7,7 +7,7 @@ include:
 
 # Single place to update image used for pipelines
 .util-image:
-  image: registry1.dso.mil/bigbang-ci/bb-ci:2.9.4
+  image: registry1.dso.mil/bigbang-ci/bb-ci:2.9.12
 
 # Runner tags
 .bigbang-runner-tags:
@@ -53,7 +53,7 @@ include:
     - package_auth_setup
 
 .kubectl-output:
-  extends: 
+  extends:
   - .util-image
   after_script:
     - source ${PIPELINE_REPO_DESTINATION}/library/templates.sh

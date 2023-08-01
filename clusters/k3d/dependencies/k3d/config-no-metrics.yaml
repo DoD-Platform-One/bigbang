@@ -3,7 +3,6 @@ kind: Simple
 metadata:
   name: ci
 servers: 1
-image: rancher/k3s:v1.23.4-k3s1
 options:
   k3s:
     extraArgs:
@@ -28,10 +27,6 @@ options:
   k3d:
     wait: true
 volumes:
-  - volume: /etc/machine-id:/etc/machine-id
-    nodeFilters:
-      - server:*
-      - agent:*
   - volume: /cypress:/cypress
     nodeFilters:
       - server:*

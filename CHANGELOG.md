@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.9.12]
+### Changed
+- Updated bb-ci image to latest version `2.9.5-beta.0`
+- Updated k3d, docker image, etc.
+
 ## [2.9.11]
 ### Added
 - Install markdown-lint dependency for bb-docs-compiler
@@ -358,7 +363,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.5.2]
 ### Added
 - Added BB CI registry to allowed list of registries
-
 
 ## [2.5.1]
 ### changed

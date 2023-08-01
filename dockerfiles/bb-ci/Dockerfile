@@ -1,7 +1,7 @@
 # This container is used in Bigbang's CI
 # Please Keep this file updated when pushes are made
 #
-# @Version bb-ci:2.5.3
+# @Version bb-ci:2.9.12
 #
 # docker build -t registry1.dso.mil/bigbang-ci/bb-ci:${VERSION} .
 # docker push registry1.dso.mil/bigbang-ci/bb-ci:${VERSION}
@@ -70,7 +70,7 @@ RUN npx playwright@1.24.2 install
 RUN chmod -R 777 /ms-playwright
 
 # Install Kyverno
-ENV KYVERNO_VERSION='v1.8.4'
+ENV KYVERNO_VERSION='v1.9.2'
 ADD https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
 RUN tar xzf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz \
     && mv kyverno /usr/local/bin/ \
@@ -78,65 +78,37 @@ RUN tar xzf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz \
     && rm -rf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
 
 # Install Helm
-ENV HELM_VERSION='3.10.2'
+ENV HELM_VERSION='3.12.0'
 ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /helm-v${HELM_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64/helm && mv linux-amd64/helm /usr/local/bin/ && chmod +x /usr/local/bin/helm && rm -rf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64*
 
-# Install ArgoCD CLI
-ENV ARGO_VERSION='2.2.5'
-ADD https://github.com/argoproj/argo-cd/releases/download/v${ARGO_VERSION}/argocd-linux-amd64 /usr/local/bin/argocd
-RUN chmod +x /usr/local/bin/argocd
-
 # Install fluxcd
-ENV FLUX_VERSION='0.27.3'
+ENV FLUX_VERSION='2.0.1'
 ADD https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_amd64.tar.gz /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /flux_${FLUX_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/flux && rm -rf /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 
-# Install Istio
-ENV ISTIO_VERSION='1.13.1'
-ADD https://github.com/istio/istio/releases/download/${ISTIO_VERSION}/istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz
-RUN tar xzf /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/istioctl && rm -rf /istioctl-${ISTIO_VERSION}-linux-amd64.tar.gz
-
-# Install mkcert
-ENV MKCERT_VERSION='1.4.3'
-ADD https://github.com/FiloSottile/mkcert/releases/download/v${MKCERT_VERSION}/mkcert-v${MKCERT_VERSION}-linux-amd64 /usr/local/bin/mkcert
-RUN chmod +x /usr/local/bin/mkcert
-
-# Install SOPS
-ENV SOPS_VERSION='3.7.1'
-ADD https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux /usr/local/bin/sops
-RUN chmod +x /usr/local/bin/sops
-
-# Install SopsSecretGenerator
-ENV SSG_VERSION='1.4.1'
-ADD https://github.com/goabout/kustomize-sopssecretgenerator/releases/download/v${SSG_VERSION}/SopsSecretGenerator_${SSG_VERSION}_linux_amd64 /usr/local/bin/SopsSecretGenerator
-RUN chmod +x /usr/local/bin/SopsSecretGenerator
-
 # Install K3d
-ENV K3D_VERSION='5.4.1'
-ADD https://github.com/rancher/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
+ENV K3D_VERSION='5.5.1'
+ADD https://github.com/k3d-io/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
 RUN chmod +x /usr/local/bin/k3d
 
 # Install kubectl
-ENV KUBECTL_VERSION='1.23.4'
+ENV KUBECTL_VERSION='1.27.2'
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
-# Install tree for directory structure
-RUN yum -y install http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/Packages/tree-1.7.0-15.el8.x86_64.rpm
-
 # Install yq for dependency handling
-ENV YQ_VERSION='4.21.1'
+ENV YQ_VERSION='4.34.1'
 ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 /usr/local/bin/yq
 RUN chmod +x /usr/local/bin/yq
 
 # Install Pluto for API Deprecation Checking
-ENV PLUTO_VERSION='5.4.1'
+ENV PLUTO_VERSION='5.16.4'
 ADD https://github.com/FairwindsOps/pluto/releases/download/v${PLUTO_VERSION}/pluto_${PLUTO_VERSION}_linux_amd64.tar.gz /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz pluto && mv pluto /usr/local/bin/ && chmod +x /usr/local/bin/pluto && rm -rf /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz
 
 # Install Kube no trouble for API Deprecation Checking in cluster
-ENV KUBENT_VERSION='0.5.1'
+ENV KUBENT_VERSION='0.7.0'
 ADD https://github.com/doitintl/kube-no-trouble/releases/download/${KUBENT_VERSION}/kubent-${KUBENT_VERSION}-linux-amd64.tar.gz /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz kubent && mv kubent /usr/local/bin/ && chmod +x /usr/local/bin/kubent && rm -rf /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz
 
@@ -147,7 +119,12 @@ ADD https://gitlab.com/api/v4/projects/gitlab-org%2Frelease-cli/packages/generic
 RUN chmod +x /usr/local/bin/release-cli
 
 # Install crane
-ENV CRANE_VERSION='v0.8.0'
+ENV CRANE_VERSION='v0.15.2'
+ADD https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz /crane.tar.gz
+RUN tar -zxf /crane.tar.gz crane && mv crane /usr/local/bin/crane && chmod +x /usr/local/bin/crane && rm -rf /crane.tar.gz
+
+# Install crane for image annotation validation
+ENV CRANE_VERSION='v0.15.2'
 ADD https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz /crane.tar.gz
 RUN tar -zxf /crane.tar.gz crane && mv crane /usr/local/bin/crane && chmod +x /usr/local/bin/crane && rm -rf /crane.tar.gz
 
@@ -156,7 +133,8 @@ ENV KUSTOMIZE_VERSION='v4.5.2'
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz kustomize && mv kustomize /usr/local/bin/ && chmod +x /usr/local/bin/kustomize && rm -rf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 
-ENV ZARF_VERSION='v0.27.0'
+# Install Zarf
+ENV ZARF_VERSION='v0.26.4'
 ADD https://github.com/defenseunicorns/zarf/releases/download/${ZARF_VERSION}/zarf_${ZARF_VERSION}_Linux_amd64 /usr/local/bin/zarf
 RUN chmod +x /usr/local/bin/zarf
 
@@ -165,6 +143,10 @@ RUN curl -sL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/aw
     unzip -qq -d /tmp /tmp/awscliv2.zip && \
     /tmp/aws/install && \
     rm -rf /tmp/aws*
+    
+# Install CNI    
+RUN mkdir -p /opt/cni/bin && \
+    curl -s -L https://github.com/containernetworking/plugins/releases/download/v1.3.0/cni-plugins-linux-amd64-v1.3.0.tgz  | tar xvz -C /opt/cni/bin 
 
 # Remove needed repos
 RUN rm -rf /etc/yum.repos.d/docker-ce.repo && \
