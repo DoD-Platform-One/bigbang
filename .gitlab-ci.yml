@@ -1,0 +1,10 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: 'fix-wait-race-condition'
+    file: '/pipelines/bigbang-package.yaml' 
+variables:
+  PIPELINE_REPO_BRANCH: 'fix-wait-race-condition'
+  MULTI_NODE: "false"
+  USE_WEAVE: "true"
+  CI_PROJECT_NAME: "kyverno-policies"
+  CI_DEFAULT_BRANCH: "mgm-test-kyverno-policies"
