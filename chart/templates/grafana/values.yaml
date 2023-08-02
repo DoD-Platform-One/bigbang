@@ -257,7 +257,7 @@ grafana.ini:
     {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
   {{- end }}
 
-{{- if and (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+{{- if or (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
 extraSecretMounts:
   {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
   - name: auth-generic-oauth-secret
