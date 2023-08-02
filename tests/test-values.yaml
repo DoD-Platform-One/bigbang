@@ -170,6 +170,7 @@ gatekeeper:
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-cypress-test
           - monitoring/monitoring-cypress-test
+          - monitoring/grafana-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
@@ -304,6 +305,7 @@ gatekeeper:
           - keycloak/keycloak-cypress-test
           - jaeger/jaeger-cypress-test
           - monitoring/monitoring-cypress-test
+          - monitoring/grafana-cypress-test
           - vault/vault-cypress-test
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
