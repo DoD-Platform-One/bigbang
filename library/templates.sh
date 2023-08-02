@@ -625,8 +625,8 @@ dependency_wait() {
        fi
      done
      echo "done."
-     echo -n "Waiting on running pods to be ready ... "
-     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+     # short kubectl timeout to avoid race condition grabbing jobs that would be in Running phase and then finish with ready=false
+     timeout 600 bash -c "until kubectl wait --for=condition=ready --timeout 10s -A pods --all --field-selector status.phase=Running > /dev/null; do echo -n \"Waiting on running pods to be ready ... \"; done"
      echo "done."
    fi
    echo -e "\e[0Ksection_end:`date +%s`:dependency_wait\r\e[0K"
@@ -695,8 +695,8 @@ package_wait() {
      fi
    done
    echo "done."
-   echo -n "Waiting on running pods to be ready ... "
-   kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+   # short kubectl timeout to avoid race condition grabbing jobs that would be in Running phase and then finish with ready=false
+   timeout 600 bash -c "until kubectl wait --for=condition=ready --timeout 10s -A pods --all --field-selector status.phase=Running > /dev/null; do echo -n \"Waiting on running pods to be ready ... \"; done"
    echo "done."
    echo -e "\e[0Ksection_end:`date +%s`:package_wait\r\e[0K"
 }
@@ -807,8 +807,8 @@ post_install_wait() {
        fi
      done
      echo "done."
-     echo -n "Waiting on running pods to be ready ... "
-     kubectl wait --for=condition=ready --timeout 600s -A pods --all --field-selector status.phase=Running > /dev/null
+     # short kubectl timeout to avoid race condition grabbing jobs that would be in Running phase and then finish with ready=false
+     timeout 600 bash -c "until kubectl wait --for=condition=ready --timeout 10s -A pods --all --field-selector status.phase=Running > /dev/null; do echo -n \"Waiting on running pods to be ready ... \"; done"
      echo "done."
    fi
    echo -e "\e[0Ksection_end:`date +%s`:post_install_wait\r\e[0K"
