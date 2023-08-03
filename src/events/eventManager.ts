@@ -1,4 +1,5 @@
 import { IncomingHttpHeaders } from "http";
+import { debug, success } from "../utils/console.js";
 import { GetMapping } from "../assets/projectMap.js";
 import { getGitHubAppAccessToken } from "../crypto/appcrypto.js";
 import { NextFunction, Request, Response } from "express";
@@ -115,7 +116,7 @@ export async function createContext(
         state["appID"] = state.mapping.github.appID;
         state["installationID"] = state.mapping.github.installationID;
       } catch {
-        console.log("Gitlab Project Name Not in Config Map");
+        debug("Gitlab Project Name Not in Config Map");
         state["isFailed"] = true;
         return state;
       }
@@ -141,7 +142,7 @@ export const emitEvent = async (
   const context = await createContext(req.headers, req.body, res, next);
 
   if (!context.isBot) {
-    console.log(`${context.instance} : ${context.event}`);
+    success(`${context.instance} : ${context.event}`);
   }
 
   if (context.isFailed) {

@@ -9,6 +9,8 @@ import ResponseError from './errors/ResponseError.js';
 
 // App
 const app = express();
+// disable x-powered-by header for one extra layer of security through obscurity
+app.disable('x-powered-by')
 
 // setting up a raw body and admin values
 export interface AppRequest extends express.Request {
