@@ -1456,14 +1456,16 @@ addons:
         server:
           name: velero
       configuration:
-        provider: aws
         backupStorageLocation:
-          bucket: velero
+        - bucket: velero
+          provider: aws
+          default: true
           config:
             region: velero
             s3ForcePathStyle: "true"
             s3Url: https://minio-api.bigbang.dev
         volumeSnapshotLocation:
+        - name: default
           provider: aws
           config:
             region: velero
