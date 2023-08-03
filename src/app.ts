@@ -28,7 +28,12 @@ app.use(validatePayload)
 
 //Gitlab webhook events
 app.post('/repo-sync', async (req, res, next) => {
-  emitEvent(req, res, next)  
+  try{
+    emitEvent(req, res, next)  
+  }catch(err){
+    // catch all errors and pass them to the error handler
+    next(err)
+  }
 })
 
 app.post('/test', (_, res) => {
@@ -42,7 +47,7 @@ app.use((err: Error | ResponseError, req: AppRequest, res: express.Response, nex
     res.status(err.status).send(err.message)
     return next()
   }else {  
-    res.status(500).send('Something broke!')
+    res.status(500).send(`Something broke: ${err.message}`)
     return next()
   }
 })

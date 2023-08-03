@@ -1,8 +1,11 @@
 import serverless from 'serverless-http'
 import { checkEnv } from './utils/environment.js';
 import dotenv from 'dotenv'
+import { success, Underscore } from './utils/console.js';
 dotenv.config();
 checkEnv()
+
+
 // import app from './app.js'
 
 // lazy load the express app until after env checks are done
@@ -15,6 +18,6 @@ const port = process.env.PORT ?? "8080"
 export const handler = serverless(app)
 
 if (serverType == "express") {
-    console.log("starting application to listen on port: " + port);
+    success("starting application to listen on port: " + Underscore + port);
     app.listen(port)
 }
