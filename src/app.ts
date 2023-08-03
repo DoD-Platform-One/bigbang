@@ -1,11 +1,15 @@
 import express from 'express'
 import validatePayload from "./crypto/validatePayload.js"
 import { emitEvent } from './events/eventManager.js'
+import {eventNames} from './events/eventManagerTypes.js'
 import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
 import "./events/comment.js"
 import "./events/pipeline.js"
 import ResponseError from './errors/ResponseError.js';
+import { debug, warn } from './utils/console.js'
+
+debug(`Registered events: \n\t${eventNames.join("\n\t")}`)
 
 // App
 const app = express();
@@ -30,12 +34,7 @@ app.use(validatePayload)
 
 //Gitlab webhook events
 app.post('/repo-sync', async (req, res, next) => {
-  try{
     emitEvent(req, res, next)  
-  }catch(err){
-    // catch all errors and pass them to the error handler
-    next(err)
-  }
 })
 
 app.post('/test', (_, res) => {
@@ -45,6 +44,7 @@ app.post('/test', (_, res) => {
 
 // Error handler
 app.use((err: Error | ResponseError, req: AppRequest, res: express.Response, next: express.NextFunction) => {
+  warn(err.message)
   if (err instanceof ResponseError) {
     res.status(err.status).send(err.message)
     return next()

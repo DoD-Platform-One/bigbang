@@ -6,63 +6,91 @@ import dotenv from 'dotenv'
 import { GetUpstreamRequestFor, UpdateConfigMapping } from '../assets/projectMap.js'
 import { onGitHubEvent } from './eventManagerTypes.js'
 import MappingError from '../errors/MappingError.js'
+import RequestError from '../errors/RequestError.js'
+import GitError from '../errors/FileSystemError.js'
 dotenv.config();
 
 onGitHubEvent('pull_request.opened', async (context) => {
-        const {payload, appID, installationID, projectName} = context
+        const {payload, appID, installationID, projectName, next} = context
         const PRNumber = payload.pull_request.number
         // repo one bot steps
         const github_url = payload.repository.clone_url
         
         const currentWorkingDirectory = `./tmp/${projectName}`
         const execOptions: ExecSyncOptions = {cwd: currentWorkingDirectory}
-
-        // clone github repo
-        cloneUrl(github_url, projectName)
-        // create remote mirror
-        // repo1 url set up with username and access token embedded
         const repo_1_url = payload.repository.homepage.replace('https://', `https://${process.env.GITLAB_USERNAME}:${process.env.GITLAB_PASSWORD}@`)
-        execSync(`git remote add mirror ${repo_1_url}`, execOptions)
-        
-        // get PR number
-        // make a new branch off the PR ref
-        
-        execSync(`git fetch origin pull/${PRNumber}/head:PR-${PRNumber}`,execOptions)
-        
-        //check out branch
-        execSync(`git checkout PR-${PRNumber}`, execOptions)
-        
-        execSync(`git push mirror PR-${PRNumber}`, execOptions)
-        
-        // clean up tmp/repo name folder
-        execSync(`rm -rf ${currentWorkingDirectory}`)
-
+        try {
+            // clone github repo
+            cloneUrl(github_url, projectName)
+            // create remote mirror
+            // repo1 url set up with username and access token embedded
+            execSync(`git remote add mirror ${repo_1_url}`, execOptions)
+            
+            // get PR number
+            // make a new branch off the PR ref
+            
+            execSync(`git fetch origin pull/${PRNumber}/head:PR-${PRNumber}`,execOptions)
+            
+            //check out branch
+            execSync(`git checkout PR-${PRNumber}`, execOptions)
+            
+            execSync(`git push mirror PR-${PRNumber}`, execOptions)
+            
+            // clean up tmp/repo name folder
+            execSync(`rm -rf ${currentWorkingDirectory}`)
+        }catch(error){
+            return next(new GitError(error.message))
+        }
         // get Repo1 project id number
-  
+        
         // TODO check mapping for project id before webscrapping
         // 1. Webscrape using the repo1 url using regex to find ProjectID: \d*
         const webpage = await axios.get(repo_1_url)
         const ProjectID = webpage.data.match(/Project ID: \d*/)[0].split(" ")[2]
-
+        
         // webscrapping takes a long time.  Check project mapping first for project name
 
         // get Repo1 default branch name
 
         const repo1Project = await axios.get(`https://repo1.dso.mil/api/v4/projects/${ProjectID}`)
         const defaultBranchName = repo1Project.data.default_branch
-    
-        const MREditedDescription = `${payload.pull_request.body}\n\n<hr/>\n# This Merge Request is associated with A GitHub PR: ${payload.pull_request.html_url} ### Please Use caution before running the pipeline.`
+
+        const cautionMessage = `# This Merge Request is associated with A [GitHub PR](${payload.pull_request.html_url}) \n\n ### Please Use caution before running the pipeline.` 
+        if (payload.pull_request.body){
+            // double up on \n for markdown
+            payload.pull_request.body = cautionMessage + '\n\n<hr/>\n' + payload.pull_request.body.replace('\n', '\n\n')
+        }else{
+            payload.pull_request.body = cautionMessage
+        }
 
         // create Merge Request in gitlab
-        const createMergeRequestURL = `https://repo1.dso.mil/api/v4/projects/${ProjectID}/merge_requests?source_branch=PR-${PRNumber}&target_branch=${defaultBranchName}&title=PR-${PRNumber}&remove_source_branch=true&squash=true&description=${MREditedDescription}`
-        const response = await axios.post(createMergeRequestURL, undefined, {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}});
-   
+        const createMergeRequestURL = `https://repo1.dso.mil/api/v4/projects/${ProjectID}/merge_requests`
+        let response;
+        try{
+            response = await axios.post(createMergeRequestURL, 
+                {
+                    "source_branch": `PR-${PRNumber}`,
+                    "target_branch": defaultBranchName,
+                    "title": `PR-${PRNumber}`,
+                    "remove_source_branch": true,
+                    "squash": true,
+                    "description": payload.pull_request.body
+                }, 
+                {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}});
+                
+        } catch (error) {
+            return next(new RequestError(error.response.data.message, error.response.status))
+        }
+
         const comment = "Merge Request Created: " + response.data.web_url
         const body = {
             "body": comment
         }
-        
-        await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
+        try {
+            await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
+        } catch (error) {
+            return next(new RequestError(error.response.data.message, error.response.status))
+        }
         
         // update config mapping for new MR and PR relationship
         UpdateConfigMapping({

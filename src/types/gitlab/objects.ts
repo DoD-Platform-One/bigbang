@@ -128,6 +128,7 @@ export interface NoteMergeRequest {
     event_type: string;
     user: User;
     project: Project;
+    merge_request: MergeRequestObjectAttributes;
     object_attributes: MergeRequestObjectAttributes;
     labels: string[];
     changes: Changes;

@@ -17,6 +17,7 @@ export interface IEventContextObject<T extends AllEventTypes = AllEventTypes> {
   event: T["type"];
   payload: EventMap[T["type"]];
   appID?: number;
+  requestNumber: number;
   installationID?: number;
   mapping: IProject;
   projectName: string;
@@ -43,10 +44,13 @@ interface CustomEventEmitter<
 export const emitter: CustomEventEmitter<AllEventTypes, EventMap> =
   new EventEmitter();
 
+
+export const eventNames: string[] = []
 export const onGitHubEvent = <K extends keyof GitHubEventMap>(
   eventName: K,
   callback: (context: IEventContextObject<GitHubEventMap[K]>) => void
 ): void => {
+  eventNames.push(eventName)
   emitter.on(eventName, callback);
 };
 
@@ -54,5 +58,6 @@ export const onGitLabEvent = <K extends keyof GithLabEventMap>(
   eventName: K,
   callback: (context: IEventContextObject<GithLabEventMap[K]>) => void
 ): void => {
+  eventNames.push(eventName)
   emitter.on(eventName, callback);
 };
