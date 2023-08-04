@@ -11,6 +11,8 @@ github:
     actions:
       - created
   pull_request:
+    canInit:
+      - opened
     payload_property_mapping:
       action: action
       installationId: installation.id

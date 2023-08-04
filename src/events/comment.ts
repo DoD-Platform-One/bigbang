@@ -10,6 +10,7 @@ import { getDiscussionId } from "../queries/discussion.js";
 import githubReplyParser from "../utils/githubReply.js";
 import gitlabReplyParser from "../utils/gitlabReply.js";
 import { onGitHubEvent, onGitLabEvent } from "./eventManagerTypes.js";
+import GithubCommentError from "../errors/GithubCommentError.js";
 dotenv.config();
 
 ///////////////////////////////
@@ -25,21 +26,14 @@ onGitHubEvent("issue_comment.created", async (context) => {
     context.response.status(403);
     return context.response.send("Bot comment detected, ignoring");
   }
-  let requestMap: IRequestMap;
-  try {
-    requestMap = GetUpstreamRequestFor(projectName, PRNumber);
-  } catch (err) {
-    githubCommentReaction(
-      400,
-      payload.comment.url,
-      context.gitHubAccessToken
-    )
-    return next(
-      new MappingError(`Project ${projectName} does not exist in the mapping`)
-    );
-  }
 
-  //format comment to be posted to gitlab
+  let requestMap: IRequestMap;
+  
+  try{
+     requestMap = GetUpstreamRequestFor(projectName, PRNumber);
+  }catch{
+    return next(new GithubCommentError(``, payload.comment.url, context.gitHubAccessToken))
+  }
 
   const [isReply, noteId, strippedComment] = githubReplyParser(
     payload.comment.body
@@ -359,7 +353,7 @@ export async function gitlabNoteReaction(
   );
 }
 
-async function githubCommentReaction(
+export async function githubCommentReaction(
   status: number,
   url: string,
   gitHubAccessToken: string

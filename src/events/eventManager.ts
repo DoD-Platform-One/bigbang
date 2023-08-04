@@ -14,15 +14,17 @@ import {
   onGitLabEvent,
   eventNames,
 } from "./eventManagerTypes.js";
-import { NoteCreated } from "../types/gitlab/events.js";
 import yaml from "js-yaml";
 import fs from "fs";
 import { GetMapping } from "../assets/projectMap.js";
-import GitlabNoteError from "../errors/GitlabNoteError.js";
-import MappingError from "../errors/MappingError.js";
 import NotImplementedError from "../errors/NotImplementedError.js";
 import RepoSyncError from "../errors/RepoSyncError.js";
+import ContextCreationError from "../errors/ContextCreationError.js";
 export { onGitHubEvent, onGitLabEvent };
+
+//////////////////////
+// Context Creation //
+//////////////////////
 
 export async function createContext(
   headers: IncomingHttpHeaders,
@@ -54,23 +56,30 @@ export async function createContext(
   const event = (headers["x-gitlab-event"] ??
     headers["x-github-event"]) as string;
   state["event"] = event as keyof EventMap;
-  const instanceConfig = config[instance][event];
+  const eventConfig = config[instance][event];
   // check if event incoming is in config
-  if (!instanceConfig) {
-    state.error = new NotImplementedError(`Event Not Configured: ${instance} : ${event}`);
-    return state
+  if (!eventConfig) {
+    state.error = new NotImplementedError(
+      `Event Not Configured: ${instance} : ${event}`
+    );
+    return state;
   }
 
-  for (const property in instanceConfig.payload_property_mapping) {
+  // map over all the defined property routes in the instanceConfig
+  for (const property in eventConfig.payload_property_mapping) {
     // @ts-expect-error difficult to define a type here since it is generic.
-    const thing = instanceConfig.payload_property_mapping[property].split(".").reduce((acc, key) => acc[key], payload) as string;
+    const value = eventConfig.payload_property_mapping[property].split(".").reduce((acc, key) => acc[key], payload) as string;
     // @ts-expect-error we can do this because we know the type of thing
-    state[property] = thing;
+    state[property] = value;
   }
 
-  if (instanceConfig.action_mapping) {
-    state["action"] = instanceConfig["action_mapping"][state["action"]];
+  // some events have a action mapping which is an object keyed by some value mapped to an action name that makes more sense
+  // e.g note.DiscussionNote => note.reply
+  if (eventConfig.action_mapping) {
+    state["action"] = eventConfig["action_mapping"][state["action"]];
   }
+
+  state.eventName = `${state.event}.${state.action}` as keyof EventMap;
 
   if (instance === "github") {
     state["appId"] = +headers["x-github-hook-installation-target-id"];
@@ -78,40 +87,67 @@ export async function createContext(
 
   // set state name to lowercase
   state["projectName"] = state["projectName"].toLowerCase();
+
   state["mapping"] = GetMapping()[state.projectName];
+
+  // can init is an array of strings e.g ['opened'] set a boolean if the event's action is in the array
+  if (eventConfig.canInit) {
+    state["canInit"] = eventConfig.canInit.includes(state.action);
+  }
+
+  if (!state.mapping && !state.canInit) {
+    state.error = new ContextCreationError(
+      `Project Not in Config Map: ${state.instance}/${state.projectName}`,
+      state.instance,
+      state.event,
+      state.payload,
+      state.appId,
+      state.installationId
+    );
+    return state;
+  }
 
   if (instance === "gitlab") {
     try {
       state["appId"] = state.mapping.github.appId;
       state["installationId"] = state.mapping.github.installationId;
     } catch {
-      if(state.event === "note"){
-        state.error =new GitlabNoteError("Project Not in Config Map", (state.payload)as NoteCreated)
-        return state
-      }
-      state.error = new MappingError("Project Not in Config Map");
+      state.error = new ContextCreationError(
+        `Project Not in Config Map: ${state.instance}/${state.projectName}`,
+        state.instance,
+        state.event,
+        state.payload
+      );
     }
   }
 
   // bot check
-  if(!instanceConfig.allow_bot){
+  if (!eventConfig.allow_bot) {
     isUserNameBot(state);
   } else {
     state["isBot"] = false;
   }
 
   if (!state.installationId) {
-    state.error = new RepoSyncError("MalFormed Data Error")
+    state.error = new RepoSyncError(
+      `Malformed Data Error: ${state.instance}/${state.projectName} : ${state.eventName}`
+    );
     return state;
   }
 
-  state["gitHubAccessToken"] = await getGitHubAppAccessToken(
-    state.appId,
-    state.projectName,
-    state.installationId
-  );
+  try {
+    state["gitHubAccessToken"] = await getGitHubAppAccessToken(
+      state.appId,
+      state.projectName,
+      state.installationId
+    );
+  } catch {
+    state.error = new RepoSyncError(
+      `Gitlab Token Request Error: ${state.instance}/${state.projectName} : ${state.eventName}`
+    );
+    return state;
+  }
 
-  state.eventName = `${state.event}.${state.action}` as keyof EventMap;
   // add .bot to the end of event name if isBot is true
   if (state.isBot) {
     state.eventName = `${state.eventName}.bot` as keyof EventMap;
@@ -120,6 +156,10 @@ export async function createContext(
   return state;
 }
 
+//////////////////////
+// Event Management //
+//////////////////////
+
 export const emitEvent = async (
   req: Request,
   res: Response,
@@ -127,40 +167,23 @@ export const emitEvent = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
   const context = await createContext(req.headers, req.body, res, next);
-  
-  if (context.error){
-    return next(context.error)
-  }
 
-  if(projectMapCheck(context)){
-    return next(context.error)
+  if (context.error) {
+    return next(context.error);
   }
-
 
   if (eventNames.includes(context.eventName)) {
     success(`${context.instance} : ${context.eventName}`);
   } else {
-    return next(new NotImplementedError(`Event Not Registered: ${context.instance} : ${context.eventName}`))
+    return next(
+      new NotImplementedError(
+        `Event Not Registered: ${context.instance} : ${context.eventName}`
+      )
+    );
   }
 
   emitter.emit(context.eventName, context);
 };
-
-function projectMapCheck(context: IEventContextObject) {
-  //only github pull_request.open can skip this config map check
-  if (context.event === "pull_request.opened") {
-    return false
-  }
-
-  // requestMap.reciprocalNumber undefined check
-  // step one check if event name is of a request type
-  if (!context.mapping[context.instance].requests[context.requestNumber]) {
-    context.error = new MappingError("Request Number Not in Config Map");
-    return true
-  }
-
-  return false
-}
 
 // helper functions
 

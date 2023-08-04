@@ -3,6 +3,7 @@ import { IProject } from "../assets/projectMap.js";
 import { NextFunction, Response } from "express";
 import { GitHubEventMap, GitHubEventTypes } from "../types/github/events.js";
 import { GithLabEventMap, GitlabEventTypes } from "../types/gitlab/events.js";
+import RepoSyncError from "../errors/RepoSyncError.js";
 
 type AllEventTypes = GitlabEventTypes | GitHubEventTypes;
 
@@ -28,6 +29,7 @@ export interface IEventContextObject<T extends AllEventTypes = AllEventTypes> {
   next: NextFunction;
   userName: string;
   isBot: boolean;
+  canInit: boolean;
   error: Error
 }
 
@@ -55,7 +57,7 @@ export interface IEventConfig {
     }
     actions: string[]
     allow_bot?: boolean
-    remap: string
+    canInit: string[]
   }
 }
 
@@ -77,7 +79,17 @@ export const onGitHubEvent = <K extends keyof GitHubEventMap>(
   callback: (context: IEventContextObject<GitHubEventMap[K]>) => void
 ): void => {
   eventNames.push(eventName)
-  emitter.on(eventName, callback);
+
+  const errorWrapper = (context: IEventContextObject<GitHubEventMap[K]>) => {
+    try{
+      callback(context)
+    }
+    catch(err){
+      context.next(new RepoSyncError(err.message))
+    }
+  }
+
+  emitter.on(eventName, errorWrapper);
 };
 
 export const onGitLabEvent = <K extends keyof GithLabEventMap>(
@@ -85,5 +97,15 @@ export const onGitLabEvent = <K extends keyof GithLabEventMap>(
   callback: (context: IEventContextObject<GithLabEventMap[K]>) => void
 ): void => {
   eventNames.push(eventName)
-  emitter.on(eventName, callback);
+
+  const errorWrapper = (context: IEventContextObject<GithLabEventMap[K]>) => {
+    try{
+      callback(context)
+    }
+    catch(err){
+      context.next(new RepoSyncError(err.message))
+    }
+  }
+
+  emitter.on(eventName, errorWrapper);
 };
