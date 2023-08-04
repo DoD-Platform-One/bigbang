@@ -62,7 +62,7 @@ onGitLabEvent('merge_request.close', async (context) => {
 
     // post comment back to gitlab
     axios.post(
-        `https://repo1.dso.mil/api/v4/projects/${mapping.gitlab.projectID}/merge_requests/${payload.object_attributes.iid}/notes`,
+        `https://repo1.dso.mil/api/v4/projects/${mapping.gitlab.projectId}/merge_requests/${payload.object_attributes.iid}/notes`,
         {body: `Pushed to ${reciprocalBranch} branch in Github`},
         { headers: { "PRIVATE-TOKEN": process.env.GITLAB_PASSWORD } }
     )

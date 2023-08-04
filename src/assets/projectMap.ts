@@ -3,7 +3,7 @@ import fs from 'fs'
 export interface IProject {
     gitlab: {
         defaultBranch: string,
-        projectID: number,
+        projectId: number,
         url: string,
         requests: {
             [key: number]: IRequestMap
@@ -11,9 +11,9 @@ export interface IProject {
     },
     github: {
         defaultBranch: string,
-        projectID: number,
-        appID: number,
-        installationID: number,
+        projectId: number,
+        appId: number,
+        installationId: number,
         cloneUrl: string,
         apiUrl: string,
         requests: {
@@ -88,7 +88,7 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
         mapping[projectName] = {
             gitlab: {
                 defaultBranch: gitLabDefaultBranch,
-                projectID:gitLabProjectId, 
+                projectId:gitLabProjectId, 
                 url: gitLabProjectUrl, 
                 requests: {
                     [gitLabMergeRequestNumber]: {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch} 
@@ -96,9 +96,9 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
             },
             github: {
                 defaultBranch: gitHubDefaultBranch, 
-                projectID: gitHubProjectId, 
-                appID: context.appID,
-                installationID: context.installationID,
+                projectId: gitHubProjectId, 
+                appId: context.appID,
+                installationId: context.installationID,
                 cloneUrl: gitHubGitUrl,
                 apiUrl: gitHubApiUrl,
                 requests: {

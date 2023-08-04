@@ -6,7 +6,7 @@ import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
 import "./events/comment.js"
 import "./events/pipeline.js"
-import ResponseError from './errors/ResponseError.js';
+import RepoSyncError from './errors/RepoSyncError.js';
 import { debug, warn } from './utils/console.js'
 
 debug(`Registered events: \n\t${eventNames.join("\n\t")}`)
@@ -43,12 +43,14 @@ app.post('/test', (_, res) => {
 })
 
 // Error handler
-app.use((err: Error | ResponseError, req: AppRequest, res: express.Response, next: express.NextFunction) => {
-  warn(err.message)
-  if (err instanceof ResponseError) {
+app.use((err: Error | RepoSyncError , req: AppRequest, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof RepoSyncError) {
+    err.consoleFunction(err.message)
+    err.effectFunction()
     res.status(err.status).send(err.message)
     return next()
-  }else {  
+  }else {
+    warn(`Something broke: ${err.message}`)
     res.status(500).send(`Something broke: ${err.message}`)
     return next()
   }

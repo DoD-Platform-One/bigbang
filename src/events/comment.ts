@@ -17,9 +17,8 @@ dotenv.config();
 ///////////////////////////////
 
 onGitHubEvent("issue_comment.created", async (context) => {
-  const { payload, mapping, projectName, next, isBot, userName } = context;
+  const { payload, mapping, projectName, next, isBot, userName, requestNumber: PRNumber } = context;
   //create variable for issue number
-  const PRNumber = payload.issue.number;
 
   //verify comment is not from a bot and end process if it is
   if (isBot) {
@@ -61,14 +60,14 @@ onGitHubEvent("issue_comment.created", async (context) => {
     response = await createGitlabReply(
       noteId,
       editedGitlabComment + strippedComment,
-      mapping.gitlab.projectID,
+      mapping.gitlab.projectId,
       requestMap.reciprocalNumber
     );
   } else {
     // axios post to gitlab api to create a comment on the merge request, using auth header with gitlab token
     response = await createGitlabComment(
       editedGitlabComment + payload.comment.body,
-      mapping.gitlab.projectID,
+      mapping.gitlab.projectId,
       requestMap.reciprocalNumber
     );
   }
@@ -161,7 +160,7 @@ onGitLabEvent("note.created", async (context) => {
   // create variable for comment bod to be posted to github
   const comment = `#### ${userName} [commented](${payload.object_attributes.url}): <hr> \n\n  ${payload.object_attributes.note}`;
 
-  const response = await createGitlabNote(
+  const response = await createGithubComment(
     context.mapping.github.apiUrl,
     requestMap.reciprocalNumber,
     comment,
@@ -223,7 +222,7 @@ onGitLabEvent("note.reply", async (context) => {
   const MRNumber = payload.merge_request.iid;
   // get top level note from the discussion
   const discussion = await getGitlabDiscussion(
-    mapping.gitlab.projectID,
+    mapping.gitlab.projectId,
     MRNumber,
     discussionId
   );
@@ -241,7 +240,7 @@ onGitLabEvent("note.reply", async (context) => {
     gitlabNoteReaction(
       500,
       payload.object_attributes.id,
-      mapping.gitlab.projectID,
+      mapping.gitlab.projectId,
       MRNumber
     );
     context.response.status(400);
@@ -275,7 +274,7 @@ onGitLabEvent("note.reply", async (context) => {
   updateGitLabNoteWithMirrorLink(
     githubResponse.data.html_url,
     originalComment,
-    mapping.gitlab.projectID,
+    mapping.gitlab.projectId,
     MRNumber,
     payload.object_attributes.id
   );
@@ -331,7 +330,7 @@ async function updateGitLabNoteWithMirrorLink(
   );
 }
 
-async function createGitlabNote(
+async function createGithubComment(
   githubUrl: string,
   downstreamRequestNumber: number,
   comment: string,

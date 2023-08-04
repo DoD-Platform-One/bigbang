@@ -7,11 +7,11 @@ import { GetUpstreamRequestFor, UpdateConfigMapping } from '../assets/projectMap
 import { onGitHubEvent } from './eventManagerTypes.js'
 import MappingError from '../errors/MappingError.js'
 import RequestError from '../errors/RequestError.js'
-import GitError from '../errors/FileSystemError.js'
+import GitError from '../errors/GitError.js'
 dotenv.config();
 
 onGitHubEvent('pull_request.opened', async (context) => {
-        const {payload, appID, installationID, projectName, next} = context
+        const {payload, appId: appID, installationId: installationID, projectName, next} = context
         const PRNumber = payload.pull_request.number
         // repo one bot steps
         const github_url = payload.repository.clone_url
@@ -132,7 +132,7 @@ onGitHubEvent('pull_request.closed', async (context) => {
     }
     //MR closed to gitlab
     await axios.put(
-        `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectID}/merge_requests/${requestMap.reciprocalNumber}`,
+        `https://repo1.dso.mil/api/v4/projects/${context.mapping.gitlab.projectId}/merge_requests/${requestMap.reciprocalNumber}`,
          {state_event: "close"}, 
         {headers : {"PRIVATE-TOKEN" :process.env.GITLAB_PASSWORD}}
         );

@@ -1,7 +1,7 @@
-import ResponseError from "./ResponseError.js";
+import RepoSyncError from "./RepoSyncError.js";
 
 
-class RequestError extends ResponseError {
+class RequestError extends RepoSyncError {
     constructor(message: string, status: number) {
         super(message);
         this.status = status;

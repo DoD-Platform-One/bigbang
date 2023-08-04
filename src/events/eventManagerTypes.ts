@@ -14,11 +14,13 @@ export type PayloadType = EventMap[AllEventTypes["type"]];
 
 export interface IEventContextObject<T extends AllEventTypes = AllEventTypes> {
   instance: "github" | "gitlab";
-  event: T["type"];
+  event: string
+  action: string
+  eventName: T["type"]
   payload: EventMap[T["type"]];
-  appID?: number;
+  appId?: number;
   requestNumber: number;
-  installationID?: number;
+  installationId?: number;
   mapping: IProject;
   projectName: string;
   gitHubAccessToken: string;
@@ -26,7 +28,7 @@ export interface IEventContextObject<T extends AllEventTypes = AllEventTypes> {
   next: NextFunction;
   userName: string;
   isBot: boolean;
-  isFailed: boolean;
+  error: Error
 }
 
 interface CustomEventEmitter<
@@ -38,6 +40,30 @@ interface CustomEventEmitter<
     callback: (context: IEventContextObject<E[K]>) => void
   ): void;
   emit(eventName: T["type"], value: IEventContextObject<T>): void;
+}
+
+export interface InstanceConfig {
+  "github": IEventConfig,
+  "gitlab": IEventConfig
+}
+
+export interface IEventConfig {
+  [key: string]: {
+    payload_property_mapping: IPayloadPropertyMapping
+    action_mapping?: {
+      [key: string]: string
+    }
+    actions: string[]
+    allow_bot?: boolean
+    remap: string
+  }
+}
+
+export interface IPayloadPropertyMapping {
+  action: string
+  projectName: string
+  installationID: string
+  requestNumber: string
 }
 
 // Example usage:

@@ -1,0 +1,88 @@
+---
+github:
+  # The list of events the GitHub App subscribes to.
+  issue_comment:
+    payload_property_mapping:
+      action: action
+      installationId: installation.id
+      projectName: repository.name
+      requestNumber: issue.number
+      userName: sender.login
+    actions:
+      - created
+  pull_request:
+    payload_property_mapping:
+      action: action
+      installationId: installation.id
+      projectName: repository.name
+      requestNumber: number
+      userName: sender.login
+    actions:
+      - opened
+      - closed
+      - synchronize
+  # pull_request_review:
+  #   payload_property_mapping:
+  #     action: action
+  #     installationId: installation.id
+  #     projectName: repository.name
+  #     requestNumber: pull_request.number
+  #     userName: sender.login
+  #   actions:
+  #     - created
+  # pull_request_review_comment:
+  #   payload_property_mapping:
+  #     action: action
+  #     installationId: installation.id
+  #     projectName: repository.name
+  #     requestNumber: pull_request.number
+  #     userName: sender.login
+  #   actions:
+  #     - created
+
+gitlab:
+  base:
+    payload_property_mapping:
+      event: object_kind
+      projectName: project.name
+      userName: user.username
+  # The list of events the GitLab App subscribes to.
+  Note Hook:
+    payload_property_mapping:
+      event: object_kind
+      action: object_attributes.type
+      projectName: project.name
+      requestNumber: merge_request.iid
+      userName: user.username
+    action_mapping:
+      undefined: created
+      null: created
+      MergeRequest: created
+      Note: created
+      DiscussionNote: reply
+      DiffNote: code
+    actions:
+      - created
+      - reply
+  merge_request:
+    payload_property_mapping:
+      event: object_kind
+      action: object_attributes.action
+      projectName: project.name
+      requestNumber: object_attributes.iid
+      userName: user.username
+    actions:
+      - close
+      - update
+  Pipeline Hook:
+    # allow bot is a flag to never mark the request as from a bot account
+    # all pipeline events from gitlab are from a bot account
+    allow_bot: true
+    payload_property_mapping:
+      event: object_kind
+      action: object_attributes.status
+      projectName: project.name
+      requestNumber: merge_request.iid
+      userName: user.username
+    actions:
+      - running
