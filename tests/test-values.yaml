@@ -414,20 +414,20 @@ kyvernoPolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
                     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
                     -----END PUBLIC KEY-----
-          # - imageReferences:
-          #   - "registry1.dso.mil/ironbank/*"
-          #   attestors:
-          #   - count: 1
-          #     entries:
-          #     - keys:
-          #         publicKeys: |-
-          #           -----BEGIN PUBLIC KEY-----
-          #           MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
-          #           UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
-          #           -----END PUBLIC KEY-----
-          #   # Ironbank images are rebuilt nightly and tags are not immutable
-          #   mutateDigest: false
-          #   verifyDigest: false
+          - imageReferences:
+            - "registry1.dso.mil/ironbank/*"
+            attestors:
+            - count: 1
+              entries:
+              - keys:
+                  publicKeys: |-
+                    -----BEGIN PUBLIC KEY-----
+                    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
+                    UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
+                    -----END PUBLIC KEY-----
+            # Ironbank images are rebuilt nightly and tags are not immutable
+            mutateDigest: false
+            verifyDigest: false
       require-labels:
         parameters:
           require:
