@@ -143,7 +143,8 @@ export const emitEvent = async (
 ): Promise<any> => {
   const context = await createContext(req.headers, req.body, res, next);
 
-  if (!context.isBot) {
+  // all pipeline events are bot events so we ignore them
+  if (!context.isBot || context.event.includes("pipeline")) {
     if (eventNames.includes(context.event)) {success(`${context.instance} : ${context.event}`);}
     else {
       debug(`Event Not Registered: ${context.instance} : ${context.event}`);

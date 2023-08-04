@@ -54,7 +54,7 @@ onGitHubEvent("issue_comment.created", async (context) => {
   // #### <username> commented: <hr/>
   //<comment>
   const githubComment = `[Github Comment Mirrored Here](${githubCommentUrl})`;
-  const commentBy = `#### ${userName} [commented](${githubCommentUrl}): <hr/>`;
+  const commentBy = `#### ${userName} [commented](${githubCommentUrl}): <hr/>\n\n`;
   const editedGitlabComment = `${githubComment}\r\n${commentBy}`;
   if (isReply && noteId) {
     // the top link is used to back reference replies to the original comment
