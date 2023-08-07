@@ -15,7 +15,7 @@ RUN npm run build
 
 # config env variables
 ENV NODE_ENV production
-ENV PORT=8080
+ENV PORT=9000
 RUN echo $PORT > .env
 
 EXPOSE $PORT

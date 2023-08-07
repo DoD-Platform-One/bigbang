@@ -16,6 +16,10 @@ export interface AppRequest extends express.Request {
   admin: boolean
 }
 
+app.get("/health", (_, res) => {
+  res.status(200) 
+  return res.send("OK")
+})
 app.use(
   express.json({
     verify: function (req: AppRequest, res, buf) {
