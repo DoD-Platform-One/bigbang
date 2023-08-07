@@ -23,25 +23,6 @@ github:
       - opened
       - closed
       - synchronize
-  # pull_request_review:
-  #   payload_property_mapping:
-  #     action: action
-  #     installationId: installation.id
-  #     projectName: repository.name
-  #     requestNumber: pull_request.number
-  #     userName: sender.login
-  #   actions:
-  #     - created
-  # pull_request_review_comment:
-  #   payload_property_mapping:
-  #     action: action
-  #     installationId: installation.id
-  #     projectName: repository.name
-  #     requestNumber: pull_request.number
-  #     userName: sender.login
-  #   actions:
-  #     - created
-
 gitlab:
   base:
     payload_property_mapping:

@@ -42,20 +42,29 @@ export async function createContext(
   ) as InstanceConfig;
   // is event gitlab or github
   // this also serves as a entry boundary
-  let instance: "github" | "gitlab" = undefined;
-  if (headers["x-gitlab-event"]) {
-    instance = "gitlab";
-  } else if (headers["x-github-event"]) {
-    instance = "github";
-  } else {
+
+  for (const key in headers) {
+    if(key.toLowerCase().includes("x-github-event")){
+      state["event"] = (headers[key] as string)
+      state["instance"] = "github"
+    }
+    
+    if(key.toLowerCase().includes("x-gitlab-event")) {
+      state["event"] = (headers[key] as string)
+      state["instance"] = "gitlab"
+    }
+  }
+
+  const instance = state["instance"];
+  const event = state["event"];
+
+  if(!state['instance']){
     state.error = new NotImplementedError("Service Not Implemented");
     return state;
   }
 
-  state["instance"] = instance;
-  const event = (headers["x-gitlab-event"] ??
-    headers["x-github-event"]) as string;
-  state["event"] = event as keyof EventMap;
+  // get x-github or x-gitlab event header but using lowercase
+
   const eventConfig = config[instance][event];
   // check if event incoming is in config
   if (!eventConfig) {
@@ -93,6 +102,8 @@ export async function createContext(
   // can init is an array of strings e.g ['opened'] set a boolean if the event's action is in the array
   if (eventConfig.canInit) {
     state["canInit"] = eventConfig.canInit.includes(state.action);
+  }else{
+    state["canInit"] = false;
   }
 
   if (!state.mapping && !state.canInit) {

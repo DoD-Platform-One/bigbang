@@ -7,6 +7,8 @@ import { UpdateConfigMapping } from '../../src/assets/projectMap'
 import {clearMapping} from '../teardown'
 import { Response } from 'express'
 import { IEventContextObject, emitter } from '../../src/events/eventManagerTypes'
+import NotImplementedError from '../../src/errors/NotImplementedError'
+import ContextCreationError from '../../src/errors/ContextCreationError'
 
 const setupConfig = () => UpdateConfigMapping({
   projectName: pullRequestPayload.repository.name,
@@ -34,29 +36,52 @@ describe('Create GitHub Context',  () => {
     mockApi("github","post", "/app/installations/1/access_tokens", {token: "testToken"})
   })
 
+  it("test create context with no headers", async () => {
+    const headers = {}
+    const context = await createContext(headers, {type: "issue_comment.created",...issueCommentPayload}, {} as Response, () => null)
+    expect(context.error).toBeInstanceOf(NotImplementedError)
+  })
+
+  it('test create context with no mapping', async () => {
+    const headers = {
+        "x-github-event": "issue_comment",
+        "x-github-hook-installation-target-id": "1234"
+    }
+    const context = await createContext(headers, {type: "issue_comment.created",...issueCommentPayload}, {} as Response, () => null)
+    expect(context.error).toBeInstanceOf(ContextCreationError)
+  })
+
   it('test create context with uppercase headers', async () => {
     const headers = {
         "X-GitHub-Event": "issue_comment",
-        "X-GitHub-Hook-Installation-Target-Id": "1234"
+        "X-Github-Hook-Installation-Target-Id": "1234"
     }
 
+    // configure the mapping file
+    setupConfig()
+
     const context = await createContext(headers, {type: "issue_comment.created",...issueCommentPayload}, {} as Response, () => null)
-    expect(context?.event).toBeTruthy()
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBeTruthy()
   })
 
   it('test create context with lowercase headers', async () => {
     const headers = {
-        "x-gitHub-event": "issue_comment",
+        "x-github-event": "issue_comment",
         "x-github-hook-installation-target-id": "1234"
     }
 
+    // configure the mapping file
+    setupConfig()
+
     const context = await createContext(headers, {type: "issue_comment.created",...issueCommentPayload}, {} as Response, () => null)
-    expect(context?.event).toBe("issue_comment.created")
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("issue_comment.created")
   })
 
   it('test mapping file is populated', async () => {
     const headers = {
-        "x-gitHub-event": "issue_comment",
+        "x-github-event": "issue_comment",
         "x-github-hook-installation-target-id": "1234"
     }
 
@@ -67,8 +92,38 @@ describe('Create GitHub Context',  () => {
     const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
 
     const context = await createContext(headers, payloadCopy, {} as Response, () => null)
-    expect(context?.event).toBe("issue_comment.created")
-    expect(context?.mapping.github.projectID).toBe(pullRequestPayload.repository.id)
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("issue_comment.created")
+    expect(context?.mapping.github.projectId).toBe(pullRequestPayload.repository.id)
+  })
+
+  it('test context has correct properties', async () => {
+    const headers = {
+        "x-github-event": "issue_comment",
+        "x-github-hook-installation-target-id": "1234"
+    }
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
+
+    const context = await createContext(headers, payloadCopy, {} as Response, () => null)
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("issue_comment.created")
+    expect(context.event).toBe("issue_comment")
+    expect(context.canInit).toBe(false)
+    expect(context.action).toBe("created")
+    expect(context.gitHubAccessToken).toBe("testToken")
+    expect(context.isBot).toBe(false)
+    expect(context?.mapping.github.projectId).toBe(issueCommentPayload.repository.id)
+    expect(context?.installationId).toBe(1)
+    expect(context?.appId).toBe(1234)
+    expect(context?.projectName).toBe(issueCommentPayload.repository.name)
+    expect(context?.requestNumber).toBe(issueCommentPayload.issue.number)
+    expect(context.userName).toBe(issueCommentPayload.sender.login)
+    expect(context.payload).toStrictEqual(issueCommentPayload)
   })
 })
 
@@ -82,21 +137,14 @@ describe ('Create GitLab Context', () => {
 
   it('test create context with uppercase headers', async () => {
     const headers = {
-        "X-Gitlab-Event": "note",
+        "x-gitlab-event": "Note Hook",
     }
     setupConfig()
     const context = await createContext(headers, {type: "note.created",...gitlabNoteMergeRequest}, {} as Response, () => null)
-    expect(context?.event).toBe("note.created")
-    expect(context?.mapping.gitlab.projectID).toBe(1234)
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("note.created")
+    expect(context?.mapping.gitlab.projectId).toBe(1234)
 
-  })
-
-  it('test undefined context with no mapping object for project name', async () => {
-    const headers = {
-        "x-gitlab-event": "note",
-    }
-    const context = await createContext(headers, {type: "note.created",...gitlabNoteMergeRequest}, {} as Response, () => null)
-    expect(context.isFailed).toBe(true)
   })
 })
 
