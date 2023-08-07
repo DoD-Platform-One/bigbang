@@ -44,11 +44,13 @@ export async function createContext(
     if(header.toLowerCase() === "x-github-event"){
       state["event"] = (headers[header] as string)
       state["instance"] = "github"
+      break;
     }
     
     if(header.toLowerCase() === "x-gitlab-event") {
       state["event"] = (headers[header] as string)
       state["instance"] = "gitlab"
+      break;
     }
   }
 
@@ -201,6 +203,6 @@ export const emitEvent = async (
 
 function isUserNameBot(state: IEventContextObject) {
   const isGitHubBot = state.userName.includes("[bot]");
-  const isGitLabBot = state.userName.includes("_bot");
+  const isGitLabBot = state.userName.includes("_bot_");
   state["isBot"] = isGitHubBot || isGitLabBot;
 }
