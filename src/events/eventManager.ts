@@ -60,8 +60,6 @@ export async function createContext(
     return state;
   }
 
-  // get x-github or x-gitlab event header but using lowercase
-
   const eventConfig = config[instance][event];
   // check if event incoming is in config
   if (!eventConfig) {
