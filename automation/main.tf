@@ -303,13 +303,8 @@ resource "aws_lb_listener" "repo-sync-https-listener" {
   protocol          = "HTTPS"
   
   default_action {
-    type             = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "OK"
-      status_code  = "200"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.repo-sync-tf-target-group.arn
   }
 
 
