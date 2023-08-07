@@ -1,12 +1,14 @@
-import {createContext } from '../../src/events/eventManager'
+import {createContext, emitEvent } from '../../src/events/eventManager'
 import {payload as issueCommentPayload} from '../fixtures/issueComment'
+import {payload as issueCommentPayloadBot} from '../fixtures/issueCommentBot'
+
 import {payload as pullRequestPayload} from '../fixtures/pullRequest'
 import {gitlabNoteMergeRequest} from '../fixtures/gitlab-note.MergeRequest'
 import { mockApi } from '../mocks/mocks'
 import { UpdateConfigMapping } from '../../src/assets/projectMap'
 import {clearMapping} from '../teardown'
-import { Response } from 'express'
-import { IEventContextObject, emitter } from '../../src/events/eventManagerTypes'
+import { Response, Request } from 'express'
+import { IEventContextObject, emitter, onGitHubEvent } from '../../src/events/eventManagerTypes'
 import NotImplementedError from '../../src/errors/NotImplementedError'
 import ContextCreationError from '../../src/errors/ContextCreationError'
 
@@ -125,6 +127,40 @@ describe('Create GitHub Context',  () => {
     expect(context.userName).toBe(issueCommentPayload.sender.login)
     expect(context.payload).toStrictEqual(issueCommentPayload)
   })
+
+  it('test has not config map', async () => {
+    const headers = {
+        "x-github-event": "this_event_does_not_exist",
+        "x-github-hook-installation-target-id": "1234"
+    }
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
+
+    const context = await createContext(headers, payloadCopy, {} as Response, () => null)
+    expect(context.error).toBeInstanceOf(NotImplementedError)
+  })
+
+  it('tests if a config has the canInit property', async () => {
+    const headers = {
+        "x-github-event": "pull_request",
+        "x-github-hook-installation-target-id": "1234"
+    }
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(pullRequestPayload))
+
+    const context = await createContext(headers, payloadCopy, {} as Response, () => null)
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("pull_request.opened")
+    expect(context.canInit).toBe(true)
+  })
 })
 
 describe ('Create GitLab Context', () => {
@@ -148,7 +184,35 @@ describe ('Create GitLab Context', () => {
   })
 })
 
-describe('Event Emmiter Tests', () => {
+describe('tests for bots', () => {
+  it('test context is bot', async () => {
+    const headers = {
+        "x-github-event": "issue_comment",
+        "x-github-hook-installation-target-id": "1234"
+    }
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayloadBot))
+
+    const context = await createContext(headers, payloadCopy, {} as Response, () => null)
+    expect(context.error).toBeUndefined()
+    expect(context?.eventName).toBe("issue_comment.created.bot")
+    expect(context.isBot).toBe(true)
+    expect(context.userName).toBe(issueCommentPayloadBot.sender.login)
+    expect(context.payload).toStrictEqual(issueCommentPayloadBot)
+  })
+})
+
+describe('Event Emiter Tests', () => {
+
+  beforeEach(() => {
+    // ensure config mapping is empty
+    clearMapping()
+    mockApi("github","post", "/app/installations/1/access_tokens", {token: "testToken"})
+  })
 
   it('Test Event Emitter', () => {
     const arrayCheck: string[] = []
@@ -158,5 +222,82 @@ describe('Event Emmiter Tests', () => {
     emitter.on("push", callback)
     emitter.emit("push", {} as IEventContextObject)
     expect(arrayCheck).toStrictEqual(["testResult"])
+  })
+
+  it('tests EmitEvent Function', async () => {
+    const next = jest.fn()
+    
+    onGitHubEvent("issue_comment.created", (context) => {
+      expect(context.next).not.toHaveBeenCalled()
+      expect(context.eventName).toBe("issue_comment.created")
+    })
+
+    const headers = {
+      "x-github-event": "issue_comment",
+      "x-github-hook-installation-target-id": "1234"
+    }
+    const request = {} as Request
+    const res = {} as Response
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
+
+    request.body = payloadCopy
+    request.headers = headers
+
+    const ret = await emitEvent(request, res, next)
+    expect(ret).toBeTruthy()
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('tests EmitEvent Function throws error', async () => {
+    const next = jest.fn()
+    emitter.on("issue_comment.created", () => {expect(next).not.toHaveBeenCalled()})
+
+    const headers = {
+      // "x-github-event": "pull_request",
+      "x-github-hook-installation-target-id": "1234"
+    }
+    const request = {} as Request
+    const res = {} as Response
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
+
+    request.body = payloadCopy
+    request.headers = headers
+
+    const ret = await emitEvent(request, res, next)
+    await expect(ret).toBeUndefined()
+    expect(next).toHaveBeenCalledWith(new NotImplementedError("Service Not Implemented"))
+  })
+
+  it('tests EmitEvent event not registered', async () => {
+    const next = jest.fn()
+    const headers = {
+      "x-github-event": "pull_request",
+      "x-github-hook-installation-target-id": "1234"
+    }
+    const request = {} as Request
+    const res = {} as Response
+
+    // configure the mapping file
+    setupConfig()
+
+    // deep copy of payload
+    const payloadCopy = JSON.parse(JSON.stringify(issueCommentPayload))
+
+    request.body = payloadCopy
+    request.headers = headers
+
+    const ret = await emitEvent(request, res, next)
+    await expect(ret).toBeUndefined()
+    expect(next).toHaveBeenCalledWith(new NotImplementedError("Event Not Registered: github : pull_request.created"))
   })
 })

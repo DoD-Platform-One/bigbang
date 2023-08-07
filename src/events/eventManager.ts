@@ -10,8 +10,6 @@ import {
   emitter,
   PayloadType,
   EventMap,
-  onGitHubEvent,
-  onGitLabEvent,
   eventNames,
 } from "./eventManagerTypes.js";
 import yaml from "js-yaml";
@@ -20,7 +18,6 @@ import { GetMapping } from "../assets/projectMap.js";
 import NotImplementedError from "../errors/NotImplementedError.js";
 import RepoSyncError from "../errors/RepoSyncError.js";
 import ContextCreationError from "../errors/ContextCreationError.js";
-export { onGitHubEvent, onGitLabEvent };
 
 //////////////////////
 // Context Creation //
@@ -177,7 +174,12 @@ export const emitEvent = async (
   next: NextFunction
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
-  const context = await createContext(req.headers, req.body, res, next);
+  let context: IEventContextObject;
+  try {
+    context = await createContext(req.headers, req.body, res, next);
+  }catch(err){
+    return next(err)
+  }
 
   if (context.error) {
     return next(context.error);
@@ -194,6 +196,7 @@ export const emitEvent = async (
   }
 
   emitter.emit(context.eventName, context);
+  return true
 };
 
 // helper functions
