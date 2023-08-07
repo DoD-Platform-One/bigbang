@@ -173,7 +173,7 @@ describe ('Create GitLab Context', () => {
 
   it('test create context with uppercase headers', async () => {
     const headers = {
-        "x-gitlab-event": "Note Hook",
+        "X-Gitlab-Event": "Note Hook",
     }
     setupConfig()
     const context = await createContext(headers, {type: "note.created",...gitlabNoteMergeRequest}, {} as Response, () => null)
@@ -182,6 +182,18 @@ describe ('Create GitLab Context', () => {
     expect(context?.mapping.gitlab.projectId).toBe(1234)
 
   })
+
+  
+    // X-Gitlab-Event-UUID: 6e8d440d-ec8a-4744-887e-3c8929b92af6
+    it('test that headers can not do a fuzzy match', async () => {
+      const headers = {
+          "X-Gitlab-Event": "Note Hook",
+          "X-Gitlab-Event-UUID": "6e8d440d-ec8a-4744-887e-3c8929b92af6",
+      }
+      setupConfig()
+      const context = await createContext(headers, {type: "note.created",...gitlabNoteMergeRequest}, {} as Response, () => null)
+      expect(context.event).toBe("note")
+    })
 })
 
 describe('tests for bots', () => {

@@ -40,14 +40,14 @@ export async function createContext(
   // is event gitlab or github
   // this also serves as a entry boundary
 
-  for (const key in headers) {
-    if(key.toLowerCase().includes("x-github-event")){
-      state["event"] = (headers[key] as string)
+  for (const header in headers) {
+    if(header.toLowerCase() === "x-github-event"){
+      state["event"] = (headers[header] as string)
       state["instance"] = "github"
     }
     
-    if(key.toLowerCase().includes("x-gitlab-event")) {
-      state["event"] = (headers[key] as string)
+    if(header.toLowerCase() === "x-gitlab-event") {
+      state["event"] = (headers[header] as string)
       state["instance"] = "gitlab"
     }
   }

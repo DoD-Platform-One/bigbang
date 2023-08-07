@@ -176,13 +176,6 @@ resource "aws_security_group" "repo-sync-tf-sg-v1" {
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
     from_port   = 9000
     to_port     = 9000
     protocol    = "tcp"
@@ -240,6 +233,16 @@ resource "aws_ecs_task_definition" "repo-sync-tf-task-definiton" {
         },
         secretOptions = [],
       },
+      "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:9000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 20
+            }
     },
   ])
 
@@ -322,7 +325,7 @@ resource "aws_lb_target_group" "repo-sync-tf-target-group" {
 
   health_check {
     path = "/health"
-    port = "80"
+    port = "9000"
   }
 
   tags = {

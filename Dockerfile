@@ -7,7 +7,7 @@ ENV ENVIRONMENT=production
 
 # Create app directory
 USER root
-RUN mkdir -p /app
+RUN mkdir -p /app && yum install -y git
 WORKDIR /app
 COPY package.json /app/.
 COPY src /app/src
