@@ -243,18 +243,18 @@ grafana.ini:
     role_attribute_path: {{ .Values.grafana.sso.grafana.role_attribute_path | default "Viewer" }}
     {{- end }}
   {{- with .Values.grafana.sso.grafana }}
-    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
+    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
   {{- end }}
   {{- with .Values.monitoring.sso.grafana }}
-    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 6 }}
-    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 6 }}
+    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
   {{- end }}
 
 {{- if and (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
