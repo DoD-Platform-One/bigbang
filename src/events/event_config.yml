@@ -47,7 +47,7 @@ gitlab:
     actions:
       - created
       - reply
-  merge_request:
+  Merge Request Hook:
     payload_property_mapping:
       event: object_kind
       action: object_attributes.action
