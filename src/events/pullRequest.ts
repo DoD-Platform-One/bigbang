@@ -82,9 +82,11 @@ onGitHubEvent('pull_request.opened', async (context) => {
             return next(new RequestError(error.response.data.message, error.response.status))
         }
 
-        const comment = "Merge Request Created: " + response.data.web_url
+        const disclaimerMessage = `# Thank You! \n\n Your contribution to the DSO Repo1 has been mirrored to ${response.data.web_url} \n\n ### Current features  \n\n 1. Comments will be mirrored to the associated GitLab Merge Request.  \n 1. Quote Replies will mirror to Gitlab as a Thread \n 1. Updates to code will be pushed to the associated GitLab Merge Request.  \n 1. Closing the PR will close the associated GitLab Merge Request.  ### Features not available yet \n\n 1. Comments on code will not be mirrored`
+
+        // const comment = "Merge Request Created: " + response.data.web_url
         const body = {
-            "body": comment
+            "body": disclaimerMessage
         }
         try {
             await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
