@@ -27,37 +27,62 @@ export const BgWhite = "\x1b[47m"
 export const BgGray = "\x1b[100m"
 
 
-
-
-
 export const log = (message: string) => {
     console.log(message)
 }
 
 export const warn = (message: string) => {
-    console.warn(`${FgYellow}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.warn(`${FgYellow}${message}${Reset}`)
+    }else{
+        console.warn(`Warning: ${message}`)
+    }
 }
 
 export const error = (message: string) => {
-    console.error(`${FgRed}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.error(`${FgRed}${message}${Reset}`)
+    }else{
+        console.error(`Error: ${message}`)
+    }
 }
 
 export const info = (message: string) => {
-    console.info(`${FgBlue}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.info(`${FgBlue}${message}${Reset}`)
+    }else{
+        console.info(`Info: ${message}`)
+    }
 }
 
 export const debug = (message: string) => {
-    console.debug(`${FgGray}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.debug(`${FgGray}${message}${Reset}`)
+    }else{
+        console.debug(`Debug: ${message}`)
+    }
 }
 
 export const trace = (message: string) => {
-    console.trace(`${FgGray}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.trace(`${FgGray}${message}${Reset}`)
+    }else{
+        console.trace(`Trace: ${message}`)
+    }
 }
 
 export const success = (message: string) => {
-    console.log(`${FgGreen}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.log(`${FgGreen}${message}${Reset}`)
+    }else{
+        console.log(`Success: ${message}`)
+    }
 }
 
 export const fail = (message: string) => {
-    console.error(`${FgRed}${message}${Reset}`)
+    if(process.env.NODE_ENV === "development"){
+        console.error(`${FgRed}${message}${Reset}`)
+    }else{
+        console.error(`Fail: ${message}`)
+    }
 }
