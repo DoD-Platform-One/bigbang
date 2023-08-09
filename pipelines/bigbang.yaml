@@ -639,7 +639,8 @@ aws/rke2/bigbang down:
     # Logic to pass stage if error is expected timeout. Fail if error == anything else
     - >
       timeoutError="Error: uninstallation completed with 1 error(s): timed out waiting for the condition";
-      if [[ $(cat error.txt) == $timeoutError ]]; then 
+      contextDeadlineError="Error: uninstallation completed with 1 error(s): context deadline exceeded";
+      if [[ $(cat error.txt) == $timeoutError || $(cat error.txt) == $contextDeadlineError ]]; then 
         echo -e "\e[31mHelm uninstall error was expected timeout\e[0m";
         echo -e "\e[31m$(cat error.txt)\e[0m";
       elif [[ $(cat error.txt) == "" ]]; then
@@ -846,7 +847,8 @@ aws/eks/bigbang down:
     # Logic to pass stage if error is expected timeout. Fail if error == anything else
     - >
       timeoutError="Error: uninstallation completed with 1 error(s): timed out waiting for the condition";
-      if [[ $(cat error.txt) == $timeoutError ]]; then 
+      contextDeadlineError="Error: uninstallation completed with 1 error(s): context deadline exceeded";
+      if [[ $(cat error.txt) == $timeoutError || $(cat error.txt) == $contextDeadlineError ]]; then 
         echo -e "\e[31mHelm uninstall error was expected timeout\e[0m";
         echo -e "\e[31m$(cat error.txt)\e[0m";
       elif [[ $(cat error.txt) == "" ]]; then
