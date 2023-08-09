@@ -34,19 +34,23 @@ const checkDevEnv = () => {
 }
 
 const checkFiles = () => {
+    let init = false
     if (process.env.ENVIRONMENT == "development") {
         // check for assets/project_map_dev.json
         if (!fs.existsSync("./src/assets/project_map_dev.json")) {
             // create assets/project_map_dev.json
             info("creating assets/project_map_dev.json")
             fs.writeFileSync("./src/assets/project_map_dev.json", JSON.stringify({}))
+            init = true
         }
     }else 
         if (!fs.existsSync("./src/assets/project_map.json")) {
             // create assets/project_map.json
             info("creating assets/project_map.json")
             fs.writeFileSync("./src/assets/project_map.json", JSON.stringify({}))
+            init = true
         }
+    return init
     }
 
 

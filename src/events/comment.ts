@@ -49,20 +49,29 @@ onGitHubEvent("issue_comment.created", async (context) => {
   const githubComment = `[Github Comment Mirrored Here](${githubCommentUrl})`;
   const commentBy = `#### ${userName} [commented](${githubCommentUrl}): <hr/>\n\n`;
   const editedGitlabComment = `${githubComment}\r\n${commentBy}`;
+
+  // get reciprocal number
+  const MRNumber = requestMap?.reciprocalNumber;
+  if (!MRNumber) {
+    return next(
+      new MappingError(`Project ${projectName} does not exist in the mapping`)
+    );
+  }
+
   if (isReply && noteId) {
     // the top link is used to back reference replies to the original comment
     response = await createGitlabReply(
       noteId,
       editedGitlabComment + strippedComment,
       mapping.gitlab.projectId,
-      requestMap.reciprocalNumber
+      MRNumber
     );
   } else {
     // axios post to gitlab api to create a comment on the merge request, using auth header with gitlab token
     response = await createGitlabComment(
       editedGitlabComment + payload.comment.body,
       mapping.gitlab.projectId,
-      requestMap.reciprocalNumber
+      MRNumber
     );
   }
 

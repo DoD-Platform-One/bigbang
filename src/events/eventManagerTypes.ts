@@ -72,20 +72,24 @@ export interface IPayloadPropertyMapping {
 export const emitter: CustomEventEmitter<AllEventTypes, EventMap> =
   new EventEmitter();
 
-
 export const eventNames: string[] = []
+
 export const onGitHubEvent = <K extends keyof GitHubEventMap>(
   eventName: K,
   callback: (context: IEventContextObject<GitHubEventMap[K]>) => void
 ): void => {
   eventNames.push(eventName)
 
-  const errorWrapper = (context: IEventContextObject<GitHubEventMap[K]>) => {
+  const errorWrapper = async (context: IEventContextObject<GitHubEventMap[K]>) => {
     try{
-      callback(context)
+      await callback(context)
     }
     catch(err){
-      context.next(new RepoSyncError(err.message))
+      if(err instanceof RepoSyncError){
+        return context.next(err)
+      }else{
+        return context.next(new RepoSyncError(err.message))
+      }
     }
   }
 
@@ -98,12 +102,16 @@ export const onGitLabEvent = <K extends keyof GithLabEventMap>(
 ): void => {
   eventNames.push(eventName)
 
-  const errorWrapper = (context: IEventContextObject<GithLabEventMap[K]>) => {
+  const errorWrapper = async (context: IEventContextObject<GithLabEventMap[K]>) => {
     try{
-      callback(context)
+      await callback(context)
     }
     catch(err){
-      context.next(new RepoSyncError(err.message))
+      if(err instanceof RepoSyncError){
+        return context.next(err)
+      }else{
+        return context.next(new RepoSyncError(err.message))
+      }
     }
   }
 
