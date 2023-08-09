@@ -22,6 +22,7 @@ RUN git clone https://repo1.dso.mil/platform-one/hagrid/sync.git synker && \
 FROM golang:1.19 AS oscal-build
 
 # Clone BigBang OSCAL Aggregator
+# renovate: depName=defenseunicorns/bigbang-oscal-component-generator
 ENV BB_OSCAL_VERSION='v0.1.0-alpha'
 RUN git clone -b ${BB_OSCAL_VERSION} https://github.com/defenseunicorns/bigbang-oscal-component-generator.git \
     && cd bigbang-oscal-component-generator \
@@ -70,7 +71,8 @@ RUN npx playwright@1.24.2 install
 RUN chmod -R 777 /ms-playwright
 
 # Install Kyverno
-ENV KYVERNO_VERSION='v1.9.2'
+# renovate: depName=kyverno/kyverno
+ENV KYVERNO_VERSION=v1.9.2
 ADD https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
 RUN tar xzf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz \
     && mv kyverno /usr/local/bin/ \
@@ -78,37 +80,44 @@ RUN tar xzf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz \
     && rm -rf /kyverno_KYVERNO_VERSION_linux_x86_64.tar.gz
 
 # Install Helm
-ENV HELM_VERSION='3.12.0'
+# renovate: depName=helm/helm
+ENV HELM_VERSION=3.12.0
 ADD https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz /helm-v${HELM_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64/helm && mv linux-amd64/helm /usr/local/bin/ && chmod +x /usr/local/bin/helm && rm -rf /helm-v${HELM_VERSION}-linux-amd64.tar.gz linux-amd64*
 
 # Install fluxcd
-ENV FLUX_VERSION='2.0.1'
+# renovate: depName=fluxcd/flux2
+ENV FLUX_VERSION=2.0.1
 ADD https://github.com/fluxcd/flux2/releases/download/v${FLUX_VERSION}/flux_${FLUX_VERSION}_linux_amd64.tar.gz /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /flux_${FLUX_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ && chmod +x /usr/local/bin/flux && rm -rf /flux_${FLUX_VERSION}_linux_amd64.tar.gz
 
 # Install K3d
-ENV K3D_VERSION='5.5.1'
+# renovate: depName=rancher/k3d
+ENV K3D_VERSION=5.5.1
 ADD https://github.com/k3d-io/k3d/releases/download/v${K3D_VERSION}/k3d-linux-amd64 /usr/local/bin/k3d
 RUN chmod +x /usr/local/bin/k3d
 
 # Install kubectl
-ENV KUBECTL_VERSION='1.27.2'
+# renovate: depName=kubernetes/kubectl
+ENV KUBECTL_VERSION=1.27.2
 ADD https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 RUN chmod +x /usr/local/bin/kubectl
 
 # Install yq for dependency handling
-ENV YQ_VERSION='4.34.1'
+# renovate: depName=mikefarah/yq
+ENV YQ_VERSION=4.34.1
 ADD https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64 /usr/local/bin/yq
 RUN chmod +x /usr/local/bin/yq
 
 # Install Pluto for API Deprecation Checking
-ENV PLUTO_VERSION='5.16.4'
+# renovate: depName=FairwindsOps/pluto
+ENV PLUTO_VERSION=5.16.4
 ADD https://github.com/FairwindsOps/pluto/releases/download/v${PLUTO_VERSION}/pluto_${PLUTO_VERSION}_linux_amd64.tar.gz /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz pluto && mv pluto /usr/local/bin/ && chmod +x /usr/local/bin/pluto && rm -rf /pluto_${PLUTO_VERSION}_linux_amd64.tar.gz
 
 # Install Kube no trouble for API Deprecation Checking in cluster
-ENV KUBENT_VERSION='0.7.0'
+# renovate: depName=doitintl/kube-no-trouble
+ENV KUBENT_VERSION=0.7.0
 ADD https://github.com/doitintl/kube-no-trouble/releases/download/${KUBENT_VERSION}/kubent-${KUBENT_VERSION}-linux-amd64.tar.gz /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz
 RUN tar xzf /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz kubent && mv kubent /usr/local/bin/ && chmod +x /usr/local/bin/kubent && rm -rf /kubent-${KUBENT_VERSION}-linux-amd64.tar.gz
 
@@ -119,22 +128,21 @@ ADD https://gitlab.com/api/v4/projects/gitlab-org%2Frelease-cli/packages/generic
 RUN chmod +x /usr/local/bin/release-cli
 
 # Install crane
-ENV CRANE_VERSION='v0.15.2'
+# renovate: depName=google/go-containerregistry
+ENV CRANE_VERSION=v0.15.2
 ADD https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz /crane.tar.gz
 RUN tar -zxf /crane.tar.gz crane && mv crane /usr/local/bin/crane && chmod +x /usr/local/bin/crane && rm -rf /crane.tar.gz
 
-# Install crane for image annotation validation
-ENV CRANE_VERSION='v0.15.2'
-ADD https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz /crane.tar.gz
-RUN tar -zxf /crane.tar.gz crane && mv crane /usr/local/bin/crane && chmod +x /usr/local/bin/crane && rm -rf /crane.tar.gz
 
 # Install Kustomize
-ENV KUSTOMIZE_VERSION='v4.5.2'
+# renovate: depName=kubernetes-sigs/kustomize
+ENV KUSTOMIZE_VERSION=v4.5.2
 ADD https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 RUN tar xzf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz kustomize && mv kustomize /usr/local/bin/ && chmod +x /usr/local/bin/kustomize && rm -rf /kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 
 # Install Zarf
-ENV ZARF_VERSION='v0.26.4'
+# renovate: depName=defenseunicorns/zarf
+ENV ZARF_VERSION=v0.27.0
 ADD https://github.com/defenseunicorns/zarf/releases/download/${ZARF_VERSION}/zarf_${ZARF_VERSION}_Linux_amd64 /usr/local/bin/zarf
 RUN chmod +x /usr/local/bin/zarf
 
