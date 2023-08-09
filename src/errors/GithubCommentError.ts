@@ -1,4 +1,4 @@
-import { githubCommentReaction } from "../events/comment.js";
+import { githubCommentReaction } from "../events/utils/comment.js";
 import RepoSyncError from "./RepoSyncError.js";
 
 class GithubCommentError extends RepoSyncError {

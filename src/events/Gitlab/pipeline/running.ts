@@ -1,10 +1,8 @@
 import axios from "axios";
-import dotenv from "dotenv";
 import {
   GetDownstreamRequestFor,
-  } from "../assets/projectMap.js";
-import {onGitLabEvent} from "../EventManager/eventManagerTypes.js";
-dotenv.config();
+  } from "../../../assets/projectMap.js";
+import {onGitLabEvent} from "../../../EventManager/eventManagerTypes.js";
 
 // Create function gitlab pipeline comment 
 async function createGitlabPipelineComment(

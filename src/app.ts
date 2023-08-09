@@ -2,13 +2,12 @@ import express from 'express'
 import validatePayload from "./crypto/validatePayload.js"
 import { emitEvent } from './EventManager/eventManager.js'
 import {eventNames} from './EventManager/eventManagerTypes.js'
-import "./events/pullRequest.js"
-import "./events/mergeRequests.js"
-import "./events/comment.js"
-import "./events/pipeline.js"
 import RepoSyncError from './errors/RepoSyncError.js';
 import { debug, warn } from './utils/console.js'
 import { execSync } from 'child_process'
+
+// register all event listeners
+import "./events/events.js"
 
 debug(`Registered events: \n\t${eventNames.join("\n\t")}`)
 

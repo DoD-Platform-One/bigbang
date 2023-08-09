@@ -1,4 +1,5 @@
-import { gitlabNoteReaction } from "../events/comment.js";
+
+import { gitlabNoteReaction } from "../events/utils/comment.js";
 import { NoteCreated } from "../types/gitlab/events.js";
 import RepoSyncError from "./RepoSyncError.js";
 
