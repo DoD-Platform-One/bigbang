@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { saveProjectMapFile } from '../utils/environment/aws.js'
 //verify project_map.json matches the interface
 export interface IProject {
     gitlab: {
@@ -74,7 +75,7 @@ interface IMappingContext {
 
 // clean up time
 
-export const UpdateConfigMapping = (context: IMappingContext) => {
+export const UpdateConfigMapping = async (context: IMappingContext) => {
     // Object destructure the context
     const {projectName, gitHubDefaultBranch, gitHubSourceBranch, gitHubIssueNumber, gitHubProjectId, gitHubApiUrl, gitHubCloneUrl: gitHubGitUrl, gitLabDefaultBranch, gitLabSourceBranch, gitLabMergeRequestNumber, gitLabProjectId, gitLabProjectUrl} = context
     
@@ -107,9 +108,11 @@ export const UpdateConfigMapping = (context: IMappingContext) => {
             }
         }
     }
-
-    // lets write it back to the disk
     fs.writeFileSync(mappingFilePath, JSON.stringify(mapping, null, 2)) // idk what 2 does lol
+    if(process.env.ENVIRONMENT === "production"){
+        await saveProjectMapFile(JSON.stringify(mapping, null, 2))
+    }
+    return true
 }
 
 

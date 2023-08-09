@@ -1,1 +1,29 @@
-{}
+{
+  "podinfo": {
+    "gitlab": {
+      "defaultBranch": "main",
+      "projectId": "13380",
+      "url": "https://repo1.dso.mil/snekcode/podinfo",
+      "requests": {
+        "70": {
+          "reciprocalNumber": 63,
+          "reciprocalBranch": "changelog"
+        }
+      }
+    },
+    "github": {
+      "defaultBranch": "main",
+      "projectId": 639124893,
+      "appId": 262992,
+      "installationId": 34507893,
+      "cloneUrl": "https://github.com/SnekCode/podinfo.git",
+      "apiUrl": "https://api.github.com/repos/SnekCode/podinfo",
+      "requests": {
+        "63": {
+          "reciprocalNumber": 70,
+          "reciprocalBranch": "PR-63"
+        }
+      }
+    }
+  }
+}

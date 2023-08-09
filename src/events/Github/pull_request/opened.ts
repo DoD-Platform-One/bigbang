@@ -37,6 +37,7 @@ onGitHubEvent('pull_request.opened', async (context) => {
     }catch(error){
         return next(new GitError(error.message))
     }
+
     // get Repo1 project id number
     
     // TODO check mapping for project id before webscrapping
@@ -77,21 +78,9 @@ onGitHubEvent('pull_request.opened', async (context) => {
     } catch (error) {
         return next(new RequestError(error.response.data.message, error.response.status))
     }
-
-    const disclaimerMessage = `# Thank You! \n\n Your contribution to the DSO Repo1 has been mirrored to ${response.data.web_url} \n\n ### Current features  \n\n 1. Comments will be mirrored to the associated GitLab Merge Request.  \n 1. Quote Replies will mirror to Gitlab as a Thread \n 1. Updates to code will be pushed to the associated GitLab Merge Request.  \n 1. Closing the PR will close the associated GitLab Merge Request. \n\n ### Features not available yet \n\n 1. Comments on code will not be mirrored`
-
-    // const comment = "Merge Request Created: " + response.data.web_url
-    const body = {
-        "body": disclaimerMessage
-    }
-    try {
-        await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
-    } catch (error) {
-        return next(new RequestError(error.response.data.message, error.response.status))
-    }
     
     // update config mapping for new MR and PR relationship
-    UpdateConfigMapping({
+    await UpdateConfigMapping({
         projectName: payload.repository.name,
         gitHubDefaultBranch: payload.repository.default_branch,
         gitHubSourceBranch: payload.pull_request.head.ref,
@@ -108,4 +97,19 @@ onGitHubEvent('pull_request.opened', async (context) => {
         appID: appID,
         installationID: installationID
     })
+
+    // comment back to github
+    const disclaimerMessage = `# Thank You! \n\n Your contribution to the DSO Repo1 has been mirrored to ${response.data.web_url} \n\n ### Current features  \n\n 1. Comments will be mirrored to the associated GitLab Merge Request.  \n 1. Quote Replies will mirror to Gitlab as a Thread \n 1. Updates to code will be pushed to the associated GitLab Merge Request.  \n 1. Closing the PR will close the associated GitLab Merge Request. \n\n ### Features not available yet \n\n 1. Comments on code will not be mirrored`
+
+    // const comment = "Merge Request Created: " + response.data.web_url
+    const body = {
+        "body": disclaimerMessage
+    }
+    try {
+        await axios.post(payload.pull_request.comments_url, body, {headers : {"Authorization" : `Bearer ${context.gitHubAccessToken}`}});
+    } catch (error) {
+        return next(new RequestError(error.response.data.message, error.response.status))
+    }
+
+
 })

@@ -1,9 +1,7 @@
 import crypto from "crypto";
-import dotenv from "dotenv";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import axios from "axios";
-dotenv.config();
 
 export const githubSigHeaderName = "X-Hub-Signature-256";
 export const gitlabTokenHeaderName = "X-Gitlab-Token";

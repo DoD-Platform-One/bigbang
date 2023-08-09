@@ -1,10 +1,11 @@
 import serverless from 'serverless-http'
-import { checkEnv } from './utils/environment.js';
+import { checkEnv } from './utils/environment/environment.js';
 import { success } from './utils/console.js';
 import dotenv from 'dotenv'
 
 dotenv.config();
-checkEnv()
+
+await checkEnv()
 
 
 // lazy load the express app until after env checks are done

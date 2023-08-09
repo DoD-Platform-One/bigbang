@@ -151,7 +151,7 @@ export async function createContext(
     );
   } catch {
     state.error = new RepoSyncError(
-      `Gitlab Token Request Error: ${state.instance}/${state.projectName} : ${state.eventName}`
+      `Github Token Request Error: ${state.instance}/${state.projectName} : ${state.eventName}`
     );
     return state;
   }
