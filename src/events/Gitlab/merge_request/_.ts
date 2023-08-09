@@ -1,4 +1,4 @@
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
 import * as close from "./close.js";
 
 export { close }
