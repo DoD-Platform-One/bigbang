@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import {
   GetDownstreamRequestFor,
   } from "../assets/projectMap.js";
-import {onGitLabEvent} from "./eventManagerTypes.js";
+import {onGitLabEvent} from "../EventManager/eventManagerTypes.js";
 dotenv.config();
 
 // Create function gitlab pipeline comment 

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { GetDownstreamRequestFor } from "../assets/projectMap.js";
-import { onGitLabEvent } from "./eventManagerTypes.js";
+import { onGitLabEvent } from "../EventManager/eventManagerTypes.js";
 import MappingError from "../errors/MappingError.js";
 import { ExecSyncOptions, execSync } from "child_process";
 import { cloneUrl } from "../utils/gitlabSignIn.js";
@@ -53,7 +53,13 @@ onGitLabEvent('merge_request.close', async (context) => {
     execSync(`git remote add github ${githubCloneUrl}`, execOptions)
 
     execSync(`git checkout ${payload.object_attributes.source_branch}`, execOptions)
-    execSync(`git checkout -b ${reciprocalBranch}`, execOptions)
+    
+    if(mapping.github.defaultBranch === reciprocalBranch){
+      execSync(`git checkout ${reciprocalBranch}`, execOptions)
+    }else{
+      execSync(`git checkout -b ${reciprocalBranch}`, execOptions)
+    }
+
     // push with force to github
     execSync(`git push github --force`, execOptions)
 

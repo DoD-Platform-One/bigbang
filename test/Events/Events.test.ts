@@ -1,4 +1,4 @@
-import {createContext, emitEvent } from '../../src/events/eventManager'
+import {createContext, emitEvent } from '../../src/EventManager/eventManager'
 import {payload as issueCommentPayload} from '../fixtures/issueComment'
 import {payload as issueCommentPayloadBot} from '../fixtures/issueCommentBot'
 
@@ -8,7 +8,7 @@ import { mockApi } from '../mocks/mocks'
 import { UpdateConfigMapping } from '../../src/assets/projectMap'
 import {clearMapping} from '../teardown'
 import { Response, Request } from 'express'
-import { IEventContextObject, emitter, onGitHubEvent } from '../../src/events/eventManagerTypes'
+import { IEventContextObject, emitter, onGitHubEvent } from '../../src/EventManager/eventManagerTypes'
 import NotImplementedError from '../../src/errors/NotImplementedError'
 import ContextCreationError from '../../src/errors/ContextCreationError'
 

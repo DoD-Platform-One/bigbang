@@ -1,4 +1,4 @@
-import { PayloadType } from "../events/eventManagerTypes.js";
+import { PayloadType } from "../EventManager/eventManagerTypes.js";
 import RepoSyncError from "./RepoSyncError.js";
 
 class ContextCreationError extends RepoSyncError {

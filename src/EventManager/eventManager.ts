@@ -35,7 +35,7 @@ export async function createContext(
   state["next"] = next;
 
   const config: InstanceConfig = yaml.load(
-    fs.readFileSync("./src/events/event_config.yml", "utf8")
+    fs.readFileSync("./src/EventManager/event_config.yml", "utf8")
   ) as InstanceConfig;
   // is event gitlab or github
   // this also serves as a entry boundary

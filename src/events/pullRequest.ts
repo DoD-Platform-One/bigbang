@@ -4,7 +4,7 @@ import {cloneUrl} from '../utils/gitlabSignIn.js'
 
 import dotenv from 'dotenv'
 import { GetUpstreamRequestFor, UpdateConfigMapping } from '../assets/projectMap.js'
-import { onGitHubEvent } from './eventManagerTypes.js'
+import { onGitHubEvent } from '../EventManager/eventManagerTypes.js'
 import MappingError from '../errors/MappingError.js'
 import RequestError from '../errors/RequestError.js'
 import GitError from '../errors/GitError.js'

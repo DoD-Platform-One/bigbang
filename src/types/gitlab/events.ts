@@ -23,6 +23,6 @@ export type GitlabEventTypes =
   | PushEvent
   | PipelineEvent;
 
-export type GithLabEventMap = {
+export type GitLabEventMap = {
   [E in GitlabEventTypes["type"]]: Extract<GitlabEventTypes, { type: E }>;
 };

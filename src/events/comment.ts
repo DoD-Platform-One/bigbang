@@ -9,7 +9,7 @@ import MappingError from "../errors/MappingError.js";
 import { getDiscussionId } from "../queries/discussion.js";
 import githubReplyParser from "../utils/githubReply.js";
 import gitlabReplyParser from "../utils/gitlabReply.js";
-import { onGitHubEvent, onGitLabEvent } from "./eventManagerTypes.js";
+import { onGitHubEvent, onGitLabEvent } from "../EventManager/eventManagerTypes.js";
 import GithubCommentError from "../errors/GithubCommentError.js";
 dotenv.config();
 

@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import { IProject } from "../assets/projectMap.js";
 import { NextFunction, Response } from "express";
 import { GitHubEventMap, GitHubEventTypes } from "../types/github/events.js";
-import { GithLabEventMap, GitlabEventTypes } from "../types/gitlab/events.js";
+import { GitLabEventMap, GitlabEventTypes } from "../types/gitlab/events.js";
 import RepoSyncError from "../errors/RepoSyncError.js";
 
 type AllEventTypes = GitlabEventTypes | GitHubEventTypes;
@@ -96,13 +96,13 @@ export const onGitHubEvent = <K extends keyof GitHubEventMap>(
   emitter.on(eventName, errorWrapper);
 };
 
-export const onGitLabEvent = <K extends keyof GithLabEventMap>(
+export const onGitLabEvent = <K extends keyof GitLabEventMap>(
   eventName: K,
-  callback: (context: IEventContextObject<GithLabEventMap[K]>) => void
+  callback: (context: IEventContextObject<GitLabEventMap[K]>) => void
 ): void => {
   eventNames.push(eventName)
 
-  const errorWrapper = async (context: IEventContextObject<GithLabEventMap[K]>) => {
+  const errorWrapper = async (context: IEventContextObject<GitLabEventMap[K]>) => {
     try{
       await callback(context)
     }

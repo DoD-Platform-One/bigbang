@@ -1,7 +1,7 @@
 import express from 'express'
 import validatePayload from "./crypto/validatePayload.js"
-import { emitEvent } from './events/eventManager.js'
-import {eventNames} from './events/eventManagerTypes.js'
+import { emitEvent } from './EventManager/eventManager.js'
+import {eventNames} from './EventManager/eventManagerTypes.js'
 import "./events/pullRequest.js"
 import "./events/mergeRequests.js"
 import "./events/comment.js"
