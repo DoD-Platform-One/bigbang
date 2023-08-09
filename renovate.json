@@ -1,0 +1,23 @@
+{
+  "baseBranches": ["master"],
+  "automerge": false,
+  "gitLabAutomerge": false,
+  "configWarningReuseIssue": false,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate: Upgrade pipeline-templates Dependencies",
+  "draftPR": true,
+  "labels": ["pipeline-templates","Package Sustainment","kind::maintenance"],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "(^|/)Dockerfile$"
+      ],
+      "matchStringsStrategy": "recursive",
+      "matchStrings": [
+        "# renovate: depName=(?<depName>.+?)(?: extractVersion=(?<extractVersion>.+?))?\\s*.*?_VERSION=\"?(?<currentValue>.+?)\"?\\s"
+      ],
+      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
+      "datasourceTemplate": "github-tags"
+    }
+  ]
+}
