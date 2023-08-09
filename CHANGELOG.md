@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.9.16]
+### Changed
+- Add contextDeadlineExceeded error to list of handled exceptions for bigbang down stage in rke2/eks pipelines
+
 ## [2.9.15]
 ### Changed
 - Avoid race condition when waiting on pods when jobs are Running
