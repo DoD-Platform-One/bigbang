@@ -6,9 +6,9 @@ Big Bang will be deployed and managed with [Flux 2](https://github.com/fluxcd/fl
 
 ### Big Bang and Flux
 
-Big Bang is composed of several Open Source and licensed products.  [Helm](https://helm.sh/), as a member of the [CNCF](https://www.cncf.io/), is the de facto standard for packaging applications for Kubernetes.  As a result, several vendors support the release of their product **as helm charts** and have built their packaging and lifecycle management to expect to be the engine for driving that management.  As a result, Big Bang has adopted Helm as its internal deployment framework for Big Bang packages and requires Helm to be treated as a first class citizen.
+Big Bang is composed of Open Source and licensed products.  [Helm](https://helm.sh/), as a member of the [CNCF](https://www.cncf.io/), is the de facto standard for packaging applications for Kubernetes.  As a result, several vendors support the release of their product **as helm charts** and have built their packaging and lifecycle management to expect to be the engine for driving that management.  As a result, Big Bang has adopted Helm as its internal deployment framework for Big Bang packages and requires Helm to be treated as a first class citizen.
 
-The Flux2 Engine has native Helm support, meaning the controller deployed as part of "Flux 2" leverages the same Helm code as the CLI.
+The Flux 2 Engine has native Helm support, meaning the controller deployed as part of "Flux 2" leverages the same Helm code as the CLI.
 
 ### Limitations of Argo
 
@@ -28,4 +28,4 @@ Argo requires all configuration options to be embedded into the ApplicationCR.  
 
 ## Argo Is Still A Package
 
-As defined in the list of [Big Bang Packages](../../packages.md), Big Bang comes deployed with Argo for use by Mission applications to continue to deploy and manage their applications.  Similarly, even though Big Bang uses Helm internally for management of Big Bang packages, Big Bang does not advocate for Helm for use by applications run on clusters with Big Bang.
+As defined in the list of [Big Bang Packages](../../packages.md), Big Bang comes deployed with Argo for use by mission applications to continue to deploy and manage their applications.  Similarly, even though Big Bang uses Helm internally for management of Big Bang packages, Big Bang does not advocate for Helm for use by applications run on clusters with Big Bang.

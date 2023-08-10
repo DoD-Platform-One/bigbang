@@ -74,13 +74,13 @@ The diagram below shows a typical deployment of Big Bang into a Kubernetes clust
 1. With everything in Git, the user can [deploy BigBang](./deployment.md) using a Kubernetes manifest.
 1. The manifest holds two Flux resources, one pointing to the Git repository holding the custom environment, and one telling Flux to run Kustomize on a targeted folder within the repo.
    1. The repository is reconciled first, pulling the files from Git.
-   1. Next, Kustomize is run on the environment configuration
+   1. Next, Kustomize is run on the environment configuration.
       1. The Kustomize files use Big Bang's Git repo as a base before applying overlays and patches for the configuration.
-      1. Flux uses SOPS to decrypt any secrets before deploying the manifests
-      1. After completing the Kustomization process, Flux deploys two ConfigMaps, two Secrets, and flux resources for Big Bang
+      1. Flux uses SOPS to decrypt any secrets before deploying the manifests.
+      1. After completing the Kustomization process, Flux deploys two ConfigMaps, two Secrets, and flux resources for Big Bang.
 1. Big Bang's flux resources include a Git repository holding the Helm chart and a Helm Release resource that tells Flux how to deploy the Helm chart.
    1. The repository is reconciled first, pulling the Helm chart from Git.
-   1. The Helm Release will check for the Helm chart and the Secrets / ConfigMaps deployed before performing a Helm install
+   1. The Helm Release will check for the Helm chart and the Secrets / ConfigMaps deployed before performing a Helm install.
 1. Once the Helm release deploys the Helm chart for Big Bang, each package that is enabled will have a Flux Git Repository and Helm Release resource deployed.
 1. All of the package Git repositories containing Helm charts will be pulled so that Flux can reconcile dependencies.
 1. Each package's Helm Release has dependencies built in.  Flux will reconcile these dependencies and deploy the Helm chart for the package once all of the dependencies are ready.
