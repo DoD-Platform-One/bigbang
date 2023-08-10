@@ -18,10 +18,16 @@
 * Big Bang by itself is not intended to be an End to End Secure Kubernetes Cluster Solution, but rather a reusable secure component/piece of a full solution.
 * A Secure Kubernetes Cluster Solution, will have multiple components, that can each be swappable and in some cases considered optional depending on use case and risk tolerance:
   Example of some potential components in a full End to End Solution:
-  * P1's Cloud Native Access Point to protect ingress traffic. (This can be swapped with an equivalent, or considered optional in an internet disconnected setup.)
+  * Ingress traffic protection
+    * Platform One's Cloud Native Access Point (CNAP) is one solution.
+    * CNAP can be swapped with an equivalent, or considered optional in an internet disconnected setup.
   * Hardened Host OS
-  * Hardened Kubernetes Distrobution and Cluster (Big Bang assumes ByoC, Bring your own Cluster) (The Big Bang team recommends consumers who are interested in a full solution, partner with vendors of Kubernetes Distributions to satisfy the prerequisite of a Hardened Kubernetes Cluster.)
-  * Hardened Applications running on the Cluster (Big Bang and Iron Bank helps solve this component)
+  * Hardened Kubernetes Cluster
+    * Big Bang assumes Bring your own Cluster (BYOC)
+    * The Big Bang team recommends consumers who are interested in a full solution, partner with Vendors of Kubernetes Distributions to satisfy the prerequisite of a Hardened Kubernetes Cluster.
+  * Hardened Applications running on the Cluster
+    * Iron Bank provides hardened containers that helps solve this component.
+    * Big Bang utilizes the hardened containers in Iron Bank.
 
 ## Benefits of using Big Bang
 
