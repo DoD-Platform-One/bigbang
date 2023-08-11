@@ -3,6 +3,28 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.8.0]
+
+- List of merge requests in this release.
+
+- [!2971](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2971): Grafana chart indentation 6 -> 4
+- [!2950](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2950): velero update to 4.0.3-bb.0
+- [!2973](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2973): gitlab update to 7.2.0-bb.0
+- [!2974](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2974): authservice update to 0.5.3-bb.12
+- [!2936](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2936): argocd update to 5.39.0-bb.0
+- [!2964](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2964): neuvector update to 2.4.5-bb.2
+- [!2966](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2966): loki update to 5.9.2-bb.0
+- [!2975](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2975): promtail update to 6.13.1-bb.0
+- [!2930](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2930): Re-add IB key to Kyverno Policies test-values
+- [!2963](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2963): kyvernoPolicies update to 1.1.0-bb.9
+- [!2972](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2972): istio & operator update to 1.18.2-bb.0
+- [!2938](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2938): Add 'comments' field to schema
+- [!2957](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2957): fix for ca-secret creation logic
+- [!2955](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2955): harbor update to 1.12.2-bb.7
+- [!2958](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2958): anchore update to 1.26.1-bb.0
+- [!2977](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2977): gitlab update to 7.2.2-bb.0
+- [!2961](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2961): Fixing conditional for grafana extraSecretMounts
+
 ## [2.7.0]
 
 - [!2.7.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.7.0); List of merge requests in this release.
