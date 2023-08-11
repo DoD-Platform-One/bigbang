@@ -533,7 +533,7 @@ dependency_install() {
        fi
        dep_branch=$(yq e ".${i}.git.tag" "tests/dependencies.yaml")
        if [[ -z ${dep_branch} || ${dep_branch} == "null" ]]; then
-         dep_branch=$(yq e ".${i}.branch" "tests/dependencies.yaml")
+         dep_branch=$(yq e ".${i}.git.branch" "tests/dependencies.yaml")
        fi
        dep_namespace=$(yq e ".${i}.namespace" "tests/dependencies.yaml")
        if [[ -z ${dep_namespace} || ${dep_namespace} == "null" ]]; then
