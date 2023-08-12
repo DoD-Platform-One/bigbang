@@ -89,7 +89,7 @@ packages:
 
 NOTE: The wrapper is an opt-in feature.  Without enabling the wrapper, the `packages` will default to just deploying the pieces [mentioned above](#package-deployment).
 
-The package also has HelmRepository support for sourcing the artifacts from a HelmRepo (of normal or OCI type); usage of HelmRepos is encouraged if you have access to these types of articats.
+The package also has HelmRepository support for sourcing the artifacts from a HelmRepo (of normal or OCI type); usage of HelmRepos is encouraged if you have access to these types of artifacts.
 
 With these values added you should have a very basic deployment of `podinfo` added onto your Big Bang install with some basic default integrations. The rest of this guide will walk you through each section of Big Bang touchpoints and some example configurations you could use. Each of the configurations are compatible with each other (i.e. you can combine the examples below).
 
