@@ -771,6 +771,118 @@ kubectl get po -n=argocd
 
 > Remember to un-edit your Hosts file when you are finished tinkering.
 
+## Step 15: Implementing Mission Applications within your bigbang environment
+
+BigBang by itself serves as a jumping off point, but many users will want to implement their own mission specific applications in to the cluster. BigBang has implemented a `packages:` and `wrapper:`  section to enable and support this in a way that ensures connectivity between your mission specific requirements and existing BigBang utilities, such as istio, the monitoring stack, and network policy management. [Here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/extra-package-deployment.md) is the documentation for the `packages` utility.
+
+We will implement a simple additional utility as a proof of concept, starting with a basic podinfo client. This will use the `wrapper` key to provide integration between bigbang and the Mission Application, without requiring the full Istio configuration to be placed inside BigBang specific keys of the dependent chart.
+
+
+```shell
+cat << EOF > ~/podinfo_wrapper.yaml
+packages:
+  # -- Package name.  Each package will be independently wrapped for Big Bang integration.
+  # @default -- Uses `defaults/<package name>.yaml` for defaults.  See `package` Helm chart for additional values that can be set.
+  podinfo:
+    # -- Toggle deployment of this package
+    # @default -- true
+    enabled: true
+
+    # -- Toggle wrapper functionality. See https://docs-bigbang.dso.mil/latest/docs/guides/deployment-scenarios/extra-package-deployment/#Wrapper-Deployment for more details.
+    # @default -- false
+    wrapper:
+      enabled: true
+
+    # -- Use a kustomize deployment rather than Helm
+    kustomize: false
+
+    # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    helmRepo:
+      # -- Name of the HelmRepo specified in `helmRepositories`
+      # @default -- Uses `registry1` Helm Repository if not specified
+      repoName:
+      # -- Name of the chart stored in the Helm repository
+      # @default -- Uses values key/package name if not specified
+      chartName:
+      # -- Tag of the chart in the Helm repo, required
+      tag:
+
+    # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    git:
+      # -- Git repo URL holding the helm chart for this package, required if using git
+      repo: "https://repo1.dso.mil/big-bang/apps/sandbox/podinfo.git"
+      # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      commit:
+      # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      semver:
+      # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
+      tag: "6.0.0-bb.7"
+      # -- Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference).
+      # @default -- When no other reference is specified, `master` branch is used
+      branch:
+      # -- Path inside of the git repo to find the helm chart or kustomize
+      # @default -- For Helm charts `chart`.  For Kustomize `/`.
+      path: "chart"
+
+    # -- Override flux settings for this package
+    flux: {}
+
+    # -- After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+    postRenderers: []
+
+    # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
+    dependsOn: []
+
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    istio:
+      hosts:
+        - names:
+            - missionapp
+          gateways:
+            - public
+          destination:
+            service: missionapp-missionapp
+            port: 9898
+
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    monitor: {}
+
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    network: {}
+
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    secrets: {}
+
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    configMaps: {}
+
+    # -- Values to pass through to package Helm chart
+    values: 
+      istio:
+        enabled: "{{ .Values.istio.enabled }}"
+      ui:
+        color: "#fcba03" #yellow
+
+EOF
+
+helm upgrade --install bigbang $HOME/bigbang/chart \
+--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values $HOME/ib_creds.yaml \
+--values $HOME/demo_values.yaml \
+--values $HOME/podinfo_wrapper.yaml \
+--namespace=bigbang --create-namespace
+
+# NOTE: There may be a ~1 minute delay for the change to apply
+
+kubectl get vs -A
+# Now missionapp should show up, if it doesn't wait a minute and rerun the command
+
+kubectl get po -n=missionapp
+# Once these are all Running you can visit missionapp's webpage
+```
+
+Wrappers also allow you to abstract out Monitoring, Secrets, Network Policies, and ConfigMaps. Additional Configuration information can be found [here](./extra-package-deployment.md)
+
 ## Troubleshooting
 This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation and instructions for additional configuration changes that may be required in restricted networks. 
 
