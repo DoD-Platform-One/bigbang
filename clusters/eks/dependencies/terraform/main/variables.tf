@@ -5,12 +5,18 @@ variable "organization" {
 }
 #variable "tags" {}
 
+# variable "aws_account_id" {
+# }
+
+# variable "vault_kms_iam_policy" {
+# }
+
 variable "main_cidr" {
   default = "10.10.0.0/16"
 }
 
-variable "k8s_version" {
-  default = "1.21"
+variable "cluster_version" {
+  default = "1.26"
 }
 
 variable "public_access_cidrs" {
@@ -20,7 +26,7 @@ variable "public_access_cidrs" {
 }
 
 variable "policy_arn_prefix" {
-  default = "aws-us-gov"
+  default     = "aws-us-gov"
   description = "gov cloud will have aws-us-gov"
 }
 
@@ -68,6 +74,4 @@ variable "ci_pipeline_url" {
   description = "URL to the pipeline that created this resource"
 }
 
-variable "iam_instance_profile" {
-  default = "InstanceOpsRole"
-}
+

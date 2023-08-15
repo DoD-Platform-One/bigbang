@@ -55,11 +55,6 @@
     - cat ~/.kube/config
     - mv ~/.kube/config ${CI_PROJECT_DIR}/eks-config.yaml
     - chmod a+rw ${CI_PROJECT_DIR}/eks-config.yaml
-    - wget -O - "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-    - mv /tmp/eksctl /usr/local/bin
-    - eksctl utils associate-iam-oidc-provider --cluster ${TF_VAR_cluster_name} --approve
-    - eksctl create iamserviceaccount --name ebs-csi-controller-sa --namespace kube-system --cluster ${TF_VAR_cluster_name} --attach-policy-arn arn:aws-us-gov:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --approve --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
-    - eksctl create addon --name aws-ebs-csi-driver --cluster ${TF_VAR_cluster_name} --service-account-role-arn arn:aws-us-gov:iam::141025336883:role/AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name} --force
     - echo -e "\e[0Ksection_end:`date +%s`:eks_up\r\e[0K"
   artifacts:
     paths:
@@ -90,7 +85,4 @@
         echo "❌ Attempt FAILED to destroy will retry in 30 seconds"
         sleep 30
       done
-    # Detach IAM policy from IAM role and cleanup EBS CSI driver role
-    - aws iam detach-role-policy --policy-arn arn:aws-us-gov:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
-    - aws iam delete-role --role-name AmazonEKS_EBS_CSI_DriverRole_${TF_VAR_cluster_name}
     - echo -e "\e[0Ksection_end:`date +%s`:eks_down\r\e[0K"
