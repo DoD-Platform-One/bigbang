@@ -157,6 +157,7 @@ policies:
           - gitlab
           names:
           - gitlab-redis-*
+          - gitlab-postgresql*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
       # Neuvector needs access to host to inspect network traffic
