@@ -1,7 +1,7 @@
 import {S3Client, GetObjectCommand, PutObjectCommand, GetBucketVersioningCommand} from '@aws-sdk/client-s3'
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { log, error } from '../console.js'
+import { error, info, success } from '../../utils/console.js'
 import S3BucketError from '../../errors/S3BucketError.js';
 dotenv.config();
 
@@ -9,13 +9,13 @@ const client = new S3Client({})
 
 
 export const checkAWSConnection = async () => {
-    log("Checking AWS Connection");
+    info("Checking AWS Connection");
     const command = new GetBucketVersioningCommand({
         Bucket: process.env.AWS_BUCKET,
     })
     try{
         await client.send(command)
-        log("AWS Connection Successful")
+        success("AWS Connection Successful")
         return true
     }catch(err){
         error(err.message)
@@ -23,41 +23,49 @@ export const checkAWSConnection = async () => {
     }
 }
 
-export const getProjectMapFile = async () => {
-    log("Getting Project Map File")
+export const getProjectMapFile = async (filePathBase: string,fileName: string) => {
+  info("Getting Project Map File")
   const command = new GetObjectCommand({
     Bucket: process.env.AWS_BUCKET,
-    Key: "project_map.json"
+    Key: fileName
   });
 
   try {
     const response = await client.send(command);
     // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
     const str = await response.Body.transformToString();
-    fs.writeFileSync("./src/assets/project_map.json", str, "utf8")
+    fs.writeFileSync(`${filePathBase}${fileName}`, str, "utf8")
   } catch (err) {
-    throw new S3BucketError("File not found in S3")
+    if(err.$metadata.httpStatusCode === 404){
+        return saveProjectMapFile(JSON.stringify({}), filePathBase, fileName)
+    }else{
+        throw new S3BucketError(err.message)
+    }
   }
+  return true
 };
 
 // save ProjectMap to S3
-export const saveProjectMapFile = async (file: string) => {
-    log("Saving Project Map File")
+export const saveProjectMapFile = async (file: string, filePathBase: string, fileName: string) => {
+    info("Saving Project Map File")
     // const projectMap = fs.readFileSync("./src/assets/project_map.json", "utf8")
 
     const command = new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET,
-        Key: "project_map.json",
+        Key: fileName,
         Body: file
     });
     try{
         await client.send(command);
-        if(!fs.existsSync("./src/assets/project_map.json")){
-            fs.writeFileSync("./src/assets/project_map.json", file, "utf8")
+        if(!fs.existsSync(`${filePathBase}${fileName}`)){
+            fs.writeFileSync(`${filePathBase}${fileName}`, file, "utf8")
         }
+        success("Project Map File Saved")
     }catch(err){
         error(err.message)
+        return false
     }
+    return true
 }
 
 

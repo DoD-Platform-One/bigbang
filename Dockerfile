@@ -4,6 +4,7 @@ FROM registry1.dso.mil/ironbank/opensource/nodejs/nodejs18:18.17.0 AS builder
 ENV NODE_ENV=production
 ENV PORT=9000
 ENV ENVIRONMENT=production
+ENV USE_S3=true
 
 # Create app directory
 USER root

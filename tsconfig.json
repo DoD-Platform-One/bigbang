@@ -14,12 +14,17 @@
     "skipLibCheck": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "declaration": true
+    "declaration": true,
+    // "baseUrl": "./",
+    // "paths": {
+    //   "@/*": ["src/*"]
+    // },
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "test/**/*",
   ],
-  "exclude": ["test/**/*"],
+  // "exclude": ["test/**/*"],
   "compileOnSave": false,
   "ts-node": {
     "esm": true,

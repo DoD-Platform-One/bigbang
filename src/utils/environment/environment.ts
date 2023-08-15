@@ -1,6 +1,5 @@
-import fs from 'fs'
-import {warn, error, info, success} from '../console.js'
-import { checkAWSConnection, getProjectMapFile, saveProjectMapFile } from './aws.js'
+import {warn, error, info} from '../console.js'
+import { checkAWSConnection } from './aws.js'
 
 // example .env file
 // GITHUB_WEBHOOK_SECRET=number
@@ -58,39 +57,6 @@ const checkDevEnv = () => {
     }
 }
 
-const checkFiles = async () => {
-    let init = false
-    if (process.env.ENVIRONMENT == "development") {
-        // check for assets/project_map_dev.json
-        if (!fs.existsSync("./src/assets/project_map_dev.json")) {
-            // create assets/project_map_dev.json
-            info("creating assets/project_map_dev.json")
-            fs.writeFileSync("./src/assets/project_map_dev.json", JSON.stringify({}))
-            init = true
-        }
-    }else 
-        if (!fs.existsSync("./src/assets/project_map.json")) {
-            info("File does not exist locally checking AWS S3")
-            try{
-                await getProjectMapFile()
-                success("project mapping file found in S3")
-            }catch(err){
-                warn(err.message)
-                await saveProjectMapFile(JSON.stringify({}))
-                success("Project mapping file created in S3 bucket")
-                init = true
-            }
-
-            // if(!fs.existsSync("./src/assets/project_map.json")){
-            //     // create assets/project_map.json
-            //     info("creating assets/project_map.json")
-            //     fs.writeFileSync("./src/assets/project_map.json", JSON.stringify({}))
-            //     init = true
-            // }
-        }
-    return init
-    }
-
 
 export const checkEnv = async () => {
     checkBaseEnv()
@@ -110,5 +76,4 @@ export const checkEnv = async () => {
         checkAWSVariables()
         await checkAWSConnection()
     }
-    await checkFiles()
 }

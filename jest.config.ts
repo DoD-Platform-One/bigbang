@@ -15,11 +15,13 @@ const config: Config.InitialOptions = {
   setupFiles: ["dotenv/config"],
   globalSetup: "./test/setup.ts",
   globalTeardown: "./test/teardown.ts",
-  watchPathIgnorePatterns: ["<rootDir>/test/fixtures"],
+  watchPathIgnorePatterns: ["<rootDir>/src/assets/*.json"],
   // Needed for ECMAScript Modules aka import name.js
+  moduleDirectories: ["node_modules", "src", "test"],
   moduleNameMapper: {
-    "^(\\.\\.?\\/.+)\\.jsx?$": "$1"
-  }
+    "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
+    // '@/(.*)': '/src/$1'
+  },
 };
 
 export default config;

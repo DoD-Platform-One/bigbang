@@ -32,7 +32,7 @@ export const log = (message: string) => {
 }
 
 export const warn = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.warn(`${FgYellow}${message}${Reset}`)
     }else{
         console.warn(`Warning: ${message}`)
@@ -40,7 +40,7 @@ export const warn = (message: string) => {
 }
 
 export const error = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.error(`${FgRed}${message}${Reset}`)
     }else{
         console.error(`Error: ${message}`)
@@ -48,7 +48,7 @@ export const error = (message: string) => {
 }
 
 export const info = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.info(`${FgBlue}${message}${Reset}`)
     }else{
         console.info(`Info: ${message}`)
@@ -56,7 +56,7 @@ export const info = (message: string) => {
 }
 
 export const debug = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.debug(`${FgGray}${message}${Reset}`)
     }else{
         console.debug(`Debug: ${message}`)
@@ -64,7 +64,7 @@ export const debug = (message: string) => {
 }
 
 export const trace = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.trace(`${FgGray}${message}${Reset}`)
     }else{
         console.trace(`Trace: ${message}`)
@@ -72,7 +72,7 @@ export const trace = (message: string) => {
 }
 
 export const success = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.log(`${FgGreen}${message}${Reset}`)
     }else{
         console.log(`Success: ${message}`)
@@ -80,7 +80,7 @@ export const success = (message: string) => {
 }
 
 export const fail = (message: string) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV !== "production"){
         console.error(`${FgRed}${message}${Reset}`)
     }else{
         console.error(`Fail: ${message}`)

@@ -1,5 +1,7 @@
 import fs from 'fs'
-import { saveProjectMapFile } from '../utils/environment/aws.js'
+import { getProjectMapFile, saveProjectMapFile } from '../utils/environment/aws.js'
+import { info } from '../utils/console.js'
+
 //verify project_map.json matches the interface
 export interface IProject {
     gitlab: {
@@ -33,28 +35,45 @@ export interface IMapping {
     [key: string]: IProject
 }
 
+
+const writeProjectMapFile = (filePathBase: string, fileName: string, file: string) =>{
+    if(!fs.existsSync(`${filePathBase}${fileName}`)){
+        fs.writeFileSync(`${filePathBase}${fileName}`, file, "utf8")
+    }
+}
+
+
 // if in the future we need more than just "Projects" in the mapping we can update the definition of the ^ Mapping
 //if .env ENVIRONMENT variable is set to "development" then use the development mapping file called project_map_dev.json else use project_map.json
 // mappingFilePath if Environment is production
-let mappingFilePath = './src/assets/project_map.json'
-if (process.env.ENVIRONMENT === "development") {
-    mappingFilePath = './src/assets/project_map_dev.json'
-}
+export let mappingFileName = 'project_map_dev.json'
+export const mappingFilePath = './src/assets/'
 // mappingFilePath if Environment is testing
 if (process.env.ENVIRONMENT === "test") {
-    mappingFilePath = './test/fixtures/project_map_test.json'
+    mappingFileName = 'project_map_test.json'
 }
-const mappingFile = () => fs.readFileSync(mappingFilePath, 'utf8')
+if (process.env.ENVIRONMENT === "production") {
+    mappingFileName = 'project_map_prod.json'
+}
+
+const mappingFile =  () => fs.readFileSync(mappingFilePath+mappingFileName, 'utf8')
+let mapping: IMapping;
+const useS3: boolean = process.env.USE_S3 === 'true' ? true : false;
+info("USE_S3: " + useS3);
+
+if (useS3 && process.env.ENVIRONMENT !== 'test'){
+    getProjectMapFile(mappingFilePath,mappingFileName).then(() => {
+        mapping = JSON.parse(mappingFile())
+    })
+}
+// fail case to create a new mapping file
+if (!mapping) {
+    writeProjectMapFile(mappingFilePath, mappingFileName, JSON.stringify({}))
+    mapping = JSON.parse(mappingFile())
+}
 
 
 //parse the mapping file into a JSON object 
-let mapping: IMapping = JSON.parse(mappingFile())
-
-
-
-
-
-
 
 interface IMappingContext {
     projectName: string,
@@ -108,9 +127,9 @@ export const UpdateConfigMapping = async (context: IMappingContext) => {
             }
         }
     }
-    fs.writeFileSync(mappingFilePath, JSON.stringify(mapping, null, 2)) // idk what 2 does lol
-    if(process.env.ENVIRONMENT === "production"){
-        await saveProjectMapFile(JSON.stringify(mapping, null, 2))
+    fs.writeFileSync(mappingFilePath+mappingFileName, JSON.stringify(mapping, null, 2)) // idk what 2 does lol
+    if(process.env.ENVIRONMENT === "production" || process.env.USE_S3){
+        await saveProjectMapFile(JSON.stringify(mapping, null, 2), mappingFilePath, mappingFileName)
     }
     return true
 }

@@ -1,12 +1,12 @@
 import fs from 'fs'
 import path from 'path'
+import {mappingFileName,mappingFilePath} from '../src/assets/projectMap'
 
+const mappingFilePathFull = path.join(__dirname, mappingFilePath + mappingFileName)
 export default async function() {
-    const mappingFilePath = path.join(__dirname, './fixtures/project_map_test.json')
-    fs.unlinkSync(mappingFilePath)
+    fs.unlinkSync(mappingFilePathFull)
   }
 
 export const clearMapping = async function() {
-  const mappingFilePath = path.join(__dirname, './fixtures/project_map_test.json')
-  fs.writeFileSync(mappingFilePath, '{}')
+  fs.writeFileSync(mappingFilePathFull, '{}')
   }
