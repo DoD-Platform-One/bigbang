@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.9.19]
+### Changed
+- incorporating the new AWS Terraform EKS Module into the pipeline
+
 ## [2.9.18]
 ### Changed
 - select "branch" key under "git" when processing tests/dependencies.yaml

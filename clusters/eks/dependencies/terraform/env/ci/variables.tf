@@ -7,8 +7,14 @@ variable "cluster_name" {
   default = "bigbang-eks-cluster"
 }
 
-variable "k8s_version" {
+variable "aws_account_id" {}
+
+variable "cluster_version" {
   default = "1.26"
+}
+
+variable "vault_kms_iam_policy" {
+  default = "EKS-Pipeline-Vault-KMS-Access"
 }
 
 variable "ng_desired_size" {

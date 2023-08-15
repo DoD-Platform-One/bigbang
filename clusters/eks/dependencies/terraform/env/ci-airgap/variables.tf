@@ -8,7 +8,9 @@ variable "cluster_name" {
   default = "bigbang-eks-cluster"
 }
 
-variable "k8s_version" {
+variable "aws_account_id" {}
+
+variable "cluster_version" {
   default = "1.26"
 }
 
