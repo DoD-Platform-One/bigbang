@@ -777,6 +777,9 @@ monitoring:
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
           cypress_check_istio_dashboards: 'true'
+          cypress_keycloak_test_enable: 'false'
+          cypress_tnr_username: "cypress"
+          cypress_tnr_password: "tnr_w!G33ZyAt@C8"
 
 grafana:
   enabled: true
@@ -1543,7 +1546,7 @@ addons:
             CUSTOM_REGISTRATION_CONFIG: /opt/keycloak/conf/customreg.yaml
         customreg:
           stringData:
-            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda-ci.yaml" }}'
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
         realm:
           stringData:
             realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
