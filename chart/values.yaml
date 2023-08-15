@@ -270,6 +270,18 @@ istio:
     #     enabled: true
     #   tls:
     #     mode: "PASSTHROUGH"
+    # mutual:
+    #   ingressGateway: "mutual-ingressgateway"
+    #   hosts:
+    #   - "*.{{ .Values.domain }}"
+    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
+    #   autoHttpRedirect:
+    #     enabled: true
+    #   tls:
+    #     mode: MUTUAL
+    #     cert: ""
+    #     key: ""
+    #     ca: ""
 
   # -- Flux reconciliation overrides specifically for the Istio Package
   flux: {}
