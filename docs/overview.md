@@ -10,7 +10,7 @@ Kiali is an application that allows for monitoring and management related to the
 
 ## How it works
 
-Kiali connects with Prometheus, Grafana, Jaeger, and Istio to collect and aggregate data. Please reference the [architecture document](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/charter/packages/kiali/Architecture.md) for more information.
+Kiali connects with Prometheus, Grafana, Jaeger, and Istio to collect and aggregate data. Please reference the [architecture document](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/understanding-bigbang/package-architecture/kiali.md) for more information.
 
 ## Prerequisites
 
