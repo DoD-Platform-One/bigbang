@@ -1,4 +1,4 @@
-import {PullRequestPayload} from "../../src/types/github/objects"
+import {PullRequestPayload} from "../../src/types/github/objects.js"
 
 
 export const payload: PullRequestPayload = {

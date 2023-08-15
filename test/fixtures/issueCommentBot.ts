@@ -1,4 +1,4 @@
-import { IssueCommentPayload } from "../../src/types/github/objects";
+import { IssueCommentPayload } from "../../src/types/github/objects.js";
 
 export const payload: IssueCommentPayload = {
     "action": "created",

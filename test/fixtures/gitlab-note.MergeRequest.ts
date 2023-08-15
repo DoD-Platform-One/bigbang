@@ -1,4 +1,4 @@
-import { NoteMergeRequest } from "../../src/types/gitlab/objects";
+import { NoteMergeRequest } from "../../src/types/gitlab/objects.js";
 
 export const gitlabNoteMergeRequest: NoteMergeRequest = {
   "object_kind": "note",

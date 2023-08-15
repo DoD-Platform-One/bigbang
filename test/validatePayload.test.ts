@@ -1,6 +1,6 @@
 import request from 'supertest'
-import {githubSigHeaderName, gitlabTokenHeaderName} from '../src/crypto/appcrypto'
-import app from '../src/app'
+import {githubSigHeaderName, gitlabTokenHeaderName} from '../src/crypto/appcrypto.js'
+import app from '../src/app.js'
 import crypto from 'crypto'
 
 

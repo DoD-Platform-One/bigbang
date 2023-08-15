@@ -1,4 +1,4 @@
-import gitlabReplyParser from '../../src/events/utils/gitlabReply'
+import gitlabReplyParser from '../../src/events/utils/gitlabReply.js'
 
 describe('Test github replies',  () => {
     // > > #### snekcode [commented](https://repo1.dso.mil/snekcode/podinfo/-/merge_requests/23#note_1373973):\r\n> > this is a reply\r\n> \r\n> ok thanks for the reply\r\n\r\nyou're welcome!

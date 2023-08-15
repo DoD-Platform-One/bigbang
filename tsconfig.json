@@ -15,14 +15,14 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "declaration": true,
-    // "baseUrl": "./",
-    // "paths": {
-    //   "@/*": ["src/*"]
-    // },
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
   },
   "include": [
     "src/**/*",
-    "test/**/*",
+    "test/**/*"
   ],
   // "exclude": ["test/**/*"],
   "compileOnSave": false,

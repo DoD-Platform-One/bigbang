@@ -1,8 +1,8 @@
 // src/mocks/server.js
-import { setupServer } from 'msw/node';
+import { setupServer, SetupServer } from 'msw/node';
 import { rest, graphql} from 'msw';
 
 // This configures a request mocking server with the given request handlers.
-const server = setupServer();
+const server: SetupServer = setupServer();
 
 export { server, rest, graphql };

@@ -1,5 +1,5 @@
-import { getDiscussionId } from '../src/queries/discussion';
-import {server, graphql} from './mocks/msw';
+import { getDiscussionId } from '../src/queries/discussion.js';
+import {server, graphql} from './mocks/msw.js';
 
 describe('graph ql tests', () => {
     

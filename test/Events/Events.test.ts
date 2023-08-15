@@ -1,16 +1,16 @@
-import {createContext, emitEvent } from '../../src/EventManager/eventManager'
-import {payload as issueCommentPayload} from '../fixtures/issueComment'
-import {payload as issueCommentPayloadBot} from '../fixtures/issueCommentBot'
+import {createContext, emitEvent } from '../../src/EventManager/eventManager.js'
+import {payload as issueCommentPayload} from '../fixtures/issueComment.js'
+import {payload as issueCommentPayloadBot} from '../fixtures/issueCommentBot.js'
 
-import {payload as pullRequestPayload} from '../fixtures/pullRequest'
-import {gitlabNoteMergeRequest} from '../fixtures/gitlab-note.MergeRequest'
-import { mockApi } from '../mocks/mocks'
-import { UpdateConfigMapping } from '../../src/assets/projectMap'
-import {clearMapping} from '../teardown'
+import {payload as pullRequestPayload} from '../fixtures/pullRequest.js'
+import {gitlabNoteMergeRequest} from '../fixtures/gitlab-note.MergeRequest.js'
+import { mockApi } from '../mocks/mocks.js'
+import { UpdateConfigMapping } from '../../src/assets/projectMap.js'
+import {clearMapping} from '../teardown.js'
 import { Response, Request } from 'express'
-import { IEventContextObject, emitter, onGitHubEvent } from '../../src/EventManager/eventManagerTypes'
-import NotImplementedError from '../../src/errors/NotImplementedError'
-import ContextCreationError from '../../src/errors/ContextCreationError'
+import { IEventContextObject, emitter, onGitHubEvent } from '../../src/EventManager/eventManagerTypes.js'
+import NotImplementedError from '../../src/errors/NotImplementedError.js'
+import ContextCreationError from '../../src/errors/ContextCreationError.js'
 
 const setupConfig = () => UpdateConfigMapping({
   projectName: pullRequestPayload.repository.name,
