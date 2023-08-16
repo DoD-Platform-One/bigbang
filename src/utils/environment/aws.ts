@@ -69,5 +69,5 @@ export const saveProjectMapFile = async (file: string, filePathBase: string, fil
 }
 
 
-// saveProjectMapFile(JSON.stringify({}))
+// saveProjectMapFile(JSON.stringify({}), './src/assets/', 'project_map_prod.json')
 // fs.writeFileSync("./src/assets/project_map.json", JSON.stringify({}), "utf8")

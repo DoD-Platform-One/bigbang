@@ -88,6 +88,7 @@ onGitHubEvent('pull_request.opened', async (context) => {
         gitHubProjectId: payload.repository.id,
         gitHubApiUrl: payload.repository.url,
         gitHubCloneUrl: payload.repository.clone_url,
+        githubPullRequestCloneUrl: payload.pull_request.head.repo.clone_url,
         // gitlab v
         gitLabMergeRequestNumber: response.data.iid,
         gitLabProjectId: ProjectID,

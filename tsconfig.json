@@ -15,16 +15,11 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "declaration": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    },
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "src/**/*"
   ],
-  // "exclude": ["test/**/*"],
+  "exclude": ["test/**/*"],
   "compileOnSave": false,
   "ts-node": {
     "esm": true,

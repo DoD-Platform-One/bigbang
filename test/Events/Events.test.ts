@@ -19,6 +19,7 @@ const setupConfig = () => UpdateConfigMapping({
   gitHubProjectId: pullRequestPayload.repository.id,
   gitHubApiUrl: pullRequestPayload.repository.url,
   gitHubCloneUrl: pullRequestPayload.repository.clone_url,
+  githubPullRequestCloneUrl: pullRequestPayload.pull_request.head.repo.clone_url,
   gitHubSourceBranch: pullRequestPayload.pull_request.head.ref,
   gitLabSourceBranch: pullRequestPayload.pull_request.head.ref,
   // gitlab v

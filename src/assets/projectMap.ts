@@ -28,6 +28,7 @@ export interface IProject {
 export interface IRequestMap {
     reciprocalNumber: number,
     reciprocalBranch: string,
+    reciprocalCloneUrl?: string
 }
 
 
@@ -86,6 +87,7 @@ interface IMappingContext {
     gitHubProjectId: number,
     gitHubApiUrl: string,
     gitHubCloneUrl: string,
+    githubPullRequestCloneUrl: string,
     gitHubDefaultBranch: string,
     gitHubSourceBranch: string,
     installationID: number,
@@ -96,11 +98,14 @@ interface IMappingContext {
 
 export const UpdateConfigMapping = async (context: IMappingContext) => {
     // Object destructure the context
-    const {projectName, gitHubDefaultBranch, gitHubSourceBranch, gitHubIssueNumber, gitHubProjectId, gitHubApiUrl, gitHubCloneUrl: gitHubGitUrl, gitLabDefaultBranch, gitLabSourceBranch, gitLabMergeRequestNumber, gitLabProjectId, gitLabProjectUrl} = context
+    const {projectName, gitHubDefaultBranch, gitHubSourceBranch, gitHubIssueNumber, 
+        gitHubProjectId, gitHubApiUrl, gitHubCloneUrl: gitHubGitUrl, gitLabDefaultBranch, 
+        gitLabSourceBranch, gitLabMergeRequestNumber, gitLabProjectId, gitLabProjectUrl,
+        githubPullRequestCloneUrl} = context
     
     // if the project already exists in the mapping, add the new merge request and issue number to the mapping
     if (mapping[projectName]) {
-        mapping[projectName].github.requests[gitHubIssueNumber] = {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch}
+        mapping[projectName].github.requests[gitHubIssueNumber] = {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch, reciprocalCloneUrl: githubPullRequestCloneUrl}
         mapping[projectName].gitlab.requests[gitLabMergeRequestNumber] = {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch}
     } 
     // if the project does not exist in the mapping, create a new project in the mapping
@@ -111,7 +116,7 @@ export const UpdateConfigMapping = async (context: IMappingContext) => {
                 projectId:gitLabProjectId, 
                 url: gitLabProjectUrl, 
                 requests: {
-                    [gitLabMergeRequestNumber]: {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch} 
+                    [gitLabMergeRequestNumber]: {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch, reciprocalCloneUrl: githubPullRequestCloneUrl} 
                 },
             },
             github: {

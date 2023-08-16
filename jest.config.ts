@@ -16,7 +16,7 @@ const config: Config.InitialOptions = {
   globalTeardown: "./test/teardown.ts",
   watchPathIgnorePatterns: ["<rootDir>/src/assets/*.json"],
   // Needed for ECMAScript Modules aka import name.js
-  moduleDirectories: ["node_modules", "src", "test"],
+  // moduleDirectories: ["node_modules", "src", "test"],
   moduleNameMapper: {
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
     // '@/(.*)': '/src/$1'
