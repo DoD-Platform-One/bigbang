@@ -105,8 +105,8 @@ export const UpdateConfigMapping = async (context: IMappingContext) => {
     
     // if the project already exists in the mapping, add the new merge request and issue number to the mapping
     if (mapping[projectName]) {
-        mapping[projectName].github.requests[gitHubIssueNumber] = {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch, reciprocalCloneUrl: githubPullRequestCloneUrl}
-        mapping[projectName].gitlab.requests[gitLabMergeRequestNumber] = {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch}
+        mapping[projectName].gitlab.requests[gitLabMergeRequestNumber] = {reciprocalNumber: gitHubIssueNumber, reciprocalBranch: gitHubSourceBranch, reciprocalCloneUrl: githubPullRequestCloneUrl}
+        mapping[projectName].github.requests[gitHubIssueNumber] = {reciprocalNumber: gitLabMergeRequestNumber, reciprocalBranch: gitLabSourceBranch}
     } 
     // if the project does not exist in the mapping, create a new project in the mapping
     else {
