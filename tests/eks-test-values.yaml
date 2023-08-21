@@ -5,14 +5,17 @@ networkPolicies:
 
 istio:
   values:
-    values:
-      global: 
-        proxy:
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits: null
+    global: 
+      proxy:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_META_DNS_CAPTURE: "true"
+        ISTIO_META_DNS_AUTO_ALLOCATE: "true"
 
 neuvector:
   values:
@@ -105,12 +108,17 @@ monitoring:
   values:
     prometheus:
       prometheusSpec:
-        # additionalScrapeConfigs: []
-        # podMetadata:
-        #   annotations:
-        #     vault.hashicorp.com/agent-inject: "false"
-        #     vault.hashicorp.com/agent-init-first: "false"
-        #     vault.hashicorp.com/agent-inject-token: "false"
+        additionalScrapeConfigs: []
+        podMetadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "false"
+            vault.hashicorp.com/agent-init-first: "true"
+            vault.hashicorp.com/agent-inject-token: "true"
+            vault.hashicorp.com/role: "prometheus"
+            vault.hashicorp.com/agent-pre-populate: "false"
+            proxy.istio.io/config: |
+              holdApplicationUntilProxyStarts: true
+   
         resources:
           requests:
             cpu: 300m
@@ -483,3 +491,4 @@ addons:
           cpu: 100m
           memory: 256Mi
         limits: null
+
