@@ -162,11 +162,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.18.2-bb.0"
+    tag: "1.18.2-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.18.2-bb.0"
+    tag: "1.18.2-bb.1"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -1757,12 +1757,12 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
-      tag: "0.24.1-bb.1"
+      tag: "0.24.1-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "vault"
-      tag: "0.24.1-bb.1"
-
+      tag: "0.24.1-bb.3"
+      
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
 
