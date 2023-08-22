@@ -13,8 +13,6 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | Name | Email | Url |
 | ---- | ------ | --- |
 | Ryan Garcia | ryan.garcia@sigmadefense.com |  |
-| Micah Nagel | micah.nagel@defenseunicorns.com |  |
-| Rob Ferguson | rob.ferguson@defenseunicorns.com |  |
 | Chris O'Connell | coconnell@bridgephase.com |  |
 
 ## Source Code
