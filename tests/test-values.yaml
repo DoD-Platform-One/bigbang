@@ -87,6 +87,10 @@ jaeger:
       cypress:
         envs:
           cypress_url: "https://tracing.bigbang.dev"
+          # uncomment following variables for sso keycloak testing in bb
+          # cypress_tnr_username: "cypress"
+          # cypress_tnr_password: "tnr_w!G33ZyAt@C8"
+          # cypress_keycloak_test_enable: "true"
 
 kiali:
   enabled: true
