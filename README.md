@@ -70,7 +70,7 @@ To see what is on the roadmap or included in a given release you can still revie
 
 ## Community
 
-The Big Bang Universe Community Slack workspace is a great place to go to get involved, interact with the community, and ask for help. You can join the workspace with [this invite link](https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/zt-1z02ulxva-lYoVPEpMRzJrMap7ffxU5A).
+The Big Bang Universe Community Slack workspace is a great place to go to get involved, interact with the community, and ask for help. You can join the workspace with [this invite link](https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/zt-21zrvwacw-zoionTAz0UdzVbjnAFSnDw).
 
 ## Navigating our Documentation
 
