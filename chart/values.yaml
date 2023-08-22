@@ -1356,11 +1356,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
-      tag: "8.0.1-bb.3"
+      tag: "8.0.1-bb.4"
     helmRepo:
       repoName: "registry1"
       chartName: "sonarqube"
-      tag: "8.0.1-bb.3"
+      tag: "8.0.1-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
