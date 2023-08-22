@@ -4,7 +4,7 @@
 
 ### Requires Big Bang 1.54.0 and greater.
 
-This section is currently purely devoted to building and testing packages on a development cluster.  The result could be a set of archives that can be used for moving across an airgap.  Essentially this automates a few of the steps indicated in this [documentation](https://github.com/defenseunicorns/zarf/blob/main/docs/13-walkthroughs/5-big-bang.md).
+This section is currently purely devoted to building and testing packages on a development cluster.  The result could be a set of archives that can be used for moving across an airgap.  Essentially this automates a few of the steps indicated in this [documentation](https://docs.zarf.dev/docs/zarf-tutorials/big-bang).
 
 The first step would be to stand up a Big Bang dev cluster.  This is most easily represented by following the steps outlined here, but would ultimately result in running the below command, which stands up a larger development cluster.  Take note of the KeyName and Public IP address which will be used in a later step.
 
