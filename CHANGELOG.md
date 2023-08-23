@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.9.21]
+### Changed
+- Updating pipelines/bigbang.yaml to switch to docs_compiler_rc_test to run and 'lint' only on RC tags
+
 ## [2.9.20]
 ### Changed
 - Updating pipelines/bigbang.yaml to remove docs_compiler execution on release stage

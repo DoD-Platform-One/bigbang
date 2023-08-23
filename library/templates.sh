@@ -467,12 +467,12 @@ bigbang_cut_release(){
 }
 
 # https://docs.gitlab.com/ee/api/pipeline_schedules.html#run-a-scheduled-pipeline-immediately
-bigbang_docs_compile(){
+bigbang_docs_compile_rc_test(){
   echo -e "\e[0Ksection_start:`date +%s`:bb_docs_compile[collapsed=true]\r\e[0K\e[33;1mDocs Compiler Pipeline Trigger\e[37m"
   echo "Triggering docs compiler pipeline"
   echo "BB_DOCS_PROJECT_ID: $BB_DOCS_PROJECT_ID"
   echo "BB_DOCS_SCHEDULED_ID: $BB_DOCS_SCHEDULED_ID"
-  curl --request POST --header "PRIVATE-TOKEN: $BB_DOCS_TOKEN" "https://repo1.dso.mil/api/v4/projects/$BB_DOCS_PROJECT_ID/pipeline_schedules/$BB_DOCS_SCHEDULED_ID/play"
+  curl --request POST --header "PRIVATE-TOKEN: $BB_DOCS_TOKEN" --form "key=TEST_RELEASE_CANDIDATE" --form "value=true" "https://repo1.dso.mil/api/v4/projects/$BB_DOCS_PROJECT_ID/pipeline_schedules/$BB_DOCS_SCHEDULED_ID/play"
   echo -e "\e[0Ksection_end:`date +%s`:bb_docs_compile\r\e[0K"
 }
 
