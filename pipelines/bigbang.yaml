@@ -420,7 +420,6 @@ release:
     # Use release-cli to cut a release in Gitlab or simulate a dry-run & print asset links
     - bigbang_release_check
     - bigbang_release
-    - bigbang_docs_compile
   retry:
     max: 2
     when:
