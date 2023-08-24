@@ -301,7 +301,7 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | monitoring.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | grafana.enabled | bool | `true` | Toggle deployment of Grafana |
 | grafana.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| grafana.git.repo | string | `"https://repo1.dso.mil/big-bang/apps/sandbox/grafana.git"` |  |
+| grafana.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/grafana.git"` |  |
 | grafana.git.path | string | `"./chart"` |  |
 | grafana.git.tag | string | `"6.57.4-bb.0"` |  |
 | grafana.helmRepo.repoName | string | `"registry1"` |  |
