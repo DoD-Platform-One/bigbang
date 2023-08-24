@@ -472,7 +472,7 @@ bigbang_docs_compile_rc_test(){
   echo "Triggering docs compiler pipeline"
   echo "BB_DOCS_PROJECT_ID: $BB_DOCS_PROJECT_ID"
   echo "BB_DOCS_SCHEDULED_ID: $BB_DOCS_SCHEDULED_ID"
-  curl --request POST --header "PRIVATE-TOKEN: $BB_DOCS_TOKEN" --form "key=TEST_RELEASE_CANDIDATE" --form "value=true" "https://repo1.dso.mil/api/v4/projects/$BB_DOCS_PROJECT_ID/pipeline_schedules/$BB_DOCS_SCHEDULED_ID/play"
+  curl --request POST -F "token=$BB_DOCS_RC_TRIGGER_TOKEN" -F "ref=main" -F "variables[TEST_RELEASE_CANDIDATE]=true" "https://repo1.dso.mil/api/v4/projects/$BB_DOCS_PROJECT_ID/trigger/pipeline"
   echo -e "\e[0Ksection_end:`date +%s`:bb_docs_compile\r\e[0K"
 }
 

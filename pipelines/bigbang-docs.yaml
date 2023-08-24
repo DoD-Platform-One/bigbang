@@ -117,8 +117,6 @@ bb-docs:
     - .util-image
   stage: dry-run
   only:
-    refs:
-      - schedules
     variables:
       - $TEST_RELEASE_CANDIDATE == "true"
   except:
@@ -138,8 +136,6 @@ test:
     - .util-image
   stage: test
   only:
-    refs:
-      - schedules
     variables:
       - $TEST_RELEASE_CANDIDATE == "true"
   except:
