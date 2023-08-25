@@ -1,6 +1,6 @@
 apiVersion: v2
 name: bigbang
-version: 2.8.0
+version: 2.9.0
 description: Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
 type: application
@@ -16,10 +16,6 @@ sources:
 maintainers:
   - name: Ryan Garcia
     email: ryan.garcia@sigmadefense.com
-  - name: Micah Nagel
-    email: micah.nagel@defenseunicorns.com
-  - name: Rob Ferguson
-    email: rob.ferguson@defenseunicorns.com
   - name: Chris O'Connell
     email: coconnell@bridgephase.com
 
