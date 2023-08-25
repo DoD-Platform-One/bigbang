@@ -903,7 +903,7 @@ grafana:
   sourceType: "git"
 
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/grafana.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
     tag: "6.58.9-bb.0"
   helmRepo:
