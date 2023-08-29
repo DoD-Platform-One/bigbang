@@ -8,14 +8,21 @@ source ${PIPELINE_REPO_DESTINATION}/library/templates.sh
 clusterType="unknown"
 coreDnsName="unknown"
 touch newhosts
-if kubectl get configmap -n kube-system coredns &>/dev/null; then
+NAMESPACE="kube-system"
+LABEL_KEY="eks.amazonaws.com/component"
+label_value=$(kubectl get configmap -n ${NAMESPACE} coredns -o json | jq -r '.metadata.labels."'"$LABEL_KEY"'"')
+if [ "$label_value" == "coredns" ]; then
+  clusterType="eks"
+  coreDnsName="coredns"
+  kubectl get configmap -n ${NAMESPACE} ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
+elif kubectl get configmap -n ${NAMESPACE} coredns &>/dev/null; then
   clusterType="k3d"
   coreDnsName="coredns"
-  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.NodeHosts}' > newhosts
-elif kubectl get configmap -n kube-system rke2-coredns-rke2-coredns &>/dev/null; then
+  kubectl get configmap -n ${NAMESPACE} ${coreDnsName} -o jsonpath='{.data.NodeHosts}' > newhosts
+elif kubectl get configmap -n ${NAMESPACE} rke2-coredns-rke2-coredns &>/dev/null; then
   clusterType="rke2"
   coreDnsName="rke2-coredns-rke2-coredns"
-  kubectl get configmap -n kube-system ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
+  kubectl get configmap -n ${NAMESPACE} ${coreDnsName} -o jsonpath='{.data.Corefile}' > newcorefile
 fi
 
 # Safeguard in case configmap doesn't end with newline
@@ -33,7 +40,7 @@ for vs in $(kubectl get virtualservice -A -o go-template='{{range .items}}{{.met
   external_ip=""
   if [[ ${clusterType} == "k3d" ]]; then
     external_ip=$(kubectl get svc -n istio-system $ingress_gateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  elif [[ ${clusterType} == "rke2" ]]; then
+  elif [[ ${clusterType} == "eks" ]] || [[ ${clusterType} == "rke2" ]]; then
     external_hostname=$(kubectl get svc -n istio-system $ingress_gateway -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
     external_ip=$(dig $external_hostname +search +short | head -1)
   fi
@@ -65,14 +72,14 @@ if [[ ${clusterType} == "k3d" ]]; then
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig  
   fi
-# For rke2
-elif [[ ${clusterType} == "rke2" ]]; then
+# For rke2 or eks
+elif [[ ${clusterType} == "eks" ]] || [[ ${clusterType} == "rke2" ]]; then
   if [[ ${DEBUG} ]]; then
     echo "Verify coredns configmap NodeHosts before patch:"
     testCoreDnsConfig=$(kubectl get cm ${coreDnsName} -n kube-system -o jsonpath='{.data.NodeHosts}'; echo)
     echo $testCoreDnsConfig
   fi
-  echo "Starting coredns configmap patch for rke2 cluster"
+  echo "Starting coredns configmap patch for ${clusterType} cluster"
   cat patch.yaml
   # Add an entry to the corefile
   sed -i '/prometheus/i \ \ \ \ hosts /etc/coredns/NodeHosts {\n        ttl 60\n        reload 15s\n        fallthrough\n    }' newcorefile
