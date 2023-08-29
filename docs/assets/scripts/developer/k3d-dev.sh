@@ -23,7 +23,7 @@ function getPrivateIP2() {
   echo `aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress'`
 }
 
-#### Global variables - These allow the script to be run by non-bigbang devs easily
+#### Global variables - These allow the script to be run by non-bigbang devs easily - Update VPC_ID here or export environment variable for it if not default VPC
 if [[ -z "${VPC_ID}" ]]; then
   # default
   VPC_ID=vpc-065ffa1c7b2a2b979
@@ -90,6 +90,9 @@ SGname="${AWSUSERNAME}-dev"
 VPC="${VPC_ID}"  # default VPC
 RESET_K3D=false
 ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
+
+#### Querying for first pub subnet to deploy EC2 to ####
+PubSubnet=$(aws ec2 describe-subnets --filter Name=vpc-id,Values=$VPC_ID --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId|[0]' --output text)
 
 while [ -n "$1" ]; do # while loop starts
 
@@ -289,7 +292,8 @@ if [[ "${RESET_K3D}" == false ]]; then
 
   # Lookup the security group created to get the ID
   echo -n Retrieving ID for security group ${SGname} ...
-  SecurityGroupId=$(aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} --query "SecurityGroups[0].GroupId" --output text)
+  #### SecurityGroupId=$(aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} --query "SecurityGroups[0].GroupId" --output text)
+  SecurityGroupId=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=$SGname --query 'SecurityGroups[*].[GroupId]' --output text)
   echo done
 
   # Add name tag to security group
@@ -299,15 +303,19 @@ if [[ "${RESET_K3D}" == false ]]; then
   # Add rule for IP based filtering
   WorkstationIP=`curl http://checkip.amazonaws.com/ 2> /dev/null`
   echo -n Checking if ${WorkstationIP} is authorized in security group ...
-  aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} | grep ${WorkstationIP} > /dev/null || ipauth=missing
+  #### aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} | grep ${WorkstationIP} > /dev/null || ipauth=missing
+  aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=$SGname | grep ${WorkstationIP} > /dev/null || ipauth=missing
   if [ "${ipauth}" == "missing" ]; then
     echo -e "missing\nAdding ${WorkstationIP} to security group ${SGname} ..."
     if [[ "$PRIVATE_IP" == true ]];
     then
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
     else  # all protocols to all ports is the default
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol all --cidr ${WorkstationIP}/32
     fi
     echo done
   else
@@ -410,6 +418,7 @@ EOF
     --output json --no-paginate \
     --count 1 --image-id "${ImageId}" \
     --instance-type "${InstanceType}" \
+    --subnet-id "${PubSubnet}" \
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
