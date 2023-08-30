@@ -25,8 +25,24 @@ function getPrivateIP2() {
 
 #### Global variables - These allow the script to be run by non-bigbang devs easily - Update VPC_ID here or export environment variable for it if not default VPC
 if [[ -z "${VPC_ID}" ]]; then
-  # default
-  VPC_ID=vpc-065ffa1c7b2a2b979
+  VPC_ID="$(aws ec2 describe-vpcs --filters Name=is-default,Values=true | jq -j .Vpcs[0].VpcId)"
+  if [[ -z "${VPC_ID}" ]]; then
+    echo "AWS account has no default VPC - please provide VPC_ID"
+    exit 1
+  fi
+fi
+
+if [[ -n "${SUBNET_ID}" ]]; then
+  if [[ "$(aws ec2 describe-subnets --subnet-id "${SUBNET_ID}" --filters "Name=vpc-id,Values=${VPC_ID}" | jq -j .Subnets[0])" == "null" ]]; then
+    echo "SUBNET_ID ${SUBNET_ID} does not belong to VPC ${VPC_ID}"
+    exit 1
+  fi
+else
+  SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" "Name=default-for-az,Values=true" | jq -j .Subnets[0].SubnetId)"
+  if [[ "${SUBNET_ID}" == "null" ]]; then
+    echo "VPC ${VPC_ID} has no default subnets - please provide SUBNET_ID"
+    exit 1
+  fi
 fi
 
 # If the user is using her own AMI, then respect that and do not update it.
@@ -425,6 +441,7 @@ EOF
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
     --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
+    --subnet-id "${SUBNET_ID}" \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
