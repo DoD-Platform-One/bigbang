@@ -44,7 +44,7 @@ mkdir -p bigbang/templates/$PKGNAME
 touch bigbang/values.yaml
 
 # Copy helpers from Big Bang
-curl -sL -o bigbang/templates/_helpers.tpl https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/templates/_helpers.tpl
+curl -sL -o bigbang/templates/_helpers.tpl https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/templates/_helpers.tpl
 
 # Create chart file
 cat << EOF >> bigbang/Chart.yaml
@@ -115,7 +115,7 @@ The `GitRepository` Helm template above requires the following values to be adde
 podinfo:
   # The Git location of the package Helm chart
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/podinfo
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/podinfo
     branch: master
 ```
 
@@ -249,7 +249,7 @@ At this point, you should have a minimum viable set of values in `bigbang/values
 podinfo:
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/podinfo
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/podinfo
     branch: bigbang
     path: chart
   flux: {}
@@ -259,7 +259,7 @@ Use the Big Bang default values to make sure our Helm templates don't have any s
 
    ```shell
    # Get the helm chart
-   git clone https://repo1.dso.mil/platform-one/big-bang/bigbang ~/bigbang
+   git clone https://repo1.dso.mil/big-bang/bigbang ~/bigbang
 
    # Check that our chart generates without errors
    # We want our local values to override the big bang defaults, so we need to specify both
@@ -310,7 +310,7 @@ To validate that the Helm chart is working, perform the following steps to deplo
      enabled: false
    ```
 
-1. To enable Big Bang packages that are disabled by default, add the appropriate code block for the Big Bang package from the Big Bang helm chart [values file](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/values.yaml).
+1. To enable Big Bang packages that are disabled by default, add the appropriate code block for the Big Bang package from the Big Bang helm chart [values file](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml).
       
       - For example, if you want to test a package's functionality with MinIO, you would add this block from the Big Bang helm chart values file to the package repo's `bigbang/values.yaml` file
 
@@ -329,7 +329,7 @@ To validate that the Helm chart is working, perform the following steps to deplo
 
       - A `tests/test-values.yaml` in a package repo can be used as override values for the pipeline. It allows pipeline-specific configurations so that the package's `chart/values.yaml` doesn't have to be changed.
 
-1. Install flux using the [instructions from Big Bang](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/1.19.0/docs/guides/deployment_scenarios/quickstart.md#step-8-install-flux).
+1. Install flux using the [instructions from Big Bang](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/quickstart.md#step-8-install-flux).
 1. Install the package using the bigbang Helm chart
 
    ```shell
@@ -365,9 +365,9 @@ To validate that the Helm chart is working, perform the following steps to deplo
 
    ## Prerequisites
 
-   - Kubernetes cluster matching [Big Bang's Prerequisites](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/guides/prerequisites)
+   - Kubernetes cluster matching [Big Bang's Prerequisites](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/guides/prerequisites)
    - [FluxCD](https://fluxcd.io/) running in the cluster
-   - The [Big Bang git repository](https://repo1.dso.mil/platform-one/big-bang/bigbang) cloned into `~/bigbang`
+   - The [Big Bang git repository](https://repo1.dso.mil/big-bang/bigbang) cloned into `~/bigbang`
    - [Helm](https://helm.sh/docs/intro/install/)
 
    ## Usage
