@@ -1411,6 +1411,35 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
+  fortify:
+    # -- Toggle deployment of Fortify.
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/apps/third-party/fortify.git
+      path: "./chart"
+      tag: "0.2.0-bb.11"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "fortify"
+      tag: "0.2.0-bb.11"
+
+    # -- Flux reconciliation overrides specifically for the Fortify Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    # -- Values to passthrough to the fortify chart: https://repo1.dso.mil/big-bang/apps/third-party/fortify.git
+    values: {}
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
   # ----------------------------------------------------------------------------------------------------------------------
   # Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
   #
