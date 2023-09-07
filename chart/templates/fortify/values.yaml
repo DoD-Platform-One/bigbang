@@ -1,0 +1,38 @@
+{{- $pkg := "fortify" }}
+
+{{- /* Create secret */ -}}
+{{- if (get .Values.addons $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values.addons $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.fortify" -}}
+
+imagePullSecrets:
+- name: private-registry
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+externalURL: https://fortify.{{ .Values.domain }}
+
+domain: {{ .Values.domain }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  fortify:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.fortify.ingress.gateway }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.fortify.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+sso:
+  enabled: {{ default "false" .Values.addons.fortify.sso.enabled }}
+
+{{- end }}
