@@ -48,6 +48,11 @@ controller:
         default_role: {{ .Values.neuvector.sso.default_role }}
       {{- end }}
   {{- end }}
+  {{- if and .Values.neuvector.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+  sso:
+    certificateAuthority:
+      secretName: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
+  {{- end }}
 {{- end }}
 
 monitor:
