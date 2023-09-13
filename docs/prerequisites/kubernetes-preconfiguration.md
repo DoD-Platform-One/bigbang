@@ -63,9 +63,7 @@ It is important to note that while Big Bang does not require/mandate usage of a 
 
 ### OpenShift
 
-OpenShift
-
-1) When deploying BigBang, set the OpenShift flag to true.
+1. When deploying BigBang, set the OpenShift flag to true.
 
     ```yaml
     # inside a values.yaml being passed to the command installing bigbang
@@ -77,14 +75,15 @@ OpenShift
     helm install bigbang chart --set openshift=true
     ```
 
-1) Patch the istio-cni daemonset to allow containers to run privileged (AFTER istio-cni daemonset exists).
-Note: it was unsuccessfully attempted to apply this setting via modifications to the helm chart. Online patching succeeded.
+1. Patch the istio-cni daemonset to allow containers to run privileged (AFTER istio-cni daemonset exists).
+
+    Note: it was unsuccessfully attempted to apply this setting via modifications to the helm chart. Online patching succeeded.
 
     ```shell
     kubectl get daemonset istio-cni-node -n kube-system -o json | jq '.spec.template.spec.containers[] += {"securityContext":{"privileged":true}}' | kubectl replace -f -
     ```
 
-1) Modify the OpenShift cluster(s) with the following scripts based on <https://istio.io/v1.7/docs/setup/platform-setup/openshift/>
+1. Modify the OpenShift cluster(s) with the following scripts based on <https://istio.io/v1.7/docs/setup/platform-setup/openshift/>
 
     ```shell
     # Istio Openshift configurations Post Install

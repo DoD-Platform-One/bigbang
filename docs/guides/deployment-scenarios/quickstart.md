@@ -894,19 +894,21 @@ After completing step 5, if you are unable to connect to external DNS providers 
     ```shell
     kubectl -n kube-system edit configmaps CoreDNS -o yaml 
     ```
-2. Change: 
 
-     ```plaintext
-     forward . /etc/resolv.conf
-     ```
+1. Change: 
 
-     To:
+    ```plaintext
+    forward . /etc/resolv.conf
+    ```
 
-     ```plaintext
-     forward . <DNS Server IP>
-     ```
-3. Save changes in editor (for vi use `:wq`)
-4. Verify changes in terminal output that prints new config 
+    To:
+
+    ```plaintext
+    forward . <DNS Server IP>
+    ```
+
+1. Save changes in editor (for vi use `:wq`)
+1. Verify changes in terminal output that prints new config 
 
 ### Useful Commands for Obtaining Detailed Logs from Kubernetes Cluster or Containers
 * Print all pods including information related to the status of each pod 
