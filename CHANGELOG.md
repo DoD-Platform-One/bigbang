@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.9.24]
+### Changed
+- library/templates.sh BigBang auto MR creation logic to new format
+
 ## [2.9.23]
 ### Changed
 - Adding eks cluster changes

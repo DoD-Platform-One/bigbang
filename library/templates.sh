@@ -1446,7 +1446,7 @@ create_bigbang_merge_request() {
     ## Update merge request with reviewers and a description
 
     # Get ID of the MR that was just created
-    BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=opened" | jq '.[].iid' | head -1)
+    BB_MR_ID=$(curl -s "${GITLAB_PROJECTS_API_ENDPOINT}/${BB_PROJECT_ID}/merge_requests?source_branch=${BB_SOURCE_BRANCH}&state=merged" | jq '.[].iid' | head -1)
 
     # Get description of MR and save it to a JSON file
     JSON_DESCRIPTION_FILE="/tmp/description.json"
