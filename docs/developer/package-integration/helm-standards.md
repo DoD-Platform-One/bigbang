@@ -42,16 +42,16 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
     * The BigBang chart should prevent the use of a database bundled as part of the package chart by default, and warn if an end user uses one anyways.
     * There should be a database section under the package configuration that matches the following section
 
-    ```yaml
-    database:
-      # Entering connection info will enable external database and will auto-create any required secrets.
-      host: ""
-      port: ""
-      username: ""
-      password: ""
-      database: ""
-      type: "" # Optional. One of mysql, mssql, postgres, mongo if ther
-    ```
+      ```yaml
+      database:
+        # Entering connection info will enable external database and will auto-create any required secrets.
+        host: ""
+        port: ""
+        username: ""
+        password: ""
+        database: ""
+        type: "" # Optional. One of mysql, mssql, postgres, mongo if ther
+      ```
 
 * Monitoring
     * Charts should expect a value `monitoring.enabled` to be set by the BigBang chart to conditionally create monitoring components (`ServiceMonitors`, `PodMonitors`, etc).  This value should default to false
