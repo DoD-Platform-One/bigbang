@@ -1421,11 +1421,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/apps/third-party/fortify.git
       path: "./chart"
-      tag: "0.2.0-bb.12"
+      tag: "0.2.0-bb.14"
     helmRepo:
       repoName: "registry1"
       chartName: "fortify"
-      tag: "0.2.0-bb.12"
+      tag: "0.2.0-bb.14"
 
     # -- Flux reconciliation overrides specifically for the Fortify Package
     flux: {}
