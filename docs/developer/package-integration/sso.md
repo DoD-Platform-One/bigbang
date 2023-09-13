@@ -57,19 +57,19 @@ In order to use Authservice, Istio injection is required and utilized to route a
 
 1. The first step is to ensure your namespace template where you package is destined is istio injected, and the appropriate label is set in `chart/templates/<package>/namespace.yaml`.
 
-Example: [Jaeger Namespace template](../../../chart/templates/jaeger/namespace.yaml)
+    Example: [Jaeger Namespace template](../../../chart/templates/jaeger/namespace.yaml)
 
 1. Next is to make sure the following label is applied to the workload (pod/deployment/replicaset/daemonset/etc) that will be behind the Authservice gate:
 
-```yaml
-...
-{{- $<package>AuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-{{- $<package>AuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-...
-metadata:
-  labels:
-    {{ $<package>AuthserviceKey }}: {{ $<package>AuthserviceValue }}
-```
+    ```yaml
+    ...
+    {{- $<package>AuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+    {{- $<package>AuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+    ...
+    metadata:
+      labels:
+        {{ $<package>AuthserviceKey }}: {{ $<package>AuthserviceValue }}
+    ```
 
 This label is set in the Authservice package, and is set to `protect=keycloak` by default, the above logic will check if anyone overwrites these values within their BigBang installation and overwrite the label accordingly.
 

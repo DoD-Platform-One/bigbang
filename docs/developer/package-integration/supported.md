@@ -32,37 +32,37 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Merge your default package values from `<your-package-git-folder>/bigbang/values.yaml` into `chart/values.yaml`.  Only the "standard" keys used across packages should be used.  Keep in mind that values can be passed directly to the package using `.Values.<package>.values`
 
-   > If your package is an `addon`, it falls into a different location than core packages.  In this case, you will need to update all your references from `.Values.<package>` to `.Values.addons.<package>`.
+    > If your package is an `addon`, it falls into a different location than core packages.  In this case, you will need to update all your references from `.Values.<package>` to `.Values.addons.<package>`.
 
-   Example:
+    Example:
 
-   ```yaml
-   addons:
-     mypackage:
-       enabled: false     # default to false
-       git:
-         repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/mypackage.git
-         path: "./chart"
-         tag: "1.2.3-bb.0"
-       sso:
-         enabled: false   # default to false
-         client_id: ""
-       database:
-         host: ""
-         port: ""
-         username: ""
-         database: ""
-         password: {} # unencoded stringData
-       objectstorage:
-         type: s3   # supported types are "s3" or "minio"
-         endpoint: "" # ignored if type is "s3". used only for minio. example " http://minio.minio.svc.cluster.local:9000"
-         host: s3.amazonaws.com  # used for gitlab backup storage
-         region: us-west-1
-         accessKey: ""
-         accessSecret: ""
-         bucketPrefix: ""  # optional. example: dev-
-       values: {}
-   ```
+    ```yaml
+    addons:
+      mypackage:
+        enabled: false     # default to false
+        git:
+          repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/mypackage.git
+          path: "./chart"
+          tag: "1.2.3-bb.0"
+        sso:
+          enabled: false   # default to false
+          client_id: ""
+        database:
+          host: ""
+          port: ""
+          username: ""
+          database: ""
+          password: {} # unencoded stringData
+        objectstorage:
+          type: s3   # supported types are "s3" or "minio"
+          endpoint: "" # ignored if type is "s3". used only for minio. example " http://minio.minio.svc.cluster.local:9000"
+          host: s3.amazonaws.com  # used for gitlab backup storage
+          region: us-west-1
+          accessKey: ""
+          accessSecret: ""
+          bucketPrefix: ""  # optional. example: dev-
+        values: {}
+    ```
 
 1. Edit `tests/test-values.yaml`. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
 

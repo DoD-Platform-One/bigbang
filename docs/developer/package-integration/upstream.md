@@ -27,35 +27,35 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
 1. Identify the location of an existing Helm chart for the package.
 
-   > If selecting between several Helm charts, give preference to a Helm chart that:
-   >
-   > - Was created by the company that owns the package
-   > - Has recent and frequent updates
-   > - Offers maximum flexibility through values
-   > - Does not bundle several packages together (unless they can be individually disabled)
-   > - Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context
+    > If selecting between several Helm charts, give preference to a Helm chart that:
+    >
+    > - Was created by the company that owns the package
+    > - Has recent and frequent updates
+    > - Offers maximum flexibility through values
+    > - Does not bundle several packages together (unless they can be individually disabled)
+    > - Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context
 
 1. Using [Kpt](https://googlecontainertools.github.io/kpt/installation/), create a clone of the package's Helm chart
 
-   ```shell
-   # Change these for your upstream helm chart
-   export GITREPO=https://github.com/stefanprodan/podinfo
-   export GITDIR=charts/podinfo
-   export GITTAG=5.2.1
+    ```shell
+    # Change these for your upstream helm chart
+    export GITREPO=https://github.com/stefanprodan/podinfo
+    export GITDIR=charts/podinfo
+    export GITTAG=5.2.1
 
-   # Clone
-   kpt pkg get $GITREPO/$GITDIR@$GITTAG chart
-   ```
+    # Clone
+    kpt pkg get $GITREPO/$GITDIR@$GITTAG chart
+    ```
 
-   > Always use an release tag for `GITTAG` so your chart is immutable.  Never use a branch or `latest`.
+    > Always use an release tag for `GITTAG` so your chart is immutable.  Never use a branch or `latest`.
 
 1. Add `-bb.0` suffix on `chart/Chart.yaml`, `version`.  For example:
 
-   ```yaml
-   version: 6.0.0-bb.0
-   ```
+    ```yaml
+    version: 6.0.0-bb.0
+    ```
 
-   > The `bb.#` will increment for each change we merge into our `main` branch.  It will also become our release label.
+    > The `bb.#` will increment for each change we merge into our `main` branch.  It will also become our release label.
 
 1. Add the following files to the Git repository at the root:
 
