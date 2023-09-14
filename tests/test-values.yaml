@@ -716,6 +716,7 @@ tempo:
     bbtests:
       enabled: true
       cypress:
+        image: registry1.dso.mil/bigbang-ci/cypress-kubectl:9.7.0
         artifacts: true
         envs:
           cypress_url: 'https://tempo.bigbang.dev'
