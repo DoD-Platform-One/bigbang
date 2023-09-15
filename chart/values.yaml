@@ -1419,7 +1419,7 @@ addons:
     sourceType: "git"
 
     git:
-      repo: https://repo1.dso.mil/big-bang/apps/third-party/fortify.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/fortify.git
       path: "./chart"
       tag: "0.2.0-bb.14"
     helmRepo:
@@ -1444,7 +1444,7 @@ addons:
       # -- OIDC Client Secret to use for Harbor
       client_secret: ""
 
-    # -- Values to passthrough to the fortify chart: https://repo1.dso.mil/big-bang/apps/third-party/fortify.git
+    # -- Values to passthrough to the fortify chart: https://repo1.dso.mil/big-bang/product/packages/fortify.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
