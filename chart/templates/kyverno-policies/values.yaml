@@ -184,6 +184,11 @@ policies:
 
   require-non-root-group:
     validationFailureAction: audit
+    {{- if .Values.istio.enabled }}
+    parameters:
+      excludeContainers:
+        - istio-init
+    {{- end }}
     {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
     exclude:
       any:
