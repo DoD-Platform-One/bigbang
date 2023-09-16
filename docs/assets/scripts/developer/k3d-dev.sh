@@ -107,9 +107,6 @@ VPC="${VPC_ID}"  # default VPC
 RESET_K3D=false
 ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
 
-#### Querying for first pub subnet to deploy EC2 to ####
-PubSubnet=$(aws ec2 describe-subnets --filter Name=vpc-id,Values=$VPC_ID --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId|[0]' --output text)
-
 while [ -n "$1" ]; do # while loop starts
 
   case "$1" in
@@ -424,24 +421,25 @@ EOF
   # NOTE: t3a.2xlarge spot price is 0.35 m5a.4xlarge is 0.69
   echo "Running spot instance ..."
 
-  # If we are using a Secondary IP, don't use an auto-assigned IP, and also generate a 2nd private address for EIPs allocation.
-  additional_create_instance_options=""
   if [[ "${ATTACH_SECONDARY_IP}" == true ]]; then
-    additional_create_instance_options+=" --no-associate-public-ip-address --secondary-private-ip-address-count 1"
+    # If we are using a secondary IP, we don't want to assign public IPs at launch time. Instead, the script will attach both public IPs after the instance is launched.
+    additional_create_instance_options="--no-associate-public-ip-address --secondary-private-ip-address-count 1"
+  else
+    additional_create_instance_options="--associate-public-ip-address"
   fi
 
   InstId=`aws ec2 run-instances \
     --output json --no-paginate \
     --count 1 --image-id "${ImageId}" \
     --instance-type "${InstanceType}" \
-    --subnet-id "${PubSubnet}" \
+    --subnet-id "${SUBNET_ID}" \
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
-    --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
-    --subnet-id "${SUBNET_ID}" \
+    --instance-market-options file://$HOME/aws/spot_options.json \
+    ${additional_create_instance_options} \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
