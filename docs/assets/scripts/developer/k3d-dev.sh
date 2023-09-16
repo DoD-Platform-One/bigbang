@@ -107,9 +107,6 @@ VPC="${VPC_ID}"  # default VPC
 RESET_K3D=false
 ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
 
-#### Querying for first pub subnet to deploy EC2 to ####
-PubSubnet=$(aws ec2 describe-subnets --filter Name=vpc-id,Values=$VPC_ID --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId|[0]' --output text)
-
 while [ -n "$1" ]; do # while loop starts
 
   case "$1" in
@@ -434,14 +431,13 @@ EOF
     --output json --no-paginate \
     --count 1 --image-id "${ImageId}" \
     --instance-type "${InstanceType}" \
-    --subnet-id "${PubSubnet}" \
+    --subnet-id "${SUBNET_ID}" \
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
     --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
-    --subnet-id "${SUBNET_ID}" \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
