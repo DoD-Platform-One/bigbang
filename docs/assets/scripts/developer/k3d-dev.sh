@@ -438,6 +438,7 @@ EOF
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
     --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
+    --associate-public-ip-address \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
