@@ -114,7 +114,7 @@ Authservice can also be configured to communicate with external redis serivces s
 addons:
   authservice:
     values:
-      globals:
+      global:
         redis_server_uri: "tcp://redis-01.7abc2d.0001.usw2.cache.amazonaws.com:6379"
 ```
 
