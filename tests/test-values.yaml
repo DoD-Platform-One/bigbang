@@ -345,10 +345,12 @@ kyverno:
 kyvernoReporter:
   values:
     bbtests:
+      enabled: true
       cypress:
         envs:
           cypress_grafana_url: https://grafana.bigbang.dev
           cypress_prometheus_url: https://prometheus.bigbang.dev
+          cypress_check_datasource: 'true'
 
 kyvernoPolicies:
   values:
@@ -463,6 +465,7 @@ kyvernoPolicies:
               - nexus-repository-manager
               - keycloak
               - jaeger
+              - kyverno-reporter
               - monitoring
               - vault
               - logging
@@ -497,6 +500,7 @@ kyvernoPolicies:
               - mattermost
               - nexus-repository-manager
               - keycloak
+              - kyverno-reporter
               - jaeger
               - monitoring
               - vault
@@ -542,6 +546,7 @@ kyvernoPolicies:
               - mattermost
               - nexus-repository-manager
               - keycloak
+              - kyverno-reporter
               - jaeger
               - monitoring
               - vault
