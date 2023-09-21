@@ -1581,7 +1581,7 @@ addons:
             customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
         realm:
           stringData:
-            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda-bb-ci.json" }}'
         truststore:
           data:
             truststore.jks: |-
