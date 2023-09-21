@@ -52,6 +52,9 @@ sso:
   auth_endpoint: {{ default (include "sso.oidc.auth" $) .auth_endpoint }}
   token_endpoint: {{ default (include "sso.oidc.token" $) .token_endpoint }}
   user_api_endpoint: {{ default (include "sso.oidc.userinfo" $) .user_api_endpoint }}
+  {{- list "enable_sign_up_with_email" .enable_sign_up_with_email | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "enable_sign_in_with_email" .enable_sign_in_with_email | include "bigbang.addValueIfSet" | indent 2 }}
+  {{- list "enable_sign_in_with_username" .enable_sign_in_with_username | include "bigbang.addValueIfSet" | indent 2 }}
 {{- end }}
 
 networkPolicies:
