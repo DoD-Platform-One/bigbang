@@ -1382,7 +1382,6 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
           envs:
             cypress_url: https://chat.bigbang.dev
 
