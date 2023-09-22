@@ -2,29 +2,20 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return false
 })
 
-// keep cookies between blocks (stay logged in if using SSO)
-beforeEach(function () {
-  cy.getCookies().then(cookies => {
-    const namesOfCookies = cookies.map(cm => cm.name)
-    Cypress.Cookies.preserveOnce(...namesOfCookies)
-  })
-})
-
 before(() => {
   if (Cypress.env('keycloak_test_enable')) {
         cy.visit(Cypress.env('url'))
-        cy.get('button').click()
-        cy.get('input[id="username"]').type(Cypress.env('keycloak_username'))
-        cy.get('input[id="password"]').type(Cypress.env('keycloak_password'))
+        cy.get('input[id="username"]').type(Cypress.env('tnr_username'))
+        cy.get('input[id="password"]').type(Cypress.env('tnr_password'))
         cy.get('input[id="kc-login"]').click()
         cy.get('input[id="kc-accept"]').click()
-        cy.intercept('GET', '**/*').as('landingpage')
         cy.get('input[id="kc-login"]').click()
-        // after hitting "yes" on the consent page, there should be a redirect back to the app (302)
-        cy.wait('@landingpage').its('response.statusCode').should('eq', 302)
-        // then the app's page should load
-        cy.wait('@landingpage').its('response.statusCode').should('eq', 200)
   }
+})
+
+// Clear cookies to force login again
+after(() => {
+  Cypress.session.clearCurrentSessionData
 })
 
 function expandMenu() {
@@ -64,7 +55,7 @@ if (Cypress.env("check_data")) {
     cy.get('#Graph', { timeout: 15000 }).click();
     collapseMenu();
     cy.get('button[id="namespace-selector"').click()
-    cy.get('input[type="checkbox"][value="monitoring"]').click()
+    cy.get('input[type="checkbox"][value="monitoring"]').check()
     cy.get('button[id="refresh_button"').click({force: true})
     // Check for graph side panel because the main graph is tricky to grab
     cy.get('div[id="graph-side-panel"]', { timeout: 15000 }).should("be.visible")
@@ -77,17 +68,24 @@ if (Cypress.env("check_data")) {
     cy.get('#Applications', { timeout: 15000 }).click();
     collapseMenu();
     cy.get('button[id="namespace-selector"]').click()
-    cy.get('input[type="checkbox"][value="monitoring"]').click()
+    //Only check the box for monitoring if it isn't already selected from previous test
+    cy.get('input[type="checkbox"][value="monitoring"]').then(($checkbox) => {
+      if (!$checkbox.prop('checked')) {
+        cy.wrap($checkbox).check()
+      }
+    })
     cy.get('button[id="refresh_button"]').click({force: true})
     // This gets us to the prometheus application
-    cy.get(':nth-child(2) > :nth-child(2) > .virtualitem_definition_link', { timeout: 15000 }).click()
+    cy.get('a').filter((index, element) => {
+      return element.textContent.trim() === 'prometheus';
+    }).click();
     // Validate the graph is visible
     cy.get('#MiniGraphCard > .pf-c-card__body', { timeout: 15000 }).should("be.visible")
     // Load the outbound metrics tab
     // there's nothing easy to check on here since elements are dynamic but we can at least load the page for the video
-    cy.get('#pf-tab-3-basic-tabs').click()
+    cy.get('#pf-tab-2-basic-tabs').click()
     // Load the tracing tab
-    cy.get('#pf-tab-4-basic-tabs').click()
+    cy.get('#pf-tab-3-basic-tabs').click()
     // Validate that error is not displayed
     // NOTE: we don't check for actual traces because there can be delays in them displaying on the webpage
     cy.contains('Error fetching traces').should("not.exist")
