@@ -973,6 +973,12 @@ addons:
       gateway: ""
     sso:
       enabled: false
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: "https://fortify.bigbang.dev"
 
   gitlab:
     enabled: false
