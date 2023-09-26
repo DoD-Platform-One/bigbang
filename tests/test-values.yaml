@@ -672,7 +672,7 @@ loki:
           cpu: 200m
           memory: 400Mi
     backend:
-      replicas: 1
+      replicas: 3
       persistence:
         size: 2Gi
       resources:
