@@ -648,6 +648,7 @@ run "kubectl config use-context k3d-k3s-default"
 run "kubectl cluster-info && kubectl get nodes"
 
 echo "copying kubeconfig to workstation..."
+mkdir -p ~/.kube
 scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
 if [[ "$PRIVATE_IP" == true ]]; then
   $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
