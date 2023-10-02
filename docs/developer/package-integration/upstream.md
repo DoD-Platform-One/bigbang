@@ -11,7 +11,7 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Project
 
-It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox).  This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
+It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/big-bang/product/packages).  This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
 
 You will need to request a sandbox project and Developer access from a Big Bang team member.
 
@@ -143,7 +143,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       - Values: How to configure Helm chart values
       - Contributing: Link to contributing guide
 
-      There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
+      There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
 
       > This process produces a `README.md`, `README.md.gotpl`, and `.helmdocsignore`.  The `gotpl` file is used as values to update the `README.md`.
 

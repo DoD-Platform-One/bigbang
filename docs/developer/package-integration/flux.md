@@ -115,7 +115,7 @@ The `GitRepository` Helm template above requires the following values to be adde
 podinfo:
   # The Git location of the package Helm chart
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/podinfo
+    repo: https://repo1.dso.mil/big-bang/product/packages/podinfo
     branch: master
 ```
 
@@ -249,7 +249,7 @@ At this point, you should have a minimum viable set of values in `bigbang/values
 podinfo:
   enabled: true
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/podinfo
+    repo: https://repo1.dso.mil/big-bang/product/packages/podinfo
     branch: bigbang
     path: chart
   flux: {}

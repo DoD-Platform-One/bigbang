@@ -15,7 +15,7 @@ Usually, Helm charts come with a set of Helm tests that can be run to test the d
 
 ## Integration
 
-Bigbang provides a library helm chart called [Gluon](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon) to help simplify the process of creating both cypress and script helm tests.
+Bigbang provides a library helm chart called [Gluon](https://repo1.dso.mil/big-bang/apps/library-charts/gluon) to help simplify the process of creating both cypress and script helm tests.
 
 To include this library as a subchart in your package repo follow the instructions provided in the pipeline repo [here](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#including-the-gluon-helm-test-library-in-your-package).
 
@@ -90,7 +90,7 @@ echo "END podinfo jwt test"
 echo "-----------------------------------------"
 ```
 
-More information on cypress tests and creating tests with scripts for testing non-UI portions of an app can be found [here](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)
+More information on cypress tests and creating tests with scripts for testing non-UI portions of an app can be found [here](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md)
 
 ## Validation
 

@@ -213,7 +213,7 @@ monitoring:
 
 #### Prometheus
 
-High Availability can be accomplished by increasing the number of replicas for the deployment of Prometheus. [Thanos](https://repo1.dso.mil/big-bang/apps/sandbox/thanos/-/tree/main) must also be installed in the same namespace as the monitoring package in order for data to replicate across pods. An example of a Thanos object storage config using minIO [is located here](https://repo1.dso.mil/big-bang/apps/sandbox/thanos/-/blob/main/tests/test-values.yaml). Thanos also supports cloud object storage endpoints.
+High Availability can be accomplished by increasing the number of replicas for the deployment of Prometheus. [Thanos](https://repo1.dso.mil/big-bang/product/packages/thanos/-/tree/main) must also be installed in the same namespace as the monitoring package in order for data to replicate across pods. An example of a Thanos object storage config using minIO [is located here](https://repo1.dso.mil/big-bang/product/packages/thanos/-/blob/main/tests/test-values.yaml). Thanos also supports cloud object storage endpoints.
 ```yaml
 monitoring:
   values:

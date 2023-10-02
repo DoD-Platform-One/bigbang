@@ -42,7 +42,7 @@ Airgap Deployment is a form of deployment which does not have any direct connect
 ### General Prerequisites
 
 * A kubernetes cluster with container mirroring support. There is a section below that covers mirroring in more detail with examples for supported clusters.
-* BigBang(BB) [release artifacts](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases).
+* BigBang(BB) [release artifacts](https://repo1.dso.mil/big-bang/bigbang/-/releases).
 * Utility Server.
 
 ### Package Specific Prerequisites
@@ -336,7 +336,7 @@ We need a namespace for our preparations and eventually for Big Bang to deploy i
 kubectl create ns bigbang
 ```
 
-Installing Big Bang in an air gap environment currently uses the Helm charts from the **[Big Bang Repo](https://repo1.dso.mil/platform-one/big-bang/bigbang)**.
+Installing Big Bang in an air gap environment currently uses the Helm charts from the **[Big Bang Repo](https://repo1.dso.mil/big-bang/bigbang)**.
 
 All changes are modified in the custom [values.yaml](../../assets/scripts/airgap-dev/values.yaml) file. Modify as needed and replace IP.
 
@@ -469,7 +469,7 @@ The third party guide assumes that you already have or are planning to install B
 Packaging your repository from Git
 
 ```shell
-git clone --no-checkout https://repo1.dso.mil/platform-one/big-bang/apps/third-party/kafka.git && tar -zcvf kafka-repo.tar.gz kafka
+git clone --no-checkout https://repo1.dso.mil/big-bang/apps/third-party/kafka.git && tar -zcvf kafka-repo.tar.gz kafka
 ```
 
 This creates a tar of a full git repo without a checkout. After you have placed this git repo in its destination you can get the files to view by doing.

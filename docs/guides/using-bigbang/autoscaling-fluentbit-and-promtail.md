@@ -1,6 +1,6 @@
 # Installing and Configuring VPA for Vertical Scaling of Fluent Bit and Promtail Pods
 
-Since log forwarder pods like fluentbit & promtail are designed to have 1 pod per node via a ReplicaSet instantiation they are unable to be Horizontally Scaled when reaching their resource limits. They can still be Vertically scaled once [VPA](https://repo1.dso.mil/big-bang/apps/sandbox/vpa) is installed.
+Since log forwarder pods like fluentbit & promtail are designed to have 1 pod per node via a ReplicaSet instantiation they are unable to be Horizontally Scaled when reaching their resource limits. They can still be Vertically scaled once [VPA](https://repo1.dso.mil/big-bang/product/packages/vpa) is installed.
 
 # 1.Prerequisites:
 - Kubernetes cluster running version 1.14 or later
@@ -10,7 +10,7 @@ Since log forwarder pods like fluentbit & promtail are designed to have 1 pod pe
   1. Run the following commands to install the VPA components from the package repo:
 
     
-    git clone https://repo1.dso.mil/big-bang/apps/sandbox/vpa.git
+    git clone https://repo1.dso.mil/big-bang/product/packages/vpa.git
     cd vpa
     helm install vertical-pod-autoscaler chart/
     
@@ -20,7 +20,7 @@ Since log forwarder pods like fluentbit & promtail are designed to have 1 pod pe
       vpa:
         enabled: true
         git:
-          repo: "https://repo1.dso.mil/big-bang/apps/sandbox/vpa.git"
+          repo: "https://repo1.dso.mil/big-bang/product/packages/vpa.git"
           tag: LATEST_TAG
           path: chart
         ...

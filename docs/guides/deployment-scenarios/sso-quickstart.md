@@ -43,9 +43,9 @@ Why 2 VMs? 2 reasons:
 
 ### Additional Auth Service and Keycloak documentation can be found in these locations
 
-* [Authservice](https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice)
+* [Authservice](https://repo1.dso.mil/big-bang/product/packages/authservice)
 * [Authservice Architecture](../../understanding-bigbang/package-architecture/authservice.md)
-* [Keycloak](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak)
+* [Keycloak](https://repo1.dso.mil/big-bang/product/packages/keycloak)
 * [Keycloak Architecture](../../understanding-bigbang/package-architecture/keycloak.md)
 
 ## Step 1: Provision 2 Virtual Machines
@@ -111,7 +111,7 @@ Why 2 VMs? 2 reasons:
     # (Note: 1.30.1 was the last version this guide was tested against)
     #
     # The following will load the latest tagger version of BigBang into an environment variable
-    BIG_BANG_VERSION=$(curl -s https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/base/gitrepository.yaml | grep 'tag:' | awk '{print $2}')
+    BIG_BANG_VERSION=$(curl -s https://repo1.dso.mil/big-bang/bigbang/-/raw/master/base/gitrepository.yaml | grep 'tag:' | awk '{print $2}')
     echo "This script will install Big Bang version: $BIG_BANG_VERSION"
     REGISTRY1_USERNAME="REPLACE_ME"
     REGISTRY1_PASSWORD="REPLACE_ME"
@@ -380,7 +380,7 @@ export REGISTRY1_PASSWORD=\$(cat ~/.bashrc  | grep REGISTRY1_PASSWORD | cut -d \
 export BIG_BANG_VERSION=\$(cat ~/.bashrc  | grep BIG_BANG_VERSION | cut -d \" -f 2)
 
 cd ~
-git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+git clone https://repo1.dso.mil/big-bang/bigbang.git
 cd ~/bigbang
 git checkout tags/\$BIG_BANG_VERSION
 \$HOME/bigbang/scripts/install_flux.sh -u \$REGISTRY1_USERNAME -p \$REGISTRY1_PASSWORD
@@ -554,7 +554,7 @@ twistlock:
 EOF
 
 helm upgrade --install bigbang \$HOME/bigbang/chart \
-  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -626,7 +626,7 @@ helm upgrade --install bigbang \$HOME/bigbang/chart \
   --values \$HOME/bigbang/docs/assets/configs/example/keycloak-dev-values.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/keycloak_qs_demo_values.yaml \
-  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --namespace=bigbang --create-namespace
 EOFdeploy-keycloakEOF
 
@@ -846,7 +846,7 @@ addons:
 EOF
 
 helm upgrade --install bigbang \$HOME/bigbang/chart \
-  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --values \$HOME/ib_creds.yaml \
   --values \$HOME/demo_values.yaml \
   --values \$HOME/auth_service_demo_values.yaml \

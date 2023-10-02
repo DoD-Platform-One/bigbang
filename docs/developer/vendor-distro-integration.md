@@ -20,6 +20,6 @@ A working example for rke2 can be found [here][2] (Note this link is pinned to a
 
 You can find more information about specific jobs in each jobs specific README.md inside [umbrella-templates][1]
 
-[0]: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/pipelines
-[1]: https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/umbrella-templates
-[2]: https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/a1b7926ce05127a57661fe5ff72c6d7a23db0470/.gitlab-ci.yml#L148
+[0]: https://repo1.dso.mil/big-bang/bigbang/-/pipelines
+[1]: https://repo1.dso.mil/big-bang/pipeline-templates/umbrella-templates
+[2]: https://repo1.dso.mil/big-bang/bigbang/-/blob/a1b7926ce05127a57661fe5ff72c6d7a23db0470/.gitlab-ci.yml#L148
