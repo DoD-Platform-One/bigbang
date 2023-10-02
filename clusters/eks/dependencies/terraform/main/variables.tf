@@ -35,7 +35,7 @@ variable "cluster_name" {
 
 variable "ng_desired_size" {
   type    = number
-  default = "3"
+  default = "5"
 }
 
 variable "ng_max_size" {
