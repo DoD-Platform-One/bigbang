@@ -30,8 +30,8 @@ TODO: Make this all happen with a flag in the dev script, this should not be too
 
     ```console
     mkdir certs
-    curl -sS https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml | yq '.istio.gateways.public.tls.key' > certs/tls.key
-    curl -sS https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml | yq '.istio.gateways.public.tls.cert' > certs/tls.crt
+    curl -sS https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml | yq '.istio.gateways.public.tls.key' > certs/tls.key
+    curl -sS https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml | yq '.istio.gateways.public.tls.cert' > certs/tls.crt
     ```
 
 1. Setup a docker registry, mounting the certs to expose this as a TLS (HTTPS) registry.

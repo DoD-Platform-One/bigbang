@@ -83,7 +83,7 @@ Each package (e.g. `istio`, `clusterAuditor`) has configuration to control how B
 | Key | Description | Type | Default |
 |--|--|--|--|
 | `enabled` | Determines if the package will get deployed or skipped | Boolean | `true` (unless its an `addon`) |
-| `git.repo` | Location of the Git repo holding the package deployment resources | URL | `https://repo1.dso.mil/platform-one/big-bang/apps/...`
+| `git.repo` | Location of the Git repo holding the package deployment resources | URL | `https://repo1.dso.mil/big-bang/apps/...`
 | `git.branch` | Branch to use for package deployment resources | string | `chart-release` or `release-vx.x.x` |
 | `git.commit` | SHA of specific commit to use in Git for package deployment resources | SHA | null |
 | `git.tag` | Git tag to use for package deployment resources | string | null |
@@ -128,7 +128,7 @@ In your `kustomization.yaml` under your environment, here is an example of how t
 
 ```yaml
 bases:
-  - https://repo1.dso.mil/platform-one/big-bang/bigbang.git/base/?ref=v1.2.*
+  - https://repo1.dso.mil/big-bang/bigbang.git/base/?ref=v1.2.*
 patchesStrategicMerge:
   - |-
     apiVersion: source.toolkit.fluxcd.io/v1
@@ -155,7 +155,7 @@ metadata:
   namespace: bigbang
 spec:
   interval: 1m
-  url: https://repo1.dso.mil/platform-one/big-bang/customers/template.git
+  url: https://repo1.dso.mil/big-bang/customers/template.git
   ref:
     branch: main
 ---

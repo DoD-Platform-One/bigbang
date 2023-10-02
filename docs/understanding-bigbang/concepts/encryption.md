@@ -97,7 +97,7 @@ TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-o
 
 ## Configure Big Bang
 
-Big Bang needs to know how to retrieve the private key so it can deploy the encrypted secrets from Git. Decryption configuration is placed in the top-level manifest (e.g. `dev.yaml`, `prod.yaml`) from the [Big Bang template](https://repo1.dso.mil/platform-one/big-bang/customers/template).
+Big Bang needs to know how to retrieve the private key so it can deploy the encrypted secrets from Git. Decryption configuration is placed in the top-level manifest (e.g. `dev.yaml`, `prod.yaml`) from the [Big Bang template](https://repo1.dso.mil/big-bang/customers/template).
 
 ### GPG
 

@@ -185,6 +185,6 @@ Gitlab uses S3, Minio, or another S3-style storage for file storage. By default 
 Additional pass-throughs for dependencies that deviate from rationalized standards can be passed using the values: tag in the main Bigbang values.yaml.
 
 ```yaml
-# -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+# -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
     values: {}
 ```
