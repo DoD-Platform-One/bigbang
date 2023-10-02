@@ -75,7 +75,7 @@ variable "agent_instance_type" {
   default = "m5a.4xlarge"
 }
 variable "agent_asg" {
-  default = { min : 3, max : 10, desired : 3, termination_policies : ["Default"]}
+  default = { min : 3, max : 10, desired : 5, termination_policies : ["Default"]}
 }
 variable "agent_spot" {
   default = false
