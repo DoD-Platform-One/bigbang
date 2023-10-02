@@ -77,7 +77,7 @@ fileStore:
 {{- end }}
 ```
 
-Example: [MatterMost](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/templates/mattermost/mattermost/values.yaml#L66-68) passes the endpoint and bucket via chart values.
+Example: [MatterMost](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/mattermost/mattermost/values.yaml#L66-68) passes the endpoint and bucket via chart values.
 
 1. Package chart accepts a secret name where all the object storage connection info is defined. In these cases we make the secret in the BB chart.
 
@@ -90,7 +90,7 @@ objectStorage:
     key: backups
 ```
 
-Example: [GitLab](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/templates/gitlab/values.yaml#L54-57)
+Example: [GitLab](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gitlab/values.yaml#L54-57)
 
 - Create the secret in the Big Bang chart. (NOTE: Replace `<package>` with your package name in the example below)
 
@@ -114,7 +114,7 @@ stringData:
 {{- end }}
 ```
 
-Example: [GitLab secret-objectstore.yaml](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/templates/gitlab/secret-objectstore.yaml)
+Example: [GitLab secret-objectstore.yaml](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gitlab/secret-objectstore.yaml)
 
 ## Validation
 
@@ -138,17 +138,17 @@ For testing with the CI pipeline, create a `tests/dependencies.yaml` and include
 ```yaml
 minioOperator:
   git:
-    repo: "https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git"
+    repo: "https://repo1.dso.mil/big-bang/product/packages/minio-operator.git"
     tag: "4.2.3-bb.2"
   namespace: "minio-operator"
 
 minio:
   git:
-    repo: "https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git"
+    repo: "https://repo1.dso.mil/big-bang/product/packages/minio.git"
     tag: "4.2.3-bb.6"
   namespace: minio
 ```
 
-Example: [Velero dependencies.yaml](https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero/-/blob/main/tests/dependencies.yaml)
+Example: [Velero dependencies.yaml](https://repo1.dso.mil/big-bang/product/packages/velero/-/blob/main/tests/dependencies.yaml)
 
 In order to test that the object storage is working, perform an action that stores a file. For example, if using Mattermost, upload an image for a user avatar.

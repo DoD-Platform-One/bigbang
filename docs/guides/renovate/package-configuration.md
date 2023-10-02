@@ -60,7 +60,7 @@ The first 10 lines set up the basics of what a Renovate ticket is expected to lo
 This is where regex-based rules for updating dependencies are defined. This is where the majority of the work is done for Renovate. 
 
 In this example the version of Big Bang tracked by the base/kustomization.yaml is the target of renovate. 
-The regex targets `- git::https://repo1.dso.mil/platform-one/big-bang/bigbang.git//base?ref=1.41.0` setting `1.41.0` as a capture group.
+The regex targets `- git::https://repo1.dso.mil/big-bang/bigbang.git//base?ref=1.41.0` setting `1.41.0` as a capture group.
 
 ```json
   {

@@ -1393,7 +1393,7 @@ addons:
             runAsNonRoot: true
       bbtests:
         # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
-        # https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio/-/issues/7
+        # https://repo1.dso.mil/big-bang/product/packages/minio/-/issues/7
         # This issue can be reopened if problems reappear.
         enabled: true
         cypress:
@@ -1810,7 +1810,7 @@ addons:
     # -- Toggle deployment of harbor
     enabled: false
 
-    # -- Values to pass through to Habor chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+    # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values: 
       redis:
         external: 

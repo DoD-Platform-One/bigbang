@@ -629,8 +629,8 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.metricsServer.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.harbor.enabled | bool | `false` | Toggle deployment of harbor |
 | addons.harbor.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| addons.harbor.git.repo | string | `"https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git"` |  |
-| addons.harbor.git.tag | string | `"1.12.4-bb.0"` |  |
+| addons.harbor.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/harbor.git"` |  |
+| addons.harbor.git.tag | string | `"1.12.2-bb.7"` |  |
 | addons.harbor.git.path | string | `"./chart"` |  |
 | addons.harbor.helmRepo.repoName | string | `"registry1"` |  |
 | addons.harbor.helmRepo.chartName | string | `"harbor"` |  |
@@ -640,14 +640,14 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.harbor.sso.enabled | bool | `false` | Toggle SSO for Harbor on and off |
 | addons.harbor.sso.client_id | string | `""` | OIDC Client ID to use for Harbor |
 | addons.harbor.sso.client_secret | string | `""` | OIDC Client Secret to use for Harbor |
-| addons.harbor.values | object | `{}` | Values to pass through to Habor chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git |
+| addons.harbor.values | object | `{}` | Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git |
 | addons.harbor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | wrapper | object | `{"git":{"path":"chart","repo":"https://repo1.dso.mil/big-bang/product/packages/wrapper.git","tag":"0.4.1"},"helmRepo":{"chartName":"wrapper","repoName":"registry1","tag":"0.4.1"},"sourceType":"git"}` | Wrapper chart for integrating Big Bang components alongside a package |
 | wrapper.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | wrapper.helmRepo.repoName | string | `"registry1"` | Repository holding OCI chart, corresponding to `helmRepositories` name |
 | wrapper.helmRepo.chartName | string | `"wrapper"` | Name of the OCI chart in `repo` |
 | wrapper.helmRepo.tag | string | `"0.4.1"` | Tag of the OCI chart in `repo` |
-| wrapper.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/wrapper.git"` | Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper |
+| wrapper.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/wrapper.git"` | Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/big-bang/apps/wrapper |
 | wrapper.git.path | string | `"chart"` | Path inside of the git repo to find the helm chart, example: chart |
 | wrapper.git.tag | string | `"0.4.1"` | Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference), example: 0.0.2 |
 | packages | object | `{"sample":{"configMaps":{},"dependsOn":[],"enabled":false,"flux":{},"git":{"branch":null,"commit":null,"path":null,"repo":null,"semver":null,"tag":null},"helmRepo":{"chartName":null,"repoName":null,"tag":null},"istio":{},"kustomize":false,"monitor":{},"network":{},"postRenderers":[],"secrets":{},"values":{},"wrapper":{"enabled":false}}}` | Packages to deploy with Big Bang @default - '{}' |
@@ -669,9 +669,9 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | packages.sample.flux | object | `{}` | Override flux settings for this package |
 | packages.sample.postRenderers | list | `[]` | After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers) |
 | packages.sample.dependsOn | list | `[]` | Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference. |
-| packages.sample.istio | object | `{}` | Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
-| packages.sample.monitor | object | `{}` | Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
-| packages.sample.network | object | `{}` | Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
-| packages.sample.secrets | object | `{}` | Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
-| packages.sample.configMaps | object | `{}` | ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
+| packages.sample.istio | object | `{}` | Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
+| packages.sample.monitor | object | `{}` | Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
+| packages.sample.network | object | `{}` | Package details for network policies.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
+| packages.sample.secrets | object | `{}` | Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
+| packages.sample.configMaps | object | `{}` | ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings. |
 | packages.sample.values | object | `{}` | Values to pass through to package Helm chart |

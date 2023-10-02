@@ -14,7 +14,7 @@
     kubectl get  secret monitoring-monitoring-grafana  -o jsonpath='{.data.admin-password}' | base64 -d
     ```
 
-    Or [review password value within helm chart](https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring/-/blob/main/chart/values.yaml#L708)
+    Or [review password value within helm chart](https://repo1.dso.mil/big-bang/product/packages/monitoring/-/blob/main/chart/values.yaml#L708)
 
 1. Once logged in and directed to the home page, click the menu Dashboard and then select Manage. \
      ![Manage Dashboard Screenshot](../../assets/imgs/guides/grafana-dashboard-manage.jpeg)

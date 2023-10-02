@@ -13,7 +13,7 @@ There are multiple phases of testing for an application to get into a customer e
 
 Big Bang Applications will leverage GitLab Runners to execute these common BigBang Pipelines.  Each Big Bang application is required to use the Big Bang Pipelines, whose functionality is outlined here.
 
-A detailed description of the pipelines and how to execute the testing process on a local system is described in the README.md in <https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates>.  
+A detailed description of the pipelines and how to execute the testing process on a local system is described in the README.md in <https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates>.  
 
 ## Application Testing
 

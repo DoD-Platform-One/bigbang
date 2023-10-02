@@ -44,7 +44,7 @@ Additionally, if your network has a proxy that has custom/internal SSL certifica
 
 ## Important Background Contextual Information
 
-`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/platform-one/big-bang/customers/template) for guidance on production deployments.
+`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/big-bang/customers/template) for guidance on production deployments.
 
 `Details of how each prerequisite/dependency is quickly satisfied:`  
 
@@ -440,7 +440,7 @@ k3d-k3s-default-server-0   Ready    control-plane,master   11m   v1.22.7+k3s1
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 cd ~
-git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+git clone https://repo1.dso.mil/big-bang/bigbang.git
 
 # Checkout version latest stable version of Big Bang
 cd ~/bigbang
@@ -602,7 +602,7 @@ EOF
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 helm upgrade --install bigbang $HOME/bigbang/chart \
-  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --values $HOME/ib_creds.yaml \
   --values $HOME/demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -616,7 +616,7 @@ This makes the command more idempotent by allowing the exact same command to wor
 `bigbang $HOME/bigbang/chart`:  
 bigbang is the name of the helm release that you'd see if you run `helm list -n=bigbang`. `$HOME/bigbang/chart` is a reference to the helm chart being installed.
 
-`--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
+`--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
 References demonstration HTTPS certificates embedded in the public repository. The *.bigbang.dev wildcard certificate is signed by Let's Encrypt, a free public internet Certificate Authority. Note the URL path to the copy of the cert on master branch is used instead of `$HOME/bigbang/chart/ingress-certs.yaml`, because the Let's Encrypt certs expire after 3 months, and if you deploy a tagged release of BigBang, like 1.15.0, the version of the cert stored in the tagged git commit / release of Big Bang could be expired. Referencing the master branches copy via URL ensures you receive the latest version of the cert, which won't be expired.
 
 `--namespace=bigbang --create-namespace`:  
@@ -741,7 +741,7 @@ Note, default credentials for Big Bang packages can be found [here](../using-big
 ## Step 14: Play
 
 Here's an example of post deployment customization of Big Bang.  
-After looking at <https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/values.yaml>  
+After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>  
 It should make sense that the following is a valid edit
 
 ```shell
@@ -754,7 +754,7 @@ addons:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/tinkering.yaml \
@@ -810,7 +810,7 @@ packages:
     # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
-      repo: "https://repo1.dso.mil/big-bang/apps/sandbox/podinfo.git"
+      repo: "https://repo1.dso.mil/big-bang/product/packages/podinfo.git"
       # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
       commit:
       # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
@@ -833,7 +833,7 @@ packages:
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
-    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio:
       hosts:
         - names:
@@ -844,16 +844,16 @@ packages:
             service: missionapp-missionapp
             port: 9898
 
-    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     monitor: {}
 
-    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     network: {}
 
-    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     secrets: {}
 
-    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     configMaps: {}
 
     # -- Values to pass through to package Helm chart
@@ -866,7 +866,7 @@ packages:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/podinfo_wrapper.yaml \

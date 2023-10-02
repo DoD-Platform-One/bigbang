@@ -37,7 +37,7 @@ If your package has an externally facing service (e.g. URL, port), you will need
 
 For `https` connections, Istio will provide end-to-end encryption using TLS termination and mutual TLS to the sidecar.  Therefore, the `http` connection on the pod can be used for the virtual service.
 
-> In some cases, you may have multiple services that need to be exposed.  A separate `VirtualService` should be created for each one.  See [this example](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/1.14.7-bb.2/chart/templates/bigbang/anchore-vs.yaml)
+> In some cases, you may have multiple services that need to be exposed.  A separate `VirtualService` should be created for each one.  See [this example](https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/blob/1.14.7-bb.2/chart/templates/bigbang/anchore-vs.yaml)
 
 ### virtualservice.yaml
 

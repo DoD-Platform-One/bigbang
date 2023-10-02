@@ -31,7 +31,7 @@
         Creates a VPC and subnets for the cluster to be deployed in.
     1. **aws/airgap/package**
 
-        Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for BB [https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases)
+        Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for BB [https://repo1.dso.mil/big-bang/bigbang/-/releases](https://repo1.dso.mil/big-bang/bigbang/-/releases)
 
 1. **airgap up**
 

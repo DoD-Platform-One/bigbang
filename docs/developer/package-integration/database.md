@@ -35,7 +35,7 @@ Add database values for the package in bigbang/chart/values.yaml
     password: ""
 ```
 
-Example: [Anchore](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/values.yaml#L882)
+Example: [Anchore](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/values.yaml#L882)
 
 **Next details the first way packages connect to a pre-existing database.**
 
@@ -66,7 +66,7 @@ postgresql:
 {{- end }}
 ```
 
-Example: [Anchore](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/anchore/values.yaml#L49)
+Example: [Anchore](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/anchore/values.yaml#L49)
 
 **The alternative way packages connect to a pre-existing database is detailed below.**
 
@@ -89,7 +89,7 @@ postgresql:
 {{- end }}
 ```
 
-Example: [Mattermost](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/mattermost/mattermost/values.yaml#L49)
+Example: [Mattermost](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/mattermost/mattermost/values.yaml#L49)
 
 - create manifest that uses database values to create the database secret referenced above
 
@@ -113,7 +113,7 @@ stringData:
 {{- end }}
 ```
 
-Example: [Mattermost](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/mattermost/mattermost/secret-database.yaml)
+Example: [Mattermost](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/mattermost/mattermost/secret-database.yaml)
 
 ## Validation
 

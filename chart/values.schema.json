@@ -1562,7 +1562,7 @@
         "repo": {
           "type": "string",
           "examples": [
-            "https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git"
+            "https://repo1.dso.mil/big-bang/product/packages/loki.git"
           ]
         },
         "path": {
@@ -1602,7 +1602,7 @@
       "additionalProperties": false,
       "examples": [
         {
-          "repo": "https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git",
+          "repo": "https://repo1.dso.mil/big-bang/product/packages/loki.git",
           "path": "./chart",
           "tag": "4.8.0-bb.0"
         }

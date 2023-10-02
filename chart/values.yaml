@@ -1885,7 +1885,7 @@ addons:
       # -- OIDC Client Secret to use for Harbor
       client_secret: ""
 
-    # -- Values to pass through to Habor chart: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+    # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1905,7 +1905,7 @@ wrapper:
     # -- Tag of the OCI chart in `repo`
     tag: "0.4.1"
   git:
-    # -- Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/platform-one/big-bang/apps/wrapper
+    # -- Git repo holding the wrapper helm chart, example: https://repo1.dso.mil/big-bang/product/packages/wrapper
     repo: "https://repo1.dso.mil/big-bang/product/packages/wrapper.git"
     # -- Path inside of the git repo to find the helm chart, example: chart
     path: "chart"
@@ -1967,19 +1967,19 @@ packages:
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
-    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio: {}
 
-    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     monitor: {}
 
-    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     network: {}
 
-    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     secrets: {}
 
-    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     configMaps: {}
 
     # -- Values to pass through to package Helm chart

@@ -833,9 +833,9 @@ component-definition:
       - uuid: 86815b87-fc12-432b-9d0a-77492186ad6e
         control-id: ac-2
         description: |-
-          Big Bang implements a custom plugin to handle account managment, found here (https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/tree/main/development).  Through this plugin logic is implemented to control automated registration and ties into DoD PKI validation/verification. Additionally, this plugin validates group membership in conjunction with Keycloak Clients to prohibit/allow access to various resources behind the single sign on solution.
+          Big Bang implements a custom plugin to handle account managment, found here (https://repo1.dso.mil/big-bang/product/packages/keycloak/-/tree/main/development).  Through this plugin logic is implemented to control automated registration and ties into DoD PKI validation/verification. Additionally, this plugin validates group membership in conjunction with Keycloak Clients to prohibit/allow access to various resources behind the single sign on solution.
 
-            a/c. non-privileged users are prohibited by the keycloak plugin and declarative group structure defined here (https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/tree/main/development). Privileged users follow a similar posture combined with other solutions to prohibit access to resources based on group membership.
+            a/c. non-privileged users are prohibited by the keycloak plugin and declarative group structure defined here (https://repo1.dso.mil/big-bang/product/packages/keycloak/-/tree/main/development). Privileged users follow a similar posture combined with other solutions to prohibit access to resources based on group membership.
             b. Keycloak can be configured for fine grain permissions to assign account managers, additionally the custom plugin allows configuration of groups with specific permissions within the keycloak web UI console.
             d (1-3). Declarative groups specify authorized users, groups, and roles. Access authorizations and assignment is related to Day 2 operations of keycloak and may vary between organizations.
             e. Handled by Day 2 operations of keycloak.
@@ -1066,4 +1066,4 @@ component-definition:
     - uuid: C322D234-BD2A-4332-B8A9-54D45E7148B8
       title: Big Bang
       rlinks:
-      - href: https://repo1.dso.mil/platform-one/big-bang/bigbang
+      - href: https://repo1.dso.mil/big-bang/bigbang
