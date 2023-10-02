@@ -20,7 +20,7 @@ Big Bang is designed in such a way as to be as easily deployed locally as it is 
 
 ## Iron Bank Images
 
-Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
+Per the [charter](https://repo1.dso.mil/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
 
 1) Register for a free Iron Bank account [Here](https://sso-info.il2.dso.mil/new_account.html)
 1) Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
@@ -61,7 +61,7 @@ For more extensive development, use the [Development Guide](./docs/developer).
 
 ## Testing Big Bang Development Changes
 
-Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dso.mil/platform-one/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
+Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dso.mil/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dso.mil/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
 
 Follow the [Big Bang documentation](./docs) for testing a full deployment of Big Bang.
 

@@ -139,12 +139,12 @@ PLATFORM ONE LOGGING WARNING:
 
 {{- if and $.Values.loki.enabled (dig "values" "global" "createGlobalConfig" false $.Values.loki) }}
 PLATFORM ONE LOKI WARNING:
-  You still have Loki global values set but this version of Loki has changed significantly, please review the latest production document within the Loki package repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/-/blob/main/docs/production.md
+  You still have Loki global values set but this version of Loki has changed significantly, please review the latest production document within the Loki package repo: https://repo1.dso.mil/big-bang/product/packages/loki/-/blob/main/docs/production.md
 {{- end }}
 
 {{- if and $.Values.loki.enabled (dig "values" "gel" "enabled" false $.Values.loki) }}
 PLATFORM ONE LOKI WARNING:
-  You still have Loki gel values set but this version of Loki has changed significantly, please review the latest grafana enterprise document within the Loki package repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki/-/blob/main/docs/grafana-enterprise.md
+  You still have Loki gel values set but this version of Loki has changed significantly, please review the latest grafana enterprise document within the Loki package repo: https://repo1.dso.mil/big-bang/product/packages/loki/-/blob/main/docs/grafana-enterprise.md
 {{- end }}
 
 {{- if and $.Values.jaeger.enabled .Values.tempo.enabled }}

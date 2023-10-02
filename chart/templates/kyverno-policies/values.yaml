@@ -465,7 +465,7 @@ policies:
       # FluentBit - `/var/log/flb-storage`: fluent bit buffering and persistent state
       - /var/log/flb-storage/
       # FluentBit - `/var/log`
-      # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/issues/31
+      # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/big-bang/product/packages/fluentbit/-/issues/31
       # Temporarily added so policy could be enforced
       - /var/log
       {{- end }}

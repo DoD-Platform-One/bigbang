@@ -2,7 +2,7 @@
 
 ## Prerequisite
 
-- `images.tar.gz` from [Big Bang Releases](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/releases)
+- `images.tar.gz` from [Big Bang Releases](https://repo1.dso.mil/big-bang/bigbang/-/releases)
 - 40gb disk space
 - docker
 

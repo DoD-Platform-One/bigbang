@@ -82,7 +82,7 @@ Not every deployment need/configuration for a specific package will be represent
 
 Every package has a `values: {}` section where you can set additional variables which are defined in the chart but not exposed in Big Bang's `values.yaml`. To see available values options for a specific package you can check the package repo and view its `chart/values.yaml` file. It is important to note that anything set via `<package>.values` will take precedence over the abstracted or global values configured by Big Bang.
 
-Indentation of these values WILL NOT match the same indentation as the package level. As an example, let's say you want to set the `replicaCount` value for the Kiali package. If you were to check the [Kiali values](https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali/-/blob/c1d7cfcde20b7778b34ef909f49fc9e7cd2f7ec7/chart/values.yaml#L41) you could override the value this way:
+Indentation of these values WILL NOT match the same indentation as the package level. As an example, let's say you want to set the `replicaCount` value for the Kiali package. If you were to check the [Kiali values](https://repo1.dso.mil/big-bang/product/packages/kiali/-/blob/c1d7cfcde20b7778b34ef909f49fc9e7cd2f7ec7/chart/values.yaml#L41) you could override the value this way:
 
 ```yaml
 replicaCount: 3

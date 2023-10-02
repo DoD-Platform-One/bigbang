@@ -27,7 +27,7 @@ You can override bigbang's helm values so istio will provision a service of type
 
 ## BigBang Doesn’t Support PSPs (Pod Security Policies)
 
-* [PSP's are being removed from Kubernetes and will be gone by version 1.25.x](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/10)
+* [PSP's are being removed from Kubernetes and will be gone by version 1.25.x](https://repo1.dso.mil/big-bang/bigbang/-/issues/10)
 * [Open Policy Agent Gatekeeper can enforce the same security controls as PSPs](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/pod-security-policy#pod-security-policies), and is core component of BigBang, which operates as an elevated [validating admission controller](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to audit and enforce various [constraints](https://github.com/open-policy-agent/frameworks/tree/master/constraint) on all requests sent to the kubernetes api server.
 * We recommend users disable PSPs completely given they're being removed, we have a replacement, and PSPs can prevent OPA from deploying (and if OPA is not able to deploy, nothing else gets deployed).
 * Different ways of Disabling PSPs:

@@ -46,7 +46,7 @@ Due to the sensitivity of Keycloak, Big Bang does not support deploying KeyCloak
 
 ### Keycloak's Custom Image
 
-The upstream [Keycloak Helm chart](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak) is customized for use in Platform One.  It contains the following modifications from a standard Keycloak deployment:
+The upstream [Keycloak Helm chart](https://repo1.dso.mil/big-bang/product/packages/keycloak) is customized for use in Platform One.  It contains the following modifications from a standard Keycloak deployment:
 
 - Customized Platform One registration plugin
 

@@ -4,7 +4,7 @@
 
 ## Preface
 
-Please read through the documentation linked here and in the [understanding big bang folder](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/docs/understanding_bigbang) to understand Big Bang concepts and development standards. Study all the documents carefully before you start developing.  
+Please read through the documentation linked here and in the [understanding big bang folder](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/understanding_bigbang) to understand Big Bang concepts and development standards. Study all the documents carefully before you start developing.  
 
 ## Communications
 

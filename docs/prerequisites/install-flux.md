@@ -23,7 +23,7 @@ kubectl create secret docker-registry private-registry \
     --docker-username=$REGISTRY1_USER \
     --docker-password=$REGISTRY1_TOKEN \
     --namespace flux-system
-kubectl apply -f https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/scripts/deploy/flux.yaml
+kubectl apply -f https://repo1.dso.mil/big-bang/bigbang/-/raw/master/scripts/deploy/flux.yaml
 ```
 
 > k apply -f flux.yaml, is equivalent to "flux install", but it installs a version of flux that's been tested and gone through IronBank.
@@ -36,10 +36,10 @@ kubectl get crds | grep flux
 
 ## Advanced Installation
 
-Clone the Big Bang repo and use the awesome installation [scripts](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/tree/master/scripts) directory
+Clone the Big Bang repo and use the awesome installation [scripts](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/scripts) directory
 
 ```shell
-git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+git clone https://repo1.dso.mil/big-bang/bigbang.git
 ./bigbang/scripts/install_flux.sh
 ```
 
