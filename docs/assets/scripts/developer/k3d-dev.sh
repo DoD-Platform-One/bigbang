@@ -23,6 +23,35 @@ function getPrivateIP2() {
   echo `aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress'`
 }
 
+function getDefaultAmi() {
+  local partition
+  local ubuntu_account_id
+  local image_id
+  # extract partition from the ARN
+  partition=$(aws sts get-caller-identity --query 'Arn' --output text | awk -F ":" '{print $2}')
+  # Select the correct AWS Account ID for Ubuntu Server AMI based on the partition
+  if [[ "${partition}" == "aws-us-gov" ]]; then
+      ubuntu_account_id="513442679011"
+  elif [[ "${partition}" == "aws" ]]; then
+      ubuntu_account_id="099720109477"
+  else
+      echo "Unrecognized AWS partition"
+      exit 1
+  fi
+  # Filter on latest 22.04 jammy server
+  image_id=$(aws ec2 describe-images \
+    --owners ${ubuntu_account_id} \
+    --filters 'Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*' \
+    --query 'sort_by(Images,&CreationDate)[-1].ImageId' \
+    --output text)
+
+  if [ $? -ne 0 ] || [ "${image_id}" == "None" ]; then
+      echo "Error getting AMI ID"
+      exit 1
+  fi
+  echo "${image_id}"
+}
+
 #### Global variables - These allow the script to be run by non-bigbang devs easily - Update VPC_ID here or export environment variable for it if not default VPC
 if [[ -z "${VPC_ID}" ]]; then
   VPC_ID="$(aws ec2 describe-vpcs --filters Name=is-default,Values=true | jq -j .Vpcs[0].VpcId)"
@@ -51,7 +80,7 @@ if [[ $AMI_ID ]]; then
   APT_UPDATE="false"
 else
   # default
-  AMI_ID=$(aws ec2 describe-images --filters Name=owner-alias,Values=aws-marketplace Name=architecture,Values=x86_64 Name=name,Values="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" --query 'max_by(Images, &CreationDate).ImageId' --output text)
+  AMI_ID=$(getDefaultAmi)
 fi
 
 #### Preflight Checks
