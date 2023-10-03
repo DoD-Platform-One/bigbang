@@ -56,7 +56,8 @@ spec:
           allowPrivilegeEscalation: false
           privileged: false
           runAsNonRoot: true
-          runAsGroup: 1000
+          runAsGroup: 2001
+          runAsUser: 2001
           capabilities:
             drop:
             - ALL
