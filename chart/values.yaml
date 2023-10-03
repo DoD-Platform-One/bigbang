@@ -18,8 +18,9 @@ istio:
 
 port: 20001
 image:
+  # repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
   repo: registry1.dso.mil/ironbank/opensource/kiali/kiali-operator
-  tag: v1.72.0
+  tag: v1.74.0
   digest: "" # use "sha256" if tag is a sha256 hash (do NOT prefix this value with a "@")
   pullPolicy: IfNotPresent
   pullSecrets:
@@ -50,7 +51,8 @@ securityContext:
   privileged: false
   runAsNonRoot: true
   readOnlyRootFilesystem: true
-  runAsGroup: 1000
+  runAsGroup: 2001
+  runAsUser: 2001
 
 # metrics.enabled: set to true if you want Prometheus to collect metrics from the operator
 metrics:
@@ -148,7 +150,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.72.0
+      image_version: v1.74.1
       image_pull_secrets:
         - private-registry
       ingress_enabled: false
