@@ -1,3 +1,9 @@
+workflow:
+  rules:
+    # skip pipeline for MRs with docs label
+    - if: $CI_MERGE_REQUEST_LABELS =~ /(^|,)kind::docs(,|$)/
+      when: never
+
 variables:
 # So long as the token permissions are the same, we are going to use the renovate token for the bb-bot. 
 # If the bb-bot needs different permissions than renovate, we'll need to generate a token specifically for that function.
