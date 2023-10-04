@@ -165,7 +165,15 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
 {{- end -}}
 
 {{/*
-Prevents auto mounting of K8s API token for "default" ServiceAccount  
+Prevents auto mounting of K8s API token for "default" ServiceAccount
+Accepts a dict in the following format:
+    dict "Namespace" "my-package-namespace" "isIstioEnabled" .Values.istio.enabled
+
+- Namespace determines the namespace to create the roles + post-install Job.
+  This should be unique to the Package that is utilizing this template helper
+  i.e., "Namespace" "tempo"  
+
+- isIstioEnabled determines whether or not to kill the Istio sidecar in the Job
 */}}
 {{- define "hardenDefaultServiceAccount" -}}
 apiVersion: rbac.authorization.k8s.io/v1
