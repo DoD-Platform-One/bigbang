@@ -1555,6 +1555,20 @@ addons:
     plugins:
     - aws
     values:
+      schedules:
+        temp-backup:
+          disabled: false
+          annotations:
+            meta.helm.sh/release-name: velero-velero
+            meta.helm.sh/release-namespace: velero
+          schedule: "0 0 * * *"
+          useOwnerReferencesInBackup: false
+          template:
+            storageLocation: default
+            wait: true
+            selector:
+              app: nginx
+            ttl: "1h"
       serviceAccount:
         server:
           name: velero
