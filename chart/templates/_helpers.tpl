@@ -164,6 +164,93 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
 {{- end -}}
 {{- end -}}
 
+{{/*
+Prevents auto mounting of K8s API token for "default" ServiceAccount  
+*/}}
+{{- define "hardenDefaultServiceAccount" -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+  name: default
+  namespace: {{ .Namespace }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+  name: default
+  namespace: {{ .Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: default
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: {{ .Namespace }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: harden-default-sa-hook
+  namespace: {{ .Namespace }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: true
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      imagePullSecrets:
+      - name: private-registry
+      containers:
+      - name: harden-default-sa-hook
+        image: registry1.dso.mil/ironbank/big-bang/base:2.0.0
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+        command:
+          - /bin/sh
+          - -c
+          - |
+            kubectl patch serviceaccount default --patch '{"automountServiceAccountToken": false}'
+            {{- if .isIstioEnabled }}
+              echo "Killing Istio sidecar"
+              curl -X POST http://localhost:15020/quitquitquit
+            {{- end}}
+            exit 0
+{{- end -}}
+
 {{- /* Helpers below this line are in support of the Big Bang extensibility feature */ -}}
 
 {{- /* Converts the string in . to a legal Kubernetes resource name */ -}}

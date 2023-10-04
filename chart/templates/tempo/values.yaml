@@ -46,6 +46,7 @@ tempoQuery:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 serviceAccount:
+  automountServiceAccountToken: false
   imagePullSecrets:
     - name: private-registry
 

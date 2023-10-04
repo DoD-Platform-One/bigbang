@@ -1,0 +1,4 @@
+{{- if .Values.tempo.enabled }}
+{{- $args := dict "Namespace" "tempo" "isIstioEnabled" .Values.istio.enabled -}}
+{{ include "hardenDefaultServiceAccount" $args }}
+{{- end }}
