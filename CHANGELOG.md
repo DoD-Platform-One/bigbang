@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.10.1]
+### Changed
+- Enabled kind::docs functionality in bigbang-bot
+
 ## [2.10.0]
 ### Changed
 - Increase desired worker node count for RKE2 and EKS pipelines from 3 -> 5
