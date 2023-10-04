@@ -1558,6 +1558,8 @@ addons:
       schedules:
         temp-backup:
           disabled: false
+          labels:
+            app.kubernetes.io/instance: velero
           annotations:
             meta.helm.sh/release-name: velero-velero
             meta.helm.sh/release-namespace: velero
