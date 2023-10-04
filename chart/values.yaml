@@ -1704,7 +1704,7 @@ addons:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
       #tag: "5.0.2-bb.2"
-      branch: "schedule-test"
+      branch: "61-add-schedule-orchestration-to-test-values"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
