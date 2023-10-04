@@ -1599,7 +1599,6 @@ addons:
         scripts:
           envs:
             MINIO_HOST: https://minio-api.bigbang.dev
-            VELERO_TEST: "{{ .Release.Name }}"-temp-backup
 
   keycloak:
     enabled: false
