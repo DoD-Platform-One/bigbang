@@ -1556,7 +1556,7 @@ addons:
     - aws
     values:
       schedules:
-        temp-backup:
+        scheduled-backup:
           disabled: false
           annotations:
             meta.helm.sh/release-name: "{{ .Release.Name }}"
@@ -1579,7 +1579,7 @@ addons:
           default: true
           config:
             region: velero
-            s3ForcePathStyle: "true"
+            s3ForcePathStyle: 'true'
             s3Url: https://minio-api.bigbang.dev
         volumeSnapshotLocation:
         - name: default
@@ -1599,6 +1599,7 @@ addons:
         scripts:
           envs:
             MINIO_HOST: https://minio-api.bigbang.dev
+            SCHEDULED_TESTS: 'true'
 
   keycloak:
     enabled: false
