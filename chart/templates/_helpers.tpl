@@ -174,6 +174,12 @@ Accepts a dict in the following format:
   i.e., "Namespace" "tempo"  
 
 - isIstioEnabled determines whether or not to kill the Istio sidecar in the Job
+
+Example template helper usage:
+{{- if .Values.mypackage.enabled }}
+{{- $args := dict "Namespace" "mypackage" "isIstioEnabled" .Values.istio.enabled -}}
+{{ include "hardenDefaultServiceAccount" $args }}
+{{- end }}
 */}}
 {{- define "hardenDefaultServiceAccount" -}}
 apiVersion: rbac.authorization.k8s.io/v1
