@@ -240,6 +240,9 @@
     "istio": {
       "properties": {
         "enabled": true,
+        "mtls": {
+          "type": "object"
+        },
         "sourceType": true,
         "git": true,
         "helmRepo": true,
