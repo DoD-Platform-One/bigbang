@@ -370,7 +370,8 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.72.0-bb.1"
+    #tag: "1.72.0-bb.1"
+    branch: "66-fix-kiali-cypress-test-broken-from-renovate"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
