@@ -630,7 +630,7 @@ aws/rke2/bigbang down:
     # Allow failure here since Istio might not be up
     - kubectl delete hr istio -n bigbang --wait || true
     # To fix issue with kyverno svc webhook timeouts on helm uninstall. Scaling down replicaSet removes Kyverno validatingwebhooksconfigurations
-    - kubectl scale deploy kyverno-kyverno -n kyverno --replicas 0
+    - kubectl scale deploy kyverno-admission-controller -n kyverno --replicas 0
     # Sleep to be sure kyverno is not running.. Running Kyverno pods will add the validatingwebhooksconfigurations back
     - sleep 2m
     # Helm uninstall + wait (max of 5 minutes) - we don't actually care if BB is completely down
