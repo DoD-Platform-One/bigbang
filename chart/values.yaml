@@ -155,6 +155,10 @@ imagePullPolicy: IfNotPresent
 istio:
   # -- Toggle deployment of Istio.
   enabled: true
+  mtls:
+    # -- STRICT = Allow only mutual TLS traffic,
+    # PERMISSIVE = Allow both plain text and mutual TLS traffic
+    mode: STRICT
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -162,11 +166,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.19.0-bb.0"
+    tag: "1.19.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.19.0-bb.0"
+    tag: "1.19.0-bb.1"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -370,11 +374,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.72.0-bb.1"
+    tag: "1.72.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.72.0-bb.1"
+    tag: "1.72.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -1262,11 +1266,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
-      tag: "0.52.0-bb.6"
+      tag: "0.52.0-bb.7"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab-runner"
-      tag: "0.52.0-bb.6"
+      tag: "0.52.0-bb.7"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
@@ -1796,11 +1800,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
-      tag: "0.25.0-bb.2"
+      tag: "0.25.0-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "vault"
-      tag: "0.25.0-bb.2"
+      tag: "0.25.0-bb.3"
       
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
