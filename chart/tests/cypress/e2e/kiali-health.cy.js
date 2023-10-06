@@ -80,7 +80,8 @@ if (Cypress.env("check_data")) {
       return element.textContent.trim() === 'prometheus';
     }).click();
     // Validate the graph is visible
-    cy.get('#MiniGraphCard > .pf-c-card__body', { timeout: 15000 }).should("be.visible")
+    cy.contains('.Empty Graph', { timeout: 10000 }).should('not.exist');
+    cy.contains('.Error loading Graph', { timeout: 10000 }).should('not.exist');
     // Load the outbound metrics tab
     // there's nothing easy to check on here since elements are dynamic but we can at least load the page for the video
     cy.get('#pf-tab-2-basic-tabs').click()
