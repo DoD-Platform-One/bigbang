@@ -34,6 +34,13 @@ spec:
         kind: HelmRepository
         name: {{ dig "helmRepo" "repoName" "registry1" $vals }}
         namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $vals.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $vals.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $vals.helmRepo.repoName }}
+      {{- end }}
       {{- else }}
       {{- fail (printf "Values for source (git or helmRepo) are required for package %s" $pkg) }}
       {{- end }}

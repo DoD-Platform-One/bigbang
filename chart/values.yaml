@@ -16,6 +16,7 @@ helmRepositories: []
 #   username: ""
 #   password: ""
 #   email: ""
+#   cosignPublicKey: ""
 
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
@@ -1944,6 +1945,9 @@ packages:
       chartName:
       # -- Tag of the chart in the Helm repo, required
       tag:
+      # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI)
+      # @default -- False
+      cosignVerify:
 
     # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:

@@ -306,3 +306,13 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
     {{- printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----" $cert -}}
   {{- end -}}
 {{- end -}}
+
+{{- /* Returns type of Helm Repository */ -}}
+{{- define "getRepoType" -}}
+  {{- $repoName := .repoName -}}
+  {{- range .allRepos -}}
+    {{- if eq .name $repoName -}}
+      {{- print .type -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
