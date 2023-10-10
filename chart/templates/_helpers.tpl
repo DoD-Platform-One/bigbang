@@ -384,3 +384,13 @@ data:
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- /* Returns type of Helm Repository */ -}}
+{{- define "getRepoType" -}}
+  {{- $repoName := .repoName -}}
+  {{- range .allRepos -}}
+    {{- if eq .name $repoName -}}
+      {{- print .type -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
