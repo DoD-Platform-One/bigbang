@@ -1,12 +1,18 @@
 {
   "baseBranches": ["master"],
-  "automerge": false,
-  "gitLabAutomerge": false,
   "configWarningReuseIssue": false,
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "Renovate: Upgrade pipeline-templates Dependencies",
   "draftPR": true,
   "labels": ["pipeline-templates","Package Sustainment","kind::maintenance"],
+  "enabledManagers": ["regex"],
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "matchDatasources": ["github-tags", "docker"],
+      "groupName": "Github"
+    }
+  ],
   "regexManagers": [
     {
       "fileMatch": [
