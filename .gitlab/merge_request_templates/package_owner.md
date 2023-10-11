@@ -25,7 +25,7 @@ Be sure to assign to yourself:
 
 Once it is ready for review switch the status and assign reviewers:
 
-/label ~status::review
+/label status::review
 
 /reviewer @reviewer1 @reviewer2
 -->
