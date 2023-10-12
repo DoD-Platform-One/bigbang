@@ -17,6 +17,14 @@ helmRepositories: []
 #   password: ""
 #   email: ""
 
+# -- Toggle signature verification of OCI artifacts
+verifySignatures: 
+  images:
+   # -- Toggle signature verification of IronBank images. Setting to true will enforce that valid signatures must be present on all images pulled from IronBank. 
+   # Default behavior is false, which will tell Kyverno to audit invalid signatures on IronBank images.
+    ironbank:
+      enabled: false
+ 
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
   registry: registry1.dso.mil

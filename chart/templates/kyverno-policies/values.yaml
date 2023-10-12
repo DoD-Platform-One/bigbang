@@ -160,8 +160,8 @@ policies:
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
-    enabled: false
-    validationFailureAction: audit
+    enabled: true
+    validationFailureAction: {{ .Values.verifySignatures.images.ironbank.enabled | ternary "Enforce" "Audit" }}
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}

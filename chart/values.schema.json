@@ -6,6 +6,7 @@
   "required": [
     "domain",
     "offline",
+    "verifySignatures",
     "helmRepositories",
     "registryCredentials",
     "openshift",
@@ -60,6 +61,45 @@
         }
       ]
     },
+    "verifySignatures": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "object",
+          "required": [
+            "ironbank"
+          ],
+          "properties": {
+            "ironbank": {
+              "type": "object",
+              "description": "Toggle signature verification for ironbank images",
+              "required": [
+                "enabled"
+              ],
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "external": {
+              "type": "object",
+              "required": [
+                "enabled"
+              ],
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }        
+      }
+    },    
     "helmRepositories": {
       "$ref": "#/$defs/helmRepositories"
     },
