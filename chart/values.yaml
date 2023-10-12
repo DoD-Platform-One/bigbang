@@ -166,11 +166,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.19.0-bb.1"
+    tag: "1.19.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.19.0-bb.1"
+    tag: "1.19.0-bb.2"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -1707,11 +1707,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "5.0.2-bb.2"
+      tag: "5.0.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "5.0.2-bb.2"
+      tag: "5.0.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -1743,11 +1743,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "18.4.3-bb.7"
+      tag: "18.4.3-bb.10"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
-      tag: "18.4.3-bb.7"
+      tag: "18.4.3-bb.10"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
