@@ -166,11 +166,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.19.0-bb.1"
+    tag: "1.19.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.19.0-bb.1"
+    tag: "1.19.0-bb.2"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -374,11 +374,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.74.0-bb.1"
+    tag: "1.74.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.74.0-bb.1"
+    tag: "1.74.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -561,11 +561,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.3.1-bb.3"
+    tag: "1.4.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.3.1-bb.3"
+    tag: "1.4.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
