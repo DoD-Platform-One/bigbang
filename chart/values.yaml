@@ -104,7 +104,7 @@ allowAdHocKialiImage: true
 # allowSecurityContextOverride tells the operator to allow a user to be able to fully override the Kiali
 # container securityContext. If this is false, certain securityContext settings must exist on the Kiali
 # container and any attempt to override them will be ignored.
-allowSecurityContextOverride: false
+allowSecurityContextOverride: true
 
 # allowAllAccessibleNamespaces tells the operator to allow a user to be able to configure Kiali
 # to access all namespaces in the cluster via spec.deployment.accessible_namespaces=['**'].
@@ -165,6 +165,15 @@ cr:
         limits:
           cpu: 200m
           memory: 368Mi
+      security_context:
+        capabilities:
+          drop:
+            - ALL
+        privileged: false
+        run_as_non_root: true
+        run_as_group: 2001
+        run_as_user: 2001
+        allow_privilege_escalation: false
 
     auth:
       strategy: "anonymous"
