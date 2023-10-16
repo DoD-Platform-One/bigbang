@@ -218,7 +218,7 @@ policies:
   {{- end }}
 
   require-drop-all-capabilities:
-    validationFailureAction: audit
+    validationFailureAction: Audit
     {{- if .Values.neuvector.enabled }}
     exclude:
       any:
@@ -234,7 +234,7 @@ policies:
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
     enabled: false
-    validationFailureAction: audit
+    validationFailureAction: Audit
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
@@ -256,7 +256,7 @@ policies:
           - istio-system
 
   require-non-root-group:
-    validationFailureAction: audit
+    validationFailureAction: Enforce
     {{- if .Values.istio.enabled }}
     parameters:
       excludeContainers:
@@ -309,7 +309,7 @@ policies:
     {{- end }}
 
   require-non-root-user:
-    validationFailureAction: audit
+    validationFailureAction: Audit
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
@@ -375,7 +375,7 @@ policies:
   {{- end }}
 
   restrict-capabilities:
-    validationFailureAction: audit
+    validationFailureAction: Audit
     # NEEDS FURTHER JUSTIFICATION
     # Twistlock Defenders require the following capabilities
     # - NET_ADMIN  - Process monitoring and Iptables
