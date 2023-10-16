@@ -377,6 +377,7 @@ policies:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     validationFailureAction: Enforce
 =======
     validationFailureAction: Audit
@@ -390,6 +391,9 @@ policies:
 =======
     validationFailureAction: Audit
 >>>>>>> 347e2eb8 (set non-root-group to enforce)
+=======
+    validationFailureAction: Audit
+>>>>>>> 25af885b (set non-root-group to enforce)
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
