@@ -1,6 +1,7 @@
 #!/bin/bash
 
-K3D_VERSION="5.5.1"
+K3D_VERSION="5.6.0"
+DEFAULT_K3S_TAG="v1.27.6+k3s1"
 
 # get the current script dir
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -603,7 +604,7 @@ if [[ -z "${PrivateIP2}" ]]; then
 fi
 
 # Selecting K8S version through the use of a K3S image tag
-K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:="${DEFAULT_K3S_TAG}"}
 if [[ $K3S_IMAGE_TAG ]]; then
   echo "Using custom K3S image tag $K3S_IMAGE_TAG..."
   k3d_command+=" --image docker.io/rancher/k3s:$K3S_IMAGE_TAG"
