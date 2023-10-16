@@ -356,6 +356,7 @@ policies:
   require-non-root-user:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     validationFailureAction: Enforce
 =======
     validationFailureAction: Audit
@@ -363,6 +364,9 @@ policies:
 =======
     validationFailureAction: Audit
 >>>>>>> d7011b76 (set non-root-group to enforce)
+=======
+    validationFailureAction: Audit
+>>>>>>> 5ee4b34d (set non-root-group to enforce)
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
