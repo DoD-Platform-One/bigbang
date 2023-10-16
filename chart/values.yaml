@@ -960,11 +960,12 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
-    tag: "0.13.0-bb.2"
+    #tag: "0.13.0-bb.2"
+    branch: cypress-test
   helmRepo:
     repoName: "registry1"
     chartName: "twistlock"
-    tag: "0.13.0-bb.2"
+    tag: "0.13.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
