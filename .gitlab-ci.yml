@@ -1,0 +1,9 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    ref: Automate-Release-Notes
+    file: '/pipelines/bigbang.yaml'
+variables:
+  PIPELINE_REPO_BRANCH: "Automate-Release-Notes"
+  DEBUG_ENABLED: "true"
+  CI_DEBUG_TRACE: "true"
+  # CI_DEFAULT_BRANCH: test-automated-release-notes
