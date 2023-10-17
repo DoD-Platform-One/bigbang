@@ -321,7 +321,12 @@ policies:
           namespaces: 
           - neuvector
           names:
+<<<<<<< HEAD
           - neuvector*
+=======
+          - neuvector-enforcer*
+          - neuvector-controller*
+>>>>>>> 40e887cf (add exception for neuvector enforcer and controller pods)
       {{- end }}
     {{- end }}
 
