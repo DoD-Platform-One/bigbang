@@ -33,6 +33,8 @@ before_script:
   - python3 -m venv ./venv
   - source venv/bin/activate
   - python3 -m pip install -r requirements.txt
+  - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin #required for SBOM module
+  - syft --version #for debugging
 
 bb-bot:on-schedule-gitlab:
   stage: scheduled
