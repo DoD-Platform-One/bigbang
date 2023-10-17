@@ -512,7 +512,8 @@ kyvernoPolicies:
   flux: {}
 
   # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
-  values: {}
+  values:
+    validationFailureAction: "audit"
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
@@ -763,7 +764,10 @@ neuvector:
   flux: {}
 
   # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
-  values: {}
+  values:
+    k3s:
+      enabled: true
+
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
