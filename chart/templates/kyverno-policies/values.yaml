@@ -262,7 +262,7 @@ policies:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
     exclude:
       any:
       {{- if $deployNodeAgent }}
@@ -305,6 +305,15 @@ policies:
           - promtail
           names:
           - promtail-promtail*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
+      - resources: 
+          namespaces: 
+          - neuvector
+          names:
+          - neuvector-enforcer*
+          - neuvector-controller*
       {{- end }}
     {{- end }}
 
