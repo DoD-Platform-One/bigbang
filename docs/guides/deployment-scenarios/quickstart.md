@@ -44,7 +44,7 @@ Additionally, if your network has a proxy that has custom/internal SSL certifica
 
 ## Important Background Contextual Information
 
-`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/big-bang/customers/template) for guidance on production deployments.
+`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/platform-one/big-bang/customers/template) for guidance on production deployments.
 
 `Details of how each prerequisite/dependency is quickly satisfied:`  
 
@@ -440,7 +440,7 @@ k3d-k3s-default-server-0   Ready    control-plane,master   11m   v1.22.7+k3s1
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 cd ~
-git clone https://repo1.dso.mil/big-bang/bigbang.git
+git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
 
 # Checkout version latest stable version of Big Bang
 cd ~/bigbang
@@ -602,7 +602,7 @@ EOF
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 helm upgrade --install bigbang $HOME/bigbang/chart \
-  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --values $HOME/ib_creds.yaml \
   --values $HOME/demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -616,7 +616,7 @@ This makes the command more idempotent by allowing the exact same command to wor
 `bigbang $HOME/bigbang/chart`:  
 bigbang is the name of the helm release that you'd see if you run `helm list -n=bigbang`. `$HOME/bigbang/chart` is a reference to the helm chart being installed.
 
-`--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
+`--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
 References demonstration HTTPS certificates embedded in the public repository. The *.bigbang.dev wildcard certificate is signed by Let's Encrypt, a free public internet Certificate Authority. Note the URL path to the copy of the cert on master branch is used instead of `$HOME/bigbang/chart/ingress-certs.yaml`, because the Let's Encrypt certs expire after 3 months, and if you deploy a tagged release of BigBang, like 1.15.0, the version of the cert stored in the tagged git commit / release of Big Bang could be expired. Referencing the master branches copy via URL ensures you receive the latest version of the cert, which won't be expired.
 
 `--namespace=bigbang --create-namespace`:  
@@ -672,18 +672,18 @@ Means it will install the bigbang helm chart in the bigbang namespace and create
 * `helm list -n=bigbang` should also show STATUS deployed
 
   ```console
-  NAME                           	NAMESPACE        	REVISION	UPDATED                                	STATUS  	CHART                            	APP VERSION
-  bigbang                        	bigbang          	1       	2022-03-31 12:07:49.239343968 +0000 UTC	deployed	bigbang-1.30.1
-  cluster-auditor-cluster-auditor	cluster-auditor  	1       	2022-03-31 12:14:23.004377605 +0000 UTC	deployed	cluster-auditor-1.4.0-bb.0       	0.0.4
-  eck-operator-eck-operator      	eck-operator     	1       	2022-03-31 12:09:52.921098159 +0000 UTC	deployed	eck-operator-2.0.0-bb.0          	2.0.0
-  gatekeeper-system-gatekeeper   	gatekeeper-system	1       	2022-03-31 12:07:53.52890717 +0000 UTC 	deployed	gatekeeper-3.7.1-bb.0            	v3.7.1
-  istio-operator-istio-operator  	istio-operator   	1       	2022-03-31 12:07:55.111321595 +0000 UTC	deployed	istio-operator-1.13.2-bb.1       	1.13.2
-  istio-system-istio             	istio-system     	1       	2022-03-31 12:08:23.439981427 +0000 UTC	deployed	istio-1.13.2-bb.0                	1.13.2
-  jaeger-jaeger                  	jaeger           	1       	2022-03-31 12:12:58.068313509 +0000 UTC	deployed	jaeger-operator-2.29.0-bb.0      	1.32.0
-  kiali-kiali                    	kiali            	1       	2022-03-31 12:12:57.011215896 +0000 UTC	deployed	kiali-operator-1.47.0-bb.1       	1.47.0
-  logging-ek                     	logging          	1       	2022-03-31 12:10:52.785810021 +0000 UTC	deployed	logging-0.7.0-bb.0               	7.17.1
-  logging-fluent-bit             	logging          	1       	2022-03-31 12:12:53.27612266 +0000 UTC 	deployed	fluent-bit-0.19.20-bb.1          	1.8.13
-  monitoring-monitoring          	monitoring       	1       	2022-03-31 12:10:02.31254196 +0000 UTC 	deployed	kube-prometheus-stack-33.2.0-bb.0	0.54.1
+  NAME                            NAMESPACE         REVISION  UPDATED                                STATUS          CHART                           APP VERSION
+bigbang                           bigbang           1        2023-09-18 15:48:39.651431366 -0500 CDT deployed        bigbang-2.10.0
+istio-operator-istio-operator     istio-operator    1        2023-09-18 20:50:31.522101782 +0000 UTC deployed        istio-operator-1.18.2-bb.0      1.18.2
+istio-system-istio                istio-system      1        2023-09-18 20:50:58.942212635 +0000 UTC deployed        istio-1.18.2-bb.1               1.18.2
+kiali-kiali                       kiali             1        2023-09-18 20:52:15.392959584 +0000 UTC deployed        kiali-1.71.0-bb.1               1.71.0
+kyverno-kyverno                   kyverno           1        2023-09-18 20:49:06.538077892 +0000 UTC deployed        kyverno-2.7.2-bb.0              v1.9.2
+kyverno-kyverno-policies          kyverno           1        2023-09-18 20:49:57.998138903 +0000 UTC deployed        kyverno-policies-1.1.0-bb.9     1.1.0
+kyverno-reporter-kyverno-reporter kyverno-reporter  1        2023-09-18 20:52:17.113894032 +0000 UTC deployed        kyverno-reporter-2.16.0-bb.1    2.12.0
+logging-loki                      logging           1        2023-09-18 20:52:39.287416477 +0000 UTC deployed        loki-5.15.0-bb.0                2.8.4
+monitoring-grafana                monitoring        1        2023-09-18 20:52:30.818051548 +0000 UTC deployed        grafana-6.58.9-bb.3             10.0.3
+monitoring-monitoring             monitoring        1        2023-09-18 20:51:29.441411817 +0000 UTC deployed        monitoring-48.3.1-bb.0          v0.66.0
+tempo-tempo                       tempo             1        2023-09-18 20:52:38.867112179 +0000 UTC deployed        tempo-1.2.0-bb.5                2.1.1
   ```
 
 ## Step 12: Edit Your Workstation’s Hosts File To Access the Web Pages Hosted on the Big Bang Cluster
@@ -696,12 +696,11 @@ kubectl get vs -A
 
 ```console
 NAMESPACE    NAME                                      GATEWAYS                  HOSTS                          AGE
-logging      kibana                                    ["istio-system/public"]   ["kibana.bigbang.dev"]         10m
-monitoring   monitoring-monitoring-kube-alertmanager   ["istio-system/public"]   ["alertmanager.bigbang.dev"]   10m
-monitoring   monitoring-monitoring-kube-grafana        ["istio-system/public"]   ["grafana.bigbang.dev"]        10m
-monitoring   monitoring-monitoring-kube-prometheus     ["istio-system/public"]   ["prometheus.bigbang.dev"]     10m
-kiali        kiali                                     ["istio-system/public"]   ["kiali.bigbang.dev"]          8m21s
-jaeger       jaeger                                    ["istio-system/public"]   ["tracing.bigbang.dev"]        7m46s
+monitoring   monitoring-monitoring-kube-prometheus     ["istio-system/public"]   ["prometheus.bigbang.dev"]     2m45s
+monitoring   monitoring-monitoring-kube-alertmanager   ["istio-system/public"]   ["alertmanager.bigbang.dev"]   2m45s
+kiali        kiali                                     ["istio-system/public"]   ["kiali.bigbang.dev"]          2m12s
+monitoring   monitoring-grafana-grafana                ["istio-system/public"]   ["grafana.bigbang.dev"]        117s
+tempo        tempo-query                               ["istio-system/public"]   ["tracing.bigbang.dev"]        109s
 ```
 
 ### Linux/Mac Users
@@ -741,7 +740,7 @@ Note, default credentials for Big Bang packages can be found [here](../using-big
 ## Step 14: Play
 
 Here's an example of post deployment customization of Big Bang.  
-After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>  
+After looking at <https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/values.yaml>  
 It should make sense that the following is a valid edit
 
 ```shell
@@ -754,7 +753,7 @@ addons:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/tinkering.yaml \
@@ -810,7 +809,7 @@ packages:
     # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
-      repo: "https://repo1.dso.mil/big-bang/product/packages/podinfo.git"
+      repo: "https://repo1.dso.mil/big-bang/apps/sandbox/podinfo.git"
       # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
       commit:
       # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
@@ -833,7 +832,7 @@ packages:
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
-    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio:
       hosts:
         - names:
@@ -844,16 +843,16 @@ packages:
             service: missionapp-missionapp
             port: 9898
 
-    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     monitor: {}
 
-    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     network: {}
 
-    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     secrets: {}
 
-    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     configMaps: {}
 
     # -- Values to pass through to package Helm chart
@@ -866,7 +865,7 @@ packages:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/podinfo_wrapper.yaml \
@@ -953,4 +952,31 @@ If the NeuVector pods fail to open, and you look at the K8s logs only to find th
 sudo sysctl fs.inotify.max_queued_events=616384
 sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
+```
+
+### WSL2 
+This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2
+
+#### NeuVector "Failed to get container"
+In you receive a similar error to the above "Failed to get container" with NeuVector it could be because of the cgroup configurations in WSL2.  WSL2 often tries to run both cgroup and cgroup v2 in a unified manner which can confuse docker and affect deployments.  To remedy this you need to create a .wslconfig file in the C:\Users\<UserName>\ directory.  In this file you need to add:
+
+```shell
+[wsl2]
+kernelCommandLine = cgroup_no_v1=all
+```
+
+Once created you need to restart wsl2.
+
+If this doesn't remedy the issue and the cgroup.controllers file is still located in the /sys/fs/cgroup/unified directory you may have to modify /etc/fstab and add 
+
+```shell
+cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0
+```
+
+#### Container fails to start "Not enough memory"
+Wsl2 limits the amount of memory available to half of what your computer has.  If you have 32g or less (16g or less available) this is often not enough to run all of the standard big bang services.  If you have more available memory you can modify the initial limit by modifying (or creating) the C:\Users\<UserName>\.wslconfig file by adding:
+
+```shell
+[wsl2]
+memory=24GB
 ```
