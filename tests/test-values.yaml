@@ -426,6 +426,8 @@ kyvernoPolicies:
                     -----END PUBLIC KEY-----
           - imageReferences:
             - "registry1.dso.mil/ironbank/*"
+            mutateDigest: false
+            verifyDigest: false            
             attestors:
             - count: 1
               entries:
