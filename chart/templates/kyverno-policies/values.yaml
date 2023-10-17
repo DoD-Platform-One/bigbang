@@ -327,7 +327,7 @@ policies:
     {{- end }}
 
   require-non-root-user:
-    validationFailureAction: Enforce
+    validationFailureAction: Audit
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
