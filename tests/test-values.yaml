@@ -867,12 +867,10 @@ twistlock:
       localVolumeUpgrade: true
     bbtests:
       enabled: true
-      cypress:
-        envs:
-          cypress_baseUrl: "https://twistlock.bigbang.dev"
       scripts:
         envs:
-          twistlock_host: "https://twistlock.bigbang.dev"
+          twistlock_host: "https://twistlock-console.twistlock.svc.cluster.local:8083"
+          desired_version: "{{ .Values.console.image.tag }}"
 
 # Addons are toggled based on labels in CI
 addons:
