@@ -740,7 +740,7 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.6.3-bb.0"
+    branch: "kyverno_perms"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
