@@ -238,6 +238,7 @@ policies:
   require-non-root-user:
     validationFailureAction: audit
     {{ if .Values.istio.enabled }}
+    #test istio-init exclude
     parameters:
       excludeContainers:
         - istio-init
