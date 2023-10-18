@@ -867,6 +867,9 @@ twistlock:
       localVolumeUpgrade: true
     bbtests:
       enabled: true
+      scripts:
+        envs:
+          twistlock_host: "https://twistlock.bigbang.dev"
 
 # Addons are toggled based on labels in CI
 addons:
