@@ -867,11 +867,7 @@ twistlock:
       localVolumeUpgrade: true
     bbtests:
       enabled: true
-      scripts:
-        envs:
-          twistlock_host: "https://twistlock-console.twistlock.svc.cluster.local:8083"
-          desired_version: "{{ .Values.console.image.tag }}"
-          
+
 # Addons are toggled based on labels in CI
 addons:
   argocd:
