@@ -315,7 +315,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
-          - fortify/fortify-cypress-test
+          - fortify/fortify-ssc-cypress-test
           - harbor/harbor-cypress-test
           - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
