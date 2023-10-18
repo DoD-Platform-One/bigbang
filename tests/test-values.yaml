@@ -516,6 +516,12 @@ kyvernoPolicies:
               - fortify
               names:
               - "*-cypress-test*"
+          - resources:
+              namespaces:
+              - neuvector
+              names:
+              - "neuvector-enforcer-*"
+              - "neuvector-manager-*"
         parameters:
           allow:
           - /tmp/allowed
