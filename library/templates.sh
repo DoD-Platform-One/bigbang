@@ -384,9 +384,19 @@ bigbang_publish() {
 }
 
 bigbang_release() {
+   mkdir -p readme
+    # Creates the correct file name i.e instead of 2.9.0 for the commit tag it changes it to 2-9-0 as is expected
+   release_notes_filename=$(echo "${CI_COMMIT_TAG}" | awk -F- '{gsub(/\./, "-", $1); print $1}')
+    # Dogfood URL with the current release tag
+  curl --header "Private-Token: $RELEASE_NOTES_TOKEN" "https://repo1.dso.mil/api/v4/projects/3617/repository/files/docs%2Frelease%2Frelease-notes-${release_notes_filename}.md/raw?ref=master" -o readme/releasenotes.md
+
+   release_notes=$(cat readme/releasenotes.md)
+
+   echo $release_notes
+
    echo -e "\e[0Ksection_start:`date +%s`:bb_release[collapsed=true]\r\e[0K\e[33;1mRelease\e[37m"
      release-cli create --name "Big Bang ${CI_COMMIT_TAG}" --tag-name ${CI_COMMIT_TAG} \
-       --description "Automated release notes are a WIP." \
+       --description "$release_notes" \
        --assets-link "{\"name\":\"${CHECKSUM_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${CHECKSUM_FILE}\"}" \
        --assets-link "{\"name\":\"${IMAGE_LIST}\",\"url\":\"${RELEASE_ENDPOINT}/${IMAGE_LIST}\"}" \
        --assets-link "{\"name\":\"${PACKAGE_IMAGE_FILE}\",\"url\":\"${RELEASE_ENDPOINT}/${PACKAGE_IMAGE_FILE}\"}" \
