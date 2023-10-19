@@ -954,3 +954,29 @@ sudo sysctl fs.inotify.max_queued_events=616384
 sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
 ```
+### WSL2 
+This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2
+
+#### NeuVector "Failed to get container"
+In you receive a similar error to the above "Failed to get container" with NeuVector it could be because of the cgroup configurations in WSL2.  WSL2 often tries to run both cgroup and cgroup v2 in a unified manner which can confuse docker and affect deployments.  To remedy this you need to create a .wslconfig file in the C:\Users\<UserName>\ directory.  In this file you need to add:
+
+```shell
+[wsl2]
+kernelCommandLine = cgroup_no_v1=all
+```
+
+Once created you need to restart wsl2.
+
+If this doesn't remedy the issue and the cgroup.controllers file is still located in the /sys/fs/cgroup/unified directory you may have to modify /etc/fstab and add 
+
+```shell
+cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0
+```
+
+#### Container fails to start "Not enough memory"
+Wsl2 limits the amount of memory available to half of what your computer has.  If you have 32g or less (16g or less available) this is often not enough to run all of the standard big bang services.  If you have more available memory you can modify the initial limit by modifying (or creating) the C:\Users\<UserName>\.wslconfig file by adding:
+
+```shell
+[wsl2]
+memory=24GB
+```
