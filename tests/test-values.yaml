@@ -650,7 +650,7 @@ elasticsearchKibana:
           cypress_kibana_url: "https://kibana.bigbang.dev"
 
 fluentbit:
-  enabled: false
+  enabled: true
   values:
     securityContext:
       privileged: true
