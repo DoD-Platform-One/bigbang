@@ -955,7 +955,7 @@ sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
 ```
 ### Failed to provide IP to istio-system/public-ingressgateway
-As one option to provide IP to the istio-system/public-ingressgateway metallb can be run. The following steps will demonstrate a standard configuration however some changes may need to be made for each individual system (specific /ets/hosts addresses, etc.)
+As one option to provide IP to the istio-system/public-ingressgateway, metallb can be run. The following steps will demonstrate a standard configuration, however, some changes may need to be made for each individual system (specific /ets/hosts addresses, etc.)
 
 #### Step 1: K3d deploy
 To facilitate metallb, servicelb needs to be disabled on the initial install.  Replace the above k3d deploy command with the following.
