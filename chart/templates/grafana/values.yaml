@@ -101,6 +101,7 @@ datasources:
     {{- if .Values.monitoring.enabled }}
     - name: Prometheus
       type: prometheus
+      uid: prometheus
       access: proxy
       url: http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090
       editable: true
