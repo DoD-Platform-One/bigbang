@@ -456,6 +456,7 @@ policies:
           - neuvector
           names:
           - neuvector-controller-pod*
+          - neuvector-enforcer-pod*
       {{- end }}
     {{- end }}
     {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
