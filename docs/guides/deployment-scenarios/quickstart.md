@@ -971,7 +971,7 @@ k3d cluster create \
   --api-port 6443
 ```
 
-### Step 2: Deploy MetalLB
+#### Step 2: Deploy MetalLB
 After following the above instructions to deploy flux, deploy the metallb controller and speaker.
 ```shell
 kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
