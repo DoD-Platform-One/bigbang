@@ -418,11 +418,11 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
-    tag: "1.5.0-bb.8"
+    tag: "1.5.0-bb.9"
   helmRepo:
     repoName: "registry1"
     chartName: "cluster-auditor"
-    tag: "1.5.0-bb.8"
+    tag: "1.5.0-bb.9"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -480,11 +480,11 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
-    tag: "3.0.0-bb.7"
+    tag: "3.0.0-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno"
-    tag: "3.0.0-bb.7"
+    tag: "3.0.0-bb.8"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -960,11 +960,11 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
-    tag: "0.13.0-bb.3"
+    tag: "0.13.0-bb.5"
   helmRepo:
     repoName: "registry1"
     chartName: "twistlock"
-    tag: "0.13.0-bb.3"
+    tag: "0.13.0-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -1007,11 +1007,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.46.7-bb.2"
+      tag: "5.46.7-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.46.7-bb.2"
+      tag: "5.46.7-bb.3"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -1095,11 +1095,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
-      tag: "5.0.9-bb.0"
+      tag: "5.0.10-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-operator"
-      tag: "5.0.9-bb.0"
+      tag: "5.0.10-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
@@ -1120,11 +1120,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
-      tag: "5.0.9-bb.2"
+      tag: "5.0.10-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-instance"
-      tag: "5.0.9-bb.2"
+      tag: "5.0.10-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}

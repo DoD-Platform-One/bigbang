@@ -873,9 +873,6 @@ twistlock:
       localVolumeUpgrade: true
     bbtests:
       enabled: true
-      cypress:
-        envs:
-          cypress_baseUrl: "https://twistlock.bigbang.dev"
       scripts:
         envs:
           twistlock_host: "https://twistlock.bigbang.dev"
