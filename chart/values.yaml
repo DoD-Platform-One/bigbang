@@ -626,7 +626,7 @@ eckOperator:
 
 fluentbit:
   # -- Toggle deployment of Fluent-Bit.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
