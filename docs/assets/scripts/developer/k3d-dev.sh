@@ -688,7 +688,22 @@ fi
 # Handle MetalLB cluster resource creation
 if [[ "${METAL_LB}" == true || "${ATTACH_SECONDARY_IP}" == true ]]; then
   echo "Installing MetalLB..."
-  run "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"
+
+  if [[ -z "${REGISTRY1_USERNAME}" ]] || [[ -z "${REGISTRY1_PASSWORD}" ]]; then
+    read -p "Registry1 Username: " REGISTRY1_USERNAME
+    read -p "Registry1 Password: " REGISTRY1_PASSWORD
+  fi
+  run "kubectl create namespace metallb-system"
+  run "kubectl create secret docker-registry registry1 \
+    --docker-server=registry1.dso.mil \
+    --docker-username=${REGISTRY1_USERNAME} \
+    --docker-password=${REGISTRY1_PASSWORD} \
+    -n metallb-system"
+
+  run "mkdir /tmp/metallb"
+  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/metallb/* ubuntu@${PublicIP}:/tmp/metallb
+  run "kubectl apply -k /tmp/metallb"
+
 	# Wait for controller to be live so that validating webhooks function when we apply the config
 	echo "Waiting for MetalLB controller..."
 	run "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
