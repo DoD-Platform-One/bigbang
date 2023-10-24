@@ -411,6 +411,8 @@ kyvernoPolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
+        enabled: true
+        validationFailureAction: enforce
         parameters:
           require:
           - imageReferences:
@@ -424,6 +426,8 @@ kyvernoPolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
                     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
                     -----END PUBLIC KEY-----
+            mutateDigest: false
+            verifyDigest: false 
           - imageReferences:
             - "registry1.dso.mil/ironbank/*"
             attestors:
