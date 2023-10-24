@@ -93,16 +93,19 @@ podAnnotations:
   {{- end }}
 {{- end }}
 
-{{- if or .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
+{{- if or .Values.monitoring.enabled .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
 datasources:
   datasourcesbb.yaml:
     apiVersion: 1
     datasources:
+    {{- if .Values.monitoring.enabled }}
     - name: Prometheus
       type: prometheus
+      uid: prometheus
       access: proxy
       url: http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090
       editable: true
+    {{- end }}
     {{- if .Values.addons.argocd.enabled }}
     - name: Argo Master
       type: redis-datasource
