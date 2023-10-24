@@ -662,7 +662,7 @@ promtail:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
-    tag: "6.15.0-bb.3"
+    tag: "6.15.3-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "promtail"
