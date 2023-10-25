@@ -1444,14 +1444,25 @@ create_bigbang_merge_request() {
     ## Push changes and create merge request
     git add ${VALUES_FILE} 1>/dev/null
     git commit -m "Updated ${valuesKey} git tag" 1>/dev/null
-    git push --set-upstream origin ${BB_SOURCE_BRANCH} \
-      -o merge_request.create \
-      -o merge_request.title="Draft: ${valuesKey} update to ${CI_COMMIT_TAG}" \
-      -o merge_request.label="status::review"	\
-      -o merge_request.label="bot::mr"	\
-      -o merge_request.label=${valuesKey} \
-      ${BB_MR_ASSIGNEE} 1>/dev/null
-
+    ## Enable fluentbit package for BB MRs if testing elasticsearchKibana. Not a helm dependency but required for testing in pipelines.
+    if [ "$valuesKey" == "elasticsearchKibana" ]; then
+      git push --set-upstream origin ${BB_SOURCE_BRANCH} \
+        -o merge_request.create \
+        -o merge_request.title="Draft: ${valuesKey} update to ${CI_COMMIT_TAG}" \
+        -o merge_request.label="status::review"	\
+        -o merge_request.label="bot::mr"	\
+        -o merge_request.label=${valuesKey} \
+        -o merge_request.label=fluentbit \
+        ${BB_MR_ASSIGNEE} 1>/dev/null
+    else
+      git push --set-upstream origin ${BB_SOURCE_BRANCH} \
+        -o merge_request.create \
+        -o merge_request.title="Draft: ${valuesKey} update to ${CI_COMMIT_TAG}" \
+        -o merge_request.label="status::review"	\
+        -o merge_request.label="bot::mr"	\
+        -o merge_request.label=${valuesKey} \
+        ${BB_MR_ASSIGNEE} 1>/dev/null
+    fi
 
     ## Update merge request with reviewers and a description
 
