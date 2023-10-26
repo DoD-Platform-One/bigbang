@@ -150,7 +150,7 @@ cr:
     # custom_dashboards: []
     deployment:
       image_name: registry1.dso.mil/ironbank/opensource/kiali/kiali
-      image_version: v1.74.1
+      image_version: v1.75.1
       image_pull_secrets:
         - private-registry
       ingress_enabled: false
