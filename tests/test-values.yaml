@@ -1817,10 +1817,7 @@ addons:
     enabled: false
 
     # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
-    values: 
-      redis:
-        external: 
-          addr: "harbor-redis-bb-headless:6379"
+    values:
       expose:
         type: clusterIP
         tls:

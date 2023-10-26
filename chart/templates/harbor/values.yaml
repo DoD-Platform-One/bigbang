@@ -17,6 +17,7 @@ domain: {{ .Values.domain }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.harbor }}
   harbor:
     gateways:
     - istio-system/{{ default "public" .Values.addons.harbor.ingress.gateway }}
