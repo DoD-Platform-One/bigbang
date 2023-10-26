@@ -21,4 +21,14 @@ From the root of the repo run, kpt pkg update chart@<v1.x.x> --strategy alpha-gi
 
 8. Perform the steps below for manual testing. CI provides a good set of basic smoke tests but it is beneficial to run some additional checks.
 
-Manually testing steps TBD
+# Manual testing steps
+
+1. Browse to https://kiali.bigbang.dev/kiali/ and log on through SSO. 
+
+1. On the main menu, choose Overview and verify that the panels that appear populate and that there are no errors. 
+
+1. Still on the main menu, choose Workloads, then kiali. Click Inbound Metrics, then Outbound Metrics. Verify that graphs populate for at least some of the items in both.
+
+1. Click on Traces and verify that at least some traces appear on the graph. 
+
+Note: The notification bell on the upper right will be red and you will see error pop-ups near it as you move between screens if there are errors. Errors on individual application listings for labels, etc are expected and OK.
