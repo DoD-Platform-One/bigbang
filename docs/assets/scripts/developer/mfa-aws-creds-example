@@ -1,0 +1,7 @@
+[bigbang]
+region = us-gov-west-1
+## REPLACE WITH YOUR EXISTING ACCESS KEYS FOR YOUR DEV ACCOUNT
+aws_access_key_id = XXXXXXXXXXXXXXXXXXXXX
+aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+[default]
+region=us-gov-west-1
