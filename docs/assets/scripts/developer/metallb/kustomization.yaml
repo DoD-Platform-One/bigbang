@@ -1,0 +1,47 @@
+resources:
+  - https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
+
+images:
+  - name: quay.io/metallb/controller
+    newName: registry1.dso.mil/ironbank/opensource/metallb/controller
+    newTag: v0.13.12
+  - name: quay.io/metallb/speaker
+    newName: registry1.dso.mil/ironbank/opensource/metallb/speaker
+    newTag: v0.13.12
+
+patches:
+  - target:
+      kind: Deployment
+      name: controller
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: controller
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+              - name: registry1
+            securityContext:
+              fsGroup: 65532
+              runAsNonRoot: true
+              runAsUser: 65532
+              runAsGroup: 65532
+  - target:
+      kind: DaemonSet
+      name: speaker
+    patch: |-
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: speaker
+      spec:
+        template:
+          spec:
+            imagePullSecrets:
+              - name: registry1
+            securityContext:
+              fsGroup: 65532
+              runAsUser: 0
+
