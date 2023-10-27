@@ -786,7 +786,7 @@ tempo:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
-    tag: "null"
+    tag: null
     branch: "fix-save-data-source-cypress-test"
   helmRepo:
     repoName: "registry1"
