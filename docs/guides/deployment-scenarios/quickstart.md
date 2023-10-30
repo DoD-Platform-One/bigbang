@@ -954,6 +954,85 @@ sudo sysctl fs.inotify.max_queued_events=616384
 sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
 ```
+### Failed to provide IP to istio-system/public-ingressgateway
+As one option to provide IP to the istio-system/public-ingressgateway, metallb can be run. The following steps will demonstrate a standard configuration, however, some changes may need to be made for each individual system (specific /ets/hosts addresses, etc.)
+
+#### Step 1: K3d deploy
+To facilitate metallb, servicelb needs to be disabled on the initial install.  Replace the above k3d deploy command with the following.
+```shell
+k3d cluster create \
+  --k3s-arg "--tls-san=$SERVER_IP@server:0" \
+  --volume /etc/machine-id:/etc/machine-id \
+  --volume ${IMAGE_CACHE}:/var/lib/rancher/k3s/agent/containerd/io.containerd.content.v1.content \
+  --k3s-arg "--disable=traefik@server:0" \
+  --k3s-arg "--disable=servicelb@server:0" \
+  --port 80:80@loadbalancer \
+  --port 443:443@loadbalancer \
+  --api-port 6443
+```
+
+#### Step 2: Deploy MetalLB
+After following the above instructions to deploy flux, deploy the metallb controller and speaker.
+```shell
+kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
+```
+Wait for the pods to be running:
+```shell
+kubectl get po -n metallb-system
+```
+
+```console
+NAME                          READY   STATUS    RESTARTS   AGE
+controller-5684477f66-s99jg   1/1     Running   0          30s
+speaker-jrddv                 1/1     Running   0          30s
+```
+
+#### Step 3: Configure MetalLB
+Note: This step will not work if either the controller or speaker are not in a running condition.
+
+The following configuration addresses will need to be filled with the values that match your configuration. These can typically be found by looking at your docker subnet using the 'docker network ls' command.  If there is no subnet currently configured you can use the following as an example to set up your subnet. 'docker network create --opt com.docker.network.bridge.name=$NETWORK_NAME $NETWORK_NAME --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.x.x.x/16 --gateway 172.x.x.x'. Be sure to replace the network name, subnet and gateway values as needed.
+
+```shell
+export SUBNET_RANGE=172.x.x.x-172.x.x.x
+cat << EOF > ~/metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+  - $SUBNET_RANGE
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement1
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default
+EOF
+
+kubectl create -f $HOME/metallb-config.yaml
+```
+#### Step 4: Configure /etc/hosts
+Lastly configure /etc/hosts/ with the new IP Addresses (you can add your own as needed for services). You will need to fill in the values used for the subnet.
+```shell
+  export PASSTHROUGH_GATEWAY_IP=172.x.x.x
+  export PUBLIC_GATEWAY_IP=172.x.x.x
+  sudo sed -i '/bigbang.dev/d' /etc/hosts
+  sudo bash -c "echo '## begin bigbang.dev section (METAL_LB)' >> /etc/hosts"
+  sudo bash -c "echo $PASSTHROUGH_GATEWAY_IP keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo $PUBLIC_GATEWAY_IP anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+  # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+  kubectl get configmap -n kube-system coredns -o yaml | sed '/^    $PASSTHROUGH_GATEWAY_IP host.k3d.internal$/a\ \ \ \ $PASSTHROUGH_GATEWAY_IP keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+  kubectl delete pod -n kube-system -l k8s-app=kube-dns
+```
+
+From this point continue with the helm upgrade command above.
+
 ### WSL2 
 This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2
 
