@@ -30,7 +30,7 @@ collectorGitlabSCM:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-scm
-    tag: "3.0.0"
+    tag: "3.0.2"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-scm-0
@@ -45,7 +45,7 @@ collectorGitlabBuild:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-build
-    tag: "3.0.0"
+    tag: "3.0.2"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-build-0
@@ -60,7 +60,7 @@ collectorGitlabWorkflow:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-workflow
-    tag: "3.0.0"
+    tag: "3.0.2"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-workflow-0
@@ -95,7 +95,7 @@ collectorJiraWorkflow:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-jira-workflow
-    tag: "3.0.0"
+    tag: "3.0.2"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: jira-workflow-0
@@ -108,6 +108,26 @@ collectorJiraWorkflow:
       MAX_REQUESTS_PER_MINUTE: 500
 {{- else }}
 collectorJiraWorkflow:
+  instances: []
+{{- end }}
+{{- if .Values.addons.sonarqube.enabled }}
+collectorSonarQubeProjectAnalysis:
+  replicas: 1
+  image:
+    repository: registry1.dso.mil/ironbank/holocron/collector-sonarqube-project-analysis
+    tag: "3.0.2"
+    pullPolicy: IfNotPresent
+  instances:
+  - accessTokenSecretKey: sonarqube-project-analysis-0
+    env:
+      COLLECTOR_NAME: sonarqube-project-analysis-0
+      COLLECTOR_INTERVAL_SECONDS: 600
+      LOOK_BACK_DAYS: 365
+      TARGET_URL: "http://sonarqube-sonarqube.gitlab.svc.cluster.local:9000"
+      COLLECTOR_TARGETS_INTRVL_SECS: 86400
+      MAX_REQUESTS_PER_MINUTE: 500
+{{- else }}
+collectorSonarQubeProjectAnalysis:
   instances: []
 {{- end }}
 
@@ -152,6 +172,9 @@ networkPolicies:
     {{- end }}
     {{- if .Values.addons.holocron.jira.enabled }}
     {{ toYaml .Values.addons.holocron.jira.service.label | nindent 4 }}
+    {{- end }}
+    {{- if .Values.addons.sonarqube.enabled }}
+    app: sonarqube
     {{- end }}
 
 monitoring:

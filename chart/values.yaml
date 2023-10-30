@@ -1880,10 +1880,11 @@ addons:
       enabled: false
       service:
       # -- The service name to communicate with
-        name:
+        name: ""
         # -- If network policies are enabled, a label to match the namespace for egress policy
         # -- Ensure you create a matching ingress policy for Jira
-        label: {}
+        label:
+          key: value
 
     # -- Flux reconciliation overrides specifically for the Holocron Package
     flux: {}
