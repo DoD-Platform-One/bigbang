@@ -614,7 +614,6 @@ policies:
         serviceAccounts:
         - istio-operator
         pods:
-        - istiod-* 
         - istio-operator-*
 
 
