@@ -1865,12 +1865,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
-      tag: "1.13.0-bb.1"
+      tag: "1.13.0-bb.3"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "harbor"
-      tag: "1.13.0-bb.1"
+      tag: "1.13.0-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
