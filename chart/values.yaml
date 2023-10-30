@@ -687,7 +687,9 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.31.0-bb.0"
+    #tag: "5.31.0-bb.0"
+    branch: "mas-istio-stuff"
+    #tag: "5.23.1-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
@@ -700,13 +702,8 @@ loki:
   strategy: monolith
 
   objectStorage:
-    # -- Object storage type to use for Loki, setting to s3 will assume an external, pre-existing object storage is to be used.
-    # Entering connection info will enable this option and will auto-create any required secrets
-    type: "minio" # supported types are "s3" or "minio"
-
     # -- S3 compatible endpoint to use for connection information.
     # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
-    # If using iamProfile for connection, endpoint must be left as an empty string: ""
     endpoint: ""
 
     # -- S3 compatible region to use for connection information.

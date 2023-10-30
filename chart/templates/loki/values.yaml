@@ -55,11 +55,14 @@ loki:
     bucketNames:
       {{- toYaml .Values.loki.objectStorage.bucketNames | nindent 6 }}
     s3:
+      {{- if (eq .Values.loki.objectStorage.iamProfile "") }}
       endpoint: {{ .Values.loki.objectStorage.endpoint }}
+      {{- end }}
       region: {{ .Values.loki.objectStorage.region }}
-      {{- if and (not (eq .Values.loki.objectStorage.accessKey "")) (not (eq .Values.loki.objectStorage.accessSecret "")) }}
-      accessKeyId: {{ .Values.loki.objectStorage.accessKey }}
-      secretAccessKey: {{ .Values.loki.objectStorage.accessSecret }}
+      #//{{- if and (not (eq .Values.loki.objectStorage.accessKey "")) (not (eq .Values.loki.objectStorage.accessSecret "")) }}
+      {{- with .Values.loki.objectStorage }}
+      accessKeyId: {{ .accessKey }}
+      secretAccessKey: {{ .accessSecret }}
     {{- end }}
     {{- end }}
   {{- if (eq .Values.loki.strategy "monolith") }}
@@ -74,12 +77,33 @@ loki:
       shared_store: filesystem
     filesystem:
       directory: /var/loki/chunks
-  {{- end }}
-  {{- if and (eq $.Values.loki.objectStorage.type "s3") }}
+  {{- else }}
   storage_config:
+    boltdb_shipper:
+      active_index_directory: /var/loki/boltdb-shipper-active
+      cache_location: /var/loki/boltdb-shipper-cache
+      cache_ttl: 24h
+      shared_store: s3
+    hedging:
+      at: 250ms
+      max_per_second: 20
+      up_to: 3
+    tsdb_shipper:
+      active_index_directory: /var/loki/tsdb-index
+      cache_location: /var/loki/tsdb-cache
+      shared_store: s3
+      cache_ttl: 24h
+  {{- end }}
+  {{- if and (eq .Values.loki.strategy "scalable") .Values.loki.objectStorage.iamProfile }}
     aws:
-      region: {{ $.Values.loki.objectStorage.region }}
+      s3: s3://{{ .Values.loki.objectStorage.region }}/{{ .Values.loki.objectStorage.bucketNames.chunks }}
+      region: {{ .Values.loki.objectStorage.region }}
       s3forcepathstyle: false
+  rulerConfig:
+    storage:
+      s3:
+        s3: s3://{{ .Values.loki.objectStorage.region }}/{{ .Values.loki.objectStorage.bucketNames.ruler }}
+      type: s3
   {{- end }}
   {{- if .Values.istio.enabled }}
   podAnnotations:
@@ -92,16 +116,17 @@ singleBinary:
 {{- end }}
 
 {{- with .Values.loki.objectStorage }}
-{{- if and (eq $.Values.loki.strategy "scalable") (eq .type "minio") }}
+{{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
   enabled: true
 
 {{- end }}
-{{- if and (eq $.Values.loki.strategy "scalable") (eq .type "s3") (not (eq $.Values.loki.objectStorage.iamProfile "")) }}
+{{- if and (eq $.Values.loki.strategy "scalable") (not (eq $.Values.loki.objectStorage.iamProfile "")) }}
 serviceAccount:
   create: true
   annotations:
     eks.amazonaws.com/role-arn: {{ $.Values.loki.objectStorage.iamProfile }}
+{{- end }}
 
 {{- end }}
 {{- end }}
