@@ -561,8 +561,7 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: ""
-    branch: "92-resolve-cypress-tests-in-bb-pipelines"
+    tag: "1.6.1-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
