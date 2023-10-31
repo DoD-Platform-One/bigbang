@@ -891,6 +891,15 @@ addons:
       client_secret: anything-for-dev
       groups: |
         g, Impact Level 2 Authorized, role:admin
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
+      path: "./chart"
+      tag: ""
+      branch: "dd/update-gluon-dep"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "argocd"
+      tag: "5.46.7-bb.6"
     values:
       sso:
         rbac:
@@ -947,6 +956,15 @@ addons:
         cypress:
           envs:
             cypress_url: "https://argocd.bigbang.dev"
+        istio:
+          sidecar:
+            resources:
+              cpu:
+                requests: 100m
+                limits: 2000m
+              memory:
+                requests: 512Mi
+                limits: 2048Mi
 
   authservice:
     enabled: false
