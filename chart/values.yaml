@@ -692,7 +692,7 @@ loki:
     repoName: "registry1"
     chartName: "loki"
     tag: "5.31.0-bb.2"
-
+  
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
 
