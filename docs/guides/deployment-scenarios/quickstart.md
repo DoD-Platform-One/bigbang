@@ -172,19 +172,19 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
-    # The following downloads the 64 bit linux version of k3d v5.4.1, checks it
+    # The following downloads the 64 bit linux version of k3d v5.5.1, checks it
     # against a copy of the sha256 checksum, if they match k3d gets installed
-    wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.4.1/k3d-linux-amd64 > k3d
+    wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.5.1/k3d-linux-amd64 > k3d
 
-    echo 50f64747989dc1fcde5db5cb82f8ac132a174b607ca7dfdb13da2f0e509fda11 k3d | sha256sum -c | grep OK
-    # 50f64747989dc1fcde5db5cb82f8ac132a174b607ca7dfdb13da2f0e509fda11 came from running the following against a trusted internet connection.
-    # wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.4.1/k3d-linux-amd64 | sha256sum | cut -d ' ' -f 1
+    echo 4849027dc5e835bcce49070af3f4eeeaada81d96bce49a8b89904832a0c3c2c0 k3d | sha256sum -c | grep OK
+    # 4849027dc5e835bcce49070af3f4eeeaada81d96bce49a8b89904832a0c3c2c0 came from running the following against a trusted internet connection.
+    # wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.5.1/k3d-linux-amd64 | sha256sum | cut -d ' ' -f 1
 
     if [ $? == 0 ]; then chmod +x k3d && sudo mv k3d /usr/local/bin/k3d; fi
 
 
     # Alternative command (less safe due to curl | bash, but more generic):
-    # wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.4.1 bash
+    # wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
     ```
 
 1. Verify k3d installation
@@ -195,8 +195,8 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     ```
 
     ```console
-    k3d version v5.4.1
-    k3s version v1.22.7-k3s1 (default)
+    k3d version v5.5.1
+    k3s version v1.26.4-k3s1 (default)
     ```
 
 1. Install kubectl
@@ -926,7 +926,7 @@ After completing step 5, if you are unable to connect to external DNS providers 
 
 ### Documentation References for command line tools used
 * Kubectl - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands 
-* k3d - https://k3d.io/v5.4.3/usage/k3s/
+* k3d - https://k3d.io/v5.5.1/usage/k3s/
 * Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
 * Helm - https://helm.sh/docs/helm/helm/
 
