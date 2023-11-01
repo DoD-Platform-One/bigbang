@@ -2,7 +2,7 @@
 {{- $gitCredsDict := dict
   "name" "anchore"
   "packageGitScope" .Values.addons.anchore.git
-  "outerScope" .
+  "rootScope" .
   "releaseName" .Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

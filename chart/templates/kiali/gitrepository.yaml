@@ -2,7 +2,7 @@
 {{- $gitCredsDict := dict
   "name" "kiali"
   "packageGitScope" .Values.kiali.git
-  "outerScope" .
+  "rootScope" .
   "releaseName" .Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

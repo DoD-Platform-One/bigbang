@@ -2,7 +2,7 @@
 {{- $gitCredsDict := dict
   "name" "tempo"
   "packageGitScope" .Values.tempo.git
-  "outerScope" .
+  "rootScope" .
   "releaseName" .Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

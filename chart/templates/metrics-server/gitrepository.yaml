@@ -6,7 +6,7 @@
 {{- $gitCredsDict := dict
   "name" "metricsServer"
   "packageGitScope" .Values.addons.metricsServer.git
-  "outerScope" .
+  "rootScope" .
   "releaseName" .Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

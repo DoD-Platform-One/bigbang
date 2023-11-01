@@ -94,7 +94,7 @@ Flux's source controller uses the [GitRepository](https://fluxcd.io/docs/compone
 {{- $gitCredsDict := dict
   "name" $pkg
   "packageGitScope" (get .Values pkg).git
-  "outerScope" .
+  "rootScope" .
   "releaseName" $.Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

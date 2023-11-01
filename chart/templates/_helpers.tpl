@@ -71,7 +71,6 @@ secretRef:
 Build the appropriate git credentials secret for individual package and BB wide private git repositories
 */}}
 {{- define "gitCredsExtended" -}}
-{{- if .outerScope -}}
 {{- if .packageGitScope.existingSecret -}}
 secretRef:
   name: {{ .packageGitScope.existingSecret }}
@@ -80,12 +79,8 @@ secretRef:
 secretRef:
   name: {{ .releaseName }}-{{ .name }}-git-credentials
 {{- else -}}
-{{/* If no credentials are specified, use the global credentials in the outerScope */}}
-{{- include "gitCredsGlobal" .outerScope }}
-{{- end -}}
-{{- else -}}
-{{/* If no outerScope is specified, use the global credentials */}}
-{{- include "gitCredsGlobal" . }}
+{{/* If no credentials are specified, use the global credentials in the rootScope */}}
+{{- include "gitCredsGlobal" .rootScope }}
 {{- end -}}
 {{- end -}}
 

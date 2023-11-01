@@ -10,7 +10,7 @@
 {{- $gitCredsDict := dict
   "name" $pkg
   "packageGitScope" $vals.git
-  "outerScope" $
+  "rootScope" $
   "releaseName" $pkg
 }}
 apiVersion: source.toolkit.fluxcd.io/v1

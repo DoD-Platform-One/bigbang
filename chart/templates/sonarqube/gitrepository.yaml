@@ -2,7 +2,7 @@
 {{- $gitCredsDict := dict
   "name" "sonarqube"
   "packageGitScope" .Values.addons.sonarqube.git
-  "outerScope" .
+  "rootScope" .
   "releaseName" .Release.Name
 }}
 apiVersion: source.toolkit.fluxcd.io/v1
