@@ -114,6 +114,41 @@ policies:
       {{- end }}
   {{- end }}
 
+  # -- Prevent Automounting of Kubernetes API Credentials on Pods and Service Accounts
+  disallow-auto-mount-service-account-token:
+    enabled: true
+    validationFailureAction: Audit
+    exclude:
+      any:
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          kinds:
+          - Pod
+          names:
+          - gitlab-shared-secrets*
+      {{- end }}
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          kinds:
+          - ServiceAccount
+          names:
+          - gitlab-runner
+      {{- end }}
+      {{- if .Values.kyvernoReporter.enabled }}
+      - resources:
+          namespaces:
+          - kyverno-reporter 
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - kyverno-reporter*
+      {{- end }}
+
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
     exclude:
