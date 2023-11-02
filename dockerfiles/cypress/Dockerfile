@@ -1,5 +1,5 @@
 FROM cypress/included:9.7.0
-LABEL version="1.1.1"
+LABEL version="1.1.0"
 
 # renovate: depName=kubernetes/kubectl
 ENV KUBECTL_VERSION=1.26.0
