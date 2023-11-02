@@ -851,14 +851,17 @@ monitoring:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
 
+  thanos:
+    objstoreConfig: ""
+
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "51.10.0-bb.0"
+    tag: "51.10.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "51.10.0-bb.0"
+    tag: "51.10.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -909,11 +912,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "6.60.6-bb.0"
+    tag: "6.60.6-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "6.60.6-bb.0"
+    tag: "6.60.6-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
@@ -1895,6 +1898,39 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
+  # ----------------------------------------------------------------------------------------------------------------------
+  # thanos
+  #
+  thanos:
+    # -- Toggle deployment of thanos
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
+      tag: "12.13.12-bb.2"
+      path: "./chart"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "thanos"
+      tag: "12.13.12-bb.2"
+
+    # -- Flux reconciliation overrides specifically for the Jaeger Package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+      
+    # -- Configure the object storage for Thanos.  
+    # The monitoring.prometheus thanos-sidecar and Thanos will use this configuration if defined 
+    objstoreConfig: ""
+
+    values: {}
+
+    postRenderers: []
 
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:

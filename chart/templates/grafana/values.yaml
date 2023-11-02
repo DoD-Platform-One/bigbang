@@ -99,12 +99,21 @@ datasources:
     apiVersion: 1
     datasources:
     {{- if .Values.monitoring.enabled }}
+    {{- if .Values.addons.thanos.enabled }}
+    - name: Thanos
+      type: prometheus
+      uid: prometheus
+      access: proxy
+      url: http://thanos-query.thanos.svc:9090
+      editable: true
+    {{- else }}
     - name: Prometheus
       type: prometheus
       uid: prometheus
       access: proxy
       url: http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090
       editable: true
+    {{- end }}
     {{- end }}
     {{- if .Values.addons.argocd.enabled }}
     - name: Argo Master

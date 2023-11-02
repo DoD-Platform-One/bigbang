@@ -1,0 +1,14 @@
+{{- $pkg := "thanos" }}
+{{- if (get .Values.addons $pkg).enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $pkg }}
+  labels:
+    {{- if .Values.istio.enabled }}
+    istio-injection: enabled
+    {{- end }}
+    app.kubernetes.io/name: {{ $pkg }}
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}

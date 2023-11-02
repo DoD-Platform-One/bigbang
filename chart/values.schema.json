@@ -685,6 +685,9 @@
         "ingress": {
           "$ref": "#/$defs/ingress"
         },
+        "thanos": {
+          "type": "object"
+        },
         "sso": {
           "type": "object",
           "properties": {
@@ -1060,6 +1063,13 @@
           }
         },
         "harbor": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
+        },
+        "thanos": {
           "allOf": [
             {
               "$ref": "#/$defs/basePackage"

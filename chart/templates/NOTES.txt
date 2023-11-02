@@ -398,3 +398,13 @@ DEPRECATION NOTICE:
   Please reconfigure your values overrides to use .Values.addons.mattermostOperator
 {{- end }}
 
+{{- if and $.Values.addons.thanos.enabled (not (dig "values" "prometheus" "prometheusSpec" "replicas" "" $.Values.monitoring)) }}
+PLATFORM ONE THANOS WARNING:
+  You have enabled Thanos with the default Prometheus replicas set to 1.  For production deployments, 
+  you can increase the number of replicas by adding:
+  monitoring:
+    values:
+      prometheus:
+        prometheusSpec:
+          replicas: 3
+{{- end }}
