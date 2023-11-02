@@ -1,0 +1,62 @@
+{{- $pkg := "thanos" }}
+
+{{- /* Create secret */ -}}
+{{- if (get .Values.addons $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values.addons $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.thanos" -}}
+
+imagePullSecrets:
+- name: private-registry
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+externalURL: https://thanos.{{ .Values.domain }}
+
+domain: {{ .Values.domain }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  thanos:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.thanos.ingress.gateway }}
+    
+{{- with .Values.addons.thanos.objectStorage }}
+{{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
+minio:
+  enabled: true
+{{- end }}
+{{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.thanos.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+query:
+  dnsDiscovery:
+    # to allow lookups to work with and without Istio enabled, we disable k8s dns service
+    # discovery and manually set stores: below.
+    #
+    # With Istio, the combination of headless service + TCP port will create an entry
+    # for each pod IP:PORT and that makes communication via IP:PORT viable
+    enabled: false
+  {{- if or .Values.monitoring.enabled (dig "values" "storegateway" "enabled" false .Values.addons.thanos) }}
+  stores:
+  {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - dns+monitoring-monitoring-kube-thanos-discovery.monitoring.svc.cluster.local:10901
+    {{- end }}
+    {{- if (dig "values" "storegateway" "enabled" false .Values.addons.thanos) }}
+    - dns+thanos-storegateway.thanos.svc.cluster.local:10901
+    {{- end }}
+    
+objstoreConfig: {{- toYaml (tpl (dig "values" "objstoreConfig" "" .Values.addons.thanos) .) | indent 2 }}
+
+{{- end }}
