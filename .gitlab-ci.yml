@@ -1,7 +1,7 @@
 include:
   - project: 'big-bang/pipeline-templates/pipeline-templates'
     ref: 156-docker-image-build
-    file: '/pipelines/docker.yaml' 
+    file: '/pipelines/pipeline-templates.yaml' 
 variables:
   PIPELINE_REPO_BRANCH: "156-docker-image-build"
   CI_DEFAULT_BRANCH: test-docker-image-build-master
@@ -9,7 +9,7 @@ variables:
   # CI_COMMIT_TAG: "1.12.4-bb.5"
   # BB_AUTO_MR_TOKEN: ${USERNAME_FORK_TOKEN}
   # BB_REPO: repo1.dso.mil/big-bang/bigbang
-  BB_PROJECT_ID: 2327
-  HARBOR_BB_REPO: "bigbang-staging"
-  DOCKERFILE_PATH: dockerfiles/bb-ci/Dockerfile
-  DOCKER_DIR: dockerfiles/bb-ci/
+  # BB_PROJECT_ID: 2327
+  # HARBOR_BB_REPO: "bigbang-staging"
+  # DOCKERFILE_PATH: dockerfiles/bb-ci/Dockerfile
+  # DOCKER_DIR: dockerfiles/bb-ci/
