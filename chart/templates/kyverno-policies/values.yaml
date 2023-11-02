@@ -322,6 +322,7 @@ policies:
           - neuvector
           names:
           - neuvector*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
