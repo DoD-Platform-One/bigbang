@@ -632,6 +632,27 @@ policies:
       {{- end }}
   {{- end }}
 
+  update-automountserviceaccounttokens:
+    enabled: true
+    namespaces:
+      - namespace: istio-system
+        serviceAccounts:
+        - istiod
+        - istio-reader-service-account
+        - public-ingressgateway-service-account
+        - passthrough-ingressgateway-service-account 
+        pods:
+        - istiod-*
+        - passthrough-ingressgateway-*
+        - public-ingressgateway-*
+      - namespace: istio-operator
+        serviceAccounts:
+        - istio-operator
+        pods:
+        - istiod-*
+        - istio-operator-*
+
+
 {{- end }}
 
 {{- /* This function merges defaults in lists from above into overlays */ -}}
