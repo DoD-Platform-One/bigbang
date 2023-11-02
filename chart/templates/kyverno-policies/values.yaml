@@ -160,7 +160,7 @@ policies:
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   require-istio-on-namespaces:
