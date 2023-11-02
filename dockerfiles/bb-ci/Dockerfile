@@ -8,6 +8,7 @@
 # Update library/templates.yaml -> .util-image -> image with the latest image
 
 FROM golang:1.13 AS builder
+LABEL version="2.11.0"
 
 # Download build dependencies
 RUN apt-get update && apt-get install -y \
