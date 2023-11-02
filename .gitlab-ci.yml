@@ -12,3 +12,4 @@ variables:
   BB_PROJECT_ID: 2327
   HARBOR_BB_REPO: "bigbang-staging"
   DOCKERFILE_PATH: dockerfiles/bb-ci/Dockerfile
+  DOCKER_DIR: dockerfiles/bb-ci/
