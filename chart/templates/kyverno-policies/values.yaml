@@ -322,11 +322,16 @@ policies:
           - neuvector
           names:
 <<<<<<< HEAD
+<<<<<<< HEAD
           - neuvector*
 =======
           - neuvector-enforcer*
           - neuvector-controller*
 >>>>>>> 40e887cf (add exception for neuvector enforcer and controller pods)
+=======
+          - neuvector-enforce-pod*
+          - neuvector-controller-pod*
+>>>>>>> 4fd8d849 (update neuvector pod names)
       {{- end }}
     {{- end }}
 
