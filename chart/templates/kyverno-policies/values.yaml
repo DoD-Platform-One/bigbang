@@ -328,6 +328,7 @@ policies:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           - neuvector*
 =======
           - neuvector-enforcer*
@@ -355,6 +356,10 @@ policies:
           - neuvector-enforcer*
           - neuvector-controller*
 >>>>>>> 73171fda (add exception for neuvector enforcer and controller pods)
+=======
+          - neuvector-enforce-pod*
+          - neuvector-controller-pod*
+>>>>>>> ae215278 (update neuvector pod names)
       {{- end }}
     {{- end }}
 
