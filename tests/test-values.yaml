@@ -856,7 +856,7 @@ neuvector:
           cypress_url: https://neuvector.bigbang.dev
 
 twistlock:
-  enabled: false
+  enabled: true
   sso:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
@@ -877,7 +877,7 @@ twistlock:
 # Addons are toggled based on labels in CI
 addons:
   argocd:
-    enabled: false
+    enabled: true
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_argocd
@@ -942,7 +942,7 @@ addons:
             cypress_url: "https://argocd.bigbang.dev"
 
   authservice:
-    enabled: false
+    enabled: true
     chains:
       minimal:
         callback_uri: "https://minimal.bigbang.dev"
@@ -966,7 +966,7 @@ addons:
             size: 256Mi
 
   fortify:
-    enabled: false
+    enabled: true
     flux:
       timeout: 15m
     ingress:
@@ -1042,7 +1042,7 @@ addons:
             cypress_url: "https://fortify.bigbang.dev"
 
   gitlab:
-    enabled: false
+    enabled: true
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_gitlab
@@ -1140,7 +1140,7 @@ addons:
             GITLAB_REGISTRY: registry.bigbang.dev
 
   gitlabRunner:
-    enabled: false
+    enabled: true
     values:
       resources:
         requests:
@@ -1180,7 +1180,7 @@ addons:
                   key: password
 
   anchore:
-    enabled: false
+    enabled: true
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_anchore
@@ -1324,7 +1324,7 @@ addons:
             ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
 
   sonarqube:
-    enabled: false
+    enabled: true
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_saml-sonarqube
@@ -1367,7 +1367,7 @@ addons:
     enabled: true # Minio Operator is required for Loki in default core
 
   minio:
-    enabled: false
+    enabled: true
     values:
       tenant:
         pools:
@@ -1551,7 +1551,7 @@ addons:
             docker_host: "containers.bigbang.dev"
 
   velero:
-    enabled: false
+    enabled: true
     plugins:
     - aws
     values:
@@ -1807,7 +1807,7 @@ addons:
   #
   harbor:
     # -- Toggle deployment of harbor
-    enabled: false
+    enabled: true
 
     # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values: 
