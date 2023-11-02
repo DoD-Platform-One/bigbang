@@ -274,8 +274,8 @@ policies:
           namespaces: 
           - neuvector
           names:
-          - neuvector-enforcer*
-          - neuvector-controller*
+          - neuvector-enforce-pod*
+          - neuvector-controller-pod*
       {{- end }}
     {{- end }}
 
