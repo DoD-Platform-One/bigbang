@@ -1,5 +1,11 @@
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
 {{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- $gitCredsDict := dict
+  "name" "haproxy"
+  "packageGitScope" .Values.addons.haproxy.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -15,5 +21,5 @@ spec:
   ref:
     {{- include "validRef" .Values.addons.haproxy.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

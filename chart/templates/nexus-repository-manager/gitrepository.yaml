@@ -1,6 +1,12 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- if and (eq $nexusValues.sourceType "git") $nexusValues.enabled  }}
+{{- $gitCredsDict := dict
+  "name" "nexusRepositoryManager"
+  "packageGitScope" $nexusValues.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -16,5 +22,5 @@ spec:
   ref:
     {{- include "validRef" $nexusValues.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

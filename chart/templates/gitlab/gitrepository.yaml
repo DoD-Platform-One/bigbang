@@ -1,4 +1,10 @@
 {{- if and (eq .Values.addons.gitlab.sourceType "git") (not .Values.offline) .Values.addons.gitlab.enabled }}
+{{- $gitCredsDict := dict
+  "name" "gitlab"
+  "packageGitScope" .Values.addons.gitlab.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -13,5 +19,5 @@ spec:
   url: {{ .Values.addons.gitlab.git.repo }}
   ref:
     {{- include "validRef" .Values.addons.gitlab.git | nindent 4 }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

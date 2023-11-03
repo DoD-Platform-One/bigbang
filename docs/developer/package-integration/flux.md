@@ -91,6 +91,12 @@ Flux's source controller uses the [GitRepository](https://fluxcd.io/docs/compone
 ```yaml
 {{- $pkg := "podinfo" }}
 {{- if (get .Values $pkg).enabled }}
+{{- $gitCredsDict := dict
+  "name" $pkg
+  "packageGitScope" (get .Values pkg).git
+  "rootScope" .
+  "releaseName" $.Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -105,7 +111,7 @@ spec:
   ref:
     {{- include "validRef" (get .Values $pkg).git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}
 ```
 
