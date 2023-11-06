@@ -851,9 +851,6 @@ monitoring:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
 
-  thanos:
-    objstoreConfig: ""
-
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
