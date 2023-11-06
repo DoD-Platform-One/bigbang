@@ -54,9 +54,9 @@ branch: {{ .branch | quote }}
 {{- end -}}
 
 {{/*
-Build the appropriate git credentials secret for private git repositories
+Build the appropriate git credentials secret for BB wide git repositories
 */}}
-{{- define "gitCreds" -}}
+{{- define "gitCredsGlobal" -}}
 {{- if .Values.git.existingSecret -}}
 secretRef:
   name: {{ .Values.git.existingSecret }}
@@ -65,6 +65,30 @@ secretRef:
 secretRef:
   name: {{ $.Release.Name }}-git-credentials
 {{- end -}}
+{{- end -}}
+
+{{/*
+Build the appropriate git credentials secret for individual package and BB wide private git repositories
+*/}}
+{{- define "gitCredsExtended" -}}
+{{- if .packageGitScope.existingSecret -}}
+secretRef:
+  name: {{ .packageGitScope.existingSecret }}
+{{- else if and (.packageGitScope.credentials) (coalesce .packageGitScope.credentials.username .packageGitScope.credentials.password .packageGitScope.credentials.caFile .packageGitScope.credentials.privateKey .packageGitScope.credentials.publicKey .packageGitScope.credentials.knownHosts "") -}}
+{{- /* Input validation happens in git-credentials.yaml template */ -}}
+secretRef:
+  name: {{ .releaseName }}-{{ .name }}-git-credentials
+{{- else -}}
+{{/* If no credentials are specified, use the global credentials in the rootScope */}}
+{{- include "gitCredsGlobal" .rootScope }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Pointer to the appropriate git credentials template
+*/}}
+{{- define "gitCreds" -}}
+{{- include "gitCredsGlobal" . }}
 {{- end -}}
 
 {{/*
@@ -306,3 +330,57 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
     {{- printf "-----BEGIN CERTIFICATE-----\n%s\n-----END CERTIFICATE-----" $cert -}}
   {{- end -}}
 {{- end -}}
+
+{{- /*
+Returns the git credentails secret for the given scope and name
+*/ -}}
+{{- define "gitCredsSecret" -}}
+{{- $name := .name }}
+{{- $releaseName := .releaseName }}
+{{- $releaseNamespace := .releaseNamespace }}
+{{- with .targetScope -}}
+{{- if and (eq .sourceType "git") .enabled }}
+{{- if .git }}
+{{- with .git -}}
+{{- if not .existingSecret }}
+{{- if .credentials }}
+{{- if coalesce  .credentials.username .credentials.password .credentials.caFile .credentials.privateKey .credentials.publicKey .credentials.knownHosts -}}
+{{- $http := coalesce .credentials.username .credentials.password .credentials.caFile "" }}
+{{- $ssh := coalesce .credentials.privateKey .credentials.publicKey .credentials.knownHosts "" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $releaseName }}-{{ $name }}-git-credentials
+  namespace: {{ $releaseNamespace }}
+type: Opaque
+data:
+  {{- if $http }}
+  {{- if .credentials.caFile }}
+  caFile: {{ .credentials.caFile | b64enc }}
+  {{- end }}
+  {{- if and .credentials.username  (not .credentials.password ) }}
+  {{- printf "%s - When using http git username, password must be specified" $name | fail }}
+  {{- end }}
+  {{- if and .credentials.password  (not .credentials.username ) }}
+  {{- printf "%s - When using http git password, username must be specified" $name | fail }}
+  {{- end }}
+  {{- if and .credentials.username .credentials.password }}
+  username: {{ .credentials.username | b64enc }}
+  password: {{ .credentials.password | b64enc }}
+  {{- end }}
+  {{- else }}
+  {{- if not (and (and .credentials.privateKey .credentials.publicKey) .credentials.knownHosts) }}
+  {{- printf "%s - When using ssh git credentials, privateKey, publicKey, and knownHosts must all be specified" $name | fail }}
+  {{- end }}
+  identity: {{ .credentials.privateKey | b64enc }}
+  identity.pub: {{ .credentials.publicKey | b64enc }}
+  known_hosts: {{ .credentials.knownHosts | b64enc }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

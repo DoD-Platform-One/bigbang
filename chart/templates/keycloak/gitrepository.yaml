@@ -1,5 +1,11 @@
 {{- if and (eq .Values.addons.keycloak.sourceType "git") (not .Values.offline) .Values.addons.keycloak.enabled }}
 {{ $name := "keycloak" }}
+{{- $gitCredsDict := dict
+  "name" $name
+  "packageGitScope" .Values.addons.keycloak.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -14,5 +20,5 @@ spec:
   url: {{ .Values.addons.keycloak.git.repo }}
   ref:
     {{- include "validRef" .Values.addons.keycloak.git | nindent 4 }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

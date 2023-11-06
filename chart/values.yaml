@@ -374,11 +374,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.74.0-bb.4"
+    tag: "1.76.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.74.0-bb.4"
+    tag: "1.76.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -561,11 +561,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.6.0-bb.0"
+    tag: "1.6.1-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.6.0-bb.0"
+    tag: "1.6.1-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -1496,11 +1496,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.26.1-bb.0"
+      tag: "1.27.4-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "1.26.1-bb.0"
+      tag: "1.27.4-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1962,6 +1962,9 @@ packages:
     # @default -- true
     enabled: false
 
+    # -- Choose source type of "git" ("helmRepo" not supported yet)
+    sourceType: "git"
+
     # -- Toggle wrapper functionality. See https://docs-bigbang.dso.mil/latest/docs/guides/deployment-scenarios/extra-package-deployment/#Wrapper-Deployment for more details.
     # @default -- false
     wrapper:
@@ -1997,6 +2000,19 @@ packages:
       # -- Path inside of the git repo to find the helm chart or kustomize
       # @default -- For Helm charts `chart`.  For Kustomize `/`.
       path:
+      # -- Optional, alternative existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication
+      existingSecret: ""
+      # -- Optional, alternative Chart created secrets with user defined values
+      credentials:
+        # -- HTTP git credentials, both username and password must be provided
+        username: ""
+        password: ""
+        # -- HTTPS certificate authority file.  Required for any repo with a self signed certificate
+        caFile: ""
+        # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+        privateKey: ""
+        publicKey: ""
+        knownHosts: ""
 
     # -- Override flux settings for this package
     flux: {}

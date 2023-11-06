@@ -1,4 +1,10 @@
 {{- if and (eq .Values.addons.anchore.sourceType "git") .Values.addons.anchore.enabled  }}
+{{- $gitCredsDict := dict
+  "name" "anchore"
+  "packageGitScope" .Values.addons.anchore.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -10,5 +16,5 @@ spec:
   ref:
     {{- include "validRef" .Values.addons.anchore.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}
