@@ -411,8 +411,8 @@ kyvernoPolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
-        enabled: false
-        validationFailureAction: audit
+        enabled: true
+        validationFailureAction: enforce
         parameters:
           require:
           - imageReferences:
