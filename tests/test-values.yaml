@@ -315,7 +315,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - twistlock/twistlock-cypress-test
           - sonarqube/sonarqube-cypress-test
-          - fortify/fortify-cypress-test
+          - fortify/fortify-ssc-cypress-test
           - harbor/harbor-cypress-test
           - logging/elasticsearch-kibana-cypress-test
           - tempo/tempo-cypress-test
@@ -411,6 +411,8 @@ kyvernoPolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
+        enabled: true
+        validationFailureAction: enforce
         parameters:
           require:
           - imageReferences:
@@ -424,6 +426,8 @@ kyvernoPolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
                     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
                     -----END PUBLIC KEY-----
+            mutateDigest: false
+            verifyDigest: false 
           - imageReferences:
             - "registry1.dso.mil/ironbank/*"
             attestors:
@@ -478,6 +482,7 @@ kyvernoPolicies:
               - neuvector
               - harbor
               - fortify
+              - thanos
               names:
               - "*-cypress-test*"
         parameters:
@@ -514,8 +519,15 @@ kyvernoPolicies:
               - neuvector
               - harbor
               - fortify
+              - thanos
               names:
               - "*-cypress-test*"
+          - resources:
+              namespaces:
+              - neuvector
+              names:
+              - "neuvector-enforcer-*"
+              - "neuvector-manager-*"
         parameters:
           allow:
           - /tmp/allowed
@@ -560,6 +572,7 @@ kyvernoPolicies:
               - neuvector
               - harbor
               - fortify
+              - thanos
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -663,7 +676,7 @@ loki:
     minio:
       enabled: true
     write:
-      replicas: 1
+      replicas: 3
       persistence:
         size: 2Gi
       resources:
@@ -685,7 +698,7 @@ loki:
           cpu: 200m
           memory: 400Mi
     read:
-      replicas: 1
+      replicas: 3
       persistence:
         size: 2Gi
       resources:
@@ -771,9 +784,27 @@ monitoring:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_prometheus
     alertmanager:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
+  thanos:
+    objstoreConfig: |-
+      type: s3
+      config:
+        bucket: "thanos"
+        endpoint: minio.thanos.svc.cluster.local:80
+        access_key: "minio"
+        secret_key: "minio123"
+        insecure: false
+        trace:
+          enable: true
+        http_config:
+          tls_config:
+            key_file: /etc/prom-certs/key.pem
+            ca_file: /etc/prom-certs/root-cert.pem
+            cert_file: /etc/prom-certs/cert-chain.pem
+          insecure_skip_verify: true  
   values:
     prometheus:
       prometheusSpec:
+        replicas: 1
         resources:
           requests:
             cpu: 100m
@@ -867,9 +898,6 @@ twistlock:
       localVolumeUpgrade: true
     bbtests:
       enabled: true
-      cypress:
-        envs:
-          cypress_baseUrl: "https://twistlock.bigbang.dev"
       scripts:
         envs:
           twistlock_host: "https://twistlock.bigbang.dev"
@@ -1810,10 +1838,7 @@ addons:
     enabled: false
 
     # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
-    values: 
-      redis:
-        external: 
-          addr: "harbor-redis-bb-headless:6379"
+    values:
       expose:
         type: clusterIP
         tls:
@@ -1965,3 +1990,58 @@ addons:
           image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
           envs:
             HARBOR_REGISTRY: "harbor.bigbang.dev"
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Thanos
+  #
+  thanos:
+    # -- Toggle deployment of thanos
+    enabled: false
+    values:
+      minio:
+        enabled: true
+        tenant:
+          pools:
+          - servers: 1
+            volumesPerServer: 4
+            size: 256Mi
+            resources:
+              requests:
+                cpu: 250m
+                memory: 2Gi
+              limits:
+                cpu: 250m
+                memory: 2Gi
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+              runAsNonRoot: true
+            containerSecurityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              runAsNonRoot: true
+      storegateway:
+        enabled: true            
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_url: "https://thanos.bigbang.dev"
+            cypress_prometheus_integration_enabled: "true"
+            cypress_objstorage_integration_enabled: "true"
+        scripts:
+          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          envs:
+            THANOS_REGISTRY: "thanos.bigbang.dev"
+      objstoreConfig: |-
+        type: s3
+        config:
+          bucket: "thanos"
+          endpoint: minio.thanos.svc.cluster.local:80
+          access_key: "minio"
+          secret_key: "minio123"
+          insecure: true
+          trace:
+            enable: true
