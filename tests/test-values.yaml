@@ -620,12 +620,6 @@ kyvernoPolicies:
         parameters:
           disallow:
           - bigbang
-      update-automountserviceaccounttokens:
-        enabled: true
-        namespaces:
-          - namespace: update-automountserviceaccounttokens-2
-            serviceAccounts:
-            - update-token-automount-2
 
 elasticsearchKibana:
   enabled: false
