@@ -227,6 +227,15 @@ policies:
     {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
     exclude:
       any:
+      - resources:
+          namespaces:
+          - kube-system
+          names: 
+          - coredns-*
+          - weave-net-*
+          - svclb-public-ingressgateway-*
+          - helper-pod-create-pvc-*
+          - local-path-provisioner-*
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
       # mounted inside velero/node agent pods.
@@ -274,8 +283,7 @@ policies:
           namespaces: 
           - neuvector
           names:
-          - neuvector-enforce-pod*
-          - neuvector-controller-pod*
+          - neuvector*
       {{- end }}
     {{- end }}
 
