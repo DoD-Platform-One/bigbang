@@ -606,9 +606,11 @@ kyvernoPolicies:
               namespaces:
               - gitlab
               - fortify
+              - metallb-system
               names:
               - gitlab-minio-*
               - fortify-mysql-* # mysql breaks if you give it a different group
+              - speaker-* # speaker pod requires elevated permission in order to perform its network functionalities.
       require-non-root-user:
         exclude:
           any:
@@ -617,8 +619,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - metallb-system
               names:
               - gitlab-minio-*
+              - speaker-*
       disallow-namespaces:
         parameters:
           disallow:
