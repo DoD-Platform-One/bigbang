@@ -148,6 +148,44 @@ policies:
           names:
           - kyverno-reporter*
       {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - ServiceAccount
+          names:
+          - monitoring-monitoring-prometheus-node-exporter
+          - monitoring-monitoring-kube-operator
+          - monitoring-monitoring-kube-state-metrics
+          - monitoring-monitoring-kube-admission
+          - monitoring-monitoring-kube-prometheus
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - prometheus-monitoring-monitoring-kube-prometheus*
+      {{- end }}
+      {{- if .Values.grafana.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - ServiceAccount
+          names:
+          - monitoring-grafana
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - monitoring-grafana*
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
