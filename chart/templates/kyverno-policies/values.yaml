@@ -321,8 +321,7 @@ policies:
           namespaces: 
           - neuvector
           names:
-          - neuvector-enforcer*
-          - neuvector-controller*
+          - neuvector*
       {{- end }}
     {{- end }}
 
