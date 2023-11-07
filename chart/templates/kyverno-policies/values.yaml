@@ -181,6 +181,7 @@ policies:
 
   require-drop-all-capabilities:
     validationFailureAction: Audit
+    validationFailureAction: Audit
     {{- if .Values.neuvector.enabled }}
     exclude:
       any:
