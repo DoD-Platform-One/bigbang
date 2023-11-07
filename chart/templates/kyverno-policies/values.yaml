@@ -323,6 +323,7 @@ policies:
           names:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           - neuvector*
 =======
           - neuvector-enforcer*
@@ -332,6 +333,9 @@ policies:
           - neuvector-enforce-pod*
           - neuvector-controller-pod*
 >>>>>>> 4fd8d849 (update neuvector pod names)
+=======
+          - neuvector*
+>>>>>>> 10273cd0 (add kube-system and neuvector exceptions)
       {{- end }}
     {{- end }}
 
