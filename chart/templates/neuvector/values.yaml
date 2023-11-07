@@ -101,6 +101,8 @@ cve:
 
 {{- if .Values.istio.enabled }}
 manager:
+  runAsGroup: 1000
+  runAsUser: 1000
   env:
     ssl: false
   {{- if $istioInjection }}
@@ -109,6 +111,13 @@ manager:
   {{- end }}
 {{- end }}
 
+cve:
+  updater:
+    runAsUser: 1000
+    runAsGroup: 1000
+  scanner:
+    runAsUser: 1000
+    runAsGroup: 1000
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
