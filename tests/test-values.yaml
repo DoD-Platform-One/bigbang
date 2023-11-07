@@ -629,7 +629,6 @@ kyvernoPolicies:
               - metallb-system
               names:
               - gitlab-minio-*
-              - speaker-*
           - resources:
               namespaces:
               - metallb-system
