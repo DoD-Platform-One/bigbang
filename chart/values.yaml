@@ -496,7 +496,7 @@ kyverno:
   postRenderers: []
 
 
-kyvernoPolicies:
+`icies:
   # -- Toggle deployment of Kyverno policies
   enabled: true
 
@@ -506,12 +506,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    #tag: "3.0.4-bb.7"
-    branch: "testin-things"
+    tag: "3.0.4-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.0.4-bb.7"
+    tag: "3.0.4-bb.8"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
