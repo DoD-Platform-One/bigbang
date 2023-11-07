@@ -496,7 +496,7 @@ kyverno:
   postRenderers: []
 
 
-`icies:
+kyvernoPolicies:
   # -- Toggle deployment of Kyverno policies
   enabled: true
 
