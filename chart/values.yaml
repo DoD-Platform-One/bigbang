@@ -375,7 +375,7 @@ kiali:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
     branch: "increase-memory-limit-operator"
-    tag: "null"
+    tag: null
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
