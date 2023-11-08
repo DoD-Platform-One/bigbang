@@ -1,6 +1,7 @@
 #!/bin/bash
 
-K3D_VERSION="5.5.1"
+K3D_VERSION="5.6.0"
+DEFAULT_K3S_TAG="v1.27.6-k3s1"
 
 # get the current script dir
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -591,7 +592,7 @@ echo "creating k3d cluster"
 
 # Shared k3d settings across all options
 # 1 server, 3 agents
-k3d_command="k3d cluster create --servers 1 --agents 3"
+k3d_command="k3d cluster create --servers 1 --agents 3 --verbose"
 # Volumes to support Twistlock defenders
 k3d_command+=" -v /etc:/etc@server:*\;agent:* -v /dev/log:/dev/log@server:*\;agent:* -v /run/systemd/private:/run/systemd/private@server:*\;agent:*"
 # Disable traefik and metrics-server
@@ -603,7 +604,7 @@ if [[ -z "${PrivateIP2}" ]]; then
 fi
 
 # Selecting K8S version through the use of a K3S image tag
-K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:="${DEFAULT_K3S_TAG}"}
 if [[ $K3S_IMAGE_TAG ]]; then
   echo "Using custom K3S image tag $K3S_IMAGE_TAG..."
   k3d_command+=" --image docker.io/rancher/k3s:$K3S_IMAGE_TAG"
@@ -659,7 +660,7 @@ run "${k3d_command}"
 
 # install kubectl
 echo Installing kubectl based on k8s version...
-K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:="${DEFAULT_K3S_TAG}"}
 if [[ $K3S_IMAGE_TAG ]]; then
   KUBECTL_VERSION=$(echo $K3S_IMAGE_TAG | cut -d'-' -f1)
   echo "Using specified kubectl version $KUBECTL_VERSION based on k3s image tag."
