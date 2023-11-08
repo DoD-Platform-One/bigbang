@@ -418,11 +418,11 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
-    tag: "1.5.0-bb.9"
+    tag: "1.5.0-bb.10"
   helmRepo:
     repoName: "registry1"
     chartName: "cluster-auditor"
-    tag: "1.5.0-bb.9"
+    tag: "1.5.0-bb.10"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
@@ -447,11 +447,11 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
-    tag: "3.13.2-bb.0"
+    tag: "3.13.3-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "gatekeeper"
-    tag: "3.13.2-bb.0"
+    tag: "3.13.3-bb.2"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
@@ -506,11 +506,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.0.4-bb.6"
+    tag: "3.0.4-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.0.4-bb.6"
+    tag: "3.0.4-bb.8"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -909,11 +909,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "6.60.6-bb.1"
+    tag: "6.60.6-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "6.60.6-bb.1"
+    tag: "6.60.6-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
@@ -1007,11 +1007,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.46.7-bb.3"
+      tag: "5.46.7-bb.8"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.46.7-bb.3"
+      tag: "5.46.7-bb.8"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -1064,11 +1064,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
-      tag: "0.5.3-bb.18"
+      tag: "0.5.3-bb.20"
     helmRepo:
       repoName: "registry1"
       chartName: "authservice"
-      tag: "0.5.3-bb.18"
+      tag: "0.5.3-bb.20"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
@@ -1613,11 +1613,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
-      tag: "9.0.0-bb.0"
+      tag: "9.1.1-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost"
-      tag: "9.0.0-bb.0"
+      tag: "9.1.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux: {}
@@ -1907,12 +1907,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
-      tag: "12.13.12-bb.2"
+      tag: "12.13.12-bb.3"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "12.13.12-bb.2"
+      tag: "12.13.12-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}

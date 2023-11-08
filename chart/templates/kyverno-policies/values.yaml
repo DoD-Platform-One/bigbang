@@ -651,7 +651,8 @@ policies:
         pods:
         - istiod-*
         - istio-operator-*
-
+istio:
+  enabled: {{ .Values.istio.enabled }}
 
 {{- end }}
 

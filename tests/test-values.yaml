@@ -331,6 +331,9 @@ gatekeeper:
 
 kyverno:
   values:
+    networkPolicies:
+      externalRegistries:
+        allowEgress: true
     replicaCount: 3
     resources:
       limits:
