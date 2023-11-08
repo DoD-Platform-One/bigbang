@@ -323,7 +323,7 @@ istioOperator:
 
 jaeger:
   # -- Toggle deployment of Jaeger.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -410,7 +410,7 @@ kiali:
 #
 clusterAuditor:
   # -- Toggle deployment of Cluster Auditor.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -439,7 +439,7 @@ clusterAuditor:
 #
 gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -553,7 +553,7 @@ kyvernoReporter:
 #
 elasticsearchKibana:
   # -- Toggle deployment of Logging (EFK).
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -601,7 +601,7 @@ elasticsearchKibana:
 
 eckOperator:
   # -- Toggle deployment of ECK Operator.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -626,7 +626,7 @@ eckOperator:
 
 fluentbit:
   # -- Toggle deployment of Fluent-Bit.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -952,7 +952,7 @@ grafana:
 #
 twistlock:
   # -- Toggle deployment of Twistlock.
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -999,7 +999,7 @@ twistlock:
 addons:
   argocd:
     # -- Toggle deployment of ArgoCD.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1056,7 +1056,7 @@ addons:
     #   chain:
     #     minimal:
     #       callback_uri: "https://somecallback"
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1087,7 +1087,7 @@ addons:
   #
   minioOperator:
     # -- Toggle deployment of minio operator and instance.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1147,7 +1147,7 @@ addons:
 
   gitlab:
     # -- Toggle deployment of Gitlab
-    enabled: false
+    enabled: true
 
     hostnames:
       # host name only without the domain
@@ -1258,7 +1258,7 @@ addons:
 
   gitlabRunner:
     # -- Toggle deployment of Gitlab Runner
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1283,7 +1283,7 @@ addons:
 
   nexusRepositoryManager:
     # -- Toggle deployment of Nexus Repository Manager.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1352,7 +1352,7 @@ addons:
 
   sonarqube:
     # -- Toggle deployment of SonarQube.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1417,7 +1417,7 @@ addons:
 
   fortify:
     # -- Toggle deployment of Fortify.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1485,7 +1485,7 @@ addons:
 
   anchore:
     # -- Toggle deployment of Anchore.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1580,7 +1580,7 @@ addons:
   #
   mattermostOperator:
     # -- Toggle deployment of Mattermost Operator.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1605,7 +1605,7 @@ addons:
 
   mattermost:
     # -- Toggle deployment of Mattermost.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1699,7 +1699,7 @@ addons:
 
   velero:
     # -- Toggle deployment of Velero.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1858,7 +1858,7 @@ addons:
   #
   harbor:
     # -- Toggle deployment of harbor
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1900,7 +1900,7 @@ addons:
   #
   thanos:
     # -- Toggle deployment of thanos
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
