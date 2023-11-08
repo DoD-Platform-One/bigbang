@@ -740,11 +740,13 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.6.3-bb.1"
+    tag: ""
+    branch: "exporter-wait-for-api"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
-    tag: "2.6.3-bb.1"
+    tag: ""
+    branch: "exporter-wait-for-api"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
