@@ -741,7 +741,7 @@ neuvector:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
     tag: null
-    branch: "exception-testing"
+    branch: "exporter-wait-for-controller"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
