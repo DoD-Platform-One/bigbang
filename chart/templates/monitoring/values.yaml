@@ -106,13 +106,7 @@ prometheus:
       blockSize: 1m
       {{- end }}
 
-      {{- if .Values.monitoring.thanos.objstoreConfig }}
-      objectStorageConfig:
-        key: objstore.yml
-        name: thanos-objstore-secret
-      {{- end }}
-
-      {{- if and $istioInjection .Values.monitoring.thanos.objstoreConfig }}    
+      {{- if $istioInjection }}    
       # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
       volumes:
         - emptyDir:
