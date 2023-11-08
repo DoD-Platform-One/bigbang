@@ -796,24 +796,6 @@ monitoring:
             cpu: 100m
             memory: 200Mi
           limits: {}
-        thanos:
-          objectStorageConfig:
-            secret:
-              type: s3
-              config:
-                bucket: "thanos"
-                endpoint: minio.thanos.svc.cluster.local:80
-                access_key: "minio"
-                secret_key: "minio123"
-                insecure: false
-                trace:
-                  enable: true
-                http_config:
-                  tls_config:
-                    key_file: /etc/prom-certs/key.pem
-                    ca_file: /etc/prom-certs/root-cert.pem
-                    cert_file: /etc/prom-certs/cert-chain.pem
-                  insecure_skip_verify: true  
 
     kube-state-metrics:
       resources:
