@@ -23,7 +23,11 @@ kubectl create secret docker-registry private-registry \
     --docker-username=$REGISTRY1_USER \
     --docker-password=$REGISTRY1_TOKEN \
     --namespace flux-system
-kubectl apply -k base/flux/
+kubectl apply -k https://repo1.dso.mil/platform-one/big-bang/bigbang.git//base/flux?ref=master
+```
+Note that you can replace ```master``` in the ```kubectl apply -k``` command above with tag of the Big Bang release you need. For example:
+```
+kubectl apply -k https://repo1.dso.mil/platform-one/big-bang/bigbang.git//base/flux?ref=2.14.0
 ```
 
 ### Now You Can See New CRD Objects Types Inside the Cluster
