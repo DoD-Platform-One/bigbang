@@ -110,6 +110,12 @@ manager:
   {{- end }}
 {{- end }}
 
+cve:
+  updater:
+    runAsUser: 1000
+  scanner:
+    runAsUser: 1000
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
