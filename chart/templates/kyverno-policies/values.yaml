@@ -306,18 +306,67 @@ policies:
           names:
           - promtail-promtail*
       {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # Neuvector
+      - resources:
+          namespaces:
+          -  neuvector
+          names:
+          - neuvector*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
-    validationFailureAction: audit
+    validationFailureAction: Enforce
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.kiali.enabled .Values.neuvector.enabled .Values.addons.argocd.enabled .Values.addons.velero.enabled}}
     exclude:
       any:
+      - resources:
+          namespaces:
+          - kube-system
+          names:
+          - coredns-*
+          - local-path-provisioner-*
+          - helper-pod-create-pvc-*
+          - weave-net-*
+          - svclb-public-ingressgateway-*
+      {{- if .Values.kiali.enabled }}
+      # Kiali needs exception for operator to deploy Kiali server
+      - resources:
+          namespaces:
+          - kiali
+          names:
+          - kiali-*
+      {{- end }}
+      {{- if .Values.addons.argocd.enabled }}
+      # Argocd giestbook needs to run as root to enable priorty port for applications and applicationsets
+      - resources:
+          namespaces:
+          - argocd
+          names:
+          - guestbook*
+      {{- end }}
+      {{- if .Values.addons.velero.enabled }}
+      # Velero needs exception for non numeric user in test
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - velero-backup-restore-test*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector*
+      {{- end }}
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
       # mounted inside velero/node agent pods.

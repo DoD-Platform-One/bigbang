@@ -101,6 +101,7 @@ cve:
 
 {{- if .Values.istio.enabled }}
 manager:
+  runAsUser: 1000
   env:
     ssl: false
   {{- if $istioInjection }}

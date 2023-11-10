@@ -619,6 +619,11 @@ kyvernoPolicies:
               - gitlab
               names:
               - gitlab-minio-*
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
       disallow-namespaces:
         parameters:
           disallow:
