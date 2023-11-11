@@ -506,9 +506,7 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    #tag: "3.0.4-bb.8"
-    tag: null
-    branch: "require-non-root-user-exception"
+    tag: "3.0.4-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
