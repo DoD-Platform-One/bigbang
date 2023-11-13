@@ -1,4 +1,10 @@
 {{- if and (eq .Values.addons.mattermost.sourceType "git") .Values.addons.mattermost.enabled  }}
+{{- $gitCredsDict := dict
+  "name" "mattermost"
+  "packageGitScope" .Values.addons.mattermost.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -14,5 +20,5 @@ spec:
   ref:
     {{- include "validRef" .Values.addons.mattermost.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

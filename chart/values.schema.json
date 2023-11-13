@@ -580,8 +580,12 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
-        "istio": { "$ref": "#/$defs/istio"  },
-        "ingress": { "$ref": "#/$defs/ingress"  },
+        "istio": {
+          "$ref": "#/$defs/istio"
+        },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
         "sso": {
           "type": "object",
           "required": [
@@ -679,8 +683,8 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
-        "istio": { 
-          "$ref": "#/$defs/istio"  
+        "istio": {
+          "$ref": "#/$defs/istio"
         },
         "ingress": {
           "$ref": "#/$defs/ingress"
@@ -780,8 +784,8 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
-        "istio": { 
-          "$ref": "#/$defs/istio"  
+        "istio": {
+          "$ref": "#/$defs/istio"
         },
         "ingress": {
           "$ref": "#/$defs/ingress"
@@ -1065,6 +1069,13 @@
               "$ref": "#/$defs/basePackage"
             }
           ]
+        },
+        "thanos": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/basePackage"
+            }
+          ]
         }
       }
     },
@@ -1186,7 +1197,9 @@
       ],
       "if": {
         "properties": {
-          "sourceType": { "const": "git" }
+          "sourceType": {
+            "const": "git"
+          }
         }
       },
       "then": {
@@ -1195,7 +1208,9 @@
             "$ref": "#/$defs/git"
           }
         },
-        "required": ["git"]
+        "required": [
+          "git"
+        ]
       },
       "else": {
         "properties": {
@@ -1203,14 +1218,19 @@
             "$ref": "#/$defs/helmRepo"
           }
         },
-        "required": ["helmRepo"]
+        "required": [
+          "helmRepo"
+        ]
       },
       "properties": {
         "enabled": {
           "$ref": "#/$defs/enabled"
         },
         "sourceType": {
-          "enum": ["git", "helmRepo"]
+          "enum": [
+            "git",
+            "helmRepo"
+          ]
         },
         "flux": {
           "$ref": "#/$defs/flux"
@@ -1304,9 +1324,12 @@
       "kubeConfig": {
         "description": "KubeConfig for reconciling the HelmRelease on a remote cluster. When used in combination with HelmReleaseSpec.ServiceAccountName, forces the controller to act on behalf of that Service Account at the target cluster. If the --default-service-account flag is set, its value will be used as a controller level fallback for when HelmReleaseSpec.ServiceAccountName is empty.",
         "type": "object",
+        "required": [
+          "secretRef"
+        ],
         "properties": {
           "secretRef": {
-            "description": "SecretRef holds the name to a secret that contains a key with the kubeconfig file as the value. If no key is specified the key will default to 'value'. The secret must be in the same namespace as the HelmRelease. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling the HelmRelease.",
+            "description": "SecretRef holds the name of a secret that contains a key with the kubeconfig file as the value. If no key is set, the key will default to 'value'. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling Kubernetes resources.",
             "type": "object",
             "required": [
               "name"
@@ -1327,6 +1350,10 @@
       "maxHistory": {
         "description": "MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.",
         "type": "integer"
+      },
+      "persistentClient": {
+        "description": "PersistentClient tells the controller to use a persistent Kubernetes client for this release. When enabled, the client will be reused for the duration of the reconciliation, instead of being created and destroyed for each (step of a) Helm action. \n This can improve performance, but may cause issues with some Helm charts that for example do create Custom Resource Definitions during installation outside Helm's CRD lifecycle hooks, which are then not observed to be available by e.g. post-install hooks. \n If not set, it defaults to true.",
+        "type": "boolean"
       },
       "releaseName": {
         "description": "ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.",
@@ -1411,6 +1438,16 @@
         "description": "Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.",
         "type": "object",
         "properties": {
+          "deletionPropagation": {
+            "description": "DeletionPropagation specifies the deletion propagation policy when a Helm uninstall is performed.",
+            "type": "string",
+            "default": "background",
+            "enum": [
+              "background",
+              "foreground",
+              "orphan"
+            ]
+          },
           "disableHooks": {
             "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
             "type": "boolean"
@@ -1600,6 +1637,49 @@
         },
         "semver": {
           "type": "string"
+        },
+        "existingSecret": {
+          "type": "string"
+        },
+        "credentials": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "caFile": {
+              "type": "string"
+            },
+            "privateKey": {
+              "type": "string"
+            },
+            "publicKey": {
+              "type": "string"
+            },
+            "knownHosts": {
+              "type": "string"
+            }
+          },
+          "required": [],
+          "anyOf": [
+            {
+              "required": [
+                "username",
+                "password"
+              ]
+            },
+            {
+              "required": [
+                "privateKey",
+                "publicKey",
+                "knownHosts"
+              ]
+            }
+          ],
+          "additionalProperties": false
         }
       },
       "additionalProperties": false,
@@ -1657,6 +1737,9 @@
                 "items": {
                   "description": "Patch contains an inline StrategicMerge or JSON6902 patch, and the target the patch should be applied to.",
                   "type": "object",
+                  "required": [
+                    "patch"
+                  ],
                   "properties": {
                     "patch": {
                       "description": "Patch contains an inline StrategicMerge patch or an inline JSON6902 patch with an array of operation objects.",
@@ -1854,16 +1937,21 @@
       "additionalProperties": false
     },
     "sourceType": {
-      "enum": ["helmRepo", "git"]
+      "enum": [
+        "helmRepo",
+        "git"
+      ]
     },
     "istio": {
       "type": "object",
       "properties": {
         "injection": {
-          "enum": ["enabled", "disabled"]
+          "enum": [
+            "enabled",
+            "disabled"
+          ]
         }
       }
     }
   }
 }
-

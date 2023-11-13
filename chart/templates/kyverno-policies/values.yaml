@@ -114,6 +114,79 @@ policies:
       {{- end }}
   {{- end }}
 
+  # -- Prevent Automounting of Kubernetes API Credentials on Pods and Service Accounts
+  disallow-auto-mount-service-account-token:
+    enabled: true
+    validationFailureAction: Audit
+    exclude:
+      any:
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          kinds:
+          - Pod
+          names:
+          - gitlab-shared-secrets*
+      {{- end }}
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          kinds:
+          - ServiceAccount
+          names:
+          - gitlab-runner
+      {{- end }}
+      {{- if .Values.kyvernoReporter.enabled }}
+      - resources:
+          namespaces:
+          - kyverno-reporter 
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - kyverno-reporter*
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - ServiceAccount
+          names:
+          - monitoring-monitoring-prometheus-node-exporter
+          - monitoring-monitoring-kube-operator
+          - monitoring-monitoring-kube-state-metrics
+          - monitoring-monitoring-kube-admission
+          - monitoring-monitoring-kube-prometheus
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - prometheus-monitoring-monitoring-kube-prometheus*
+      {{- end }}
+      {{- if .Values.grafana.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - ServiceAccount
+          names:
+          - monitoring-grafana
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - monitoring-grafana*
+      {{- end }}
+
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
     exclude:
@@ -160,7 +233,7 @@ policies:
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   require-istio-on-namespaces:
@@ -596,6 +669,28 @@ policies:
           - node-agent*
       {{- end }}
   {{- end }}
+
+  update-automountserviceaccounttokens:
+    enabled: true
+    namespaces:
+      - namespace: istio-system
+        serviceAccounts:
+        - istiod
+        - istio-reader-service-account
+        - public-ingressgateway-service-account
+        - passthrough-ingressgateway-service-account 
+        pods:
+        - istiod-*
+        - passthrough-ingressgateway-*
+        - public-ingressgateway-*
+      - namespace: istio-operator
+        serviceAccounts:
+        - istio-operator
+        pods:
+        - istiod-*
+        - istio-operator-*
+istio:
+  enabled: {{ .Values.istio.enabled }}
 
 {{- end }}
 

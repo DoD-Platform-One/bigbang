@@ -1,4 +1,10 @@
 {{- if and (eq .Values.grafana.sourceType "git") (not .Values.offline) .Values.grafana.enabled }}
+{{- $gitCredsDict := dict
+  "name" "grafana"
+  "packageGitScope" .Values.grafana.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -14,6 +20,6 @@ spec:
   ref:
     {{- include "validRef" .Values.grafana.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}
 

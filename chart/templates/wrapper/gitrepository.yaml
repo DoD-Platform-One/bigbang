@@ -1,17 +1,24 @@
 {{- /* Used for GitOps of the BigBang package wrapper Helm chart.  Shared by all packages */ -}}
 {{- if and .Values.wrapper (eq .Values.wrapper.sourceType "git") (omit (default dict .Values.packages) "sample") -}}
+{{- $pkg := print .Release.Name "-wrapper" -}}
+{{- $gitCredsDict := dict
+  "name" $pkg
+  "packageGitScope" .Values.wrapper.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
-  name: {{ .Release.Name }}-wrapper
+  name: {{ $pkg }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ .Release.Name }}-wrapper
+    app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
 spec:
   interval: {{ dig "interval" "5m" .Values.flux }}
   url: {{ .Values.wrapper.git.repo }}
   ref:
     {{- include "validRef" .Values.wrapper.git | nindent 4 -}}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end -}}

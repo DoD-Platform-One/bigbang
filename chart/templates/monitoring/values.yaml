@@ -12,6 +12,7 @@ domain: {{ $domainName }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
+{{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
 
 flux:
   enabled: true
@@ -79,7 +80,62 @@ alertmanager:
     {{- end }}
 
 prometheus:
+    # Note: We need to change the portName in order for istio to correctly detect TCP is being used
+    #       for the headless service
+
+  {{- if $thanosEnabled }}
+  thanosService:
+    enabled: true
+
+    {{- if $istioInjection }}
+    portName: "tcp-grpc"       
+    {{- end }}
+
+  thanosServiceMonitor:
+    enabled: true
+  {{- end }}
+
   prometheusSpec:
+
+    {{- if $thanosEnabled }}
+    thanos:
+
+      {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
+      objectStorageConfig:
+        secret:
+          type: s3
+          config:
+            bucket: "thanos"
+            endpoint: minio.thanos.svc.cluster.local:80
+            access_key: "minio"
+            secret_key: "minio123"
+            insecure: false
+            trace:
+              enable: true
+            http_config:
+              tls_config:
+                key_file: /etc/prom-certs/key.pem
+                ca_file: /etc/prom-certs/root-cert.pem
+                cert_file: /etc/prom-certs/cert-chain.pem
+              insecure_skip_verify: true  
+
+      # by default, the object stores only sync every 2 hours
+      # increase the frequency so the tests will pass 
+      blockSize: 1m
+      {{- end }}
+
+      {{- if $istioInjection }}    
+      # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: istio-certs
+      volumeMounts:
+        - mountPath: /etc/prom-certs/
+          name: istio-certs
+      {{- end }}
+    {{- end }}
+
     # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
     # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
     containers:
