@@ -100,9 +100,27 @@ prometheus:
     {{- if $thanosEnabled }}
     thanos:
 
+      {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
+      objectStorageConfig:
+        secret:
+          type: s3
+          config:
+            bucket: "thanos"
+            endpoint: minio.thanos.svc.cluster.local:80
+            access_key: "minio"
+            secret_key: "minio123"
+            insecure: false
+            trace:
+              enable: true
+            http_config:
+              tls_config:
+                key_file: /etc/prom-certs/key.pem
+                ca_file: /etc/prom-certs/root-cert.pem
+                cert_file: /etc/prom-certs/cert-chain.pem
+              insecure_skip_verify: true  
+
       # by default, the object stores only sync every 2 hours
       # increase the frequency so the tests will pass 
-      {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
       blockSize: 1m
       {{- end }}
 
