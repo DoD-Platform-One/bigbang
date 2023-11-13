@@ -671,7 +671,7 @@ policies:
   {{- end }}
 
   update-automountserviceaccounttokens-default:
-    enabled: false
+    enabled: true
     namespaces:
       - istio-system
       - istio-operator
