@@ -80,7 +80,6 @@ sso:
     idpMetadata: '{{ default (dig "saml" "metadata" "" .Values.sso) (dig "sso" "idp_data" "idpMetadata" "" $nexusValues) }}'
   realm:
     - "NexusAuthenticatingRealm"
-    - "NexusAuthorizingRealm"
     - "SamlRealm"
   role:
     {{- range $nexusValues.sso.role }}
