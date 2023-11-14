@@ -374,11 +374,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.76.0-bb.1"
+    tag: "1.76.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.76.0-bb.1"
+    tag: "1.76.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -1291,11 +1291,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
-      tag: "61.0.0-bb.0"
+      tag: "61.0.0-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "nexus-repository-manager"
-      tag: "61.0.0-bb.0"
+      tag: "61.0.0-bb.1"
 
     # -- Base64 encoded license file.
     license_key: ""
