@@ -309,6 +309,7 @@ gatekeeper:
           - kiali/kiali-cypress-test
           - mattermost/mattermost-cypress-test
           - keycloak/keycloak-cypress-test
+          - kyverno-reporter/kyverno-reporter-cypress-test
           - jaeger/jaeger-cypress-test
           - monitoring/monitoring-cypress-test
           - monitoring/grafana-cypress-test
