@@ -23,10 +23,12 @@ kubectl create secret docker-registry private-registry \
     --docker-username=$REGISTRY1_USER \
     --docker-password=$REGISTRY1_TOKEN \
     --namespace flux-system
-kubectl apply -f https://repo1.dso.mil/big-bang/bigbang/-/raw/master/scripts/deploy/flux.yaml
+kubectl apply -k https://repo1.dso.mil/big-bang/bigbang/bigbang.git//base/flux?ref=master
 ```
-
-> k apply -f flux.yaml, is equivalent to "flux install", but it installs a version of flux that's been tested and gone through IronBank.
+Note that you can replace ```master``` in the ```kubectl apply -k``` command above with tag of the Big Bang release you need. For example:
+```
+kubectl apply -k https://repo1.dso.mil/big-bang/bigbang/bigbang.git//base/flux?ref=2.14.0
+```
 
 ### Now You Can See New CRD Objects Types Inside the Cluster
 
