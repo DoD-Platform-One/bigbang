@@ -306,11 +306,11 @@ istioOperator:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
-    tag: "1.19.3-bb.0"
+    tag: "1.19.4-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-operator"
-    tag: "1.19.3-bb.0"
+    tag: "1.19.4-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
@@ -374,11 +374,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.76.0-bb.1"
+    tag: "1.76.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.76.0-bb.1"
+    tag: "1.76.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -447,11 +447,11 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
-    tag: "3.13.3-bb.2"
+    tag: "3.14.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "gatekeeper"
-    tag: "3.13.3-bb.2"
+    tag: "3.14.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
@@ -506,11 +506,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.0.4-bb.9"
+    tag: "3.0.4-bb.10"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.0.4-bb.9"
+    tag: "3.0.4-bb.10"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -687,11 +687,11 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.31.0-bb.3"
+    tag: "5.31.0-bb.4"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
-    tag: "5.31.0-bb.3"
+    tag: "5.31.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -909,11 +909,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "6.60.6-bb.2"
+    tag: "6.60.6-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "6.60.6-bb.2"
+    tag: "6.60.6-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
@@ -1291,11 +1291,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
-      tag: "61.0.0-bb.0"
+      tag: "61.0.0-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "nexus-repository-manager"
-      tag: "61.0.0-bb.0"
+      tag: "61.0.0-bb.1"
 
     # -- Base64 encoded license file.
     license_key: ""
