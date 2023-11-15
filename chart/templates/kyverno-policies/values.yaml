@@ -309,13 +309,13 @@ policies:
     {{- end }}
 
   require-non-root-user:
-    validationFailureAction: audit
+    validationFailureAction: Enforce
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.kiali.enabled .Values.neuvector.enabled .Values.addons.argocd.enabled .Values.addons.velero.enabled}}
     exclude:
       any:
       {{- if $deployNodeAgent }}
