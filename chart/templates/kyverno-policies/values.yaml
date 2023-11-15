@@ -675,6 +675,7 @@ policies:
     namespaces:
       - istio-system
       - istio-operator
+      - twistlock
  
   update-automountserviceaccounttokens:
     enabled: true
@@ -695,6 +696,14 @@ policies:
         pods:
         - istiod-*
         - istio-operator-*
+      - namespace: twistlock
+        serviceAccounts:
+        - twistlock-console
+        - twistlock-init
+        - volume-upgrade-svc-acct
+        pods:
+        - twistlock-init-*
+        - twistlock-volume-upgrade-job
 istio:
   enabled: {{ .Values.istio.enabled }}
 
