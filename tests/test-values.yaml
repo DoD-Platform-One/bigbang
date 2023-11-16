@@ -339,7 +339,6 @@ kyverno:
       externalRegistries:
         allowEgress: true
     admissionController:
-      replicas: 1
       container:
         extraArgs:
           webhookTimeout: 30
