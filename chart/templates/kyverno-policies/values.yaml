@@ -701,9 +701,11 @@ policies:
         - twistlock-console
         - twistlock-init
         - volume-upgrade-svc-acct
+        - twistlock-service
         pods:
         - twistlock-init-*
         - twistlock-volume-upgrade-job
+        - twistlock-defender-ds-*
 istio:
   enabled: {{ .Values.istio.enabled }}
 
