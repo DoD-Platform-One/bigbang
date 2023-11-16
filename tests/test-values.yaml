@@ -218,6 +218,7 @@ gatekeeper:
           # Allow kyverno test vectors for Helm test
           - default/c.?
           - default/i.?
+          - default/not-me
       containerRatio:
         parameters:
           excludedResources:
@@ -337,6 +338,7 @@ kyverno:
       externalRegistries:
         allowEgress: true
     admissionController:
+      replicas: 1
       container:
         extraArgs:
           webhookTimeout: 30
