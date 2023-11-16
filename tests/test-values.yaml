@@ -336,14 +336,17 @@ kyverno:
     networkPolicies:
       externalRegistries:
         allowEgress: true
-    replicaCount: 3
-    resources:
-      limits:
-        cpu: 768m
-        memory: 768Mi
-      requests:
-        cpu: 768m
-        memory: 768Mi
+    admissionController:
+      container:
+        extraArgs:
+          webhookTimeout: 30
+        resources:
+          limits:
+            cpu: 1
+            memory: 768Mi
+          requests:
+            cpu: 1
+            memory: 768Mi
     bbtests:
       enabled: true
 
