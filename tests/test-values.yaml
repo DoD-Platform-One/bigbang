@@ -644,7 +644,6 @@ kyvernoPolicies:
               - velero
               names:
               - velero-backup-restore-test*  
-              - speaker-*
       disallow-namespaces:
         parameters:
           disallow:
