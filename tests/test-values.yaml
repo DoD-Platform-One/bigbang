@@ -621,6 +621,21 @@ kyvernoPolicies:
               - gitlab
               names:
               - gitlab-minio-*
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook*    
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*  
       disallow-namespaces:
         parameters:
           disallow:
