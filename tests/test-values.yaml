@@ -166,6 +166,7 @@ gatekeeper:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
+          - fortify/fortify-ssc-cypress-test
           - gitlab/gitlab-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - gitlab/gitlab-runner-cypress-test
@@ -304,6 +305,7 @@ gatekeeper:
           excludedResources:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
+          - fortify/fortify-ssc-cypress-test          
           - gitlab/gitlab-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - gitlab/gitlab-runner-cypress-test
