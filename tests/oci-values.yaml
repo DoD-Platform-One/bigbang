@@ -43,6 +43,27 @@ monitoring:
 grafana:
   sourceType: "helmRepo"
 
+twistlock:
+  sourceType: "helmRepo"
+
+fluentbit:
+  sourceType: "helmRepo"
+
+jaeger:
+  sourceType: "helmRepo"
+
+eckOperator:
+  sourceType: "helmRepo"
+
+elasticsearchKibana:
+  sourceType: "helmRepo"
+
+clusterAuditor:
+  sourceType: "helmRepo"
+
+gatekeeper:
+  sourceType: "helmRepo"
+
 addons:
   argocd:
     sourceType: "helmRepo"
@@ -94,3 +115,11 @@ addons:
   
   harbor:
     sourceType: "helmRepo"
+  
+  thanos:
+    sourceType: "helmRepo"
+
+  fortify:
+    sourceType: "helmRepo"
+
+  
