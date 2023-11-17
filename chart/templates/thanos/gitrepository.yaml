@@ -1,8 +1,8 @@
 {{- $pkg := "thanos" }}
 {{- if and (eq (get .Values.addons $pkg).sourceType "git") (not .Values.offline) (get .Values.addons $pkg).enabled }}
 {{- $gitCredsDict := dict
-  "name" "tempo"
-  "packageGitScope" .Values.tempo.git
+  "name" "thanos"
+  "packageGitScope" .Values.addons.thanos.git
   "rootScope" .
   "releaseName" .Release.Name
 }}
