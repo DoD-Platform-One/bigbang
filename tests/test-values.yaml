@@ -164,29 +164,30 @@ gatekeeper:
       allowedHostFilesystem:
         parameters:
           excludedResources:
-          - nexus-repository-manager/nexus-repository-manager-cypress-test
-          - cluster-auditor/cluster-auditor-cypress-test
-          - gitlab/gitlab-cypress-test
-          - gitlab-runner/gitlab-runner-cypress-test
-          - gitlab/gitlab-runner-cypress-test
-          - kiali/kiali-cypress-test
-          - mattermost/mattermost-cypress-test
-          - keycloak/keycloak-cypress-test
-          - kyverno-reporter/kyverno-reporter-cypress-test
-          - jaeger/jaeger-cypress-test
-          - monitoring/monitoring-cypress-test
-          - monitoring/grafana-cypress-test
-          - vault/vault-cypress-test
-          - logging/loki-cypress-test
-          - twistlock/twistlock-cypress-test
-          - sonarqube/sonarqube-cypress-test
-          - fortify/fortify-cypress-test
-          - harbor/harbor-cypress-test
-          - logging/elasticsearch-kibana-cypress-test
-          - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
+          - fortify/fortify-cypress-test
+          - fortify/fortify-ssc-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
+          - gitlab-runner/gitlab-runner-cypress-test
+          - harbor/harbor-cypress-test
+          - jaeger/jaeger-cypress-test
+          - keycloak/keycloak-cypress-test
+          - kiali/kiali-cypress-test
+          - kyverno-reporter/kyverno-reporter-cypress-test
+          - logging/elasticsearch-kibana-cypress-test
+          - logging/loki-cypress-test
+          - mattermost/mattermost-cypress-test
           - minio/minio-instance-cypress-test
+          - monitoring/grafana-cypress-test
+          - monitoring/monitoring-cypress-test
           - neuvector/neuvector-cypress-test
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - sonarqube/sonarqube-cypress-test
+          - tempo/tempo-cypress-test
+          - twistlock/twistlock-cypress-test
+          - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -218,6 +219,7 @@ gatekeeper:
           # Allow kyverno test vectors for Helm test
           - default/c.?
           - default/i.?
+          - default/not-me
       containerRatio:
         parameters:
           excludedResources:
@@ -301,29 +303,29 @@ gatekeeper:
       volumeTypes:
         parameters:
           excludedResources:
-          - nexus-repository-manager/nexus-repository-manager-cypress-test
-          - cluster-auditor/cluster-auditor-cypress-test
-          - gitlab/gitlab-cypress-test
-          - gitlab-runner/gitlab-runner-cypress-test
-          - gitlab/gitlab-runner-cypress-test
-          - kiali/kiali-cypress-test
-          - mattermost/mattermost-cypress-test
-          - keycloak/keycloak-cypress-test
-          - kyverno-reporter/kyverno-reporter-cypress-test
-          - jaeger/jaeger-cypress-test
-          - monitoring/monitoring-cypress-test
-          - monitoring/grafana-cypress-test
-          - vault/vault-cypress-test
-          - logging/loki-cypress-test
-          - twistlock/twistlock-cypress-test
-          - sonarqube/sonarqube-cypress-test
-          - fortify/fortify-ssc-cypress-test
-          - harbor/harbor-cypress-test
-          - logging/elasticsearch-kibana-cypress-test
-          - tempo/tempo-cypress-test
           - argocd/argocd-cypress-test
+          - cluster-auditor/cluster-auditor-cypress-test
+          - fortify/fortify-ssc-cypress-test
+          - gitlab/gitlab-cypress-test
+          - gitlab/gitlab-runner-cypress-test
+          - gitlab-runner/gitlab-runner-cypress-test
+          - harbor/harbor-cypress-test
+          - jaeger/jaeger-cypress-test
+          - keycloak/keycloak-cypress-test
+          - kiali/kiali-cypress-test
+          - kyverno-reporter/kyverno-reporter-cypress-test
+          - logging/elasticsearch-kibana-cypress-test
+          - logging/loki-cypress-test
+          - mattermost/mattermost-cypress-test
           - minio/minio-instance-cypress-test
+          - monitoring/grafana-cypress-test
+          - monitoring/monitoring-cypress-test
           - neuvector/neuvector-cypress-test
+          - nexus-repository-manager/nexus-repository-manager-cypress-test
+          - sonarqube/sonarqube-cypress-test
+          - tempo/tempo-cypress-test
+          - twistlock/twistlock-cypress-test
+          - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -336,14 +338,17 @@ kyverno:
     networkPolicies:
       externalRegistries:
         allowEgress: true
-    replicaCount: 3
-    resources:
-      limits:
-        cpu: 768m
-        memory: 768Mi
-      requests:
-        cpu: 768m
-        memory: 768Mi
+    admissionController:
+      container:
+        extraArgs:
+          webhookTimeout: 30
+        resources:
+          limits:
+            cpu: 1
+            memory: 768Mi
+          requests:
+            cpu: 1
+            memory: 768Mi
     bbtests:
       enabled: true
 
