@@ -1,0 +1,10 @@
+include:
+  - project: 'big-bang/pipeline-templates/pipeline-templates'
+    file: '/pipelines/bigbang-package.yaml'
+    ref: "dd/1694-package-pipeline-check"
+variables:
+  PIPELINE_REPO_BRANCH: "dd/1694-package-pipeline-check"
+  DEBUG_ENABLED: "true"
+  PACKAGE_NAMESPACE: "kyverno"
+  HARBOR_BB_REPO: "bigbang-staging"
+
