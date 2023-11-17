@@ -1,4 +1,4 @@
-{{- $fluxSettingsVelero := merge .Values.addons.velero.flux .Values.flux -}}
+{{- $fluxSettingsVelero := mergeOverwrite .Values.addons.velero.flux .Values.flux -}}
 {{- if .Values.addons.velero.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
