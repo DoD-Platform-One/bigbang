@@ -675,6 +675,8 @@ policies:
     namespaces:
       - istio-system
       - istio-operator
+      - logging
+      - authservice
  
   update-automountserviceaccounttokens:
     enabled: true
@@ -695,6 +697,10 @@ policies:
         pods:
         - istiod-*
         - istio-operator-*
+      - namespace: authservice
+        serviceAccounts:
+        - authservice
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
