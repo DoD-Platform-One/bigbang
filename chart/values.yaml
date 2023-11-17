@@ -1425,7 +1425,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/fortify.git
       path: "./chart"
-      tag: "1.1.2311007-bb.5"
+      branch: "fix-fortify-all-packages"
+      tag: ""
     helmRepo:
       repoName: "registry1"
       chartName: "fortify"
