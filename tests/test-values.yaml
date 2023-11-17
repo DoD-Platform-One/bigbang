@@ -1016,8 +1016,8 @@ addons:
       jvmMaxRAMPercentage: 85
       resources:
         limits:
-          cpu: 1
-          memory: 1Gi
+          cpu: 2
+          memory: 8Gi
         requests:
           cpu: 1
           memory: 1Gi
@@ -1026,8 +1026,8 @@ addons:
       initContainer:
         resources:
           limits:
-            cpu: 500m
-            memory: 128Mi
+            cpu: 1
+            memory: 500Mi
           requests:
             cpu: 250m
             memory: 64Mi
@@ -1051,8 +1051,8 @@ addons:
         primary:
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 2
+              memory: 2Gi
             requests:
               cpu: 100m
               memory: 500Mi
