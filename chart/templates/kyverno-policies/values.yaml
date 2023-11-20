@@ -694,6 +694,7 @@ policies:
     namespaces:
       - istio-system
       - istio-operator
+      - twistlock
  
   update-automountserviceaccounttokens:
     enabled: true
@@ -714,6 +715,22 @@ policies:
         pods:
         - istiod-*
         - istio-operator-*
+      - namespace: twistlock
+        serviceAccounts:
+        - twistlock-console
+        - twistlock-init
+        - volume-upgrade-svc-acct
+        - twistlock-service
+        pods:
+        # twistlock-init pods require get/list/patch/etc to several resources. 
+        # More details in twistlock/chart/templates/init/clusterrole.yaml
+        - twistlock-init-*
+        # twistlock-volume-upgrade-job requires patch/get/list/update to deployments and get/list to pods
+        # More details in twistlock/chart/templates/init/volume-upgrade-role.yaml
+        - twistlock-volume-upgrade-job
+        # Twistlock Defender enforces various policies that may involve the K8s cluster itself
+        # Enforcing said policies requires access to the API to get/list resources
+        - twistlock-defender-ds-*
 istio:
   enabled: {{ .Values.istio.enabled }}
 
