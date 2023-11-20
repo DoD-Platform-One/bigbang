@@ -186,6 +186,15 @@ policies:
           names:
           - monitoring-grafana*
       {{- end }}
+      {{- if .Values.promtail.enabled }}
+      - resources:
+          namespaces:
+          - promtail
+          kinds:
+          - ServiceAccount 
+          names:
+          - promtail-promtail
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
