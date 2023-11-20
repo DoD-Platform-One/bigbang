@@ -5,7 +5,7 @@ include:
 variables:
   PIPELINE_REPO_BRANCH: "dd/1694-package-pipeline-check"
   DEBUG_ENABLED: "true"
-  PACKAGE_NAMESPACE: "kyverno"
+  PACKAGE_NAMESPACE: "kiali"
   HARBOR_BB_REPO: "bigbang-staging"
   CI_DEFUALT_BRANCH: "danieldides-kiali-test"
 
