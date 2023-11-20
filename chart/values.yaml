@@ -687,7 +687,8 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.31.0-bb.4"
+    tag: ""
+    branch: "fix-loki-all-packages"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
