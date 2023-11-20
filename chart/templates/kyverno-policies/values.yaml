@@ -695,7 +695,7 @@ policies:
       - istio-system
       - istio-operator
       - twistlock
-      # - argocd
+      - argocd
  
   update-automountserviceaccounttokens:
     enabled: true
