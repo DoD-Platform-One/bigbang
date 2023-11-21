@@ -687,8 +687,7 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: ""
-    branch: "fix-loki-all-packages"
+    tag: "5.31.0-bb.6"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
@@ -1426,8 +1425,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/fortify.git
       path: "./chart"
-      branch: "fix-fortify-all-packages"
-      tag: ""
+      tag: "1.1.2311007-bb.5"
     helmRepo:
       repoName: "registry1"
       chartName: "fortify"
