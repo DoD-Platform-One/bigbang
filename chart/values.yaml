@@ -1266,11 +1266,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
-      tag: "0.52.0-bb.8"
+      tag: "0.58.1-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab-runner"
-      tag: "0.52.0-bb.8"
+      tag: "0.58.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
