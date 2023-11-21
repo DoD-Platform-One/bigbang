@@ -687,8 +687,8 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    #tag: "5.31.0-bb.5"
-    branch: "74-loki-ingester-configuration-unusable"
+    tag: "5.31.0-bb.5"
+
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
@@ -855,7 +855,8 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "52.1.0-bb.0"
+    #tag: "52.1.0-bb.0"
+    branch: "145-it-should-be-possible-to-disable-the-any-all-prometheusrules"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
