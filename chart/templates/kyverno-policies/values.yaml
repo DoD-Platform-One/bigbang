@@ -695,6 +695,7 @@ policies:
       - istio-system
       - istio-operator
       - twistlock
+      - logging
  
   update-automountserviceaccounttokens:
     enabled: true
