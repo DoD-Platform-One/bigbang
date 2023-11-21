@@ -707,8 +707,8 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 800Mi
         requests:
           cpu: 200m
           memory: 400Mi
@@ -718,8 +718,8 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 800Mi
         requests:
           cpu: 200m
           memory: 400Mi
@@ -729,8 +729,8 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 800Mi
         requests:
           cpu: 200m
           memory: 400Mi
