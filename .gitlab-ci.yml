@@ -7,6 +7,5 @@ variables:
   DEBUG_ENABLED: "true"
   PACKAGE_NAMESPACE: "kiali"
   HARBOR_BB_REPO: "bigbang-staging"
-  # Probably not needed but we'll see
-  CI_DEFUALT_BRANCH: "danieldides-kiali-test-2"
+  CI_DEFAULT_BRANCH: "danieldides-kiali-test-2"
 
