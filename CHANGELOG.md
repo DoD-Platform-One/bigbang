@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.15.1]
+
+- [!3473](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3473): gitlab update to 7.5.1-bb.1 [certificates initContainer permission fixes]
+- [!3471](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3471): gitlabRunner update to 0.58.1-bb.0 [gitlab-runner update to 16.5.0]
+- [!3470](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3470): loki update to 5.31.0-bb.6 [Removing hardcoded ingester: block in loki package values]
+- [!3465](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3465): loki update to 5.31.0-bb.5 [Cypress unit testing updates]
+- [!3435](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3435): loki update to 5.31.0-bb.4 [big-bang/base image update to 2.1.0]
+
 ## [2.15.0]
 
 - [!2.15.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.15.0); List of merge requests in this release.
