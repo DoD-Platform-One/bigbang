@@ -739,7 +739,7 @@ policies:
         - argocd-argocd-redis-bb
         - upgrade-job-svc-account
         - argocd-server
-        - argocd-repo-server
+        - argocd-argocd-repo-server
         - argocd-applicationset-controller
         - argocd-notifications-controller
         - argocd-notifications-bot
@@ -764,7 +764,7 @@ policies:
         - argocd-argocd-applicationset-controller-*
         # notifications controller pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/role.yaml
-        # Additionally-
+        # Additionally (this wildcard covers both)-
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
