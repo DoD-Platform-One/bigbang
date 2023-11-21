@@ -977,6 +977,19 @@ addons:
         cypress:
           envs:
             cypress_url: "https://argocd.bigbang.dev"
+          resources:
+            requests:
+              cpu: 2
+              memory: 2Gi
+        istio:
+          sidecar:
+            resources:
+              cpu:
+                requests: 100m
+                limits: 2000m
+              memory:
+                requests: 512Mi
+                limits: 2048Mi
 
   authservice:
     enabled: false
