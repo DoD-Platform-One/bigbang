@@ -792,6 +792,10 @@ policies:
         - neuvector-registry-adapter-pod-*
 
 
+      - namespace: logging
+        serviceAccounts:
+        - logging-loki-minio-sa
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
