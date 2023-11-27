@@ -186,6 +186,18 @@ policies:
           names:
           - monitoring-grafana*
       {{- end }}
+      {{- if .Values.elasticsearchKibana.enabled }}
+      - resources:
+          namespaces:
+          - logging
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - logging-ek-kb-*
+          - logging-ek-es-data-*
+          - logging-ek-es-master-*
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -731,6 +743,10 @@ policies:
         # Twistlock Defender enforces various policies that may involve the K8s cluster itself
         # Enforcing said policies requires access to the API to get/list resources
         - twistlock-defender-ds-*
+      - namespace: logging
+        serviceAccounts:
+        - logging-kibana
+        - logging-elasticsearch
 istio:
   enabled: {{ .Values.istio.enabled }}
 
