@@ -629,9 +629,6 @@ kyvernoPolicies:
               - metallb-system
               names:
               - gitlab-minio-*
-<<<<<<< HEAD
-              - speaker-*
-=======
           - resources:
               namespaces:
               - metallb-system
@@ -647,7 +644,6 @@ kyvernoPolicies:
               - velero
               names:
               - velero-backup-restore-test*  
->>>>>>> f3b635b1 (set require-non-root-user to enforce)
       disallow-namespaces:
         parameters:
           disallow:
