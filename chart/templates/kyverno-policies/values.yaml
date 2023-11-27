@@ -803,6 +803,10 @@ policies:
         serviceAccounts:
         - logging-loki-minio-sa
 
+      - namespace: logging
+        serviceAccounts:
+        - logging-loki-minio-sa
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
