@@ -710,6 +710,7 @@ policies:
       - velero
       - neuvector
       - promtail
+      - logging
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -794,6 +795,10 @@ policies:
       - namespace: promtail
         pods:
         - promtail-promtail-*
+      - namespace: logging
+        serviceAccounts:
+        - logging-loki-minio-sa
+
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
