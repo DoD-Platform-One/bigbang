@@ -704,7 +704,6 @@ policies:
       - istio-system
       - istio-operator
       - twistlock
-      - promtail
       - logging
       
   update-automountserviceaccounttokens:
@@ -742,11 +741,6 @@ policies:
         # Twistlock Defender enforces various policies that may involve the K8s cluster itself
         # Enforcing said policies requires access to the API to get/list resources
         - twistlock-defender-ds-*
-
-      - namespace: promtail
-        pods:
-        - promtail-promtail-*
-
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
