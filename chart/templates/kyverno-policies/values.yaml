@@ -696,6 +696,8 @@ policies:
       - istio-operator
       - twistlock
       - logging
+      - minio
+      - minio-operator
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -735,6 +737,21 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: minio-operator
+        serviceAccounts:
+        - console-sa
+        - minio-operator
+        - minio-operator-minio-operator-bb-tenant-patch
+        pods:
+        # console pods require access to several API resources
+        # More details in minio-operator/chart/templates/console-clusterrole.yaml
+        - console-*
+        # operator pods require access to several API resources
+        # More details in minio-operator/chart/templates/operator-clusterrole.yaml
+        - minio-operator-*
+        # tenantPatchJob requires get/list/patch on tenants (minio CRD)
+        # More details in minio-operator/chart/templates/bigbang/tenant-patch-job.yaml
+        - bb-minio-operator-minio-operator-tenant-patch 
 
 istio:
   enabled: {{ .Values.istio.enabled }}
