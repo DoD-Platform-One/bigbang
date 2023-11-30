@@ -752,6 +752,13 @@ policies:
         # tenantPatchJob requires get/list/patch on tenants (minio CRD)
         # More details in minio-operator/chart/templates/bigbang/tenant-patch-job.yaml
         - bb-minio-operator-minio-operator-tenant-patch 
+      - namespace: minio
+        serviceAccounts:
+        - minio-minio-minio-instance-sa
+        pods:
+        # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
+        # More details in role named minio-minio-minio-instance-role
+        - minio-minio-minio-instance-ss-0-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
