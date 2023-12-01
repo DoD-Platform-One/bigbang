@@ -706,33 +706,33 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
     backend:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
     read:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
     bbtests:
       enabled: true
       cypress:
