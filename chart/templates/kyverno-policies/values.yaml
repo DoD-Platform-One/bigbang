@@ -758,12 +758,14 @@ policies:
         - kyverno-cleanup-cluster-admission-reports-*
       - namespace: velero
         serviceAccounts:
-        - velero-velero-*
-        - velero-label-namespace-*
+        - velero
+        - velero-upgrade-crds
+        - velero-velero-server
+        pods:
         - velero-cleanup-crds-*
-        - velero-upgrade-crds-*
-        - velero-velero-server-*
+        - velero-velero-*
         - node-agent-*
+        - velero-label-namespace-*
 
 
 istio:
