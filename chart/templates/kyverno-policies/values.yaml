@@ -696,6 +696,7 @@ policies:
       - istio-operator
       - twistlock
       - logging
+      - velero
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -735,6 +736,14 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: velero
+        serviceAccounts:
+        - velero-velero-*
+        - velero-label-namespace-*
+        - velero-cleanup-crds-*
+        - velero-upgrade-crds-*
+        - velero-velero-server-*
+        - node-agent-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
