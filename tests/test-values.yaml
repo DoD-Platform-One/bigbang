@@ -45,6 +45,7 @@ flux:
   timeout: 20m
   interval: 1m
   rollback:
+    timeout: 20m
     cleanupOnFail: false
 
 networkPolicies:
