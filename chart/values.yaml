@@ -1,4 +1,4 @@
-# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
+[# -- Domain used for BigBang created exposed services, can be overridden by individual packages.
 domain: bigbang.dev
 
 # -- (experimental) Toggle sourcing from external repos.
@@ -2037,3 +2037,4 @@ packages:
 
     # -- Values to pass through to package Helm chart
     values: {}
+]
