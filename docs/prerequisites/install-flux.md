@@ -23,7 +23,7 @@ kubectl create secret docker-registry private-registry \
     --docker-username=$REGISTRY1_USER \
     --docker-password=$REGISTRY1_TOKEN \
     --namespace flux-system
-kubectl apply -k https://repo1.dso.mil/big-bang/bigbang/bigbang.git//base/flux?ref=master
+kubectl apply -k https://repo1.dso.mil/big-bang/bigbang.git//base/flux?ref=master
 ```
 Note that you can replace ```master``` in the ```kubectl apply -k``` command above with tag of the Big Bang release you need. For example:
 ```
