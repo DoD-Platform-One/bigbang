@@ -1007,11 +1007,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.46.7-bb.8"
+      tag: "5.46.7-bb.9"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.46.7-bb.8"
+      tag: "5.46.7-bb.9"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -1493,11 +1493,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.27.4-bb.3"
+      tag: "1.27.4-bb.4"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "1.27.4-bb.3"
+      tag: "1.27.4-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1707,11 +1707,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "5.1.3-bb.1"
+      tag: "5.1.3-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "5.1.3-bb.1"
+      tag: "5.1.3-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -1907,12 +1907,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
-      tag: "12.13.12-bb.3"
+      tag: "12.13.12-bb.4"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "12.13.12-bb.3"
+      tag: "12.13.12-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
