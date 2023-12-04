@@ -1493,7 +1493,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.27.4-bb.4"
+      tag: "1.27.4-bb.3"
       branch: "anchore-script-fix"
     helmRepo:
       repoName: "registry1"
