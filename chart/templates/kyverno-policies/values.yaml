@@ -705,6 +705,7 @@ policies:
       - istio-operator
       - twistlock
       - logging
+      - kyverno
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -744,6 +745,17 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: kyverno
+        pods:
+        - kyverno-reports-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-controller-*
+        - kyverno-cleanup-admission-reports-*
+        - kyverno-admission-controller-*
+        - kyverno-background-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-cluster-admission-reports-*
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
