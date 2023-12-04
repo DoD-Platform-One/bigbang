@@ -1907,12 +1907,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
-      tag: "12.13.12-bb.3"
+      tag: "12.13.12-bb.4"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "12.13.12-bb.3"
+      tag: "12.13.12-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
