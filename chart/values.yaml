@@ -506,11 +506,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.0.4-bb.10"
+    tag: "3.0.4-bb.12"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.0.4-bb.10"
+    tag: "3.0.4-bb.12"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -786,11 +786,11 @@ tempo:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
-    tag: "1.7.0-bb.1"
+    tag: "1.7.0-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "tempo"
-    tag: "1.7.0-bb.1"
+    tag: "1.7.0-bb.3"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -854,11 +854,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "52.1.0-bb.0"
+    tag: "52.1.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "52.1.0-bb.0"
+    tag: "52.1.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -1007,11 +1007,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "5.46.7-bb.8"
+      tag: "5.46.7-bb.9"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "5.46.7-bb.8"
+      tag: "5.46.7-bb.9"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
@@ -1360,11 +1360,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
-      tag: "8.0.2-bb.2"
+      tag: "8.0.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "sonarqube"
-      tag: "8.0.2-bb.2"
+      tag: "8.0.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
@@ -1707,11 +1707,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "5.1.3-bb.1"
+      tag: "5.1.3-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "5.1.3-bb.1"
+      tag: "5.1.3-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -1838,11 +1838,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
-      tag: "3.10.0-bb.3"
+      tag: "3.11.0-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "metrics-server"
-      tag: "3.10.0-bb.3"
+      tag: "3.11.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
@@ -1865,12 +1865,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
-      tag: "1.13.1-bb.2"
+      tag: "1.13.1-bb.3"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "harbor"
-      tag: "1.13.1-bb.2"
+      tag: "1.13.1-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
