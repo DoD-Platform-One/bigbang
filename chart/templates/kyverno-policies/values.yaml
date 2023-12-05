@@ -696,7 +696,11 @@ policies:
       - istio-operator
       - twistlock
       - logging
+<<<<<<< chart/templates/kyverno-policies/values.yaml
       - velero
+=======
+      - kyverno
+>>>>>>> chart/templates/kyverno-policies/values.yaml
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -744,6 +748,17 @@ policies:
         - velero-upgrade-crds-*
         - velero-velero-server-*
         - node-agent-*
+      - namespace: kyverno
+        pods:
+        - kyverno-reports-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-controller-*
+        - kyverno-cleanup-admission-reports-*
+        - kyverno-admission-controller-*
+        - kyverno-background-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-cluster-admission-reports-*
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
