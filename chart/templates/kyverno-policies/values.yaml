@@ -697,9 +697,9 @@ policies:
       - twistlock
       - logging
       - kyverno
-      - velero      
+      - velero
       - neuvector
-
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
