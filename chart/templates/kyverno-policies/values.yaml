@@ -696,11 +696,8 @@ policies:
       - istio-operator
       - twistlock
       - logging
-<<<<<<< chart/templates/kyverno-policies/values.yaml
       - velero
-=======
       - kyverno
->>>>>>> chart/templates/kyverno-policies/values.yaml
       
   update-automountserviceaccounttokens:
     enabled: true
