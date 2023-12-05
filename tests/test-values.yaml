@@ -187,6 +187,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - sonarqube/sonarqube-cypress-test
           - tempo/tempo-cypress-test
+          - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
@@ -325,6 +326,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - sonarqube/sonarqube-cypress-test
           - tempo/tempo-cypress-test
+          - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
