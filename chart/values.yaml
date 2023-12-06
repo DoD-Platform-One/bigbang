@@ -687,7 +687,8 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.31.0-bb.10"
+    tag: null
+    branch: "72-implement-istio-authorization-policies"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
