@@ -558,6 +558,11 @@ kyvernoPolicies:
               - argocd
               names:
               - guestbook-ui-*
+          - resources:
+              namespaces:
+                - gitlab-runner
+              names:
+                - gitlab-runner-*
       restrict-volume-types:
         exclude:
           any:
