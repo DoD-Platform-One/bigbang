@@ -697,6 +697,7 @@ policies:
       - twistlock
       - logging
       - kyverno
+      - harbor
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -746,6 +747,9 @@ policies:
         - kyverno-background-controller-*
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
+      - namespace: harbor
+        serviceAccounts: 
+        - harbor-redis-bb
 
 
 istio:
