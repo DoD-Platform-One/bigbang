@@ -697,6 +697,7 @@ policies:
       - twistlock
       - logging
       - kyverno
+      - jaeger
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -747,6 +748,9 @@ policies:
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
 
+      - namespace: jaeger
+        pods:
+        - jaeger-jaeger-jaeger-operator-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
