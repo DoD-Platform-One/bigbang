@@ -697,7 +697,6 @@ policies:
       - twistlock
       - argocd
       - logging
-      - velero
       - minio
       - minio-operator
       - kyverno
@@ -707,6 +706,7 @@ policies:
       - jaeger
       - harbor
       - authservice
+      - jaeger
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -837,6 +837,11 @@ policies:
         - authservice
         pods:
         - authservice-authservice-redis-bb-*
+      - namespace: jaeger
+        pods:
+        - jaeger-jaeger-jaeger-operator-*
+
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
