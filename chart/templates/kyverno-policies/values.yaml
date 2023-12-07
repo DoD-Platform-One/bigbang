@@ -710,7 +710,7 @@ policies:
       - anchore
       - jaeger
 
-
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -855,11 +855,9 @@ policies:
         - anchore-ui-redis
         pods:
         - anchore-ui-redis-*
-
       - namespace: jaeger
         pods:
         - jaeger-jaeger-jaeger-operator-*
-
 
 istio:
   enabled: {{ .Values.istio.enabled }}
