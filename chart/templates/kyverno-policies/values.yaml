@@ -242,6 +242,7 @@ policies:
           - gitlab
           names: 
           - gitlab-minio-*
+          - gitlab-redis-*
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
