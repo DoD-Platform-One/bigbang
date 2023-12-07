@@ -235,6 +235,13 @@ policies:
   require-image-signature:
     enabled: false
     validationFailureAction: audit
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - gitlab
+          names: 
+          gitlab-minio-*
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
