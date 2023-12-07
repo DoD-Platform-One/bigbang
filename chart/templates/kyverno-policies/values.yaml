@@ -704,7 +704,6 @@ policies:
       - neuvector
       - kiali
       - jaeger
-
       
   update-automountserviceaccounttokens:
     enabled: true
