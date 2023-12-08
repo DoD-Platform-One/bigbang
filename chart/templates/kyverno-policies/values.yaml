@@ -778,7 +778,6 @@ policies:
         - kiali-*
 
 
-
 istio:
   enabled: {{ .Values.istio.enabled }}
 
