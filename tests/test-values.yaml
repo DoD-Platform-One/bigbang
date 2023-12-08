@@ -67,12 +67,12 @@ istio:
       tls:
         key: "" # Gets added via chart/ingress-certs.yaml
         cert: "" # Gets added via chart/ingress-certs.yaml
-  postInstallHook:
-    resources:
-      requests:
-        cpu: "2"
-        memory: "2Gi"
   values:
+    postInstallHook:
+      resources:
+        requests:
+          cpu: "2"
+          memory: "2Gi"
     kiali:
       dashboard:
         auth:
