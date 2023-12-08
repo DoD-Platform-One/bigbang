@@ -746,7 +746,7 @@ policies:
         - kyverno-background-controller-*
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
-
+      - namespace: kiali 
 
 istio:
   enabled: {{ .Values.istio.enabled }}
