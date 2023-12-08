@@ -114,6 +114,11 @@ kiali:
           #cypress_keycloak_test_enable: "true"
           #cypress_keycloak_username: "cypress"
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+
 
 clusterAuditor:
   enabled: false
