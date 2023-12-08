@@ -748,6 +748,8 @@ policies:
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
       - namespace: kiali 
+        pods:
+        - kiali-*
 
 
 istio:
