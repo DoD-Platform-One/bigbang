@@ -2,7 +2,7 @@
 # These values inherit and override values from tests/test-values.yaml
 networkPolicies:
   controlPlaneCidr: 10.0.0.0/8
-
+#
 istio:
   values:
     values:
