@@ -2000,6 +2000,13 @@ addons:
             memory: 200Mi
           initContainer:
             migrator: {}
+            resources:
+            requests:
+              memory: 100Mi
+              cpu: 80m
+            limits:
+              cpu: 80m
+              memory: 100Mi
             permissions: {}
             resources:
               requests:
