@@ -697,6 +697,7 @@ policies:
       - twistlock
       - logging
       - kyverno
+      - kiali
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -747,6 +748,7 @@ policies:
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
       - namespace: kiali 
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
