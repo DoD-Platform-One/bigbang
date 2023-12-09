@@ -909,6 +909,13 @@ neuvector:
         artifacts: true
         envs:
           cypress_url: https://neuvector.bigbang.dev
+        resources:
+          requests:
+            cpu: "2"
+            memory: "1500M"
+          limits:
+            cpu: "2"
+            memory: "1500M"
 
 twistlock:
   enabled: false
