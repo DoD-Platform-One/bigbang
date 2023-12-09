@@ -104,6 +104,9 @@ kiali:
           # if enabling the keycloak SSO integration test, set strategy to "openid"
           #strategy: "openid"
           strategy: "anonymous"
+    resources:
+      limits:
+        cpu: "1"          
     bbtests:
       enabled: true
       cypress:
