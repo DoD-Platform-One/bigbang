@@ -697,8 +697,9 @@ policies:
       - twistlock
       - logging
       - kyverno
+      - velero      
       - neuvector
-      
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -747,6 +748,16 @@ policies:
         - kyverno-background-controller-*
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
+      - namespace: velero
+        serviceAccounts:
+        - velero
+        - velero-upgrade-crds
+        - velero-velero-server
+        pods:
+        - velero-cleanup-crds-*
+        - velero-velero-*
+        - node-agent-*
+        - velero-label-namespace-*
       - namespace: neuvector
         serviceAccounts:
         - basic
