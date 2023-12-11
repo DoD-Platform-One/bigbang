@@ -696,8 +696,10 @@ policies:
       - istio-operator
       - twistlock
       - logging
+      - velero
       - kyverno
-      
+      - velero
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -736,6 +738,14 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: velero
+        serviceAccounts:
+        - velero-velero-*
+        - velero-label-namespace-*
+        - velero-cleanup-crds-*
+        - velero-upgrade-crds-*
+        - velero-velero-server-*
+        - node-agent-*
       - namespace: kyverno
         pods:
         - kyverno-reports-controller-*
@@ -746,6 +756,16 @@ policies:
         - kyverno-background-controller-*
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
+      - namespace: velero
+        serviceAccounts:
+        - velero
+        - velero-upgrade-crds
+        - velero-velero-server
+        pods:
+        - velero-cleanup-crds-*
+        - velero-velero-*
+        - node-agent-*
+        - velero-label-namespace-*
 
 
 istio:
