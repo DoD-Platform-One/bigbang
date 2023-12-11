@@ -45,6 +45,7 @@ flux:
   timeout: 20m
   interval: 1m
   rollback:
+    timeout: 20m
     cleanupOnFail: false
 
 networkPolicies:
@@ -721,33 +722,33 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
     backend:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
     read:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
     bbtests:
       enabled: true
       cypress:
@@ -1978,21 +1979,14 @@ addons:
             memory: 200Mi
           initContainer:
             migrator: {}
-            resources:
-            requests:
-              memory: 100Mi
-              cpu: 80m
-            limits:
-              cpu: 80m
-              memory: 100Mi
             permissions: {}
             resources:
-            requests:
-              memory: 100Mi
-              cpu: 80m
-            limits:
-              cpu: 80m
-              memory: 100Mi
+              requests:
+                memory: 100Mi
+                cpu: 80m
+              limits:
+                cpu: 80m
+                memory: 100Mi
       postgresql:
         resources:
           requests:
