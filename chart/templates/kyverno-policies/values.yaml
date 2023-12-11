@@ -378,6 +378,13 @@ policies:
           names:
           - promtail-promtail*
       {{- end }}
+      {{- if .Values.packages.jira.enabled }}
+      - resources:
+          namespaces:
+          - jira
+          names:
+          - jira-*
+      {{- end }}
     {{- end }}
 
   {{- if .Values.twistlock.enabled }}
