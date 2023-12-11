@@ -105,6 +105,9 @@ kiali:
           # if enabling the keycloak SSO integration test, set strategy to "openid"
           #strategy: "openid"
           strategy: "anonymous"
+    resources:
+      limits:
+        cpu: "1"          
     bbtests:
       enabled: true
       cypress:
@@ -117,6 +120,9 @@ kiali:
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
         resources:
           requests:
+            cpu: 2
+            memory: 2Gi
+          limits:
             cpu: 2
             memory: 2Gi
 
@@ -910,6 +916,13 @@ neuvector:
         artifacts: true
         envs:
           cypress_url: https://neuvector.bigbang.dev
+        resources:
+          requests:
+            cpu: "2"
+            memory: "1500M"
+          limits:
+            cpu: "2"
+            memory: "1500M"
 
 twistlock:
   enabled: false
