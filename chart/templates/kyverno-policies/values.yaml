@@ -858,8 +858,6 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
 
-
-
 istio:
   enabled: {{ .Values.istio.enabled }}
 
