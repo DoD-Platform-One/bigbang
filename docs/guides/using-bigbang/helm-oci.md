@@ -10,7 +10,7 @@ There is a `HelmRepositories` property which holds an array of defined helm repo
 
 ```yaml
 helmRepositories: 
-    - name: "registry1"
+  - name: "registry1"
     repository: "oci://registry1.dso.mil/bigbang"
     existingSecret: "private-registry"
     type: "oci"
