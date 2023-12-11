@@ -1874,7 +1874,7 @@ addons:
   harbor:
     # -- Toggle deployment of harbor
     enabled: false
-
+    #
     # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values:
       expose:
