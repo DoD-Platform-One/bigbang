@@ -706,8 +706,9 @@ policies:
       - jaeger
       - harbor
       - authservice
-      - jaeger
 
+      - jaeger
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -841,8 +842,6 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
         - jaeger-clean-svc-monitor
-
-
 
 istio:
   enabled: {{ .Values.istio.enabled }}
