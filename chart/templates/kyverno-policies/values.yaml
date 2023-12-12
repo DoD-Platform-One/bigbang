@@ -794,7 +794,6 @@ policies:
       - namespace: promtail
         pods:
         - promtail-promtail-*
-
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
