@@ -695,6 +695,7 @@ policies:
       - istio-system
       - istio-operator
       - twistlock
+      - argocd
       - logging
       - velero
       - kyverno
@@ -781,8 +782,32 @@ policies:
         - neuvector-updater-pod-*
         - neuvector-prometheus-exporter-pod-*
         - neuvector-registry-adapter-pod-*
-
-
+      - namespace: argocd
+        pods:
+        # application-controller pods interact with secrets, configmaps, events, and Argo CRDs 
+        # More details in argocd/chart/templates/argocd-application-controller/role.yaml
+        - argocd-argocd-application-controller-*
+        # dex pods interact with secrets and configmaps
+        # More details in argocd/chart/templates/dex/role.yaml
+        - argocd-argocd-dex-server-*
+        # argocd-upgrade-job interacts with CRDs
+        # More details in argocd/chart/templates/bigbang/upgrade-job.yaml
+        - argocd-upgrade-job
+        # argocd server pods interact with secrets, configmaps, events, and CRDs 
+        # More details in argocd/chart/templates/argocd-server/role.yaml
+        - argocd-argocd-server-*
+        # repo server pods require access to the K8s API if using RBAC
+        # Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md
+        - argocd-argocd-repo-server-*
+        # The applicationSet controller pods interact with many API resources, including CRDs
+        # More details in argocd/chart/templates/argocd-applicationset/role.yaml
+        - argocd-argocd-applicationset-controller-*
+        # notifications controller pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/role.yaml
+        # Additionally (this wildcard covers both)-
+        # notifications bot pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
+        - argocd-argocd-notifications-controller-*
 istio:
   enabled: {{ .Values.istio.enabled }}
 
