@@ -698,6 +698,8 @@ policies:
       - argocd
       - logging
       - velero
+      - minio
+      - minio-operator
       - kyverno
       - velero
       - neuvector
@@ -740,6 +742,22 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: minio-operator
+        pods:
+        # console pods require access to several API resources
+        # More details in minio-operator/chart/templates/console-clusterrole.yaml
+        - console-*
+        # operator pods require access to several API resources
+        # More details in minio-operator/chart/templates/operator-clusterrole.yaml
+        - minio-operator-*
+        # tenantPatchJob requires get/list/patch on tenants (minio CRD)
+        # More details in minio-operator/chart/templates/bigbang/tenant-patch-job.yaml
+        - bb-minio-operator-minio-operator-tenant-patch
+      - namespace: minio
+        pods:
+        # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
+        # More details in role named minio-minio-minio-instance-role
+        - minio-minio-minio-instance-ss-0-*
       - namespace: velero
         serviceAccounts:
         - velero-velero-*
