@@ -708,7 +708,8 @@ policies:
       - velero
       - kyverno
       - velero
-
+      - neuvector
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -775,6 +776,20 @@ policies:
         - velero-velero-*
         - node-agent-*
         - velero-label-namespace-*
+      - namespace: neuvector
+        serviceAccounts:
+        - basic
+        - controller
+        - enforcer
+        - updater
+        pods:
+        - neuvector-manager-pod-*
+        - neuvector-scanner-pod-*
+        - neuvector-controller-pod-*
+        - neuvector-enforcer-pod-*
+        - neuvector-updater-pod-*
+        - neuvector-prometheus-exporter-pod-*
+        - neuvector-registry-adapter-pod-*
 
 
 istio:
