@@ -375,6 +375,13 @@ kyvernoReporter:
           cypress_grafana_url: https://grafana.bigbang.dev
           cypress_prometheus_url: https://prometheus.bigbang.dev
           cypress_check_datasource: 'true'
+        resources:
+          requests:
+            cpu: 2
+            memory: 3Gi
+          limits:
+            cpu: 2
+            memory: 3Gi
 
 kyvernoPolicies:
   values:
