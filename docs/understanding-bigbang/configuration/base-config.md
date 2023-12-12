@@ -259,6 +259,8 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | neuvector.sso.client_id | string | `""` | OIDC Client ID to use for Neuvector |
 | neuvector.sso.client_secret | string | `""` | OIDC Client Secret to use for Neuvector |
 | neuvector.sso.default_role | string | `""` | Default role to use for Neuvector OIDC users. Supports admin, reader, or no default |
+| neuvector.sso.group_claim | string | `""` | Claim in token to pull groups from. Supports openid, profile, email, or no default |
+| neuvector.sso.group_mapped_roles | array |  `{"group":"", "global_role":""}` | List of groups to map to Neuvector global roles. Supports admin, reader, ciops, or no default |
 | neuvector.flux | object | `{}` | Flux reconciliation overrides specifically for the Neuvector Package |
 | neuvector.values | object | `{}` | Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git |
 | neuvector.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
