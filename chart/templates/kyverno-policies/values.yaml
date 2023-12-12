@@ -696,8 +696,9 @@ policies:
       - istio-operator
       - twistlock
       - logging
-      - velero
       - kyverno
+      - velero
+      - neuvector
       - kiali
       
   update-automountserviceaccounttokens:
