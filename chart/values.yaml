@@ -1493,11 +1493,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.27.4-bb.5"
+      tag: "1.27.4-bb.6"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "1.27.4-bb.5"
+      tag: "1.27.4-bb.6"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
