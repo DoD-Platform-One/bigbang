@@ -697,6 +697,7 @@ policies:
       - twistlock
       - argocd
       - logging
+      - velero
       - minio
       - minio-operator
       - kyverno
@@ -704,6 +705,7 @@ policies:
       - neuvector
       - kiali
       - jaeger
+
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -826,6 +828,7 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
         - jaeger-clean-svc-monitor
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
