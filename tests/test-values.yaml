@@ -378,7 +378,10 @@ kyvernoReporter:
         resources:
           requests:
             cpu: 2
-            memory: 8Gi
+            memory: 3Gi
+          limits:
+            cpu: 2
+            memory: 3Gi
 
 kyvernoPolicies:
   values:
