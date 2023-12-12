@@ -703,6 +703,7 @@ policies:
       - kyverno
       - velero
       - neuvector
+      - anchore
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -826,7 +827,12 @@ policies:
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
-istio:
+      - namespace: anchore
+        serviceAccounts:
+        - anchore-ui-redis
+        pods:
+        - anchore-ui-redis-*
+
   enabled: {{ .Values.istio.enabled }}
 
 {{- end }}
