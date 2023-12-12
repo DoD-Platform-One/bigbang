@@ -763,6 +763,12 @@ neuvector:
     # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
     default_role: ""
 
+    # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
+    group_claim: ""
+
+    # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
+    group_mapped_roles: []
+
   # -- Flux reconciliation overrides specifically for the Neuvector Package
   flux: {}
 

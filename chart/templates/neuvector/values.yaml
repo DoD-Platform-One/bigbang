@@ -46,6 +46,9 @@ controller:
         client_id: {{ .Values.neuvector.sso.client_id }}
         client_secret: {{ .Values.neuvector.sso.client_secret | default "no-secret" }}
         default_role: {{ .Values.neuvector.sso.default_role }}
+        group_claim: {{ .Values.neuvector.sso.group_claim }}
+        group_mapped_roles: 
+          {{ toYaml .Values.neuvector.sso.group_mapped_roles | nindent 10 }}
       {{- end }}
   {{- end }}
   {{- if and .Values.neuvector.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
