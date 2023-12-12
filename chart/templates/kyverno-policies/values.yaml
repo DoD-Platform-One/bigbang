@@ -709,6 +709,7 @@ policies:
       - kyverno
       - velero
       - neuvector
+      - promtail
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -790,7 +791,9 @@ policies:
         - neuvector-updater-pod-*
         - neuvector-prometheus-exporter-pod-*
         - neuvector-registry-adapter-pod-*
-
+      - namespace: promtail
+        pods:
+        - promtail-promtail-*
 
       - namespace: logging
         serviceAccounts:
