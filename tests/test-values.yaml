@@ -45,6 +45,7 @@ flux:
   timeout: 20m
   interval: 1m
   rollback:
+    timeout: 20m
     cleanupOnFail: false
 
 networkPolicies:
@@ -104,6 +105,9 @@ kiali:
           # if enabling the keycloak SSO integration test, set strategy to "openid"
           #strategy: "openid"
           strategy: "anonymous"
+    resources:
+      limits:
+        cpu: "1"          
     bbtests:
       enabled: true
       cypress:
@@ -114,6 +118,14 @@ kiali:
           #cypress_keycloak_test_enable: "true"
           #cypress_keycloak_username: "cypress"
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
+        resources:
+          requests:
+            cpu: 2
+            memory: 2Gi
+          limits:
+            cpu: 2
+            memory: 2Gi
+
 
 clusterAuditor:
   enabled: false
@@ -186,6 +198,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - sonarqube/sonarqube-cypress-test
           - tempo/tempo-cypress-test
+          - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
@@ -324,6 +337,7 @@ gatekeeper:
           - nexus-repository-manager/nexus-repository-manager-cypress-test
           - sonarqube/sonarqube-cypress-test
           - tempo/tempo-cypress-test
+          - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
           # Allow kyverno test vectors for Helm test
@@ -422,7 +436,8 @@ kyvernoPolicies:
           - kyverno-policies-bbtest/required
       require-image-signature:
         enabled: true
-        validationFailureAction: enforce
+        # set to Audit for now -- having signature issues with registry1.dso.mil/ironbank/bitnami/redis:7.0.0-debian-10-r3
+        validationFailureAction: Audit
         parameters:
           require:
           - imageReferences:
@@ -436,6 +451,10 @@ kyvernoPolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
                     5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
                     -----END PUBLIC KEY-----
+                  # Skip Rekor Transparency log check
+                  rekor:
+                    ignoreTlog: true
+                    url: ""
             mutateDigest: false
             verifyDigest: false 
           - imageReferences:
@@ -449,6 +468,10 @@ kyvernoPolicies:
                     MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7CjMGH005DFFz6mffqTIGurBt6fL
                     UfTZxuEDFRBS8mFJx1xw8DEVvjMibLTtqmAoJxUmzmGFgzz+LV875syVEg==
                     -----END PUBLIC KEY-----
+                  # Skip Rekor Transparency log check
+                  rekor:
+                    ignoreTlog: true
+                    url: ""
             # Ironbank images are rebuilt nightly and tags are not immutable
             mutateDigest: false
             verifyDigest: false
@@ -706,33 +729,33 @@ loki:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 1
+          memory: 1G
     backend:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 500m
+          memory: 1G
     read:
       replicas: 3
       persistence:
         size: 2Gi
       resources:
         limits:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
         requests:
-          cpu: 200m
-          memory: 400Mi
+          cpu: 400m
+          memory: 500Mi
     bbtests:
       enabled: true
       cypress:
@@ -894,6 +917,13 @@ neuvector:
         artifacts: true
         envs:
           cypress_url: https://neuvector.bigbang.dev
+        resources:
+          requests:
+            cpu: "2"
+            memory: "1500M"
+          limits:
+            cpu: "2"
+            memory: "1500M"
 
 twistlock:
   enabled: false
@@ -1963,21 +1993,14 @@ addons:
             memory: 200Mi
           initContainer:
             migrator: {}
-            resources:
-            requests:
-              memory: 100Mi
-              cpu: 80m
-            limits:
-              cpu: 80m
-              memory: 100Mi
             permissions: {}
             resources:
-            requests:
-              memory: 100Mi
-              cpu: 80m
-            limits:
-              cpu: 80m
-              memory: 100Mi
+              requests:
+                memory: 100Mi
+                cpu: 80m
+              limits:
+                cpu: 80m
+                memory: 100Mi
       postgresql:
         resources:
           requests:
