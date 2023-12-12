@@ -703,6 +703,7 @@ policies:
       - kyverno
       - velero
       - neuvector
+      - kiali
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -800,6 +801,9 @@ policies:
         - neuvector-updater-pod-*
         - neuvector-prometheus-exporter-pod-*
         - neuvector-registry-adapter-pod-*
+      - namespace: kiali 
+        pods:
+        - kiali-*
       - namespace: argocd
         pods:
         # application-controller pods interact with secrets, configmaps, events, and Argo CRDs 
@@ -826,6 +830,7 @@ policies:
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
