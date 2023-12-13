@@ -704,6 +704,7 @@ policies:
       - velero
       - neuvector
       - kiali
+      - harbor
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -830,6 +831,10 @@ policies:
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
+      - namespace: harbor
+        serviceAccounts: 
+        - harbor-redis-bb
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
