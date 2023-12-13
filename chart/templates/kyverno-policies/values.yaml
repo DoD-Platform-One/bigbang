@@ -709,7 +709,6 @@ policies:
       - jaeger
       - anchore
       - jaeger
-
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -858,6 +857,8 @@ policies:
       - namespace: jaeger
         pods:
         - jaeger-jaeger-jaeger-operator-*
+
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
