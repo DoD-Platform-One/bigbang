@@ -706,7 +706,8 @@ policies:
       - kiali
       - jaeger
       - harbor
-      
+      - authservice
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -831,7 +832,11 @@ policies:
       - namespace: harbor
         serviceAccounts: 
         - harbor-redis-bb
-
+      - namespace: authservice
+        serviceAccounts:
+        - authservice
+        pods:
+        - authservice-authservice-redis-bb-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
