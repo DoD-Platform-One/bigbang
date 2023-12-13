@@ -703,7 +703,6 @@ policies:
       - velero
       - neuvector
       - kiali
-      - jaeger
       - harbor
       - authservice
       - jaeger
