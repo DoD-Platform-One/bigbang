@@ -834,6 +834,9 @@ policies:
         - anchore-ui-redis
         pods:
         - anchore-ui-redis-*
+      - namespace: fluentbit
+        serviceAccounts:
+        - fluentbit-fluentbit-* 
 
 istio:
   enabled: {{ .Values.istio.enabled }}
