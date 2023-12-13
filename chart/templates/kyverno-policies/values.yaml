@@ -169,23 +169,6 @@ policies:
           names:
           - prometheus-monitoring-monitoring-kube-prometheus*
       {{- end }}
-      {{- if .Values.grafana.enabled }}
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - ServiceAccount
-          names:
-          - monitoring-grafana
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - Pod
-          - Deployment
-          names:
-          - monitoring-grafana*
-      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -840,7 +823,12 @@ policies:
         - authservice
         pods:
         - authservice-authservice-redis-bb-*
-
+      - namespace: monitoring
+        serviceAccounts:
+        - monitoring-grafana
+        pods:
+        - monitoring-grafana-*
+        
 istio:
   enabled: {{ .Values.istio.enabled }}
 
