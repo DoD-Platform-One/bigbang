@@ -689,7 +689,8 @@ policies:
       - kiali
       - harbor
       - authservice
-
+      - anchore
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -828,7 +829,12 @@ policies:
         - monitoring-grafana
         pods:
         - monitoring-grafana-*
-        
+      - namespace: anchore
+        serviceAccounts:
+        - anchore-ui-redis
+        pods:
+        - anchore-ui-redis-*
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
