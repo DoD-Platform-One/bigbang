@@ -51,7 +51,7 @@
 
 ## How do I deploy Big Bang?
 
-**Note:** The Deployment Process and Pre-Requisites will vary depending on the deployment scenario. The [Quick Start Demo Deployment](./guides/deployment-scenarios/quickstart.md) for example, allows some steps to be skipped due to a mixture of automation and generically reusable demonstration configuration that satisfies pre-requisites. The following is a general overview of the process, reference the [deployment guides](./guides/deployment-scenarios) for more detail.
+**Note:** The Deployment Process and Pre-Requisites will vary depending on the deployment scenario. The [Quick Start Demo Deployment](./guides/deployment-scenarios/quickstart.md) for example, allows some steps to be skipped due to a mixture of automation and generically reusable demonstration configuration that satisfies pre-requisites. The following is a general overview of the process, reference the [deployment guides](./guides/#deployment-scenarios) for more detail.
 
 1. Satisfy Pre-Requisites:
    * Provision a Kubernetes Cluster according to [best practices](./prerequisites/kubernetes-preconfiguration.md#best-practices).
