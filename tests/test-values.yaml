@@ -671,6 +671,11 @@ kyvernoPolicies:
               - velero
               names:
               - velero-backup-restore-test*  
+          - resources:
+              namespaces:
+              - twistlock
+              names:
+              - volume-upgrade-job*
       disallow-namespaces:
         parameters:
           disallow:
