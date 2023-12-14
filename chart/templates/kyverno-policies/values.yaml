@@ -706,6 +706,7 @@ policies:
       - kiali
       - harbor
       - authservice
+      - fortify
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -840,7 +841,10 @@ policies:
         - authservice
         pods:
         - authservice-authservice-redis-bb-*
-
+      - namespace: fortify
+        serviceAccounts:
+        - fortify-mysql
+        
 istio:
   enabled: {{ .Values.istio.enabled }}
 
