@@ -169,23 +169,6 @@ policies:
           names:
           - prometheus-monitoring-monitoring-kube-prometheus*
       {{- end }}
-      {{- if .Values.grafana.enabled }}
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - ServiceAccount
-          names:
-          - monitoring-grafana
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - Pod
-          - Deployment
-          names:
-          - monitoring-grafana*
-      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -706,6 +689,7 @@ policies:
       - harbor
       - authservice
       - jaeger
+      - anchore
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -840,6 +824,16 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
         - jaeger-clean-svc-monitor
+      - namespace: monitoring
+        serviceAccounts:
+        - monitoring-grafana
+        pods:
+        - monitoring-grafana-*
+      - namespace: anchore
+        serviceAccounts:
+        - anchore-ui-redis
+        pods:
+        - anchore-ui-redis-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
