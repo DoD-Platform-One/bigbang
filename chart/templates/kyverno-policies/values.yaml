@@ -687,6 +687,7 @@ policies:
       - velero
       - neuvector
       - kiali
+      - confluence
       - harbor
       - authservice
       - anchore
@@ -816,6 +817,11 @@ policies:
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
+      - namespace: confluence
+        pods:
+        # confluence pods require get/list on endpoints, pods, and nodes
+        # More details in confluence/chart/templates/clusterrole.yaml
+        - confluence-?
       - namespace: harbor
         serviceAccounts: 
         - harbor-redis-bb
