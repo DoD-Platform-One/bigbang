@@ -32,7 +32,7 @@ spec:
         name: {{ $nexusValues.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" $nexusValues.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and $nexusValueshelmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- if (and $nexusValues.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
