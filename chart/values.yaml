@@ -177,6 +177,10 @@ istio:
     repoName: "registry1"
     chartName: "istio"
     tag: "1.19.4-bb.0"
+    # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI)
+    # @default -- False
+    cosignVerify:
+
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription

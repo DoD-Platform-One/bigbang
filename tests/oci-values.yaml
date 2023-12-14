@@ -12,10 +12,33 @@ helmRepositories:
         R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
         -----END PUBLIC KEY-----
 
-istio:
+clusterAuditor:
   sourceType: "helmRepo"
 
+eckOperator:
+  sourceType: "helmRepo"
+
+elasticsearchKibana:
+  sourceType: "helmRepo"
+
+fluentbit:
+  sourceType: "helmRepo"
+
+gatekeeper:
+  sourceType: "helmRepo"
+
+grafana:
+  sourceType: "helmRepo"
+
+istio:
+  sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
+
 istioOperator:
+  sourceType: "helmRepo"
+
+jaeger:
   sourceType: "helmRepo"
 
 kiali:
@@ -30,56 +53,35 @@ kyvernoPolicies:
 kyvernoReporter:
   sourceType: "helmRepo"
 
-promtail:
-  sourceType: "helmRepo"
-
 loki:
-  sourceType: "helmRepo"
-
-neuvector:
-  sourceType: "helmRepo"
-
-tempo:
   sourceType: "helmRepo"
 
 monitoring:
   sourceType: "helmRepo"
 
-grafana:
+neuvector:
+  sourceType: "helmRepo"
+
+promtail:
+  sourceType: "helmRepo"
+
+tempo:
   sourceType: "helmRepo"
 
 twistlock:
   sourceType: "helmRepo"
 
-fluentbit:
-  sourceType: "helmRepo"
-
-jaeger:
-  sourceType: "helmRepo"
-
-eckOperator:
-  sourceType: "helmRepo"
-
-elasticsearchKibana:
-  sourceType: "helmRepo"
-
-clusterAuditor:
-  sourceType: "helmRepo"
-
-gatekeeper:
-  sourceType: "helmRepo"
-
 addons:
+  anchore:
+    sourceType: "helmRepo"
+
   argocd:
     sourceType: "helmRepo"
   
   authservice:
     sourceType: "helmRepo"
 
-  minioOperator:
-    sourceType: "helmRepo"
-
-  minio:
+  fortify:
     sourceType: "helmRepo"
 
   gitlab:
@@ -88,16 +90,13 @@ addons:
   gitlabRunner:
     sourceType: "helmRepo"
 
-  nexusRepositoryManager:
-    sourceType: "helmRepo"
-  
-  sonarqube:
-    sourceType: "helmRepo"
-
   haproxy:
     sourceType: "helmRepo"
 
-  anchore:
+  harbor:
+    sourceType: "helmRepo"
+  
+  keycloak:
     sourceType: "helmRepo"
 
   mattermostOperator:
@@ -106,25 +105,27 @@ addons:
   mattermost:
     sourceType: "helmRepo"
 
-  velero:
-    sourceType: "helmRepo"
-    
-  keycloak:
-    sourceType: "helmRepo"
-
-  vault:
-    sourceType: "helmRepo"
-
   metricsServer:
     sourceType: "helmRepo"
   
-  harbor:
+  minioOperator:
+    sourceType: "helmRepo"
+
+  minio:
+    sourceType: "helmRepo"
+
+  nexusRepositoryManager:
     sourceType: "helmRepo"
   
+  sonarqube:
+    sourceType: "helmRepo"
+
   thanos:
     sourceType: "helmRepo"
 
-  fortify:
+  velero:
     sourceType: "helmRepo"
-
+    
+  vault:
+    sourceType: "helmRepo"
   

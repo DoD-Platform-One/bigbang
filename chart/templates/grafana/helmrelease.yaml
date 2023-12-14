@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.grafana.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.grafana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.grafana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.grafana.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 
