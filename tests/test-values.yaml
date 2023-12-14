@@ -435,7 +435,7 @@ kyvernoPolicies:
           - 'kyverno-policies-bbtest/test: required'
           - kyverno-policies-bbtest/required
       require-image-signature:
-        enabled: true
+        enabled: false
         # set to Audit for now -- having signature issues with registry1.dso.mil/ironbank/bitnami/redis:7.0.0-debian-10-r3
         validationFailureAction: Audit
         parameters:
