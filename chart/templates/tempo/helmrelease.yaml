@@ -1,4 +1,4 @@
-{{- $fluxSettingsTempo := merge .Values.tempo.flux .Values.flux -}}
+{{- $fluxSettingsTempo := mergeOverwrite .Values.flux .Values.tempo.flux -}}
 {{- if .Values.tempo.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

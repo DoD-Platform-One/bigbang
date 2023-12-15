@@ -169,23 +169,6 @@ policies:
           names:
           - prometheus-monitoring-monitoring-kube-prometheus*
       {{- end }}
-      {{- if .Values.grafana.enabled }}
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - ServiceAccount
-          names:
-          - monitoring-grafana
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - Pod
-          - Deployment
-          names:
-          - monitoring-grafana*
-      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -356,6 +339,7 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+          - volume-upgrade-job*
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
@@ -695,8 +679,19 @@ policies:
       - istio-system
       - istio-operator
       - twistlock
+      - argocd
       - logging
+      - velero
+      - minio
+      - minio-operator
       - kyverno
+      - velero
+      - neuvector
+      - kiali
+      - confluence
+      - harbor
+      - authservice
+      - anchore
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -736,6 +731,22 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+      - namespace: minio-operator
+        pods:
+        # console pods require access to several API resources
+        # More details in minio-operator/chart/templates/console-clusterrole.yaml
+        - console-*
+        # operator pods require access to several API resources
+        # More details in minio-operator/chart/templates/operator-clusterrole.yaml
+        - minio-operator-*
+        # tenantPatchJob requires get/list/patch on tenants (minio CRD)
+        # More details in minio-operator/chart/templates/bigbang/tenant-patch-job.yaml
+        - bb-minio-operator-minio-operator-tenant-patch
+      - namespace: minio
+        pods:
+        # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
+        # More details in role named minio-minio-minio-instance-role
+        - minio-minio-minio-instance-ss-0-*
       - namespace: kyverno
         pods:
         - kyverno-reports-controller-*
@@ -746,6 +757,86 @@ policies:
         - kyverno-background-controller-*
         - kyverno-admission-controller-*
         - kyverno-cleanup-cluster-admission-reports-*
+      - namespace: velero
+        serviceAccounts:
+        - velero
+        - velero-upgrade-crds
+        - velero-velero-server
+        pods:
+        - velero-cleanup-crds-*
+        - velero-velero-*
+        - node-agent-*
+        - velero-label-namespace-*
+      - namespace: neuvector
+        serviceAccounts:
+        - basic
+        - controller
+        - enforcer
+        - updater
+        pods:
+        - neuvector-manager-pod-*
+        - neuvector-scanner-pod-*
+        - neuvector-controller-pod-*
+        - neuvector-enforcer-pod-*
+        - neuvector-updater-pod-*
+        - neuvector-prometheus-exporter-pod-*
+        - neuvector-registry-adapter-pod-*
+      - namespace: kiali 
+        pods:
+        - kiali-*
+      - namespace: argocd
+        pods:
+        # application-controller pods interact with secrets, configmaps, events, and Argo CRDs 
+        # More details in argocd/chart/templates/argocd-application-controller/role.yaml
+        - argocd-argocd-application-controller-*
+        # dex pods interact with secrets and configmaps
+        # More details in argocd/chart/templates/dex/role.yaml
+        - argocd-argocd-dex-server-*
+        # argocd-upgrade-job interacts with CRDs
+        # More details in argocd/chart/templates/bigbang/upgrade-job.yaml
+        - argocd-upgrade-job
+        # argocd server pods interact with secrets, configmaps, events, and CRDs 
+        # More details in argocd/chart/templates/argocd-server/role.yaml
+        - argocd-argocd-server-*
+        # repo server pods require access to the K8s API if using RBAC
+        # Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md
+        - argocd-argocd-repo-server-*
+        # The applicationSet controller pods interact with many API resources, including CRDs
+        # More details in argocd/chart/templates/argocd-applicationset/role.yaml
+        - argocd-argocd-applicationset-controller-*
+        # notifications controller pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/role.yaml
+        # Additionally (this wildcard covers both)-
+        # notifications bot pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
+        - argocd-argocd-notifications-controller-*
+      - namespace: confluence
+        pods:
+        # confluence pods require get/list on endpoints, pods, and nodes
+        # More details in confluence/chart/templates/clusterrole.yaml
+        - confluence-?
+      - namespace: harbor
+        serviceAccounts: 
+        - harbor-redis-bb
+      - namespace: authservice
+        serviceAccounts:
+        - authservice
+        pods:
+        - authservice-authservice-redis-bb-*
+      - namespace: monitoring
+        serviceAccounts:
+        - monitoring-grafana
+        pods:
+        - monitoring-grafana-*
+      - namespace: anchore
+        serviceAccounts:
+        - anchore-ui-redis
+        pods:
+        - anchore-ui-redis-*
+      - namespace: jaeger
+        pods:
+        - jaeger-jaeger-jaeger-operator-*
+        - jaeger-clean-svc-monitor
 
 
 istio:

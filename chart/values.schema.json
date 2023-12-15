@@ -608,6 +608,23 @@
             },
             "issuer": {
               "type": "string"
+            },
+            "group_claim": {
+              "type": "string"
+            },
+            "group_mapped_roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "group": {
+                    "type": "string"
+                  },
+                  "global_role":{
+                    "type": "string"
+                  }
+                }
+              }
             }
           },
           "additionalProperties": false

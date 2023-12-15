@@ -1,5 +1,5 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
-{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- if and (eq $nexusValues.sourceType "git") $nexusValues.enabled  }}
 {{- $gitCredsDict := dict
   "name" "nexusRepositoryManager"

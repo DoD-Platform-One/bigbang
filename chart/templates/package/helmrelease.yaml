@@ -4,9 +4,9 @@
 {{- $pkg := include "resourceName" $pkg -}}
 {{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
 {{- if $defaults -}}
-{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
 {{- end -}}
-{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
+{{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
