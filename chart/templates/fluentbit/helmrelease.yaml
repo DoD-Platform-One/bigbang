@@ -30,7 +30,8 @@ spec:
         name: {{ .Values.fluentbit.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.fluentbit.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.fluentbit.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.fluentbit.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.fluentbit.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:

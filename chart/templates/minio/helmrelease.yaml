@@ -25,7 +25,8 @@ spec:
         name: {{ .Values.addons.minio.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.minio.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.minio.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.addons.minio.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.addons.minio.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
@@ -35,7 +36,7 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsMinio | nindent 2 }}
-  
+
   {{- if .Values.addons.minio.postRenderers }}
   postRenderers:
   {{ toYaml .Values.addons.minio.postRenderers | nindent 4 }}
@@ -57,5 +58,5 @@ spec:
     {{- if .Values.monitoring.enabled }}
     - name: monitoring
       namespace: {{ .Release.Namespace }}
-    {{- end }}      
+    {{- end }}
 {{- end }}

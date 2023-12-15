@@ -29,7 +29,8 @@ spec:
         name: {{ .Values.jaeger.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.jaeger.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.jaeger.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.jaeger.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.jaeger.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:

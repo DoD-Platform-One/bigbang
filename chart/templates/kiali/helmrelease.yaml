@@ -29,7 +29,8 @@ spec:
         name: {{ .Values.kiali.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.kiali.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.kiali.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.kiali.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.kiali.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
@@ -39,7 +40,7 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsKiali | nindent 2 }}
-  
+
   {{- if .Values.kiali.postRenderers }}
   postRenderers:
   {{ toYaml .Values.kiali.postRenderers | nindent 4 }}

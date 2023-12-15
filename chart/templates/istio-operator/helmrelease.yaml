@@ -29,7 +29,8 @@ spec:
         name: {{ .Values.istioOperator.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.istioOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.istioOperator.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.istioOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.istioOperator.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
@@ -54,7 +55,7 @@ spec:
     - name: {{ .Release.Name }}-istio-operator-values
       kind: Secret
       valuesKey: "overlays"
-  
+
   {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}

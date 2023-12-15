@@ -35,7 +35,8 @@ spec:
         name: {{ dig "helmRepo" "repoName" "registry1" $vals }}
         namespace: {{ $.Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" $vals.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and $vals.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" $vals.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true $vals.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:

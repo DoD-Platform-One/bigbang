@@ -29,7 +29,8 @@ spec:
         name: {{ .Values.addons.velero.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.velero.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.velero.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.addons.velero.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.addons.velero.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
@@ -39,7 +40,7 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsVelero | nindent 2 }}
-  
+
   {{- if .Values.addons.velero.postRenderers }}
   postRenderers:
   {{ toYaml .Values.addons.velero.postRenderers | nindent 4 }}
@@ -56,11 +57,11 @@ spec:
       valuesKey: "overlays"
   {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
-    {{- if .Values.istio.enabled }}  
+    {{- if .Values.istio.enabled }}
     - name: istio
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if .Values.kyvernoPolicies.enabled }}  
+    {{- if .Values.kyvernoPolicies.enabled }}
     - name: kyverno-policies
       namespace: {{ .Release.Namespace }}
     {{- end }}

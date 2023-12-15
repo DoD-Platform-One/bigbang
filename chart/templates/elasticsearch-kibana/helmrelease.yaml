@@ -29,7 +29,8 @@ spec:
         name: {{ .Values.elasticsearchKibana.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.elasticsearchKibana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.elasticsearchKibana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.elasticsearchKibana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.elasticsearchKibana.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:

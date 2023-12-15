@@ -30,7 +30,8 @@ spec:
         name: {{ .Values.addons.sonarqube.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
       {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.sonarqube.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.sonarqube.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $hasPublicKey := include "repoHasPublicKey" (dict "repoName" .Values.addons.sonarqube.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and ( dig "cosignVerify" true .Values.addons.sonarqube.helmRepo ) (eq $repoType "oci") $hasPublicKey ) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
@@ -40,11 +41,11 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsSonarqube | nindent 2 }}
-  
+
   {{- if .Values.addons.sonarqube.postRenderers }}
   postRenderers:
   {{ toYaml .Values.addons.sonarqube.postRenderers | nindent 4 }}
-  {{- end }}  
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-sonarqube-values
       kind: Secret
