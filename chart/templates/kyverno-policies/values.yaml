@@ -692,6 +692,7 @@ policies:
       - harbor
       - authservice
       - anchore
+      - fluentbit
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -843,7 +844,7 @@ policies:
         - anchore-ui-redis-*
       - namespace: fluentbit
         serviceAccounts:
-        - fluentbit-fluentbit-* 
+        - fluentbit-fluent-bit
 
 istio:
   enabled: {{ .Values.istio.enabled }}
