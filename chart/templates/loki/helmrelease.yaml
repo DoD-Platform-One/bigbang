@@ -1,4 +1,4 @@
-{{- $fluxSettingsLoki := merge .Values.loki.flux .Values.flux -}}
+{{- $fluxSettingsLoki := mergeOverwrite .Values.flux .Values.loki.flux -}}
 {{- if .Values.loki.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

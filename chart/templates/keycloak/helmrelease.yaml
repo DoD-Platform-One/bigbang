@@ -1,4 +1,4 @@
-{{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
+{{- $fluxSettingsKeycloak := mergeOverwrite .Values.flux .Values.addons.keycloak.flux -}}
 {{- if .Values.addons.keycloak.enabled }}
 {{ $name := "keycloak" }}
 {{ $component := "security-tools" }}
