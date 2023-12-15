@@ -1,12 +1,12 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
-{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- if $nexusValues.enabled  }}
 {{- include "values-secret" (dict "root" $ "package" $nexusValues "name" "nexus-repository-manager" "defaults" (include "bigbang.defaults.nexus-repository-manager" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.nexus-repository-manager" -}}
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
-{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 hostname: nexus

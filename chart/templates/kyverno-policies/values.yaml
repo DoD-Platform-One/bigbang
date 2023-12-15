@@ -216,7 +216,7 @@ policies:
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
-    enabled: true
+    enabled: false
     validationFailureAction: audit
 
   require-istio-on-namespaces:
@@ -339,6 +339,7 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+          - volume-upgrade-job*
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
@@ -687,6 +688,7 @@ policies:
       - velero
       - neuvector
       - kiali
+      - confluence
       - harbor
       - authservice
       - anchore
@@ -816,6 +818,11 @@ policies:
         # notifications bot pods interact with secrets, configmaps, and CRDs
         # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
         - argocd-argocd-notifications-controller-*
+      - namespace: confluence
+        pods:
+        # confluence pods require get/list on endpoints, pods, and nodes
+        # More details in confluence/chart/templates/clusterrole.yaml
+        - confluence-?
       - namespace: harbor
         serviceAccounts: 
         - harbor-redis-bb

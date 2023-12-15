@@ -740,11 +740,11 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.6.3-bb.7"
+    tag: "2.6.3-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
-    tag: "2.6.3-bb.7"
+    tag: "2.6.3-bb.8"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -966,11 +966,11 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
-    tag: "0.13.0-bb.7"
+    tag: "0.13.0-bb.9"
   helmRepo:
     repoName: "registry1"
     chartName: "twistlock"
-    tag: "0.13.0-bb.7"
+    tag: "0.13.0-bb.9"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -1166,11 +1166,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
-      tag: "7.6.0-bb.0"
+      tag: "7.6.1-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab"
-      tag: "7.6.0-bb.0"
+      tag: "7.6.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
@@ -1431,11 +1431,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/fortify.git
       path: "./chart"
-      tag: "1.1.2311007-bb.7"
+      tag: "1.1.2320154-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "fortify"
-      tag: "1.1.2311007-bb.7"
+      tag: "1.1.2320154-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Fortify Package
     flux: {}
