@@ -747,14 +747,6 @@ policies:
         # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
         # More details in role named minio-minio-minio-instance-role
         - minio-minio-minio-instance-ss-0-*
-      - namespace: velero
-        serviceAccounts:
-        - velero-velero-*
-        - velero-label-namespace-*
-        - velero-cleanup-crds-*
-        - velero-upgrade-crds-*
-        - velero-velero-server-*
-        - node-agent-*
       - namespace: kyverno
         pods:
         - kyverno-reports-controller-*
@@ -841,6 +833,11 @@ policies:
         - anchore-ui-redis
         pods:
         - anchore-ui-redis-*
+      - namespace: jaeger
+        pods:
+        - jaeger-jaeger-jaeger-operator-*
+        - jaeger-clean-svc-monitor
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
