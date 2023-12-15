@@ -133,7 +133,7 @@ Big Bang exclusively uses Helm charts for deployment through Flux.  Using the [H
 
 ```yaml
 {{- $pkg := "podinfo" }}
-{{- $fluxSettings := merge (get .Values $pkg).flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite .Values.flux (get .Values $pkg).flux -}}
 {{- if (get .Values $pkg).enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease

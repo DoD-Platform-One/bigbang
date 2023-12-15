@@ -1,4 +1,4 @@
-{{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
+{{- $fluxSettingsVault := mergeOverwrite .Values.flux .Values.addons.vault.flux -}}
 
 {{- if .Values.addons.vault.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1

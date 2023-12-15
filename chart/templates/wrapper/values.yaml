@@ -12,7 +12,7 @@ stringData:
   values.yaml: |
     {{- $defaults := ($.Files.Get (printf "defaults/%s.yaml" $pkg) | fromYaml) -}}
     {{- $overlays := dict "bigbang" $.Values "package" $vals -}}
-    {{- $merged := merge $overlays $defaults }}
+    {{- $merged := mergeOverwrite $overlays $defaults }}
     package:
       name: {{ $pkg }}
       {{- if (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn") }}
