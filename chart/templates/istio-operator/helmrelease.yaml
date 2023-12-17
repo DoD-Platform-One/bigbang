@@ -1,4 +1,4 @@
-{{- $fluxSettingsIstioOperator := merge .Values.istioOperator.flux .Values.flux -}}
+{{- $fluxSettingsIstioOperator := mergeOverwrite .Values.flux .Values.istioOperator.flux -}}
 {{- if .Values.istioOperator.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
