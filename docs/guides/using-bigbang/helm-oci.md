@@ -6,7 +6,7 @@ A supported alternative deployment scenario to using Flux’s GitRepository for 
 
 The values needed for deploying a package from a HelmRepository are found in two spots in bigbang's `values.yaml`.
 
-There is a `HelmRepositories` property which holds an array of defined helm repos
+There is a `HelmRepositories` property which holds an array of defined helm repos.
 
 ```yaml
 helmRepositories: 
@@ -17,7 +17,14 @@ helmRepositories:
     username: ""
     password: ""
     email: ""
+    cosignPublicKey: |
+    -----BEGIN PUBLIC KEY-----
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
+    R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
+    -----END PUBLIC KEY-----
 ```
+
+The cosignPublicKey is used for [Artifact Verification](#artifact-verification); in this particular block the public key is from CNAP and is for Iron Bank Helm OCI artifacts, but this structure also supports a "bring-your-own" public/private keys.
 
 In each package, the type should be set to `helmRepo` where the `repoName` references the array item from `helmRepositories`:
 
@@ -33,31 +40,11 @@ istio:
 
 ### Artifact Verification
 
-To include an additional layer of secure helm chart deployment, you can enable the Flux feature to `verify` the Helm OCI artifacts. This checks that the OCI artifact deployed to the cluster has been signed using the expected certificate. The provider for this check is [cosign](https://github.com/sigstore/cosign). Currently, keyless signing is not performed by the bigbang build pipeline and is subsequently not a supported configuration by umbrella.
+An additional layer of secure helm chart deployment is added via verification of the OCI Helm artifacts. This checks that the OCI artifact deployed to the cluster has been signed using the expected certificate. The provider for this check is [cosign](https://github.com/sigstore/cosign). Currently, keyless signing is not performed by the bigbang build pipeline and is subsequently not a supported configuration by umbrella.
 
 The Helm OCI artifacts found in Registry1 are signed by cosign during the build phase using a CNAP-provided certificate. 
 
-To enable this signature verification, the following modifications are needed to the values file:
-
-The `cosignPublicKey` property, containing the public key of the package, should be added into the respective `helmRepositories` item:
-
-```yaml
-helmRepositories: 
-    - name: "registry1"
-    repository: "oci://registry1.dso.mil/bigbang"
-    existingSecret: "private-registry"
-    type: "oci"
-    username: ""
-    password: ""
-    email: ""
-    cosignPublicKey: |
-    -----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
-    R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
-    -----END PUBLIC KEY-----
-```
-
-The `cosignVerify` property should be added and marked `true` in the respective package's `helmRepo` block:
+The signature verification is enabled by default when an OCI helm repository is used and the `cosignPublicKey` field is populated. To disable this signature verification, the `cosignVerify` property will need to be set to `false` in individual package `helmRepo` sections:
 
 ```yaml
 # Example package
@@ -67,7 +54,7 @@ istio:
     repoName: "registry1"
     chartName: "istio"
     tag: "1.19.4-bb.0"
-    cosignVerify: true
+    cosignVerify: false
 ```
 
 ### Note about self-hosted registries
