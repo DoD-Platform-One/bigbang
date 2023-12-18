@@ -736,6 +736,12 @@ loki:
     istio:
       hardened:
         enabled: true
+        prometheus:
+          enabled: true
+          # namespaces: [] # this will break prometheus scraping
+        loki:
+          enabled: true
+          exposeReadyEndpoint: true
     minio:
       enabled: true
     write:
