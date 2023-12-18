@@ -1533,11 +1533,11 @@ addons:
             cypress_url: https://chat.bigbang.dev
           resources:
             requests:
-              cpu: 2
-              memory: 2Gi
+              cpu: 3
+              memory: 3Gi
             limits:
-              cpu: 2
-              memory: 2Gi
+              cpu: 3
+              memory: 3Gi
 
   nexusRepositoryManager:
     enabled: false
