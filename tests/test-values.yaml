@@ -735,7 +735,7 @@ loki:
   values:
     istio:
       hardened:
-        enabled: true
+        enabled: false
         prometheus:
           enabled: true
           # namespaces: [] # this will break prometheus scraping
