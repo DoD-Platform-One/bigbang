@@ -691,6 +691,7 @@ policies:
       - harbor
       - authservice
       - anchore
+      - vault
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -831,7 +832,11 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
         - jaeger-clean-svc-monitor
-
+      - namespace: vault
+        serviceAccounts:
+        - vault-vault
+        - vault-vault-root-token-secret
+        - vault-vault-agent-injector
 
 istio:
   enabled: {{ .Values.istio.enabled }}
