@@ -732,13 +732,13 @@ fluentbit:
 
 loki:
   strategy: scalable
+  git:
+    tag: null
+    branch: "72-implement-istio-authorization-policies"
   values:
     istio:
       hardened:
         enabled: true
-      prometheus:
-        enabled: true
-        # namespaces: [] # this will break prometheus scraping
       loki:
         enabled: true
         exposeReadyEndpoint: true
