@@ -1912,7 +1912,7 @@ addons:
     sourceType: "git"
 
     git:
-      repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
       tag: "12.16.1-bb.0"
       path: "./chart"
     helmRepo:
