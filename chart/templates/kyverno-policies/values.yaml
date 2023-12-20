@@ -693,6 +693,7 @@ policies:
       - anchore
       - fortify
       - vault
+      - promtail
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -841,7 +842,12 @@ policies:
         - vault-vault
         - vault-vault-root-token-secret
         - vault-vault-agent-injector
-
+      - namespace: promtail 
+        serviceAccounts:
+        - promtail-promtail
+        pods:
+        - promtail-promtail-*
+        
 istio:
   enabled: {{ .Values.istio.enabled }}
 
