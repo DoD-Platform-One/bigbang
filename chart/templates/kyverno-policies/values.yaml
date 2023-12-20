@@ -694,7 +694,8 @@ policies:
       - fortify
       - vault
       - promtail
-
+      - fluentbit
+      
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -847,7 +848,12 @@ policies:
         - promtail-promtail
         pods:
         - promtail-promtail-*
-        
+      - namespace: fluentbit
+        serviceAccounts:
+        - fluentbit-fluent-bit
+        pods:
+        - fluentbit-fluent-bit-*
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
