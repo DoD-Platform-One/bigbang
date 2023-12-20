@@ -694,6 +694,7 @@ policies:
       - fortify
       - vault
       - promtail
+      - thanos
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -847,7 +848,17 @@ policies:
         - promtail-promtail
         pods:
         - promtail-promtail-*
-        
+      - namespace: thanos
+        serviceAccounts:
+        - thanos-minio-sa
+        - thanos-storegateway
+        - thanos-query
+        - thanos-query-frontend
+        pods:
+        - thanos-query-frontend-*
+        - thanos-storegateway-*
+        - thanos-query-*
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 
