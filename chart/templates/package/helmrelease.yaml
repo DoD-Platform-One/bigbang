@@ -7,7 +7,7 @@
 {{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
 {{- end -}}
 {{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}
