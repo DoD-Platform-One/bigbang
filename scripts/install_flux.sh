@@ -174,7 +174,7 @@ fi
 #
 echo "Installing flux from kustomization"
 KUBECTL_VERSION=$(kubectl version --client --output=yaml | awk '/gitVersion:/ {print $2}' | cut -c2-)
-KUBECTL_MIN_VERSION="1.21.0"
+KUBECTL_MIN_VERSION="1.26.0"
 
 if [ "$(printf '%s\n' "$KUBECTL_MIN_VERSION" "$KUBECTL_VERSION" | sort -V | head -n1)" = "$KUBECTL_MIN_VERSION" ]; then
   kubectl kustomize "$FLUX_KUSTOMIZATION" | sed "s/registry1.dso.mil/${REGISTRY_URL}/g" | kubectl apply -f -
