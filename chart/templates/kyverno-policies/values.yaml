@@ -691,8 +691,10 @@ policies:
       - harbor
       - authservice
       - anchore
+      - fortify
       - vault
-      
+      - promtail
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -832,12 +834,20 @@ policies:
         pods:
         - jaeger-jaeger-jaeger-operator-*
         - jaeger-clean-svc-monitor
+      - namespace: fortify
+        serviceAccounts:
+        - fortify-mysql
       - namespace: vault
         serviceAccounts:
         - vault-vault
         - vault-vault-root-token-secret
         - vault-vault-agent-injector
-
+      - namespace: promtail 
+        serviceAccounts:
+        - promtail-promtail
+        pods:
+        - promtail-promtail-*
+        
 istio:
   enabled: {{ .Values.istio.enabled }}
 

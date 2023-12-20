@@ -166,11 +166,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.19.4-bb.0"
+    tag: "1.19.5-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.19.4-bb.0"
+    tag: "1.19.5-bb.1"
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -306,11 +306,11 @@ istioOperator:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
-    tag: "1.19.4-bb.1"
+    tag: "1.19.5-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-operator"
-    tag: "1.19.4-bb.1"
+    tag: "1.19.5-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
@@ -506,11 +506,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.0.4-bb.15"
+    tag: "3.0.4-bb.16"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.0.4-bb.15"
+    tag: "3.0.4-bb.16"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -561,11 +561,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.7.0-bb.0"
+    tag: "1.7.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.7.0-bb.0"
+    tag: "1.7.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -860,11 +860,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "55.0.0-bb.1"
+    tag: "55.0.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "55.0.0-bb.1"
+    tag: "55.0.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -915,11 +915,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "6.60.6-bb.3"
+    tag: "6.60.6-bb.5"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "6.60.6-bb.3"
+    tag: "6.60.6-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
@@ -1912,13 +1912,13 @@ addons:
     sourceType: "git"
 
     git:
-      repo: https://repo1.dso.mil/big-bang/apps/sandbox/thanos.git
-      tag: "12.13.12-bb.4"
+      repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
+      tag: "12.16.1-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "12.13.12-bb.4"
+      tag: "12.16.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}

@@ -87,5 +87,5 @@
 | [Argocd](https://repo1.dso.mil/big-bang/product/packages/argocd) |  ![Argo Build](https://repo1.dso.mil/big-bang/product/packages/argocd/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/572) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1368) |
 | [Velero](https://repo1.dso.mil/big-bang/product/packages/velero) |  ![Velero Build](https://repo1.dso.mil/big-bang/product/packages/velero/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/552) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1451) |
 | [Metrics Server](https://repo1.dso.mil/big-bang/product/packages/metrics-server) |  ![Metrics Server Build](https://repo1.dso.mil/big-bang/product/packages/metrics-server/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1738) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1968) |
-
+| [Thanos](https://repo1.dso.mil/big-bang/product/packages/thanos) |  ![Thanos Build](https://repo1.dso.mil/big-bang/product/packages/thanos/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) |
 
