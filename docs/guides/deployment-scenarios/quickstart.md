@@ -266,11 +266,11 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # [ubuntu@Ubuntu_VM:~]
     # The following downloads the 64 bit linux version of helm v3.8.1, checks it
     # against a copy of the sha256 checksum, if they match helm gets installed
-    wget -q -O - https://get.helm.sh/helm-v3.8.1-linux-amd64.tar.gz > helm.tar.gz
+    wget -q -O - https://get.helm.sh/helm-v3.13.3-linux-amd64.tar.gz > helm.tar.gz
 
-    echo d643f48fe28eeb47ff68a1a7a26fc5142f348d02c8bc38d699674016716f61cd helm.tar.gz | sha256sum -c | grep OK
-    # d643f48fe28eeb47ff68a1a7a26fc5142f348d02c8bc38d699674016716f61cd
-    # came from https://github.com/helm/helm/releases/tag/v3.8.1
+    echo bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d helm.tar.gz | sha256sum -c | grep OK
+    # bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d
+    # came from https://github.com/helm/helm/releases/tag/v3.13.3
 
     if [ $? == 0 ]; then tar -xvf helm.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm && rm -rf linux-amd64 && rm helm.tar.gz ; fi  
 
@@ -287,7 +287,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     ```
 
     ```console
-    version.BuildInfo{Version:"v3.8.1", GitCommit:"5cb9af4b1b271d11d7a97a71df3ac337dd94ad37", GitTreeState:"clean", GoVersion:"go1.17.5"}
+    version.BuildInfo{Version:"v3.13.3", GitCommit:"c8b948945e52abba22ff885446a1486cb5fd3474", GitTreeState:"clean", GoVersion:"go1.20.11"}
     ```
 
 ## Step 4: Configure Host Operating System Prerequisites
