@@ -74,10 +74,12 @@ Build the appropriate git credentials secret for individual package and BB wide 
 {{- if .packageGitScope.existingSecret -}}
 secretRef:
   name: {{ .packageGitScope.existingSecret }}
-{{- else if and (.packageGitScope.credentials) (coalesce .packageGitScope.credentials.username .packageGitScope.credentials.password .packageGitScope.credentials.caFile .packageGitScope.credentials.privateKey .packageGitScope.credentials.publicKey .packageGitScope.credentials.knownHosts "") -}}
-{{- /* Input validation happens in git-credentials.yaml template */ -}}
-secretRef:
-  name: {{ .releaseName }}-{{ .name }}-git-credentials
+{{- else if .packageGitScope.credentials -}}
+  {{- if (coalesce .packageGitScope.credentials.username .packageGitScope.credentials.password .packageGitScope.credentials.caFile .packageGitScope.credentials.privateKey .packageGitScope.credentials.publicKey .packageGitScope.credentials.knownHosts "") }}
+  {{- /* Input validation happens in git-credentials.yaml template */ -}}
+  secretRef:
+    name: {{ .releaseName }}-{{ .name }}-git-credentials
+  {{- end }}
 {{- else -}}
 {{/* If no credentials are specified, use the global credentials in the rootScope */}}
 {{- include "gitCredsGlobal" .rootScope }}
