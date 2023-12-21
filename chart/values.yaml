@@ -1101,14 +1101,18 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
-      tag: "5.0.11-bb.0"
+      tag: "5.0.11-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-operator"
-      tag: "5.0.11-bb.0"
+      tag: "5.0.11-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
 
     # -- Values to passthrough to the minio operator chart: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
     values: {}
