@@ -33,9 +33,16 @@ operator:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  ingressLabels:
+    {{- $gateway := default "public" .Values.addons.minio.ingress.gateway }}
+    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
+    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  console:
+    gateways:
+    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
 
 {{- if .Values.istio.enabled }}
 annotations:
