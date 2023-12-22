@@ -1046,7 +1046,6 @@ addons:
           enabled: true
 
   authservice:
-    enabled: true
     git:
       tag: null
       branch: "81-implement-istio-authorization-policies"
