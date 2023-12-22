@@ -1048,7 +1048,7 @@ addons:
     enabled: true
     git:
       tag: null
-      # branch: "81-implement-istio-authorization-policies"
+      branch: "81-implement-istio-authorization-policies"
     chains:
       minimal:
         callback_uri: "https://minimal.bigbang.dev"
