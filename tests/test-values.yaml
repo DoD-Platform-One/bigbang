@@ -830,7 +830,8 @@ promtail:
 
 monitoring:
   enabled: true
-  injection: "disabled"
+  istio:
+    injection: "disabled"
   flux:
     timeout: 20m
     install:
