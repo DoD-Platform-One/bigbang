@@ -1107,7 +1107,8 @@
         },
         "helmRepo": {
           "$ref": "#/$defs/helmRepo"
-        }
+        },
+        "postRenderers": true
       },
       "additionalProperties": false
     },

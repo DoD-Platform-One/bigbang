@@ -1958,6 +1958,8 @@ wrapper:
     path: "chart"
     # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference), example: 0.0.2
     tag: "0.4.2"
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 # -- Packages to deploy with Big Bang
 # @default - '{}'
