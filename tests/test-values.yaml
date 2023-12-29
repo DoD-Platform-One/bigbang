@@ -642,10 +642,19 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
-              - fortify
               names:
               - gitlab-minio-*
+          - resources:
+              namespaces:
+              - fortify
+              names:
               - fortify-mysql-* # mysql breaks if you give it a different group
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
+              - controller-*
       require-non-root-user:
         exclude:
           any:
