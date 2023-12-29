@@ -239,15 +239,18 @@ policies:
           - istio-system
 
   require-non-root-group:
-    validationFailureAction: audit
+    validationFailureAction: Enforce
     {{- if .Values.istio.enabled }}
     parameters:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
     exclude:
       any:
+      - resources:
+          namespaces:
+          - kube-system
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
       # mounted inside velero/node agent pods.
@@ -288,6 +291,15 @@ policies:
           - promtail
           names:
           - promtail-promtail*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector-enforcer-pod-*
+          - neuvector-controller-pod-*
       {{- end }}
     {{- end }}
 
