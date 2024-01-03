@@ -707,7 +707,9 @@ policies:
       - vault
       - promtail
       - fluentbit
-      
+      - mattermost
+      - mattermost-operator
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -865,6 +867,13 @@ policies:
         - fluentbit-fluent-bit
         pods:
         - fluentbit-fluent-bit-*
+      - namespace: mattermost
+        serviceAccounts:
+        - mattermost
+        - mattermost-minio-sa
+      - namespace: mattermost-operator
+        serviceAccounts:
+        - mattermost-operator
 
 istio:
   enabled: {{ .Values.istio.enabled }}
