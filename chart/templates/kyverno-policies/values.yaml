@@ -873,6 +873,7 @@ policies:
         - mattermost-minio-sa
         pods:
         - default-minio-bucket-creation-*
+        - mattermost-minio-ss-*
       - namespace: mattermost-operator
         serviceAccounts:
         - mattermost-operator
