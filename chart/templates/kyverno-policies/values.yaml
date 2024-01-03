@@ -871,9 +871,13 @@ policies:
         serviceAccounts:
         - mattermost
         - mattermost-minio-sa
+        pods:
+        - default-minio-bucket-creation-*
       - namespace: mattermost-operator
         serviceAccounts:
         - mattermost-operator
+        pods:
+        - mattermost-operator-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
