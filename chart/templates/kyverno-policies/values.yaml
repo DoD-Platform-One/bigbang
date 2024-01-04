@@ -707,6 +707,7 @@ policies:
       - vault
       - promtail
       - fluentbit
+      - eck-operator
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -865,6 +866,11 @@ policies:
         - fluentbit-fluent-bit
         pods:
         - fluentbit-fluent-bit-*
+      - namespace: eck-operator
+        serviceAccounts:
+        - elastic-operator
+        pods:
+        - elastic-operator-?
 
 istio:
   enabled: {{ .Values.istio.enabled }}
