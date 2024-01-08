@@ -708,6 +708,7 @@ policies:
       - promtail
       - fluentbit
       - eck-operator
+      - nexus-repository-manager
       
   update-automountserviceaccounttokens:
     enabled: true
@@ -871,6 +872,13 @@ policies:
         - elastic-operator
         pods:
         - elastic-operator-?
+      - namespace: nexus-repository-manager
+        serviceAccounts:
+        - nexus-repository-manager
+        pods:
+        - nexus-repository-manager-* 
+
+
 
 istio:
   enabled: {{ .Values.istio.enabled }}
