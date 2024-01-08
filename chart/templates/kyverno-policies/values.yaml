@@ -709,7 +709,8 @@ policies:
       - fluentbit
       - eck-operator
       - nexus-repository-manager
-      
+      - thanos
+
   update-automountserviceaccounttokens:
     enabled: true
     namespaces:
@@ -879,8 +880,18 @@ policies:
         - nexus-repository-manager
         pods:
         - nexus-repository-manager-* 
-
-
+      - namespace: thanos
+        serviceAccounts:
+        - thanos-minio-sa
+        - thanos-storegateway
+        - thanos-query
+        - thanos-query-frontend
+        pods:
+        - thanos-minio-*
+        podsToHarden:
+        - thanos-query-frontend-*
+        - thanos-storegateway-*
+        - thanos-query-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
