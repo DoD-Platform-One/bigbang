@@ -710,6 +710,8 @@ policies:
       - eck-operator
       - nexus-repository-manager
       - thanos
+      - mattermost
+      - mattermost-operator
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -892,6 +894,18 @@ policies:
         - thanos-query-frontend-*
         - thanos-storegateway-*
         - thanos-query-*
+      - namespace: mattermost
+        serviceAccounts:
+        - mattermost
+        - mattermost-minio-sa
+        pods:
+        - default-minio-bucket-creation-*
+        - mattermost-minio-ss-*
+      - namespace: mattermost-operator
+        serviceAccounts:
+        - mattermost-operator
+        pods:
+        - mattermost-operator-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
