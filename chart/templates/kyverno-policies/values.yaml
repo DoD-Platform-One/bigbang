@@ -747,6 +747,8 @@ policies:
       - namespace: logging
         serviceAccounts:
         - logging-loki-minio-sa
+        pods:
+        - logging-loki-minio-ss-*
       - namespace: minio-operator
         pods:
         # console pods require access to several API resources
