@@ -852,6 +852,7 @@ policies:
         - monitoring-monitoring-prometheus-node-exporter
         pods:
         - monitoring-grafana-*
+        - monitoring-monitoring-kube-admission-create-*
       - namespace: anchore
         serviceAccounts:
         - anchore-ui-redis
