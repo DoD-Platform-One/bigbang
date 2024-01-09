@@ -840,8 +840,10 @@ policies:
       - namespace: authservice
         serviceAccounts:
         - authservice
+        - authservice-haproxy-sso
         pods:
         - authservice-authservice-redis-bb-*
+        - authservice-haproxy-sso-*
       - namespace: monitoring
         serviceAccounts:
         - monitoring-grafana
