@@ -120,24 +120,24 @@ policies:
     validationFailureAction: Audit
     exclude:
       any:
-      {{- if .Values.addons.gitlab.enabled }}
-      - resources:
-          namespaces:
-          - gitlab
-          kinds:
-          - Pod
-          names:
-          - gitlab-shared-secrets*
-      {{- end }}
-      {{- if .Values.addons.gitlabRunner.enabled }}
-      - resources:
-          namespaces:
-          - gitlab-runner
-          kinds:
-          - ServiceAccount
-          names:
-          - gitlab-runner
-      {{- end }}
+      # {{- if .Values.addons.gitlab.enabled }}
+      # - resources:
+      #     namespaces:
+      #     - gitlab
+      #     kinds:
+      #     - Pod
+      #     names:
+      #     - gitlab-shared-secrets*
+      # {{- end }}
+      # {{- if .Values.addons.gitlabRunner.enabled }}
+      # - resources:
+      #     namespaces:
+      #     - gitlab-runner
+      #     kinds:
+      #     - ServiceAccount
+      #     names:
+      #     - gitlab-runner
+      # {{- end }}
       {{- if .Values.kyvernoReporter.enabled }}
       - resources:
           namespaces:
@@ -148,27 +148,27 @@ policies:
           names:
           - kyverno-reporter*
       {{- end }}
-      {{- if .Values.monitoring.enabled }}
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - ServiceAccount
-          names:
-          - monitoring-monitoring-prometheus-node-exporter
-          - monitoring-monitoring-kube-operator
-          - monitoring-monitoring-kube-state-metrics
-          - monitoring-monitoring-kube-admission
-          - monitoring-monitoring-kube-prometheus
-      - resources:
-          namespaces:
-          - monitoring
-          kinds:
-          - Pod
-          - Deployment
-          names:
-          - prometheus-monitoring-monitoring-kube-prometheus*
-      {{- end }}
+      # {{- if .Values.monitoring.enabled }}
+      # - resources:
+      #     namespaces:
+      #     - monitoring
+      #     kinds:
+      #     - ServiceAccount
+      #     names:
+      #     - monitoring-monitoring-prometheus-node-exporter
+      #     - monitoring-monitoring-kube-operator
+      #     - monitoring-monitoring-kube-state-metrics
+      #     - monitoring-monitoring-kube-admission
+      #     - monitoring-monitoring-kube-prometheus
+      # - resources:
+      #     namespaces:
+      #     - monitoring
+      #     kinds:
+      #     - Pod
+      #     - Deployment
+      #     names:
+      #     - prometheus-monitoring-monitoring-kube-prometheus*
+      # {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -712,6 +712,8 @@ policies:
       - thanos
       - mattermost
       - mattermost-operator
+      - gitlab
+      - monitoring
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -906,6 +908,9 @@ policies:
         - mattermost-operator
         pods:
         - mattermost-operator-*
+      - namespace: gitlab
+        pods:
+        - gitlab-shared-secrets*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
