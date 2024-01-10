@@ -856,6 +856,7 @@ policies:
         - monitoring-monitoring-kube-admission-patch-*
         - monitoring-monitoring-kube-state-metrics-*
         - monitoring-monitoring-kube-operator-*
+        - prometheus-monitoring-monitoring-kube-prometheus-*
       - namespace: anchore
         serviceAccounts:
         - anchore-ui-redis
