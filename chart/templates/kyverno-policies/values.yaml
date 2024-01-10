@@ -853,6 +853,7 @@ policies:
         pods:
         - monitoring-grafana-*
         - monitoring-monitoring-kube-admission-create-*
+        - monitoring-monitoring-kube-admission-patch-*
         - monitoring-monitoring-kube-state-metrics-*
         - monitoring-monitoring-kube-operator-*
       - namespace: anchore
