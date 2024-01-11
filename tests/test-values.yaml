@@ -1552,6 +1552,7 @@ addons:
         cypress:
           envs:
             cypress_url: https://chat.bigbang.dev
+            cypress_keycloak_test_enable: "true"
 
   nexusRepositoryManager:
     enabled: false
