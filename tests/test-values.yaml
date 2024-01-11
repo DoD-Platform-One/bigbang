@@ -812,9 +812,9 @@ tempo:
           cypress_check_datasource: 'true'
           cypress_grafana_url: 'https://grafana.bigbang.dev'
           # uncomment following variables for sso keycloak testing in bb
-          #cypress_tnr_username: "cypress"
-          #cypress_tnr_password: "tnr_w!G33ZyAt@C8"
-          #cypress_keycloak_test_enable: "true"
+          cypress_tnr_username: "cypress"
+          cypress_tnr_password: "tnr_w!G33ZyAt@C8"
+          cypress_keycloak_test_enable: "true"
       scripts:
         enabled: false
         envs:
