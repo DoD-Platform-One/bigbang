@@ -808,7 +808,7 @@ tempo:
 
   sso:
     # -- Toggle SSO for Tempo on and off
-    enabled: false
+    enabled: true
 
     # -- OIDC Client ID to use for Tempo
     client_id: ""
