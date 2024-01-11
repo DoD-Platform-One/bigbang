@@ -1599,7 +1599,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
       path: "./chart"
-      tag: "1.20.1-bb.0"
+      #tag: "1.20.1-bb.0"
+      branch: "99-refactor-mattermost-gluon4-7"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost-operator"
