@@ -693,6 +693,8 @@ policies:
       - mattermost-operator
       - gitlab
       - monitoring
+      - gitlab
+      - gitlab-runner
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -898,8 +900,15 @@ policies:
         pods:
         - mattermost-operator-*
       - namespace: gitlab
+        serviceAccounts:
+        - gitlab
         pods:
         - gitlab-shared-secrets*
+      - namespace: gitlab-runner
+        serviceAccounts: 
+        - gitlab-runner
+        pods:
+        - gitlab-runner-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}
