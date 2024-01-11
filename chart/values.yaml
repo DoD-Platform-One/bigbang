@@ -4,7 +4,7 @@ domain: bigbang.dev
 # -- (experimental) Toggle sourcing from external repos.
 # All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false
-
+#
 # -- List of Helm repositories/credentials to pull helm charts from.
 # OCI Type: Must specify username/password or existingSecret if repository requires auth. Using "private-registry" for existingSecret will reuse credentials from registryCredentials above.
 # Default Type: Must specify existingSecret with auth - see https://fluxcd.io/flux/components/source/helmrepositories/#secret-reference for details on secret data required.
