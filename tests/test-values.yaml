@@ -1503,6 +1503,10 @@ addons:
           envs:
             MINIO_PORT: ''
             MINIO_HOST: 'https://minio-api.bigbang.dev'
+    istio:
+      enabled: true
+      hardened:
+        enabled: true
 
   mattermostOperator:
     enabled: false
