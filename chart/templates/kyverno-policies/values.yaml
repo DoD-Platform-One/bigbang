@@ -804,6 +804,8 @@ policies:
         - neuvector-prometheus-exporter-pod-*
         - neuvector-registry-adapter-pod-*
       - namespace: kiali 
+        serviceAccounts:
+        - kiali-kiali-kiali-operator
         pods:
         - kiali-*
       - namespace: argocd
@@ -862,6 +864,10 @@ policies:
         - vault-vault
         - vault-vault-root-token-secret
         - vault-vault-agent-injector
+        pods:
+        - vault-vault-0
+        - vault-vault-agent-injector-*
+        - vault-vault-job-init-*
       - namespace: promtail 
         serviceAccounts:
         - promtail-promtail
