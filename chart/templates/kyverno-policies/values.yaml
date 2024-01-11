@@ -900,8 +900,6 @@ policies:
         pods:
         - mattermost-operator-*
       - namespace: gitlab
-        serviceAccounts:
-        - gitlab
         pods:
         - gitlab-shared-secrets*
       - namespace: gitlab-runner
