@@ -1706,6 +1706,7 @@ addons:
         cypress:
           envs:
             cypress_url: "https://keycloak.bigbang.dev"
+            cypress_keycloak_enable: "true"
       command:
         - "/opt/keycloak/bin/kc.sh"
       args:
