@@ -9,13 +9,21 @@ offline: false
 # OCI Type: Must specify username/password or existingSecret if repository requires auth. Using "private-registry" for existingSecret will reuse credentials from registryCredentials above.
 # Default Type: Must specify existingSecret with auth - see https://fluxcd.io/flux/components/source/helmrepositories/#secret-reference for details on secret data required.
 helmRepositories: []
-# - name: "registry1"
-#   repository: "oci://registry1.dso.mil/bigbang"
-#   existingSecret: "private-registry"
-#   type: "oci"
-#   username: ""
-#   password: ""
-#   email: ""
+  # - name: "registry1"
+  #   repository: "oci://registry1.dso.mil/bigbang"
+  #   existingSecret: "private-registry"
+  #   type: "oci"
+  #   username: ""
+  #   password: ""
+  #   email: ""
+  #   # This is an array/list of public keys to be used. Template will append `.pub` to the key as required by Flux
+  #   cosignPublicKeys: []
+  #     key1: |
+  #       -----BEGIN PUBLIC KEY-----
+  #       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
+  #       R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
+  #       -----END PUBLIC KEY-----
+
 
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
@@ -171,6 +179,8 @@ istio:
     repoName: "registry1"
     chartName: "istio"
     tag: "1.19.5-bb.2"
+    # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI).  Set to 'false' to disable verification.
+    # cosignVerify:
 
   # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
   # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
@@ -1990,6 +2000,8 @@ packages:
       chartName:
       # -- Tag of the chart in the Helm repo, required
       tag:
+      # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI). Set to 'false' to disable verification
+      #cosignVerify:
 
     # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:

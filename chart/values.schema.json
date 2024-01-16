@@ -1182,6 +1182,9 @@
           },
           "email": {
             "type": "string"
+          },
+          "cosignPublicKey": {
+            "type": "string"
           }
         },
         "anyOf": [
@@ -1944,6 +1947,9 @@
         },
         "tag": {
           "type": "string"
+        },
+        "cosignVerify": {
+          "type": "boolean"
         }
       },
       "required": [

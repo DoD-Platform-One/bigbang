@@ -30,6 +30,13 @@ spec:
         kind: HelmRepository
         name: {{ $mmOpValues.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $mmOpValues.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $mmOpValues.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $mmOpValues.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

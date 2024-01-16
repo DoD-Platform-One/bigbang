@@ -35,6 +35,13 @@ spec:
         kind: HelmRepository
         name: {{ $.Values.wrapper.helmRepo.repoName }}
         namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $.Values.wrapper.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $.Values.wrapper.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $.Values.wrapper.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: {{ default "5m" $fluxSettings.interval }}
       reconcileStrategy: Revision

@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.neuvector.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.neuvector.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.neuvector.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.neuvector.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

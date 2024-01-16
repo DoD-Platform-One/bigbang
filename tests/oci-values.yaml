@@ -6,120 +6,200 @@ helmRepositories:
     username: ""
     password: ""
     email: ""
+    cosignPublicKeys:
+      key1: |
+        -----BEGIN PUBLIC KEY-----
+        MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
+        R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
+        -----END PUBLIC KEY-----
 
 istio:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 istioOperator:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 kiali:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 kyverno:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 kyvernoPolicies:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 kyvernoReporter:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 promtail:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 loki:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 neuvector:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 tempo:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 monitoring:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 grafana:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 twistlock:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 fluentbit:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 jaeger:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 eckOperator:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 elasticsearchKibana:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 clusterAuditor:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 gatekeeper:
   sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
 
 addons:
   argocd:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
   
   authservice:
     sourceType: "helmRepo"
-
+    helmRepo:
+      cosignVerify: true
+  
   minioOperator:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   minio:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   gitlab:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   gitlabRunner:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   nexusRepositoryManager:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
   
   sonarqube:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   haproxy:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   anchore:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   mattermostOperator:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   mattermost:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   velero:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
     
   keycloak:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   vault:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   metricsServer:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
   
   harbor:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
   
   thanos:
     sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: true
 
   fortify:
     sourceType: "helmRepo"
-
-  
+    helmRepo:
+      cosignVerify: true
