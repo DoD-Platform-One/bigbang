@@ -1756,7 +1756,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "18.4.3-bb.11"
+      #tag: "18.4.3-bb.11"
+      branch: "117-refactor-keycloak-to-gluon-0-4-7"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
