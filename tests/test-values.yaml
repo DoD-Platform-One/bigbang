@@ -967,7 +967,7 @@ addons:
   argocd:
     enabled: false
     sso:
-      enabled: false
+      enabled: true
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_argocd
       client_secret: anything-for-dev
       groups: |
@@ -1028,6 +1028,9 @@ addons:
         cypress:
           envs:
             cypress_url: "https://argocd.bigbang.dev"
+            cypress_tnr_username: "cypress"
+            cypress_tnr_password: "tnr_w!G33ZyAt@C8"
+            cypress_keycloak_test_enable: "true"
           resources:
             requests:
               cpu: 2
