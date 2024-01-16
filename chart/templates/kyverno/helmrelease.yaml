@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.kyverno.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.kyverno.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.kyverno.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.kyverno.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 
