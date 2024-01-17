@@ -1,6 +1,6 @@
 # Deploying Packages with Helm Repositories
 
-A supported alternative deployment scenario to using Flux’s GitRepository for package deployment is to use Helm OCI artifacts via the HelmRepository type. Deploying Bigbang using the OCI artifact may be beneficial if you do not want to deploy from a git repository or wish to make use of artifact verification.
+A supported alternative deployment scenario to using Flux’s GitRepository for package deployment is to use Helm OCI artifacts via the HelmRepository type. Deploying Bigbang using the OCI artifact may be beneficial to make use of artifact verification or when Git is not available.
 
 ### Values
 
@@ -17,11 +17,12 @@ helmRepositories:
     username: ""
     password: ""
     email: ""
-    cosignPublicKey: |
-    -----BEGIN PUBLIC KEY-----
-    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
-    R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
-    -----END PUBLIC KEY-----
+    cosignPublicKeys:
+      key1: |
+        -----BEGIN PUBLIC KEY-----
+        MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
+        R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
+        -----END PUBLIC KEY-----
 ```
 
 The cosignPublicKey is used for [Artifact Verification](#artifact-verification); in this particular block the public key is from CNAP and is for Iron Bank Helm OCI artifacts, but this structure also supports a "bring-your-own" public/private keys.
