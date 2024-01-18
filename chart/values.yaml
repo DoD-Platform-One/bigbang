@@ -1982,6 +1982,9 @@ addons:
       # -- Database password for the username used to connect to the existing database.
       password: "holocron"
 
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: []
+
     # -- Values to passthrough to the Holocron chart: https://repo1.dso.mil/big-bang/product/packages/holocron.git
     values: {}
 

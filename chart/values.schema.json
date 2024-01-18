@@ -1097,7 +1097,7 @@
         "thanos": {
           "allOf": [
             {
-              "$ref": "/$defs/basePackage"
+              "$ref": "#/$defs/basePackage"
             }
           ]
         }
