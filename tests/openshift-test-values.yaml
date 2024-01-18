@@ -20,7 +20,7 @@ twistlock:
     bbtests:
       enabled: true
       cypress:
-        artifacts: false
+        artifacts: true
         openshift: true
         envs:
           cypress_baseUrl: "https://twistlock.bigbang.dev"
