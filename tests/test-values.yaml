@@ -1142,6 +1142,11 @@ addons:
           envs:
             cypress_url: "https://fortify.bigbang.dev"
 
+  haproxy:
+    istio:
+      hardened:
+        enabled: true
+
   gitlab:
     enabled: false
     sso:
