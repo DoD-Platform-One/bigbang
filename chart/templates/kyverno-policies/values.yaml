@@ -712,6 +712,7 @@ policies:
       - thanos
       - mattermost
       - mattermost-operator
+      - keycloak
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -914,6 +915,9 @@ policies:
         - mattermost-operator
         pods:
         - mattermost-operator-*
+      - namespace: keycloak
+        serviceAccounts:
+        - keycloak
 
 istio:
   enabled: {{ .Values.istio.enabled }}
