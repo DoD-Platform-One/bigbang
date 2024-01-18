@@ -77,7 +77,7 @@ istio:
 jaeger:
   enabled: false
   sso:
-    enabled: false
+    enabled: true
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
   values:
     istio:
@@ -89,9 +89,9 @@ jaeger:
         envs:
           cypress_url: "https://tracing.bigbang.dev"
           # uncomment following variables for sso keycloak testing in bb
-          # cypress_tnr_username: "cypress"
-          # cypress_tnr_password: "tnr_w!G33ZyAt@C8"
-          # cypress_keycloak_test_enable: "true"
+          cypress_tnr_username: "cypress"
+          cypress_tnr_password: "tnr_w!G33ZyAt@C8"
+          cypress_keycloak_test_enable: "true"
 
 kiali:
   enabled: false
