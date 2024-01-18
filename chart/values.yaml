@@ -1071,7 +1071,7 @@ addons:
     #   chain:
     #     minimal:
     #       callback_uri: "https://somecallback"
-    enabled: true
+    enabled: false
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1915,19 +1915,19 @@ addons:
   
   holocron:
     # -- Toggle deployment of Holocron.
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/holocron.git
-      tag: "0.1.1"
+      tag: "0.1.2"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "holocron"
-      tag: "0.1.1"
+      tag: "0.1.2"
 
     collectorAuth:
       # -- Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
@@ -1988,7 +1988,6 @@ addons:
     # -- Values to passthrough to the Holocron chart: https://repo1.dso.mil/big-bang/product/packages/holocron.git
     values: {}
 
-    # -- Post Renderers. See docs/postrenders.md
   # ----------------------------------------------------------------------------------------------------------------------
   # thanos
   #
