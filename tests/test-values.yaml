@@ -96,7 +96,7 @@ jaeger:
 kiali:
   enabled: false
   sso:
-    enabled: false
+    enabled: true
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
   values:
     cr:
@@ -115,9 +115,9 @@ kiali:
           cypress_url: 'https://kiali.bigbang.dev'
           cypress_check_data: 'true'
           # uncomment these next 3 lines if enabling the keycloak SSO integration test
-          #cypress_keycloak_test_enable: "true"
-          #cypress_keycloak_username: "cypress"
-          #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
+          cypress_keycloak_test_enable: "true"
+          cypress_keycloak_username: "cypress"
+          cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
         resources:
           requests:
             cpu: 3
