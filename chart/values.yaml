@@ -331,7 +331,8 @@ jaeger:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
     path: "./chart"
-    tag: "2.47.0-bb.1"
+    #tag: "2.47.0-bb.1"
+    branch: "65-refactor-thanos-to-gluon-0-4-7"
   helmRepo:
     repoName: "registry1"
     chartName: "jaeger"
@@ -1130,8 +1131,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
-      #tag: "5.0.11-bb.0"
-      branch: "68-refactor-minio-gluon4-7"
+      tag: "5.0.11-bb.0"
+
     helmRepo:
       repoName: "registry1"
       chartName: "minio-instance"
@@ -1302,8 +1303,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
-      #tag: "62.0.0-bb.2"
-      branch: "renovate/ironbank"
+      tag: "62.0.0-bb.2"
+
     helmRepo:
       repoName: "registry1"
       chartName: "nexus-repository-manager"
@@ -1625,8 +1626,7 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
-      #tag: "9.3.0-bb.1"
-      branch: "99-refactor-mattermost-gluon4-7"
+      tag: "9.3.0-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost"
@@ -1756,8 +1756,8 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      #tag: "18.4.3-bb.11"
-      branch: "117-refactor-keycloak-to-gluon-0-4-7"
+      tag: "18.4.3-bb.11"
+
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
