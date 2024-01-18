@@ -1,5 +1,11 @@
 {{- $pkg := "harbor" }}
 {{- if and (eq (get .Values.addons $pkg).sourceType "git") (not .Values.offline) (get .Values.addons $pkg).enabled }}
+{{- $gitCredsDict := dict
+  "name" $pkg
+  "packageGitScope" (get .Values.addons $pkg).git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -11,5 +17,5 @@ spec:
   ref:
     {{- include "validRef" (get .Values.addons $pkg).git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

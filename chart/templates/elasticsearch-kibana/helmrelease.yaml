@@ -1,6 +1,6 @@
-{{- $fluxSettingsEk := merge .Values.elasticsearchKibana.flux .Values.flux -}}
+{{- $fluxSettingsEk := mergeOverwrite .Values.flux .Values.elasticsearchKibana.flux -}}
 {{- if .Values.elasticsearchKibana.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: ek
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.elasticsearchKibana.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.elasticsearchKibana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.elasticsearchKibana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.elasticsearchKibana.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

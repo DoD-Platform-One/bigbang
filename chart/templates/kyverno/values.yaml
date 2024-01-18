@@ -21,6 +21,26 @@ serviceMonitor:
   dashboards:
     namespace: monitoring
 
+admissionController:
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+backgroundController:
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+cleanupController:
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+reportsController:
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+grafana:
+  enabled: {{ .Values.monitoring.enabled }}
+  namespace: monitoring
+
 istio:
   enabled: {{ .Values.istio.enabled }}
 {{- end -}}

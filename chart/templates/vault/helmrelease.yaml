@@ -1,7 +1,7 @@
-{{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
+{{- $fluxSettingsVault := mergeOverwrite .Values.flux .Values.addons.vault.flux -}}
 
 {{- if .Values.addons.vault.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: vault
@@ -29,6 +29,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.addons.vault.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.vault.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.vault.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.vault.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

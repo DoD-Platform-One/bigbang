@@ -1,6 +1,6 @@
-{{- $fluxSettingsMinio := merge .Values.addons.minio.flux .Values.flux -}}
+{{- $fluxSettingsMinio := mergeOverwrite .Values.flux .Values.addons.minio.flux -}}
 {{- if .Values.addons.minio.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: minio
@@ -24,6 +24,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.addons.minio.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.minio.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.minio.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.minio.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

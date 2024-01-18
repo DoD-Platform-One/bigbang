@@ -14,15 +14,15 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 ## Package Updates
 
-1. Have a Big Bang owner move the package's GitLab project from sandbox to `https://repo1.dso.mil/platform-one/big-bang/apps/<category>`.
+1. Have a Big Bang owner move the package's GitLab project from sandbox to `https://repo1.dso.mil/big-bang/apps/<category>`.
 
 1. Have a Big Bang maintainer create a new tag and release for your project that matches your Helm chart `version` in `chart/Chart.yaml`.
 
 ## Big Bang Updates
 
-1. Open an issue under `https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues` to track your work for the new package.
+1. Open an issue under `https://repo1.dso.mil/big-bang/bigbang/-/issues` to track your work for the new package.
 
-1. Clone the [Big Bang Git repository](https://repo1.dso.mil/platform-one/big-bang/bigbang) to your machine using `git clone https://repo1.dso.mil/platform-one/big-bang/bigbang`
+1. Clone the [Big Bang Git repository](https://repo1.dso.mil/big-bang/bigbang) to your machine using `git clone https://repo1.dso.mil/big-bang/bigbang`
 
 1. Make a branch from the BigBang chart repository `master` branch. You can automatically create a branch from the Repo1 Gitlab issue. Or, in some cases you might manually create the branch. Name the branch with your issue number. For example, if your issue number is `9999` then your branch name can be `9999-my-description`. It is best practice to make branch names short and simple.
 
@@ -32,16 +32,16 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Merge your default package values from `<your-package-git-folder>/bigbang/values.yaml` into `chart/values.yaml`.  Only the "standard" keys used across packages should be used.  Keep in mind that values can be passed directly to the package using `.Values.<package>.values`
 
-   > If your package is an `addon`, it falls into a different location than core packages.  In this case, you will need to update all your references from `.Values.<package>` to `.Values.addons.<package>`.
+    > If your package is an `addon`, it falls into a different location than core packages.  In this case, you will need to update all your references from `.Values.<package>` to `.Values.addons.<package>`.
 
-   Example:
+    Example:
 
    ```yaml
    addons:
      mypackage:
        enabled: false     # default to false
        git:
-         repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/mypackage.git
+         repo: https://repo1.dso.mil/big-bang/product/packages/mypackage.git
          path: "./chart"
          tag: "1.2.3-bb.0"
        sso:
@@ -66,7 +66,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Edit `tests/test-values.yaml`. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
 
-1. You will also need to create an MR into the pipeline templates to update [02_wait_for_helmreleases.sh](https://repo1.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/-/blob/master/scripts/deploy/02_wait_for_helmreleases.sh) and add your package's HR name to the core or addon lists.
+1. You will also need to create an MR into the pipeline templates to update [02_wait_for_helmreleases.sh](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/blob/master/scripts/deploy/02_wait_for_helmreleases.sh) and add your package's HR name to the core or addon lists.
 
     To test your pipeline changes you can make a draft MR pointing to your pipeline branch in `.gitlab-ci.yml`:
     ```yaml
@@ -152,7 +152,7 @@ kubectl delete ns bigbang
 
 ### GitOps with Flux
 
-Using GitOps for development is NOT recommended. Your development iteration cycle time will be slowed down waiting for flux reconciliation. This is not an efficient use of your time. These instructions are included here for informational purposes. You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/platform-one/big-bang/customers/template) that has an example template for how to deploy using BigBang. You must fork or copy this repo to your own private repo. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run. This will reveal many errors before you make a commit. Here are the steps you can iterate:
+Using GitOps for development is NOT recommended. Your development iteration cycle time will be slowed down waiting for flux reconciliation. This is not an efficient use of your time. These instructions are included here for informational purposes. You can deploy your development code the same way a customer would deploy using GitOps. You must commit any code changes to your development branches because this is how GitOps works. There is a [customer template repository](https://repo1.dso.mil/big-bang/customers/template) that has an example template for how to deploy using BigBang. You must fork or copy this repo to your own private repo. Make the necessary modifications as explained in the README.md. The setup information is not repeated here. Before committing code it is a good idea to manually run `helm template` and a `helm install` with dry run. This will reveal many errors before you make a commit. Here are the steps you can iterate:
 
 ```shell
 # Verify chart code before committing

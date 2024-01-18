@@ -114,6 +114,62 @@ policies:
       {{- end }}
   {{- end }}
 
+  # -- Prevent Automounting of Kubernetes API Credentials on Pods and Service Accounts
+  disallow-auto-mount-service-account-token:
+    enabled: true
+    validationFailureAction: Audit
+    exclude:
+      any:
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          kinds:
+          - Pod
+          names:
+          - gitlab-shared-secrets*
+      {{- end }}
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          kinds:
+          - ServiceAccount
+          names:
+          - gitlab-runner
+      {{- end }}
+      {{- if .Values.kyvernoReporter.enabled }}
+      - resources:
+          namespaces:
+          - kyverno-reporter 
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - kyverno-reporter*
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - ServiceAccount
+          names:
+          - monitoring-monitoring-prometheus-node-exporter
+          - monitoring-monitoring-kube-operator
+          - monitoring-monitoring-kube-state-metrics
+          - monitoring-monitoring-kube-admission
+          - monitoring-monitoring-kube-prometheus
+      - resources:
+          namespaces:
+          - monitoring
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - prometheus-monitoring-monitoring-kube-prometheus*
+      {{- end }}
+
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
     exclude:
@@ -183,10 +239,18 @@ policies:
           - istio-system
 
   require-non-root-group:
-    validationFailureAction: audit
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
+    validationFailureAction: Enforce
+    {{- if .Values.istio.enabled }}
+    parameters:
+      excludeContainers:
+        - istio-init
+    {{- end }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
     exclude:
       any:
+      - resources:
+          namespaces:
+          - kube-system
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
       # mounted inside velero/node agent pods.
@@ -228,18 +292,46 @@ policies:
           names:
           - promtail-promtail*
       {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector-enforcer-pod-*
+          - neuvector-controller-pod-*
+      {{- end }}
     {{- end }}
 
   require-non-root-user:
-    validationFailureAction: audit
+    validationFailureAction: Enforce
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled }}
     exclude:
       any:
+      - resources:
+          namespaces:
+          - kube-system
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.kiali.enabled .Values.neuvector.enabled}}
+      {{- if .Values.kiali.enabled }}
+      # Kiali needs exception for operator to deploy Kiali server
+      - resources:
+          namespaces:
+          - kiali
+          names:
+          - kiali-*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # Neuvector needs privileged access for realtime scanning of files from the node / access to the container runtime
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector*
+      {{- end }}
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root user access to the host's runtime pod directory which is
       # mounted inside velero/node agent pods.
@@ -259,6 +351,7 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+          - volume-upgrade-job*
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
@@ -451,6 +544,7 @@ policies:
           - neuvector
           names:
           - neuvector-controller-pod*
+          - neuvector-enforcer-pod*
       {{- end }}
     {{- end }}
     {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
@@ -460,7 +554,7 @@ policies:
       # FluentBit - `/var/log/flb-storage`: fluent bit buffering and persistent state
       - /var/log/flb-storage/
       # FluentBit - `/var/log`
-      # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit/-/issues/31
+      # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/big-bang/product/packages/fluentbit/-/issues/31
       # Temporarily added so policy could be enforced
       - /var/log
       {{- end }}
@@ -590,6 +684,239 @@ policies:
           - node-agent*
       {{- end }}
   {{- end }}
+
+  update-automountserviceaccounttokens-default:
+    enabled: true
+    namespaces:
+      - istio-system
+      - istio-operator
+      - twistlock
+      - argocd
+      - logging
+      - velero
+      - minio
+      - minio-operator
+      - kyverno
+      - velero
+      - neuvector
+      - kiali
+      - harbor
+      - authservice
+      - anchore
+      - fortify
+      - vault
+      - promtail
+      - fluentbit
+      - eck-operator
+      - nexus-repository-manager
+      - thanos
+      - mattermost
+      - mattermost-operator
+
+  update-automountserviceaccounttokens:
+    enabled: true
+    namespaces:
+      - namespace: istio-system
+        serviceAccounts:
+        - istiod
+        - istio-reader-service-account
+        - public-ingressgateway-service-account
+        - passthrough-ingressgateway-service-account 
+        pods:
+        - istiod-*
+        - passthrough-ingressgateway-*
+        - public-ingressgateway-*
+      - namespace: istio-operator
+        serviceAccounts:
+        - istio-operator
+        pods:
+        - istiod-*
+        - istio-operator-*
+      - namespace: twistlock
+        serviceAccounts:
+        - twistlock-console
+        - twistlock-init
+        - volume-upgrade-svc-acct
+        - twistlock-service
+        pods:
+        # twistlock-init pods require get/list/patch/etc to several resources. 
+        # More details in twistlock/chart/templates/init/clusterrole.yaml
+        - twistlock-init-*
+        # twistlock-volume-upgrade-job requires patch/get/list/update to deployments and get/list to pods
+        # More details in twistlock/chart/templates/init/volume-upgrade-role.yaml
+        - twistlock-volume-upgrade-job
+        # Twistlock Defender enforces various policies that may involve the K8s cluster itself
+        # Enforcing said policies requires access to the API to get/list resources
+        - twistlock-defender-ds-*
+      - namespace: logging
+        serviceAccounts:
+        - logging-loki-minio-sa
+        pods:
+        - logging-loki-minio-ss-*
+      - namespace: minio-operator
+        pods:
+        # console pods require access to several API resources
+        # More details in minio-operator/chart/templates/console-clusterrole.yaml
+        - console-*
+        # operator pods require access to several API resources
+        # More details in minio-operator/chart/templates/operator-clusterrole.yaml
+        - minio-operator-*
+        # tenantPatchJob requires get/list/patch on tenants (minio CRD)
+        # More details in minio-operator/chart/templates/bigbang/tenant-patch-job.yaml
+        - bb-minio-operator-minio-operator-tenant-patch
+      - namespace: minio
+        pods:
+        # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
+        # More details in role named minio-minio-minio-instance-role
+        - minio-minio-minio-instance-ss-0-*
+      - namespace: kyverno
+        pods:
+        - kyverno-reports-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-controller-*
+        - kyverno-cleanup-admission-reports-*
+        - kyverno-admission-controller-*
+        - kyverno-background-controller-*
+        - kyverno-admission-controller-*
+        - kyverno-cleanup-cluster-admission-reports-*
+      - namespace: velero
+        serviceAccounts:
+        - velero
+        - velero-upgrade-crds
+        - velero-velero-server
+        pods:
+        - velero-cleanup-crds-*
+        - velero-velero-*
+        - node-agent-*
+        - velero-label-namespace-*
+      - namespace: neuvector
+        serviceAccounts:
+        - basic
+        - controller
+        - enforcer
+        - updater
+        pods:
+        - neuvector-manager-pod-*
+        - neuvector-scanner-pod-*
+        - neuvector-controller-pod-*
+        - neuvector-enforcer-pod-*
+        - neuvector-updater-pod-*
+        - neuvector-prometheus-exporter-pod-*
+        - neuvector-registry-adapter-pod-*
+      - namespace: kiali 
+        serviceAccounts:
+        - kiali-kiali-kiali-operator
+        pods:
+        - kiali-*
+      - namespace: argocd
+        pods:
+        # application-controller pods interact with secrets, configmaps, events, and Argo CRDs 
+        # More details in argocd/chart/templates/argocd-application-controller/role.yaml
+        - argocd-argocd-application-controller-*
+        # dex pods interact with secrets and configmaps
+        # More details in argocd/chart/templates/dex/role.yaml
+        - argocd-argocd-dex-server-*
+        # argocd-upgrade-job interacts with CRDs
+        # More details in argocd/chart/templates/bigbang/upgrade-job.yaml
+        - argocd-upgrade-job
+        # argocd server pods interact with secrets, configmaps, events, and CRDs 
+        # More details in argocd/chart/templates/argocd-server/role.yaml
+        - argocd-argocd-server-*
+        # repo server pods require access to the K8s API if using RBAC
+        # Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/rbac.md
+        - argocd-argocd-repo-server-*
+        # The applicationSet controller pods interact with many API resources, including CRDs
+        # More details in argocd/chart/templates/argocd-applicationset/role.yaml
+        - argocd-argocd-applicationset-controller-*
+        # notifications controller pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/role.yaml
+        # Additionally (this wildcard covers both)-
+        # notifications bot pods interact with secrets, configmaps, and CRDs
+        # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
+        - argocd-argocd-notifications-controller-*
+      - namespace: harbor
+        serviceAccounts: 
+        - harbor-redis-bb
+      - namespace: authservice
+        serviceAccounts:
+        - authservice
+        - authservice-haproxy-sso
+        pods:
+        - authservice-authservice-redis-bb-*
+        - authservice-haproxy-sso-*
+      - namespace: monitoring
+        serviceAccounts:
+        - monitoring-grafana
+        pods:
+        - monitoring-grafana-*
+      - namespace: anchore
+        serviceAccounts:
+        - anchore-ui-redis
+        pods:
+        - anchore-ui-redis-*
+      - namespace: jaeger
+        pods:
+        - jaeger-jaeger-jaeger-operator-*
+        - jaeger-clean-svc-monitor
+      - namespace: fortify
+        serviceAccounts:
+        - fortify-mysql
+      - namespace: vault
+        serviceAccounts:
+        - vault-vault
+        - vault-vault-root-token-secret
+        - vault-vault-agent-injector
+        pods:
+        - vault-vault-0
+        - vault-vault-agent-injector-*
+        - vault-vault-job-init-*
+      - namespace: promtail 
+        serviceAccounts:
+        - promtail-promtail
+        pods:
+        - promtail-promtail-*
+      - namespace: fluentbit
+        serviceAccounts:
+        - fluentbit-fluent-bit
+        pods:
+        - fluentbit-fluent-bit-*
+      - namespace: eck-operator
+        serviceAccounts:
+        - elastic-operator
+        pods:
+        - elastic-operator-?
+      - namespace: nexus-repository-manager
+        serviceAccounts:
+        - nexus-repository-manager
+        pods:
+        - nexus-repository-manager-* 
+      - namespace: thanos
+        serviceAccounts:
+        - thanos-minio-sa
+        - thanos-storegateway
+        - thanos-query
+        - thanos-query-frontend
+        pods:
+        - thanos-minio-*
+        podsToHarden:
+        - thanos-query-frontend-*
+        - thanos-storegateway-*
+        - thanos-query-*
+      - namespace: mattermost
+        serviceAccounts:
+        - mattermost
+        - mattermost-minio-sa
+        pods:
+        - default-minio-bucket-creation-*
+        - mattermost-minio-ss-*
+      - namespace: mattermost-operator
+        serviceAccounts:
+        - mattermost-operator
+        pods:
+        - mattermost-operator-*
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
 
 {{- end }}
 

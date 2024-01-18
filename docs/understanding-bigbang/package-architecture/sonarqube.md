@@ -122,4 +122,4 @@ Sonarqube is released under the [Lesser GNU General Public License](https://en.w
 ## Dependencies
 
 Node kernel mods:
-<https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/docs/guides/prerequisites/os_preconfiguration.md#sonarqube-specific-configuration-sonarqube-is-a-bb-addon-app>
+<https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/prerequisites/os_preconfiguration.md#sonarqube-specific-configuration-sonarqube-is-a-bb-addon-app>

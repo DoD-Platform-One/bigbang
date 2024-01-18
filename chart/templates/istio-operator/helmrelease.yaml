@@ -1,6 +1,6 @@
-{{- $fluxSettingsIstioOperator := merge .Values.istioOperator.flux .Values.flux -}}
+{{- $fluxSettingsIstioOperator := mergeOverwrite .Values.flux .Values.istioOperator.flux -}}
 {{- if .Values.istioOperator.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: istio-operator
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.istioOperator.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istioOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.istioOperator.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.istioOperator.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

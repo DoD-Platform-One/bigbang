@@ -37,7 +37,7 @@ If your package has an externally facing service (e.g. URL, port), you will need
 
 For `https` connections, Istio will provide end-to-end encryption using TLS termination and mutual TLS to the sidecar.  Therefore, the `http` connection on the pod can be used for the virtual service.
 
-> In some cases, you may have multiple services that need to be exposed.  A separate `VirtualService` should be created for each one.  See [this example](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise/-/blob/1.14.7-bb.2/chart/templates/bigbang/anchore-vs.yaml)
+> In some cases, you may have multiple services that need to be exposed.  A separate `VirtualService` should be created for each one.  See [this example](https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/blob/1.14.7-bb.2/chart/templates/bigbang/anchore-vs.yaml)
 
 ### virtualservice.yaml
 
@@ -193,31 +193,31 @@ Test the following items to ensure Istio is working properly with your applicati
 
 1. Verify syntax and resolve errors:
 
-   ```shell
-   helm template -n bigbang -f ~/bigbang/chart/values.yaml -f bigbang/values.yaml bigbang-podinfo bigbang
-   ```
+    ```shell
+    helm template -n bigbang -f ~/bigbang/chart/values.yaml -f bigbang/values.yaml bigbang-podinfo bigbang
+    ```
 
 1. Commit changes
 
-   ```shell
-   git add -A
-   git commit -m "feat: Istio integration"
-   git push
-   ```
+    ```shell
+    git add -A
+    git commit -m "feat: Istio integration"
+    git push
+    ```
 
 1. Install Big Bang core with `bigbang.dev` certificate
 
-   ```shell
-   # Iron Bank credentials are required since you are pulling Big Bang images from Iron Bank
-   helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f ~/bigbang/chart/ingress-certs.yaml -f bigbang/values.yaml --set registryCredentials.username=<your Iron Bank username> --set registryCredentials.password=<your Iron Bank PAT> bigbang ~/bigbang/chart
-   ```
+    ```shell
+    # Iron Bank credentials are required since you are pulling Big Bang images from Iron Bank
+    helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f ~/bigbang/chart/ingress-certs.yaml -f bigbang/values.yaml --set registryCredentials.username=<your Iron Bank username> --set registryCredentials.password=<your Iron Bank PAT> bigbang ~/bigbang/chart
+    ```
 
 1. Install the package
 
-   ```shell
-   # Iron Bank credentials are optional until we migrate the package to an Iron Bank image
-   helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f ~/bigbang/chart/ingress-certs.yaml -f bigbang/values.yaml --set registryCredentials.username=<your Iron Bank username> --set registryCredentials.password=<your Iron Bank PAT> bigbang-podinfo bigbang
-   ```
+    ```shell
+    # Iron Bank credentials are optional until we migrate the package to an Iron Bank image
+    helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f ~/bigbang/chart/ingress-certs.yaml -f bigbang/values.yaml --set registryCredentials.username=<your Iron Bank username> --set registryCredentials.password=<your Iron Bank PAT> bigbang-podinfo bigbang
+    ```
 
 1. Watch the `GitRepository`, `HelmRelease`, and `Pods` by running `watch kubectl get gitrepo,hr,po -A`.  Istio operator, Istio control plane, and the package should all be installed.
 
@@ -225,112 +225,112 @@ Test the following items to ensure Istio is working properly with your applicati
 
 1. Validate the TLS certificate is in the secret `istio-system/public-cert`.  This is the certificate Istio uses to provide https access to your package from outside the cluster.
 
-   ```shell
-   kubectl get secret -n istio-system public-cert -o 'go-template={{ index .data "tls.crt" }}' | base64 -d
+    ```shell
+    kubectl get secret -n istio-system public-cert -o 'go-template={{ index .data "tls.crt" }}' | base64 -d
 
-   ## OUTPUT ##
-   -----BEGIN CERTIFICATE-----
-   MIIFYDCCB...
-   ```
+    ## OUTPUT ##
+    -----BEGIN CERTIFICATE-----
+    MIIFYDCCB...
+    ```
 
-   > Istio self generates a different certificate for mutual TLS encryption between the Istio control plane and the Istio sidecar inside the pod for traffic into the pod.
+    > Istio self generates a different certificate for mutual TLS encryption between the Istio control plane and the Istio sidecar inside the pod for traffic into the pod.
 
 1. Validate Istio's Ingress Gateway service is running.  This is the load balancer that listens for traffic coming from outside the cluster.
 
-   ```shell
-   kubectl describe services -n istio-system public-ingressgateway
+    ```shell
+    kubectl describe services -n istio-system public-ingressgateway
 
-   ## OUTPUT ##
-   Name:                     public-ingressgateway
-   Namespace:                istio-system
-   Labels: ...
-   ```
+    ## OUTPUT ##
+    Name:                     public-ingressgateway
+    Namespace:                istio-system
+    Labels: ...
+    ```
 
-   > Big Bang defaults to a single ingress gateway called `public-ingressgateway`.
+    > Big Bang defaults to a single ingress gateway called `public-ingressgateway`.
 
-   In the description, you can see the following:
-   - Type is `LoadBalancer`
-   - `status-port` is configured for a health status check on ingress
-   - `http` is configured to listen on port 80 and forward to port 8080
-   - `https` is configured to listen on port 443 and forward to port 8443
-   - LoadBalancer Ingress IPs are external IPs assigned to the load balancer that can be accessed outside of the cluster.
+    In the description, you can see the following:
+    - Type is `LoadBalancer`
+    - `status-port` is configured for a health status check on ingress
+    - `http` is configured to listen on port 80 and forward to port 8080
+    - `https` is configured to listen on port 443 and forward to port 8443
+    - LoadBalancer Ingress IPs are external IPs assigned to the load balancer that can be accessed outside of the cluster.
 
 1. Validate Istio's Gateway is configured correctly.  Istio will use the Gateway's configuration for TLS encryption and host/port-based traffic matching.
 
-   ```shell
-   kubectl describe gateway -n istio-system
+    ```shell
+    kubectl describe gateway -n istio-system
 
-   ## OUTPUT ##
-   Name:         public
-   Namespace:    istio-system
-   Labels: ...
-   ```
+    ## OUTPUT ##
+    Name:         public
+    Namespace:    istio-system
+    Labels: ...
+    ```
 
-   > Big Bang defaults to a single `Gateway` called `public`.
+    > Big Bang defaults to a single `Gateway` called `public`.
 
-   By default the Gateway is setup with the following:
+    By default the Gateway is setup with the following:
 
-   - Connected to the `public-ingressgateway` using `spec.selector`
-   - `http`:
-     - Matches traffic for any hostname
-     - Listen on port 8080
-     - Redirects all traffic to `https`
-   - `https`:
-     - Matches all hosts in domain (`*.bigbang.dev`)
-     - Listen on port 8443
-     - Uses TLS certificate from `public-cert` for encryption/decryption
+    - Connected to the `public-ingressgateway` using `spec.selector`
+    - `http`:
+      - Matches traffic for any hostname
+      - Listen on port 8080
+      - Redirects all traffic to `https`
+    - `https`:
+      - Matches all hosts in domain (`*.bigbang.dev`)
+      - Listen on port 8443
+      - Uses TLS certificate from `public-cert` for encryption/decryption
 
 1. Validate the package's virtual service.  The virtual service controls the traffic routing between Istio and the package.
 
-   ```shell
-   kubectl describe virtualservice -n podinfo
+    ```shell
+    kubectl describe virtualservice -n podinfo
 
-   ## OUTPUT ##
-   Name:         podinfo-podinfo
-   Namespace:    podinfo
-   Labels:  ...
-   ```
+    ## OUTPUT ##
+    Name:         podinfo-podinfo
+    Namespace:    podinfo
+    Labels:  ...
+    ```
 
-   The virtual service should have the following configured:
-   - Connection to Istio's `istio-system/public` Gateway using `spec.gateway`
-   - Matches specific host for package (`podinfo.bigbang.dev`)
-   - Routes `http` traffic to package's service and port.  You can view the service name and `http` port using `kubectl describe service -n podinfo`.
+    The virtual service should have the following configured:
+    - Connection to Istio's `istio-system/public` Gateway using `spec.gateway`
+    - Matches specific host for package (`podinfo.bigbang.dev`)
+    - Routes `http` traffic to package's service and port.  You can view the service name and `http` port using `kubectl describe service -n podinfo`.
 
 1. Validate Istio's sidecar is running in the package's pod.
 
-   ```shell
-   # Get "ready" status of running containers
-   kubectl get pods -n podinfo -o jsonpath='{range .items[*].status.containerStatuses[*]}{@.name}{" "}{@.ready}{"\n"}'
+    ```shell
+    # Get "ready" status of running containers
+    kubectl get pods -n podinfo -o jsonpath='{range .items[*].status.containerStatuses[*]}{@.name}{" "}{@.ready}{"\n"}'
 
-   ## OUTPUT ##
-   istio-proxy true
-   podinfo true
-   ```
+    ## OUTPUT ##
+    istio-proxy true
+    podinfo true
+    ```
 
-   > If `istio-proxy` is not listed in the running containers, try restarting your pod.  Use `kubectl get deploy,sts,ds -n podinfo` to get the name and `kubectl rollout restart -n podinfo <name>` to restart it.  Then, check for the `istio-proxy` container again.
+    > If `istio-proxy` is not listed in the running containers, try restarting your pod.  Use `kubectl get deploy,sts,ds -n podinfo` to get the name and `kubectl rollout restart -n podinfo <name>` to restart it.  Then, check for the `istio-proxy` container again.
 
 1. Check the package's URL
 
-   > The hostname `*.bigbang.dev` points to your local IP address of 127.0.0.1.  If you are running the cluster on a different machine, you will need to add the hostname and host machine's IP to `/etc/hosts`.
+    > The hostname `*.bigbang.dev` points to your local IP address of 127.0.0.1.  If you are running the cluster on a different machine, you will need to add the hostname and host machine's IP to `/etc/hosts`.
 
-   ```shell
-   curl -sL https://podinfo.bigbang.dev
+    ```shell
+    curl -sL https://podinfo.bigbang.dev
 
-   ## OUTPUT ##
-   {
-     "hostname": "podinfo-podinfo-86b4b9d85c-rnd4z",
-     "version": "6.0.0",
-     "revision": "",
-     "color": "#34577c",
-     "logo": "https://raw.githubusercontent.com/stefanprodan/podinfo/gh-pages/cuddle_clap.gif",
-     "message": "greetings from podinfo v6.0.0",
-     "goos": "linux",
-     "goarch": "amd64",
-     "runtime": "go1.15.7",
-     "num_goroutine": "8",
-     "num_cpu": "32"
-   }
-   ```
+    ## OUTPUT ##
+    {
+      "hostname": "podinfo-podinfo-86b4b9d85c-rnd4z",
+      "version": "6.0.0",
+      "revision": "",
+      "color": "#34577c",
+      "logo": "https://raw.githubusercontent.com/stefanprodan/podinfo/gh-pages/cuddle_clap.gif",
+      "message": "greetings from podinfo v6.0.0",
+      "goos": "linux",
+      "goarch": "amd64",
+      "runtime": "go1.15.7",
+      "num_goroutine": "8",
+      "num_cpu": "32"
+    }
+    ```
 
 You have now verified Istio is working properly with the package.  To recap, incoming traffic to the cluster is first processed by Istio's ingress gateway listening on specific ports on each node.  `http` and `https` traffic is forwarded to internal ports 8080 and 8443 respectively.  The Istio Gateway configuration redirects `http` traffic to `https` and `https` traffic matching the domain (`bigbang.dev`) is TLS decrypted.  The Virtual Service configuration processes `https` traffic from the Gateway matching the package's hostname (`podinfo.bigbang.dev`) and routes traffic to the package's service and `http` port.  The service then directs traffic to the pod for handling.  Since the pod has the Istio sidecar running, the mutual TLS Istio feature will automatically encrypt traffic from the gateway to the pod inside the cluster (even though its http).  The sidecar will then decrypt to package before sending it over to the package for handling.  The following diagram illustrates this flow:
 

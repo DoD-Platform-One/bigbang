@@ -13,14 +13,14 @@ gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
   enabled: true
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
     tag: "3.5.1-bb.2"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux: {}
 
-  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+  # -- Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/big-bang/product/packages/policy.git
   values:
     violations:
       allowedDockerRegistries:
@@ -115,7 +115,7 @@ addons:
 
 ### Kubernetes resource request/limit settings
 
-K8s resource requests/limits for webservice and gitaly workloads should be increased from the defaults. Gitlab engineers state predicting Gitaly's resource consumption is very difficult, and will require testing to find the applicable limits/requests for each individual installation. See this [Gitlab Epic](https://gitlab.com/groups/gitlab-org/-/epics/6127) for more information. See the [gitlab/docs/k8s-resources.md](https://repo1.dso.mil/big-bang/apps/developer-tools/gitlab/-/blob/main/docs/k8s-resources.md) for a list of all possible configuration values. Use BigBang values overrides to change the Gitlab resource settings.  
+K8s resource requests/limits for webservice and gitaly workloads should be increased from the defaults. Gitlab engineers state predicting Gitaly's resource consumption is very difficult, and will require testing to find the applicable limits/requests for each individual installation. See this [Gitlab Epic](https://gitlab.com/groups/gitlab-org/-/epics/6127) for more information. See the [gitlab/docs/k8s-resources.md](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/blob/main/docs/k8s-resources.md) for a list of all possible configuration values. Use BigBang values overrides to change the Gitlab resource settings.  
 Recommended starting point:
 
 ```yaml

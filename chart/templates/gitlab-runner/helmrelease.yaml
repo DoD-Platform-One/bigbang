@@ -1,6 +1,6 @@
-{{- $fluxSettingsGitlabRunner := merge .Values.addons.gitlabRunner.flux .Values.flux -}}
+{{- $fluxSettingsGitlabRunner := mergeOverwrite .Values.flux .Values.addons.gitlabRunner.flux -}}
 {{- if .Values.addons.gitlabRunner.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: gitlab-runner
@@ -25,6 +25,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.addons.gitlabRunner.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.gitlabRunner.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.gitlabRunner.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.gitlabRunner.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

@@ -1,4 +1,10 @@
 {{- if and (not .Values.offline) (eq .Values.neuvector.sourceType "git") .Values.neuvector.enabled }}
+{{- $gitCredsDict := dict
+  "name" "neuvector"
+  "packageGitScope" .Values.neuvector.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
@@ -14,5 +20,5 @@ spec:
   ref:
     {{- include "validRef" .Values.neuvector.git | nindent 4 }}
   {{ include "gitIgnore" . }}
-  {{- include "gitCreds" . | nindent 2 }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

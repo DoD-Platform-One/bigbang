@@ -1,6 +1,6 @@
-{{- $fluxSettingsTempo := merge .Values.tempo.flux .Values.flux -}}
+{{- $fluxSettingsTempo := mergeOverwrite .Values.flux .Values.tempo.flux -}}
 {{- if .Values.tempo.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: tempo
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.tempo.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.tempo.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.tempo.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.tempo.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

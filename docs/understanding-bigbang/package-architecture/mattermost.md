@@ -119,7 +119,7 @@ addons:
 
 SSO is built in for Mattermost and Big Bang uses the [Gitlab SSO integration](https://docs.mattermost.com/deployment/sso-gitlab.html) as its implementation since this option is available at the free tier. Mattermost also provides OAuth and SAML integration as paid features for its [enterprise tiers](#licensing) if you wish to use those.
 
-If using Big Bang's SSO implementation, Keycloak is used behind the scenes to "spoof" the way Gitlab interaction works for SSO. The set up for how to configure Keycloak to handle this is well documented via the [Mattermost docs](https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost/-/blob/main/docs/keycloak.md).
+If using Big Bang's SSO implementation, Keycloak is used behind the scenes to "spoof" the way Gitlab interaction works for SSO. The set up for how to configure Keycloak to handle this is well documented via the [Mattermost docs](https://repo1.dso.mil/big-bang/product/packages/mattermost/-/blob/main/docs/keycloak.md).
 
 See below for an example of the values to provide to Mattermost for SSO setup:
 

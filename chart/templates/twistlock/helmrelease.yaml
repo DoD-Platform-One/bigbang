@@ -1,6 +1,6 @@
-{{- $fluxSettingsTwistlock := merge .Values.twistlock.flux .Values.flux -}}
+{{- $fluxSettingsTwistlock := mergeOverwrite .Values.flux .Values.twistlock.flux -}}
 {{- if .Values.twistlock.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: twistlock
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.twistlock.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.twistlock.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.twistlock.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.twistlock.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

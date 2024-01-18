@@ -1,8 +1,8 @@
-{{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
+{{- $fluxSettingsKeycloak := mergeOverwrite .Values.flux .Values.addons.keycloak.flux -}}
 {{- if .Values.addons.keycloak.enabled }}
 {{ $name := "keycloak" }}
 {{ $component := "security-tools" }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: {{ $name }}
@@ -31,6 +31,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.addons.keycloak.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.keycloak.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.keycloak.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.keycloak.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

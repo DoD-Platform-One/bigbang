@@ -1,6 +1,6 @@
-{{- $fluxSettingsKiali := merge .Values.kiali.flux .Values.flux -}}
+{{- $fluxSettingsKiali := mergeOverwrite .Values.flux .Values.kiali.flux -}}
 {{- if .Values.kiali.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: kiali
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.kiali.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.kiali.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.kiali.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.kiali.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

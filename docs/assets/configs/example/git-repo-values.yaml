@@ -21,172 +21,172 @@ git:
 
 istio:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-controlplane.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
     branch: "my-dev-branch"
 istioOperator:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/istio-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
     branch: "my-dev-branch"
 jaeger:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/jaeger.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
     path: "./chart"
     branch: "my-dev-branch"
 kiali:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/kiali.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
     branch: "my-dev-branch"
 clusterAuditor:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/cluster-auditor.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
     branch: "my-dev-branch"
 gatekeeper:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/policy.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
     branch: "my-dev-branch"
 kyverno:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
     branch: "my-dev-branch"
 kyvernoPolicies:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-policies.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
     branch: "my-dev-branch"
 kyvernoReporter:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/kyverno-reporter
+    repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter
     path: ./chart
     branch: "my-dev-branch"
 elasticsearchKibana:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
     branch: "my-dev-branch"
 eckOperator:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/eck-operator.git
     path: "./chart"
     branch: "my-dev-branch"
 fluentbit:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/fluentbit.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
     branch: "my-dev-branch"
 promtail:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/promtail.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/promtail.git
     path: "./chart"
     branch: "my-dev-branch"
 loki:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/loki.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
     branch: "my-dev-branch"
 neuvector:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/neuvector.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
     branch: "my-dev-branch"
 tempo:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/tempo.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
     branch: "my-dev-branch"
 monitoring:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/monitoring.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
     branch: "my-dev-branch"
 twistlock:
   git:
-    repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
     branch: "my-dev-branch"
 addons:
   argocd:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
       branch: "my-dev-branch"
   authservice:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/core/authservice.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
       branch: "my-dev-branch"
   minioOperator:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
       branch: "my-dev-branch"
   minio:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/application-utilities/minio.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
       branch: "my-dev-branch"
   gitlab:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
       branch: "my-dev-branch"
   gitlabRunner:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/gitlab-runner.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
       path: "./chart"
       branch: "my-dev-branch"
   nexusRepositoryManager:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/nexus.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
       branch: "my-dev-branch"
   sonarqube:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/sonarqube.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
       branch: "my-dev-branch"
   haproxy:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/developer-tools/haproxy.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
       path: "./chart"
       branch: "my-dev-branch"
   anchore:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/anchore-enterprise.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
       branch: "my-dev-branch"
   mattermostOperator:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost-operator.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
       path: "./chart"
       branch: "my-dev-branch"
   mattermost:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/collaboration-tools/mattermost.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
       branch: "my-dev-branch"
   velero:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/cluster-utilities/velero.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
       branch: "my-dev-branch"
   keycloak:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
       branch: "my-dev-branch"
   vault:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/vault.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
       branch: "my-dev-branch"
   metricsServer:
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/metrics-server.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
       branch: "my-dev-branch"

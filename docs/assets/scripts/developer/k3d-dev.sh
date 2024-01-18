@@ -1,6 +1,7 @@
 #!/bin/bash
 
-K3D_VERSION="5.5.1"
+K3D_VERSION="5.6.0"
+DEFAULT_K3S_TAG="v1.27.6-k3s1"
 
 # get the current script dir
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -23,10 +24,55 @@ function getPrivateIP2() {
   echo `aws ec2 describe-instances --output json --no-cli-pager --instance-ids ${InstId} | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress'`
 }
 
-#### Global variables - These allow the script to be run by non-bigbang devs easily
+function getDefaultAmi() {
+  local partition
+  local ubuntu_account_id
+  local image_id
+  # extract partition from the ARN
+  partition=$(aws sts get-caller-identity --query 'Arn' --output text | awk -F ":" '{print $2}')
+  # Select the correct AWS Account ID for Ubuntu Server AMI based on the partition
+  if [[ "${partition}" == "aws-us-gov" ]]; then
+      ubuntu_account_id="513442679011"
+  elif [[ "${partition}" == "aws" ]]; then
+      ubuntu_account_id="099720109477"
+  else
+      echo "Unrecognized AWS partition"
+      exit 1
+  fi
+  # Filter on latest 22.04 jammy server
+  image_id=$(aws ec2 describe-images \
+    --owners ${ubuntu_account_id} \
+    --filters 'Name=name,Values=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*' \
+    --query 'sort_by(Images,&CreationDate)[-1].ImageId' \
+    --output text)
+
+  if [ $? -ne 0 ] || [ "${image_id}" == "None" ]; then
+      echo "Error getting AMI ID"
+      exit 1
+  fi
+  echo "${image_id}"
+}
+
+#### Global variables - These allow the script to be run by non-bigbang devs easily - Update VPC_ID here or export environment variable for it if not default VPC
 if [[ -z "${VPC_ID}" ]]; then
-  # default
-  VPC_ID=vpc-065ffa1c7b2a2b979
+  VPC_ID="$(aws ec2 describe-vpcs --filters Name=is-default,Values=true | jq -j .Vpcs[0].VpcId)"
+  if [[ -z "${VPC_ID}" ]]; then
+    echo "AWS account has no default VPC - please provide VPC_ID"
+    exit 1
+  fi
+fi
+
+if [[ -n "${SUBNET_ID}" ]]; then
+  if [[ "$(aws ec2 describe-subnets --subnet-id "${SUBNET_ID}" --filters "Name=vpc-id,Values=${VPC_ID}" | jq -j .Subnets[0])" == "null" ]]; then
+    echo "SUBNET_ID ${SUBNET_ID} does not belong to VPC ${VPC_ID}"
+    exit 1
+  fi
+else
+  SUBNET_ID="$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" "Name=default-for-az,Values=true" | jq -j .Subnets[0].SubnetId)"
+  if [[ "${SUBNET_ID}" == "null" ]]; then
+    echo "VPC ${VPC_ID} has no default subnets - please provide SUBNET_ID"
+    exit 1
+  fi
 fi
 
 # If the user is using her own AMI, then respect that and do not update it.
@@ -35,7 +81,7 @@ if [[ $AMI_ID ]]; then
   APT_UPDATE="false"
 else
   # default
-  AMI_ID=$(aws ec2 describe-images --filters Name=owner-alias,Values=aws-marketplace Name=architecture,Values=x86_64 Name=name,Values="ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" --query 'max_by(Images, &CreationDate).ImageId' --output text)
+  AMI_ID=$(getDefaultAmi)
 fi
 
 #### Preflight Checks
@@ -289,7 +335,8 @@ if [[ "${RESET_K3D}" == false ]]; then
 
   # Lookup the security group created to get the ID
   echo -n Retrieving ID for security group ${SGname} ...
-  SecurityGroupId=$(aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} --query "SecurityGroups[0].GroupId" --output text)
+  #### SecurityGroupId=$(aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} --query "SecurityGroups[0].GroupId" --output text)
+  SecurityGroupId=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=$SGname --query 'SecurityGroups[*].[GroupId]' --output text)
   echo done
 
   # Add name tag to security group
@@ -299,15 +346,19 @@ if [[ "${RESET_K3D}" == false ]]; then
   # Add rule for IP based filtering
   WorkstationIP=`curl http://checkip.amazonaws.com/ 2> /dev/null`
   echo -n Checking if ${WorkstationIP} is authorized in security group ...
-  aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} | grep ${WorkstationIP} > /dev/null || ipauth=missing
+  #### aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} | grep ${WorkstationIP} > /dev/null || ipauth=missing
+  aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=$SGname | grep ${WorkstationIP} > /dev/null || ipauth=missing
   if [ "${ipauth}" == "missing" ]; then
     echo -e "missing\nAdding ${WorkstationIP} to security group ${SGname} ..."
     if [[ "$PRIVATE_IP" == true ]];
     then
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol tcp --port 22 --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol tcp --port 6443 --cidr ${WorkstationIP}/32
     else  # all protocols to all ports is the default
-      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
+      #### aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-name ${SGname} --protocol all --cidr ${WorkstationIP}/32
+      aws ec2 authorize-security-group-ingress --output json --no-cli-pager --group-id ${SecurityGroupId} --protocol all --cidr ${WorkstationIP}/32
     fi
     echo done
   else
@@ -400,22 +451,25 @@ EOF
   # NOTE: t3a.2xlarge spot price is 0.35 m5a.4xlarge is 0.69
   echo "Running spot instance ..."
 
-  # If we are using a Secondary IP, don't use an auto-assigned IP, and also generate a 2nd private address for EIPs allocation.
-  additional_create_instance_options=""
   if [[ "${ATTACH_SECONDARY_IP}" == true ]]; then
-    additional_create_instance_options+=" --no-associate-public-ip-address --secondary-private-ip-address-count 1"
+    # If we are using a secondary IP, we don't want to assign public IPs at launch time. Instead, the script will attach both public IPs after the instance is launched.
+    additional_create_instance_options="--no-associate-public-ip-address --secondary-private-ip-address-count 1"
+  else
+    additional_create_instance_options="--associate-public-ip-address"
   fi
 
   InstId=`aws ec2 run-instances \
     --output json --no-paginate \
     --count 1 --image-id "${ImageId}" \
     --instance-type "${InstanceType}" \
+    --subnet-id "${SUBNET_ID}" \
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
     --user-data file://$HOME/aws/userdata.txt \
     --block-device-mappings file://$HOME/aws/device_mappings.json \
-    --instance-market-options file://$HOME/aws/spot_options.json ${additional_create_instance_options} \
+    --instance-market-options file://$HOME/aws/spot_options.json \
+    ${additional_create_instance_options} \
     | jq -r '.Instances[0].InstanceId'`
 
   # Check if spot instance request was not created
@@ -538,7 +592,7 @@ echo "creating k3d cluster"
 
 # Shared k3d settings across all options
 # 1 server, 3 agents
-k3d_command="k3d cluster create --servers 1 --agents 3"
+k3d_command="k3d cluster create --servers 1 --agents 3 --verbose"
 # Volumes to support Twistlock defenders
 k3d_command+=" -v /etc:/etc@server:*\;agent:* -v /dev/log:/dev/log@server:*\;agent:* -v /run/systemd/private:/run/systemd/private@server:*\;agent:*"
 # Disable traefik and metrics-server
@@ -550,7 +604,7 @@ if [[ -z "${PrivateIP2}" ]]; then
 fi
 
 # Selecting K8S version through the use of a K3S image tag
-K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:="${DEFAULT_K3S_TAG}"}
 if [[ $K3S_IMAGE_TAG ]]; then
   echo "Using custom K3S image tag $K3S_IMAGE_TAG..."
   k3d_command+=" --image docker.io/rancher/k3s:$K3S_IMAGE_TAG"
@@ -606,7 +660,7 @@ run "${k3d_command}"
 
 # install kubectl
 echo Installing kubectl based on k8s version...
-K3S_IMAGE_TAG=${K3S_IMAGE_TAG:=""}
+K3S_IMAGE_TAG=${K3S_IMAGE_TAG:="${DEFAULT_K3S_TAG}"}
 if [[ $K3S_IMAGE_TAG ]]; then
   KUBECTL_VERSION=$(echo $K3S_IMAGE_TAG | cut -d'-' -f1)
   echo "Using specified kubectl version $KUBECTL_VERSION based on k3s image tag."
@@ -624,6 +678,7 @@ run "kubectl config use-context k3d-k3s-default"
 run "kubectl cluster-info && kubectl get nodes"
 
 echo "copying kubeconfig to workstation..."
+mkdir -p ~/.kube
 scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@${PublicIP}:/home/ubuntu/.kube/config ~/.kube/${AWSUSERNAME}-dev-config
 if [[ "$PRIVATE_IP" == true ]]; then
   $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${AWSUSERNAME}-dev-config
@@ -634,10 +689,27 @@ fi
 # Handle MetalLB cluster resource creation
 if [[ "${METAL_LB}" == true || "${ATTACH_SECONDARY_IP}" == true ]]; then
   echo "Installing MetalLB..."
-  run "kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"
-	# Wait for controller to be live so that validating webhooks function when we apply the config
-	echo "Waiting for MetalLB controller..."
-	run "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
+
+  until [[ ${REGISTRY_USERNAME} ]]; do
+    read -p "Please enter your Registry1 username: " REGISTRY_USERNAME
+  done
+  until [[ ${REGISTRY_PASSWORD} ]]; do
+    read -s -p "Please enter your Registry1 password: " REGISTRY_PASSWORD
+  done
+  run "kubectl create namespace metallb-system"
+  run "kubectl create secret docker-registry registry1 \
+    --docker-server=registry1.dso.mil \
+    --docker-username=${REGISTRY_USERNAME} \
+    --docker-password=${REGISTRY_PASSWORD} \
+    -n metallb-system"
+
+  run "mkdir /tmp/metallb"
+  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/metallb/* ubuntu@${PublicIP}:/tmp/metallb
+  run "kubectl apply -k /tmp/metallb"
+
+  # Wait for controller to be live so that validating webhooks function when we apply the config
+  echo "Waiting for MetalLB controller..."
+  run "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
   echo "MetalLB is installed."
 
   if [[ "$METAL_LB" == true ]]; then

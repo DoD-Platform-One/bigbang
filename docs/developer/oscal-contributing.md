@@ -56,7 +56,7 @@ Validating package OSCAL documents against the JSON Schema ensures that they adh
 * Verify that the document passes the validation without any errors or warnings.
 
 ### Example:
-from the directory containg your oscal-component.yaml file
+from the directory containing your oscal-component.yaml file
 
 ```shell
 yq eval oscal-component.yaml -o=json > tmp-oscal-component.json

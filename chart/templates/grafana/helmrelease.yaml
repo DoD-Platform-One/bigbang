@@ -1,6 +1,6 @@
-{{- $fluxSettingsMonitoring := merge .Values.grafana.flux .Values.flux -}}
+{{- $fluxSettingsMonitoring := mergeOverwrite .Values.flux .Values.grafana.flux -}}
 {{- if .Values.grafana.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: grafana
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.grafana.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.grafana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.grafana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.grafana.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

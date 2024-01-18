@@ -1,8 +1,8 @@
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
-{{- $mmOpValues := merge $mmOpOldValues .Values.addons.mattermostOperator -}}
-{{- $fluxSettingsMattermostOperator := merge $mmOpValues.flux .Values.flux -}}
+{{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
+{{- $fluxSettingsMattermostOperator := mergeOverwrite .Values.flux $mmOpValues.flux -}}
 {{- if or $mmOpValues.enabled .Values.addons.mattermost.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: mattermost-operator
@@ -30,6 +30,13 @@ spec:
         kind: HelmRepository
         name: {{ $mmOpValues.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $mmOpValues.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $mmOpValues.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $mmOpValues.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

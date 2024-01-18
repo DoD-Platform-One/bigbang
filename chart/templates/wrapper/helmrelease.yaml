@@ -2,8 +2,8 @@
 {{- range $pkg, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg = include "resourceName" $pkg -}}
-{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+{{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}-wrapper
@@ -14,7 +14,7 @@ metadata:
   annotations:
     {{- $defaults := ($.Files.Get (printf "defaults/%s.yaml" $pkg) | fromYaml) -}}
     {{- $overlays := dict "bigbang" $.Values "package" $vals -}}
-    {{- $merged := merge $overlays $defaults }}
+    {{- $merged := mergeOverwrite $overlays $defaults }}
     {{- if (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn") }}
     checksum/bigbang-values: {{ (toJson (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn")) | sha256sum }}
     {{- end }}
@@ -35,6 +35,13 @@ spec:
         kind: HelmRepository
         name: {{ $.Values.wrapper.helmRepo.repoName }}
         namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $.Values.wrapper.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $.Values.wrapper.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $.Values.wrapper.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: {{ default "5m" $fluxSettings.interval }}
       reconcileStrategy: Revision

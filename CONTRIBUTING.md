@@ -2,6 +2,8 @@
 
 Thanks for taking the time to contribute to BigBang!
 
+If you are coming from `repo1.dso.mil` and have an account at `login.dso.mil` please keep reading. If you are coming from or looking for the [project on Github](https://github.com/DoD-Platform-One) and wanting to make a Pull Request without a `dso.mil` account please see the last section [External Github Contributions](#community-contributions-to-dod-platform-one-via-github).
+
 Table of Contents:
 
 - [Contributing to Big Bang](#contributing-to-big-bang)
@@ -13,6 +15,7 @@ Table of Contents:
   - [DNS](#dns)
   - [Secrets & Certificates](#secrets--certificates)
   - [Merge requests process](#merge-requests-process)
+  - [External Github Contributions](#community-contributions-to-dod-platform-one-via-github)
 
 ## Developers Guide
 
@@ -20,7 +23,7 @@ Big Bang is designed in such a way as to be as easily deployed locally as it is 
 
 ## Iron Bank Images
 
-Per the [charter](https://repo1.dso.mil/platform-one/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
+Per the [charter](https://repo1.dso.mil/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang.  To obtain access to these images, follow the guides below.  These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
 
 1) Register for a free Iron Bank account [Here](https://sso-info.il2.dso.mil/new_account.html)
 1) Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
@@ -61,7 +64,7 @@ For more extensive development, use the [Development Guide](./docs/developer).
 
 ## Testing Big Bang Development Changes
 
-Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dso.mil/platform-one/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dso.mil/platform-one/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
+Development changes should be tested using a full GitOps environment.  The [Big Bang environment template](https://repo1.dso.mil/big-bang/customers/template/) should be replicated, either on a branch or new repository, to start your deployment.  Follow the instructions in the [template's readme](https://repo1.dso.mil/big-bang/customers/template/-/tree/main/README.md) and in the [Big Bang docs](./docs) for configuration.
 
 Follow the [Big Bang documentation](./docs) for testing a full deployment of Big Bang.
 
@@ -87,4 +90,37 @@ Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specifi
 - To report a cybersecurity concern, follow this [link](https://jira.il2.dso.mil/servicedesk/customer/portal/81).
 - Never push secrets or certificates into our repository.
 
+# Community Contributions to DoD-Platform-One via Github
 
+## How to Contribute
+
+1. Fork this repository, develop, and test your changes
+1. Submit a pull request
+1. Keep an eye out for comments. From bots and maintainers to ensure CI is passing and issues or suggestions are addressed.
+
+### Technical Requirements
+
+* Pipelines which must pass will run on runners from `repo1.dso.mil` and a bot will comment the status and information from the pipeline.
+* Any change to a Big Bang package chart requires a version bump following [semver](https://semver.org/) principles. See [Documentation Changes](#documentation-changes) and [Versioning](#versioning) below
+* Big Bang Package Issues which need to be included in the Big Bang Umbrella chart are not complete when the package PR is merged so please do not close issues. A new tag will automatically get created on `repo1.dso.mil` along with an MR into the Big Bang Umbrella as part of the CI process. This repo1 MR is reviewed the Big Bang Product team to merge on the Gitlab side, upon which the issue will be closed.
+* Changes to the Big Bang Umbrella get released separately according to our Release Schedule outlined in the [README](./README.md#release-schedule).
+
+Once changes have been merged all subsequent automation will run on `repo1.dso.mil` with changes getting published back to Github.
+
+### Documentation Changes
+
+If your changes are to documentation or guides/images and not code, templates or variables then a `kind::docs` label will need to be added and will not kick off and wait for CI testing to complete.
+
+### Versioning
+
+Big Bang package chart `version` should follow [semver](https://semver.org/).
+
+Charts should start at `1.0.0` unless they are based off an upstream chart (shown in chart/Kptfile) in which case a bug fix would increment the `bb.X` suffix.
+
+Big Bang umbrella MRs will not need the version in `chart/Chart.yaml` edited via Pull Requests.
+
+### Generate README
+
+The readme of each Big Bang package chart can be re-generated with the following command https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md
+
+Big Bang umbrella MRs will not need the main README.md edited via Pull Requests.

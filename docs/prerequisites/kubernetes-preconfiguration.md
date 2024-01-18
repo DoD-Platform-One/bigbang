@@ -27,7 +27,7 @@ You can override bigbang's helm values so istio will provision a service of type
 
 ## BigBang Doesn’t Support PSPs (Pod Security Policies)
 
-* [PSP's are being removed from Kubernetes and will be gone by version 1.25.x](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/issues/10)
+* [PSP's are being removed from Kubernetes and will be gone by version 1.25.x](https://repo1.dso.mil/big-bang/bigbang/-/issues/10)
 * [Open Policy Agent Gatekeeper can enforce the same security controls as PSPs](https://github.com/open-policy-agent/gatekeeper-library/tree/master/library/pod-security-policy#pod-security-policies), and is core component of BigBang, which operates as an elevated [validating admission controller](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to audit and enforce various [constraints](https://github.com/open-policy-agent/frameworks/tree/master/constraint) on all requests sent to the kubernetes api server.
 * We recommend users disable PSPs completely given they're being removed, we have a replacement, and PSPs can prevent OPA from deploying (and if OPA is not able to deploy, nothing else gets deployed).
 * Different ways of Disabling PSPs:
@@ -63,9 +63,7 @@ It is important to note that while Big Bang does not require/mandate usage of a 
 
 ### OpenShift
 
-OpenShift
-
-1) When deploying BigBang, set the OpenShift flag to true.
+1. When deploying BigBang, set the OpenShift flag to true.
 
     ```yaml
     # inside a values.yaml being passed to the command installing bigbang
@@ -77,14 +75,15 @@ OpenShift
     helm install bigbang chart --set openshift=true
     ```
 
-1) Patch the istio-cni daemonset to allow containers to run privileged (AFTER istio-cni daemonset exists).
-Note: it was unsuccessfully attempted to apply this setting via modifications to the helm chart. Online patching succeeded.
+1. Patch the istio-cni daemonset to allow containers to run privileged (AFTER istio-cni daemonset exists).
+
+    Note: it was unsuccessfully attempted to apply this setting via modifications to the helm chart. Online patching succeeded.
 
     ```shell
     kubectl get daemonset istio-cni-node -n kube-system -o json | jq '.spec.template.spec.containers[] += {"securityContext":{"privileged":true}}' | kubectl replace -f -
     ```
 
-1) Modify the OpenShift cluster(s) with the following scripts based on <https://istio.io/v1.7/docs/setup/platform-setup/openshift/>
+1. Modify the OpenShift cluster(s) with the following scripts based on <https://istio.io/v1.7/docs/setup/platform-setup/openshift/>
 
     ```shell
     # Istio Openshift configurations Post Install

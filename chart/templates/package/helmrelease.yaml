@@ -4,10 +4,10 @@
 {{- $pkg := include "resourceName" $pkg -}}
 {{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
 {{- if $defaults -}}
-{{- $vals := merge $vals ($defaults | fromYaml).package -}}
+{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
 {{- end -}}
-{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+{{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}
@@ -34,6 +34,13 @@ spec:
         kind: HelmRepository
         name: {{ dig "helmRepo" "repoName" "registry1" $vals }}
         namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $vals.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $vals.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $vals.helmRepo.repoName }}
+      {{- end }}
       {{- else }}
       {{- fail (printf "Values for source (git or helmRepo) are required for package %s" $pkg) }}
       {{- end }}

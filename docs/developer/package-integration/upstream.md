@@ -11,7 +11,7 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Project
 
-It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox).  This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
+It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/big-bang/product/packages).  This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
 
 You will need to request a sandbox project and Developer access from a Big Bang team member.
 
@@ -27,35 +27,35 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
 1. Identify the location of an existing Helm chart for the package.
 
-   > If selecting between several Helm charts, give preference to a Helm chart that:
-   >
-   > - Was created by the company that owns the package
-   > - Has recent and frequent updates
-   > - Offers maximum flexibility through values
-   > - Does not bundle several packages together (unless they can be individually disabled)
-   > - Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context
+    > If selecting between several Helm charts, give preference to a Helm chart that:
+    >
+    > - Was created by the company that owns the package
+    > - Has recent and frequent updates
+    > - Offers maximum flexibility through values
+    > - Does not bundle several packages together (unless they can be individually disabled)
+    > - Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context
 
 1. Using [Kpt](https://googlecontainertools.github.io/kpt/installation/), create a clone of the package's Helm chart
 
-   ```shell
-   # Change these for your upstream helm chart
-   export GITREPO=https://github.com/stefanprodan/podinfo
-   export GITDIR=charts/podinfo
-   export GITTAG=5.2.1
+    ```shell
+    # Change these for your upstream helm chart
+    export GITREPO=https://github.com/stefanprodan/podinfo
+    export GITDIR=charts/podinfo
+    export GITTAG=5.2.1
 
-   # Clone
-   kpt pkg get $GITREPO/$GITDIR@$GITTAG chart
-   ```
+    # Clone
+    kpt pkg get $GITREPO/$GITDIR@$GITTAG chart
+    ```
 
-   > Always use an release tag for `GITTAG` so your chart is immutable.  Never use a branch or `latest`.
+    > Always use an release tag for `GITTAG` so your chart is immutable.  Never use a branch or `latest`.
 
 1. Add `-bb.0` suffix on `chart/Chart.yaml`, `version`.  For example:
 
-   ```yaml
-   version: 6.0.0-bb.0
-   ```
+    ```yaml
+    version: 6.0.0-bb.0
+    ```
 
-   > The `bb.#` will increment for each change we merge into our `main` branch.  It will also become our release label.
+    > The `bb.#` will increment for each change we merge into our `main` branch.  It will also become our release label.
 
 1. Add the following files to the Git repository at the root:
 
@@ -143,7 +143,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       - Values: How to configure Helm chart values
       - Contributing: Link to contributing guide
 
-      There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/platform-one/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
+      There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
 
       > This process produces a `README.md`, `README.md.gotpl`, and `.helmdocsignore`.  The `gotpl` file is used as values to update the `README.md`.
 

@@ -1,6 +1,6 @@
-{{- $fluxSettingsJaeger := merge .Values.jaeger.flux .Values.flux -}}
+{{- $fluxSettingsJaeger := mergeOverwrite .Values.flux .Values.jaeger.flux -}}
 {{- if .Values.jaeger.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: jaeger
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.jaeger.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.jaeger.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.jaeger.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.jaeger.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

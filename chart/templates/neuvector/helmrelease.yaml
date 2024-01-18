@@ -1,6 +1,6 @@
-{{- $fluxSettingsNeuvector := merge .Values.neuvector.flux .Values.flux -}}
+{{- $fluxSettingsNeuvector := mergeOverwrite .Values.flux .Values.neuvector.flux -}}
 {{- if .Values.neuvector.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: neuvector
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.neuvector.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.neuvector.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.neuvector.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.neuvector.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

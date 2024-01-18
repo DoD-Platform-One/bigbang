@@ -13,7 +13,7 @@ comments: |
   https://keycloak.bigbang.dev/  
   
   For an example "baby-yoda" keycloak realm file that already has sso clients configured see
-    https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/blob/main/chart/resources/dev/baby-yoda.json
+    https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/chart/resources/dev/baby-yoda.json
   Within the Keycloak Admin Console UI import your custom realm.json file. 
 
 
@@ -140,7 +140,7 @@ addons:
 
       # This config includes an example of injecting a custom theme jar on startup
       # Instructions for building a custom theme can be found in the Big Bang Keycloak repository
-      #    https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/keycloak/-/blob/main/development/README.md
+      #    https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/development/README.md
       extraInitContainers: |-
         - name: plugin
           image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:X.X.X

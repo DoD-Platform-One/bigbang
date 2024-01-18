@@ -52,7 +52,7 @@ To upgrade your umbrella deployment of Big Bang when using the [Customer Templat
 ```yaml
 namespace: bigbang
 resources:
-  - git::https://repo1.dso.mil/platform-one/big-bang/bigbang.git//base?ref=1.57.1
+  - git::https://repo1.dso.mil/big-bang/bigbang.git//base?ref=1.57.1
 ```
 
 - Edit the environment specific Kustomization (ex: `dev/kustomization.yaml`) to use the new version under the [ref/patch section](https://repo1.dso.mil/big-bang/customers/template/-/blob/main/dev/kustomization.yaml#L18-21).

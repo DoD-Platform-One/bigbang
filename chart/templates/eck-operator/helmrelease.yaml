@@ -1,6 +1,6 @@
-{{- $fluxSettingsEckOperator := merge .Values.eckOperator.flux .Values.flux -}}
+{{- $fluxSettingsEckOperator := mergeOverwrite .Values.flux .Values.eckOperator.flux -}}
 {{- if or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: eck-operator
@@ -28,6 +28,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.eckOperator.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.eckOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.eckOperator.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.eckOperator.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

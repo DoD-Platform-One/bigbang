@@ -1,9 +1,9 @@
-{{- $fluxSettingsMetrics := merge .Values.addons.metricsServer.flux .Values.flux -}}
+{{- $fluxSettingsMetrics := mergeOverwrite .Values.flux .Values.addons.metricsServer.flux -}}
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
-{{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2beta1" "HelmRelease" "bigbang" "metrics-server") }}
+{{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2beta2" "HelmRelease" "bigbang" "metrics-server") }}
 {{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: metrics-server
@@ -32,6 +32,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.addons.metricsServer.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.metricsServer.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.metricsServer.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.metricsServer.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

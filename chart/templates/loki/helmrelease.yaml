@@ -1,6 +1,6 @@
-{{- $fluxSettingsLoki := merge .Values.loki.flux .Values.flux -}}
+{{- $fluxSettingsLoki := mergeOverwrite .Values.flux .Values.loki.flux -}}
 {{- if .Values.loki.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: loki
@@ -29,6 +29,13 @@ spec:
         kind: HelmRepository
         name: {{ .Values.loki.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.loki.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.loki.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.loki.helmRepo.repoName }}
+      {{- end }}
       {{- end }}
       interval: 5m
 

@@ -44,7 +44,7 @@ Additionally, if your network has a proxy that has custom/internal SSL certifica
 
 ## Important Background Contextual Information
 
-`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/platform-one/big-bang/customers/template) for guidance on production deployments.
+`BLUF:` This quick start guide optimizes the speed at which a demonstrable and tinker-able deployment of Big Bang can be achieved by minimizing prerequisite dependencies and substituting them with quickly implementable alternatives. Refer to the [Customer Template Repo](https://repo1.dso.mil/big-bang/customers/template) for guidance on production deployments.
 
 `Details of how each prerequisite/dependency is quickly satisfied:`  
 
@@ -172,19 +172,19 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
-    # The following downloads the 64 bit linux version of k3d v5.4.1, checks it
+    # The following downloads the 64 bit linux version of k3d v5.5.1, checks it
     # against a copy of the sha256 checksum, if they match k3d gets installed
-    wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.4.1/k3d-linux-amd64 > k3d
+    wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.5.1/k3d-linux-amd64 > k3d
 
-    echo 50f64747989dc1fcde5db5cb82f8ac132a174b607ca7dfdb13da2f0e509fda11 k3d | sha256sum -c | grep OK
-    # 50f64747989dc1fcde5db5cb82f8ac132a174b607ca7dfdb13da2f0e509fda11 came from running the following against a trusted internet connection.
-    # wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.4.1/k3d-linux-amd64 | sha256sum | cut -d ' ' -f 1
+    echo 4849027dc5e835bcce49070af3f4eeeaada81d96bce49a8b89904832a0c3c2c0 k3d | sha256sum -c | grep OK
+    # 4849027dc5e835bcce49070af3f4eeeaada81d96bce49a8b89904832a0c3c2c0 came from running the following against a trusted internet connection.
+    # wget -q -O - https://github.com/k3d-io/k3d/releases/download/v5.5.1/k3d-linux-amd64 | sha256sum | cut -d ' ' -f 1
 
     if [ $? == 0 ]; then chmod +x k3d && sudo mv k3d /usr/local/bin/k3d; fi
 
 
     # Alternative command (less safe due to curl | bash, but more generic):
-    # wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.4.1 bash
+    # wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
     ```
 
 1. Verify k3d installation
@@ -195,8 +195,8 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     ```
 
     ```console
-    k3d version v5.4.1
-    k3s version v1.22.7-k3s1 (default)
+    k3d version v5.5.1
+    k3s version v1.26.4-k3s1 (default)
     ```
 
 1. Install kubectl
@@ -266,11 +266,11 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # [ubuntu@Ubuntu_VM:~]
     # The following downloads the 64 bit linux version of helm v3.8.1, checks it
     # against a copy of the sha256 checksum, if they match helm gets installed
-    wget -q -O - https://get.helm.sh/helm-v3.8.1-linux-amd64.tar.gz > helm.tar.gz
+    wget -q -O - https://get.helm.sh/helm-v3.13.3-linux-amd64.tar.gz > helm.tar.gz
 
-    echo d643f48fe28eeb47ff68a1a7a26fc5142f348d02c8bc38d699674016716f61cd helm.tar.gz | sha256sum -c | grep OK
-    # d643f48fe28eeb47ff68a1a7a26fc5142f348d02c8bc38d699674016716f61cd
-    # came from https://github.com/helm/helm/releases/tag/v3.8.1
+    echo bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d helm.tar.gz | sha256sum -c | grep OK
+    # bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d
+    # came from https://github.com/helm/helm/releases/tag/v3.13.3
 
     if [ $? == 0 ]; then tar -xvf helm.tar.gz && chmod +x linux-amd64/helm && sudo mv linux-amd64/helm /usr/local/bin/helm && rm -rf linux-amd64 && rm helm.tar.gz ; fi  
 
@@ -287,7 +287,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     ```
 
     ```console
-    version.BuildInfo{Version:"v3.8.1", GitCommit:"5cb9af4b1b271d11d7a97a71df3ac337dd94ad37", GitTreeState:"clean", GoVersion:"go1.17.5"}
+    version.BuildInfo{Version:"v3.13.3", GitCommit:"c8b948945e52abba22ff885446a1486cb5fd3474", GitTreeState:"clean", GoVersion:"go1.20.11"}
     ```
 
 ## Step 4: Configure Host Operating System Prerequisites
@@ -440,7 +440,7 @@ k3d-k3s-default-server-0   Ready    control-plane,master   11m   v1.22.7+k3s1
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 cd ~
-git clone https://repo1.dso.mil/platform-one/big-bang/bigbang.git
+git clone https://repo1.dso.mil/big-bang/bigbang.git
 
 # Checkout version latest stable version of Big Bang
 cd ~/bigbang
@@ -602,7 +602,7 @@ EOF
 ```shell
 # [ubuntu@Ubuntu_VM:~]
 helm upgrade --install bigbang $HOME/bigbang/chart \
-  --values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+  --values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
   --values $HOME/ib_creds.yaml \
   --values $HOME/demo_values.yaml \
   --namespace=bigbang --create-namespace
@@ -616,7 +616,7 @@ This makes the command more idempotent by allowing the exact same command to wor
 `bigbang $HOME/bigbang/chart`:  
 bigbang is the name of the helm release that you'd see if you run `helm list -n=bigbang`. `$HOME/bigbang/chart` is a reference to the helm chart being installed.
 
-`--values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
+`--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
 References demonstration HTTPS certificates embedded in the public repository. The *.bigbang.dev wildcard certificate is signed by Let's Encrypt, a free public internet Certificate Authority. Note the URL path to the copy of the cert on master branch is used instead of `$HOME/bigbang/chart/ingress-certs.yaml`, because the Let's Encrypt certs expire after 3 months, and if you deploy a tagged release of BigBang, like 1.15.0, the version of the cert stored in the tagged git commit / release of Big Bang could be expired. Referencing the master branches copy via URL ensures you receive the latest version of the cert, which won't be expired.
 
 `--namespace=bigbang --create-namespace`:  
@@ -741,7 +741,7 @@ Note, default credentials for Big Bang packages can be found [here](../using-big
 ## Step 14: Play
 
 Here's an example of post deployment customization of Big Bang.  
-After looking at <https://repo1.dso.mil/platform-one/big-bang/bigbang/-/blob/master/chart/values.yaml>  
+After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>  
 It should make sense that the following is a valid edit
 
 ```shell
@@ -754,7 +754,7 @@ addons:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/tinkering.yaml \
@@ -810,7 +810,7 @@ packages:
     # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
-      repo: "https://repo1.dso.mil/big-bang/apps/sandbox/podinfo.git"
+      repo: "https://repo1.dso.mil/big-bang/product/packages/podinfo.git"
       # -- Git commit to check out.  Takes precedence over semver, tag, and branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
       commit:
       # -- Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference)
@@ -833,7 +833,7 @@ packages:
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
-    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio:
       hosts:
         - names:
@@ -844,16 +844,16 @@ packages:
             service: missionapp-missionapp
             port: 9898
 
-    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for monitoring.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     monitor: {}
 
-    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Package details for network policies.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     network: {}
 
-    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- Secrets that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     secrets: {}
 
-    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/platform-one/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
+    # -- ConfigMaps that should be created prior to package installation.  See [wrapper values](https://repo1.dso.mil/big-bang/apps/wrapper/-/blob/main/chart/values.yaml) for settings.
     configMaps: {}
 
     # -- Values to pass through to package Helm chart
@@ -866,7 +866,7 @@ packages:
 EOF
 
 helm upgrade --install bigbang $HOME/bigbang/chart \
---values https://repo1.dso.mil/platform-one/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
+--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml \
 --values $HOME/ib_creds.yaml \
 --values $HOME/demo_values.yaml \
 --values $HOME/podinfo_wrapper.yaml \
@@ -894,19 +894,21 @@ After completing step 5, if you are unable to connect to external DNS providers 
     ```shell
     kubectl -n kube-system edit configmaps CoreDNS -o yaml 
     ```
-2. Change: 
 
-     ```plaintext
-     forward . /etc/resolv.conf
-     ```
+1. Change: 
 
-     To:
+    ```plaintext
+    forward . /etc/resolv.conf
+    ```
 
-     ```plaintext
-     forward . <DNS Server IP>
-     ```
-3. Save changes in editor (for vi use `:wq`)
-4. Verify changes in terminal output that prints new config 
+    To:
+
+    ```plaintext
+    forward . <DNS Server IP>
+    ```
+
+1. Save changes in editor (for vi use `:wq`)
+1. Verify changes in terminal output that prints new config 
 
 ### Useful Commands for Obtaining Detailed Logs from Kubernetes Cluster or Containers
 * Print all pods including information related to the status of each pod 
@@ -924,7 +926,7 @@ After completing step 5, if you are unable to connect to external DNS providers 
 
 ### Documentation References for command line tools used
 * Kubectl - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands 
-* k3d - https://k3d.io/v5.4.3/usage/k3s/
+* k3d - https://k3d.io/v5.5.1/usage/k3s/
 * Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
 * Helm - https://helm.sh/docs/helm/helm/
 
@@ -951,4 +953,109 @@ If the NeuVector pods fail to open, and you look at the K8s logs only to find th
 sudo sysctl fs.inotify.max_queued_events=616384
 sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
+```
+### Failed to provide IP to istio-system/public-ingressgateway
+As one option to provide IP to the istio-system/public-ingressgateway, metallb can be run. The following steps will demonstrate a standard configuration, however, some changes may need to be made for each individual system (specific /ets/hosts addresses, etc.)
+
+#### Step 1: K3d deploy
+To facilitate metallb, servicelb needs to be disabled on the initial install.  Replace the above k3d deploy command with the following.
+```shell
+k3d cluster create \
+  --k3s-arg "--tls-san=$SERVER_IP@server:0" \
+  --volume /etc/machine-id:/etc/machine-id \
+  --volume ${IMAGE_CACHE}:/var/lib/rancher/k3s/agent/containerd/io.containerd.content.v1.content \
+  --k3s-arg "--disable=traefik@server:0" \
+  --k3s-arg "--disable=servicelb@server:0" \
+  --port 80:80@loadbalancer \
+  --port 443:443@loadbalancer \
+  --api-port 6443
+```
+
+#### Step 2: Deploy MetalLB
+After following the above instructions to deploy flux, deploy the metallb controller and speaker.
+```shell
+kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
+```
+Wait for the pods to be running:
+```shell
+kubectl get po -n metallb-system
+```
+
+```console
+NAME                          READY   STATUS    RESTARTS   AGE
+controller-5684477f66-s99jg   1/1     Running   0          30s
+speaker-jrddv                 1/1     Running   0          30s
+```
+
+#### Step 3: Configure MetalLB
+Note: This step will not work if either the controller or speaker are not in a running condition.
+
+The following configuration addresses will need to be filled with the values that match your configuration. These can typically be found by looking at your docker subnet using the 'docker network ls' command.  If there is no subnet currently configured you can use the following as an example to set up your subnet. 'docker network create --opt com.docker.network.bridge.name=$NETWORK_NAME $NETWORK_NAME --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.x.x.x/16 --gateway 172.x.x.x'. Be sure to replace the network name, subnet and gateway values as needed.
+
+```shell
+export SUBNET_RANGE=172.x.x.x-172.x.x.x
+cat << EOF > ~/metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+  - $SUBNET_RANGE
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement1
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default
+EOF
+
+kubectl create -f $HOME/metallb-config.yaml
+```
+#### Step 4: Configure /etc/hosts
+Lastly configure /etc/hosts/ with the new IP Addresses (you can add your own as needed for services). You will need to fill in the values used for the subnet.
+```shell
+  export PASSTHROUGH_GATEWAY_IP=172.x.x.x
+  export PUBLIC_GATEWAY_IP=172.x.x.x
+  sudo sed -i '/bigbang.dev/d' /etc/hosts
+  sudo bash -c "echo '## begin bigbang.dev section (METAL_LB)' >> /etc/hosts"
+  sudo bash -c "echo $PASSTHROUGH_GATEWAY_IP keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo $PUBLIC_GATEWAY_IP anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
+  sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+  # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+  kubectl get configmap -n kube-system coredns -o yaml | sed '/^    $PASSTHROUGH_GATEWAY_IP host.k3d.internal$/a\ \ \ \ $PASSTHROUGH_GATEWAY_IP keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+  kubectl delete pod -n kube-system -l k8s-app=kube-dns
+```
+
+From this point continue with the helm upgrade command above.
+
+### WSL2 
+This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2
+
+#### NeuVector "Failed to get container"
+In you receive a similar error to the above "Failed to get container" with NeuVector it could be because of the cgroup configurations in WSL2.  WSL2 often tries to run both cgroup and cgroup v2 in a unified manner which can confuse docker and affect deployments.  To remedy this you need to create a .wslconfig file in the C:\Users\<UserName>\ directory.  In this file you need to add:
+
+```shell
+[wsl2]
+kernelCommandLine = cgroup_no_v1=all
+```
+
+Once created you need to restart wsl2.
+
+If this doesn't remedy the issue and the cgroup.controllers file is still located in the /sys/fs/cgroup/unified directory you may have to modify /etc/fstab and add 
+
+```shell
+cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0
+```
+
+#### Container fails to start "Not enough memory"
+Wsl2 limits the amount of memory available to half of what your computer has.  If you have 32g or less (16g or less available) this is often not enough to run all of the standard big bang services.  If you have more available memory you can modify the initial limit by modifying (or creating) the C:\Users\<UserName>\.wslconfig file by adding:
+
+```shell
+[wsl2]
+memory=24GB
 ```
