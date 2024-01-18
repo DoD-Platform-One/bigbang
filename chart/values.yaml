@@ -1051,7 +1051,7 @@ addons:
     #   chain:
     #     minimal:
     #       callback_uri: "https://somecallback"
-    enabled: false
+    enabled: true
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
@@ -1859,11 +1859,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/holocron.git
-      branch: initial-chart
+      tag: "0.1.1"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "holocron"
+      tag: "0.1.1"
 
     collectorAuth:
       # -- Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
@@ -1882,7 +1883,6 @@ addons:
       # -- The service name to communicate with
         name: ""
         # -- If network policies are enabled, a label to match the namespace for egress policy
-        # -- Ensure you create a matching ingress policy for Jira
         label:
           key: value
 

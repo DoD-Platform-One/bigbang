@@ -145,7 +145,7 @@ postgresql:
     
   image:
     repository: ironbank/opensource/postgres/postgresql
-    tag: "15.4"
+    tag: "15.5"
   auth:
     secretKey: password
     username: {{ .Values.addons.holocron.database.username }}
