@@ -18,9 +18,10 @@ twistlock:
         size: 256Mi
       localVolumeUpgrade: true
     bbtests:
-      enabled: false
+      enabled: true
       cypress:
         artifacts: false
+        openshift: true
         envs:
           cypress_baseUrl: "https://twistlock.bigbang.dev"
       scripts:
@@ -36,12 +37,35 @@ neuvector:
     crio:
       enabled: true
       path: /var/run/crio/crio.sock
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+        #envs:
+          #cypress_url: "https://neuvector.bigbang.dev"
+      #scripts:
+        #envs:
+          #URL: "https://neuvector.bigbang.dev"
      
 loki:
   enabled: true
   git:
     tag: null
     branch: "openshift-updates"
+  values:
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true 
+        envs:
+          cypress_check_datasource: 'true'
+            #cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_grafana_url: 'http://monitoring-grafana.monitoring.svc.cluster.local'
+      scripts:
+        envs:
+          LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
 
 promtail:
   enabled: true
@@ -53,7 +77,22 @@ tempo:
   enabled: true
   git:
     tag: null
-    branch: "openshift-updates"  
+    branch: "openshift-updates"
+  values:
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+        #envs:
+          #cypress_url: 'https://tempo.bigbang.dev'
+          #cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3100'
+          #cypress_check_datasource: 'true'
+          #cypress_grafana_url: 'https://grafana.bigbang.dev'
+      #scripts:
+        #enabled: true
+        #envs:
+          #TEMPO_METRICS_URL: 'http://tempo-tempo.tempo.svc:3100'  
 
 grafana:
   enabled: true
@@ -67,12 +106,35 @@ grafana:
           requests:
             cpu: 20m
             memory: 20M
+    bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
+          envs:
+            cypress_grafana_url: 'https://grafana.bigbang.dev'
 
 kyverno:
   enabled: true
   git:
     tag: null
     branch: "openshift-updates"
+  values:
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+      scripts:
+        image: registry1.dso.mil/ironbank/opensource/kubernetes/kubectl:1.27.4
+        additionalVolumeMounts:
+          - name: "kyverno-bbtest-manifest"
+            mountPath: /yaml
+        additionalVolumes:
+          - name: "kyverno-bbtest-manifest"
+            configMap:
+              name: "kyverno-bbtest-manifest"  
 
 kyvernoPolicies:
   enabled: false
@@ -150,6 +212,24 @@ monitoring:
               operator: NotIn
               values:
                 - 'true'
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+          #image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
+        envs:
+          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
+          #cypress_prometheus_url: 'http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090'
+          #cypress_grafana_url: 'http://monitoring-grafana.monitoring.svc.cluster.local'
+          #cypress_alertmanager_url: 'http://monitoring-monitoring-kube-alertmanager.monitoring.svc.cluster.local:9093'
+          cypress_check_istio_dashboards: 'true'
+          cypress_keycloak_test_enable: 'false'
+          cypress_tnr_username: "cypress"
+          cypress_tnr_password: "tnr_w!G33ZyAt@C8"   
+
 eckOperator:
   enabled: true
   git:
@@ -169,6 +249,11 @@ fluentbit:
     securityContext:
       seLinuxOptions: null
       privileged: true
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
 
 elasticsearchKibana:
   enabled: true
@@ -210,6 +295,14 @@ elasticsearchKibana:
         heap: 
           min: 3g
           max: 3g
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+        envs:
+          cypress_expect_logs: "true"
+          cypress_kibana_url: "https://kibana.bigbang.dev" 
 
 clusterAuditor:
   enabled: true
@@ -305,6 +398,13 @@ jaeger:
           security: none
     sso: 
       enabled: true
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+        envs:
+          cypress_url: "https://tracing.bigbang.dev"
 
 kiali: 
   enabled: true
@@ -317,6 +417,24 @@ kiali:
         identity: 
           cert_file: ""
           private_key_file: ""
+    bbtests:
+      enabled: true
+      cypress:
+        artifacts: true
+        openshift: true
+        #artifactsHostPath: /mnt/cypress
+        #privileged: true
+        resources:
+          requests:
+            cpu: 3
+            memory: 2Gi
+          limits:
+            cpu: 3
+            memory: 2Gi
+        envs:
+          cypress_url: 'https://kiali:{{ default 20001 .Values.port }}'
+          #cypress_url: 'https://kiali.bigbang.dev'
+          cypress_check_data: 'true'
 
 
 addons:
@@ -420,6 +538,7 @@ addons:
         enabled: true
         cypress:
           artifacts: true
+          openshift: true
           envs:
             cypress_vault_url: "https://vault.bigbang.dev"
 
@@ -473,6 +592,29 @@ addons:
              cpu: 100m
              memory: 256Mi
            limits: null
+       bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          #artifactsHostPath: /mnt/cypress
+          #privileged: true
+          envs:
+            cypress_url: "https://argocd.bigbang.dev"
+            #cypress_url: http://argocd-server:80
+            cypress_user: "admin"
+            cypress_waittime: "20000"
+            cypress_timeout: "30000"
+          secretEnvs:
+          - name: cypress_password
+            valueFrom:
+              secretKeyRef:
+                key: "password"
+                name: argocd-initial-admin-secret
+      # configs::
+      #   secret:
+      #       argocdServerAdminPassword: "$2a$10$rUDZDckdDZ2TEwk9PDs3QuqjkL58qR1IHE1Kj4MwDx.7/m5dytZJm"
+    
 
   anchore:
     enabled: true
@@ -601,6 +743,21 @@ addons:
             cpu: 200m
             memory: 512Mi
           limits: null
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
+            ANCHORE_CLI_USER: admin
+            ANCHORE_SCAN_IMAGE: quay.io/prometheus/node-exporter:latest
+          secretEnvs:
+            - name: ANCHORE_CLI_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "anchore-anchore-engine-admin-pass"
+                  key: ANCHORE_ADMIN_PASSWORD     
 
   sonarqube:
     enabled: true
@@ -627,6 +784,14 @@ addons:
         enabled: false
       serviceAccount:
         create: true
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_url: "https://sonarqube.bigbang.dev"
+            cypress_url_setup: "https://sonarqube.bigbang.dev/setup"   
  
   minio:
     enabled: true
@@ -750,6 +915,44 @@ addons:
         slave:
           persistence:
             size: 256Mi
+      bbtests:
+        enabled: true
+        scripts:
+          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          envs:
+            GITLAB_USER: "testuser"
+            GITLAB_PASS: "Password123h56a78"
+            GITLAB_EMAIL: "testuser@example.com"
+            GITLAB_PROJECT: "my-awesome-project"
+            GITLAB_REPOSITORY: http://gitlab-webservice-default.gitlab.svc.cluster.local:8181
+            GITLAB_ORIGIN: http://testuser:Password123h56a78@gitlab-webservice-default.gitlab.svc.cluster.local:8181
+            GITLAB_REGISTRY: gitlab-registry-test-svc.gitlab.svc.cluster.local:80
+
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_baseUrl: https://gitlab.bigbang.dev
+            cypress_gitlab_first_name: "test"
+            cypress_gitlab_last_name: "user"
+            cypress_gitlab_username: "testuser"
+            cypress_gitlab_password: "Password123h56a78"
+            cypress_gitlab_email: "testuser@example.com"
+            cypress_gitlab_project: "my-awesome-project"
+            cypress_keycloak_username: "cypress"
+            cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
+          secretEnvs:
+          - name: cypress_adminpassword
+            valueFrom:
+              secretKeyRef:
+                name: gitlab-gitlab-initial-root-password
+                key: password
+         #scripts:
+         #image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+         #envs:
+         #GITLAB_REPOSITORY: https://gitlab.bigbang.dev
+         #GITLAB_ORIGIN: https://testuser:Password123h56a78@gitlab.bigbang.dev
+         #GITLAB_REGISTRY: registry.bigbang.dev       
 
   gitlabRunner:
     enabled: true
@@ -771,6 +974,25 @@ addons:
           #  - resources:
           #      namespaces:
           #        - gitlab-runner
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_gitlab_first_name: "testrunner"
+            cypress_gitlab_last_name: "userrunner"
+            cypress_gitlab_email: "gitlab@bigbang.dev"
+            cypress_gitlab_username: "gitlabrunner_user"
+            cypress_gitlab_password: "Runner_PaSsw0rd123"
+            cypress_gitlab_project: "runner-hello-world"
+          secretEnvs:
+            - name: cypress_adminpassword
+              valueFrom:
+                secretKeyRef:
+                  name: gitlab-gitlab-initial-root-password
+                  key: password     
 
   nexusRepositoryManager:
     enabled: true
@@ -787,6 +1009,15 @@ addons:
             cpu: 100m
             memory: 1500Mi
           limits: null
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_nexus_url: "https://nexus.bigbang.dev"
+   
+     
 
   mattermostOperator:
     # -- Toggle deployment of Mattermost Operator.
@@ -834,6 +1065,19 @@ addons:
               runAsUser: 1001
               runAsGroup: 1001
               runAsNonRoot: true
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          #image: registry1.dso.mil/bigbang-ci/cypress-kubectl:8.3.1
+          envs:
+            #cypress_url: https://chat.bigbang.dev
+            cypress_url: http://mattermost.mattermost.svc.cluster.local:8065
+            cypress_mm_email: "test@bigbang.dev"
+            cypress_mm_user: "bigbang"
+            cypress_mm_password: "Bigbang#123"
+            cypress_waittime: "8000"         
 
   keycloak:
     enabled: true
@@ -955,6 +1199,13 @@ addons:
         - name: quarkusproperties
           mountPath: /opt/keycloak/conf/quarkus.properties
           subPath: quarkus.properties
+     
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: false
+          envs:
+            cypress_url: "https://keycloak.bigbang.dev"     
  
   fortify:
     enabled: true
@@ -965,6 +1216,19 @@ addons:
       istio:
         enabled: true
       openshift: true
+      bbtests:
+        enabled: true
+        cypress: 
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_url: "http://fortify-ssc-service:80"
+            cypress_new_pwd: "BigBang@2023!"
+        scripts:
+          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          envs: {}
+ 
+
 
   harbor:
     enabled: true
@@ -974,6 +1238,22 @@ addons:
     redis:
         external:
           addr: harbor-redis-bb-master:6379
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          openshift: true
+          envs:
+            cypress_url: "https://harbor.bigbang.dev"
+        scripts:
+          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          envs:
+            HARBOR_REGISTRY: "harbor.bigbang.dev"
+            HARBOR_USER: "admin"
+            HARBOR_PASS: "Harbor12345"
+            HARBOR_REGISTRY: "harbor:80"
+            HARBOR_PROJECT: "library" 
 
   velero:
     enabled: true
@@ -1015,6 +1295,9 @@ addons:
       cleanUpCRDs: true
       bbtests:
         enabled: false
+        cypress:
+          artifacts: true
+          openshift: true
         scripts:
           envs:
             MINIO_HOST: https://minio-api.bigbang.dev
