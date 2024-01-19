@@ -1898,6 +1898,10 @@ addons:
 
               service_registration "kubernetes" {}
 
+      istio:
+        hardened:
+          enabled: true
+
       bbtests:
         enabled: true
         cypress:
