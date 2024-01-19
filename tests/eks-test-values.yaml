@@ -492,3 +492,43 @@ addons:
           memory: 256Mi
         limits: null
 
+  thanos:
+    # -- Toggle deployment of thanos
+    enabled: false
+    values:
+      minio:
+        enabled: true
+        tenant:
+          pools:
+          - servers: 1
+            volumesPerServer: 4
+            size: 256Mi
+            resources:
+              requests:
+                cpu: 250m
+                memory: 2Gi
+              limits:
+                cpu: 250m
+                memory: 2Gi
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+              runAsNonRoot: true
+            containerSecurityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              runAsNonRoot: true
+      storegateway:
+        enabled: true            
+      objstoreConfig: |-
+        type: s3
+        config:
+          bucket: "thanos"
+          endpoint: minio.thanos.svc.cluster.local:80
+          access_key: "minio"
+          secret_key: "minio123"
+          insecure: true
+          trace:
+            enable: true
+
