@@ -925,7 +925,8 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "7.2.1-bb.1"
+    # tag: "7.2.1-bb.1"
+    branch: "bstask-testing"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
