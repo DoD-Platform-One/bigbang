@@ -1252,7 +1252,8 @@ addons:
             HARBOR_REGISTRY: "harbor.bigbang.dev"
             HARBOR_USER: "admin"
             HARBOR_PASS: "Harbor12345"
-            HARBOR_REGISTRY: "harbor:80"
+            #HARBOR_REGISTRY: "harbor:80"
+            HARBOR_REGISTRY: "harbor-core:80"
             HARBOR_PROJECT: "library" 
 
   velero:
