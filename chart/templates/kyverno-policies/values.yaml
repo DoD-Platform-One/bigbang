@@ -169,6 +169,17 @@ policies:
           names:
           - prometheus-monitoring-monitoring-kube-prometheus*
       {{- end }}
+      - resources:
+          namespaces:
+          - flux-system
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - notification-controller-*
+          - helm-controller-*
+          - source-controller-*
+          - kustomize-controller-*
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
@@ -712,6 +723,8 @@ policies:
       - thanos
       - mattermost
       - mattermost-operator
+      - bigbang
+      - flux-system
       - keycloak
 
   update-automountserviceaccounttokens:
