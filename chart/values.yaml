@@ -384,7 +384,8 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.78.0-bb.1"
+    #tag: "1.78.0-bb.1"
+    branch: "79-refactor-kiali-to-gluon-0-4-7"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
