@@ -393,7 +393,7 @@ kiali:
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
-
+#
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
     gateway: ""
