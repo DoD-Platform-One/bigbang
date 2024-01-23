@@ -2077,6 +2077,9 @@ addons:
     # -- Toggle deployment of thanos
     enabled: false
     values:
+      # upped flux timeout
+      flux:
+        timeout: 30m
       minio:
         enabled: true
         tenant:
