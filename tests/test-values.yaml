@@ -655,6 +655,11 @@ kyvernoPolicies:
               names:
               - speaker-*
               - controller-*
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*  
       require-non-root-user:
         exclude:
           any:
