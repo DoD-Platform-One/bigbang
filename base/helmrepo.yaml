@@ -1,0 +1,11 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: bigbang
+  namespace: bigbang
+spec:
+  interval: 2m
+  type: oci
+  url: oci://registry1.dso.mil/bigbang
+  secretRef:
+    name: private-registry

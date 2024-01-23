@@ -10,8 +10,12 @@ spec:
     spec:
       chart: chart
       sourceRef:
-        kind: GitRepository
+        kind: HelmRepository
         name: bigbang
+      verify:
+        provider: cosign
+        secretRef:
+          name: bigbang-cosign-pub
   test:
     enable: false
   install:
