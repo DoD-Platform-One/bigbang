@@ -251,10 +251,17 @@ policies:
 
   require-non-root-group:
     validationFailureAction: Enforce
-    {{- if .Values.istio.enabled }}
+    {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
         - istio-init
+        {{ if not .Values.addons.holocron.database.host }}
+        - init-chmod-data
+        {{- end }}
+    {{ else if not .Values.addons.holocron.database.host }}
+    parameters:
+      excludeContainers:
+        - init-chmod-data
     {{- end }}
     {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
     exclude:
@@ -320,6 +327,13 @@ policies:
     parameters:
       excludeContainers:
         - istio-init
+        {{ if not .Values.addons.holocron.database.host }}
+        - init-chmod-data
+        {{- end }}
+    {{ else if not .Values.addons.holocron.database.host }}
+    parameters:
+      excludeContainers:
+        - init-chmod-data
     {{- end }}
     exclude:
       any:
