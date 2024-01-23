@@ -9,7 +9,9 @@ commonLabels:
 resources:
   - namespace.yaml
   - gitrepository.yaml
+  - helmrepo.yaml
   - helmrelease.yaml
+  - cosignsecret.yaml
 
 configMapGenerator:
   - name: common

@@ -4,7 +4,7 @@ metadata:
   name: bigbang
   namespace: bigbang
 spec:
-  interval: 2m
+  interval: 1m
   type: oci
   url: oci://registry1.dso.mil/bigbang
   secretRef:
