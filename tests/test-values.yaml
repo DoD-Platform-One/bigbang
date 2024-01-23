@@ -2075,7 +2075,7 @@ addons:
   # Thanos
   #
   thanos:
-    # -- Toggle deployment of thanos
+    # -- Toggle deployment of thanos -- a simple change to test pipelines
     enabled: false
     values:
       minio:
