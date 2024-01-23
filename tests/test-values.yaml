@@ -408,6 +408,10 @@ kyvernoPolicies:
     # Parameters are copied from kyverno policies for test vectors
     # Exclusions are for allowing other helm tests to function
     policies:
+      # Test Policy
+      require-requests-equal-limits:
+        enabled: true
+        validationFailureAction: Audit
       clone-configs:
         parameters:
           clone:
