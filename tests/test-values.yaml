@@ -836,6 +836,10 @@ tempo:
 
 promtail:
   enabled: true
+  values:
+    istio:
+      hardened:
+        enabled: true
 
 monitoring:
   enabled: true
