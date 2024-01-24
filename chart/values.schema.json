@@ -1087,13 +1087,6 @@
             }
           ]
         },
-        "holocron": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ]
-        },
         "thanos": {
           "allOf": [
             {
