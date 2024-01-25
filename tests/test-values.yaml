@@ -747,6 +747,9 @@ fluentbit:
 loki:
   strategy: scalable
   values:
+    istio:
+      hardened:
+        enabled: true
     minio:
       enabled: true
     write:
@@ -841,6 +844,10 @@ tempo:
 
 promtail:
   enabled: true
+  values:
+    istio:
+      hardened:
+        enabled: true
 
 monitoring:
   enabled: true
