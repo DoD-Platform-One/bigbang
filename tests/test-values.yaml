@@ -747,6 +747,9 @@ fluentbit:
 loki:
   strategy: scalable
   values:
+    istio:
+      hardened:
+        enabled: true
     minio:
       enabled: true
     write:
