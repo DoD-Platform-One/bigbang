@@ -1080,11 +1080,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
-      tag: "0.5.3-bb.24"
+      tag: "0.5.3-bb.27"
     helmRepo:
       repoName: "registry1"
       chartName: "authservice"
-      tag: "0.5.3-bb.24"
+      tag: "0.5.3-bb.27"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
