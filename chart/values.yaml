@@ -541,11 +541,13 @@ kyvernoReporter:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
     path: ./chart
-    tag: "2.21.6-bb.0"
+    tag: ""
+    branch: "fix-cypress"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-reporter"
-    tag: "2.21.6-bb.0"
+    tag: ""
+    branch: "fix-cypress"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
