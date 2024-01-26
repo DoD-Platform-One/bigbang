@@ -713,11 +713,6 @@ policies:
         - istiod-*
         - istio-operator-*
       - namespace: twistlock
-        serviceAccounts:
-        - twistlock-console
-        - twistlock-init
-        - volume-upgrade-svc-acct
-        - twistlock-service
         pods:
         # twistlock-init pods require get/list/patch/etc to several resources. 
         # More details in twistlock/chart/templates/init/clusterrole.yaml
