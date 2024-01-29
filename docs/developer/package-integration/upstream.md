@@ -146,7 +146,6 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
 
       > This process produces a `README.md`, `README.md.gotpl`, and `.helmdocsignore`.  The `gotpl` file is used as values to update the `README.md`.
-
       > To avoid having the `flux` helm chart also added to the `README.md`, run `echo 'flux/*' >> .helmdocsignore`
 
       Example:
@@ -195,7 +194,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       ## Contributing
 
-      <!-- markdownlint-disable-line MD000 Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing. -->
+      <!-- markdownlint-disable-line -->Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
       ```
 
 1. Commit changes
