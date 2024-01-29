@@ -120,24 +120,6 @@ policies:
     validationFailureAction: Audit
     exclude:
       any:
-      {{- if .Values.addons.gitlab.enabled }}
-      - resources:
-          namespaces:
-          - gitlab
-          kinds:
-          - Pod
-          names:
-          - gitlab-shared-secrets*
-      {{- end }}
-      {{- if .Values.addons.gitlabRunner.enabled }}
-      - resources:
-          namespaces:
-          - gitlab-runner
-          kinds:
-          - ServiceAccount
-          names:
-          - gitlab-runner
-      {{- end }}
       {{- if .Values.kyvernoReporter.enabled }}
       - resources:
           namespaces:
@@ -151,23 +133,15 @@ policies:
       {{- if .Values.monitoring.enabled }}
       - resources:
           namespaces:
-          - monitoring
-          kinds:
-          - ServiceAccount
-          names:
-          - monitoring-monitoring-prometheus-node-exporter
-          - monitoring-monitoring-kube-operator
-          - monitoring-monitoring-kube-state-metrics
-          - monitoring-monitoring-kube-admission
-          - monitoring-monitoring-kube-prometheus
-      - resources:
-          namespaces:
-          - monitoring
+          - flux-system
           kinds:
           - Pod
           - Deployment
           names:
-          - prometheus-monitoring-monitoring-kube-prometheus*
+          - notification-controller-*
+          - helm-controller-*
+          - source-controller-*
+          - kustomize-controller-*
       {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
@@ -712,6 +686,12 @@ policies:
       - thanos
       - mattermost
       - mattermost-operator
+      - bigbang
+      - flux-system
+      - keycloak
+      - monitoring
+      - gitlab
+      - gitlab-runner
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -733,11 +713,6 @@ policies:
         - istiod-*
         - istio-operator-*
       - namespace: twistlock
-        serviceAccounts:
-        - twistlock-console
-        - twistlock-init
-        - volume-upgrade-svc-acct
-        - twistlock-service
         pods:
         # twistlock-init pods require get/list/patch/etc to several resources. 
         # More details in twistlock/chart/templates/init/clusterrole.yaml
@@ -789,6 +764,8 @@ policies:
         - velero-velero-*
         - node-agent-*
         - velero-label-namespace-*
+        - velero-script-test
+        - velero-backup-restore-test
       - namespace: neuvector
         serviceAccounts:
         - basic
@@ -847,8 +824,18 @@ policies:
       - namespace: monitoring
         serviceAccounts:
         - monitoring-grafana
+        - monitoring-monitoring-kube-admission
+        - monitoring-monitoring-kube-prometheus
+        - monitoring-monitoring-kube-state-metrics
+        - monitoring-monitoring-kube-operator
+        - monitoring-monitoring-prometheus-node-exporter
         pods:
         - monitoring-grafana-*
+        - monitoring-monitoring-kube-admission-create-*
+        - monitoring-monitoring-kube-admission-patch-*
+        - monitoring-monitoring-kube-state-metrics-*
+        - monitoring-monitoring-kube-operator-*
+        - prometheus-monitoring-monitoring-kube-prometheus-*
       - namespace: anchore
         serviceAccounts:
         - anchore-ui-redis
@@ -914,6 +901,17 @@ policies:
         - mattermost-operator
         pods:
         - mattermost-operator-*
+      - namespace: keycloak
+        serviceAccounts:
+        - keycloak
+      - namespace: gitlab
+        pods:
+        - gitlab-shared-secrets*
+      - namespace: gitlab-runner
+        serviceAccounts: 
+        - gitlab-runner
+        pods:
+        - gitlab-runner-*
 
 istio:
   enabled: {{ .Values.istio.enabled }}

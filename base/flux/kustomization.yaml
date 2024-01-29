@@ -54,6 +54,15 @@ patches:
                       - ALL
                   $patch: replace
   - target:
+      kind: ServiceAccount
+      name: helm-controller
+    patch: |-
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: helm-controller
+      automountServiceAccountToken: false
+  - target:
       kind: Deployment
       name: helm-controller
     patch: |-
@@ -64,6 +73,7 @@ patches:
       spec:
         template:
           spec:
+            automountServiceAccountToken: true
             containers:
             - name: manager
               resources:
@@ -73,6 +83,15 @@ patches:
                 requests:
                   cpu: 900m
                   memory: 1Gi
+  - target:
+      kind: ServiceAccount
+      name: kustomize-controller
+    patch: |-
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: kustomize-controller
+      automountServiceAccountToken: false
   - target:
       kind: Deployment
       name: kustomize-controller
@@ -84,6 +103,7 @@ patches:
       spec:
         template:
           spec:
+            automountServiceAccountToken: true
             containers:
             - name: manager
               resources:
@@ -93,6 +113,15 @@ patches:
                 requests:
                   cpu: 300m
                   memory: 600Mi
+  - target:
+      kind: ServiceAccount
+      name: notification-controller
+    patch: |-
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: notification-controller
+      automountServiceAccountToken: false
   - target:
       kind: Deployment
       name: notification-controller
@@ -104,6 +133,7 @@ patches:
       spec:
         template:
           spec:
+            automountServiceAccountToken: true
             containers:
             - name: manager
               resources:
@@ -113,6 +143,15 @@ patches:
                 requests:
                   cpu: 100m
                   memory: 200Mi
+  - target:
+      kind: ServiceAccount
+      name: source-controller
+    patch: |-
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: source-controller
+      automountServiceAccountToken: false
   - target:
       kind: Deployment
       name: source-controller
@@ -124,6 +163,7 @@ patches:
       spec:
         template:
           spec:
+            automountServiceAccountToken: true
             containers:
             - name: manager
               resources:

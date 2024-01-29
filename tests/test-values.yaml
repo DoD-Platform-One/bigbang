@@ -655,6 +655,11 @@ kyvernoPolicies:
               names:
               - speaker-*
               - controller-*
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*  
       require-non-root-user:
         exclude:
           any:
@@ -742,6 +747,9 @@ fluentbit:
 loki:
   strategy: scalable
   values:
+    istio:
+      hardened:
+        enabled: true
     minio:
       enabled: true
     write:
@@ -836,6 +844,10 @@ tempo:
 
 promtail:
   enabled: true
+  values:
+    istio:
+      hardened:
+        enabled: true
 
 monitoring:
   enabled: true
