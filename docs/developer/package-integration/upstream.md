@@ -4,7 +4,7 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Prerequisites
 
-- [Kpt](https://googlecontainertools.github.io/kpt/installation/)
+- [Kpt version 0.39.2](https://github.com/kptdev/kpt/releases/tag/v0.39.2) (Later versions of kpt are incompatible with Bigbang)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 > Throughout this document, we will be setting up an application called `podinfo` as a demonstration.
