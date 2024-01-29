@@ -55,8 +55,7 @@ networkPolicies:
 istio:
   enabled: true
   # Test if enterprise deploys
-  enterprise:
-    enabled: true
+  enterprise: true
   ingressGateways:
     passthrough-ingressgateway:
       type: "LoadBalancer"
