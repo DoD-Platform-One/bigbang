@@ -194,7 +194,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       ## Contributing
 
-      <!-- markdownlint-disable-line -->Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
+      <!-- markdownlint-disable-line Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing. -->
       ```
 
 1. Commit changes
