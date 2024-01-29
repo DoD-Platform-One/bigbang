@@ -161,8 +161,8 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       * <https://github.com/stefanprodan/podinfo>
 
       ## Learn More
-      * `[Application Overview](docs/overview.md)`
-      * `[Other Documentation](docs/)`
+      * [Application Overview](docs/overview.md)
+      * [Other Documentation](docs/)
 
       ## Pre-Requisites
 
