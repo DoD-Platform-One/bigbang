@@ -707,8 +707,6 @@ policies:
         - passthrough-ingressgateway-*
         - public-ingressgateway-*
       - namespace: istio-operator
-        serviceAccounts:
-        - istio-operator
         pods:
         - istiod-*
         - istio-operator-*
