@@ -162,8 +162,8 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       * <https://github.com/stefanprodan/podinfo>
 
       ## Learn More
-      * \[Application Overview\](docs/overview.md)
-      * \[Other Documentation\](docs/)
+      * `[Application Overview](docs/overview.md)`
+      * `[Other Documentation](docs/)`
 
       ## Pre-Requisites
 
@@ -195,7 +195,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       ## Contributing
 
-      Please see the \[contributing guide\](./CONTRIBUTING.md) if you are interested in contributing.
+      Please see the `[contributing guide](./CONTRIBUTING.md)` if you are interested in contributing.
       ```
 
 1. Commit changes
