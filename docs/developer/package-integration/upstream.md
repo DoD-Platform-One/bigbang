@@ -4,7 +4,7 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Prerequisites
 
-- [Kpt](https://googlecontainertools.github.io/kpt/installation/)
+- [Kpt version 0.39.2](https://github.com/kptdev/kpt/releases/tag/v0.39.2) (Later versions of kpt are incompatible with Bigbang)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 > Throughout this document, we will be setting up an application called `podinfo` as a demonstration.
@@ -146,11 +146,11 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
 
       > This process produces a `README.md`, `README.md.gotpl`, and `.helmdocsignore`.  The `gotpl` file is used as values to update the `README.md`.
-
       > To avoid having the `flux` helm chart also added to the `README.md`, run `echo 'flux/*' >> .helmdocsignore`
 
       Example:
 
+<!-- markdownlint-disable -->
       ```markdown
       # podinfo
 
@@ -162,8 +162,8 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       * <https://github.com/stefanprodan/podinfo>
 
       ## Learn More
-      * [Application Overview\](docs/overview.md)
-      * [Other Documentation\](docs/)
+      * [Application Overview](docs/overview.md)
+      * [Other Documentation](docs/)
 
       ## Pre-Requisites
 
@@ -195,8 +195,9 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       ## Contributing
 
-      Please see the [contributing guide\](./CONTRIBUTING.md) if you are interested in contributing.
+      Please see the [contributing guide](./CONTRIBUTING.md) if you are interested in contributing.
       ```
+<!-- markdownlint-enable -->
 
 1. Commit changes
 
