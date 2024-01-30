@@ -34,6 +34,7 @@ collectorGitlabSCM:
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-scm-0
+    accessToken: ""
     env:
       COLLECTOR_NAME: gitlab-scm-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -49,6 +50,7 @@ collectorGitlabBuild:
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-build-0
+    accessToken: ""
     env:
       COLLECTOR_NAME: gitlab-build-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -64,6 +66,7 @@ collectorGitlabWorkflow:
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-workflow-0
+    accessToken: ""
     env:
       COLLECTOR_NAME: gitlab-workflow-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -99,6 +102,7 @@ collectorJiraWorkflow:
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: jira-workflow-0
+    accessToken: ""
     env:
       COLLECTOR_NAME: jira-workflow-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -119,6 +123,7 @@ collectorSonarQubeProjectAnalysis:
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: sonarqube-project-analysis-0
+    accessToken: ""
     env:
       COLLECTOR_NAME: sonarqube-project-analysis-0
       COLLECTOR_INTERVAL_SECONDS: 600
