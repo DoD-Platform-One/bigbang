@@ -1,8 +1,8 @@
-# Metric Server
+# Metrics Server
 
 ## Overview
 
-> Metric Server is an addon cluster utility that adds functionality to Kubernetes clusters rather than applications. It is used for monitoring pod CPU & memory utilization for use with autoscaling pods horizontally and vertically.
+> Metrics Server is an addon cluster utility that adds functionality to Kubernetes clusters rather than applications. It is used for monitoring pod CPU & memory utilization for use with autoscaling pods horizontally and vertically.
 
 Metrics Server collects resource metrics from Kubelets and exposes them in Kubernetes apiserver through [Metrics API] for use by [Horizontal Pod Autoscaler] and [Vertical Pod Autoscaler]. Metrics API can also be accessed by `kubectl top`, making it easier to debug autoscaling pipelines.
 
@@ -32,15 +32,12 @@ Don't use Metrics Server when you need:
 - An accurate source of resource usage metrics
 - Horizontal autoscaling based on other resources than CPU/Memory
 
-For unsupported use cases, check out full monitoring solutions like Prometheus.
+For unsupported use cases, check out full monitoring solutions like Prometheus (also deployed by default within the BigBang [monitoring package](https://repo1.dso.mil/big-bang/product/packages/monitoring)).
 
 ### Deployment
 
-Since metrics server is prerequisite for a number of Kubernetes components (HPA, scheduler, kubectl top)
-it typically will run by default in all Kubernetes clusters. Metrics server initiates connections to nodes,
-due to security reasons (policy allows only connection in the opposite direction) so it has to run on user’s node.
- 
-There will be only one instance of metrics server running in each cluster.
+Since Metrics Server is prerequisite for a number of Kubernetes components (HPA, scheduler, kubectl top)
+it typically will run by default in most Kubernetes clusters. By default within a BigBang deployment, the enabled value is set to `auto`, which installs only if metrics API endpoint is not present.
 
 ## Big Bang Touch Points
 
@@ -96,7 +93,7 @@ distributions. Please ensure that your cluster distribution supports these requi
 [container metrics RPCs]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/cri-container-stats.md
 [cAdvisor]: https://github.com/google/cadvisor
 
-Resource efficiency, using 1 mili core of CPU and 2 MB of memory for each node in a cluster.
+Resource footprint on nodes within cluster are minimal at: 1 mili core of CPU and 2 MB of memory per node.
 
 - [Metric Server Requirements](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#requirements)
 
