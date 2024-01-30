@@ -755,10 +755,6 @@ policies:
           - kyverno-admission-controller-*
           - kyverno-cleanup-cluster-admission-reports-*
       - namespace: velero
-        serviceAccounts:
-        - velero
-        - velero-upgrade-crds
-        - velero-velero-server
         pods:
           allow:
           - velero-cleanup-crds-*
