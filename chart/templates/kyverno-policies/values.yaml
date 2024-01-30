@@ -678,7 +678,7 @@ policies:
       - authservice
       - anchore
       - fortify
-      - vault
+      # - vault
       - promtail
       - fluentbit
       - eck-operator
@@ -848,15 +848,15 @@ policies:
       - namespace: fortify
         serviceAccounts:
         - fortify-mysql
-      - namespace: vault
-        serviceAccounts:
-        - vault-vault
-        - vault-vault-root-token-secret
-        - vault-vault-agent-injector
-        pods:
-        - vault-vault-0
-        - vault-vault-agent-injector-*
-        - vault-vault-job-init-*
+      # - namespace: vault
+      #   serviceAccounts:
+      #   - vault-vault
+      #   - vault-vault-root-token-secret
+      #   - vault-vault-agent-injector
+      #   pods:
+      #   - vault-vault-0
+      #   - vault-vault-agent-injector-*
+      #   - vault-vault-job-init-*
       - namespace: promtail 
         serviceAccounts:
         - promtail-promtail
