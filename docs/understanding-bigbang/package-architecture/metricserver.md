@@ -23,8 +23,8 @@ Metrics Server offers:
 
 You can use Metrics Server for:
 
-- CPU/Memory based horizontal autoscaling (learn more about [Horizontal Autoscaling])
-- Automatically adjusting/suggesting resources needed by containers (learn more about [Vertical Autoscaling])
+- CPU/Memory based horizontal autoscaling (learn more about [Horizontal Autoscaling](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/))
+- Automatically adjusting/suggesting resources needed by containers (learn more about [Vertical Autoscaling](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler/))
 
 Don't use Metrics Server when you need:
 
@@ -70,7 +70,7 @@ These values get passed into the metric server chart [here](https://repo1.dso.mi
 
 ### High Availability
 
-Metrics Server is simply installed in high availability mode by setting the `replicas` value greater than `1`. The default configuration within BigBang is 2 replicas.
+Metrics Server is simply installed in high availability mode by setting the `replicas` chart value greater than `1`. The default configuration within BigBang is a 2 replica deployment.
 
 Additional Metric Server High Availability documentation can be found [here](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#high-availability).
 
@@ -107,4 +107,4 @@ None. This service doesn't have a web interface.
 
 ## Licensing
 
-Metric Server utilizes an [Apache 2.0](https://github.com/kubernetes-sigs/metrics-server/blob/master/LICENSE) for it's code.
+Metric Server utilizes an [Apache 2.0](https://github.com/kubernetes-sigs/metrics-server/blob/master/LICENSE)  license.
