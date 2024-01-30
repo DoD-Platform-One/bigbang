@@ -36,26 +36,39 @@ Don't use Metrics Server when you need:
 
 For unsupported use cases, check out full monitoring solutions like Prometheus.
 
-### Architecture:
+### Deployment
 
-- [Promtail Client](https://grafana.com/docs/loki/latest/clients/promtail/)
+Since metrics server is prerequisite for a number of Kubernetes components (HPA, scheduler, kubectl top)
+it typically will run by default in all Kubernetes clusters. Metrics server initiates connections to nodes,
+due to security reasons (policy allows only connection in the opposite direction) so it has to run on user’s node.
+ 
+There will be only one instance of metrics server running in each cluster.
+
+## Big Bang Touch Points
+
+### Architecture: 
+- [Kubernetes Metrics Server](https://github.com/kubernetes-sigs/metrics-server?tab=readme-ov-file#kubernetes-metrics-server)
+- [Horizontal Pod Autoscaling](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+  - [How does Horizontal Pod Autoscaling Work?](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#how-does-a-horizontalpodautoscaler-work)
 
 ### Storage
 
-Promtail does not persist data, and instead reads log files and streams the data to a log aggregation system.
+To store data in memory Metric Server will replace the default storage layer (etcd) by introducing in-memory store which will implement [Storage interface](https://github.com/kubernetes/apiserver/blob/master/pkg/registry/rest/rest.go).
+
+Only the most recent value of each metric will be remembered. If a user needs an access to historical data they should either use 3rd party monitoring solution or archive the metrics on their own.
 
 ### Istio Configuration
 
-Istio is disabled in the promtail chart by default and can be enabled by setting the following values in the bigbang chart:
+Istio is disabled in the metric server chart by default and can be enabled by setting the following values in the bigbang chart:
 
 ```yaml
 istio:
   enabled: true
 ```
 
-These values get passed into the promtail chart [here](https://repo1.dso.mil/big-bang/product/packages/promtail/-/blob/main/chart/values.yaml#L428).
+These values get passed into the metric server chart [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml) or more specifically [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml#L199).
 
-## High Availability
+### High Availability
 
 Metrics Server is simply installed in high availability mode by setting the `replicas` value greater than `1`. The default configuration within BigBang is 2 replicas.
 
@@ -71,6 +84,10 @@ https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#high-ava
 
 None. This service doesn't have a web interface.
 
+## Other Resources
+
+- [Metric Server Design Proposal](https://github.com/kubernetes/design-proposals-archive/blob/main/instrumentation/metrics-server.md)
+
 ## Licensing
 
-Promtail utilizes an [AGPLv3 License](https://github.com/grafana/loki/blob/main/LICENSE) for it's code and binaries.
+Metric Server utilizes an [Apache 2.0](https://github.com/kubernetes-sigs/metrics-server/blob/master/LICENSE) for it's code.
