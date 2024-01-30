@@ -2,7 +2,7 @@
 
 ## Overview
 
-> Metric Server is an addon cluster utility that adds functionality to Kubernetes clusters rather than applications. It is used for monitoring pod CPU & memory utilization.
+> Metric Server is an addon cluster utility that adds functionality to Kubernetes clusters rather than applications. It is used for monitoring pod CPU & memory utilization for use with autoscaling pods horizontally and vertically.
 
 Metrics Server collects resource metrics from Kubelets and exposes them in Kubernetes apiserver through [Metrics API]
 for use by [Horizontal Pod Autoscaler] and [Vertical Pod Autoscaler]. Metrics API can also be accessed by `kubectl top`,
@@ -55,7 +55,9 @@ There will be only one instance of metrics server running in each cluster.
 
 To store data in memory Metric Server will replace the default storage layer (etcd) by introducing in-memory store which will implement [Storage interface](https://github.com/kubernetes/apiserver/blob/master/pkg/registry/rest/rest.go).
 
-Only the most recent value of each metric will be remembered. If a user needs an access to historical data they should either use 3rd party monitoring solution or archive the metrics on their own.
+Only the most recent value of each metric will be remembered.
+
+Users looking to access historical data should look into Prometheus and Grafana packages as part of Big Bang's [monitoring stack](https://repo1.dso.mil/big-bang/product/packages/monitoring).
 
 ### Istio Configuration
 
