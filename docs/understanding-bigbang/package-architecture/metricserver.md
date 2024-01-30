@@ -4,9 +4,7 @@
 
 > Metric Server is an addon cluster utility that adds functionality to Kubernetes clusters rather than applications. It is used for monitoring pod CPU & memory utilization for use with autoscaling pods horizontally and vertically.
 
-Metrics Server collects resource metrics from Kubelets and exposes them in Kubernetes apiserver through [Metrics API]
-for use by [Horizontal Pod Autoscaler] and [Vertical Pod Autoscaler]. Metrics API can also be accessed by `kubectl top`,
-making it easier to debug autoscaling pipelines.
+Metrics Server collects resource metrics from Kubelets and exposes them in Kubernetes apiserver through [Metrics API] for use by [Horizontal Pod Autoscaler] and [Vertical Pod Autoscaler]. Metrics API can also be accessed by `kubectl top`, making it easier to debug autoscaling pipelines.
 
 Metrics Server is not meant for non-autoscaling purposes. For example, don't use it to forward metrics to monitoring solutions, or as a source of monitoring solution metrics. In such cases please collect metrics from Kubelet `/metrics/resource` endpoint directly.
 
@@ -60,7 +58,7 @@ To store data in memory Metric Server will replace the default storage layer (et
 
 Only the most recent value of each metric will be remembered.
 
-Users looking to access historical data should look into Prometheus and Grafana packages as part of Big Bang's [monitoring stack](https://repo1.dso.mil/big-bang/product/packages/monitoring).
+Users looking to access historical data should look into Prometheus and Grafana packages as part of BigBang's [monitoring stack](https://repo1.dso.mil/big-bang/product/packages/monitoring).
 
 ### Istio Configuration
 
@@ -71,19 +69,36 @@ istio:
   enabled: true
 ```
 
-These values get passed into the metric server chart [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml) or more specifically [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml#L199).
+These values get passed into the metric server chart [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml).
 
 ### High Availability
 
 Metrics Server is simply installed in high availability mode by setting the `replicas` value greater than `1`. The default configuration within BigBang is 2 replicas.
 
-Additional Metric Server High Availability documentation [here](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#high-availability).
+Additional Metric Server High Availability documentation can be found [here](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#high-availability).
 
 ## Requirements
 
-[Metric Server Requirements](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#requirements)
+Metrics Server has specific requirements for cluster and network configuration. These requirements aren't the default for all cluster
+distributions. Please ensure that your cluster distribution supports these requirements before using Metrics Server:
 
-https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#high-availability
+- The kube-apiserver must [enable an aggregation layer].
+- Nodes must have Webhook [authentication and authorization] enabled.
+- Kubelet certificate needs to be signed by cluster Certificate Authority (or disable certificate validation by passing `--kubelet-insecure-tls` to Metrics Server)
+- Container runtime must implement a [container metrics RPCs] (or have [cAdvisor] support)
+- Network should support following communication:
+  - Control plane to Metrics Server. Control plane node needs to reach Metrics Server's pod IP and port 10250 (or node IP and custom port if `hostNetwork` is enabled). Read more about [control plane to node communication](https://kubernetes.io/docs/concepts/architecture/control-plane-node-communication/#control-plane-to-node).
+  - Metrics Server to Kubelet on all nodes. Metrics server needs to reach node address and Kubelet port. Addresses and ports are configured in Kubelet and published as part of Node object. Addresses in `.status.addresses` and port in `.status.daemonEndpoints.kubeletEndpoint.port` field (default 10250). Metrics Server will pick first node address based on the list provided by `kubelet-preferred-address-types` command line flag (default `InternalIP,ExternalIP,Hostname` in manifests).
+
+[reachable from kube-apiserver]: https://kubernetes.io/docs/concepts/architecture/master-node-communication/#master-to-cluster
+[enable an aggregation layer]: https://kubernetes.io/docs/tasks/access-kubernetes-api/configure-aggregation-layer/
+[authentication and authorization]: https://kubernetes.io/docs/reference/access-authn-authz/kubelet-authn-authz/
+[container metrics RPCs]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/cri-container-stats.md
+[cAdvisor]: https://github.com/google/cadvisor
+
+Resource efficiency, using 1 mili core of CPU and 2 MB of memory for each node in a cluster.
+
+- [Metric Server Requirements](https://github.com/kubernetes-sigs/metrics-server/blob/master/README.md#requirements)
 
 ## Single Sign on (SSO)
 
