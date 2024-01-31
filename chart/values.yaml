@@ -516,7 +516,8 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.0.4-bb.21"
+    tag: ""
+    branch: "67-update-sysctls"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
