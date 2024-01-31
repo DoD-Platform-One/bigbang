@@ -27,7 +27,7 @@ Pipelines provide rapid feedback to changes in our Helm chart as we develop and 
 
 The pipeline **requires** that all images are stored in either Iron Bank (`registry1.dso.mil`) or Repo1 (`registry.dso.mil`).  In some cases, you may be able to substitute images already in Iron Bank for the ones in the Helm chart.  For example, images for `curl`, `kubectl` or `jq` can use `registry1.dso.mil/ironbank/big-bang/base`.  If you have not already submitted your containers to Iron Bank, [start the process](https://repo1.dso.mil/dsop/dccscr/-/blob/master/README.md).  While you are working your way to Iron Bank approval, you can temporarily put the images in `registry.dso.mil` for development by doing the following:
 
-> Check if the Container Registry is on by navigating to `https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/<your project>/container_registry`.  If you get a 404 error, you need to request a Maintainer turn this feature on in your project via Settings > General > Visibility > Container Registry.
+> Check if the Container Registry is on by navigating to `https://repo1.dso.mil/big-bang/apps/sandbox/<your project>/container_registry`.  If you get a 404 error, you need to request a Maintainer turn this feature on in your project via Settings > General > Visibility > Container Registry.
 
 ```shell
 # Image Info

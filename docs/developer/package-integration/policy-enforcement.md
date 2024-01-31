@@ -17,7 +17,7 @@ The policy enforcement tool is deployed as the first package in the default Big 
 
 ### 2. Identifying Violations Found on Your Application
 
-In the following section, you will be shown how to identify violations found in your package. The app [PodInfo](https://repo1.dso.mil/big-bang/product/packages/podinfo) will be used for all of the examples. Gatekeeper has three enforcement actions `deny`, `dryrun`, and `warn`. Only `deny` will prohibit access to the cluster, but the `warn` and `dryrun` constraints should be fixed as well as they are generally best practice.
+In the following section, you will be shown how to identify violations found in your package. The app [PodInfo](https://repo1.dso.mil/big-bang/apps/sandbox/podinfo) will be used for all of the examples. Gatekeeper has three enforcement actions `deny`, `dryrun`, and `warn`. Only `deny` will prohibit access to the cluster, but the `warn` and `dryrun` constraints should be fixed as well as they are generally best practice.
 
 In this example we will be attempting to install PodInfo onto our cluster:
 
