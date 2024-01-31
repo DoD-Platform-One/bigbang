@@ -1936,9 +1936,9 @@ addons:
       # -- If not provided, one will be created
       existingSecret: ""
       # -- Tokens for the secret to be created
-      gitlabToken: mygitlabtoken
-      jiraToken: myjiratoken
-      sonarToken: mysonartoken
+      gitlabToken: ""
+      jiraToken: ""
+      sonarToken: ""
 
     jira:
       # -- If there is a Jira deployment, enable a collector for it

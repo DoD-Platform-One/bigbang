@@ -2132,3 +2132,15 @@ addons:
           insecure: true
           trace:
             enable: true
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Holocron
+  #
+  holocron:
+    # -- Toggle deployment of holocron
+    enabled: true
+    values:
+      collectorAuth:
+        gitlabToken: mygitlabtoken
+        jiraToken: myjiratoken
+        sonartoken: mysonartoken
