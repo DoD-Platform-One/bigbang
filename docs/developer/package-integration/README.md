@@ -16,3 +16,4 @@ The following documents should be followed, in order, to fully integrate a new p
 1. [Package Readme Generation](package-readme-generation.md): Include formatted comments in package values.yaml for readme generation script
 2. [Supported Package](supported.md): Migrate package into the Big Bang repo as a supported package
 3. [Final Documentation](documentation.md): Add additional Big Bang documentation for final release
+4. [Big Bang Merge Request](bigbang-merge-request.md): Create Big Bang Merge Request and run all packages pipeline.
