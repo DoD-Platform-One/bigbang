@@ -868,8 +868,6 @@ policies:
           allow:
           - promtail-promtail-*
       - namespace: fluentbit
-        serviceAccounts:
-        - fluentbit-fluent-bit
         pods:
           allow:
           - fluentbit-fluent-bit-*
