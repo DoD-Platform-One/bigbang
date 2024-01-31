@@ -720,6 +720,8 @@ policies:
           # Enforcing said policies requires access to the API to get/list resources
           - twistlock-defender-ds-*
       - namespace: logging
+        serviceAccounts:
+          - logging-loki-*
         pods:
           allow:
           - logging-loki-minio-ss-*
