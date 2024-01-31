@@ -880,8 +880,6 @@ policies:
           allow:
           - fluentbit-fluent-bit-*
       - namespace: eck-operator
-        serviceAccounts:
-        - elastic-operator
         pods:
           allow:
           - elastic-operator-?
