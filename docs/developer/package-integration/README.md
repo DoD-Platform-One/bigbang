@@ -15,3 +15,4 @@ The following documents should be followed, in order, to fully integrate a new p
 1. [Policy Enforcement](policy-enforcement.md): Update package to comply with default security and governance policies in Big Bang
 2. [Supported Package](supported.md): Migrate package into the Big Bang repo as a supported package
 3. [Final Documentation](documentation.md): Add additional Big Bang documentation for final release
+4. [Big Bang Merge Request](bigbang-merge-request.md): Create Big Bang Merge Request and run all packages pipeline.
