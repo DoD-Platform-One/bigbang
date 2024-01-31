@@ -1927,17 +1927,18 @@ addons:
     helmRepo:
       repoName: "registry1"
       chartName: "holocron"
-      tag: "0.1.2"
+      tag: "0.1.4"
 
     collectorAuth:
       # -- Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
       # -- Default keys for secret are:
-      # -- gitlab-scm-0, gitlab-workflow-0, gitlab-build-0, jira-workflow-0
+      # -- gitlab-scm-0, gitlab-workflow-0, gitlab-build-0, jira-workflow-0, sonarqube-project-analysis-0
       # -- If not provided, one will be created
       existingSecret: ""
       # -- Tokens for the secret to be created
       gitlabToken: ""
       jiraToken: ""
+      sonarToken: ""
 
     jira:
       # -- If there is a Jira deployment, enable a collector for it

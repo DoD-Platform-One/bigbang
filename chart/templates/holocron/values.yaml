@@ -30,11 +30,11 @@ collectorGitlabSCM:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-scm
-    tag: "3.0.2"
+    tag: "3.1.1"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-scm-0
-    accessToken: ""
+    accessToken: {{ .Values.addons.holocron.collectorAuth.gitlabToken }}
     env:
       COLLECTOR_NAME: gitlab-scm-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -46,11 +46,11 @@ collectorGitlabBuild:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-build
-    tag: "3.0.2"
+    tag: "3.0.4"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-build-0
-    accessToken: ""
+    accessToken: {{ .Values.addons.holocron.collectorAuth.gitlabToken }}
     env:
       COLLECTOR_NAME: gitlab-build-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -62,11 +62,11 @@ collectorGitlabWorkflow:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-gitlab-workflow
-    tag: "3.0.2"
+    tag: "3.0.4"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: gitlab-workflow-0
-    accessToken: ""
+    accessToken: {{ .Values.addons.holocron.collectorAuth.gitlabToken }}
     env:
       COLLECTOR_NAME: gitlab-workflow-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -98,11 +98,11 @@ collectorJiraWorkflow:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-jira-workflow
-    tag: "3.0.2"
+    tag: "3.0.4"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: jira-workflow-0
-    accessToken: ""
+    accessToken: {{ .Values.addons.holocron.collectorAuth.jiraToken }}
     env:
       COLLECTOR_NAME: jira-workflow-0
       COLLECTOR_INTERVAL_SECONDS: 600
@@ -119,11 +119,11 @@ collectorSonarQubeProjectAnalysis:
   replicas: 1
   image:
     repository: registry1.dso.mil/ironbank/holocron/collector-sonarqube-project-analysis
-    tag: "3.0.2"
+    tag: "3.0.5"
     pullPolicy: IfNotPresent
   instances:
   - accessTokenSecretKey: sonarqube-project-analysis-0
-    accessToken: ""
+    accessToken: {{ .Values.addons.holocron.collectorAuth.sonarToken }}
     env:
       COLLECTOR_NAME: sonarqube-project-analysis-0
       COLLECTOR_INTERVAL_SECONDS: 600
