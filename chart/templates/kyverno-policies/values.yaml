@@ -781,8 +781,6 @@ policies:
         - neuvector-prometheus-exporter-pod-*
         - neuvector-registry-adapter-pod-*
       - namespace: kiali 
-        serviceAccounts:
-        - kiali-kiali-kiali-operator
         pods:
         - kiali-*
       - namespace: argocd
