@@ -2140,7 +2140,13 @@ addons:
     # -- Toggle deployment of holocron
     enabled: true
     values:
-      collectorAuth:
-        gitlabToken: mygitlabtoken
-        jiraToken: myjiratoken
-        sonartoken: mysonartoken
+      bbtests:
+        enabled: true
+        cypress:
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2G"
+            limits:
+              cpu: "2"
+              memory: "2G"
