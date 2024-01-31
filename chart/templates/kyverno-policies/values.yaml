@@ -868,8 +868,6 @@ policies:
           - vault-vault-agent-injector-*
           - vault-vault-job-init-*
       - namespace: promtail 
-        serviceAccounts:
-        - promtail-promtail
         pods:
           allow:
           - promtail-promtail-*
