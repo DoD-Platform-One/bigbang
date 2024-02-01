@@ -708,6 +708,9 @@ elasticsearchKibana:
   license:
     trial: false
   values:
+    istio:
+      hardened:
+        enabled: true
     elasticsearch:
       master:
         count: 1

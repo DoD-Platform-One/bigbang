@@ -457,11 +457,11 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
-    tag: "3.14.0-bb.6"
+    tag: "3.14.0-bb.7"
   helmRepo:
     repoName: "registry1"
     chartName: "gatekeeper"
-    tag: "3.14.0-bb.6"
+    tag: "3.14.0-bb.7"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
@@ -570,11 +570,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.9.0-bb.0"
+    tag: "1.9.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.9.0-bb.0"
+    tag: "1.9.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -696,11 +696,11 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.42.0-bb.1"
+    tag: "5.42.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
-    tag: "5.42.0-bb.1"
+    tag: "5.42.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -1725,11 +1725,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "5.1.6-bb.0"
+      tag: "5.2.2-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "5.1.6-bb.0"
+      tag: "5.2.2-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
