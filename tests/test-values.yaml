@@ -757,7 +757,7 @@ loki:
   values:
     istio:
       hardened:
-        enabled: false
+        enabled: true
     minio:
       enabled: true
     write:
