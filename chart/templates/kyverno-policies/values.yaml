@@ -884,8 +884,6 @@ policies:
           allow:
           - elastic-operator-?
       - namespace: nexus-repository-manager
-        serviceAccounts:
-        - nexus-repository-manager
         pods:
           allow:
           - nexus-repository-manager-* 
