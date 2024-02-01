@@ -721,7 +721,7 @@ policies:
           - twistlock-defender-ds-*
       - namespace: logging
         serviceAccounts:
-        - logging-loki-minio-sa
+          - logging-loki-*
         pods:
           allow:
           - logging-loki-minio-ss-*
