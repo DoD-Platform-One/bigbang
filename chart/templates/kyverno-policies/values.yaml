@@ -852,10 +852,6 @@ policies:
         serviceAccounts:
         - fortify-mysql
       - namespace: vault
-        serviceAccounts:
-        - vault-vault
-        - vault-vault-root-token-secret
-        - vault-vault-agent-injector
         pods:
           allow:
           - vault-vault-0
