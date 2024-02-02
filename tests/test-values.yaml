@@ -1527,6 +1527,10 @@ addons:
 
   mattermostOperator:
     enabled: false
+    values:
+      istio:
+        hardened:
+          enabled: true
 
   mattermost:
     enabled: false
