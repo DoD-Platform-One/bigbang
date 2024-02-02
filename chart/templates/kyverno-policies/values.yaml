@@ -911,7 +911,7 @@ policies:
         pods:
           allow:
           - default-minio-bucket-creation-*
-          - mattermost-minio-ss-*
+          - mattermost-minio-*
       - namespace: mattermost-operator
         serviceAccounts:
         - mattermost-operator
