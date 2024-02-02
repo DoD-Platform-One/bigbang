@@ -5,7 +5,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [2.19.2]
 
-- [!3746](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3746); Gitlab update to 16.8.1
 - [!3780](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3780); istio update pod security context
 - [!3759](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3759); fluentbit update to 2.2.2
 
