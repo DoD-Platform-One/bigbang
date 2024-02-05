@@ -913,8 +913,6 @@ policies:
           allow:
           - gitlab-shared-secrets*
       - namespace: gitlab-runner
-        serviceAccounts: 
-        - gitlab-runner
         pods:
           allow:
           - gitlab-runner-*
