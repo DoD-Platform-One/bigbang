@@ -642,8 +642,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - fortify
@@ -668,8 +670,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - metallb-system
