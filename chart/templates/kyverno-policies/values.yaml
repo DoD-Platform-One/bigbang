@@ -907,8 +907,9 @@ policies:
           allow:
           - mattermost-operator-*
       - namespace: keycloak
-        serviceAccounts:
-        - keycloak
+        pods:
+          allow:
+          - keycloak-*
       - namespace: gitlab
         pods:
           allow:
