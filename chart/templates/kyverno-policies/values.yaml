@@ -244,6 +244,7 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+          - volume-upgrade-job*
       {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
