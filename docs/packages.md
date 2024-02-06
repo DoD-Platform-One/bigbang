@@ -60,6 +60,7 @@
 | [Sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube) |  ![Sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube/badges/main/pipeline.svg) | N/A | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/503) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1508) |
 | [Harbor](https://repo1.dso.mil/big-bang/product/packages/harbor) |  ![Harbor](https://repo1.dso.mil/big-bang/product/packages/harbor/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2939) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2939) |
 | [Fortify](https://repo1.dso.mil/big-bang/product/packages/fortify) |  ![Fortify](https://repo1.dso.mil/big-bang/product/packages/fortify/badges/main/pipeline.svg) | No | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3027) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3027) |
+| [Holocron](https://repo1.dso.mil/big-bang/product/packages/holocron) | ![Holocron](https://repo1.dso.mil/big-bang/product/packages/holocron/badges/main/pipeline.svg) | No | No | Yes | Yes (STRICT) |
 
 > `*` inherited from Gitlab when installed in the same namespace.
 
