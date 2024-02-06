@@ -642,8 +642,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - fortify
@@ -668,8 +670,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - metallb-system
@@ -703,6 +707,9 @@ elasticsearchKibana:
   license:
     trial: false
   values:
+    istio:
+      hardened:
+        enabled: true
     elasticsearch:
       master:
         count: 1
@@ -1250,7 +1257,7 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_baseUrl: https://gitlab.bigbang.dev
+            cypress_url: https://gitlab.bigbang.dev
         scripts:
           envs:
             GITLAB_REPOSITORY: https://gitlab.bigbang.dev
@@ -1283,7 +1290,7 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_url: "https://gitlab.bigbang.dev"
             cypress_gitlab_first_name: "testrunner"
             cypress_gitlab_last_name: "userrunner"
             cypress_gitlab_email: "gitlab@bigbang.dev"

@@ -721,7 +721,7 @@ policies:
           - twistlock-defender-ds-*
       - namespace: logging
         serviceAccounts:
-        - logging-loki-minio-sa
+          - logging-loki-*
         pods:
           allow:
           - logging-loki-minio-ss-*
@@ -755,10 +755,6 @@ policies:
           - kyverno-admission-controller-*
           - kyverno-cleanup-cluster-admission-reports-*
       - namespace: velero
-        serviceAccounts:
-        - velero
-        - velero-upgrade-crds
-        - velero-velero-server
         pods:
           allow:
           - velero-cleanup-crds-*
@@ -783,8 +779,6 @@ policies:
           - neuvector-prometheus-exporter-pod-*
           - neuvector-registry-adapter-pod-*
       - namespace: kiali 
-        serviceAccounts:
-        - kiali-kiali-kiali-operator
         pods:
           allow:
           - kiali-*
@@ -868,26 +862,18 @@ policies:
           - vault-vault-agent-injector-*
           - vault-vault-job-init-*
       - namespace: promtail 
-        serviceAccounts:
-        - promtail-promtail
         pods:
           allow:
           - promtail-promtail-*
       - namespace: fluentbit
-        serviceAccounts:
-        - fluentbit-fluent-bit
         pods:
           allow:
           - fluentbit-fluent-bit-*
       - namespace: eck-operator
-        serviceAccounts:
-        - elastic-operator
         pods:
           allow:
-          - elastic-operator-?
+          - elastic-operator-*
       - namespace: nexus-repository-manager
-        serviceAccounts:
-        - nexus-repository-manager
         pods:
           allow:
           - nexus-repository-manager-* 
@@ -919,15 +905,14 @@ policies:
           allow:
           - mattermost-operator-*
       - namespace: keycloak
-        serviceAccounts:
-        - keycloak
+        pods:
+          allow:
+          - keycloak-*
       - namespace: gitlab
         pods:
           allow:
           - gitlab-shared-secrets*
       - namespace: gitlab-runner
-        serviceAccounts: 
-        - gitlab-runner
         pods:
           allow:
           - gitlab-runner-*

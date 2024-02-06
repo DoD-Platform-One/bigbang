@@ -103,6 +103,22 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
 
   namespacesHaveIstio:
     enabled: {{ .Values.istio.enabled }}
+    parameters:
+      excludedResources:
+        # Kuberentes control plane does not use Istio
+        - kube-node-lease
+        - kube-public
+        - kube-system
+        # No pods in bigbang / default
+        - bigbang
+        - default
+        # Flux is installed prior to Istio
+        - flux-system
+        # Istio does not inject itself
+        - istio-operator
+        - istio-system
+        # Kyverno is installed prior to Istio
+        - kyverno
 
   {{- if or .Values.fluentbit.enabled .Values.neuvector.enabled }}
   noPrivilegedContainers:
