@@ -761,7 +761,7 @@ loki:
   values:
     istio:
       hardened:
-        enabled: false
+        enabled: true
     minio:
       enabled: true
     write:
@@ -2094,7 +2094,7 @@ addons:
   # Thanos
   #
   thanos:
-    # -- Toggle deployment of thanos -- a simple change to test pipelines
+    # -- Toggle deployment of thanos
     enabled: false
     values:
       minio:
