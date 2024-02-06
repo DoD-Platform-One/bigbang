@@ -862,23 +862,17 @@ policies:
           - vault-vault-agent-injector-*
           - vault-vault-job-init-*
       - namespace: promtail 
-        serviceAccounts:
-        - promtail-promtail
         pods:
           allow:
           - promtail-promtail-*
       - namespace: fluentbit
-        serviceAccounts:
-        - fluentbit-fluent-bit
         pods:
           allow:
           - fluentbit-fluent-bit-*
       - namespace: eck-operator
-        serviceAccounts:
-        - elastic-operator
         pods:
           allow:
-          - elastic-operator-?
+          - elastic-operator-*
       - namespace: nexus-repository-manager
         pods:
           allow:
@@ -911,15 +905,14 @@ policies:
           allow:
           - mattermost-operator-*
       - namespace: keycloak
-        serviceAccounts:
-        - keycloak
+        pods:
+          allow:
+          - keycloak-*
       - namespace: gitlab
         pods:
           allow:
           - gitlab-shared-secrets*
       - namespace: gitlab-runner
-        serviceAccounts: 
-        - gitlab-runner
         pods:
           allow:
           - gitlab-runner-*
