@@ -184,6 +184,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -323,6 +324,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -523,6 +525,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
         parameters:
@@ -560,6 +563,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
           - resources:
@@ -613,6 +617,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -2139,3 +2144,22 @@ addons:
           insecure: true
           trace:
             enable: true
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Holocron
+  #
+  holocron:
+    # -- Toggle deployment of holocron
+    enabled: false
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2G"
+            limits:
+              cpu: "2"
+              memory: "2G"
