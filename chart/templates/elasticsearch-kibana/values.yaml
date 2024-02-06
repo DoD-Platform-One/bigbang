@@ -14,6 +14,12 @@ imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    {{- if or (dig "istio" "hardened" "enabled" .Values.loki.values) (dig "istio" "hardened" "enabled" .Values.elasticsearchKibana.values) }}
+    enabled: true
+    {{- else }}
+    enabled: false
+    {{- end }}
   kibana:
     gateways:
     - istio-system/{{ default "public" .Values.elasticsearchKibana.ingress.gateway }}

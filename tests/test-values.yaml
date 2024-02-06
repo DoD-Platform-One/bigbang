@@ -184,6 +184,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -323,6 +324,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -523,6 +525,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
         parameters:
@@ -560,6 +563,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
           - resources:
@@ -613,6 +617,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -642,8 +647,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - fortify
@@ -668,8 +675,10 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
+              - gitlab-runner
               names:
               - gitlab-minio-*
+              - runner-*
           - resources:
               namespaces:
               - metallb-system
@@ -703,6 +712,9 @@ elasticsearchKibana:
   license:
     trial: false
   values:
+    istio:
+      hardened:
+        enabled: true
     elasticsearch:
       master:
         count: 1
@@ -1250,7 +1262,7 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_baseUrl: https://gitlab.bigbang.dev
+            cypress_url: https://gitlab.bigbang.dev
         scripts:
           envs:
             GITLAB_REPOSITORY: https://gitlab.bigbang.dev
@@ -1283,7 +1295,7 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_baseUrl: "https://gitlab.bigbang.dev"
+            cypress_url: "https://gitlab.bigbang.dev"
             cypress_gitlab_first_name: "testrunner"
             cypress_gitlab_last_name: "userrunner"
             cypress_gitlab_email: "gitlab@bigbang.dev"
@@ -2132,3 +2144,22 @@ addons:
           insecure: true
           trace:
             enable: true
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Holocron
+  #
+  holocron:
+    # -- Toggle deployment of holocron
+    enabled: false
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2G"
+            limits:
+              cpu: "2"
+              memory: "2G"

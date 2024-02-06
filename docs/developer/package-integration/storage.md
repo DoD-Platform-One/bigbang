@@ -77,7 +77,7 @@ fileStore:
 {{- end }}
 ```
 
-Example: [MatterMost](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/mattermost/mattermost/values.yaml#L66-68) passes the endpoint and bucket via chart values.
+Example: [MatterMost](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/mattermost/values.yaml#L101) passes the endpoint and bucket via chart values.
 
 1. Package chart accepts a secret name where all the object storage connection info is defined. In these cases we make the secret in the BB chart.
 
@@ -90,7 +90,7 @@ objectStorage:
     key: backups
 ```
 
-Example: [GitLab](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gitlab/values.yaml#L54-57)
+Example: [GitLab](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gitlab/values.yaml#L76)
 
 - Create the secret in the Big Bang chart. (NOTE: Replace `<package>` with your package name in the example below)
 
