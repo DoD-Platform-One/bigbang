@@ -251,6 +251,7 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+          - volume-upgrade-job*
       {{- end }}
       # For GitLab runner CI jobs that require root access
       {{- if .Values.addons.gitlabRunner.enabled }}
