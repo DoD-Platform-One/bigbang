@@ -836,8 +836,8 @@ policies:
           # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
           - argocd-argocd-notifications-controller-*
       - namespace: harbor
-        serviceAccounts: 
-        - harbor-redis-bb
+        # Omitting the serviceAccount and Pods section forces the policy to apply to 
+        # all of the serviceAccount and Pods in the namespace 
       - namespace: authservice
         serviceAccounts:
         - authservice
