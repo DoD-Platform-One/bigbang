@@ -778,11 +778,6 @@ policies:
           - velero-script-test
           - velero-backup-restore-test
       - namespace: neuvector
-        serviceAccounts:
-        - basic
-        - controller
-        - enforcer
-        - updater
         pods:
           allow:
           - neuvector-manager-pod-*
