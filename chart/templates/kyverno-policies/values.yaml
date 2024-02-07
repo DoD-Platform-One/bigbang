@@ -252,6 +252,14 @@ policies:
           names:
           - twistlock-defender-ds*
       {{- end }}
+      # For GitLab runner CI jobs that require root access
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          names:
+          - runner-*
+      {{- end }}
       {{- if .Values.fluentbit.enabled }}
       # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
       # to the host operating system, creating a user, adding that user to the  systemd-journal user group
@@ -328,6 +336,14 @@ policies:
           - velero
           names:
           - node-agent*
+      {{- end }}
+      # For GitLab runner CI jobs that require root access
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          names:
+          - runner-*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
