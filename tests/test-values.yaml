@@ -1541,6 +1541,9 @@ addons:
 
   mattermost:
     enabled: false
+    git:
+      tag: null
+      branch: "fixes-for-mm"
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_mattermost
@@ -1568,6 +1571,7 @@ addons:
         tenant:
           pools:
           - servers: 1
+            name: pool-0
             volumesPerServer: 4
             size: 256Mi
             resources:
