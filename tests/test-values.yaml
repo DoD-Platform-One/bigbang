@@ -1577,11 +1577,15 @@ addons:
               runAsUser: 1001
               runAsGroup: 1001
               fsGroup: 1001
+              fsGroupChangePolicy: "OnRootMismatch"
               runAsNonRoot: true
             containerSecurityContext:
               runAsUser: 1001
               runAsGroup: 1001
               runAsNonRoot: true
+              capabilities:
+                drop:
+                  - ALL
       bbtests:
         enabled: true
         cypress:
