@@ -457,11 +457,11 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
-    tag: "3.14.0-bb.7"
+    tag: "3.14.0-bb.8"
   helmRepo:
     repoName: "registry1"
     chartName: "gatekeeper"
-    tag: "3.14.0-bb.7"
+    tag: "3.14.0-bb.8"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
@@ -696,11 +696,11 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.42.0-bb.3"
+    tag: "5.42.0-bb.5"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
-    tag: "5.42.0-bb.3"
+    tag: "5.42.0-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -749,11 +749,11 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.6.3-bb.8"
+    tag: "2.6.3-bb.9"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
-    tag: "2.6.3-bb.8"
+    tag: "2.6.3-bb.9"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -975,11 +975,11 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
-    tag: "0.14.0-bb.0"
+    tag: "0.14.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "twistlock"
-    tag: "0.14.0-bb.0"
+    tag: "0.14.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -1139,11 +1139,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
-      tag: "5.0.11-bb.2"
+      tag: "5.0.11-bb.5"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-instance"
-      tag: "5.0.11-bb.2"
+      tag: "5.0.11-bb.5"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
@@ -1818,11 +1818,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
-      tag: "0.25.0-bb.10"
+      tag: "0.25.0-bb.14"
     helmRepo:
       repoName: "registry1"
       chartName: "vault"
-      tag: "0.25.0-bb.10"
+      tag: "0.25.0-bb.14"
       
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}

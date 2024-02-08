@@ -647,10 +647,8 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
-              - gitlab-runner
               names:
               - gitlab-minio-*
-              - runner-*
           - resources:
               namespaces:
               - fortify
@@ -675,10 +673,8 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
-              - gitlab-runner
               names:
               - gitlab-minio-*
-              - runner-*
           - resources:
               namespaces:
               - metallb-system
@@ -978,7 +974,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 256Mi
+        size: 5Gi
       localVolumeUpgrade: true
     bbtests:
       enabled: true
@@ -1922,6 +1918,9 @@ addons:
 
               service_registration "kubernetes" {}
 
+      istio:
+        hardened:
+          enabled: true
       bbtests:
         enabled: true
         cypress:
