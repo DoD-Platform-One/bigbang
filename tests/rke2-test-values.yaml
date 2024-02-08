@@ -136,7 +136,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 256Mi
+        size: 5Gi
 
 # Addons are toggled based on labels in CI
 addons:
