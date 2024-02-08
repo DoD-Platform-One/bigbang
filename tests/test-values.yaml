@@ -974,7 +974,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 256Mi
+        size: 5Gi
       localVolumeUpgrade: true
     bbtests:
       enabled: true
