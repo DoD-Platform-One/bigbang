@@ -839,9 +839,6 @@ policies:
         # Omitting the serviceAccount and Pods section forces the policy to apply to 
         # all of the serviceAccount and Pods in the namespace 
       - namespace: authservice
-        serviceAccounts:
-        - authservice
-        - authservice-haproxy-sso
         pods:
           allow:
           - authservice-authservice-redis-bb-*
