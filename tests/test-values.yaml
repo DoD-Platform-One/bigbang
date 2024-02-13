@@ -99,6 +99,45 @@ kiali:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
   values:
+    istio:
+      hardened:
+        enabled: true
+        customServiceEntries:
+          - name: "allow-kiali-dashboard-for-cypress-tests"
+            enabled: true
+            spec:
+              hosts:
+                - 'kiali.bigbang.dev'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-npm-for-cypress-tests"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-repo1-for-cypress"
+            enabled: true
+            spec:
+              hosts:
+                - 'repo1.dso.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     cr:
       spec:
         auth:
@@ -107,7 +146,7 @@ kiali:
           strategy: "anonymous"
     resources:
       limits:
-        cpu: "1"          
+        cpu: "1"
     bbtests:
       enabled: true
       cypress:
@@ -184,6 +223,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -323,6 +363,7 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
+          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -463,7 +504,7 @@ kyvernoPolicies:
                     ignoreTlog: true
                     url: ""
             mutateDigest: false
-            verifyDigest: false 
+            verifyDigest: false
           - imageReferences:
             - "registry1.dso.mil/ironbank/*"
             attestors:
@@ -523,6 +564,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
         parameters:
@@ -560,6 +602,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
           - resources:
@@ -613,6 +656,7 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
+              - holocron
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -642,10 +686,8 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
-              - gitlab-runner
               names:
               - gitlab-minio-*
-              - runner-*
           - resources:
               namespaces:
               - fortify
@@ -661,7 +703,7 @@ kyvernoPolicies:
               namespaces:
               - velero
               names:
-              - velero-backup-restore-test*  
+              - velero-backup-restore-test*
       require-non-root-user:
         exclude:
           any:
@@ -670,10 +712,8 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - gitlab
-              - gitlab-runner
               names:
               - gitlab-minio-*
-              - runner-*
           - resources:
               namespaces:
               - metallb-system
@@ -683,12 +723,12 @@ kyvernoPolicies:
               namespaces:
               - argocd
               names:
-              - guestbook*    
+              - guestbook*
           - resources:
               namespaces:
               - velero
               names:
-              - velero-backup-restore-test*  
+              - velero-backup-restore-test*
           - resources:
               namespaces:
               - twistlock
@@ -973,7 +1013,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 256Mi
+        size: 5Gi
       localVolumeUpgrade: true
     bbtests:
       enabled: true
@@ -1081,7 +1121,7 @@ addons:
         replica:
           replicaCount: 0
           autoscaling:
-            enabled: false  
+            enabled: false
           persistence:
             size: 256Mi
 
@@ -1441,7 +1481,7 @@ addons:
         replica:
           replicaCount: 0
           autoscaling:
-            enabled: false 
+            enabled: false
       bbtests:
         enabled: true
         scripts:
@@ -1936,6 +1976,9 @@ addons:
 
               service_registration "kubernetes" {}
 
+      istio:
+        hardened:
+          enabled: true
       bbtests:
         enabled: true
         cypress:
@@ -2135,7 +2178,7 @@ addons:
               runAsGroup: 1001
               runAsNonRoot: true
       storegateway:
-        enabled: true            
+        enabled: true
       bbtests:
         enabled: true
         cypress:
@@ -2158,3 +2201,22 @@ addons:
           insecure: true
           trace:
             enable: true
+
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Holocron
+  #
+  holocron:
+    # -- Toggle deployment of holocron
+    enabled: false
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          resources:
+            requests:
+              cpu: "2"
+              memory: "2G"
+            limits:
+              cpu: "2"
+              memory: "2G"

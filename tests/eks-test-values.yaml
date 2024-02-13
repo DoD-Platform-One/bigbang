@@ -116,9 +116,9 @@ monitoring:
             vault.hashicorp.com/agent-inject-token: "true"
             vault.hashicorp.com/role: "prometheus"
             vault.hashicorp.com/agent-pre-populate: "false"
-            proxy.istio.io/config: |
-              holdApplicationUntilProxyStarts: true
-   
+### COMMENTED OUT DUE TO ISSUES WITH THANOS-SIDECAR CONTAINER AND PROMETHEUS ###
+#            proxy.istio.io/config: |
+#              holdApplicationUntilProxyStarts: true
         resources:
           requests:
             cpu: 300m
@@ -148,7 +148,7 @@ twistlock:
   values:
     console:
       persistence:
-        size: 256Mi
+        size: 5Gi
 
 # Addons are toggled based on labels in CI
 addons:
