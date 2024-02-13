@@ -892,11 +892,6 @@ policies:
           allow:
           - nexus-repository-manager-* 
       - namespace: thanos
-        serviceAccounts:
-        - thanos-minio-sa
-        - thanos-storegateway
-        - thanos-query
-        - thanos-query-frontend
         pods:
           allow:
           - thanos-minio-*
