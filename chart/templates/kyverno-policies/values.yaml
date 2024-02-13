@@ -844,13 +844,6 @@ policies:
           - authservice-authservice-redis-bb-*
           - authservice-haproxy-sso-*
       - namespace: monitoring
-        serviceAccounts:
-        - monitoring-grafana
-        - monitoring-monitoring-kube-admission
-        - monitoring-monitoring-kube-prometheus
-        - monitoring-monitoring-kube-state-metrics
-        - monitoring-monitoring-kube-operator
-        - monitoring-monitoring-prometheus-node-exporter
         pods:
           allow:
           - monitoring-grafana-*
