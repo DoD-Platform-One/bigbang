@@ -1209,6 +1209,7 @@ addons:
 
       # Uncomment this block and populate with Keycloak groups according to your desired Gitlab membership requirements
       # Legend
+      #   groupsAttribute - where to loook for groups in the OIDC response (default is "groups")
       #   requiredGroups - groups that must be included in the Keycloak response for the user to be granted access to Gitlab
       #   externalGroups - groups that must be included in the Keycloak response for the user to be identified as an external Gitlab user (see https://docs.gitlab.com/ee/administration/external_users.html)
       #   auditorGroups - groups that must be included in the Keycloak response for the user to be added as Gitlab instance auditors
