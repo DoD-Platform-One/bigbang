@@ -1209,14 +1209,8 @@ addons:
 
       # -- Uncomment the groups block below and populate with Keycloak groups according to your desired Gitlab membership requirements
       # Full documentation: https://docs.gitlab.com/ee/administration/auth/oidc.html?tab=Linux+package+%28Omnibus%29#configure-users-based-on-oidc-group-membership
-      #   groupsAttribute - where to loook for groups in the OIDC response (default is "groups")
-      #   requiredGroups - groups that must be included in the Keycloak response for the user to be granted access to Gitlab
-      #   externalGroups - groups that must be included in the Keycloak response for the user to be identified as an external Gitlab user (see https://docs.gitlab.com/ee/administration/external_users.html)
-      #   auditorGroups - groups that must be included in the Keycloak response for the user to be added as Gitlab instance auditors
-      #   adminGroups - groups that must be included in the Keycloak response for the user to be added as a Gitlab instance admin
-      #   Full documentation: https://docs.gitlab.com/ee/administration/auth/oidc.html?tab=Linux+package+%28Omnibus%29#configure-users-based-on-oidc-group-membership
-      #
       # groups:
+      #   groupsAttribute: "" # default is "groups"
       #   requiredGroups: []
       #   externalGroups: []
       #   auditorGroups: []
