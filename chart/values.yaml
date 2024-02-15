@@ -1207,6 +1207,15 @@ addons:
       scopes:
         - Gitlab
 
+      # -- Fill out the groups block below and populate with Keycloak groups according to your desired Gitlab membership requirements. The default groupsAttribute is "groups".
+      # Full documentation: https://docs.gitlab.com/ee/administration/auth/oidc.html?tab=Linux+package+%28Omnibus%29#configure-users-based-on-oidc-group-membership
+      groups: []
+      #   groupsAttribute: ""
+      #   requiredGroups: []
+      #   externalGroups: []
+      #   auditorGroups: []
+      #   adminGroups: []
+
     database:
       # -- Hostname of a pre-existing PostgreSQL database to use for Gitlab.
       # Entering connection info will disable the deployment of an internal database and will auto-create any required secrets.
@@ -1823,7 +1832,7 @@ addons:
       repoName: "registry1"
       chartName: "vault"
       tag: "0.25.0-bb.14"
-      
+
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
 
@@ -1912,7 +1921,7 @@ addons:
 
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
-  
+
   holocron:
     # -- Toggle deployment of Holocron.
     enabled: false
@@ -2014,9 +2023,9 @@ addons:
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
       gateway: ""
-      
-    # -- Configure the object storage for Thanos.  
-    # The monitoring.prometheus thanos-sidecar and Thanos will use this configuration if defined 
+
+    # -- Configure the object storage for Thanos.
+    # The monitoring.prometheus thanos-sidecar and Thanos will use this configuration if defined
     objstoreConfig: ""
 
     values: {}
