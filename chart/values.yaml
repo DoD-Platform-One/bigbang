@@ -1207,10 +1207,10 @@ addons:
       scopes:
         - Gitlab
 
-      # -- Uncomment the groups block below and populate with Keycloak groups according to your desired Gitlab membership requirements
+      # -- Fill out the groups block below and populate with Keycloak groups according to your desired Gitlab membership requirements. The default groupsAttribute is "groups".
       # Full documentation: https://docs.gitlab.com/ee/administration/auth/oidc.html?tab=Linux+package+%28Omnibus%29#configure-users-based-on-oidc-group-membership
-      # groups:
-      #   groupsAttribute: "" # default is "groups"
+      groups: []
+      #   groupsAttribute: ""
       #   requiredGroups: []
       #   externalGroups: []
       #   auditorGroups: []
