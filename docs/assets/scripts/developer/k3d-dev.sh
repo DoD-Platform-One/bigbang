@@ -1,7 +1,7 @@
 #!/bin/bash
 
 K3D_VERSION="5.6.0"
-DEFAULT_K3S_TAG="v1.27.6-k3s1"
+DEFAULT_K3S_TAG="v1.28.6-k3s2"
 
 # get the current script dir
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
