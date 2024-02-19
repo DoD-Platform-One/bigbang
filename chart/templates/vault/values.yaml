@@ -73,9 +73,9 @@ istio:
       key:  {{ .Values.addons.vault.ingress.key | quote }}
     {{- end }}
 
+{{- if .Values.istio.enabled }}
 minio:
-  {{- if .Values.istio.enabled }}
   annotations:
     {{ include "istioAnnotation" . }}
-  {{- end }}        
+{{- end }}        
 {{- end -}}

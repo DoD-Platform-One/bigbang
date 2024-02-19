@@ -13,6 +13,7 @@ The guides included here are not all inclusive of every situation. Please open a
 [Image Pull Policy](./using-bigbang/image-pull-policy.md) |
 [Pod Usage in Grafana](./using-bigbang/pod-usage-in-grafana.md) |
 [Migrating Logging from ELK to PLG](./using-bigbang/efk-plg-logging-migration.md)
+[Testing Deployments](./using-bigbang/testing-deployments.md)
 
 ## Deployment Scenarios
 
