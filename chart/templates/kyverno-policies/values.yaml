@@ -896,16 +896,12 @@ policies:
           - thanos-storegateway-*
           - thanos-query-*
       - namespace: mattermost
-        serviceAccounts:
-        - mattermost
-        - mattermost-minio-sa
         pods:
           allow:
           - default-minio-bucket-creation-*
           - mattermost-minio-ss-*
+          - mattermost-minio-pool-*
       - namespace: mattermost-operator
-        serviceAccounts:
-        - mattermost-operator
         pods:
           allow:
           - mattermost-operator-*
