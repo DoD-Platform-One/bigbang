@@ -1574,6 +1574,10 @@ addons:
 
   mattermostOperator:
     enabled: false
+    values:
+      istio:
+        hardened:
+          enabled: true
 
   mattermost:
     enabled: false
@@ -1584,6 +1588,13 @@ addons:
     elasticsearch:
       enabled: true
     values:
+      enterprise:
+        enabled: true
+      monitoring:
+        enabled: true
+      istio:
+        hardened:
+          enabled: true
       postgresql:
         persistence:
           size: 256Mi
@@ -1597,6 +1608,7 @@ addons:
         tenant:
           pools:
           - servers: 1
+            name: pool-0
             volumesPerServer: 4
             size: 256Mi
             resources:
@@ -1610,11 +1622,15 @@ addons:
               runAsUser: 1001
               runAsGroup: 1001
               fsGroup: 1001
+              fsGroupChangePolicy: "OnRootMismatch"
               runAsNonRoot: true
             containerSecurityContext:
               runAsUser: 1001
               runAsGroup: 1001
               runAsNonRoot: true
+              capabilities:
+                drop:
+                  - ALL
       bbtests:
         enabled: true
         cypress:
