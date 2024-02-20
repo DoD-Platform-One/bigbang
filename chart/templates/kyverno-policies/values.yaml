@@ -893,8 +893,8 @@ policies:
           - thanos-minio-*
           deny:
           - thanos-query-frontend-*
-          - thanos-storegateway-*
-          - thanos-query-*
+          - thanos-storegateway*
+          - thanos-query*
       - namespace: mattermost
         pods:
           allow:
