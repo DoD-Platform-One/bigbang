@@ -899,8 +899,7 @@ policies:
         pods:
           allow:
           - default-minio-bucket-creation-*
-          - mattermost-minio-ss-*
-          - mattermost-minio-pool-*
+          - mattermost-minio-*
       - namespace: mattermost-operator
         pods:
           allow:
