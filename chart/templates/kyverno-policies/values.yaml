@@ -846,13 +846,12 @@ policies:
       - namespace: monitoring
         pods:
           allow:
-          - monitoring-grafana-*
-          - monitoring-grafana-*
+          - monitoring-grafana*
           - monitoring-monitoring-kube-admission-create-*
           - monitoring-monitoring-kube-admission-patch-*
           - monitoring-monitoring-kube-state-metrics-*
           - monitoring-monitoring-kube-operator-*
-          - prometheus-monitoring-monitoring-kube-prometheus-*
+          - prometheus-monitoring-monitoring-kube-prometheus*
       - namespace: anchore
         pods:
           allow:
