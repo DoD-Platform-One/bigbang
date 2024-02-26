@@ -751,8 +751,6 @@ policies:
           # Enforcing said policies requires access to the API to get/list resources
           - twistlock-defender-ds-*
       - namespace: logging
-        serviceAccounts:
-          - logging-loki-*
         pods:
           allow:
           - logging-loki-minio-ss-*
@@ -773,7 +771,7 @@ policies:
           allow:
           # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
           # More details in role named minio-minio-minio-instance-role
-          - minio-minio-minio-instance-ss-0-*
+          - minio-minio-minio-instance-*
       - namespace: kyverno
         pods:
           allow:
@@ -846,13 +844,12 @@ policies:
       - namespace: monitoring
         pods:
           allow:
-          - monitoring-grafana-*
-          - monitoring-grafana-*
+          - monitoring-grafana*
           - monitoring-monitoring-kube-admission-create-*
           - monitoring-monitoring-kube-admission-patch-*
-          - monitoring-monitoring-kube-state-metrics-*
-          - monitoring-monitoring-kube-operator-*
-          - prometheus-monitoring-monitoring-kube-prometheus-*
+          - monitoring-monitoring-kube-state-metrics*
+          - monitoring-monitoring-kube-operator*
+          - prometheus-monitoring-monitoring-kube-prometheus*
       - namespace: anchore
         pods:
           allow:
@@ -893,8 +890,8 @@ policies:
           - thanos-minio-*
           deny:
           - thanos-query-frontend-*
-          - thanos-storegateway-*
-          - thanos-query-*
+          - thanos-storegateway*
+          - thanos-query*
       - namespace: mattermost
         pods:
           allow:
