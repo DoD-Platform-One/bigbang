@@ -137,11 +137,12 @@ policies:
           kinds:
           - Pod
           - Deployment
+          - StatefulSet
           names:
-          - notification-controller-*
-          - helm-controller-*
-          - source-controller-*
-          - kustomize-controller-*
+          - notification-controller*
+          - helm-controller*
+          - source-controller*
+          - kustomize-controller*
       {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
