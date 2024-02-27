@@ -14,7 +14,13 @@ openshift:
 createNamespace: false
 
 global:
-  image: 
+  {{- $argocdHosts := (dig "istio" "argocd" "hosts" dict .Values.addons.argocd.values) }}
+  {{- if $argocdHosts }}
+  domain: {{ tpl ($argocdHosts | first) $ }}
+  {{- else }}
+  domain: argocd.{{ $domainName }}
+  {{- end }}
+  image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
@@ -25,7 +31,7 @@ global:
 {{- end }}
 
 controller:
-  image: 
+  image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
@@ -42,7 +48,7 @@ controller:
   {{- end }}
 
 dex:
-  image: 
+  image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
@@ -59,7 +65,7 @@ redis-bb:
   {{- else }}
   enabled: true
   {{- end }}
-  image: 
+  image:
     pullPolicy: {{ .Values.imagePullPolicy }}
   auth:
     enabled: false
@@ -89,7 +95,7 @@ redis-bb:
       enabled: true
       namespace: monitoring
   {{- end }}
-{{- if $istioInjection }}  
+{{- if $istioInjection }}
   master:
     podAnnotations:
       {{ include "istioAnnotation" . }}
@@ -99,7 +105,7 @@ redis-bb:
 {{- end }}
 
 server:
-  image: 
+  image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   autoscaling:
     enabled: true
@@ -119,7 +125,7 @@ server:
   {{- end }}
 
 repoServer:
-  image: 
+  image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   autoscaling:
     enabled: true
@@ -152,15 +158,6 @@ networkPolicies:
     {{- $gateway := default "public" .Values.addons.argocd.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
-
-configs:
-  cm:
-    {{- $argocdHosts := (dig "istio" "argocd" "hosts" dict .Values.addons.argocd.values) }}
-    {{- if $argocdHosts }}
-    url: {{ tpl ($argocdHosts | first) $ }}
-    {{- else }}
-    url: https://argocd.{{ .Values.domain }}
-    {{- end }}
 
 {{- if .Values.addons.argocd.sso.enabled }}
 sso:
