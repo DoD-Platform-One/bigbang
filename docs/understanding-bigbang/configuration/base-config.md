@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 2.21.0](https://img.shields.io/badge/Version-2.21.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.21.1](https://img.shields.io/badge/Version-2.21.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -128,10 +128,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | clusterAuditor.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | clusterAuditor.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git"` |  |
 | clusterAuditor.git.path | string | `"./chart"` |  |
-| clusterAuditor.git.tag | string | `"1.5.0-bb.13"` |  |
+| clusterAuditor.git.tag | string | `"1.5.0-bb.14"` |  |
 | clusterAuditor.helmRepo.repoName | string | `"registry1"` |  |
 | clusterAuditor.helmRepo.chartName | string | `"cluster-auditor"` |  |
-| clusterAuditor.helmRepo.tag | string | `"1.5.0-bb.13"` |  |
+| clusterAuditor.helmRepo.tag | string | `"1.5.0-bb.14"` |  |
 | clusterAuditor.flux | object | `{}` | Flux reconciliation overrides specifically for the Cluster Auditor Package |
 | clusterAuditor.values | object | `{}` | Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git |
 | clusterAuditor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -340,10 +340,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.argocd.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.argocd.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/argocd.git"` |  |
 | addons.argocd.git.path | string | `"./chart"` |  |
-| addons.argocd.git.tag | string | `"5.53.1-bb.2"` |  |
+| addons.argocd.git.tag | string | `"6.1.0-bb.0"` |  |
 | addons.argocd.helmRepo.repoName | string | `"registry1"` |  |
 | addons.argocd.helmRepo.chartName | string | `"argocd"` |  |
-| addons.argocd.helmRepo.tag | string | `"5.53.1-bb.2"` |  |
+| addons.argocd.helmRepo.tag | string | `"6.1.0-bb.0"` |  |
 | addons.argocd.flux | object | `{}` | Flux reconciliation overrides specifically for the ArgoCD Package |
 | addons.argocd.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.argocd.redis.host | string | `""` | Hostname of a pre-existing Redis to use for ArgoCD. Entering connection info will enable external Redis and will auto-create any required secrets. |
@@ -398,10 +398,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"7.9.0-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"7.9.1-bb.0"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"7.9.0-bb.0"` |  |
+| addons.gitlab.helmRepo.tag | string | `"7.9.1-bb.0"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
