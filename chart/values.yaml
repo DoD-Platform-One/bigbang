@@ -2024,10 +2024,6 @@ addons:
     ingress:
       gateway: ""
 
-    # -- Configure the object storage for Thanos.
-    # The monitoring.prometheus thanos-sidecar and Thanos will use this configuration if defined
-    objstoreConfig: ""
-
     values: {}
 
     postRenderers: []

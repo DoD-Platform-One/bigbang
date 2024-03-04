@@ -57,6 +57,5 @@ query:
     - dns+thanos-storegateway.thanos.svc.cluster.local:10901
     {{- end }}
     
-objstoreConfig: {{- toYaml (tpl (dig "values" "objstoreConfig" "" .Values.addons.thanos) .) | indent 2 }}
 
 {{- end }}
