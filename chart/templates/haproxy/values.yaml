@@ -100,4 +100,6 @@ image:
   repository: registry1.dso.mil/ironbank/opensource/haproxy/haproxy22
 containerPorts:
   http: 8080
+istio:
+  enabled: {{ .Values.istio.enabled }}
 {{- end -}}

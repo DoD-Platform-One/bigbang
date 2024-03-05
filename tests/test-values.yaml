@@ -1107,6 +1107,9 @@ addons:
       minimal:
         callback_uri: "https://minimal.bigbang.dev"
     values:
+      istio:
+        hardened:
+          enabled: true
       resources:
         requests:
           cpu: 100m
@@ -1202,9 +1205,10 @@ addons:
             cypress_url: "https://fortify.bigbang.dev"
 
   haproxy:
-    istio:
-      hardened:
-        enabled: true
+    values:
+      istio:
+        hardened:
+          enabled: true
 
   gitlab:
     enabled: false
