@@ -754,7 +754,12 @@ policies:
       - namespace: logging
         pods:
           allow:
-          - logging-loki-minio-ss-*
+          - logging-loki-minio-*
+          deny:
+          - logging-ek-es-data*
+          - logging-ek-es-master*
+          - logging-ek-kb*
+          - logging-ek-metrics*
       - namespace: minio-operator
         pods:
           allow:
