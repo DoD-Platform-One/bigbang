@@ -32,6 +32,8 @@ networkPolicies:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+  
+openshift: {{ .Values.openshift }}
 
 sso:
   enabled: {{ .Values.addons.harbor.sso.enabled }}
