@@ -141,12 +141,14 @@ postgresql:
   enabled: false
   service:
     name: {{ .Values.addons.holocron.database.host }}
+    ports:
+      postgresql: {{ .Values.addons.holocron.database.port }}
   {{- else }}
   enabled: true
-  {{- end }}
   service:
     ports:
       postgresql: {{ .Values.addons.holocron.database.port }}
+  {{- end }}
     
   image:
     repository: ironbank/opensource/postgres/postgresql
