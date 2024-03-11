@@ -2027,6 +2027,9 @@ addons:
   metricsServer:
     enabled: false
     values:
+      istio:
+        hardened:
+          enabled: true
       replicas: 1
       bbtests:
         enabled: true
