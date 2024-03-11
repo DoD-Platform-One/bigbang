@@ -2247,6 +2247,9 @@ addons:
     # -- Toggle deployment of holocron
     enabled: false
     values:
+      istio:
+        hardened:
+          enabled: true    
       bbtests:
         enabled: true
         cypress:
