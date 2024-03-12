@@ -869,11 +869,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "56.2.1-bb.3"
+    tag: "56.2.1-bb.9"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "56.2.1-bb.3"
+    tag: "56.2.1-bb.9"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -1640,11 +1640,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
-      tag: "9.5.1-bb.1"
+      tag: "9.5.1-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost"
-      tag: "9.5.1-bb.1"
+      tag: "9.5.1-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux: {}
