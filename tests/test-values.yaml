@@ -232,6 +232,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - mattermost/mattermost-cypress-test
           - minio/minio-instance-cypress-test
+          - minio-operator/minio-operator-cypress-test
           - monitoring/grafana-cypress-test
           - monitoring/monitoring-cypress-test
           - neuvector/neuvector-cypress-test
@@ -372,6 +373,7 @@ gatekeeper:
           - logging/loki-cypress-test
           - mattermost/mattermost-cypress-test
           - minio/minio-instance-cypress-test
+          - minio-operator/minio-operator-cypress-test
           - monitoring/grafana-cypress-test
           - monitoring/monitoring-cypress-test
           - neuvector/neuvector-cypress-test
@@ -560,6 +562,7 @@ kyvernoPolicies:
               - tempo
               - argocd
               - minio
+              - minio-operator
               - neuvector
               - harbor
               - fortify
@@ -598,6 +601,7 @@ kyvernoPolicies:
               - tempo
               - argocd
               - minio
+              - minio-operator
               - neuvector
               - harbor
               - fortify
@@ -652,6 +656,7 @@ kyvernoPolicies:
               - tempo
               - argocd
               - minio
+              - minio-operator
               - neuvector
               - harbor
               - fortify
@@ -1571,6 +1576,11 @@ addons:
 
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core
+    values:
+      console:
+        enabled: true
+      bbtests:
+        enabled: true
 
   minio:
     enabled: false
