@@ -46,6 +46,8 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
+openshift: {{ .Values.openshift }}
+
 imagePullSecrets:
 - name: private-registry
 
