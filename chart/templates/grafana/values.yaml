@@ -35,6 +35,12 @@ gitlabRunner:
 istio:
   {{- $grafanaInjection := dig "istio" "injection" "enabled" .Values.grafana }}
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    {{- if or (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (dig "values" "istio" "hardened" "enabled" false .Values.grafana) }}
+    enabled: true
+    {{- else }}
+    enabled: false
+    {{- end }}
   grafana:
     enabled: true
     gateways:

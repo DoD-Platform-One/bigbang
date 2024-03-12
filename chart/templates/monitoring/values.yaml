@@ -36,6 +36,12 @@ gitlabRunner:
 istio:
   {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    {{- if or (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (dig "values" "istio" "hardened" "enabled" false .Values.grafana) }}
+    enabled: true
+    {{- else }}
+    enabled: false
+    {{- end }}
   prometheus:
     enabled: true
     {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
