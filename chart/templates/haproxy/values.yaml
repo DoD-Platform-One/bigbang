@@ -102,4 +102,5 @@ containerPorts:
   http: 8080
 istio:
   enabled: {{ .Values.istio.enabled }}
+openshift: {{ .Values.openshift }}  
 {{- end -}}
