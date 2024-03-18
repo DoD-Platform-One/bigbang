@@ -1022,11 +1022,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "6.1.0-bb.3"
+      tag: "6.7.2-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "6.1.0-bb.3"
+      tag: "6.7.2-bb.0"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
