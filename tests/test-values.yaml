@@ -2307,6 +2307,9 @@ addons:
     # -- Toggle deployment of thanos
     enabled: false
     values:
+      istio:
+        hardened:
+          enabled: true
       minio:
         enabled: true
         tenant:

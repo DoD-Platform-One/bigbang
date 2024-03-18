@@ -2010,12 +2010,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
-      tag: "13.2.2-bb.0"
+      tag: "13.2.2-bb.1"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "13.2.2-bb.0"
+      tag: "13.2.2-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
