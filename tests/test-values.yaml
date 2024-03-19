@@ -1145,6 +1145,52 @@ twistlock:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
   values:
+    istio:
+      enabled: true
+      hardened:
+        enabled: true
+        customServiceEntries:
+          - name: "allow-npm-for-cypress-tests"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+              location: MESH_EXTERNAL
+              exportTo:
+                - "."
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-repo1-for-cypress"
+            enabled: true
+            spec:
+              hosts:
+                - 'repo1.dso.mil'
+              location: MESH_EXTERNAL
+              exportTo:
+                - "."
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-twistlock-for-cypress"
+            enabled: true
+            spec:
+              hosts:
+                - 'twistlock.bigbang.dev'
+              location: MESH_EXTERNAL
+              exportTo:
+                - "."
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     console:
       persistence:
         size: 5Gi
