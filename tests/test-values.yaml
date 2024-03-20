@@ -1571,9 +1571,8 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_anchore
     enterprise:
-      enabled: false
       licenseYaml: |
-       "TBD"
+        "TBD"
     values:
       ensureDbJobs:
         resources:
@@ -1601,97 +1600,87 @@ addons:
               cpu: 100m
               memory: 200Mi
             limits: {}
-      anchoreAnalyzer:
+      analyzer:
         replicaCount: 1
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreApi:
+      api:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreCatalog:
+      catalog:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchorePolicyEngine:
+      policyEngine:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreSimpleQueue:
+      simpleQueue:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreEngineUpgradeJob:
+      upgradeJob:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchore-feeds-db:
+      feeds:
+        enabled: true
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-        metrics:
+        feeds-db:
           resources:
             requests:
               cpu: 100m
               memory: 200Mi
             limits: {}
-      anchoreEnterpriseFeeds:
+          metrics:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 200Mi
+              limits: {}
+        feedsUpgradeJob:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits: {}
+      rbacManager:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreEnterpriseFeedsUpgradeJob:
+      reports:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreEnterpriseRbac:
-        authResources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-        managerResources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-      anchoreEnterpriseReports:
+      notifications:
         resources:
           requests:
             cpu: 100m
             memory: 200Mi
           limits: {}
-      anchoreEnterpriseNotifications:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-      anchoreEntperpiseUi:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
-      anchoreEnterpriseEngineUpgradeJob:
+      ui:
         resources:
           requests:
             cpu: 100m

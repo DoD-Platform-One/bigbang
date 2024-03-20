@@ -1520,11 +1520,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "1.27.4-bb.7"
+      tag: "2.0.2-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "1.27.4-bb.7"
+      tag: "2.0.2-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1536,10 +1536,7 @@ addons:
 
     # -- Anchore Enterprise functionality.
     enterprise:
-      # -- Toggle the installation of Anchore Enterprise.  This must be accompanied by a valid license.
-      enabled: false
-
-      # -- License for Anchore Enterprise.
+      # -- License for Anchore Enterprise. Enterprise is the only option available for the chart starting with chart major version 2.X.
       # For formatting examples see https://repo1.dso.mil/big-bang/product/packages/CHART.md#enabling-enterprise-services
       licenseYaml: |
         FULL LICENSE
