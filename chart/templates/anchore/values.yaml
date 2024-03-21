@@ -80,10 +80,9 @@ feeds:
     imagePullSecrets: private-registry
     {{- if and .Values.addons.anchore.database.host .Values.addons.anchore.database.port .Values.addons.anchore.database.username .Values.addons.anchore.database.password .Values.addons.anchore.database.feeds_database }}
     enabled: false
-    auth:
-      username: {{ .Values.addons.anchore.database.username }}
-      password: {{ .Values.addons.anchore.database.password }}
-      database: {{ .Values.addons.anchore.database.feeds_database }}
+    postgresUser: {{ .Values.addons.anchore.database.username }}
+    postgresPassword: {{ .Values.addons.anchore.database.password }}
+    postgresDatabase: {{ .Values.addons.anchore.database.feeds_database }}
     externalEndpoint: "{{ .Values.addons.anchore.database.host }}"
     postgresPort: {{ .Values.addons.anchore.database.port }}
     {{- end }}
