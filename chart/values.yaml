@@ -1824,11 +1824,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/vault.git
       path: "./chart"
-      tag: "0.25.0-bb.19"
+      tag: "0.25.0-bb.20"
     helmRepo:
       repoName: "registry1"
       chartName: "vault"
-      tag: "0.25.0-bb.19"
+      tag: "0.25.0-bb.20"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
     flux: {}
