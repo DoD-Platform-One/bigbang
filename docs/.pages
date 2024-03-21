@@ -1,5 +1,5 @@
 nav:
-  - Home: README.md
+  - Overview: README.md
   - Packages: packages.md
   - Developer: developer
   - Guides: guides
