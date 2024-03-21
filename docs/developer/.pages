@@ -1,5 +1,5 @@
 nav:
-  - Home: README.md
+  - Overview: README.md
   - AWS Dev Script: aws-k3d-script.md
   - CI Workflow: ci-workflow.md
   - Package Development: develop-package.md

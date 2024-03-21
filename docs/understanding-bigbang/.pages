@@ -1,5 +1,5 @@
 nav:
-  - Home: README.md
+  - Overview: README.md
   - Licensing Model: licensing-model.md
   - Configuration: configuration
   - Concepts: concepts

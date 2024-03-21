@@ -1,5 +1,5 @@
 nav:
-  - Home: README.md
+  - Overview: README.md
   - Database: database.md
   - Documentation: documentation.md
   - Flux: flux.md
