@@ -65,6 +65,13 @@ Package is the term we use for an application that has been prepared to be deplo
 1. Add a continuous integration (CI) pipeline to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library. Instructions are not repeated here.
 
 1. Documentation for the Package should be included. A "docs" directory would include all detailed documentation. Reference other that Packages for examples.
+    1. You should include a `DEVELOPMENT_MAINTENANCE.md` file in this directory. Outlined in this file should the following: 
+    
+       - How to update the package
+       - How to deploy the package in a test environment
+       - How to test the package
+       - A list of modifications that were made from the upstream chart
+
 
 1. Add the following markdown files to complete the Package. Reference other that Packages for examples of how to create them.
 
@@ -96,6 +103,7 @@ Package is the term we use for an application that has been prepared to be deplo
           ├── cypress/
           └── scripts/
     ├── docs/
+        ├── DEVELOPMENT_MAINTENANCE.md
         ├── documentation-file-1.md
         └── documentation-file-2.md
     ├── tests/
