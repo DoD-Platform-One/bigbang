@@ -15,6 +15,7 @@ Table of Contents:
   - [DNS](#dns)
   - [Secrets & Certificates](#secrets--certificates)
   - [Merge requests process](#merge-requests-process)
+  - [Security Consideration](#security-considerations)
   - [External Github Contributions](#community-contributions-to-dod-platform-one-via-github)
 
 ## Developers Guide
