@@ -71,6 +71,11 @@ postgresql:
   postgresPort: {{ .Values.addons.anchore.database.port }}
   {{- end }}
 
+{{- if .Values.addons.anchore.adminPassword }}
+anchoreConfig:
+  default_admin_password: {{ .Values.addons.anchore.adminPassword }}
+{{- end }}
+
 feeds:
   feeds-db:
     {{- if .Values.istio.enabled }}
