@@ -1110,11 +1110,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
-      tag: "5.0.13-bb.0"
+      tag: "5.0.14-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-operator"
-      tag: "5.0.13-bb.0"
+      tag: "5.0.14-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
