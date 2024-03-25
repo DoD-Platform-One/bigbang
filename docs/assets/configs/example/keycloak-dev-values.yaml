@@ -1,7 +1,7 @@
 comments: |
   This example values override file is provided FOR DEVELOPMENT/DEMO/TEST PURPOSES ONLY
 
-domain: bigbang.dev
+domain: dev.bigbang.mil
 
 flux:
   interval: 1m
@@ -28,7 +28,7 @@ addons:
     ingress:
       gateway: "passthrough"
 
-      # For development include the *.bigbang.dev cert from ./chart/ingress-certs.yaml
+      # For development include the *.dev.bigbang.mil cert from ./chart/ingress-certs.yaml
       # key: |
       #   -----BEGIN PRIVATE KEY-----
       #   INSERT KEY HERE
@@ -67,7 +67,7 @@ addons:
         - name: KC_HTTP_RELATIVE_PATH
           value: /auth
         - name: KC_HOSTNAME
-          value: keycloak.bigbang.dev
+          value: keycloak.dev.bigbang.mil
         - name: KC_HOSTNAME_STRICT
           value: "true"
         - name: KC_HOSTNAME_STRICT_HTTPS

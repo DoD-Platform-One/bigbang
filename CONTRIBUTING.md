@@ -71,9 +71,9 @@ Follow the [Big Bang documentation](./docs) for testing a full deployment of Big
 
 ## DNS
 
-To ease with local development, the TLD `bigbang.dev` is maintained by the Big Bang team with the CNAME record:
+To ease with local development, the TLD `dev.bigbang.mil` is maintained by the Platform One team with the CNAME record:
 
-`CNAME: *.bigbang.dev -> 127.0.0.1`
+`CNAME: *.dev.bigbang.mil -> cluster.local`
 
 All routable endpoints BigBang deploys will use the TLD of `bigbang.dev` by default.  It is expected that consumers modify this appropriately for their environment.
 
