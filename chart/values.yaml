@@ -1,5 +1,5 @@
 # -- Domain used for BigBang created exposed services, can be overridden by individual packages.
-domain: bigbang.dev
+domain: dev.bigbang.mil
 
 # -- (experimental) Toggle sourcing from external repos.
 # All this does right now is toggle GitRepositories, it is _not_ fully functional
@@ -1767,11 +1767,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "23.0.7-bb.1"
+      tag: "23.0.7-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
-      tag: "23.0.7-bb.1"
+      tag: "23.0.7-bb.2"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.

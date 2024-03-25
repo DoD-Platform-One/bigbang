@@ -831,26 +831,26 @@ if [[ "$METAL_LB" == true ]]; then
   run <<- 'ENDSSH'
   # run this command on remote
   # fix /etc/hosts for new cluster
-  sudo sed -i '/bigbang.dev/d' /etc/hosts
-  sudo bash -c "echo '## begin bigbang.dev section (METAL_LB)' >> /etc/hosts"
-  sudo bash -c "echo 172.20.1.240  keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
-  sudo bash -c "echo 172.20.1.241 anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
-  sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+  sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
+  sudo bash -c "echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts"
+  sudo bash -c "echo 172.20.1.240  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
+  sudo bash -c "echo 172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
+  sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
   # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-  kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+  kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
   kubectl delete pod -n kube-system -l k8s-app=kube-dns
 	ENDSSH
 elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
   run <<ENDSSH
     # run this command on remote
     # fix /etc/hosts for new cluster
-    sudo sed -i '/bigbang.dev/d' /etc/hosts
-    sudo bash -c "echo '## begin bigbang.dev section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
-    sudo bash -c "echo $PrivateIP2  keycloak.bigbang.dev vault.bigbang.dev >> /etc/hosts"
-    sudo bash -c "echo $PrivateIP anchore-api.bigbang.dev anchore.bigbang.dev argocd.bigbang.dev gitlab.bigbang.dev registry.bigbang.dev tracing.bigbang.dev kiali.bigbang.dev kibana.bigbang.dev chat.bigbang.dev minio.bigbang.dev minio-api.bigbang.dev alertmanager.bigbang.dev grafana.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev sonarqube.bigbang.dev tempo.bigbang.dev twistlock.bigbang.dev >> /etc/hosts"
-    sudo bash -c "echo '## end bigbang.dev section' >> /etc/hosts"
+    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
+    sudo bash -c "echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
+    sudo bash -c "echo $PrivateIP2  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo $PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
     # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.bigbang.dev vault.bigbang.dev' | kubectl apply -f -
+    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
     kubectl delete pod -n kube-system -l k8s-app=kube-dns
 ENDSSH
 fi
@@ -904,8 +904,8 @@ if [[ "$METAL_LB" == true ]]; then # using MetalLB
     echo "Edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with application hostnames."
     echo "Here is an example. You might have to change this depending on the number of gateways you configure for k8s cluster."
     echo "  # METALLB ISTIO INGRESS IPs"
-    echo "  172.20.1.240 keycloak.bigbang.dev vault.bigbang.dev"
-    echo "  172.20.1.241 sonarqube.bigbang.dev prometheus.bigbang.dev nexus.bigbang.dev gitlab.bigbang.dev"
+    echo "  172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil"
+    echo "  172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil"
   fi
 elif [[ "$PRIVATE_IP" == true ]]; then  # not using MetalLB
 	# Not using MetalLB and using private IP
@@ -913,16 +913,16 @@ elif [[ "$PRIVATE_IP" == true ]]; then  # not using MetalLB
   echo "  sshuttle --dns -vr ubuntu@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ~/.ssh/${KeyName}.pem'"
   echo
   echo "To access apps from a browser edit your /etc/hosts to add the private IP of your EC2 instance with application hostnames. Example:"
-  echo "  ${PrivateIP}  gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
+  echo "  ${PrivateIP}  gitlab.dev.bigbang.mil prometheus.dev.bigbang.mil kibana.dev.bigbang.mil"
   echo 
 else   # Not using MetalLB and using public IP. This is the default
   echo "To access apps from a browser edit your /etc/hosts to add the public IP of your EC2 instance with application hostnames."
   echo "Example:"
-  echo "  ${PublicIP} gitlab.bigbang.dev prometheus.bigbang.dev kibana.bigbang.dev"
+  echo "  ${PublicIP} gitlab.dev.bigbang.mil prometheus.dev.bigbang.mil kibana.dev.bigbang.mil"
   echo
 
   if [[ $SecondaryIP ]]; then
     echo "A secondary IP is available for use if you wish to have a passthrough ingress for Istio along with a public Ingress Gateway, this maybe useful for Keycloak x509 mTLS authentication."
-    echo "  $SecondaryIP  keycloak.bigbang.dev"
+    echo "  $SecondaryIP  keycloak.dev.bigbang.mil"
   fi
 fi

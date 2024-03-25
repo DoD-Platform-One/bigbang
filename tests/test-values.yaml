@@ -1,7 +1,7 @@
-domain: bigbang.dev
+domain: dev.bigbang.mil
 
 sso:
-  url: https://keycloak.bigbang.dev/auth/realms/baby-yoda
+  url: https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda
 
   # LetsEncrypt certificate authority
   certificateAuthority:
@@ -39,7 +39,7 @@ sso:
       -----END CERTIFICATE-----
   saml:
     # Retrieve from {{ .Values.sso.url }}/protocol/saml/descriptor
-    metadata: <md:EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://keycloak.bigbang.dev/auth/realms/baby-yoda"><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="signing"><ds:KeyInfo><ds:KeyName>4CK69bW66HE2wph9VuBs0fTc1MaETSTpU1iflEkBHR4</ds:KeyName><ds:X509Data><ds:X509Certificate>MIICoTCCAYkCBgF/iYn0azANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMzE0MTc0NDUzWhcNMzIwMzE0MTc0NjMzWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoCX4G1TCnZlWXvCLH/z6m5y/6NMrUv1AYVVbTaQ9iUWLR+uD44v1exIHUywkgQV+cMhn+my+9ZihmRWfOJuBWV8CM5BfIh685YulKVQrcGlYWcB877SjJBZKxyXITz7GnNOJ8vvlK9tK8OncldUFrhR2BXaqw2zvG733CKlDtyujaWmd7kQge/p4okx4bV4VBLYMmsjrJ004uvMcU4DekCFlGmEh3p3FhZorMf+1xHfi5DaCD4iCYZqRgsWEb8/Zmsx0+qi56P9YWhz1j2GUfHw0At8Dq5h7hoMJtYJMvVXWxkmPNVHtaJMOHt8iiBO7/a6SkI6ddf9Jotp2i6XEvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAJwSLJ0eybbeBYPvXnawqpy6JSXJ/MnnRvSGN9tXJ2+d/QXMOEPwJaAaOrvFtpUQxyPELJ8nU/Ukf7AL2zWltsCLiwtTrJkC+BpbZYkb1UsByveBS5wTPfiNkFzHeGg+MxBjiju2y04P4kEngXhQh4ZIUdi+WJjew721nJa/tjrMfnuEsMjxY/tWnzkk8xkGgaApZpGyaj1tOmVH4GR6CeBU6459m/GXmGH5TCGwT3EyfpZ189te+xV73WZR/r2nDlGuuy//w/P4JGHh4lcCwLfPcOOH30otcPAgctyX9Takk4MkVjva+b9S88sGaWPg075bxA2sysmkuqEOULjdXjU=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml/resolve" index="0"></md:ArtifactResolutionService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.bigbang.dev/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService></md:IDPSSODescriptor></md:EntityDescriptor>
+    metadata: <md:EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda"><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="signing"><ds:KeyInfo><ds:KeyName>4CK69bW66HE2wph9VuBs0fTc1MaETSTpU1iflEkBHR4</ds:KeyName><ds:X509Data><ds:X509Certificate>MIICoTCCAYkCBgF/iYn0azANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwHhcNMjIwMzE0MTc0NDUzWhcNMzIwMzE0MTc0NjMzWjAUMRIwEAYDVQQDDAliYWJ5LXlvZGEwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCoCX4G1TCnZlWXvCLH/z6m5y/6NMrUv1AYVVbTaQ9iUWLR+uD44v1exIHUywkgQV+cMhn+my+9ZihmRWfOJuBWV8CM5BfIh685YulKVQrcGlYWcB877SjJBZKxyXITz7GnNOJ8vvlK9tK8OncldUFrhR2BXaqw2zvG733CKlDtyujaWmd7kQge/p4okx4bV4VBLYMmsjrJ004uvMcU4DekCFlGmEh3p3FhZorMf+1xHfi5DaCD4iCYZqRgsWEb8/Zmsx0+qi56P9YWhz1j2GUfHw0At8Dq5h7hoMJtYJMvVXWxkmPNVHtaJMOHt8iiBO7/a6SkI6ddf9Jotp2i6XEvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAJwSLJ0eybbeBYPvXnawqpy6JSXJ/MnnRvSGN9tXJ2+d/QXMOEPwJaAaOrvFtpUQxyPELJ8nU/Ukf7AL2zWltsCLiwtTrJkC+BpbZYkb1UsByveBS5wTPfiNkFzHeGg+MxBjiju2y04P4kEngXhQh4ZIUdi+WJjew721nJa/tjrMfnuEsMjxY/tWnzkk8xkGgaApZpGyaj1tOmVH4GR6CeBU6459m/GXmGH5TCGwT3EyfpZ189te+xV73WZR/r2nDlGuuy//w/P4JGHh4lcCwLfPcOOH30otcPAgctyX9Takk4MkVjva+b9S88sGaWPg075bxA2sysmkuqEOULjdXjU=</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml/resolve" index="0"></md:ArtifactResolutionService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleLogoutService><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://keycloak.dev.bigbang.mil/auth/realms/baby-yoda/protocol/saml"></md:SingleSignOnService></md:IDPSSODescriptor></md:EntityDescriptor>
 
 flux:
   timeout: 20m
@@ -87,7 +87,7 @@ jaeger:
       enabled: true
       cypress:
         envs:
-          cypress_url: "https://tracing.bigbang.dev"
+          cypress_url: "https://tracing.dev.bigbang.mil"
           # uncomment following variables for sso keycloak testing in bb
           # cypress_tnr_username: "cypress"
           # cypress_tnr_password: "tnr_w!G33ZyAt@C8"
@@ -107,7 +107,7 @@ kiali:
             enabled: true
             spec:
               hosts:
-                - 'kiali.bigbang.dev'
+                - 'kiali.dev.bigbang.mil'
               location: MESH_EXTERNAL
               ports:
                 - number: 443
@@ -151,7 +151,7 @@ kiali:
       enabled: true
       cypress:
         envs:
-          cypress_url: 'https://kiali.bigbang.dev'
+          cypress_url: 'https://kiali.dev.bigbang.mil'
           cypress_check_data: 'true'
           # uncomment these next 3 lines if enabling the keycloak SSO integration test
           #cypress_keycloak_test_enable: "true"
@@ -178,9 +178,9 @@ clusterAuditor:
       enabled: true
       cypress:
         envs:
-          cypress_grafana_url: 'https://grafana.bigbang.dev'
-          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
-          cypress_url: 'https://grafana.bigbang.dev/d/YBgRZG6Mz/opa-violations?orgId=1'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
+          cypress_prometheus_url: 'https://prometheus.dev.bigbang.mil'
+          cypress_url: 'https://grafana.dev.bigbang.mil/d/YBgRZG6Mz/opa-violations?orgId=1'
 
 gatekeeper:
   enabled: false
@@ -415,8 +415,8 @@ kyvernoReporter:
       enabled: true
       cypress:
         envs:
-          cypress_grafana_url: https://grafana.bigbang.dev
-          cypress_prometheus_url: https://prometheus.bigbang.dev
+          cypress_grafana_url: https://grafana.dev.bigbang.mil
+          cypress_prometheus_url: https://prometheus.dev.bigbang.mil
           cypress_check_datasource: 'true'
         resources:
           requests:
@@ -832,7 +832,7 @@ elasticsearchKibana:
         artifacts: true
         envs:
           cypress_expect_logs: "true"
-          cypress_kibana_url: "https://kibana.bigbang.dev"
+          cypress_kibana_url: "https://kibana.dev.bigbang.mil"
 
 fluentbit:
   enabled: false
@@ -907,7 +907,7 @@ loki:
             enabled: true
             spec:
               hosts:
-                - 'grafana.bigbang.dev' 
+                - 'grafana.dev.bigbang.mil' 
               location: MESH_EXTERNAL
               ports:
                 - number: 443
@@ -955,7 +955,7 @@ loki:
       cypress:
         envs:
           cypress_check_datasource: 'true'
-          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
       scripts:
         envs:
           LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
@@ -980,10 +980,10 @@ tempo:
       cypress:
         artifacts: true
         envs:
-          cypress_url: 'https://tempo.bigbang.dev'
+          cypress_url: 'https://tempo.dev.bigbang.mil'
           cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3100'
           cypress_check_datasource: 'true'
-          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
           # uncomment following variables for sso keycloak testing in bb
           #cypress_tnr_username: "cypress"
           #cypress_tnr_password: "tnr_w!G33ZyAt@C8"
@@ -1060,9 +1060,9 @@ monitoring:
       cypress:
         envs:
           cypress_bigbang_integration: 'true'
-          cypress_prometheus_url: 'https://prometheus.bigbang.dev'
-          cypress_grafana_url: 'https://grafana.bigbang.dev'
-          cypress_alertmanager_url: 'https://alertmanager.bigbang.dev'
+          cypress_prometheus_url: 'https://prometheus.dev.bigbang.mil'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
+          cypress_alertmanager_url: 'https://alertmanager.dev.bigbang.mil'
           cypress_check_istio_dashboards: 'true'
           cypress_keycloak_test_enable: 'false'
           cypress_tnr_username: "cypress"
@@ -1146,7 +1146,7 @@ grafana:
       cypress:
         artifacts: true
         envs:
-          cypress_grafana_url: 'https://grafana.bigbang.dev'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
 
 neuvector:
   values:
@@ -1197,7 +1197,7 @@ neuvector:
       cypress:
         artifacts: true
         envs:
-          cypress_url: https://neuvector.bigbang.dev
+          cypress_url: https://neuvector.dev.bigbang.mil
         resources:
           requests:
             cpu: "2"
@@ -1266,7 +1266,7 @@ twistlock:
       enabled: true
       scripts:
         envs:
-          twistlock_host: "https://twistlock.bigbang.dev"
+          twistlock_host: "https://twistlock.dev.bigbang.mil"
 
 # Addons are toggled based on labels in CI
 addons:
@@ -1333,7 +1333,7 @@ addons:
         enabled: true
         cypress:
           envs:
-            cypress_url: "https://argocd.bigbang.dev"
+            cypress_url: "https://argocd.dev.bigbang.mil"
           resources:
             requests:
               cpu: 2
@@ -1352,7 +1352,7 @@ addons:
     enabled: false
     chains:
       minimal:
-        callback_uri: "https://minimal.bigbang.dev"
+        callback_uri: "https://minimal.dev.bigbang.mil"
     values:
       istio:
         hardened:
@@ -1449,7 +1449,7 @@ addons:
         enabled: true
         cypress: # note `cypress:*`` is different than in the fortify chart test-values.yaml
           envs:
-            cypress_url: "https://fortify.bigbang.dev"
+            cypress_url: "https://fortify.dev.bigbang.mil"
 
   haproxy:
     values:
@@ -1548,12 +1548,12 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_url: https://gitlab.bigbang.dev
+            cypress_url: https://gitlab.dev.bigbang.mil
         scripts:
           envs:
-            GITLAB_REPOSITORY: https://gitlab.bigbang.dev
-            GITLAB_ORIGIN: https://testuser:Password123h56a78@gitlab.bigbang.dev
-            GITLAB_REGISTRY: registry.bigbang.dev
+            GITLAB_REPOSITORY: https://gitlab.dev.bigbang.mil
+            GITLAB_ORIGIN: https://testuser:Password123h56a78@gitlab.dev.bigbang.mil
+            GITLAB_REGISTRY: registry.dev.bigbang.mil
 
   gitlabRunner:
     enabled: false
@@ -1581,10 +1581,10 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_url: "https://gitlab.bigbang.dev"
+            cypress_url: "https://gitlab.dev.bigbang.mil"
             cypress_gitlab_first_name: "testrunner"
             cypress_gitlab_last_name: "userrunner"
-            cypress_gitlab_email: "gitlab@bigbang.dev"
+            cypress_gitlab_email: "gitlab@dev.bigbang.mil"
             cypress_gitlab_username: "gitlabrunner_user"
             cypress_gitlab_password: "Runner_PaSsw0rd123"
             cypress_gitlab_project: "runner-hello-world"
@@ -1726,7 +1726,7 @@ addons:
         enabled: true
         scripts:
           envs:
-            ANCHORE_CLI_URL: "https://anchore-api.bigbang.dev/v1"
+            ANCHORE_CLI_URL: "https://anchore-api.dev.bigbang.mil/v1"
 
   sonarqube:
     enabled: false
@@ -1761,8 +1761,8 @@ addons:
         enabled: true
         cypress:
           envs:
-            cypress_url: "https://sonarqube.bigbang.dev"
-            cypress_url_setup: "https://sonarqube.bigbang.dev/setup"
+            cypress_url: "https://sonarqube.dev.bigbang.mil"
+            cypress_url_setup: "https://sonarqube.dev.bigbang.mil/setup"
       account:
         adminPassword: new_admin_password
         currentAdminPassword: admin
@@ -1771,6 +1771,9 @@ addons:
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core
     values:
+      istio:
+        console:
+          enabled: false
       console:
         enabled: true
       bbtests:
@@ -1807,11 +1810,11 @@ addons:
         enabled: true
         cypress:
           envs:
-            cypress_url: 'https://minio.bigbang.dev/login'
+            cypress_url: 'https://minio.dev.bigbang.mil/login'
         scripts:
           envs:
             MINIO_PORT: ''
-            MINIO_HOST: 'https://minio-api.bigbang.dev'
+            MINIO_HOST: 'https://minio-api.dev.bigbang.mil'
     istio:
       enabled: true
       hardened:
@@ -1890,12 +1893,12 @@ addons:
         enabled: true
         cypress:
           envs:
-            cypress_url: https://chat.bigbang.dev
+            cypress_url: https://chat.dev.bigbang.mil
 
   nexusRepositoryManager:
     enabled: false
     # Nexus requires manual configuration in Keycloak client and cannot be tested with
-    # you must test with your own dev deployment.  Example: keycloak.bigbang.dev
+    # you must test with your own dev deployment.  Example: keycloak.dev.bigbang.mil
     # See more info in Nexus Package docs /docs/keycloak.md
     # Nexus SSO is behind a paywall. You must have a valid license to enable SSO
     # -- Base64 encoded license file.
@@ -1905,7 +1908,7 @@ addons:
       # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
       enabled: false
       idp_data:
-        entityId: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
+        entityId: "https://nexus.dev.bigbang.mil/service/rest/v1/security/saml/metadata"
         # -- IdP Field Mappings
         # -- NXRM username attribute
         username: "username"
@@ -1929,7 +1932,7 @@ addons:
             - "nx-admin"
     # NexusNotes: |
     #   Login to Nexus Admin UI and then get the x509 certificate from this path
-    #     https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata
+    #     https://nexus.dev.bigbang.mil/service/rest/v1/security/saml/metadata
     #   copy and paste the nexus single line certificate into a text file and save it
     #     vi nexus-x509.txt
     #     -----BEGIN CERTIFICATE-----
@@ -1956,7 +1959,7 @@ addons:
         docker:
           enabled: true
           registries:
-            - host: containers.bigbang.dev
+            - host: containers.dev.bigbang.mil
               port: 5000
         repository:
           enabled: true
@@ -1985,10 +1988,10 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_nexus_url: "https://nexus.bigbang.dev"
+            cypress_nexus_url: "https://nexus.dev.bigbang.mil"
         scripts:
           envs:
-            docker_host: "containers.bigbang.dev"
+            docker_host: "containers.dev.bigbang.mil"
 
   velero:
     enabled: false
@@ -2006,7 +2009,7 @@ addons:
           config:
             region: velero
             s3ForcePathStyle: "true"
-            s3Url: https://minio-api.bigbang.dev
+            s3Url: https://minio-api.dev.bigbang.mil
         volumeSnapshotLocation:
         - name: default
           provider: aws
@@ -2024,7 +2027,7 @@ addons:
         enabled: true
         scripts:
           envs:
-            MINIO_HOST: https://minio-api.bigbang.dev
+            MINIO_HOST: https://minio-api.dev.bigbang.mil
 
   keycloak:
     enabled: false
@@ -2043,7 +2046,7 @@ addons:
         enabled: true
         cypress:
           envs:
-            cypress_url: "https://keycloak.bigbang.dev"
+            cypress_url: "https://keycloak.dev.bigbang.mil"
       command:
         - "/opt/keycloak/bin/kc.sh"
       args:
@@ -2067,7 +2070,7 @@ addons:
         - name: KC_HTTPS_TRUST_STORE_PASSWORD
           value: password
         - name: KC_HOSTNAME
-          value: keycloak.bigbang.dev
+          value: keycloak.dev.bigbang.mil
         - name: KC_HOSTNAME_STRICT
           value: "true"
         - name: KC_HOSTNAME_STRICT_HTTPS
@@ -2187,7 +2190,7 @@ addons:
         ha:
           enabled: true
           replicas: 1
-          apiAddr: "https://vault.bigbang.dev"
+          apiAddr: "https://vault.dev.bigbang.mil"
           raft:
             enabled: true
             config: |
@@ -2211,7 +2214,7 @@ addons:
                   leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
                   leader_client_cert_file = "/vault/tls/tls.crt"
                   leader_client_key_file = "/vault/tls/tls.key"
-                  leader_tls_servername = "vault.bigbang.dev"
+                  leader_tls_servername = "vault.dev.bigbang.mil"
                 }
               }
 
@@ -2236,7 +2239,7 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_vault_url: "https://vault.bigbang.dev"
+            cypress_vault_url: "https://vault.dev.bigbang.mil"
 
   metricsServer:
     enabled: false
@@ -2263,7 +2266,7 @@ addons:
           enabled: false
       internalTLS:
         enabled: false
-      externalURL: https://harbor.bigbang.dev
+      externalURL: https://harbor.dev.bigbang.mil
       nginx:
         resources:
           requests:
@@ -2396,11 +2399,11 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_url: "https://harbor.bigbang.dev"
+            cypress_url: "https://harbor.dev.bigbang.mil"
         scripts:
           image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
           envs:
-            HARBOR_REGISTRY: "harbor.bigbang.dev"
+            HARBOR_REGISTRY: "harbor.dev.bigbang.mil"
 
   # ----------------------------------------------------------------------------------------------------------------------
   # Thanos
@@ -2442,13 +2445,13 @@ addons:
         cypress:
           artifacts: true
           envs:
-            cypress_url: "https://thanos.bigbang.dev"
+            cypress_url: "https://thanos.dev.bigbang.mil"
             cypress_prometheus_integration_enabled: "true"
             cypress_objstorage_integration_enabled: "true"
         scripts:
           image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
           envs:
-            THANOS_REGISTRY: "thanos.bigbang.dev"
+            THANOS_REGISTRY: "thanos.dev.bigbang.mil"
       objstoreConfig: |-
         type: s3
         config:
