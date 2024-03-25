@@ -8,16 +8,16 @@ comments: |
 
   Here are some of the URL paths that are available in Keycloak 
   Admin UI. Default credentials for development are admin:password  
-  https://keycloak.bigbang.dev/auth/admin   
+  https://keycloak.dev.bigbang.mil/auth/admin   
   User registration and/or account page  
-  https://keycloak.bigbang.dev/  
+  https://keycloak.dev.bigbang.mil/  
   
   For an example "baby-yoda" keycloak realm file that already has sso clients configured see
     https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/chart/resources/dev/baby-yoda.json
   Within the Keycloak Admin Console UI import your custom realm.json file. 
 
 
-domain: bigbang.dev
+domain: dev.bigbang.mil
 
 flux:
   interval: 1m
@@ -87,7 +87,7 @@ addons:
         - name: KC_HTTP_RELATIVE_PATH
           value: /auth
         - name: KC_HOSTNAME
-          value: keycloak.bigbang.dev
+          value: keycloak.dev.bigbang.mil
         - name: KC_HOSTNAME_STRICT
           value: "true"
         - name: KC_HOSTNAME_STRICT_HTTPS
