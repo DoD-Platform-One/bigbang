@@ -103,7 +103,7 @@ kiali:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-kiali-dashboard-for-cypress-tests"
+          - name: "allow-kiali-dashboard-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -114,7 +114,7 @@ kiali:
                   protocol: TLS
                   name: https
               resolution: DNS
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -429,7 +429,7 @@ kyvernoReporter:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -461,7 +461,7 @@ kyvernoReporter:
             enabled: true
             spec:
               hosts:
-                - 'prometheus.bigbang.dev'
+                - 'prometheus.dev.bigbang.mil'
               location: MESH_EXTERNAL
               exportTo:
                 - "."
@@ -801,6 +801,18 @@ elasticsearchKibana:
     istio:
       hardened:
         enabled: true
+        customServiceEntries:
+          - name: "allow-kibana-for-cypress"
+            enabled: true
+            spec:
+              hosts:
+                - 'kibana.dev.bigbang.mil'                
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     elasticsearch:
       master:
         count: 1
@@ -841,7 +853,7 @@ fluentbit:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -879,7 +891,7 @@ loki:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -1080,7 +1092,7 @@ grafana:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -1108,7 +1120,7 @@ grafana:
             enabled: true
             spec:
               hosts:
-                - 'grafana.bigbang.dev'
+                - 'grafana.dev.bigbang.mil'
               location: MESH_EXTERNAL
               ports:
                 - number: 443
@@ -1157,7 +1169,7 @@ neuvector:
      hardened:
        enabled: true
        customServiceEntries:
-         - name: "allow-npm-for-cypress-tests"
+         - name: "allow-npm-for-cypress"
            enabled: true
            spec:
              hosts:
@@ -1185,7 +1197,7 @@ neuvector:
            enabled: true
            spec:
              hosts:
-               - 'neuvector.bigbang.dev'
+               - 'neuvector.dev.bigbang.mil'
              location: MESH_EXTERNAL
              ports:
                - number: 443
@@ -1217,7 +1229,7 @@ twistlock:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "allow-npm-for-cypress"
             enabled: true
             spec:
               hosts:
@@ -1249,7 +1261,7 @@ twistlock:
             enabled: true
             spec:
               hosts:
-                - 'twistlock.bigbang.dev'
+                - 'twistlock.dev.bigbang.mil'
               location: MESH_EXTERNAL
               exportTo:
                 - "."
