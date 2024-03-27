@@ -33,14 +33,14 @@ flowchart LR
     end
 
     subgraph PE[Policy Enforcement]
-      subgraph CA[Default]
-      direction BT
-        ClusterAuditor --> OPA[OPA Gatekeeper]
-      end
-      subgraph KyvernoStack[Alternative]
-      style KyvernoStack stroke-dasharray: 10 10
+      subgraph KyvernoStack[Default]
       direction BT
         KyvernoReporter[Kyverno Reporter*] --> Kyverno[Kyverno*]
+      end
+      subgraph CA[Alternative]
+      style CA stroke-dasharray: 10 10
+      direction BT
+        ClusterAuditor --> OPA[OPA Gatekeeper]
       end
     end
 
