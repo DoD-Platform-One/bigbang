@@ -1364,7 +1364,7 @@ addons:
     enabled: false
     chains:
       minimal:
-        callback_uri: "https://minimal.dev.bigbang.mil"
+        callback_uri: "https://minimal.dev.bigbang.mil/login"
     values:
       istio:
         hardened:
