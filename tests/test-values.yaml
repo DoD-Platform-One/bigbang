@@ -1274,6 +1274,10 @@ twistlock:
       persistence:
         size: 5Gi
       localVolumeUpgrade: true
+    defender:
+      enabled: true
+      dockerSocket: "/run/k3s/containerd/containerd.sock"
+      selinux: false
     bbtests:
       enabled: true
       scripts:
