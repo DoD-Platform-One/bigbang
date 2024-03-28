@@ -99,7 +99,7 @@ The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you 
 
 From the bigbang directory deploy BigBang via helm
 ```shell
-helm upgrade -i bigbang chart/ -n bigbang --create-namespace --set registryCredentials.username=XXXXX --set registryCredentials.password='XXXXX' -f chart/values.yaml
+helm upgrade -i bigbang chart/ -n bigbang --create-namespace --set registryCredentials.username=XXXXX --set registryCredentials.password='XXXXX' -f chart/ingress-certs.yaml -f chart/values.yaml
 ```
 
 Overrides can be supplemented by adding references to the specific yaml file, the right-most values file will take highest precedence: 
