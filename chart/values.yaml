@@ -1466,13 +1466,13 @@ addons:
       gateway: ""
 
     sso:
-      # -- Toggle SSO for Harbor on and off
+      # -- Toggle SSO for Fortify on and off
       enabled: false
 
-      # -- OIDC Client ID to use for Harbor
+      # -- SAML Client ID to use for Fortify
       client_id: ""
 
-      # -- OIDC Client Secret to use for Harbor
+      # -- SAML Client Secret to use for Fortify
       client_secret: ""
 
     # -- Values to passthrough to the fortify chart: https://repo1.dso.mil/big-bang/product/packages/fortify.git
