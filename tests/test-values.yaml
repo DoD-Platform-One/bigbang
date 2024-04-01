@@ -1400,6 +1400,9 @@ addons:
     sso:
       enabled: false
     values:
+      istio:
+        hardened:
+          enabled: true    
       storage:
         volume: 5Gi
       jvmMaxRAMPercentage: 85
