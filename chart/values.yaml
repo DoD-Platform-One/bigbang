@@ -696,11 +696,11 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "5.42.0-bb.10"
+    tag: "5.42.0-bb.11"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
-    tag: "5.42.0-bb.10"
+    tag: "5.42.0-bb.11"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
