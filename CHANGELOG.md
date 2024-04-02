@@ -3,6 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [2.24.0]
+
+- [!2.24.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.24.0); List of merge requests in this release.
+
+## [2.23.1]
+
+- [!2.23.1](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.23.1); List of merge requests in this release.
+
 ## [2.23.0]
 
 - [!2.23.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.23.0); List of merge requests in this release.
