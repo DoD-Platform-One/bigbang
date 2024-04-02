@@ -1043,9 +1043,75 @@ monitoring:
     alertmanager:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
   values:
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits: {}
     istio:
       hardened:
         enabled: true
+        customServiceEntries:
+          - name: "allow-npm-for-cypress-tests-monitoring"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-repo1-for-cypress-monitoring"
+            enabled: true
+            spec:
+              hosts:
+                - 'repo1.dso.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-prometheus-for-cypress-monitoring"
+            enabled: true
+            spec:
+              hosts:
+                - 'prometheus.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-grafana-for-cypress-monitoring"
+            enabled: true
+            spec:
+              hosts:
+                - 'grafana.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+          - name: "allow-alertmanager-for-cypress-monitoring"
+            enabled: true
+            spec:
+              hosts:
+                - 'alertmanager.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     prometheus:
       prometheusSpec:
         replicas: 1
