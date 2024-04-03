@@ -103,34 +103,14 @@ kiali:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-kiali-dashboard-for-cypress"
+          - name: "cypress-service-entries-kiali"
             enabled: true
             spec:
               hosts:
                 - 'kiali.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-npm-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
               location: MESH_EXTERNAL
               ports:
@@ -429,38 +409,14 @@ kyvernoReporter:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-kyvernoreporter"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              exportTo:
-                - "."
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              exportTo:
-                - "."
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-grafana-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'prometheus.dev.bigbang.mil'
               location: MESH_EXTERNAL
               exportTo:
@@ -802,7 +758,7 @@ elasticsearchKibana:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-kibana-for-cypress"
+          - name: "cypress-service-entries-elasticsearchkibana"
             enabled: true
             spec:
               hosts:
@@ -853,30 +809,19 @@ fluentbit:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-fluentbit"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
               location: MESH_EXTERNAL
               ports:
                 - number: 443
                   protocol: TLS
                   name: https
-              resolution: DNS
 
     securityContext:
       privileged: true
@@ -891,34 +836,14 @@ loki:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-loki"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-grafana-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'grafana.dev.bigbang.mil' 
               location: MESH_EXTERNAL
               ports:
@@ -1055,56 +980,16 @@ monitoring:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests-monitoring"
+          - name: "cypress-service-entries-monitoring"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress-monitoring"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-prometheus-for-cypress-monitoring"
-            enabled: true
-            spec:
-              hosts:
                 - 'prometheus.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-grafana-for-cypress-monitoring"
-            enabled: true
-            spec:
-              hosts:
                 - 'grafana.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-alertmanager-for-cypress-monitoring"
-            enabled: true
-            spec:
-              hosts:
                 - 'alertmanager.dev.bigbang.mil'
               location: MESH_EXTERNAL
               ports:
@@ -1158,34 +1043,14 @@ grafana:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-grafana"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-grafana-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'grafana.dev.bigbang.mil'
               location: MESH_EXTERNAL
               ports:
@@ -1235,34 +1100,14 @@ neuvector:
      hardened:
        enabled: true
        customServiceEntries:
-         - name: "allow-npm-for-cypress"
+         - name: "cypress-service-entries-neuvector"
            enabled: true
            spec:
              hosts:
                - 'registry.npmjs.org'
                - 'download.cypress.io'
                - 'cdn.cypress.io'
-             location: MESH_EXTERNAL
-             ports:
-               - number: 443
-                 protocol: TLS
-                 name: https
-             resolution: DNS
-         - name: "allow-repo1-for-cypress"
-           enabled: true
-           spec:
-             hosts:
                - 'repo1.dso.mil'
-             location: MESH_EXTERNAL
-             ports:
-               - number: 443
-                 protocol: TLS
-                 name: https
-             resolution: DNS
-         - name: "allow-neuvector-for-cypress"
-           enabled: true
-           spec:
-             hosts:
                - 'neuvector.dev.bigbang.mil'
              location: MESH_EXTERNAL
              ports:
@@ -1295,38 +1140,14 @@ twistlock:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-twistlock"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              exportTo:
-                - "."
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              exportTo:
-                - "."
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-twistlock-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'twistlock.dev.bigbang.mil'
               location: MESH_EXTERNAL
               exportTo:
@@ -2084,30 +1905,14 @@ addons:
       hardened:
         enabled: true
         customServiceEntries:
-          - name: "allow-npm-for-cypress-tests"
+          - name: "cypress-service-entries-velero"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
 
     enabled: false
     plugins:
@@ -2608,23 +2413,13 @@ addons:
         hardened:
           enabled: true
           customServiceEntries:
-          - name: "allow-npm-for-cypress"
+          - name: "cypress-service-entries-eckoperator"
             enabled: true
             spec:
               hosts:
                 - 'registry.npmjs.org'
                 - 'download.cypress.io'
                 - 'cdn.cypress.io'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-          - name: "allow-repo1-for-cypress"
-            enabled: true
-            spec:
-              hosts:
                 - 'repo1.dso.mil'
               location: MESH_EXTERNAL
               ports:
