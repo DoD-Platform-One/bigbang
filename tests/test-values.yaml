@@ -1477,6 +1477,13 @@ addons:
       bbtests:
         enabled: true
         cypress:
+          resources:
+            requests:
+              cpu: 2
+              memory: 4Gi
+            limits:
+              cpu: 4
+              memory: 6Gi
           artifacts: true
           envs:
             cypress_url: "https://gitlab.dev.bigbang.mil"
