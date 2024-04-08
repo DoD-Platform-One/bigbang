@@ -52,6 +52,10 @@ This stage runs a `helm conftest` which is a plugin for testing helm charts with
 
 This stage also validates the oscal-component.yaml and checks for api deprecations within the package.
 
+### Validate MR
+
+This stage checks the MR description to ensure the `## Upgrade Notices` section contains information that is not the default `(Include any relevant notes about upgrades here or write "N/A" if there are none)`. This section is required to be filled out as if an upgrade notice is present, r2d2 will pull it into the Release Notes for the corresponding milestone. These Notices should be seen and written as customer facing when a template/secret/value name is updated that may require users to alter their configuration, this is not meant for internal or CI facing notes.
+
 ### Package Tests
 
 This stage verifies several easy to check assumptions such as:
@@ -73,6 +77,10 @@ This stage is triggered when a protected tag is created. It is responsible for p
 ### Release
 
 Upon successful completion of the package stage this release stage will use those artifacts and run the gitlab release-cli utility to publish the release.
+
+### Creating Big Bang Merge Request
+
+Post merge to the default branch and tag creation above, the last step of the package release stage will perform `Creating Big Bang Merge Request` which will pull down information from the package MR and auto increment the package's `git/helmRepo.tag` value along with pulling in the CHANGELOG and linking the package merge request. This stage can be skipped by adding `skip-bb-mr` label to the package MR pre-tag/release pipeline if a BigBang MR is already opened that will be manually updated to include the new tag.
 
 ## BigBang Pipeline Stages
 
