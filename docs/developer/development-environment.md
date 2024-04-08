@@ -22,4 +22,5 @@ There is a script that automates the creation and teardown of a remote k3d devel
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [AWS cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [jq](https://stedolan.github.io/jq/download/)
+- [KPT pre v1](https://github.com/kptdev/kpt/releases/tag/v0.39.2)
 - optional: [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
