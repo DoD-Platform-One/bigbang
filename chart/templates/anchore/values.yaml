@@ -77,6 +77,10 @@ anchoreConfig:
 {{- end }}
 
 feeds:
+  istio:
+    enabled: {{ .Values.istio.enabled }}
+    injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
+
   feeds-db:
     {{- if .Values.istio.enabled }}
     podAnnotations:
