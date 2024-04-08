@@ -25,6 +25,7 @@ Additional information can be found in the [Big Bang Docs](./docs/README.md).
 ## Getting Started
 
 - You will need to instantiate a Big Bang environment tailored to your needs.  [The Big Bang customer template](https://repo1.dso.mil/big-bang/customers/template) is provided for you to copy into your own Git repository and begin modifications.
+- There is a [Quick Start guide](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/quickstart.md) to be used as an example deployment scenario. 
 
 ## Contributing to Big Bang
 
