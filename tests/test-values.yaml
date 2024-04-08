@@ -871,6 +871,8 @@ loki:
                   protocol: TLS
                   name: https
               resolution: DNS
+        minioOperator:
+          enabled: true
 
     minio:
       enabled: true
