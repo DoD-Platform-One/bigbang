@@ -19,7 +19,7 @@ As part of your MR that modifies istio you will need to run bigbang tests agains
 1. Stage your changes `git add -A`
 1. Commit your changes `git commit -m "prepping for test"`
 1. Push your changes `git push -u origin my-bigbang-branch-for-testing`
-1. Create the bigbang MR as a draft with `TEST ONLY DO NOT MERGE` in the title
+1. Create the bigbang MR as a draft with `TEST ONLY DO NOT MERGE` in the title, and add the label of the package to test, e.g. `monitoring`
 1. Wait for tests to finish, and do fixes on your package branch as needed until they pass
 1. Close the bigbang MR by deleting the bigbang branch `git push -d origin my-bigbang-branch-for-testing`
 1. Link the bigbang MR on your package MR as evidence of your package working in bigbang
