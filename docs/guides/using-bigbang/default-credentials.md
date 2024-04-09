@@ -29,3 +29,4 @@ The applications in the table below provide both SSO and built in auth. The tabl
 | Mattermost | N/A | N/A | Prompted to setup an account when you first hit the virtual service - this user becomes admin, no default user |
 | Keycloak | `admin` | `password` | Default username and password can be overridden with Helm values `addons.keycloak.values.secrets.credentials.stringData.adminuser` and `addons.keycloak.values.secrets.credentials.stringData.password` respectively |
 | Neuvector | `admin` | `admin` | You should change the default password when you log into Neuvector. Can also be changed via the chart at the `controller.secret.data.userinitcfg.yaml` key, see the [upstream docs for more details and examples](https://open-docs.neuvector.com/deploying/production/configmap).|
+| Harbor | `admin` | `Harbor12345` | Default password can be overridden with Helm values `addons.harbor.values.harborAdminPassword` |
