@@ -702,6 +702,7 @@ policies:
       - velero
       - minio
       - minio-operator
+      - kyverno-reporter
       - kyverno
       - velero
       - neuvector
