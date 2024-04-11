@@ -16,6 +16,9 @@ istio:
       proxyMetadata:
         ISTIO_META_DNS_CAPTURE: "true"
         ISTIO_META_DNS_AUTO_ALLOCATE: "true"
+    bbtests:
+      cypress:
+        artifacts: false
 
 neuvector:
   values:
@@ -23,6 +26,9 @@ neuvector:
       enabled: false
     containerd:
       enabled: true
+    bbtests:
+      cypress:
+        artifacts: false
 
 clusterAuditor:
   values:
@@ -31,6 +37,9 @@ clusterAuditor:
         cpu: 300m
         memory: 300Mi
       limits: null
+    bbtests:
+      cypress:
+        artifacts: false
     
 gatekeeper:
   values:
@@ -41,6 +50,9 @@ gatekeeper:
         requests:
           cpu: 175m
           memory: 512Mi
+    bbtests:
+      cypress:
+        artifacts: false
 
 kyverno:
   values:
@@ -50,9 +62,15 @@ kyverno:
       requests:
         cpu: 500m
         memory: 384Mi
+    bbtests:
+      cypress:
+        artifacts: false
 
 elasticsearchKibana:
   values:
+    bbtests:
+      cypress:
+        artifacts: false
     elasticsearch:
       master:
         count: 1
@@ -73,6 +91,9 @@ elasticsearchKibana:
 
 loki:
   values:
+    bbtests:
+      cypress:
+        artifacts: false
     loki-simple-scalable:
       write:
         resources:
@@ -83,6 +104,9 @@ loki:
 
 tempo:
   values:
+    bbtests:
+      cypress:
+        artifacts: false
     tempo:
       resources:
         limits: null
@@ -106,6 +130,9 @@ tempo:
 
 monitoring:
   values:
+    bbtests:
+      cypress:
+        artifacts: false
     prometheus:
       prometheusSpec:
         additionalScrapeConfigs: []
@@ -146,14 +173,38 @@ monitoring:
 
 twistlock:
   values:
+    bbtests:
+      cypress:
+        artifacts: false
     console:
       persistence:
         size: 5Gi
+
+jaeger:
+  values:
+    bbtests:
+      cypress:
+        artifacts: false
+
+kiali:
+  values:
+    bbtests:
+      cypress:
+        artifacts: false
+
+grafana:
+  values:
+    bbtests:
+      cypress:
+        artifacts: false
 
 # Addons are toggled based on labels in CI
 addons:
   argocd:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       controller:
         resources:
           requests:
@@ -194,6 +245,9 @@ addons:
 
   authservice:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       resources:
         requests:
           cpu: 100m
@@ -211,6 +265,9 @@ addons:
     flux:
       timeout: 30m
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       gitlab-runner:
         resources:
           requests:
@@ -271,6 +328,9 @@ addons:
 
   gitlabRunner:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       resources:
         requests:
           memory: 128Mi
@@ -279,6 +339,9 @@ addons:
 
   anchore:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       ensureDbJobs:
         resources:
           requests:
@@ -403,6 +466,9 @@ addons:
     
   sonarqube:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       resources:
         requests:
           cpu: 200m
@@ -421,6 +487,9 @@ addons:
 
   minio:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       tenant:
         pools:
         - servers: 3
@@ -443,6 +512,9 @@ addons:
 
   mattermost:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       postgresql:
         persistence:
           size: 256Mi
@@ -474,6 +546,9 @@ addons:
             
   nexusRepositoryManager:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       persistence:
         # Do NOT set this below 5Gi, nexus will fail to boot
         storageSize: 5Gi
@@ -486,9 +561,35 @@ addons:
   
   keycloak:
     values:
+      bbtests:
+        cypress:
+          artifacts: false
       resources:
         requests:
           cpu: 100m
           memory: 256Mi
         limits: null
 
+  harbor:
+    values:
+      bbtests:
+        cypress:
+          artifacts: false
+    
+  holocron:
+    values:
+      bbtests:
+        cypress:
+          artifacts: false
+
+  fortify:
+    values:
+      bbtests:
+        cypress:
+          artifacts: false
+
+  minioOperator:
+    values:
+      bbtests:
+        cypress:
+          artifacts: false
