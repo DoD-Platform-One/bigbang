@@ -1287,6 +1287,7 @@ addons:
             requests:
               cpu: 2
               memory: 2Gi
+        istio:
           sidecar:
             resources:
               cpu:
@@ -1764,6 +1765,24 @@ addons:
                   - source:
                       namespaces:
                       - minio-operator
+          customServiceEntries:
+            - name: "cypress-service-entries-minio-operator"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'minio-operator.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                exportTo:
+                  - "."
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
 
   minio:
     enabled: false
