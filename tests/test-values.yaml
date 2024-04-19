@@ -833,6 +833,13 @@ elasticsearchKibana:
         envs:
           cypress_expect_logs: "true"
           cypress_kibana_url: "https://kibana.dev.bigbang.mil"
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
 
 eckOperator:
   values:
