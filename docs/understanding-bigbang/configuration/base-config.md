@@ -12,8 +12,8 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Ryan Garcia | ryan.garcia@sigmadefense.com |  |
-| Chris O'Connell | coconnell@bridgephase.com |  |
+| Michael Martin  | michaelmartin@seed-innovations.com |  |
+| Chris O'Connell | coconnell@bridgephase.com          |  |
 
 ## Source Code
 
