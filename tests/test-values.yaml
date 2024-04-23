@@ -81,6 +81,7 @@ jaeger:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
   values:
     istio:
+      enabled: true
       hardened:
         enabled: true
         customAuthorizationPolicies:
@@ -93,8 +94,22 @@ jaeger:
                 - source:
                     namespaces:
                     - jaeger
-      jaeger:
-        enabled: true
+        customServiceEntries:
+          - name: "cypress-service-entries-jaeger"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+                - 'repo1.dso.mil'
+                - 'tracing.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     bbtests:
       enabled: true
       cypress:
