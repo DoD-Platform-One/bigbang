@@ -81,7 +81,6 @@ jaeger:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
   values:
     istio:
-      enabled: true
       hardened:
         enabled: true
         customAuthorizationPolicies:
@@ -1204,7 +1203,6 @@ twistlock:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
   values:
     istio:
-      enabled: true
       hardened:
         enabled: true
         customServiceEntries:
@@ -1360,7 +1358,7 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true    
+          enabled: true
       storage:
         volume: 5Gi
       jvmMaxRAMPercentage: 85
@@ -1823,6 +1821,25 @@ addons:
                       namespaces:
                       - minio
                       - minio-operator
+          customServiceEntries:
+            - name: "cypress-service-entries-minio"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'minio.dev.bigbang.mil'
+                  - 'minio-api.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                exportTo:
+                  - "."
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       tenant:
         pools:
         - servers: 3
@@ -1860,28 +1877,6 @@ addons:
           envs:
             MINIO_PORT: ''
             MINIO_HOST: 'https://minio-api.dev.bigbang.mil'
-      istio:
-        hardened:
-          enabled: true
-          customServiceEntries:
-            - name: "cypress-service-entries-minio"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'repo1.dso.mil'
-                  - 'minio.dev.bigbang.mil'
-                  - 'minio-api.dev.bigbang.mil'
-                location: MESH_EXTERNAL
-                exportTo:
-                  - "."
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
 
   mattermostOperator:
     enabled: false
@@ -2304,12 +2299,50 @@ addons:
                 prometheus_retention_time = "24h"
                 disable_hostname = true
               }
-
               service_registration "kubernetes" {}
-
       istio:
         hardened:
           enabled: true
+          customAuthorizationPolicies:
+            - name: allow-egress-instance-metadata
+              enabled: true
+              spec:
+                action: ALLOW
+                rules:
+                - from:
+                  - source:
+                      ipBlocks:
+                        - 169.254.169.254/32
+          customServiceEntries:
+            - name: "allow-egress-cypress-tests"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'vault.dev.bigbang.mil'
+                  - 'repo1.dso.mil'
+                  - 'kms.us-gov-west-1.amazonaws.com'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
+            # - name: "allow-egress-instance-metadata"
+            #   enabled: true
+            #   spec:
+            #     addresses:
+            #     - 169.254.169.254/32
+            #     ports:
+            #     - number: 80
+            #       name: http
+            #       protocol: HTTP
+            #     location: MESH_EXTERNAL
+            #     resolution: STATIC
+            #     endpoints:
+            #     - address: 169.254.169.254
       bbtests:
         enabled: true
         cypress:
