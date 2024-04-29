@@ -707,6 +707,10 @@ loki:
 
   # -- Loki architecture.  Options are monolith and scalable
   strategy: monolith
+  
+  # -- Loki clusterName identifier for Promtail and Dashboards
+  clusterName: ""
+
 
   objectStorage:
     # -- S3 compatible endpoint to use for connection information.
@@ -1968,7 +1972,7 @@ addons:
     sso:
       # -- Toggle SSO for Holocron on and off
       enabled: false
-
+      
       # -- Holocron SSO group roles: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
       groups:
         admin: ""

@@ -13,6 +13,8 @@ domain: {{ $domainName }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
+{{- $lokiEnabled := (.Values.loki.enabled) }}
+{{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 
 flux:
   enabled: true
@@ -86,13 +88,20 @@ alertmanager:
     {{- end }}
 
 prometheus:
-    # Note: We need to change the portName in order for istio to correctly detect TCP is being used
-    #       for the headless service
+  {{- if $lokiEnabled }}
+  monitor:
+    relabelings:
+      - action: replace
+        replacement: {{ $clusterName }}
+        targetLabel: cluster
+  {{- end }}
 
   {{- if $thanosEnabled }}
   thanosService:
     enabled: true
-
+    
+    # Note: We need to change the portName in order for istio to correctly detect TCP is being used
+    #       for the headless service
     {{- if $istioInjection }}
     portName: "tcp-grpc"       
     {{- end }}
@@ -304,6 +313,7 @@ prometheus:
         name: istio-certs
     {{- end }}
 
+
 anchore:
   enabled: {{ .Values.addons.anchore.enabled }}
 
@@ -339,17 +349,31 @@ prometheus-node-exporter:
     imagePullSecrets:
     - name: private-registry
 
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
+
+  {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
   prometheus:
     monitor:
+    {{- if $lokiEnabled }}
+      relabelings:
+        - action: replace
+          replacement: {{ $clusterName }}
+          targetLabel: cluster
+        - targetLabel: "instance"
+          sourceLabels:
+            - "__meta_kubernetes_pod_node_name"
+    {{- end }}
+    {{- if $istioInjection }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
         certFile: /etc/prom-certs/cert-chain.pem
         keyFile: /etc/prom-certs/key.pem
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   {{- end }}
 
   {{- if .Values.openshift }}
@@ -358,23 +382,56 @@ prometheus-node-exporter:
     port: 9102
   {{- end }}
 
+{{- if $lokiEnabled }}
+kubelet:
+  serviceMonitor:
+    cAdvisorRelabelings:
+      - action: replace
+        replacement: {{ $clusterName }}
+        targetLabel: cluster
+      - targetLabel: metrics_path
+        sourceLabels:
+          - "__metrics_path__"
+      - targetLabel: "instance"
+        sourceLabels:
+          - "node"
+{{- end }}
+
+{{- if $lokiEnabled }}
+defaultRules:
+  additionalRuleLabels:
+    cluster: {{ $clusterName }}
+{{- end }}
+
 kube-state-metrics:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
-
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
+  {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
   prometheus:
     monitor:
+      {{- if $lokiEnabled }}
+      relabelings:
+        - action: replace
+          replacement: {{ $clusterName }}
+          targetLabel: cluster
+        - targetLabel: "instance"
+          sourceLabels:
+            - "__meta_kubernetes_pod_node_name"
+      {{- end }}
+      {{- if $istioInjection }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
         certFile: /etc/prom-certs/cert-chain.pem
         keyFile: /etc/prom-certs/key.pem
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   {{- end }}
 
 prometheusOperator:
