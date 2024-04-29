@@ -5,6 +5,8 @@
 {{- define "bigbang.defaults.loki" -}}
 hostname: {{ .Values.hostname }}
 
+clusterName: ""
+
 openshift: {{ .Values.openshift }}
 
 istio:

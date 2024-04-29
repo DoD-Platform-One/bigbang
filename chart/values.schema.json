@@ -523,6 +523,9 @@
       ],
       "properties": {
         "enabled": true,
+        "clusterName": {
+          "type": "string"
+        },
         "sourceType": true,
         "git": true,
         "helmRepo": true,
