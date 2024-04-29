@@ -46,13 +46,14 @@ The default with no options specified is to use the EC2 public IP for the k3d cl
 ./docs/assets/scripts/developer/k3d-dev.sh -h
 AWS User Name: your.name
 Usage:
-k3d-dev.sh -b -p -m -d -h
+k3d-dev.sh -b -p -m -a -d -h
 
- -b   use big M5 instance. Default is t3.2xlarge
+ -b   use BIG M5 instance. Default is m5a.4xlarge
  -p   use private IP for security group and k3d cluster
  -m   create k3d cluster with metalLB
  -a   attach secondary Public IP (overrides -p and -m flags)
  -d   destroy related AWS resources
+ -w   install the weave CNI instead of the default flannel CNI
  -h   output help
 ```
 ## To use a different AWS profile, VPC, or AMI
