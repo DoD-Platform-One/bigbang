@@ -47,6 +47,9 @@ flux:
   rollback:
     timeout: 20m
     cleanupOnFail: false
+  ## override cleanup on upgrade to allow artifacts to upload
+  upgrade:
+    cleanupOnFail: false
 
 networkPolicies:
   enabled: true
