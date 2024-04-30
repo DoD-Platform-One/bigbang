@@ -523,9 +523,6 @@
       ],
       "properties": {
         "enabled": true,
-        "clusterName": {
-          "type": "string"
-        },
         "sourceType": true,
         "git": true,
         "helmRepo": true,
@@ -1197,19 +1194,6 @@
             "type": "string"
           }
         },
-        "anyOf": [
-          {
-            "required": [
-              "existingSecret"
-            ]
-          },
-          {
-            "required": [
-              "username",
-              "password"
-            ]
-          }
-        ],
         "required": [
           "name",
           "repository"

@@ -13,6 +13,7 @@ helmRepositories: []
   #   repository: "oci://registry1.dso.mil/bigbang"
   #   existingSecret: "private-registry"
   #   type: "oci"
+  #   insecure: true
   #   username: ""
   #   password: ""
   #   email: ""
