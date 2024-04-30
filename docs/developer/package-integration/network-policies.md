@@ -206,6 +206,39 @@ spec:
 
 - The networkPolicy template for kube-api egress will look like the above, so that communication to the [AWS Instance Metadata](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) and [Azure Instance Metadata](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) can be limited unless required by the package.
 
+### Supporting additional network policies through values.yaml
+
+All bigbang core and supported addon packages are expected to provide support for the deployment of additional network policies through the values yaml [as per the user guide](../../guides/using-bigbang/network-policies.md). There is a standard mechanism for the implementation of this pattern, with two use cases: 
+
+- where a package will only be deployed into its own namespace (the majority of bigbang packages)
+- where a package may be used in inside another package's namespace or deployed into its own namespace (such as the gitlab-runner)
+
+#### Single namespace
+
+For this use case, a simple iteration over the values is sufficient to create the needed functionality. The standard pattern is to place this into `<package>/chart/templates/bigbang/networkpolicies/additional-networkpolicies.yaml`:
+
+```
+{{- if .Values.networkPolicies.enabled }}
+{{- range $policy := .Values.networkPolicies.additionalPolicies -}}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ $policy.name }}
+spec:
+  {{ tpl ($policy.spec | toYaml) $ | nindent 2 }}
+---
+{{- end }}
+{{- end }}
+```
+
+#### Multiple namespaces
+
+For this use case, refer to [the gitlab runner implementation](https://repo1.dso.mil/big-bang/product/packages/gitlab-runner/-/blob/main/chart/templates/bigbang/networkpolicies/egress-runner-jobs.yaml?ref_type=heads). In this pattern, a given chart may be deployed into one or more namespaces. However, you may only want to enable to control of additional network policies in a certain subset of those namespaces. In these cases, it is sufficient to extend the conditional at the top that checks for the flag in the values:
+
+```
+{{- if and .Values.networkPolicies.enabled (ne .Release.Namespace "NAMESPACE-YOU-DONT-WANT-TO-DO-THIS-IN") }}
+```
+
 ## Validation
 
 - Package functions as expected and is able to communicate with all BigBang touchpoints.
