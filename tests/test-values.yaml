@@ -1914,6 +1914,25 @@ addons:
                     - source:
                         namespaces:
                           - monitoring
+          customServiceEntries:
+            - name: "cypress-service-entries-mattermost"
+              enabled: true
+              spec:
+                hosts:
+                  - 'kiali.dev.bigbang.mil'
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'grafana.dev.bigbang.mil'
+                  - 'prometheus.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
+
       postgresql:
         persistence:
           size: 256Mi
