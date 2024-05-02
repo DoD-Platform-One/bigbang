@@ -1755,6 +1755,22 @@ addons:
                   - source:
                       namespaces:
                       - sonarqube
+          customServiceEntries:
+            - name: "sonarqube-allow-cypress-tests"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'sonarqube.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       plugins:
         install: []
       resources:
