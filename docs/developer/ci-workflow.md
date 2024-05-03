@@ -1,4 +1,4 @@
-# Gitlab-ci Workflow
+# BigBang GitLab CI Workflow
 
 The following is meant to serve as an overview of the pipeline stages required to get a commit merged. There are package, bigbang, and infrastructure pipelines.
 
