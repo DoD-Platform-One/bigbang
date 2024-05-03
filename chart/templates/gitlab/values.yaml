@@ -25,6 +25,11 @@ istio:
     gateways:
     - istio-system/{{ default "public" .Values.addons.gitlab.ingress.gateway }}
 
+# Used for istio SSO serviceEntry
+sso:
+  enabled: {{ .Values.addons.gitlab.sso.enabled }}
+  host: {{ include "sso.host" . }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
