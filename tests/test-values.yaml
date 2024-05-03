@@ -1609,6 +1609,10 @@ addons:
       licenseYaml: |
         "TBD"
     values:
+      istio:
+        enabled: true
+        hardened:
+          enabled: true
       ensureDbJobs:
         resources:
           requests:
