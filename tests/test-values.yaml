@@ -734,6 +734,13 @@ kyvernoPolicies:
               - gitlab
               names:
               - gitlab-minio-*
+          # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster
+          - resources:
+              namespaces:
+              - twistlock
+              names:
+              - twistlock-defender-ds*
+
       require-non-root-group:
         exclude:
           any:
