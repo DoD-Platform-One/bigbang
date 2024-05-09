@@ -2461,11 +2461,30 @@ addons:
     # -- Toggle deployment of harbor
     enabled: false
 
-    # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
+    # -- Values to pass through to Harbor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values:
       istio:
         hardened:
           enabled: true
+          customServiceEntries:
+            - name: "allow-npm-for-cypress-tests"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'harbor.dev.bigbang.mil'
+                  - 'repo1.dso.mil'
+                  - 'index.docker.io'
+                  - 'auth.docker.io'
+                  - 'production.cloudflare.docker.com'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       expose:
         type: clusterIP
         tls:
