@@ -2434,36 +2434,6 @@ addons:
                   - source:
                       ipBlocks:
                         - 169.254.169.254/32
-          customServiceEntries:
-            - name: "allow-egress-cypress-tests"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'vault.dev.bigbang.mil'
-                  - 'repo1.dso.mil'
-                  - 'kms.us-gov-west-1.amazonaws.com'
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
-            # - name: "allow-egress-instance-metadata"
-            #   enabled: true
-            #   spec:
-            #     addresses:
-            #     - 169.254.169.254/32
-            #     ports:
-            #     - number: 80
-            #       name: http
-            #       protocol: HTTP
-            #     location: MESH_EXTERNAL
-            #     resolution: STATIC
-            #     endpoints:
-            #     - address: 169.254.169.254
       bbtests:
         enabled: true
         cypress:
