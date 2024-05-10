@@ -2135,6 +2135,33 @@ addons:
                   v1Enabled: false
                   forceBasicAuth: true
                   httpPort: 5000
+      istio:
+        enabled: true
+        hardened:
+          enabled: true
+          customServiceEntries:
+            - name: "cypress-service-entries-nexus"
+              enabled: true
+              spec:
+                exportTo:
+                  - "."
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'nexus.dev.bigbang.mil'
+                  - 'containers.dev.bigbang.mil'
+                  - "index.docker.io"
+                  - "auth.docker.io"
+                  - "production.cloudflare.docker.com"
+                  - "cdnjs.cloudflare.com"
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       bbtests:
         enabled: true
         cypress:
