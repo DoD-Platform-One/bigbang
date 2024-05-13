@@ -2194,6 +2194,20 @@ addons:
       key: "" # Gets added via chart/ingress-certs.yaml
       cert: "" # Gets added via chart/ingress-certs.yaml
     values:
+      istio:
+        enabled: true
+        hardened:
+          enabled: true
+          customAuthorizationPolicies:
+            - name: "allow-intranamespace-keycloak"
+              enabled: true
+              spec:
+                action: ALLOW
+                rules:
+                - from:
+                  - source:
+                      namespaces:
+                      - keycloak
       replicas: 1
       resources:
         requests:
