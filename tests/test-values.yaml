@@ -2709,11 +2709,6 @@ addons:
     # -- Toggle deployment of holocron
     enabled: false
     values:
-      frontend:
-      ## pin tag to sha256 because latest image is broken
-        image:
-          repository: registry1.dso.mil/ironbank/holocron/holocron-dashboard@sha256
-          tag: "f18d7f66a394e2edc7f3a10faccdb943dd938be2de86bc88719ce7384ac01e44"
       istio:
         hardened:
           enabled: true
