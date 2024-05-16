@@ -1,7 +1,7 @@
 {{- $pkg := "harbor" }}
 {{- $fluxSettingsHarbor := mergeOverwrite .Values.flux (get .Values.addons $pkg).flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}

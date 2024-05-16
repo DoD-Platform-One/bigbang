@@ -1,6 +1,6 @@
 {{- $fluxSettingsVelero := mergeOverwrite .Values.flux .Values.addons.velero.flux -}}
 {{- if .Values.addons.velero.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: velero

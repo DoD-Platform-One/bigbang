@@ -1,6 +1,6 @@
 {{- $fluxSettingsJaeger := mergeOverwrite .Values.flux .Values.jaeger.flux -}}
 {{- if .Values.jaeger.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: jaeger

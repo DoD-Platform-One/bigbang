@@ -1,6 +1,6 @@
 {{- $fluxSettingsIstioOperator := mergeOverwrite .Values.flux .Values.istioOperator.flux -}}
 {{- if .Values.istioOperator.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: istio-operator

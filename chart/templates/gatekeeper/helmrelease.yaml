@@ -1,6 +1,6 @@
 {{- $fluxSettingsGatekeeper := mergeOverwrite .Values.flux .Values.gatekeeper.flux -}}
 {{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: gatekeeper
