@@ -1,6 +1,6 @@
 {{- $fluxSettingsTempo := mergeOverwrite .Values.flux .Values.tempo.flux -}}
 {{- if .Values.tempo.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: tempo

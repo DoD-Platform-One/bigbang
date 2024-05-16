@@ -3,7 +3,7 @@
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg = include "resourceName" $pkg -}}
 {{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}-wrapper

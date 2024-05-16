@@ -1,6 +1,6 @@
 {{- $fluxSettingsMattermost := mergeOverwrite .Values.flux .Values.addons.mattermost.flux -}}
 {{- if .Values.addons.mattermost.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: mattermost
