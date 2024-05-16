@@ -127,10 +127,10 @@ addons:
   keycloak:
     values:
       secrets:
-        credentials:
+        env:
           stringData:
-            adminuser: your_admin_username
-            password: your_admin_password
+            KEYCLOAK_ADMIN: "your_admin_username"
+            KEYCLOAK_ADMIN_PASSWORD: "your_admin_password"
 ```
 
 ### Keycloak TLS
