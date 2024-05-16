@@ -1773,11 +1773,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "23.0.7-bb.6"
+      tag: "23.0.7-bb.7"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
-      tag: "23.0.7-bb.6"
+      tag: "23.0.7-bb.7"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
@@ -2008,19 +2008,29 @@ addons:
     # -- Toggle deployment of thanos
     enabled: false
 
+    sso:
+        # -- Toggle SSO for Thanos on and off
+      enabled: false
+
+      # -- OIDC Client ID to use for Thanos
+      client_id: ""
+
+      # -- OIDC Client Secret to use for Thanos
+      client_secret: ""
+
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
-      tag: "13.2.2-bb.4"
+      tag: "13.2.2-bb.6"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "13.2.2-bb.4"
+      tag: "13.2.2-bb.6"
 
-    # -- Flux reconciliation overrides specifically for the Jaeger Package
+    # -- Flux reconciliation overrides specifically for the Thanos Package
     flux: {}
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".

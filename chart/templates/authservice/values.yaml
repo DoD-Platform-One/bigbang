@@ -1,4 +1,4 @@
-{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
 {{- end }}
 
@@ -128,6 +128,27 @@ chains:
     {{- end }}
     client_id: "{{ .Values.jaeger.sso.client_id }}"
     client_secret: "{{ .Values.jaeger.sso.client_secret }}"
+    {{- if not $legacy }}
+    authorization_uri: {{ include "sso.oidc.auth" . }}
+    token_uri: {{ include "sso.oidc.token" . }}
+    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
+    {{- end }}
+  {{- end }}
+
+  {{- if and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled }}
+  thanos:
+    match:
+      header: ":authority"
+    {{- $thanosHosts := (dig "istio" "thanos" "hosts" dict .Values.addons.thanos.values) }}
+    {{- if $thanosHosts }}
+      prefix: {{ tpl ($thanosHosts | first) $ }}
+    callback_uri: https://{{ tpl ($thanosHosts | first) $ }}/login/generic_oauth
+    {{- else }}
+      prefix: {{ printf "thanos.%s" $domainName }}
+    callback_uri: https://thanos.{{ $domainName }}/login/generic_oauth
+    {{- end }}
+    client_id: "{{ .Values.addons.thanos.sso.client_id }}"
+    client_secret: "{{ .Values.addons.thanos.sso.client_secret }}"
     {{- if not $legacy }}
     authorization_uri: {{ include "sso.oidc.auth" . }}
     token_uri: {{ include "sso.oidc.token" . }}
