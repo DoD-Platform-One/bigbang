@@ -1453,7 +1453,7 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
+          enabled: false
           customServiceEntries:
             - name: "cypress-service-entries-gitlab"
               enabled: true
@@ -1571,7 +1571,7 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
+          enabled: false
           customServiceEntries:
             - name: "cypress-service-entries-gitlab-runner"
               enabled: true
