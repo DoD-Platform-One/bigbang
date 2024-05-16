@@ -740,7 +740,14 @@ kyvernoPolicies:
               - twistlock
               names:
               - twistlock-defender-ds*
-
+          # Neuvector needs access to host to inspect network traffic
+          - resources:
+              namespaces:
+              - neuvector
+              names:
+              - neuvector-enforcer-pod*
+              - neuvector-controller-pod*
+              - neuvector-prometheus-exporter-pod*
       require-non-root-group:
         exclude:
           any:
