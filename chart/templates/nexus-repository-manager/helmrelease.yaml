@@ -2,7 +2,7 @@
 {{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- $fluxSettingsNexus := mergeOverwrite .Values.flux $nexusValues.flux -}}
 {{- if $nexusValues.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: nexus-repository-manager

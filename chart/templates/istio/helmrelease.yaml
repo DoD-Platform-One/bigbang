@@ -1,6 +1,6 @@
 {{- $fluxSettingsIstioCp := mergeOverwrite .Values.flux .Values.istio.flux -}}
 {{- if .Values.istio.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: istio

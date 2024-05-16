@@ -1,9 +1,9 @@
 {{- $fluxSettingsMetrics := mergeOverwrite .Values.flux .Values.addons.metricsServer.flux -}}
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
-{{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2beta2" "HelmRelease" "bigbang" "metrics-server") }}
+{{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}
 {{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: metrics-server

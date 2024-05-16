@@ -1,6 +1,6 @@
 {{- $fluxSettingsSonarqube := mergeOverwrite .Values.flux .Values.addons.sonarqube.flux -}}
 {{- if .Values.addons.sonarqube.enabled }}
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: sonarqube
