@@ -56,6 +56,12 @@ query:
     {{- if (dig "values" "storegateway" "enabled" false .Values.addons.thanos) }}
     - dns+thanos-storegateway.thanos.svc.cluster.local:10901
     {{- end }}
+  {{- if .Values.addons.thanos.sso.enabled }}
+  {{- $thanosAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+  {{- $thanosAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+  podLabels:
+    {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
+  {{- end }}
     
 
 {{- end }}

@@ -232,6 +232,10 @@ addons:
       enabled: true
       client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost"
       client_secret: "no-secret"
+  thanos:
+    sso:
+      enabled: true
+      client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-thanos
 
   nexusRepositoryManager:
     # Nexus requires manual configuration in Keycloak client and cannot be tested with login.dso.mil
