@@ -186,6 +186,7 @@ policies:
           - neuvector
           names:
           - neuvector-enforcer-pod*
+          - neuvector-controller-pod*
           - neuvector-prometheus-exporter-pod*
     {{- end }}
 
