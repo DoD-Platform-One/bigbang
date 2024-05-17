@@ -1,4 +1,4 @@
-{{- $fluxSettingsPromtail := mergeOverwrite .Values.flux .Values.promtail.flux -}}
+{{- $fluxSettingsPromtail := merge .Values.promtail.flux .Values.flux -}}
 {{- if .Values.promtail.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

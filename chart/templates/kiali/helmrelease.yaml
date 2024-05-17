@@ -1,4 +1,4 @@
-{{- $fluxSettingsKiali := mergeOverwrite .Values.flux .Values.kiali.flux -}}
+{{- $fluxSettingsKiali := merge .Values.kiali.flux .Values.flux -}}
 {{- if .Values.kiali.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

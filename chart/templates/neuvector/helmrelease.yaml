@@ -1,4 +1,4 @@
-{{- $fluxSettingsNeuvector := mergeOverwrite .Values.flux .Values.neuvector.flux -}}
+{{- $fluxSettingsNeuvector := merge .Values.neuvector.flux .Values.flux -}}
 {{- if .Values.neuvector.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

@@ -1,6 +1,6 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
-{{- $fluxSettingsNexus := mergeOverwrite .Values.flux $nexusValues.flux -}}
+{{- $fluxSettingsNexus := merge $nexusValues.flux .Values.flux -}}
 {{- if $nexusValues.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

@@ -6,7 +6,7 @@
 {{- if $defaults -}}
 {{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
 {{- end -}}
-{{- $fluxSettings := mergeOverwrite $.Values.flux (dig "flux" dict $vals) -}}
+
 {{- $gitCredsDict := dict
   "name" $pkg
   "packageGitScope" $vals.git
@@ -22,7 +22,7 @@ metadata:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
 spec:
-  interval: {{ default "5m" $fluxSettings.interval }}
+  interval: {{ $.Values.flux.interval }}
   url: {{ dig "git" "repo" nil $vals }}
   ref:
     {{- include "validRef" $vals.git | nindent 4 -}}

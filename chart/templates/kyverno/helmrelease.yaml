@@ -1,4 +1,4 @@
-{{- $fluxSettingskyverno := mergeOverwrite .Values.flux .Values.kyverno.flux -}}
+{{- $fluxSettingskyverno := merge .Values.kyverno.flux .Values.flux -}}
 {{- if or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

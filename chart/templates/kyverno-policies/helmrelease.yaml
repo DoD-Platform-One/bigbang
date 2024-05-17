@@ -1,5 +1,5 @@
 {{- $pkg := "kyvernoPolicies" }}
-{{- $fluxSettings := mergeOverwrite .Values.flux (get .Values $pkg).flux -}}
+{{- $fluxSettings := merge .Values.kyvernoPolicies.flux .Values.flux -}}
 {{- if (get .Values $pkg).enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

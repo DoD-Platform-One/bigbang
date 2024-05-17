@@ -1,4 +1,4 @@
-{{- $fluxSettingsGitlab := mergeOverwrite .Values.flux .Values.addons.gitlab.flux -}}
+{{- $fluxSettingsGitlab := merge .Values.addons.gitlab.flux .Values.flux -}}
 {{- if .Values.addons.gitlab.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
