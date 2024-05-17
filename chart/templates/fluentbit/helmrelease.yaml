@@ -1,4 +1,4 @@
-{{- $fluxSettingsFluentbit := mergeOverwrite .Values.flux .Values.fluentbit.flux -}}
+{{- $fluxSettingsFluentbit := merge .Values.fluentbit.flux .Values.flux -}}
 {{- if .Values.fluentbit.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

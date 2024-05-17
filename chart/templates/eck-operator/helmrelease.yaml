@@ -1,4 +1,4 @@
-{{- $fluxSettingsEckOperator := mergeOverwrite .Values.flux .Values.eckOperator.flux -}}
+{{- $fluxSettingsEckOperator := merge .Values.eckOperator.flux .Values.flux -}}
 {{- if or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

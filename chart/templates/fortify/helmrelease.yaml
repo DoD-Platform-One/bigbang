@@ -1,5 +1,5 @@
 {{- $pkg := "fortify" }}
-{{- $fluxSettingsFortify := mergeOverwrite .Values.flux (get .Values.addons $pkg).flux -}}
+{{- $fluxSettingsFortify := merge .Values.addons.fortify.flux .Values.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

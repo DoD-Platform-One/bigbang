@@ -1,4 +1,4 @@
-{{- $fluxSettingsMinio := mergeOverwrite .Values.flux .Values.addons.minio.flux -}}
+{{- $fluxSettingsMinio := merge .Values.addons.minio.flux .Values.flux -}}
 {{- if .Values.addons.minio.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

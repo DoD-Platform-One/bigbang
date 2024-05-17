@@ -1,4 +1,4 @@
-{{- $fluxSettingsMetrics := mergeOverwrite .Values.flux .Values.addons.metricsServer.flux -}}
+{{- $fluxSettingsMetrics := merge .Values.addons.metricsServer.flux .Values.flux -}}
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}

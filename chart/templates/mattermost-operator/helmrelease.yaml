@@ -1,6 +1,6 @@
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
 {{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
-{{- $fluxSettingsMattermostOperator := mergeOverwrite .Values.flux $mmOpValues.flux -}}
+{{- $fluxSettingsMattermostOperator := merge $mmOpValues.flux .Values.flux -}}
 {{- if or $mmOpValues.enabled .Values.addons.mattermost.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

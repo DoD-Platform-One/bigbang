@@ -1,4 +1,4 @@
-{{- $fluxSettingsMonitoring := mergeOverwrite .Values.flux .Values.monitoring.flux -}}
+{{- $fluxSettingsMonitoring := merge .Values.monitoring.flux .Values.flux -}}
 {{- if .Values.monitoring.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
