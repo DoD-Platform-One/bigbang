@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.promtail" -}}
+{{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 hostname: {{ .Values.hostname }}
 
 image:
@@ -44,6 +45,11 @@ imagePullSecrets:
 
 {{- if .Values.loki.enabled }}
 config:
+  snippets:
+    extraRelabelConfigs: 
+      - action: replace
+        replacement: {{ $clusterName }}
+        target_label: cluster
   clients:
     {{- if eq .Values.loki.strategy "monolith" }}
     - url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
