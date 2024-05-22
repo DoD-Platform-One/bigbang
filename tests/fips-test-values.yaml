@@ -1,0 +1,3 @@
+# use fips-enabled MR label to include these values in addtion to test-values and rke/eks overrides (if applicable)
+istio:
+  enterprise: true
