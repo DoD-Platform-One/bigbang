@@ -1339,8 +1339,26 @@ addons:
                 limits: 2048Mi
       istio:
         hardened:
-          enabled: false
-
+          enabled: true
+          customServiceEntries:
+            - name: "cypress-service-entries-argocd"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'argocd.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: HTTPS
+                    name: https
+                  - number: 80
+                    protocol: HTTP
+                    name: http
+                resolution: DNS
   authservice:
     enabled: false
     chains:
