@@ -1461,10 +1461,16 @@ addons:
     flux:
       timeout: 30m
     values:
+      upgradeCheck:
+        annotations:
+          sidecar.istio.io/inject: "true"
+      shared-secrets:
+        annotations:
+          sidecar.istio.io/inject: "true"
       istio:
         enabled: true
         hardened:
-          enabled: false
+          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-gitlab"
               enabled: true
@@ -1527,6 +1533,9 @@ addons:
               cpu: 10m
             limits: {}
         migrations:
+          # required annotation when istio.hardened.enabled = true
+          annotations:
+            sidecar.istio.io/inject: "true"
           resources:
             requests:
               cpu: 10m
@@ -1551,6 +1560,9 @@ addons:
               cpu: 10m
             limits: {}
       minio:
+        # required annotation when istio.hardened.enabled = true
+        jobAnnotations:
+          sidecar.istio.io/inject: "true"
         persistence:
           size: 256Mi
         resources:
@@ -1582,7 +1594,7 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: false
+          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-gitlab-runner"
               enabled: true
