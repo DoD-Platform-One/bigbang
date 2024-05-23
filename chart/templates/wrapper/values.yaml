@@ -19,41 +19,7 @@ stringData:
       {{- tpl (toYaml (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn")) $ | nindent 6 }}
       {{- end }}
     bigbang:
-      {{- toYaml (pick $merged.bigbang "domain" "openshift") | nindent 6 -}}
-      {{- /* For every top level map, if it has the enable key, pass it through. */ -}}
-      {{- range $bbpkg, $bbvals := $merged.bigbang -}}
-      {{- if kindIs "map" $bbvals -}}
-      {{- if hasKey $bbvals "enabled" -}}
-      {{- $bbpkg | nindent 6 -}}:
-        {{- /* For network policies, we need all of its values. */ -}}
-        {{- if eq $bbpkg "networkPolicies" -}}
-        {{- toYaml $bbvals | nindent 8 -}}
-        {{- else }}
-        enabled: {{ $bbvals.enabled }}
-        {{- end -}}
-      {{- /* For addons, pass through the enable key. */ -}}
-      {{- else if eq $bbpkg "addons" -}}
-      {{- $bbpkg | nindent 6 -}}:
-        {{- range $addpkg, $addvals := $bbvals -}}
-        {{- if hasKey $addvals "enabled" -}}
-        {{- $addpkg | nindent 8 }}:
-          enabled: {{ $addvals.enabled }}
-          {{- /* For authservice, the selector values are needed. */ -}}
-          {{- if and (eq $addpkg "authservice") (or (dig "values" "selector" "key" false $addvals) (dig "values" "selector" "value" false $addvals)) }}
-          values:
-            selector:
-              {{- if (dig "values" "selector" "key" false $addvals) -}}
-              key: {{ $addvals.values.selector.key }}
-              {{- end -}}
-              {{- if (dig "values" "selector" "value" false $addvals) -}}
-              value: {{ $addvals.values.selector.key }}
-              {{- end -}}
-          {{- end -}}
-        {{- end -}}
-        {{- end -}}
-      {{- end -}}
-      {{- end -}}
-      {{- end }}
+      {{- include "values-bigbang" $merged.bigbang | nindent 6 }}
 ---
 {{ end -}}
 {{- end -}}

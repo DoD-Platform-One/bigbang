@@ -1,3 +1,45 @@
+{{- define "values-bigbang" -}}
+{{- /* 
+ * bigbang.values-bigbang: Produce a stripped version of the bigbang variables
+ * in the root namespace suitable for inclusion in wrapper or package variables definitions
+ */ -}}
+{{ toYaml (pick $ "domain" "openshift") }}
+{{- /* For every top level map, if it has the enable key, pass it through. */ -}}
+{{- range $bbpkg, $bbvals := $ -}}
+  {{- if kindIs "map" $bbvals -}}
+    {{- if hasKey $bbvals "enabled" }}
+{{ $bbpkg }}:
+      {{- /* For network policies, we need all of its values. */ -}}
+      {{- if eq $bbpkg "networkPolicies" -}}
+        {{- toYaml $bbvals | nindent 2}}
+      {{- else }}
+  enabled: {{ $bbvals.enabled }}
+      {{- end -}}
+    {{- /* For addons, pass through the enable key. */ -}}
+    {{- else if eq $bbpkg "addons" }}
+{{ $bbpkg }}:
+      {{- range $addpkg, $addvals := $bbvals -}}
+        {{- if hasKey $addvals "enabled" }}
+  {{ $addpkg }}:
+    enabled: {{ $addvals.enabled }}
+          {{- /* For authservice, the selector values are needed. */ -}}
+          {{- if and (eq $addpkg "authservice") (or (dig "values" "selector" "key" false $addvals) (dig "values" "selector" "value" false $addvals)) }}
+    values:
+      selector:
+              {{- if (dig "values" "selector" "key" false $addvals) }}
+        key: {{ $addvals.values.selector.key }}
+              {{- end -}}
+              {{- if (dig "values" "selector" "value" false $addvals) }}
+        value: {{ $addvals.values.selector.key }}
+              {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- end }}
+
 {{- define "imagePullSecret" }}
   {{- if .Values.registryCredentials -}}
     {{- $credType := typeOf .Values.registryCredentials -}}
@@ -394,3 +436,5 @@ data:
     {{- end -}}
   {{- end -}}
 {{- end -}}
+
+

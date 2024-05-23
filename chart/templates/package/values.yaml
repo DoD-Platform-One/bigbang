@@ -17,6 +17,8 @@ type: Opaque
 stringData:
   {{ if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
   values.yaml: |
+    bigbang:
+      {{- include "values-bigbang" $.Values | nindent 6 }}
   {{- tpl (toYaml $vals.values) $ | nindent 4 }}
   {{ else }}
   {{- tpl (toYaml $vals.values) $ | nindent 2 }}
