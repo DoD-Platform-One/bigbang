@@ -1,0 +1,75 @@
+openshift: true
+
+
+istio:
+  values:
+    profile: "openshift"
+    ingressGateways:
+      public-ingressgateway:
+        k8s:
+          hpaSpec:
+            minReplicas: 3
+            maxReplicas: 5
+
+monitoring:
+  values:
+    prometheus:
+      prometheusSpec:
+        additionalScrapeConfigs: []
+        podMetadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "false"
+            vault.hashicorp.com/agent-init-first: "true"
+            vault.hashicorp.com/agent-inject-token: "true"
+            vault.hashicorp.com/role: "prometheus"
+            vault.hashicorp.com/agent-pre-populate: "false"
+        resources:
+          requests:
+            cpu: 300m
+            memory: 5Gi
+          limits: null
+    grafana:
+      downloadDashboards:
+        resources:
+          limits: null
+          requests:
+            cpu: 20m
+            memory: 20Mi
+
+grafana:
+  git:
+    tag: 7.3.7-bb.0
+
+neuvector:
+  values:
+    k3s:
+      enabled: false
+    crio:
+      enabled: true
+      path: /var/run/crio/crio.sock
+    istio:
+      enabled: true
+      hardened:
+        enabled: false
+        tempo:
+          enabled: false
+      console:
+        enabled: false
+    openshift: true
+    bbtests:
+      cypress:
+        openshift: true
+ 
+# Addons are toggled based on labels in CI
+addons:
+  minioOperator:
+    values:
+      openshift: true
+
+  minio:
+    values:
+      annotations:
+        traffic.sidecar.istio.io/excludeOutboundPorts: "443"
+      istio: 
+        enabled: true
+      openshift: true
