@@ -41,6 +41,9 @@ monitoring:
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
+  rules:
+    enabled: true
+    alerting: true
 
 {{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- if and .Values.fluentbit.enabled (not $disableDefaultFLB) }}
