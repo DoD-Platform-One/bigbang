@@ -176,10 +176,10 @@ policies:
   {{- end }}
 
   require-drop-all-capabilities:
-    validationFailureAction: audit
-    {{- if .Values.neuvector.enabled }}
+    validationFailureAction: Enforce
     exclude:
       any:
+      {{- if .Values.neuvector.enabled }}
       # Neuvector needs access to host to inspect network traffic
       - resources:
           namespaces:
@@ -188,7 +188,42 @@ policies:
           - neuvector-enforcer-pod*
           - neuvector-controller-pod*
           - neuvector-prometheus-exporter-pod*
-    {{- end }}
+      {{- end }}
+      {{- if .Values.addons.keycloak.enabled }}
+      - resources:
+          namespaces:
+          - keycloak
+          names:
+          - keycloak-0
+      {{- end }}
+      {{- if .Values.addons.holocron.enabled }}
+      - resources:
+          namespaces:
+          - holocron
+          names:
+          - holocron-postgresql-0
+      {{- end }}
+      {{- if .Values.addons.velero.enabled }}
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - velero-backup-restore-test*
+      {{- end }}
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          names:
+          - runner-*
+      {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - webservice-test-runner-*
+      {{- end }}
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
