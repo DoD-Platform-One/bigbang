@@ -13,6 +13,8 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/haproxy/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: enabled
   targetNamespace: authservice
   chart:
     spec:

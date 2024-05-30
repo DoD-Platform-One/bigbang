@@ -12,6 +12,8 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-operator/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: enabled
   targetNamespace: istio-operator
   chart:
     spec:
@@ -54,7 +56,7 @@ spec:
     - name: {{ .Release.Name }}-istio-operator-values
       kind: Secret
       valuesKey: "overlays"
-  
+
   {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}

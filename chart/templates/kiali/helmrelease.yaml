@@ -12,6 +12,8 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kiali/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: enabled
   targetNamespace: kiali
   chart:
     spec:
@@ -39,7 +41,7 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsKiali | nindent 2 }}
-  
+
   {{- if .Values.kiali.postRenderers }}
   postRenderers:
   {{ toYaml .Values.kiali.postRenderers | nindent 4 }}
