@@ -73,5 +73,5 @@ spec:
     {{- end }}
     
   driftDetection:
-    mode: enabled
+    mode: disabled
 {{- end }}
