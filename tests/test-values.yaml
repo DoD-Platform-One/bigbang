@@ -752,6 +752,11 @@ kyvernoPolicies:
               - neuvector-enforcer-pod*
               - neuvector-controller-pod*
               - neuvector-prometheus-exporter-pod*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui-*
       require-non-root-group:
         exclude:
           any:
