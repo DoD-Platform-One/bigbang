@@ -12,6 +12,8 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/neuvector/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: enabled
   targetNamespace: neuvector
   chart:
     spec:
