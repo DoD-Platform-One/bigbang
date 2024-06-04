@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [2.28.1]
 
-- [!4445](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4445); gitlab update to 7.11.2-bb.5
-- [!4445](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4441); gitlab update to 7.11.2-bb.4
+- [!4445](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4445): gitlab update to 7.11.2-bb.5
+- [!4441](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4441): gitlab update to 7.11.2-bb.4
 
 ## [2.28.0]
 
