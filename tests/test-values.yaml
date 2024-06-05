@@ -248,6 +248,7 @@ gatekeeper:
       allowedHostFilesystem:
         parameters:
           excludedResources:
+          - anchore/anchore-cypress-test
           - argocd/argocd-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - fortify/fortify-cypress-test
@@ -390,6 +391,7 @@ gatekeeper:
       volumeTypes:
         parameters:
           excludedResources:
+          - anchore/anchore-cypress-test
           - argocd/argocd-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - fortify/fortify-ssc-cypress-test
@@ -599,6 +601,7 @@ kyvernoPolicies:
           any:
           - resources:
               namespaces:
+              - anchore
               - gitlab
               - gitlab-runner
               - kiali
@@ -638,6 +641,7 @@ kyvernoPolicies:
           any:
           - resources:
               namespaces:
+              - anchore
               - gitlab
               - gitlab-runner
               - kiali
@@ -693,6 +697,7 @@ kyvernoPolicies:
           any:
           - resources:
               namespaces:
+              - anchore
               - gitlab
               - gitlab-runner
               - kiali
@@ -1691,6 +1696,24 @@ addons:
         enabled: true
         hardened:
           enabled: true
+          customServiceEntries:
+            - name: "anchore-allow-cypress-tests"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'auth.docker.io'
+                  - 'registry-1.docker.io'
+                  - 'anchore.dev.bigbang.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       ensureDbJobs:
         resources:
           requests:
@@ -1814,6 +1837,10 @@ addons:
         scripts:
           envs:
             ANCHORE_CLI_URL: "https://anchore-api.dev.bigbang.mil/v1"
+        cypress:
+          envs: 
+            cypress_url: "https://anchore.dev.bigbang.mil"
+
 
   sonarqube:
     enabled: false
