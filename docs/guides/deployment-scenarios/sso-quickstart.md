@@ -11,7 +11,15 @@ A 54min speed run with explanations video walkthrough of this sso quickstart gui
 
 ## Blue Team Knowledge Drop
 
-Imagine <https://authdemo.bigbang.dev> represents a mock-up of a custom-built mission application that doesn't have SSO, Authentication, or Authorization built-in. Auth Service can add those to it which creates layers of defense/defense in depth in the form only allowing authenticated users the ability to even see the page, enforcing MFA of authenticated users, and requiring that authenticated users are authorized to access that service (they must be in the correct group of their Identity Provider, and this means you can safely enable self-registration of users without hurting security. Auth Service's Authentication Proxy has an additional benefit in regards to defense in depth. You can add it in front of most frontend applications to create an additional layer of defense. Example: Grafana, Kibana, ArgoCD, and others have baked in support for OIDC/SSO and AuthN/AuthZ functionality, so you may think what benefit could be had from adding an authentication proxy in front of them (it seems redundant at first glance). Let's say that a frontend service was reachable from the public internet and it had some zero-day vulnerability that allowed authentication bypass or unauthenticated remote code execution to occur via a network-level exploit / uniquely crafted packet. Well someone on the internet wouldn't even be able to exploit these hypothetical zero-day vulnerabilities since it'd be behind an AuthN/AuthZ proxy layer of defense which would prevent them from even touching the frontend. Bonus: Istio, AuthService, and Keycloak are all Free Open Source Software (FOSS) solutions and they work in internet disconnect environments, we'll even demonstrate it working using only Kubernetes DNS and workstation hostfile edits / without needing to configure LAN/Internet DNS.
+Imagine a scenario where <https://authdemo.bigbang.dev> represents a mock-up of a custom-built mission application lacking built-in SSO, authentication, or authorization. By integrating Auth Service, we can create multiple layers of defense-in-depth. This service allows only authenticated users to access the application, enforces multi-factor authentication (MFA) for these users, and requires them to be authorized based on their group membership within their Identity Provider. This setup enables safe self-registration of users without compromising security.
+
+### Enhancing Existing Applications with Authentication Proxies
+
+Auth Service's Authentication Proxy offers significant security enhancements. Even applications like Grafana, Kibana, and ArgoCD, which already support OIDC/SSO, and AuthN/AuthZ functionalities, can benefit from this added layer. At first glance, adding an authentication proxy may seem redundant. However, consider a frontend service that is publicly accessible on the internet and has a zero-day vulnerability allowing authentication bypass or remote code execution through a network-level exploit or a uniquely crafted packet. With an Auth Service Authentication Proxy in place, such vulnerabilities become moot points; unauthorized users cannot even interact with the frontend due to this robust defensive layer.
+
+### Advantages of Open Source Solutions
+
+Istio, AuthService, and Keycloak are not only Free Open Source Software (FOSS) but also operate efficiently in internet-disconnected environments. We will demonstrate this capability using only Kubernetes DNS and workstation hostfile edits, avoiding the need for conventional LAN/Internet DNS configurations.
 
 ## Overview
 
@@ -458,83 +466,26 @@ clusterAuditor:
         cpu: null
         memory: null
 
-gatekeeper:
+kyverno:
+  enabled: true
+  values: 
+
+kyvernoPolicies:
   enabled: true
   values:
-    replicas: 1
-    controllerManager:
-      resources:
-        requests:
-          cpu: 1m
-          memory: 1Mi
-        limits:
-          cpu: null
-          memory: null
-    audit:
-      resources:
-        requests:
-          cpu: 1m
-          memory: 1Mi
-        limits:
-          cpu: null
-          memory: null
-    violations:
-      allowedCapabilities:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to not drop capabilities
-          - istio-system/lb-port-.*
-      allowedDockerRegistries:
-        enforcementAction: dryrun
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to pull from public repos
-          - istio-system/lb-port-.*
-      allowedSecCompProfiles:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to have an undefined defined seccomp
-          - istio-system/lb-port-.*
-      allowedUsers:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to run as any user/group
-          - istio-system/lb-port-.*
-      containerRatio:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to have undefined limits/requests
-          - istio-system/lb-port-.*
-      hostNetworking:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to mount host ports
-          - istio-system/lb-port-.*
-      noBigContainers:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to have undefined limits/requests
-          - istio-system/lb-port-.*
-      noPrivilegedEscalation:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to have undefined security context
-          - istio-system/lb-port-.*
-      readOnlyRoot:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to mount filesystems read/write
-          - istio-system/lb-port-.*
-      requiredLabels:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer pods to not have required labels
-          - istio-system/svclb-.*
-      requiredProbes:
-        parameters:
-          excludedResources:
-          # Allows k3d load balancer containers to not have readiness/liveness probes
-          - istio-system/lb-port-.*
+    exclude: 
+      any:
+        - resources:
+            namespaces:
+            - kube-system
+            # avoid touching anything in istio-system to avoid interfereing with k3d
+            - istio-system 
+
+gatekeeper:
+  enabled: false
+
+clusterAuditor:
+  enabled: false 
 
 istio:
   values:

@@ -20,7 +20,7 @@ This quick start guide explains in beginner-friendly terminology how to complete
 
 ## Important Security Notice
 
-All Developer and Quick Start Guides in this repo are intended to deploy environments for development, demo, and learning purposes. There are practices that are bad for security, but make perfect sense for these use cases: using of default values, minimal configuration, tinkering with new functionality that could introduce a security misconfiguration, and even purposefully using insecure passwords and disabling security measures like Open Policy Agent Gatekeeper for convenience. Many applications have default username and passwords combinations stored in the public git repo, these insecure default credentials and configurations are intended to be overridden during production deployments.
+All Developer and Quick Start Guides in this repo are intended to deploy environments for development, demo, and learning purposes. There are practices that are bad for security, but make perfect sense for these use cases: using of default values, minimal configuration, tinkering with new functionality that could introduce a security misconfiguration, and even purposefully using insecure passwords and disabling security measures like Kyverno for convenience. Many applications have default username and passwords combinations stored in the public git repo, these insecure default credentials and configurations are intended to be overridden during production deployments.
 
 When deploying a dev / demo environment there is a high chance of deploying Big Bang in an insecure configuration. Such deployments should be treated as if they could become easily compromised if made publicly accessible.
 

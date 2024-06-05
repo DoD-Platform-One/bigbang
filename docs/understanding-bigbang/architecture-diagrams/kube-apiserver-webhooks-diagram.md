@@ -32,6 +32,6 @@
 
 #### 3. Validating Admission Controllers
 
-* Open Policy Agent Gatekeeper is used as a Validating Admission Controller.
+* As of BigBang >= 2.0.0 Kyerno is used instead of Gatekeeper. See [Kyverno overview](../package-architecture/kyverno.md)
 * As of BigBang 1.7.0 OPA GK defaults to dry-run/warn and not blocking/enforcing mode,  [there are plans to change the default behavior to blocking/enforcing mode.](https://repo1.dso.mil/big-bang/bigbang/-/issues/468)
 * OPA GK can enforce security policy such as only allowing whitelisted container registries, PodSecurityPolicies equivalent functionality, and more.
