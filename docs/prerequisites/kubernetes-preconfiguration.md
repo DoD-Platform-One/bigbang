@@ -38,6 +38,7 @@ You can override bigbang's helm values so istio will provision a service of type
     kubectl patch psp global-unrestricted-psp -p '{"metadata": {"annotations":{"seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*"}}}'
     kubectl patch psp global-restricted-psp -p '{"metadata": {"annotations":{"seccomp.security.alpha.kubernetes.io/allowedProfileNames": "*"}}}'
     ```
+* [Kyverno can enforce similar security controls](https://kyverno.io/blog/2023/05/24/podsecuritypolicy-migration-with-kyverno/)
 
 ## Kubernetes Distribution Specific Notes
 

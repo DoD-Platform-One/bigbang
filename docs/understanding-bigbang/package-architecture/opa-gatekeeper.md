@@ -1,5 +1,7 @@
 # OPA-Gatekeeper
 
+# **DEPRECATED**: Kyverno is the preferred method to enforce policies within Big Bang as of version >=2.0.0
+
 ## Overview
 
 Gatekeeper is an auditing tool that allows administrators to see what resources are currently violating any given policy.
