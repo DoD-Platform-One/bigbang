@@ -839,6 +839,8 @@ policies:
           - kyverno-background-controller-*
           - kyverno-admission-controller-*
           - kyverno-cleanup-cluster-admission-reports-*
+          - kyverno-cleanup-cluster-ephemeral-reports-*
+          - kyverno-cleanup-update-requests-*
       - namespace: velero
         pods:
           allow:
