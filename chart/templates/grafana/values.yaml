@@ -177,7 +177,7 @@ datasources:
       {{- if eq .Values.loki.strategy "monolith" }}
       url: http://logging-loki.logging.svc.cluster.local:3100
       {{- else }}
-      url: http://logging-loki-read.logging.svc.cluster.local:3100
+      url: http://logging-loki-gateway.logging.svc.cluster.local
       {{- end }}
       access: proxy
       editable: true
