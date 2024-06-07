@@ -1,6 +1,6 @@
 # Big Bang
 
-Big Bang is a declarative, continuous delivery tool for deploying DoD hardened and approved packages into a Kubernetes cluster.
+Big Bang is a declarative, continuous delivery tool for deploying Department of Defense (DoD) hardened and approved packages into a Kubernetes cluster.
 
 > If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
@@ -8,17 +8,17 @@ Big Bang is a declarative, continuous delivery tool for deploying DoD hardened a
 
 Big Bang's scope is to provide publicly available installation manifests for packages required to adhere to the DoD DevSecOps Reference Architecture and additional useful utilities. Big Bang packages are broken into three categories:
 
-- Core: [Core packages](./docs/understanding-bigbang/package-architecture/README.md##Core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
+- **Core:** [Core packages](./docs/understanding-bigbang/package-architecture/README.md##Core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
 
-- Addons: [Addon packages](./docs/understanding-bigbang/package-architecture/README.md##Addons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
+- **Add-ons:** [Addon packages](./docs/understanding-bigbang/package-architecture/README.md##Addons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
 
-- Community: [Community packages](https://repo1.dso.mil/big-bang/product/community) are any packages that are maintained by the broader Big Bang community (users, vendors, etc). These packages could be alternatives to core or addon packages, or even entirely new packages to help extend usage/functionality of Big Bang.
+- **Community:** [Community packages](https://repo1.dso.mil/big-bang/product/community) are any packages that are maintained by the broader Big Bang community (e.g., users and/or vendors). These packages could be alternatives to core or add-on packages, or even entirely new packages to help extend usage/functionality of Big Bang.
 
-In order for an installation of Big Bang to be a valid installation/configuration you must install/deploy a core package of each category (for additional details on categories and options see [here](./docs/understanding-bigbang/package-architecture/README.md##Core)).
+In order for an installation of Big Bang to be a valid installation/configuration, you must install/deploy a core package of each category. For additional details on categories and options, see [here](./docs/understanding-bigbang/package-architecture/README.md##Core).
 
 Big Bang also builds tooling around the testing and validation of Big Bang packages. These tools are provided as-is, without support.
 
-Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, monitoring, etc. are handled via Big Bang.  Additional packages (e.g. ArgoCD, GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
+Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, and/or monitoring are handled via Big Bang.  Additional packages (e.g. ArgoCD and GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
 
 Additional information can be found in the [Big Bang Docs](./docs/README.md).
 
@@ -29,7 +29,7 @@ Additional information can be found in the [Big Bang Docs](./docs/README.md).
 
 ## Contributing to Big Bang
 
-There are 3 main ways to contribute to Big Bang:
+There are three primary ways to contribute to Big Bang:
 
 - [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/big-bang/bigbang/-/issues)
 - [Contribute to open-source projects under the Big Bang Technical Oversight Committee (BBTOC)](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/master/CONTRIBUTING.md)
@@ -41,7 +41,7 @@ Additional information can be found in the [contributing guide](./CONTRIBUTING.m
 
 ## Release Schedule
 
-- Big Bang releases adopt a standardized versioning based on and loosely following the [Semantic Versioning 2.0.0 guidelines](https://semver.org/spec/v2.0.0.html) (major.minor.patch). These releases are not based on a fixed schedule and instead the specifics in the following scheme.
+- Big Bang releases adopt a standardized versioning based on and loosely following the [Semantic Versioning 2.0.0 guidelines](https://semver.org/spec/v2.0.0.html) (major.minor.patch). These releases are not based on a fixed schedule and instead, follow the specifics in the following scheme:
 
 ### Patch Version
 
@@ -62,10 +62,10 @@ Minor version changes should be backwards compatible.
 
 A major version increment indicates a release that has significant changes, which could potentially break compatibility with previous versions. A major change is required when there are changes to the architecture of Big Bang or critical values file keys. For example removing a core package or changing significant values that propagate to all core and add-on packages are considered major version changes. As examples of major version changes:
 
-- Removal or renaming of Big Bang values.yaml top level keys (e.g., istio, git repository values, etc.)
+- Removal or renaming of Big Bang values.yaml top level keys (e.g., istio and/or git repository values).
 - Change to the structure of chart/templates files or key values.
 - Additional integration between core/add-on packages that require change to the charts of all packages.
-- Modification of Big Bang GitOps engine (i.e. switching from FluxCD -> ArgoCD)
+- Modification of Big Bang GitOps engine (i.e., switching from FluxCD -> ArgoCD).
 
 To see what is on the roadmap or included in a given release you can still review our [project milestones](https://repo1.dso.mil/groups/big-bang/-/milestones)
 
@@ -77,7 +77,7 @@ The Big Bang Universe Community Slack workspace is a great place to go to get in
 
 > All Big Bang documentation is also provided at [https://docs-bigbang.dso.mil](https://docs-bigbang.dso.mil) offering a better experience and improved searchability.
 
-The following list are useful starting points in the Big Bang documentation.
+Several useful starting points in the Big Bang documentation are listed in the following:
 
 - [Developer Contribution Documentation](./docs/developer/README.md)
 - [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)

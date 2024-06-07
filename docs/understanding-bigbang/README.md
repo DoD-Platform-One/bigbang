@@ -2,15 +2,15 @@
 
 Start with the [Documentation README](../README.md), which includes the following sections:
 
-* [What is Big Bang](../README.md#what-is-big-bang)
-* [What Big Bang is not](../README.md#what-big-bang-isnt)
+* [What is Big Bang?](../README.md#what-is-big-bang)
+* [What *isn't* Big Bang?](../README.md#what-big-bang-isnt)
 * [Benefits of Big Bang](../README.md#benefits-of-using-big-bang)
 
 ## Acronyms
 
 * **CSP**: Cloud Service Provider
 * **L4 LB**: Layer 4 Load Balancer
-* **KMS**: Key Management System / Encryption as a Service (AWS/GCP KMS, Azure Key Vault, HashiCorp Transient Secret Engine)
+* **KMS**: Key Management System/Encryption as a Service (AWS/GCP KMS, Azure Key Vault, HashiCorp Transient Secret Engine)
 * **PGP**: Pretty Good Privacy (Asymmetric Encryption Key Pair, where public key is used to encrypt, private key used to decrypt)
 * **SOPS**: "Secret Operations" CLI tool by Mozilla, leverages KMS or PGP to encrypt secrets in a Git Repo. (Flux and P1's modified ArgoCD can use SOPS to decrypt secrets stored in a Git Repo.)
 * **ATO**: Authority to Operate
