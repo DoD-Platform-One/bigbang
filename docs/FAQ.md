@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-## Costs and licensing fees
+## Costs and licensing Fees
 
 > Will a user, government program, or support contract incur any costs, other
 than their own labor, for installing and using Big Bang?
@@ -11,7 +11,7 @@ to use it in your environment.
 Our baseline includes multiple software components, with a variety
 of open-source and commercial licenses. Details of these components and
 their licensing models can be found in
-[Big Bang Licensing Model Overview](./understanding-bigbang/licensing-model.md)
+[Big Bang Licensing Model Overview.](./understanding-bigbang/licensing-model.md)
 
 In Big Bang 2.0, our default core components will be open source, though paid
 alternatives will remain available.
@@ -35,7 +35,7 @@ Platform One does offer optional hosting and support contracts:
   instance of Big Bang, which an application can be hosted on. Party Bus removes the
   need for you to operate a cluster entirely.
 
-For more information on services, [contact us](https://p1.dso.mil/contact-us) or email platformone@dso.mil
+For more information on services, [contact us](https://p1.dso.mil/contact-us) or email platformone@dso.mil.
 
 > Do we need a government PM to send a formal request to Platform One in order
 to get started?
@@ -54,8 +54,7 @@ TODO: reach out link
 > Is Big Bang secure? What about its plugins?
 
 Big Bang is compliant with the
-[DevSecOps Reference Architecture](https://dodcio.defense.gov/Portals/0/Documents/Library/DoD%20Enterprise%20DevSecOps%20Reference%20Design%20-%20CNCF%20Kubernetes%20w-DD1910_cleared_20211022.pdf),
-and is used at all impact levels and classifications.
+[DevSecOps Reference Architecture](https://dodcio.defense.gov/Portals/0/Documents/Library/DoD%20Enterprise%20DevSecOps%20Reference%20Design%20-%20CNCF%20Kubernetes%20w-DD1910_cleared_20211022.pdf), and is used at all impact levels and classifications.
 
 [Iron Bank](https://p1.dso.mil/products/iron-bank) performs automated scans of all image
 components used in Big Bang, and patches vulnerabilities as they are found. Big Bang
@@ -84,7 +83,7 @@ managed Big Bang Platform as a Service (PaaS) solution, or one of the [Big Bang 
 
 ## Change Control
 
-> How do you manage change control on BB? How can we be notified of changed?
+> How do you manage change control on Big Bang? How can we be notified of changed?
 
 Big Bang has a two-week release cadence. You can view our
 [release schedule](https://docs-bigbang.dso.mil/latest/#Navigating-our-documentation),
@@ -96,11 +95,11 @@ for more information.
 
 > Can you provide the latest documentation and briefings?
 
-The most up-to-date information on BigBang can be found  on
-[Big Bang Docs](https://docs-bigbang.dso.mil/latest/docs)
+The most up-to-date information on BigBang can be found on
+[Big Bang Docs.](https://docs-bigbang.dso.mil/latest/docs)
 
 An overview of BigBang's architecture, and the packages available, can be found
-on the [Big Bang Universe](https://universe.bigbang.dso.mil/)
+on the [Big Bang Universe.](https://universe.bigbang.dso.mil/)
 
 It would also be useful to review
-[Understanding Big Bang](https://docs-bigbang.dso.mil/latest/docs/understanding-bigbang/?h=understanding+bigbang%2F)
+[Understanding Big Bang.](https://docs-bigbang.dso.mil/latest/docs/understanding-bigbang/?h=understanding+bigbang%2F)
