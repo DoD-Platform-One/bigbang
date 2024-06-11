@@ -406,5 +406,11 @@ PLATFORM ONE THANOS WARNING:
     values:
       prometheus:
         prometheusSpec:
-          replicas: 3
+
+{{- end }}
+
+{{- if (eq .Values.loki.strategy "distributed") }}
+PLATFORM ONE LOKI WARNING:
+  BigBang does not support the Loki Distributed deployment mode. For production deployments,
+  please set your strategy to "scalable" or "monolithic"
 {{- end }}
