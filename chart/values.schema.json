@@ -536,7 +536,8 @@
           "type": "string",
           "enum": [
             "monolith",
-            "scalable"
+            "scalable",
+            "distributed"
           ]
         },
         "objectStorage": {
