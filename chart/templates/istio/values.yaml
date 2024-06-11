@@ -14,7 +14,7 @@ enterprise: {{ .Values.istio.enterprise }}
 
 istiod:
 {{- if not (semverCompare "<1.19" .Capabilities.KubeVersion.GitVersion) }}
-  env: 
+  env:
     - name: ENABLE_LEGACY_FSGROUP_INJECTION
       value: "false"
 {{- end }}
@@ -93,6 +93,7 @@ ingressGateways:
     {{- if $values.extraLabels }}
     {{- toYaml (dict "extraLabels" $values.extraLabels) | nindent 4 }}
     {{- end}}
+    enabled: {{ ne $values.enabled false }}
 {{- end }}
 
 {{- if .Values.istio.gateways }}
