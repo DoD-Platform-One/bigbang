@@ -14,8 +14,6 @@ metadata:
 spec:
   # Use a non-persistent client to allow for Gatekeeper CRD *magic*
   persistentClient: false
-  driftDetection:
-    mode: enabled
   targetNamespace: gatekeeper-system
   chart:
     spec:

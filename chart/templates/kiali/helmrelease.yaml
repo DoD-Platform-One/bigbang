@@ -12,8 +12,6 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kiali/values.yaml") . | sha256sum }}
 spec:
-  driftDetection:
-    mode: enabled
   targetNamespace: kiali
   chart:
     spec:

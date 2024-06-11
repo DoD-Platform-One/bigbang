@@ -71,7 +71,4 @@ spec:
     - name: ek
       namespace: {{ $.Release.Namespace }}
     {{- end }}
-    
-  driftDetection:
-    mode: disabled
 {{- end }}
