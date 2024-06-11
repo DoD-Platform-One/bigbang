@@ -1,42 +1,42 @@
 # Big Bang Licensing Model Overview
 
-While Big Bang is open source and free to use, the same cannot be said of its components. The licensing requirements of components requires a nuanced explanation. The intent of this document is to be a self service resource to help consumers of Big Bang make an informed decision regarding licenses they may need to successfully deploy an ATO'able DevSecOps Platform using Big Bang.
+While Big Bang is open source and free to use, the same cannot be said of its components. The licensing requirements of components requires a nuanced explanation. The intent of this document is to be a self-service resource to help consumers of Big Bang make an informed decision regarding licenses they may need to successfully deploy an Authority to Operate (ATO)-capable DevSecOps Platform using Big Bang.
 
 ## What Licenses Do I Need for Big Bang?
 
 There are two issues that make it difficult to figure out Big Bang's license requirements:
 
-1. The modular (and in some cases swappable) componentized nature of Big Bang means choices affect license requirements. OS, Kubernetes Distribution, and Application decisions need to be made before license requirements can be sorted out.
-1. Freemium applications often require a license to unlock features like HA (High Availability), advanced SSO functionality with authn, authz, and audit logging of federated users, or advanced compliance controls like FIPS 140-2 mode, compliance reporting, or audit logs.
+1. The modular (and in some cases, swappable) componentized nature of Big Bang means choices affect license requirements. OS, Kubernetes Distribution, and Application decisions need to be made before license requirements can be sorted out.
+1. Freemium applications often require a license to unlock features like High Availability (HA), advanced SSO functionality with authn, authz, and audit logging of federated users, or advanced compliance controls, including FIPS 140-2 mode, compliance reporting, or audit logs.
 
 ## What Components Could Have Licenses?
 
-1. OS / CSP(Cloud Service Providers) VM Images:
-   * RHEL requires a subscription and comes with vendor support.
-   * CSPs often offer licensed VM Images at additional per hour cost, these add features like offloading STIG/CIS OS hardening.
-   * Several free Linux OS Distributions exist, including Ubuntu and free RHEL alternatives like Amazon Linux 2 and others. There are also tools like [openscap](https://www.open-scap.org/), which has ansible and bash scripts to automate STIG/CIS benchmark compliance for OS security to help automate DIY hardening of the OS.
-1. Kubernetes Distributions:
-   * RedHat OpenShift, VMware TKG, and D2IQ Konvoy each require a license, that comes with support and additional features, they each offer 30-90 day trial licenses.
-   * There are free options like kubeadm, k0s, k3s, RKE2, talos-systems, and many other CNCF compliant distributions.
-   * k0s, RKE2, and talos-systems are free options with optional paid Vendor Support.
-1. Big Bang's Core Applications:
-   * Many of the core applications are free open source software.
-     * The default deployment of Big Bang does not require any licenses.
-   * Twistlock is a core component that requires a license.
-   * ElasticSearch is a core component that requires a license to unlock additional features, that could be considered required in some cases (more on this nuance below).
-1. Big Bang's Supported AddOn Applications:
-   * Also include a mix of free, freemium, and licensed products.
-1. Big Bang Integration Support:
-   * Big Bang is free, but support tiers are available for purchase through Platform One.
+1. OS/Cloud Service Providers (CSP) VM Images:
+    * RHEL requires a subscription and comes with vendor support.
+    * CSPs often offer licensed VM Images at additional per hour cost. These add features like offloading STIG/CIS OS hardening.
+    * Several free Linux OS Distributions exist, including Ubuntu and free RHEL alternatives (e.g., Amazon Linux 2). There are also tools such as [openscap](https://www.open-scap.org/), which has ansible and bash scripts to automate STIG/CIS benchmark compliance for OS security to help automate DIY hardening of the OS.
+2. Kubernetes Distributions:
+    * RedHat OpenShift, VMware TKG, and D2IQ Konvoy each require a license, that comes with support and additional features, they each offer 30-90 day trial licenses.
+    * There are free options like kubeadm, k0s, k3s, RKE2, talos-systems, and many other CNCF compliant distributions.
+    * k0s, RKE2, and talos-systems are free options with optional paid Vendor Support.
+3. Big Bang's Core Applications:
+    * Many of the core applications are free open source software.
+        * The default deployment of Big Bang does not require any licenses.
+    * Twistlock is a core component that requires a license.
+    * ElasticSearch is a core component that requires a license to unlock additional features, that could be considered required in some cases; more information on this nuance is provided below.
+4. Big Bang's Supported AddOn Applications:
+    * Includes a mix of free, freemium, and licensed products.
+5. Big Bang Integration Support:
+    * Big Bang is free, but support tiers are available for purchase through Platform One.
 
 ## Who Purchases the Licenses?
 
-Licensing of products deployable by Big Bang are not covered by Big Bang or Platform One. As a general rule of thumb the acquisition of licenses is the responsibility of the end-user's organization, and product vendors should be contacted for support of their respective products. (Party Bus is an example of an exception to the rule of thumb.)
+Licensing of products deployable by Big Bang are not covered by Big Bang or Platform One. As a general rule of thumb the acquisition of licenses is the responsibility of the end-user's organization, and product vendors should be contacted for support of their respective products. Party Bus is an example of an exception to the rule of thumb.
 
 ## Who Decides If a Licenced Feature in a Freemium Application Is a Hard Requirement?
 
-* The Consumer of Big Bang, their security team, and their AO (Authorizing Official) need to decide if licensed features constitute a hard requirement or if free tier functionality can be considered at lower impact levels or unique use cases.
-* In most cases licenses will be required due to security controls only being available in the fully licensed version; however, users may be able to hold off on licensed versions for non-ATO'd proof of concept deployments or risk acceptance by an AO for unique scenarios.
+* The Consumer of Big Bang, their security team, and their Authorizing Official (AO) need to decide if licensed features constitute a hard requirement or if free tier functionality can be considered at lower impact levels or unique use cases.
+* In most cases, licenses will be required due to security controls only being available in the fully licensed version. However, users may be able to hold off on licensed versions for non-ATO'd proof of concept deployments or risk acceptance by an AO for unique scenarios.
 * Even without a hard requirement for a license (like in the case of a Kubernetes Cluster), consumers of Big Bang may still want to consider purchasing licenses or support contracts.
 
 ## Table to Help Elaborate on Nuances of Application Licensing
