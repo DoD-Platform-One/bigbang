@@ -1191,28 +1191,31 @@ grafana:
 
 neuvector:
   values:
+    enforcer:
+      podAnnotations:
+        sidecar.istio.io/proxyMemoryLimit: "2Gi"
     k3s:
       enabled: true
     istio:
-     enabled: true
-     hardened:
-       enabled: true
-       customServiceEntries:
-         - name: "cypress-service-entries-neuvector"
-           enabled: true
-           spec:
-             hosts:
-               - 'registry.npmjs.org'
-               - 'download.cypress.io'
-               - 'cdn.cypress.io'
-               - 'repo1.dso.mil'
-               - 'neuvector.dev.bigbang.mil'
-             location: MESH_EXTERNAL
-             ports:
-               - number: 443
-                 protocol: TLS
-                 name: https
-             resolution: DNS
+      enabled: true
+      hardened:
+        enabled: true
+        customServiceEntries:
+          - name: "cypress-service-entries-neuvector"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+                - 'repo1.dso.mil'
+                - 'neuvector.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
     bbtests:
       enabled: true
       cypress:
