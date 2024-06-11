@@ -12,8 +12,6 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-operator/values.yaml") . | sha256sum }}
 spec:
-  driftDetection:
-    mode: enabled
   targetNamespace: istio-operator
   chart:
     spec:

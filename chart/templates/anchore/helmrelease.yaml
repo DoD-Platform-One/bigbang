@@ -8,8 +8,6 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/anchore/values.yaml") . | sha256sum }}
 spec:
-  driftDetection:
-    mode: enabled
   releaseName: anchore
   targetNamespace: anchore
   chart:

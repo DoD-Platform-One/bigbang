@@ -12,8 +12,6 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/cluster-auditor/values.yaml") . | sha256sum }}
 spec:
-  driftDetection:
-    mode: enabled
   targetNamespace: cluster-auditor
   chart:
     spec:

@@ -134,6 +134,8 @@ flux:
   rollback:
     timeout: 10m
     cleanupOnFail: true
+  driftDetection:
+    mode: disabled
 
 # -- Global NetworkPolicies settings
 networkPolicies:
