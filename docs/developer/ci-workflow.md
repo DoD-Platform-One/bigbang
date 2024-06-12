@@ -6,38 +6,38 @@ The following is meant to serve as an overview of the pipeline stages required t
 
 ## Bigbang Runners Overview
 
-### Privileged runners
+### Privileged Runners
 
   These run on a privileged node pool with limited access to allow for docker in docker k3d clusters.
-  - Package runners:
-    - Separate runners for each BBTOC stage; graduated, incubating, and sandbox.
-    - These run package k3d pipelines.
-  - Bigbang runner:
-    - Runner used specifically for the bigbang repo.
-    - This runs bigbang k3d pipelines.
+  * Package runners:
+      * Separate runners for each BBTOC stage; graduated, incubating, and sandbox.
+      * These run package k3d pipelines.
+  * bigbang runner:
+      * Runner used specifically for the bigbang repo.
+      * This runs bigbang k3d pipelines.
     
-### Non-privileged
+### Non-Privileged Runners
 
   These run on a non-privileged node pool.
-  - generic runner:
-    - This runner picks up all non-privileged stages within all pipelines; configuration validation, chart update check, pre vars.
-    - Used to spin up infrastructure testing clusters.
-  - release runner:
-    - This runner handles all package and release stages in all pipelines.
-    - Hashes, signs, and pushes all artifacts to bigbang umbrella s3 bucket.
+  * Generic runner:
+      * This runner picks up all non-privileged stages within all pipelines: configuration validation, chart update check, and pre vars.
+      * Used to spin up infrastructure testing clusters.
+  * Release runner:
+      * This runner handles all package and release stages in all pipelines.
+      * Hashes, signs, and pushes all artifacts to bigbang umbrella s3 bucket.
 
 ## Package Pipeline Stages
 
 This pipeline is triggered by the following for individual bigbang packages:
 
-- merge request events
-  - Note: Currently upgrade step only runs during MR events
-- manual tag events
-- commits to default branch
+* Merge Request (MR) events
+    * **NOTE:** Currently upgrade step only runs during MR events
+* Manual tag events
+* Commits to default branch
 
 ![Package Pipeline](../assets/imgs/developer/package-pipeline.png)
 
-[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
+[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer/ci workflow changes. It is provided here for ease of use.
 
 ### Chart Update Check
 
@@ -47,8 +47,8 @@ This stage validates that the required files have been updated; README, Changelo
 
 This stage runs a `helm conftest` which is a plugin for testing helm charts with Open Policy Agent. It provides the following checks:
 
-- confirms that the helm chart is valid (should fail similar to how a helm lint fails if there is bad yaml, etc)
-- runs the helm chart against a set of rego policies - currently these tests will only raise warnings on "insecure" things and will allow pipeline to proceed.
+* Confirms that the helm chart is valid (e.g., should fail similar to how a helm lint fails if there is bad yaml).
+* Runs the helm chart against a set of rego policies. Currently, these tests will only raise warnings on "insecure" things and will allow pipeline to proceed.
 
 This stage also validates the oscal-component.yaml and checks for api deprecations within the package.
 
@@ -58,17 +58,17 @@ This stage checks the MR description to ensure the `## Upgrade Notices` section 
 
 ### Package Tests
 
-This stage verifies several easy to check assumptions such as:
+This stage verifies several easy-to-check assumptions, including:
 
-- does package successfully install
-- does package successfully upgrade (from master)
-- package specific tests
+* Does package successfully install?
+* Does package successfully upgrade (from master)?
+* Package specific tests.
 
-If required, the upgrade step can skipped when MR title starts with 'SKIP UPGRADE'
+If required, the upgrade step can be skipped when the MR title starts with 'SKIP UPGRADE.'
 
 ### Auto Tag
 
-When there is a merge into the default branch of a package this stage is triggered and it will create a tag based on the version in the packages Chart.yaml
+When there is a merge into the default branch of a package, this stage is triggered and it will create a tag based on the version in the packages Chart.yaml.
 
 ### Package 
 
@@ -76,26 +76,26 @@ This stage is triggered when a protected tag is created. It is responsible for p
 
 ### Release
 
-Upon successful completion of the package stage this release stage will use those artifacts and run the gitlab release-cli utility to publish the release.
+Upon successful completion of the package stage, this release stage will use those artifacts and run the gitlab release-cli utility to publish the release.
 
-### Creating Big Bang Merge Request
+### Creating bigbang MR
 
-Post merge to the default branch and tag creation above, the last step of the package release stage will perform `Creating Big Bang Merge Request` which will pull down information from the package MR and auto increment the package's `git/helmRepo.tag` value along with pulling in the CHANGELOG and linking the package merge request. This stage can be skipped by adding `skip-bb-mr` label to the package MR pre-tag/release pipeline if a BigBang MR is already opened that will be manually updated to include the new tag.
+Post merge to the default branch and tag creation above, the last step of the package release stage will perform `Creating bigbang Merge Request` which will pull down information from the package MR and auto increment the package's `git/helmRepo.tag` value along with pulling in the CHANGELOG and linking the package merge request. This stage can be skipped by adding `skip-bb-mr` label to the package MR pre-tag/release pipeline if a bigbang MR is already opened that will be manually updated to include the new tag.
 
-## BigBang Pipeline Stages
+## bigbang Pipeline Stages
 
 This pipeline is triggered by the following for bigbang:
 
-- merge request events
-  - Note: Currently upgrade step only runs during MR events
-- manual tag events
-- commits to default branch
+* MR events
+    * **NOTE:** Currently upgrade step only runs during MR events
+* Manual tag events
+* Commits to default branch
 
 The pipeline is split into several stages:
 
 ![BB Pipeline](../assets/imgs/developer/bb-pipelines.png)
 
-[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer / ci workflow changes. It is provided here for ease of use.
+[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer/ci workflow changes. It is provided here for ease of use.
 
 ### Pre Vars
 
@@ -105,27 +105,27 @@ This stage generates a terraform var, grabs merge request labels, checks for cha
 
 For fast feedback testing, an ephemeral in cluster pipeline is created using [`k3d`](https://k3d.io) that lives for the lifetime of the gitlab ci job (max 1 hour).  Within that cluster, BigBang is deployed, and an initial set of smoke tests are performed against the deployment to ensure basic conformance.
 
-This stage verifies several easy to check assumptions such as:
+This stage verifies several easy to check assumptions, including:
 
-- does BigBang successfully install
-- does BigBang successfully upgrade (from master)
-- are endpoints routable
+* Does BigBang successfully install?
+* Does BigBang successfully upgrade (from master)?
+* Are endpoints routable?
 
 This stage will fail if:
 
-- script failures
-- gitrepositories status condition != ready
-- expected helm releases are not present
-- helm releases fail or timeout
-- kustomization secrets are not ready or timeout
-- deployments status condition != ready
-- jobs status condition != complete
-- statefulsets/daemonsets not 100% ready (ex. 0/1)
-- any virtual service endpoints are not accessible
+* script failures
+* gitrepositories status condition != ready
+* expected helm releases are not present
+* helm releases fail or timeout
+* kustomization secrets are not ready or timeout
+* deployments status condition != ready
+* jobs status condition != complete
+* statefulsets/daemonsets not 100% ready (ex. 0/1)
+* any virtual service endpoints are not accessible
 
 This stage also serves as a guide for local development, and care is taken to ensure all pipeline actions within this stage are repeatable locally.
 
-This stage is ran on every merge request event, and is a requirement for merging.
+This stage is ran on every MR event, and is a requirement for merging.
 
 ### Package 
 
@@ -142,10 +142,10 @@ Ultimately, BigBang is designed to deploy production ready workloads on real inf
 As part of Big Bang's architecture, it is expected work on any CNCF conformant Kubernetes cluster, on multiple clouds, and on premise environments.  By very definition, this means infrastructure testing is _slow_.  To strive for a pipeline with a happy medium of providing fast feedback while still exhaustively testing against environments that closely mirror production, __infrastructure testing only occurs on manual actions on merge request commits.__
 This requires adding `test-ci::infra` label to your MR. In addition, infrastructure testing pipeline is run nightly on a schedule.
 
-Note: Due to the amount of resources and time required for this pipeline, the `test-ci::infra` label should be used sparingly. The scheduled nightly run will ideally catch issues if they are already in master. The `test-ci::infra` label should mainly be used when:
+**NOTE:** Due to the amount of resources and time required for this pipeline, the `test-ci::infra` label should be used sparingly. The scheduled nightly run will ideally catch issues if they are already in master. The `test-ci::infra` label should mainly be used when:
 
-- your changes affect the infra ci
-- your changes are large in scope and likely to behave differently on "real" clusters
+* Your changes affect the infra ci
+* Your changes are large in scope and likely to behave differently on "real" clusters
 
 When you are comfortable your branch is ready to be merged, opening up an merge request will trigger the creation of a suite of infrastructure testing jobs which will require a manual action from a project maintainer (assuming smoke tests have passed).  Once the commit(s) are validated against the infrastructure tests, your changes are ready to be merged!
 
@@ -153,7 +153,7 @@ For _most_ of the infrastructure testing, `terraform` is chosen as the IAC tool 
 
 The infrastructure pipeline is designed to have _no_ human interaction, and is scoped to the lifecycle of the pipeline.  This means a single pipeline is fully responsible for provisioning infrastructure, but just as important, deprovisioning infrastructure, ensuring resources are not orphaned.
 
-More information on the full set of infrastructure tests are below:
+More information on the full set of infrastructure tests are provided in the following:
 
 ![Infra Pipeline](../assets/imgs/developer/infra-test-pipelines.png)
 
@@ -161,7 +161,7 @@ More information on the full set of infrastructure tests are below:
 
 ### Network Creation
 
-For each cloud, a BigBang owned network will be created that conform with the appropriate set of tests about to be ran.  For example, to validate that Big Bang deploys in a connected environment on AWS, a VPC, subnets, route tables, etc... are created, and the outputs are made available through terraform's remote `data` source.
+For each cloud, a BigBang owned network will be created that conform with the appropriate set of tests about to be ran.  For example, to validate that Big Bang deploys in a connected environment on AWS, a VPC, subnets, and/or route tables are created, and the outputs are made available through terraform's remote `data` source.
 
 At this time the infrastructure testing pipeline is only utilizing internet-connect AWS govcloud.
 
@@ -183,11 +183,11 @@ Like any BigBang installation, several cluster requirements (see [Pre-requisites
 
 Assuming BigBang has installed successfully, additional tests residing within the `./tests` folder of this repository are run against the deployed cluster.
 
-Currently there are 3 test scripts that test the following:
+Currently, there are three test scripts that test the following:
 
-- wait for resources to be ready, ensures everything goes to running at a kubernetes level
-- curl VirtualService endpoints, to validate istio works + the UIs are up
-- fetch a list of non-IB images (this test never fails but provides some contextual info)
+* Wait for resources to be ready, ensures everything goes to running at a kubernetes level.
+* Curl VirtualService endpoints, to validate istio works + the UIs are up.
+* Fetch a list of non-IB images; this test never fails, but provides some contextual info.
 
 ### Teardown
 
