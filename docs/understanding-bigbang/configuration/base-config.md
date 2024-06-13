@@ -487,10 +487,10 @@ To start using Big Bang, you will need to create your own Big Bang environment t
 | addons.fortify.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.fortify.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/fortify.git"` |  |
 | addons.fortify.git.path | string | `"./chart"` |  |
-| addons.fortify.git.tag | string | `"1.1.2320154-bb.9"` |  |
+| addons.fortify.git.tag | string | `"1.1.2320154-bb.12"` |  |
 | addons.fortify.helmRepo.repoName | string | `"registry1"` |  |
 | addons.fortify.helmRepo.chartName | string | `"fortify-ssc"` |  |
-| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.9"` |  |
+| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.12"` |  |
 | addons.fortify.flux | object | `{}` | Flux reconciliation overrides specifically for the Fortify Package |
 | addons.fortify.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.fortify.sso.enabled | bool | `false` | Toggle SSO for Fortify on and off |
