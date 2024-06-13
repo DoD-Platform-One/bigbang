@@ -78,6 +78,8 @@ elasticsearchKibana:
 
 loki:
   values:
+    global:
+      dnsService: rke2-coredns-rke2-coredns  
     bbtests:
       cypress:
         artifacts: false
@@ -491,7 +493,9 @@ addons:
             runAsUser: 1001
             runAsGroup: 1001
             runAsNonRoot: true
-
+            capabilities:
+              drop:
+              - ALL
   mattermost:
     values:
       bbtests:
