@@ -1,13 +1,14 @@
 # Package Development
 
-Package is the term we use for an application that has been prepared to be deployed with the BigBang helm chart. BigBang Packages are wrappers around Helm charts. All of the pertinent information should be included in the chart/values.yaml for configuration of the Package. These values are then available to be overridden in the BigBang chart/values.yaml file. The goal of these Packages is to take something that might be very complex and simplify it for consumers of BigBang. Rational and safe defaults should be used where possible while also allowing for overriding values when fine-grained control is needed. As much as possible test after each step so that the errors don't pile up, "code a little, test a little". Here are the steps:
+Package is the term we use for an application that has been prepared to be deployed with the Big Bang helm chart. Big Bang Packages are wrappers around Helm charts. All of the pertinent information should be included in the chart/values.yaml for configuration of the Package. These values are then available to be overridden in the Big Bang chart/values.yaml file. The goal of these Packages is to take something that might be very complex and simplify it for consumers of Big Bang. Rational and safe defaults should be used where possible while also allowing for overriding values when fine-grained control is needed. As much as possible, test after each step so that the errors don't pile up; "code a little, test a little." The steps are provided in the following:
 
-1. Create a repository under the appropriate group ( example: Security Tools, Developer Tools, Collaboration Tools) in [Repo1](https://repo1.dso.mil/big-bang/apps).
+1. Create a repository under the appropriate group (e.g., Security Tools, Developer Tools, Collaboration Tools) in [Repo1](https://repo1.dso.mil/big-bang/apps).
 
-1. Create a "main" branch that will serve as the master branch.
+2. Create a "main" branch that will serve as the master branch.
 
-1. There are two ways to start a new Package.  
-    1. If there is no upstream helm chart we create a helm chart from scratch. Here is a T3 video that demonstrates creating a new helm chart. Create a directory called "chart" in your repo, change to the chart directory, and scaffold a new chart in the chart directory
+3. There are two ways to start a new package.  
+
+    a. If there is no upstream helm chart, we create a helm chart from scratch. Here is a T3 video that demonstrates creating a new helm chart. Create a directory called "chart" in your repo, change to the chart directory, and scaffold a new chart in the chart directory.
 
         ```shell
         # Scaffold new helm chart
@@ -16,19 +17,19 @@ Package is the term we use for an application that has been prepared to be deplo
         helm create name-of-your-application
         ```
 
-    2. If there is an existing upstream chart we will use it and modify it. Essentially we create a "fork" of the upstream code. Use kpt to import the helm chart code into your repository. Note that kpt is not used to keep the Package code in sync with the upstream chart. It is a one time pull just to document where the upstream chart code came from. Kpt will generate a Kptfile that has the details. Do not manually create the "chart" directory.  The kpt command will create it. Here is an example from when Gitlab Package was created. It is a good idea to push a commit "initial upstream chart with no changes" so you can refer back to the original code while you are developing.
+    b. If there is an existing upstream chart, we will use it and modify it. Essentially we create a "fork" of the upstream code. Use kpt to import the helm chart code into your repository. Note that kpt is not used to keep the Package code in sync with the upstream chart. It is a one time pull just to document where the upstream chart code came from. Kpt will generate a Kptfile that has the details. Do not manually create the "chart" directory.  The kpt command will create it. Here is an example from when Gitlab Package was created. It is a good idea to push a commit "initial upstream chart with no changes" so you can refer back to the original code while you are developing.
 
         ```shell
         kpt pkg get https://gitlab.com/gitlab-org/charts/gitlab.git@v4.8.0 chart
         ```
 
-1. Run a helm dependency update that will download any external sub-chart dependencies. Commit any *.tgz files that are downloaded into the "charts" directory. The reason for doing this is that BigBang Packages must be able to be installed in an air-gap without any internet connectivity.
+4. Run a helm dependency update that will download any external sub-chart dependencies. Commit any *.tgz files that are downloaded into the "charts" directory. The reason for doing this is that BigBang Packages must be able to be installed in an air-gap without any internet connectivity.
 
     ```shell
     helm dependency update
     ```
 
-1. Edit the Chart.yaml and set the chart ```version:``` number to be compliant with the charter versioning which is {UpstreamChartVersion}-bb.{BigBangVersion}. Note that the chart version is not the same thing as the application version. If this is a patch to an existing Package chart then increment the {BigBangVersion}. Here is an example from Gitlab Runner.
+5. Edit the Chart.yaml and set the chart ```version:``` number to be compliant with the charter versioning which is {UpstreamChartVersion}-bb.{BigBangVersion}. Note that the chart version is not the same thing as the application version. If this is a patch to an existing Package chart then increment the {BigBangVersion}. Here is an example from Gitlab Runner.
 
     ```yaml
     apiVersion: v1
@@ -38,7 +39,7 @@ Package is the term we use for an application that has been prepared to be deplo
     description: GitLab Runner
     ```
 
-1. In the values.yaml replace public upstream images with IronBank hardened images. The image version should be compatible with the chart version. Here is a command to identify the images that need to be changed.
+6. In the values.yaml replace public upstream images with IronBank hardened images. The image version should be compatible with the chart version. Here is a command to identify the images that need to be changed.
 
     ```shell
     # list images
@@ -58,22 +59,23 @@ Package is the term we use for an application that has been prepared to be deplo
         - name: private-registry
     ```
 
-1. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
+7. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
 
-1. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml". The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additional policies to open traffic as needed. Refer to the other Packages code for examples. The [Gitlab package](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/tree/main/chart/templates/bigbang/networkpolicies) is a good/complete example.
+8. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml." The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additional policies to open traffic as needed. Refer to the other Packages code for examples. The [Gitlab package](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/tree/main/chart/templates/bigbang/networkpolicies) is a good/complete example.
 
-1. Add a continuous integration (CI) pipeline to the Package. A Package should be able to be deployed by itself, independently from the BigBang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library. Instructions are not repeated here.
+9. Add a Continuous Integration (CI) pipeline to the Package. A Package should be able to be deployed by itself, independently from the Big Bang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#using-the-infrastructure-in-your-package-ci-gitlab-pipeline) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library. Instructions are not repeated here.
 
-1. Documentation for the Package should be included. A "docs" directory would include all detailed documentation. Reference other that Packages for examples.
-    1. You should include a `DEVELOPMENT_MAINTENANCE.md` file in this directory. Outlined in this file should the following: 
+10. Documentation for the Package should be included. A "docs" directory would include all detailed documentation. Reference other Packages for examples.
+
+    a. You should include a `DEVELOPMENT_MAINTENANCE.md` file in this directory. Outlined in this file should the following: 
     
-       - How to update the package
-       - How to deploy the package in a test environment
-       - How to test the package
-       - A list of modifications that were made from the upstream chart
+    * How to update the package.
+    * How to deploy the package in a test environment.
+    * How to test the package.
+    * A list of modifications that were made from the upstream chart.
 
 
-1. Add the following markdown files to complete the Package. Reference other that Packages for examples of how to create them.
+11. Add the following markdown files to complete the Package. Reference other that Packages for examples of how to create them.
 
     ```shell
     CHANGELOG.md      <  standard history of changes made  
@@ -82,14 +84,14 @@ Package is the term we use for an application that has been prepared to be deplo
     README.md         <  introduction and high level information  
     ```
 
-1. Create a top-level tests directory and inside put a test-values.yaml file that includes any special values overrides that are needed for CI pipeline testing. Refer to other packages for examples. But this is specific to what is needed for your package.
+12. Create a top-level tests directory and inside put a test-values.yaml file that includes any special values overrides that are needed for CI pipeline testing. Refer to other packages for examples. But this is specific to what is needed for your package.
 
     ```shell
     mkdir tests
     touch test-values.yaml
     ```
 
-1. At a high level, a Package structure should look like this when you are finished  
+13. At a high level, a Package structure should look like this (below) when you are finished.  
 
     ```plaintext
     ├── chart/
@@ -114,13 +116,15 @@ Package is the term we use for an application that has been prepared to be deplo
     └── README.md
     ```
 
-1. Merging code should require approval from a minimum of 2 codeowners. To setup merge requests to work properly with CODEOWNERS approval change these settings in your project:  
-Under Settings → General → Merge Request Approvals, change "Any eligible user" "Approvals required" to 1. Also ensure that "Require new approvals when new commits are added to an MR" is checked.  
-Under Settings → Repository → Protected Branches, add the main branch with "Developers + Maintainers" allowed to merge, "No one" allowed to push, and "Codeowner approval required" turned on.  
-Under Settings → Repository → Default Branch, ensure that main is selected.  
+14. Merging code should require approval from a minimum of two codeowners. To se tup merge requests to work properly with CODEOWNERS approval, change these settings in your project:  
 
-1. Development Testing Cycle: Test your Package chart by deploying with helm. Test frequently so you don't pile up multiple layers of errors. The goal is for Packages to be deployable independently of the bigbang chart. Most upstream helm charts come with internal services like a database that can be toggled on or off. If available use them for testing and CI pipelines. In some cases this is not an option. You can manually deploy required in-cluster services in order to complete your development testing.  
-    Here is an example of an in-cluster postgres database
+     a. Under Settings → General → Merge Request Approvals, change "Any eligible user" "Approvals required" to 1. Also ensure that "Require new approvals when new commits are added to an MR" is checked.  
+
+     b. Under Settings → Repository → Protected Branches, add the main branch with "Developers + Maintainers" allowed to merge, "No one" allowed to push, and "Codeowner approval required" turned on.  
+
+     c. Under Settings → Repository → Default Branch, ensure that main is selected.  
+
+15. Development Testing Cycle: Test your Package chart by deploying with helm. Test frequently so you don't pile up multiple layers of errors. The goal is for Packages to be deployable independently of the bigbang chart. Most upstream helm charts come with internal services like a database that can be toggled on or off. If available use them for testing and CI pipelines. In some cases this is not an option. You can manually deploy required in-cluster services in order to complete your development testing.  Here is an example of an in-cluster postgres database.
 
     ```shell
     helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -168,7 +172,7 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
     kubectl delete ns <namespace>
     ```
 
-1. Wait to create a git tag release until integration testing with BigBang chart is completed.  You will very likely discover more Package changes that are needed during BigBang integration. When you are confident that the Package code is complete, squash commits and rebase your development branch with the "main" branch.
+16. Wait to create a git tag release until integration testing with BigBang chart is completed.  You will very likely discover more Package changes that are needed during BigBang integration. When you are confident that the Package code is complete, squash commits and rebase your development branch with the "main" branch.
 
     ```shell
     git rebase origin/main
@@ -178,22 +182,22 @@ Under Settings → Repository → Default Branch, ensure that main is selected.
     git push --force
     ```
 
-1. Then, create a merge request to branch "main"
+17. Then, create a merge request to branch "main."
 
-1. After the merge create a git tag following the charter convention of {UpstreamChartVersion}-bb.{BigBangVersion}. The tag should exactly match the chart version in the Chart.yaml.
+18. After the merge create a git tag following the charter convention of {UpstreamChartVersion}-bb.{BigBangVersion}. The tag should exactly match the chart version in the Chart.yaml.
 example:    1.2.3-bb.0
 
 ## Private registry secret creation
 
 In some instances you may wish to manually create a private-registry secret in the namespace or during a helm deployment.  There are a couple of ways to do this:
 
-1. The first way is to add the secret manually using kubectl. This method is useful for standalone package testing/development.
+19. The first way is to add the secret manually using kubectl. This method is useful for standalone package testing/development.
 
     ```shell
     kubectl create secret docker-registry private-registry --docker-server="https://registry1.dso.mil" --docker-username='Username' --docker-password="CLI secret" --docker-email=<your-email> --namespace=<package-namespace>
     ```
 
-2. The second is to create a yaml file containing the secret and apply it during a helm install. This method is applicable when installing your new package as part of the Big Bang chart. In this example the file name is "reg-creds.yaml":
+20. The second is to create a yaml file containing the secret and apply it during a helm install. This method is applicable when installing your new package as part of the Big Bang chart. In this example the file name is "reg-creds.yaml":
 
     Create the file with the secret contents:
 
