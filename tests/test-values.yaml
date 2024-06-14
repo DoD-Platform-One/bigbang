@@ -2516,17 +2516,33 @@ addons:
                 }
               }
 
-              seal "awskms" {
-                region     = "us-gov-west-1"
-                kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
-                endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
-              }
-
-              telemetry {
-                prometheus_retention_time = "24h"
-                disable_hostname = true
-              }
               service_registration "kubernetes" {}
+
+          config: |
+            ui = true
+
+            listener "tcp" {
+              tls_disable = false
+              address = "[::]:8200"
+              cluster_address = "[::]:8201"
+              tls_cert_file = "/vault/tls/tls.crt"
+              tls_key_file  = "/vault/tls/tls.key"
+              telemetry {
+                unauthenticated_metrics_access = true
+              }
+            }
+
+            seal "awskms" {
+              region     = "us-gov-west-1"
+              kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
+              endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+            }
+
+            telemetry {
+              prometheus_retention_time = "24h"
+              disable_hostname = true
+            }
+            service_registration "kubernetes" {}
       istio:
         hardened:
           enabled: true
