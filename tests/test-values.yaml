@@ -1430,13 +1430,6 @@ addons:
       storage:
         volume: 5Gi
       jvmMaxRAMPercentage: 85
-      resources:
-        limits:
-          cpu: 2
-          memory: 8Gi
-        requests:
-          cpu: 1
-          memory: 1Gi
       databaseSecret:
         useRoot: true
       initContainer:
