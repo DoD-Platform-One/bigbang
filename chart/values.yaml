@@ -174,11 +174,11 @@ istio:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
     path: "./chart"
-    tag: "1.21.2-bb.2"
+    tag: "1.21.2-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "istio"
-    tag: "1.21.2-bb.2"
+    tag: "1.21.2-bb.3"
     # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI).  Set to 'false' to disable verification.
     # cosignVerify:
 
@@ -873,11 +873,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "59.1.0-bb.0"
+    tag: "59.1.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "59.1.0-bb.0"
+    tag: "59.1.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -1083,11 +1083,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/authservice.git
       path: "./chart"
-      tag: "1.0.1-bb.0"
+      tag: "1.0.1-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "authservice"
-      tag: "1.0.1-bb.0"
+      tag: "1.0.1-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Authservice Package
     flux: {}
