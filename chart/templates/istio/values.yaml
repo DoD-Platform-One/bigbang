@@ -88,12 +88,13 @@ ingressGateways:
 {{- end }}
 
 {{- range $name, $values := .Values.istio.ingressGateways }}
+  {{ if ne $values.enabled false }}
   {{ $name | nindent 2 }}:
     {{- toYaml (merge (dict "k8s" $values.kubernetesResourceSpec) (fromYaml (include "istio.ingressgateway.k8s" $values))) | nindent 4 }}
     {{- if $values.extraLabels }}
     {{- toYaml (dict "extraLabels" $values.extraLabels) | nindent 4 }}
     {{- end}}
-    enabled: {{ ne $values.enabled false }}
+  {{- end }}
 {{- end }}
 
 {{- if .Values.istio.gateways }}
@@ -101,6 +102,7 @@ gateways:
   main: null
 {{- end }}
 {{- range $name, $values := .Values.istio.gateways }}
+  {{ if ne $values.enabled false }}
   {{ $name | nindent 2 }}:
     selector:
       app: {{ $values.ingressGateway }}
@@ -166,7 +168,7 @@ gateways:
         {{- end }}
     {{- end }}
     {{- end }}
-
+  {{- end }}
 {{- end }}
 
 {{- define "istio.ingressgateway.k8s" -}}
