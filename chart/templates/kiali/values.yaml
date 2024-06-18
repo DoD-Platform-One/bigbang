@@ -16,7 +16,7 @@ istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
     monitoring:
-      enabled: {{ .Values.monitoring.enabled }}    
+      enabled: {{ .Values.monitoring.enabled }}
   kiali:
     gateways:
     - istio-system/{{ default "public" .Values.kiali.ingress.gateway }}
@@ -97,14 +97,18 @@ cr:
               is_core: true
               is_proxy: false
             {{- range $name, $values := .Values.istio.ingressGateways }}
+            {{ if ne $values.enabled false }}
             - app_label: {{ $name }}
               is_core: true
               is_proxy: true
             {{- end }}
+            {{- end }}
             {{- range $name, $values := .Values.istio.values.ingressGateways }}
+            {{ if ne $values.enabled false }}
             - app_label: {{ $name }}
               is_core: true
               is_proxy: true
+            {{- end }}
             {{- end }}
     api:
       namespaces:
