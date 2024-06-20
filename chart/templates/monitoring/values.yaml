@@ -39,7 +39,7 @@ istio:
   {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (dig "values" "istio" "hardened" "enabled" false .Values.grafana) }}
+    {{- if or (dig "istio" "hardened" "enabled" false .Values.monitoring.values) (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) }}
     enabled: true
     {{- else }}
     enabled: false
