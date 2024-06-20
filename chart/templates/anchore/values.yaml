@@ -7,6 +7,8 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
+openshift: {{ .Values.openshift }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}

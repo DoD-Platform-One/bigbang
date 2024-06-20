@@ -1,6 +1,4 @@
 openshift: true
-
-
 istio:
   values:
     profile: "openshift"
@@ -10,7 +8,40 @@ istio:
           hpaSpec:
             minReplicas: 3
             maxReplicas: 5
-
+    values:
+      pilot:
+        env:
+          "ENABLE_NATIVE_SIDECARS": "false"
+gatekeeper:
+  values:
+    violations:
+      selinuxPolicy:
+        enforcementAction: dryrun
+        parameters:
+          excludedResources:
+          # Allow kyverno pods
+          - kyverno/kyverno-.*
+          - istio-operator/istio-operator-.*
+          - istio-operator/istiod-hook-.*
+          - istio-system/istiod-.*
+          - istio-system/public-ingressgateway-.*
+          - istio-system/passthrough-ingressgateway-.*
+          - eck-operator/elastic-operator-.*
+          - minio-operator/minio-operator-.*
+          - minio-operator/console-.*
+          - fortify/fortify-mysql-.*
+          - fortify/fortify-ssc-webapp-.*
+          - gitlab/webservice-test-runner-.*
+          - gitlab/gitlab-minio-.*
+          - gitlab-runner/runner-.*
+          - twistlock/twistlock-defender-.*
+          - neuvector/neuvector-.*
+          - argocd/guestbook-ui-.*
+          - keycloak/keycloak-.*
+          - holocron/holocron-postgresql-0
+          - velero/velero-backup-restore-test.*
+          - vault/vault-vault.*
+          - monitoring/monitoring-monitoring-kube-admission-create-.*
 monitoring:
   values:
     prometheus:
@@ -35,11 +66,6 @@ monitoring:
           requests:
             cpu: 20m
             memory: 20Mi
-
-grafana:
-  git:
-    tag: 7.3.7-bb.0
-
 neuvector:
   values:
     k3s:
@@ -59,13 +85,371 @@ neuvector:
     bbtests:
       cypress:
         openshift: true
- 
+kyvernoPolicies:
+  values:
+    policies:
+      disallow-privileged-containers:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+      disallow-privilege-escalation:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - anchore
+              names:
+              - anchore-enterprise-migrate-db
+          - resources:
+              namespaces:
+              - authservice
+              names:
+              - authservice-authservice-redis-bb-master-*
+          - resources:
+              namespaces:
+              - sonarqube
+              names:
+              - sonarqube-postgresql-*
+              - sonarqube-sonarqube-*
+      restrict-image-registries:
+        exclude:
+          any:
+          # ArgoCD deploys a test app as part of its Cypress test
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui-*
+          - resources:
+              namespaces:
+              - openshift-marketplace
+              names:
+              - certified-operators-*
+              - community-operators-*
+              - redhat-*
+          - resources:
+              namespaces:
+              - openshift-operator-lifecycle-manager
+              names:
+              - collect-profiles-*
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+          - resources:
+              namespaces:
+              - openshift-monitoring
+              names:
+              - prometheus-k8s-*
+      require-non-root-group:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - authservice
+              names:
+              - authservice-authservice-redis-bb-master-*
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+          - resources:
+              namespaces:
+              - fortify
+              names:
+              - fortify-mysql-* # mysql breaks if you give it a different group
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
+              - controller-*
+          - resources:
+              namespaces:
+              - harbor
+              names:
+              - harbor-redis-bb-*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - argocd-argocd-redis-*
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*
+          - resources:
+              namespaces:
+              - openshift-operator-lifecycle-manager
+              names:
+              - collect-profiles-*
+          - resources:
+              namespaces:
+              - openshift-marketplace
+              names:
+              - certified-operators-*
+              - community-operators-*
+              - redhat-*
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+          - resources:
+              namespaces:
+              - istio-system
+              names:
+              - passthrough-ingressgateway-*
+              - public-ingressgateway-*
+          - resources:
+              namespaces:
+              - openshift-monitoring
+              names:
+              - prometheus-k8s-*
+      require-non-root-user:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - authservice
+              names:
+              - authservice-authservice-redis-bb-master-*
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook*
+              - argocd-argocd-redis-*
+          - resources:
+              namespaces:
+              - harbor
+              names:
+              - harbor-redis-bb-*
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*
+          - resources:
+              namespaces:
+              - twistlock
+              names:
+              - volume-upgrade-job*
+          - resources:
+              namespaces:
+              - openshift-operator-lifecycle-manager
+              names:
+              - collect-profiles-*
+          - resources:
+              namespaces:
+              - openshift-marketplace
+              names:
+              - certified-operators-*
+              - community-operators-*
+              - redhat-*
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+          - resources:
+              namespaces:
+              - istio-system
+              names:
+              - passthrough-ingressgateway-*
+              - public-ingressgateway-*
+          - resources:
+              namespaces:
+              - openshift-monitoring
+              names:
+              - prometheus-k8s-*
+      require-drop-all-capabilities:
+        exclude:
+          any:
+          # Gitlab Minio sub-chart does not have configurable securityContext values from upstream. Minio installation
+          # is only recommended for Dev/CI environments.
+          - resources:
+              namespaces:
+              - gitlab
+              names:
+              - gitlab-minio-*
+          # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster
+          - resources:
+              namespaces:
+              - twistlock
+              names:
+              - twistlock-defender-ds*
+          # Neuvector needs access to host to inspect network traffic
+          - resources:
+              namespaces:
+              - neuvector
+              names:
+              - neuvector-enforcer-pod*
+              - neuvector-controller-pod*
+              - neuvector-prometheus-exporter-pod*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui-*
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+          - resources:
+              namespaces:
+              - openshift-monitoring
+              names:
+              - prometheus-k8s-*
+      restrict-volume-types:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - gitlab-runner
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - kyverno-reporter
+              - jaeger
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              - minio-operator
+              - neuvector
+              - harbor
+              - fortify
+              - thanos
+              - holocron
+              names:
+              - "*-cypress-test*"
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+      restrict-host-path-mount:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - gitlab-runner
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - jaeger
+              - kyverno-reporter
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              - minio-operator
+              - neuvector
+              - harbor
+              - fortify
+              - thanos
+              - holocron
+              names:
+              - "*-cypress-test*"
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+      restrict-host-path-write:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - gitlab
+              - gitlab-runner
+              - kiali
+              - cluster-auditor
+              - mattermost
+              - nexus-repository-manager
+              - keycloak
+              - kyverno-reporter
+              - jaeger
+              - monitoring
+              - vault
+              - logging
+              - twistlock
+              - sonarqube
+              - logging
+              - tempo
+              - argocd
+              - minio
+              - minio-operator
+              - neuvector
+              - harbor
+              - fortify
+              - thanos
+              - holocron
+              names:
+              - "*-cypress-test*"
+          - resources:
+              namespaces:
+              - neuvector
+              names:
+              - "neuvector-enforcer-*"
+              - "neuvector-manager-*"
+          - resources:
+              namespaces:
+              - openshift-etcd
+              names:
+              - installer-*
+        parameters:
+          allow:
+          - /tmp/allowed
 # Addons are toggled based on labels in CI
 addons:
   minioOperator:
     values:
       openshift: true
-
   minio:
     values:
       annotations:
