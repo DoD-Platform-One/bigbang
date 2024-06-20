@@ -8,6 +8,7 @@ spec:
   interval: {{ $.Values.flux.interval }}
   type: {{ .type | default "default" }}
   url: {{ .repository }}
+  insecure: {{ .insecure | default false }}
   {{- if or .existingSecret (and .username .password) }}
   secretRef:
     name: {{ .existingSecret | default (printf "%s-secret" .name) }}
