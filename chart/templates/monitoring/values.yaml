@@ -16,6 +16,7 @@ domain: {{ $domainName }}
 {{- $lokiEnabled := (.Values.loki.enabled) }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 
+
 flux:
   enabled: true
 
@@ -44,6 +45,20 @@ istio:
     {{- else }}
     enabled: false
     {{- end }}
+    {{- if and (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
+    customServiceEntries:
+      - name: egress-object-store
+        enabled: true
+        spec:
+          hosts:
+           - "{{ .Values.addons.thanos.objectStorage.bucket }}.{{ .Values.addons.thanos.objectStorage.endpoint }}"
+          location: MESH_EXTERNAL
+          ports:
+            - number: 443
+              protocol: TLS
+              name: https
+          resolution: DNS
+     {{- end }}
   prometheus:
     enabled: true
     {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
@@ -114,7 +129,7 @@ prometheus:
 
     {{- if $thanosEnabled }}
     thanos:
-
+    
       {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
       objectStorageConfig:
         secret:
@@ -137,6 +152,13 @@ prometheus:
       # by default, the object stores only sync every 2 hours
       # increase the frequency so the tests will pass 
       blockSize: 1m
+      
+      {{- else if not ( .Values.addons.thanos.objectStorage.endpoint | empty) }}
+      objectStorageConfig:
+        existingSecret:
+          key: objstore.yml
+          name: monitoring-objstore-secret
+
       {{- end }}
 
       {{- if $istioInjection }}    

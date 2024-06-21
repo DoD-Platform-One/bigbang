@@ -2017,6 +2017,30 @@ addons:
 
       # -- OIDC Client Secret to use for Thanos
       client_secret: ""
+    
+    #Enable S3 Object Storage for Thanos-sidecar https://thanos.io/tip/components/sidecar.md/ and enables Thanos Store Gateway by default https://thanos.io/tip/components/store.md/ 
+    objectStorage:
+      # -- S3 compatible endpoint to use for connection information.
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+      # Note: Thanos does not require protocol prefix for URL.
+      endpoint: ""
+
+      # -- S3 compatible region to use for connection information.
+      region: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket Name for Thanos
+      # examples: "Thanos-metrics"
+      bucket: ""
+
+      # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
+      insecure: false
 
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
