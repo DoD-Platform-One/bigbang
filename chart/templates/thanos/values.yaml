@@ -6,6 +6,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.thanos" -}}
+{{- $thanosS3Endpoint := (printf "%s.s3.dualstack.%s.amazonaws.com" .Values.addons.thanos.objectStorage.bucket .Values.addons.thanos.objectStorage.region) }}
 
 imagePullSecrets:
 - name: private-registry
@@ -17,10 +18,24 @@ domain: {{ .Values.domain }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  {{- if and ( dig "values" "istio" "hardened" "enabled" false .Values.addons.thanos) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
+  hardened:
+    customServiceEntries:
+      - name: egress-object-store
+        enabled: true
+        spec:
+          hosts:
+          - {{ $thanosS3Endpoint }}
+          location: MESH_EXTERNAL
+          ports:
+            - number: 443
+              protocol: TLS
+              name: https
+          resolution: DNS
+  {{- end }}
   thanos:
     gateways:
     - istio-system/{{ default "public" .Values.addons.thanos.ingress.gateway }}
-    
 {{- with .Values.addons.thanos.objectStorage }}
 {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
@@ -62,6 +77,26 @@ query:
   podLabels:
     {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
   {{- end }}
-    
 
+{{- if not (.Values.addons.thanos.objectStorage.endpoint | empty) }}
+
+objstoreConfig: |-
+  type: s3
+  config:
+    bucket: {{ .Values.addons.thanos.objectStorage.bucket }}
+    endpoint: {{ .Values.addons.thanos.objectStorage.endpoint }}
+    access_key: {{ .Values.addons.thanos.objectStorage.accessKey }}
+    secret_key: {{ .Values.addons.thanos.objectStorage.accessSecret }}
+    insecure: {{ .Values.addons.thanos.objectStorage.insecure }}
+
+storegateway:
+  enabled: true
+  useEndpointGroup: true
+  endpoint: {{ .Values.addons.thanos.objectStorage.endpoint }}
+
+query:
+  extraFlags:
+    - "--endpoint=dns+monitoring-monitoring-kube-thanos-discovery.monitoring.svc.cluster.local:{{- dig "values" "query" "containerPorts" "grpc" 10901 .Values.addons.thanos }}"
+
+{{- end }}
 {{- end }}
