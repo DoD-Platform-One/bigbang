@@ -79,8 +79,6 @@ istio:
       dashboard:
         auth:
           strategy: "anonymous"
-    hardened:
-      enabled: true
     values:
       pilot:
         env:
