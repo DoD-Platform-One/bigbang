@@ -1,6 +1,6 @@
 # Network Policies
 
-To increase the overall security posture of Big Bang, network policies are put in place to only allow ingress and egress from package namespaces to other needed services.  A deny by default policy is put in place to deny all traffic that is not explicitly allowed.  The following is how to implement the network policies per Big Bang standards.
+To increase the overall security posture of Big Bang, network policies are put in place to only allow ingress and egress from package namespaces to other needed services. A deny by default policy is put in place to deny all traffic that is not explicitly allowed. The following is how to implement the network policies per Big Bang standards.
 
 ## Table of Contents
 
@@ -9,7 +9,7 @@ To increase the overall security posture of Big Bang, network policies are put i
 ## Prerequisites
 
 - Understanding of ports and communications of applications and other components within BigBang
-- `chart/templates/bigbang` and `chart/templates/bigbang/networkpolicies` folders within package for committing bigbang specific templates
+- `chart/templates/bigbang` and `chart/templates/bigbang/networkpolicies` folders within package for committing bigbang specific templates.
 
 ## Integration
 
@@ -65,9 +65,9 @@ spec:
 ### Was Something Important Blocked?
 
 There are a few ways to determine if a network policy is blocking egress or ingress to or from a pod.
-- Test things from the pod's perspective using ssh/exec. See [this portion](../../guides/deployment-scenarios/sso-quickstart.md#step-18-update-inner-cluster-dns-on-the-workload-cluster) of the keycloak quickstart for an example of how do to that.
-- Curl a pod's IP from another pod to see if network polices are blocking that traffic. Use `kubectl pod -o wide -n <podNamespace>` to see pod IP addresses.
-- Check the pod logs (or curl from one container to the service) for a `context deadline exceeded` or `connection refused` message.
+* Test things from the pod's perspective using ssh/exec. See [this portion](../../guides/deployment-scenarios/sso-quickstart.md#step-18-update-inner-cluster-dns-on-the-workload-cluster) of the keycloak quickstart for an example of how do to that.
+* Curl a pod's IP from another pod to see if network polices are blocking that traffic. Use `kubectl pod -o wide -n <podNamespace>` to see pod IP addresses.
+* Check the pod logs (or curl from one container to the service) for a `context deadline exceeded` or `connection refused` message.
 
 ### Allowing Exceptions
 

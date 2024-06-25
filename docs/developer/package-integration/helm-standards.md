@@ -1,21 +1,21 @@
 # Helm Package Standards
 
-This document describes the technical guidelines that should be in place when building a Helm chart and integrating it with BigBang. 
+This document describes the technical guidelines that should be in place when building a Helm chart and integrating it with Big Bang. 
 
 ## Helm Package Versioning Scheme
 
-Big Bang packages follow a standard semantic versioning scheme for both the package tag and the chart version.  The package tag will always be in line with the chart version (not the `appVersion`).  To distinguish between BigBang specific changes within the semantic version of the upstream chart, a suffix of `-bb.#` will be added to _all_ charts and tags.
+Big Bang packages follow a standard semantic versioning scheme for both the package tag and the chart version. The package tag will always be in line with the chart version (not the `appVersion`). To distinguish between BigBang specific changes within the semantic version of the upstream chart, a suffix of `-bb.#` will be added to _all_ charts and tags.
 
-For example, for the upstream [`istio-operator`](https://github.com/istio/istio/tree/1.7.3/manifests/charts/istio-operator) pinned at version `1.7.3`, the big bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.7.3-bb.0`.  If in the same `istio-operator` release, BigBang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.7.3-bb.1`.
+For example, for the upstream [`istio-operator`](https://github.com/istio/istio/tree/1.7.3/manifests/charts/istio-operator) pinned at version `1.7.3`, the Big Bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.7.3-bb.0`. If in the same `istio-operator` release, Big Bang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.7.3-bb.1`.
 
-For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`.  Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
+For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`. Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
 
 ## Big Bang Values File
 
-* In the values.yaml file [here](../../../chart/values.yaml), each package should have its own region at `.package_name` if its in Core or `.addons.package_name`.
+* In the values.yaml file [here](../../../chart/values.yaml), each package should have its own region at `.package_name` if its in Core or `.addons.package_name.`
 * User Interface:
-  * If there exists need for ingress traffic into the package, the package should create a VirtualService conditional on the existence of `istio.enabled` being set to true.  This value should default to false.  The BigBang chart should set this true for all packages
-  * There should be a region under the package for configuring SSO that looks like this when there are multiple packages
+    * If there exists need for ingress traffic into the package, the package should create a VirtualService conditional on the existence of `istio.enabled` being set to true. This value should default to false.  The BigBang chart should set this true for all packages.
+    * There should be a region under the package for configuring SSO that looks like this when there are multiple packages.
 
     ```yaml
       sso:
@@ -37,10 +37,10 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
         client_secret: "change_me"
     ```
 
-   * If sso is enabled and a value is not provided in the SSO configuration of the package, it should default to the top level SSO configuration
+   * If sso is enabled and a value is not provided in the SSO configuration of the package, it should default to the top level SSO configuration.
 * Database Connections:
     * The BigBang chart should prevent the use of a database bundled as part of the package chart by default, and warn if an end user uses one anyways.
-    * There should be a database section under the package configuration that matches the following section
+    * There should be a database section under the package configuration that matches the following section.
 
       ```yaml
       database:
@@ -53,14 +53,14 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
         type: "" # Optional. One of mysql, mssql, postgres, mongo if ther
       ```
 
-* Monitoring
-    * Charts should expect a value `monitoring.enabled` to be set by the BigBang chart to conditionally create monitoring components (`ServiceMonitors`, `PodMonitors`, etc).  This value should default to false
+* Monitoring:
+    * Charts should expect a value `monitoring.enabled` to be set by the BigBang chart to conditionally create monitoring components (e.g., `ServiceMonitors` and/or `PodMonitors`). This value should default to false.
 
 
 ## Secrets
 
 * The BigBang chart should make an `ImagePullSecret` in the namespace the package will be deployed in.
-* If the package chart cannot accept credentials (e.g. for databases) as a value, then the BigBang chart should make the secret with values passed into BigBang and pass the Secret to the package chart by name.  
+* If the package chart cannot accept credentials (e.g., for databases) as a value, then the BigBang chart should make the secret with values passed into BigBang and pass the Secret to the package chart by name.  
 
 ## Big Bang Helm Release
 
@@ -97,9 +97,9 @@ commonLabels:
 
 ## Big Bang Package Readme Generation
 
-Follow [this guide](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md?ref_type=heads) for package readme.md generation
+Follow [this guide](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md?ref_type=heads) for package readme.md generation.
 
-Note the Big Bang package README.md is separate from the README.md included as part of the upstream chart. See ArgoCD for an example, [Big Bang package README.md](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/main/README.md?ref_type=heads) vs [upstream chart README.md](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/main/chart/README.md?ref_type=heads)
+Note the Big Bang package README.md is separate from the README.md included as part of the upstream chart. See ArgoCD for an example, [Big Bang package README.md](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/main/README.md?ref_type=heads) vs [upstream chart README.md](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/main/chart/README.md?ref_type=heads).
 
 Each package value in values.yaml should have a comment descriptor above the value. We generate the package README.md using a script that expects this format. The README.md will contain a table with default configurations and descriptors pulled from the comments.
 
@@ -111,7 +111,7 @@ strategy: scalable
 
 ## Kubernetes Objects
 
-These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices
+These requirements for the kubernetes components come from the Kubernetes STIG, Kubesec.io and other best practices.
 
 * Resource Limits and Requests set for cpu and memory and they are [Guaranteed QoS](https://kubernetes.io/docs/tasks/configure-pod-container/quality-service-pod/#create-a-pod-that-gets-assigned-a-qos-class-of-guaranteed)
 * Containers are not run in privileged mode

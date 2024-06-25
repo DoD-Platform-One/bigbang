@@ -1,23 +1,23 @@
 # Monitoring
 
-Monitoring packages requires a way to scrape metrics, provide those to data storage, and analyzing the results.  Big Bang uses Prometheus and Grafana as the service for monitoring.  Most packages offer built-in Prometheus metrics scraping or an add-on that will scrape the metrics.  This document will show you how to integrate metrics scraping with Big Bang.
+Monitoring packages requires a way to scrape metrics, provide those to data storage, and analyze the results.  Big Bang uses Prometheus and Grafana as the service for monitoring. Most packages offer built-in Prometheus metrics scraping or an add-on that will scrape the metrics. This document will show you how to integrate metrics scraping with Big Bang.
 
 ## Prerequisites
 
 Before integrating with Prometheus, you must identify the following:
 
-- Does the application support metrics exporting for Prometheus.  If not, you will need to find a Prometheus exporter to provide this service.
-- Does the upstream Helm chart for the application (or exporter) support Prometheus natively?  If not, we'll have to create our own monitoring resources.
-   > Searching the Helm chart for `monitoring.coreos.com` will usually find any resources that support Prometheus
-- What path and port are used to scrape metrics on the application or exporter?
-- What services and/or pods are deployed that should be monitored?
-- Is there a pre-existing Grafana dashboard that can be leveraged?  If not, we will need to create one.
+* Does the application support metrics exporting for Prometheus? If not, you will need to find a Prometheus exporter to provide this service.
+* Does the upstream Helm chart for the application (or exporter) support Prometheus natively? If not, we'll have to create our own monitoring resources.
+   > Searching the Helm chart for `monitoring.coreos.com` will usually find any resources that support Prometheus.
+* What path and port are used to scrape metrics on the application or exporter?
+* What services and/or pods are deployed that should be monitored?
+* Is there a pre-existing Grafana dashboard that can be leveraged? If not, we will need to create one.
 
 ## Integration
 
 ### Placeholder values
 
-The package requires placeholder values for whether the monitoring stack (e.g. Prometheus / Grafana) is enabled and what label to use for dashboards.  In `chart/values.yaml`, add placeholders for these:
+The package requires placeholder values for whether the monitoring stack (e.g., Prometheus/Grafana) is enabled and what label to use for dashboards. In `chart/values.yaml`, add placeholders for these:
 
 ```yaml
 serviceMonitor:
@@ -30,11 +30,11 @@ serviceMonitor:
     label: grafana_dashboard
 ```
 
-> In this case, we put the values under `serviceMonitor:` since it already exists in the upstream Helm chart. Otherwise, we would create `monitoring:` for the values
+> In this case, we put the values under `serviceMonitor:` since it already exists in the upstream Helm chart. Otherwise, we would create `monitoring:` for the values.
 
 ### Pass down values
 
-Big Bang needs to set the placeholders above to the appropriate values.  In addition, upstream charts may already have values related to monitoring that need to be set.
+Big Bang needs to set the placeholders above to the appropriate values. In addition, upstream charts may already have values related to monitoring that need to be set.
 
 In `bigbang/templates/podinfo/values.yaml`, add the following to pass down the values from Big Bang to PodInfo.
 
@@ -48,7 +48,7 @@ serviceMonitor:
 
 ### Dependency
 
-If we plan to scrape metrics from the application with the monitoring stack, we need to make sure the monitoring stack is deployed first so that CRDs are in place before we deploy our resources.  To do this, we add a `dependsOn` section in the `bigbang/templates/podinfo/helmrelease.yaml` file like this:
+If we plan to scrape metrics from the application with the monitoring stack, we need to make sure the monitoring stack is deployed first so that CRDs are in place before we deploy our resources. To do this, we add a `dependsOn` section in the `bigbang/templates/podinfo/helmrelease.yaml` file like this:
 
 ```yaml
 spec:
@@ -69,7 +69,7 @@ spec:
 
 ### Service Monitor
 
-If the upstream Helm chart provides you with a `ServiceMonitor` and `Service` for scraping metrics, verify that there is a conditional around each one to only deploy them if monitoring is enabled (e.g. `{{- if .Values.serviceMonitor.enabled }}` or `{{- if .Values.monitoring.enabled }}`)
+If the upstream Helm chart provides you with a `ServiceMonitor` and `Service` for scraping metrics, verify that there is a conditional around each one to only deploy them if monitoring is enabled (e.g., `{{- if .Values.serviceMonitor.enabled }}` or `{{- if .Values.monitoring.enabled }}`).
 
 If the upstream chart does **not** provide a `ServiceMonitor` and `Service` for scraping metrics, you will need to create one yourself using the [Prometheus instructions for running an exporter](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/running-exporters.md).
 
@@ -81,20 +81,20 @@ If the application is using Role Based Access Control (RBAC), you may need to cr
 
 ### Alerts
 
-Alerting rules allow you to define alert conditions based on Prometheus expression language expressions and to send notifications about firing alerts to an external service.  By creating a `PrometheusRule`, you can configure these conditions for your application.
+Alerting rules allow you to define alert conditions based on Prometheus expression language expressions and to send notifications about firing alerts to an external service. By creating a `PrometheusRule`, you can configure these conditions for your application.
 
-You will need to decide what aspects of the application should be monitored and alerted on to detect potential failures in the service it provides.  Some examples include:
+You will need to decide what aspects of the application should be monitored and alerted on to detect potential failures in the service it provides.  Several examples are listed in the following:
 
-- Low disk space on a persistent volume
-- Loss of connectivity to external resources
-- Metrics cannot be scraped
-- Operator down
-- Pods in CrashLookBackOff state
-- Pods restarting too often
-- Latency too high
-- Web application returns 4xx or 5xx too often
-- No log messages for too long
-- Pod memory too close to limit
+* Low disk space on a persistent volume
+* Loss of connectivity to external resources
+* Metrics cannot be scraped
+* Operator down
+* Pods in CrashLookBackOff state
+* Pods restarting too often
+* Latency too high
+* Web application returns 4xx or 5xx too often
+* No log messages for too long
+* Pod memory too close to limit
 
 All of these rules must be based on [PromQL queries](https://prometheus.io/docs/prometheus/latest/querying/basics/) using the application's metrics.
 
@@ -106,7 +106,7 @@ Some examples of rules can be found in the [Big Bang monitoring chart](https://r
 
 Dashboards are important for administrators to understand what is happening in your package and when action needs to be taken.
 
-1. Create a dashboard
+1. Create a dashboard:
 
     Some packages or maintainers provide Grafana dashboards upstream, otherwise you can search [Grafana's Dashboard Repository](https://grafana.com/grafana/dashboards/) for a relevant Dashboard. If there is already a ready-made Grafana dashboard for your package provided upstream, you should use [Kpt](https://googlecontainertools.github.io/kpt/installation/) to sync it into monitoring package (for example flux provides the JSON dashboards in their upstream repo):
 
@@ -115,9 +115,9 @@ Dashboards are important for administrators to understand what is happening in y
     kpt pkg get https://github.com/fluxcd/flux2.git//manifests/monitoring/grafana/dashboards@v0.9.1 chart/dashboards/
     ```
 
-    If you need to create your own dashboard, open Grafana and use `Create > Dashboard`.  Add a panel and setup the query to pull custom data from your package or general data about your pods (e.g. container_processes).  After you have saved your dashboard in Grafana, use `Share (icon) > Export` to save the dashboard to a .json file in `chart/dashboards`.  You can leave the `Export for sharing externally` slider off.
+    If you need to create your own dashboard, open Grafana and use `Create > Dashboard`.  Add a panel and setup the query to pull custom data from your package or general data about your pods (e.g., container_processes).  After you have saved your dashboard in Grafana, use `Share (icon) > Export` to save the dashboard to a .json file in `chart/dashboards`.  You can leave the `Export for sharing externally` slider off.
 
-1. We will store dashboards in a ConfigMap for Grafana's sidecar to parse.  Create a ConfigMapList in `chart/templates/bigbang/dashboards.yaml` to store all of the dashboards:
+1. We will store dashboards in a ConfigMap for Grafana's sidecar to parse. Create a ConfigMapList in `chart/templates/bigbang/dashboards.yaml` to store all of the dashboards:
 
     ```yaml
     {{- $pkg := "podinfo" }}
@@ -145,7 +145,7 @@ Dashboards are important for administrators to understand what is happening in y
     {{- end }}
     ```
 
-    > Podinfo's Helm chart already had a key for monitoring named `serviceMonitor`.  You may need to use a different key or create one named `monitoring`.
+    > Podinfo's Helm chart already had a key for monitoring named `serviceMonitor.` You may need to use a different key or create one named `monitoring.`
 
 1. Commit your dashboard files:
 
@@ -155,7 +155,7 @@ Dashboards are important for administrators to understand what is happening in y
     git push
     ```
 
-1. If your package is being integrated as a supported application in BigBang, you can add your Dashboards to the core monitoring package.
+1. If your package is being integrated as a supported application in Big Bang, you can add your Dashboards to the core monitoring package.
 
     Create a new folder within `chart/dashboards/APP_NAME` and sync your JSON files for your dashboard(s) there, whether using KPT from a Github repo or individual files from Grafana's Dashboard Repository.
 
@@ -173,7 +173,7 @@ Dashboards are important for administrators to understand what is happening in y
 
 ### Setup
 
-Monitoring must be enabled in our Big Bang deployment and our application.  We do this by setting `monitoring.enabled`: `true` in `bigbang/values.yaml`.  Then, deploy Big Bang and your application to your cluster.
+Monitoring must be enabled in our Big Bang deployment and our application. We do this by setting `monitoring.enabled`: `true` in `bigbang/values.yaml`. Then, deploy Big Bang and your application to your cluster.
 
 ```shell
 # This assumes you have the Big Bang repository cloned in ~/bigbang
@@ -194,18 +194,18 @@ curl -L https://prometheus.bigbang.dev
 curl -L https://grafana.bigbang.dev
 ```
 
-> If your application also has an ingress, test it (e.g. `https://podinfo.bigbang.dev`)
+> If your application also has an ingress, test it (e.g. `https://podinfo.bigbang.dev`).
 
 ### Target
 
-Open `https://prometheus.bigbang.dev` and navigate to `Status > Targets`.  The `State` should show `UP` if metrics are being scraped for your package.
+Open `https://prometheus.bigbang.dev` and navigate to `Status > Targets.`  The `State` should show `UP` if metrics are being scraped for your package.
 
 > There should be one `Endpoint` for every replica pod of your package.
 
 ### Alert Rules
 
-In Prometheus, navigate to `Alerts`.  Verify that the `PrometheusRule` alerting rules show up here and are green.
+In Prometheus, navigate to `Alerts.` Verify that the `PrometheusRule` alerting rules show up here and are green.
 
 ### Dashboards
 
-Open `https://grafana.bigbang.dev` and navigate to `Dashboards > Manage`.  Make sure your dashboards are listed.  Select each one and verify that it is working correctly.
+Open `https://grafana.bigbang.dev` and navigate to `Dashboards > Manage.` Make sure your dashboards are listed. Select each one and verify that it is working correctly.
