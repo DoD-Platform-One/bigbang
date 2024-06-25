@@ -5,7 +5,7 @@ These instructions right now are written for istio changes, but the same is prob
 ## Run bigbang tests against your branch
 As part of your MR that modifies istio you will need to run bigbang tests against your branch. To do this, at a minimum, you will need to
 1. Create a new branch on bigbang off of master `git checkout master && git pull && git checkout -b my-bigbang-branch-for-testing`
-1. Modify the test values (you may need more than this)
+1. Modify the [test values](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/tests/test-values.yaml?ref_type=heads), yours will be different for your package, you may need more than this
     ```yaml
     myAppPackage:
       git:
