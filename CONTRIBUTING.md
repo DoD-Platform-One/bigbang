@@ -88,6 +88,7 @@ The merge request process is provided as an overview of the pipeline stages requ
 Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specific details on the pipeline stages.
 
 ## Security Considerations
+
 - To report a cybersecurity concern, follow this [link](https://jira.il2.dso.mil/servicedesk/customer/portal/81).
 - Never push secrets or certificates into our repository.
 
@@ -101,10 +102,10 @@ Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specifi
 
 ### Technical Requirements
 
-* Pipelines which must pass will run on runners from `repo1.dso.mil` and a bot will comment the status and information from the pipeline.
-* Any change to a Big Bang package chart requires a version bump following [semver](https://semver.org/) principles. See [Documentation Changes](#documentation-changes) and [Versioning](#versioning) below
-* Big Bang Package Issues which need to be included in the Big Bang Umbrella chart are not complete when the package PR is merged so please do not close issues. A new tag will automatically get created on `repo1.dso.mil` along with an MR into the Big Bang Umbrella as part of the CI process. This repo1 MR is reviewed the Big Bang Product team to merge on the Gitlab side, upon which the issue will be closed.
-* Changes to the Big Bang Umbrella get released separately according to our Release Schedule outlined in the [README](./README.md#release-schedule).
+- Pipelines which must pass will run on runners from `repo1.dso.mil` and a bot will comment the status and information from the pipeline.
+- Any change to a Big Bang package chart requires a version bump following [semver](https://semver.org/) principles. See [Documentation Changes](#documentation-changes) and [Versioning](#versioning) below
+- Big Bang Package Issues which need to be included in the Big Bang Umbrella chart are not complete when the package PR is merged so please do not close issues. A new tag will automatically get created on `repo1.dso.mil` along with an MR into the Big Bang Umbrella as part of the CI process. This repo1 MR is reviewed the Big Bang Product team to merge on the Gitlab side, upon which the issue will be closed.
+- Changes to the Big Bang Umbrella get released separately according to our Release Schedule outlined in the [README](./README.md#release-schedule).
 
 Once changes have been merged all subsequent automation will run on `repo1.dso.mil` with changes getting published back to Github.
 
@@ -122,6 +123,6 @@ Big Bang umbrella MRs will not need the version in `chart/Chart.yaml` edited via
 
 ### Generate README
 
-The readme of each Big Bang package chart can be re-generated with the following command https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md
+The readme of each Big Bang package chart can be re-generated with the following command <https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md>
 
 Big Bang umbrella MRs will not need the main README.md edited via Pull Requests.
