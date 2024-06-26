@@ -3,6 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
 ## [2.28.1]
 
 - [!4445](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4445): gitlab update to 7.11.2-bb.5
@@ -146,7 +147,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - [!2.7.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.7.0); List of merge requests in this release.
 
-
 ## [2.6.0]
 
 - [!2.6.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.6.0); List of merge requests in this release.
@@ -170,7 +170,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [2.1.0]
 
 - [!2.1.0](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=2.1.0); List of merge requests in this release.
-
 
 ## [2.0.1]
 
@@ -218,6 +217,7 @@ This major release contains breaking changes. Review the [release notes](https:/
 ## [1.51.0]
 
 - [!1.51.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.51.0); List of merge requests in this release.
+
 ## [1.50.0]
 
 - [!1.50.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.50.0); List of merge requests in this release.
@@ -285,7 +285,6 @@ This major release contains breaking changes. Review the [release notes](https:/
 ## [1.35.0]
 
 - [!1.35.0](https://repo1.dso.mil/platform-one/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=1.35.0); List of merge requests in this release.
-
 
 ## [1.34.0]
 
@@ -833,7 +832,7 @@ will correctly create the ImagePullSecrets for all those registries
 ### Changed
 
 - Updated Argo to [2.9.5-bb.1](https://repo1.dso.mil/platform-one/big-bang/apps/core/argocd/-/merge_requests/10) for Iron Bank images
-- Updated Authservice to [0.1.3-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0) for authservice secret generation: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0
+- Updated Authservice to [0.1.3-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0) for authservice secret generation: <https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/authservice/-/blob/master/CHANGELOG.md#013-bb0>
 - Updated ECK-Operator to [1.3.1-bb.1](https://repo1.dso.mil/platform-one/big-bang/apps/core/eck-operator/-/tags/1.3.0-bb.1)
 - Updated Twistlock to [0.0.2-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/security-tools/twistlock/-/tags/0.0.2-bb.0) to add istio.enabled flag
 - Updated Elasticsearch Kibana to [0.1.2-bb.0](https://repo1.dso.mil/platform-one/big-bang/apps/core/elasticsearch-kibana/-/tags/0.1.2-bb.0) and Pass istio.enabled to Elasticsearch Kibana
