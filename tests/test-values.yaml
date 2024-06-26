@@ -2406,6 +2406,10 @@ addons:
           volumeMounts:
           - name: plugin
             mountPath: "/init"
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
       extraVolumes: |-
         - name: customreg
           secret:
