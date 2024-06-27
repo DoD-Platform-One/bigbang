@@ -8,17 +8,17 @@ If the package you are integrating connects to a database, you will need to foll
 
 ## Integration
 
-There are currently 2 typical ways in bigbang that packages connect to a database.
+Stateful applications in Big Bang use two different common patterns to connect to a database. 
 
-1. Package charts accept values for host, user, pass, etc and the chart makes the necessary secret, configmap etc.
+1. Package charts accept value inputs for hostname, username, and password. The package chart generates the required Kubernetes Secret and/or ConfigMap.
 
-2. Package chart accepts a secret name where all the DB connection info is defined. In these cases we make the secret in the BB chart.
+2. Package chart accepts a secret name where all the DB connection info is defined. In these cases, we generate the secret in the Big Bang umbrella chart.
 
 Both ways will first require the following step:
 
-Add database values for the package in bigbang/chart/values.yaml
+1. Add database values for the package in bigbang/chart/values.yaml
 
-  Note: Names of key/values may differ based on the application being integrated. Please refer to package chart values to ensure key/values coincide and application documentation for additional information on connecting to a database.
+  **NOTE:** Names of key/values may differ based on the specific package application. Please refer to package chart values to validate key/value pairs are valid. Refer to specific application documentation for additional information on connecting to a database.
 
 ```yaml
 <package>
@@ -39,13 +39,13 @@ Example: [Anchore](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91
 
 **Next details the first way packages connect to a pre-existing database.**
 
-1. Package charts accept values for host, user, pass, etc and the chart makes the necessary secret, configmap etc...
+1. Package charts accept values for hostname, username, and/or password. The package chart generates the required Secret and/or ConfigMap.
 
-- add a conditional statement to `bigbang/chart/templates/<package>/values` that will check if the database values exist and creates the necessary postgresql values.
+    * Add a conditional statement to `bigbang/chart/templates/<package>/values` that will check if the database values exist and creates the necessary postgresql values.
 
-  If database values are present, then the internal database is disabled by setting `enabled: false` and the server, database, username, and port values are set.
+    * To disable internal package StatefulSet database: input server, database, username, and port database values. Internal database is disabled by setting `enabled: false`.
 
-  If database values are NOT present then the internal database is enabled and default values declared in the package are used.
+    * If database values are NOT provided, then the internal package StatefulSet database is enabled by default with default credentials.
 
 ```yaml
 # External Postgres config
@@ -70,9 +70,9 @@ Example: [Anchore](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91
 
 **The alternative way packages connect to a pre-existing database is detailed below.**
 
-1. Package chart accepts a secret name where all the DB connection info is defined. In these cases we make the secret in the BB chart..
+1. Package chart accepts a secret name where all the DB connection info is defined. In these cases, we make the secret in the BB chart.
 
-- add conditional statement in `chart/templates/<package>/values.yaml` to add values for database secret, if database values exist. Otherwise the internal database is deployed.
+    * Add conditional statement in `chart/templates/<package>/values.yaml` to add values for database secret, if database values exist. Otherwise, the internal database is deployed.
 
 ```yaml
 {{- with .Values.addons.<package>.database }}
@@ -91,7 +91,7 @@ postgresql:
 
 Example: [Mattermost](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351b91dfc6f14d3b0c2b2a60fe60c6a/chart/templates/mattermost/mattermost/values.yaml#L49)
 
-- create manifest that uses database values to create the database secret referenced above
+    * Create manifest that uses database values to create the database secret referenced above.
 
 ```yaml
 {{- if .Values.addons.<package>.enabled }}
@@ -117,7 +117,7 @@ Example: [Mattermost](https://repo1.dso.mil/big-bang/bigbang/-/blob/10d43bea9351
 
 ## Validation
 
-For validating connection to the external database in your environment or testing in CI pipeline you will need to add the database specific values to your overrides file or `./tests/test-values.yaml` respectively.
+For validating connection to the external database in your environment or testing in CI pipeline, you will need to add the database specific values to your overrides file or `./tests/test-values.yaml` respectively.
 
 Mattermost Example:
 
