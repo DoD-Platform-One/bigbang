@@ -189,13 +189,6 @@ policies:
           - neuvector-controller-pod*
           - neuvector-prometheus-exporter-pod*
       {{- end }}
-      {{- if .Values.addons.keycloak.enabled }}
-      - resources:
-          namespaces:
-          - keycloak
-          names:
-          - keycloak-0
-      {{- end }}
       {{- if .Values.addons.holocron.enabled }}
       - resources:
           namespaces:
