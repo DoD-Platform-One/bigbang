@@ -6,14 +6,14 @@ When integrating your package, you must adhere to the policies enforced by Kyver
 
 ## Prerequisites
 
-- A K8s cluster with Big Bang installed.
-- cluster admin access to the cluster with [kubectl](https://kubernetes.io/docs/tasks/tools/).
+* A K8s cluster with Big Bang installed.
+* Cluster admin access to the cluster with [kubectl](https://kubernetes.io/docs/tasks/tools/).
 
 ## Integration
 
 ### 1. Deploying a Policy Enforcement Tool (Kyverno)
 
-Kyverno is deployed as the first package in the default Big Bang configuration. This setup allows Kyverno to protect the cluster from the start by enforcing policies on all resources. Your package will interact with the cluster under the governance of Kyverno's policy engine.
+Kyverno is deployed as the first package in the default Big Bang configuration. This set up allows Kyverno to protect the cluster from the start by enforcing policies on all resources. Your package will interact with the cluster under the governance of Kyverno's policy engine.
 
 ### 2. Identifying Violations Found on Your Application
 
