@@ -1,6 +1,6 @@
 # Supported Package Integration
 
-After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process) and getting approval to add it to Big Bang, the following instructions must be completed.
+After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process) and getting approval to add it to Big Bang, the instructions provided here must be completed.
 
 [[_TOC_]]
 
@@ -24,13 +24,13 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 1. Clone the [Big Bang Git repository](https://repo1.dso.mil/big-bang/bigbang) to your machine using `git clone https://repo1.dso.mil/big-bang/bigbang`
 
-1. Make a branch from the BigBang chart repository `master` branch. You can automatically create a branch from the Repo1 Gitlab issue. Or, in some cases you might manually create the branch. Name the branch with your issue number. For example, if your issue number is `9999` then your branch name can be `9999-my-description`. It is best practice to make branch names short and simple.
+1. Make a branch from the Big Bang chart repository `master` branch. You can automatically create a branch from the Repo1 Gitlab issue or, in some cases, you might manually create the branch. Name the branch with your issue number. For example, if your issue number is `9999` then your branch name can be `9999-my-description`. It is best practice to make branch names short and simple.
 
-1. Make sure the files described in this [document](./flux.md) have been generated in `chart/templates/<your-package-name>` directory
+1. Make sure the files described in this [document](./flux.md) have been generated in `chart/templates/<your-package-name>` directory.
 
-1. More details about secret-*.yaml: The secret template is where the code for secrets go. Typically you will see secrets for imagePullSecret, sso, database, and possibly object storage. These secrets are a BigBang chart enhancement. They are created conditionally based on what the user enables in the config. For example if the app supports SSO and will need a Certificate Authority supplied to trust the connection to the IdP there should be a `secret-ca.yaml` template to populate a secret with the `sso.certificateAuthority.cert` value in the application namespace.
+1. More details about secret-*.yaml: The secret template is where the code for secrets go. Typically, you will see secrets for imagePullSecret, sso, database, and possibly object storage. These secrets are a BigBang chart enhancement. They are created conditionally based on what the user enables in the config. For example if the app supports SSO and will need a Certificate Authority supplied to trust the connection to the IdP there should be a `secret-ca.yaml` template to populate a secret with the `sso.certificateAuthority.cert` value in the application namespace.
 
-1. Merge your default package values from `<your-package-git-folder>/bigbang/values.yaml` into `chart/values.yaml`.  Only the "standard" keys used across packages should be used.  Keep in mind that values can be passed directly to the package using `.Values.<package>.values`
+1. Merge your default package values from `<your-package-git-folder>/bigbang/values.yaml` into `chart/values.yaml.` Only the "standard" keys used across packages should be used.  Keep in mind that values can be passed directly to the package using `.Values.<package>.values.`
 
     > If your package is an `addon`, it falls into a different location than core packages.  In this case, you will need to update all your references from `.Values.<package>` to `.Values.addons.<package>`.
 
@@ -64,7 +64,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
        values: {}
    ```
 
-1. Edit `tests/test-values.yaml`. These are the settings that the CI pipeline uses to run a deployment test.  Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
+1. Edit `tests/test-values.yaml.` These are the settings that the CI pipeline uses to run a deployment test. Set your Package to be enabled and add any other necessary values. Where possible reduce the number of replicas to a minimum to reduce strain on the CI infrastructure. When you commit your code the pipeline will run. You can view the pipeline in the Repo1 Gitlab console. Fix any errors in the pipeline output. The pipeline automatically runs a "smoke" test. It deploys bigbang on a k3d cluster using the test values file.
 
 1. You will also need to create an MR into the pipeline templates to update [02_wait_for_helmreleases.sh](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/blob/master/scripts/deploy/03_wait_for_helmreleases.sh) and add your package's HR name to the core or addon lists.
 
@@ -78,7 +78,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
       PIPELINE_REPO_BRANCH: 'your-branch'
     ```
 
-1. Create an overrrides directory as a sibling directory next to the bigbang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake and create a local overrides directory. One option is to copy the tests/ci/k3d/values.yaml to make the override-values.yaml and make modifications. The file structure is like this:
+1. Create an override directory as a sibling directory next to the Big Bang code directory. Put your override yaml files in this directory. The reason we do this is to avoid modifying the bigbang values.yaml that is under source control. You could accidentally commit it with your secrets. Avoid that mistake by create a local override directory. One option is to copy the tests/ci/k3d/values.yaml to make the override-values.yaml and make modifications. The file structure is like this:
 
     ```plaintext
     ├── bigbang/
@@ -100,7 +100,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
     You will use these files as arguments in your helm commands.
 
-1. Verify your Package works when deployed through bigbang. See the instructions below in the ```BigBang Development and Testing Cycle``` for the manual ```imperative``` way to deploy with helm upgrade commands. While testing you should use your package git branch instead of a tag. If you don't null the tag your branch will not get deployed. example:
+1. Verify your package works when deployed through Big Bang. See the instructions below in the ```BigBang Development and Testing Cycle``` for the manual ```imperative``` way to deploy with helm upgrade commands. While testing you should use your package git branch instead of a tag. If you don't null the tag your branch will not get deployed. Here is an example:
 
     ```yaml
     addons:
@@ -110,7 +110,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
           branch: "999-your-dev-branch-name"
     ```
 
-1. After you have tested BigBang integration complete a Package MR and contact the codeowners to create a release tag. Package release tags follow the naming convention of {UpstreamChartVersion}-bb.{BigBangVersion} – example 1.2.3-bb.0.
+1. After you have tested Big Bang integration, complete a Package MR and contact the codeowners to create a release tag. Package release tags follow the naming convention of {UpstreamChartVersion}-bb.{BigBangVersion} – example 1.2.3-bb.0.
 
 1. Make sure to change the chart/values.yaml file to point to the new release tag rather than your dev branch (i.e. tag: "1.2.3-bb.0" in place of branch: "999-your-dev-branch-name"). example:
 
@@ -129,7 +129,7 @@ There are two ways to test BigBang, imperative or GitOps with Flux.  Your initia
 
 ### Imperative
 
-You can manually deploy bigbang with helm command line. With this method you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little". You should have previously created the ../overrides directory as described in step #10 above. From the root of your local bigbang repo:
+You can manually deploy Big Bang with helm command line. With this method, you can test local code changes without committing to a repository. Here are the steps that you can iterate with "code a little, test a little". You should have previously created the ../overrides directory as described in step #10 above. From the root of your local bigbang repo:
 
 ```shell
 # Deploy with helm while pointing to your override values files. 
@@ -182,20 +182,20 @@ kubectl delete -f dev/bigbang.yaml
 
 ### Validation
 
-In order to validate that the new package is running as expected, we recommend to check the following things
+In order to validate that the new package is running as expected, we recommend checking the following things:
 
-1. Make sure that the steps from the other documentation in `package-integration` directory has been completed
+1. Make sure that the steps from the other documentation in `package-integration` directory has been completed.
 
-1. Deploy the package following the Imperative step described [above](#imperative)
+1. Deploy the package following the imperative step described [above](#imperative).
 
-1. Make sure that a namespace has been created for the package deployed (`kubectl get ns`)
+1. Make sure that a namespace has been created for the package deployed (`kubectl get ns`).
 
-1. The HR (Helm Release) reconciled successfully for the package (`kubectl get hr -A`)
+1. The Helm Release (HR) reconciled successfully for the package (`kubectl get hr -A`).
 
-1. All the pods and services we expected are up and running (`kubectl get po -n <Package Namespace>`)
+1. All the pods and services we expected are up and running (`kubectl get po -n <Package Namespace>`).
 
-1. Make sure all the pods are in a healthy state and have the right specs
+1. Make sure all the pods are in a healthy state and have the right specs.
 
-1. Utilize grafana to make sure the pods have the right resources if needed
+1. Utilize grafana to make sure the pods have the right resources if needed.
 
-1. Create an MR and make sure it passes all the automated tests
+1. Create a merge request and validate passing CI tests.
