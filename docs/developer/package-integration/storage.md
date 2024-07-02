@@ -1,29 +1,34 @@
 # Object Storage
 
-If the package you are integrating connects to object storage (e.g. S3 buckets), you will need to follow the instructions below to integrate this feature into Big Bang.
+If the package you are integrating connects to object storage (e.g., S3 buckets), you will need to follow the instructions provided here to integrate this feature into Big Bang.
 
-In BigBang MinIO is a consistent, performant and scalable object store for the cloud strategies. Minio is Kubernetes-native by design and provides S3 compatible endpoints.
+In Big Bang, Minio is a consistent, performant and scalable object store for the cloud strategies. Minio is Kubernetes-native by design and provides S3 compatible endpoints.
 
 ## Prerequisites
 
-Blob storage bucket available with correct permissions, or Minio Addon is enabled at the BigBang level. Alternatively, you have (1) an existing Minio Instance, or (2) AWS S3 AccessKey and SecretKey.
+Blob storage bucket is available with correct permissions, or Minio Addon is enabled at the Big Bang level. Alternatively, you have either:
+
+1. An existing Minio Instance, or 
+
+1. AWS S3 AccessKey and SecretKey.
 
 ## Integration
 
-There are currently 2 typical ways in bigbang that packages connect to object storage.
+There are currently two ways in Big Bang that packages connect to object storage. They are listed in the following:
 
-1. Package charts accept values for endpoint, accessKey, bucket values, etc and the chart makes the necessary secret, configmap etc.
+1. Package charts accept values for endpoint, accessKey, and/or bucket values and the chart makes the necessary secret and/or configmap.
 
-2. Package chart accepts a secret name where all the object storage connection info is defined. In these cases we make the secret in the BB chart.
+1. Package chart accepts a secret name where all the object storage connection info is defined. In these cases, we make the secret in the BB chart.
 
 Both ways will first require the following step:
 
-Add objectStorage values for the package in bigbang/chart/values.yaml
+Add objectStorage values for the package in bigbang/chart/values.yaml.
 
   Notes:
 
-- Names of key/values may differ based on the application being integrated (eg: iamProfile for Gitlab objectStorage values). Please refer to package chart values to ensure key/values coincide and application documentation for additional information on connecting to object storage.
-- Some packages may have in-built object storage and the implementation may vary.
+* Names of key/values may differ based on the application being integrated (e.g., iamProfile for Gitlab objectStorage values). Please refer to package chart values to ensure key/values coincide and application documentation for additional information on connecting to object storage.
+
+* Some packages may have in-built object storage and the implementation may vary.
 
 ```yaml
 <package>
@@ -57,13 +62,13 @@ Add objectStorage values for the package in bigbang/chart/values.yaml
 
 **Options for packages connecting to a pre-existing object storage.**
 
-1. Package charts accept values for endpoint, accessKey, bucket values, etc. and the chart makes the necessary secret, configmap etc...
+1. Package charts accept values for endpoint, accessKey, and/or bucket values and the chart makes the necessary secret and/or configmap.
 
-- add a conditional statement to `bigbang/chart/templates/<package>/values` that will check if the object storage values exist and creates the necessary object storage values.
+    * Add a conditional statement to `bigbang/chart/templates/<package>/values` that will check if the object storage values exist and creates the necessary object storage values.
 
-  If object storage values are present, then the internal object storage is disabled by setting `enabled: false` and the endpoint, accessKey, accessSecret, and bucket values are set.
+    * If object storage values are present, then the internal object storage is disabled by setting `enabled: false` and the endpoint, accessKey, accessSecret, and bucket values are set.
 
-  If object storage values are NOT present then the minio cluster is enabled and default values declared in the package are used.
+    * If object storage values are NOT present then the minio cluster is enabled and default values declared in the package are used.
 
 ```yaml
 {{- with .Values.addons.<package>.objectStorage }}
@@ -79,9 +84,9 @@ fileStore:
 
 Example: [MatterMost](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/mattermost/values.yaml#L101) passes the endpoint and bucket via chart values.
 
-1. Package chart accepts a secret name where all the object storage connection info is defined. In these cases we make the secret in the BB chart.
+1. Package chart accepts a secret name where all the object storage connection info is defined. In these cases, we make the secret in the Big Bang chart.
 
-- add conditional statement in `chart/templates/<package>/values.yaml` to add values for object storage secret, if object storage values exist. Otherwise the minio cluster is used.
+    * Add conditional statement in `chart/templates/<package>/values.yaml` to add values for object storage secret, if object storage values exist. Otherwise, the minio cluster is used.
 
 ```yaml
 objectStorage:
@@ -92,7 +97,7 @@ objectStorage:
 
 Example: [GitLab](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gitlab/values.yaml#L76)
 
-- Create the secret in the Big Bang chart. (NOTE: Replace `<package>` with your package name in the example below)
+    * Create the secret in the Big Bang chart. (**NOTE:** Replace `<package>` with your package name in the example below.)
 
 ```yaml
 {{- if .Values.addons.<package>.enabled }}
@@ -118,7 +123,7 @@ Example: [GitLab secret-objectstore.yaml](https://repo1.dso.mil/big-bang/bigbang
 
 ## Validation
 
-For validating connection to the object storage in your environment or testing in CI pipeline you will need to add the object storage specific values to your overrides file or `./tests/test-values.yaml` respectively. If you are using Minio, ensure `addons.minio.enabled: true`.
+For validating connection to the object storage in your environment or testing in CI pipeline, you will need to add the object storage specific values to your overrides file or `./tests/test-values.yaml`, respectively. If you are using Minio, ensure `addons.minio.enabled: true`.
 
 Mattermost Example:
 
