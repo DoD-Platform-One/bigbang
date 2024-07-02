@@ -492,7 +492,8 @@ addons:
           artifacts: false
       tenant:
         pools:
-        - servers: 3
+        - name: pool-0
+          servers: 3
           volumesPerServer: 4
           size: 256Mi
           resources:
@@ -529,7 +530,8 @@ addons:
       minio:
         tenants:
           pools:
-          - servers: 1
+          - name: pool-0
+            servers: 1
             volumesPerServer: 4
             size: 256Mi
             resources:
