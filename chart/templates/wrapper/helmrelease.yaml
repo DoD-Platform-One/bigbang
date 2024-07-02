@@ -46,6 +46,10 @@ spec:
       interval: {{ default "5m" $fluxSettings.interval }}
       reconcileStrategy: Revision
   {{- toYaml $fluxSettings | nindent 2 }}
+  {{- if $vals.wrapper.postRenderers }}
+  postRenderers:
+  {{- toYaml $vals.wrapper.postRenderers | nindent 4 }}
+  {{- end }}
   valuesFrom:
     - name: {{ $pkg }}-wrapper-values
       kind: Secret
