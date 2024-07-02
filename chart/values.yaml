@@ -2102,6 +2102,8 @@ packages:
     # @default -- false
     wrapper:
       enabled: false
+    # -- After deployment, patch wrapper resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+      postRenderers: []
 
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
@@ -2152,7 +2154,7 @@ packages:
     # -- Override flux settings for this package
     flux: {}
 
-    # -- After deployment, patch resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+    # -- After deployment, patch package resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
     postRenderers: []
 
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.

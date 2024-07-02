@@ -51,11 +51,11 @@ spec:
   {{- toYaml $fluxSettings | nindent 2 }}
   {{- if $vals.postRenderers }}
   postRenderers:
-  {{- toYaml $vals.postRenderers | nindent 2 }}
+  {{- toYaml $vals.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
-  - name: {{ $pkg }}-values
-    kind: Secret
+    - name: {{ $pkg }}-values
+      kind: Secret
 
   {{- /* Always wait on policy enforcement */ -}}
   {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
