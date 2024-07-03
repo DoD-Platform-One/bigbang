@@ -1,6 +1,6 @@
 # Upstream Integration
 
-Before beginning the process of integrating a package into Big Bang, you will need to create a workspace and create or sync the package's Helm chart.  This document shows you how to setup the workspace and sync the upstream Helm chart.
+Before beginning the process of integrating a package into Big Bang, you will need to create a workspace and create or sync the package's Helm chart. This document shows you how to set up the workspace and sync the upstream Helm chart.
 
 ## Prerequisites
 
@@ -11,29 +11,29 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Project
 
-It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/big-bang/apps/sandbox).  This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
+It is recommended that you create your project in [Big Bang's Sandbox](https://repo1.dso.mil/big-bang/apps/sandbox). This allows you to leverage Big Bang's pipelines, collaborate with Big Bang developers, and easily migrate to a fully graduated project.
 
 You will need to request a sandbox project and Developer access from a Big Bang team member.
 
 ## Helm Chart
 
-Big Bang requires a Helm chart to deploy your package.  This Helm chart must be enhanced to support full integration with Big Bang components.
+Big Bang requires a Helm chart to deploy your package. This Helm chart must be enhanced to support full integration with Big Bang components.
 
 ### Cloning Upstream
 
-To minimize maintenance, it is preferable to reuse existing Helm charts available in the community (upstream).  Changes to the upstream Helm chart should be made with new files when possible, and always clearly marked as Big Bang additions.
+To minimize maintenance, it is preferable to reuse existing Helm charts available in the community (upstream). Changes to the upstream Helm chart should be made with new files when possible, and always clearly marked as Big Bang additions.
 
-> Sometimes, it is not possible to find an upstream Helm chart and you must develop your own.  This is beyond the scope of this document.
+> Sometimes, it is not possible to find an upstream Helm chart and you must develop your own. This is beyond the scope of this document.
 
 1. Identify the location of an existing Helm chart for the package.
 
     > If selecting between several Helm charts, give preference to a Helm chart that:
     >
-    > - Was created by the company that owns the package
-    > - Has recent and frequent updates
-    > - Offers maximum flexibility through values
-    > - Does not bundle several packages together (unless they can be individually disabled)
-    > - Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context
+    > * Was created by the company that owns the package;
+    > * Has recent and frequent updates;
+    > * Offers maximum flexibility through values;
+    > * Does not bundle several packages together (unless they can be individually disabled); and
+    > * Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context.
 
 1. Using [Kpt](https://googlecontainertools.github.io/kpt/installation/), create a clone of the package's Helm chart
 
@@ -61,9 +61,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
    - CHANGELOG.md
 
-      The format of the changelog should be based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) with versions equivalent to the Helm chart version.
-
-      Example:
+   The format of the changelog should be based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) with versions equivalent to the Helm chart version. An example is provided in the following:
 
       ```markdown
       # Changelog
@@ -77,9 +75,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
    - CODEOWNERS
 
-      Code owners are required approvals on merge requests in the Big Bang repository.  This file should be setup based on [GitLab's Code Owners guidance](https://docs.gitlab.com/ee/user/project/code_owners.html).
-
-      Example:
+      Code owners are required approvals on merge requests in the Big Bang repository. This file should be setup based on [GitLab's Code Owners guidance](https://docs.gitlab.com/ee/user/project/code_owners.html). An example is provided in the following:
 
       ```plaintext
       * @gitlabuser
@@ -87,12 +83,10 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
    - CONTRIBUTING.md
 
-      This document should outline the steps required for someone new to contribute to the repository.
+      This document should outline the steps required for someone new to contribute to the repository. An example is provided in the following:
 
-      Example:
-
-      ```markdown
-      # Contributing
+    ```markdown
+   # Contributing
 
       This repository uses the following conventions:
 
@@ -101,7 +95,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       * [Conventional Commits](https://www.conventionalcommits.org/)
       * [Cypress](https://www.cypress.io) or a shell script for testing
 
-      Development requires the following tools
+      Development requires the following tools:
 
       * [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
       * [helm](https://helm.sh/docs/intro/install/)
@@ -109,28 +103,28 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
       To contribute a change:
 
-      1. Open an issue in GitLab describing the scope of your work
-      1. Assign yourself to the issue
-      1. Label the issue with `status::doing`
-      1. Create a branch in the repository using your issue number as a prefix
-      1. Make changes in code and push to your branch
-      1. Write tests using [cypress](https://www.cypress.io) and/or shell scripts.
-      1. Make commits using the [Conventional Commits](https://www.conventionalcommits.org/) format
-      1. Update `CHANGELOG.md` using the [Keep a Changelog](https://keepachangelog.com) format
-      1. Open a merge request into the `main` branch
-      1. Add a reference to the issue in the merge request description
-      1. Resolve any failures from the pipeline
-      1. Resolve any merge conflicts
-      1. Label the Merge Request with `status::review`
-      1. Contact the code owners to expedite your Merge Request review
-      1. Address any review comments and merge conflicts during the review process
-      1. Wait for a code owner to approve and merge your changes
-      1. Request a repository maintainer to create a release and tag
+      1. Open an issue in GitLab describing the scope of your work.
+      2. Assign yourself to the issue.
+      3. Label the issue with `status::doing`.
+      4. Create a branch in the repository using your issue number as a prefix.
+      5. Make changes in code and push to your branch.
+      6. Write tests using [cypress](https://www.cypress.io) and/or shell scripts.
+      7. Make commits using the [Conventional Commits](https://www.conventionalcommits.org/) format.
+      8. Update `CHANGELOG.md` using the [Keep a Changelog](https://keepachangelog.com) format.
+      9. Open a merge request into the `main` branch.
+      10. Add a reference to the issue in the merge request description.
+      11. Resolve any failures from the pipeline.
+      12. Resolve any merge conflicts.
+      13. Label the Merge Request with `status::review`.
+      14. Contact the code owners to expedite your Merge Request review.
+      15. Address any review comments and merge conflicts during the review process.
+      16. Wait for a code owner to approve and merge your changes.
+      17. Request a repository maintainer to create a release and tag.
       ```
 
    - LICENSE
 
-      The license file should contain the license terms and conditions for using the Helm charts.  In general, Big Bang uses the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
+      The license file should contain the license terms and conditions for using the Helm charts. In general, Big Bang uses the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
 
    - README.md
 
@@ -146,7 +140,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       There is a standard Big Bang template used for all packages.  This can be created by following the [templating instructions](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md)
 
       > This process produces a `README.md`, `README.md.gotpl`, and `.helmdocsignore`.  The `gotpl` file is used as values to update the `README.md`.
-      > To avoid having the `flux` helm chart also added to the `README.md`, run `echo 'flux/*' >> .helmdocsignore`
+      > To avoid having the `flux` helm chart also added to the `README.md`, run `echo 'flux/*' >> .helmdocsignore`.
 
       Example:
 
@@ -154,7 +148,7 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       ```markdown
       # podinfo
 
-      ![Version: 6.0.0-bb.0](https://img.shields.io/badge/Version-6.0.0--bb.0-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square)
+      ![Version: 6.0.0-bb.0](https://img.shields.io/badge/Version-6.0.0--bb.0-informational?style=flat-square) ![AppVersion: 6.0.0](https://img.shields.io/badge/AppVersion-6.0.0-informational?style=flat-square).
 
       Podinfo Helm chart for Kubernetes
 
@@ -199,7 +193,9 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
       ```
 <!-- markdownlint-enable -->
 
-1. Commit changes
+
+
+5. Commit changes.
 
    ```shell
    git add -A
@@ -242,6 +238,6 @@ git push
 
 ## Validation
 
-If you are not already familiar with the package, deploy the package using the upstream helm chart onto a Kubernetes cluster and explore the functionality before continuing.  The Helm chart can be deployed according to the upstream package's documentation.
+If you are not already familiar with the package, deploy the package using the upstream helm chart onto a Kubernetes cluster and explore the functionality before continuing. The Helm chart can be deployed according to the upstream package's documentation.
 
  > It is recommended that you follow the instructions in [development environment](../development-environment.md) to get a Kubernetes cluster running.

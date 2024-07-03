@@ -1,25 +1,23 @@
 # Testing
 
-Usually, Helm charts come with a set of Helm tests that can be run to test the deployment of the application.  Big Bang requires some additional tests to verify integration is working as expected.  By adding additional tests, the goal is to verify that the package is functioning.  For example, we may want to validate that
+Usually, Helm charts come with a set of Helm tests that can be run to test the deployment of the application. Big Bang requires some additional tests to verify integration is working as expected. By adding additional tests, the goal is to verify that the package is functioning.  For example, we may want to validate the following:
 
-- The HTTPS endpoint can be reached
-- The admin user can login using the configured (or randomized) password
-- A non-admin user can be created and can login
-- Data can be stored and retrieved from the database
-- Artifacts can be stored and retrieved from the object storage
-- Interactions with other services/packages works
+* The HTTPS endpoint can be reached,
+* The admin user can login using the configured (or randomized) password,
+* A non-admin user can be created and can login,
+* Data can be stored and retrieved from the database,
+* Artifacts can be stored and retrieved from the object storage, and
+* Interactions with other services/packages works.
 
 ## Prerequisites
 
-- Package helm chart with CI settings pointing to one of bigbang's [package pipelines](./pipeline.md)
+* Package helm chart with CI settings pointing to one of bigbang's [package pipelines](./pipeline.md).
 
 ## Integration
 
-Bigbang provides a library helm chart called [Gluon](https://repo1.dso.mil/big-bang/product/packages/gluon) to help simplify the process of creating both cypress and script helm tests.
+Big Bang provides a library helm chart called [Gluon](https://repo1.dso.mil/big-bang/product/packages/gluon) to help simplify the process of creating both cypress and script helm tests.
 
-To include this library as a subchart in your package repo follow the instructions provided in the pipeline repo [here](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#including-the-gluon-helm-test-library-in-your-package).
-
-Then in your chart/values.yaml add values for bbtests, any variables used, and default it to false:
+To include this library as a subchart in your package repo, follow the instructions provided in the pipeline repo [here](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#including-the-gluon-helm-test-library-in-your-package). Then, in your chart/values.yaml, add values for bbtests, any variables used, and default it to false.
 ```yaml
 # Bigbang helm test values default disabled
 bbtests:
@@ -32,14 +30,15 @@ bbtests:
     envs:
       URL: 'http://{{ template "podinfo.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.externalPort }}'
 ```
-(NOTE: At the package level we are pointing to the service and service port instead of the istio virtual service because istio isn't enabled by default. At the bigbang test level we will point to the virtualservice url because istio will be present.)
+**NOTE:** At the package level, we are pointing to the service and service port instead of the istio virtual service because istio isn't enabled by default. At the Big Bang test level we will point to the virtualservice url because istio will be present.
 
 We will enable these tests in `tests/test-values.yaml`:
 ```yaml
 bbtests:
   enabled: true
 ```
-### Cypress test
+### Cypress Test
+
 Now we need to add the cypress gluon template yaml to `chart/templates/tests/cypress-test.yaml`:
 ```yaml
 {{- include "gluon.tests.cypress-configmap.base" .}}
@@ -56,7 +55,7 @@ describe('Basic Podinfo', function() {
   })
 })
 ```
-(NOTE: This is basic cypress test that will visit the `cypress_url` defined in values.yaml. For more information on cypress tests visit [here](https://docs.cypress.io/guides/overview/why-cypress#In-a-nutshell))
+**NOTE:** This is basic cypress test that will visit the `cypress_url` defined in values.yaml. For more information on cypress tests visit [here](https://docs.cypress.io/guides/overview/why-cypress#In-a-nutshell).
 
 We also need a cypress.json config file with any cypress configurations we need placed `chart/tests/cypress/cypress.json`:
 
@@ -67,7 +66,8 @@ We also need a cypress.json config file with any cypress configurations we need 
     "fixturesFolder": false
 }  
 ```
-### Script test
+### Script Test
+
 Now we need to add the script gluon template yaml to `chart/templates/tests/script-test.yaml`:
 ```yaml
 {{- include "gluon.tests.script-configmap.base" .}}
@@ -90,8 +90,8 @@ echo "END podinfo jwt test"
 echo "-----------------------------------------"
 ```
 
-More information on cypress tests and creating tests with scripts for testing non-UI portions of an app can be found [here](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-tests.md)
+More information on cypress tests and creating tests with scripts for testing non-UI portions of an app can be found [here](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-tests.md).
 
 ## Validation
 
-To validate these changes and view the cypress test we can create a merge request with these changes and a pipeline will automatically kick off deploying our package and running the helm tests. Artifacts of these tests (screenshots and videos) are stored in the `Clean Install`, `Upgrade`, and `Integration Test` Jobs. Just click one of the jobs and there will be `job artifacts` on the right pane.
+To validate these changes and view the cypress test we can create a merge request with these changes and a pipeline will automatically kick off deploying our package and running the helm tests. Artifacts of these tests (e.g., screenshots and videos) are stored in the `Clean Install`, `Upgrade`, and `Integration Test` Jobs. Just click one of the jobs and there will be `job artifacts` on the right pane.
