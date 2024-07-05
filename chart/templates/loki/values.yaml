@@ -12,7 +12,7 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) }}
+    {{- if or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) (dig "hardened" "enabled" false .Values.istio.values) }}
     enabled: true
     {{- else }}
     enabled: false
