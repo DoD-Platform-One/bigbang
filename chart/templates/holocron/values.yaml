@@ -15,7 +15,19 @@ externalURL: https://holocron.{{ .Values.domain }}
 
 domain: {{ .Values.domain }}
 
+{{- $holocronAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+{{- $holocronAuthServiceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+
+{{- if .Values.addons.holocron.sso.enabled }}
+frontend:
+  labels:
+    {{ $holocronAuthserviceKey }}: {{ $holocronAuthServiceValue }}
+{{- end }}
 api:
+{{- if .Values.addons.holocron.sso.enabled }}
+  labels:
+    {{ $holocronAuthserviceKey }}: {{ $holocronAuthServiceValue }}
+{{- end }}
   env:
     REQUEST_IP_HEADER: Host
     SSO_ENABLED: {{ .Values.addons.holocron.sso.enabled }}
