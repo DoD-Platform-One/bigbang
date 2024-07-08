@@ -1972,6 +1972,12 @@ addons:
     sso:
       # -- Toggle SSO for Holocron on and off
       enabled: false
+
+      # -- OIDC Client ID to use for Holocron
+      client_id: ""
+
+      # -- OIDC Client Secret to use for Holocron
+      client_secret: ""
       
       # -- Holocron SSO group roles: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
       groups:
