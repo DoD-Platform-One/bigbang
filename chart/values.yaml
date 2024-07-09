@@ -570,11 +570,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.17.0-bb.1"
+    tag: "1.17.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.17.0-bb.1"
+    tag: "1.17.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -594,6 +594,11 @@ elasticsearchKibana:
 
     # -- Elasticsearch/Kibana OIDC client secret
     client_secret: ""
+  
+  # -- Elasticsearch/Kibana Service Account Annotations
+  serviceAccountAnnotations:
+    elasticsearch: {}
+    kibana: {}
 
   license:
     # -- Toggle trial license installation of elasticsearch.  Note that enterprise (non trial) is required for SSO to work.
