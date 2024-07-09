@@ -451,6 +451,12 @@
             }
           },
           "additionalProperties": false
+        },
+        "serviceAccountAnnotations": {
+          "properties": {
+            "elasticsearch": true,
+            "kibana": true
+          }
         }
       },
       "allOf": [

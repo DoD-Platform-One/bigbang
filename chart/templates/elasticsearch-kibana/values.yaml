@@ -15,7 +15,7 @@ imagePullPolicy: {{ .Values.imagePullPolicy }}
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) }}
+    {{- if or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) }}
     enabled: true
     {{- else }}
     enabled: false
@@ -79,7 +79,11 @@ kibana:
   podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}
-
+{{- if not .Values.elasticsearchKibana.serviceAccountAnnotations.kibana }}
+  serviceAccountAnnotations: {}
+{{- else }}
+  serviceAccountAnnotations: {{ toYaml .Values.elasticsearchKibana.serviceAccountAnnotations.kibana | nindent 4 }}
+{{- end }}
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
@@ -229,4 +233,9 @@ elasticsearch:
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
+  {{- if not .Values.elasticsearchKibana.serviceAccountAnnotations.elasticsearch }}
+  serviceAccountAnnotations: {}
+  {{- else }}
+  serviceAccountAnnotations: {{ toYaml .Values.elasticsearchKibana.serviceAccountAnnotations.elasticsearch | nindent 4 }}
+  {{- end }}
 {{- end -}}
