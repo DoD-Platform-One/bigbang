@@ -2585,6 +2585,7 @@ addons:
     # -- Values to pass through to Harbor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values:
       istio:
+        enabled: true
         hardened:
           enabled: true
           customServiceEntries:
@@ -2593,6 +2594,9 @@ addons:
               spec:
                 hosts:
                   - 'registry.npmjs.org'
+                  - 'registry1.dso.mil'
+                  - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+                  - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
                   - 'download.cypress.io'
                   - 'cdn.cypress.io'
                   - 'harbor.dev.bigbang.mil'
@@ -2747,7 +2751,7 @@ addons:
           envs:
             cypress_url: "https://harbor.dev.bigbang.mil"
         scripts:
-          image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
+          image: "registry1.dso.mil/bigbang-ci/devops-tester:1.0.0"
           envs:
             HARBOR_REGISTRY: "harbor.dev.bigbang.mil"
 
