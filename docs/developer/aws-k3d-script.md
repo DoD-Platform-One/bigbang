@@ -1,12 +1,12 @@
-# Development k3d cluster automation
+# Development k3d Cluster Automation
 
-> NOTE: This script does not does not install Flux or deploy Big Bang. You must handle those deployments after your k3d dev cluster is ready.
+> **NOTE:** This script does not does not install Flux or deploy Big Bang. You must handle those deployments after your k3d dev cluster is ready.
 
-The instance will automatically terminate 8 hours after creation.
+The instance will automatically terminate eight hours after creation.
 
 ## Install and Configure Dependencies
 
-1. Install aws cli
+1. Install aws cli.
 
    ```shell
    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -18,7 +18,7 @@ The instance will automatically terminate 8 hours after creation.
    aws --version
    ```
 
-1. Configure aws cli
+1. Configure aws cli.
 
    ```shell
    aws configure
@@ -31,7 +31,7 @@ The instance will automatically terminate 8 hours after creation.
    aws configure list
    ```
 
-1. Install jq  
+1. Install jq.  
     Follow jq installation instructions for your workstation operating system.  
     <https://stedolan.github.io/jq/download/>
 
@@ -98,7 +98,7 @@ The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you 
 
 ## Deploy Bigbang
 
-From the bigbang directory deploy BigBang via helm
+From the bigbang directory, deploy BigBang via helm.
 ```shell
 helm upgrade -i bigbang chart/ -n bigbang --create-namespace --set registryCredentials.username=XXXXX --set registryCredentials.password='XXXXX' -f chart/ingress-certs.yaml -f chart/values.yaml
 ```
@@ -114,7 +114,7 @@ Refer to this [documentation](package-integration/sso.md#Prerequisites) for vari
 
 ## Troubleshooting
 
-1. If you are on a Mac insure that you have GNU sed command installed. Otherwise you will see this error and the kubeconfig will not be updated with the IP from the instance.
+1. If you are on a Mac, ensure that you have GNU sed command installed. Otherwise, you will see this error and the kubeconfig will not be updated with the IP from the instance.
 
    ```console
    copy kubeconfig
@@ -123,6 +123,6 @@ Refer to this [documentation](package-integration/sso.md#Prerequisites) for vari
 
    ```
 
-2. If you get a failure from the script study and correct the error. Then run script with "-d" option to clean up resources. Then re-run your original command.
+2. If you get a failure from the script, study and correct the error. Then run script with "-d" option to clean up resources. Then re-run your original command.
 
-3. Occasionally a ssh command will fail because of connection problems. If this happens the script will fail with "unexpected EOF". Simply try again. Run the script with `-d` to clean up resources. Then re-run your original command.
+3. Occasionally, a ssh command will fail because of connection problems. If this happens, the script will fail with "unexpected EOF". Simply try again. Run the script with `-d` to clean up resources. Then re-run your original command.

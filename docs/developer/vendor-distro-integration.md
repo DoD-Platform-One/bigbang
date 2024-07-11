@@ -4,7 +4,7 @@
 
 Vendor distributions are tested within the umbrella project's ci [pipelines][0]. These pipelines include jobs from the [umbrella-templates][1] repository.
 
-The main thing to take into account is your cluster should have:
+The main thing to take into account is your cluster should have the following:
 
 * A single stage for spinning up.
 * A single stage for spinning down.
