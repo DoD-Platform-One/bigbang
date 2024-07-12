@@ -842,6 +842,7 @@ policies:
           - kyverno-cleanup-cluster-admission-reports-*
           - kyverno-cleanup-cluster-ephemeral-reports-*
           - kyverno-cleanup-update-requests-*
+          - kyverno-clean-reports-*
       - namespace: velero
         pods:
           allow:
