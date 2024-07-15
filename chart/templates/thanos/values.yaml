@@ -54,6 +54,15 @@ networkPolicies:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+storegateway:
+  enabled: true
+
+compactor:
+  enabled: true
+  retentionResolutionRaw: 30d
+  retentionResolution5m: 30d
+  retentionResolution1h: 10y
+
 query:
   dnsDiscovery:
     # to allow lookups to work with and without Istio enabled, we disable k8s dns service
@@ -93,6 +102,12 @@ storegateway:
   enabled: true
   useEndpointGroup: true
   endpoint: {{ .Values.addons.thanos.objectStorage.endpoint }}
+
+compactor:
+  enabled: true
+  retentionResolutionRaw: 30d
+  retentionResolution5m: 30d
+  retentionResolution1h: 30d
 
 query:
   extraFlags:
