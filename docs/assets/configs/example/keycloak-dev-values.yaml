@@ -54,33 +54,18 @@ addons:
           value: /opt/keycloak/conf/tls.crt
         - name: KC_HTTPS_CERTIFICATE_KEY_FILE
           value: /opt/keycloak/conf/tls.key
+        - name: KC_HTTPS_CLIENT_AUTH
+          value: request
         - name: KC_HTTPS_TRUST_STORE_FILE
           value: /opt/keycloak/conf/truststore.jks
         - name: KC_HTTPS_TRUST_STORE_PASSWORD
           value: password
-        - name: KC_HTTPS_CLIENT_AUTH
-          value: request
-        - name: KC_PROXY
-          value: passthrough
-        - name: KC_HTTP_ENABLED
-          value: "true"
-        - name: KC_HTTP_RELATIVE_PATH
-          value: /auth
         - name: KC_HOSTNAME
           value: keycloak.dev.bigbang.mil
         - name: KC_HOSTNAME_STRICT
           value: "true"
-        - name: KC_HOSTNAME_STRICT_HTTPS
-          value: "true"
         - name: KC_LOG_LEVEL
           value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
-        - name: KC_CACHE
-          value: ispn
-        - name: KC_CACHE_STACK
-          value: kubernetes
-        - name: KC_METRICS_ENABLED
-          value: "true"
-
       secrets:
         env:
           stringData:
