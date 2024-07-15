@@ -2219,12 +2219,11 @@ addons:
                   - 'download.cypress.io'
                   - 'cdn.cypress.io'
                   - 'repo1.dso.mil'
+                  - 'registry1.dso.mil'
+                  - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+                  - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
                   - 'nexus.dev.bigbang.mil'
                   - 'containers.dev.bigbang.mil'
-                  - "index.docker.io"
-                  - "auth.docker.io"
-                  - "production.cloudflare.docker.com"
-                  - "cdnjs.cloudflare.com"
                 location: MESH_EXTERNAL
                 ports:
                   - number: 443
