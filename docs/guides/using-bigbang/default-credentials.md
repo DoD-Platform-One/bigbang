@@ -1,8 +1,8 @@
 # Credentials for Big Bang Packages
 
-This document includes details on credentials to access each package in a default install (without SSO). It is safe to assume that any packages not listed in the two categories below either have no need for authentication or use different methods (ex: Velero require kubectl access).
+This document includes details on credentials to access each package in a default install (i.e., without SSO). It is safe to assume that any packages not listed in the two categories below either have no need for authentication or use different methods (e.g., Velero require kubectl access).
 
-## Packages With No Built in Authentication
+## Packages With No Built-in Authentication
 
 Although the below applications have no built in authentication, Big Bang's helm values can be configured to deploy authservice in front of these endpoints. Authservice is an Authentication Proxy that can integrate with SSO providers like Keycloak.
 
@@ -10,9 +10,9 @@ Although the below applications have no built in authentication, Big Bang's helm
 - Monitoring (Prometheus)
 - Monitoring (Alertmanager)
 
-## Packages With Built in Authentication
+## Packages With Built-in Authentication
 
-The applications in the table below provide both SSO and built in auth. The table gives default credentials and ways to access and/or override those.
+The applications in the table below provide both SSO and built-in authentication. The table gives default credentials and ways to access and/or override those.
 
 | Package (Application) | Default Username | Default Password | Additional Notes |
 | --------------------- | ---------------- | ---------------- | ---------------- |

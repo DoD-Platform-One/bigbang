@@ -1,12 +1,13 @@
-# Installing and Configuring VPA for Vertical Scaling of Fluent Bit and Promtail Pods
+# Installing and Configuring Vertical Pod Autoscaler (VPA) for Vertical Scaling of Fluent Bit and Promtail Pods
 
-Since log forwarder pods like fluentbit & promtail are designed to have 1 pod per node via a ReplicaSet instantiation they are unable to be Horizontally Scaled when reaching their resource limits. They can still be Vertically scaled once [VPA](https://repo1.dso.mil/big-bang/product/packages/vpa) is installed.
+Since log forwarder pods, like Fluentbit and Promtail, are designed to have one pod per node via a ReplicaSet instantiation, they are unable to be horizontally scaled when reaching their resource limits. They can still be vertically scaled once [VPA](https://repo1.dso.mil/big-bang/product/packages/vpa) is installed.
 
-# 1.Prerequisites:
-- Kubernetes cluster running version 1.14 or later
-- kubectl command-line tool configured to access the cluster
+# 1. Prerequisites
 
-# 2.Install the Vertical Pod Autoscaler
+- Kubernetes cluster must be running version 1.14 or later.
+- Kubectl command-line tool must be configured to access the cluster.
+
+# 2. Install the Vertical Pod Autoscaler
   1. Run the following commands to install the VPA components from the package repo:
 
     
@@ -14,7 +15,7 @@ Since log forwarder pods like fluentbit & promtail are designed to have 1 pod pe
     cd vpa
     helm install vertical-pod-autoscaler chart/
     
-  2. Add package via the BigBang 2.0 `packages:` key:
+  2. Add package via the Big Bang 2.0 `packages:` key:
     
     packages:
       vpa:
@@ -47,6 +48,7 @@ autoscaling:
 ```
 
 # 4.Configure Promtail Deployment
+
 For Promtail, make sure the following settings are added to the Packages Helm Chart [values.yaml](https://repo1.dso.mil/big-bang/product/packages/promtail/-/blob/main/chart/values.yaml) file:
 
 ```yaml
@@ -73,6 +75,7 @@ vpa:
 ```
 
 # 5.Verify VPA Status
+
 Check the VPA status to ensure it is functioning correctly and providing recommendations.
 
 Run the following command:
@@ -84,7 +87,7 @@ Run the following command:
 Look for the Conditions section and verify that the status is Healthy.
 
 # 6.Monitor and Observe Scaling
-Monitor the cluster and observe how the VPA scales the Fluent Bit and Promtail pods based on resource utilization.
-Review the pod resource utilization metrics using commands like kubectl top pods or monitoring tools like Prometheus and Grafana.
 
-By following these steps, you should be able to install and configure the Vertical Pod Autoscaler (VPA) to vertically scale Fluent Bit and Promtail pods in your Kubernetes cluster when additional resources are needed and headroom is available. Adjust the configurations and policies based on your specific requirements and application characteristics.
+Monitor the cluster and observe how the VPA scales the Fluent Bit and Promtail pods based on resource utilization. Review the pod resource utilization metrics using commands like kubectl top pods or monitoring tools like Prometheus and Grafana.
+
+By following these steps, you should be able to install and configure the VPA to vertically scale Fluent Bit and Promtail pods in your Kubernetes cluster when additional resources are needed and headroom is available. Adjust the configurations and policies based on your specific requirements and application characteristics.

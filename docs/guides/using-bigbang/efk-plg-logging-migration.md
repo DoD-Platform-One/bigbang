@@ -1,14 +1,13 @@
 # Switching Between EFK and PLG
 
-These instructions detail how to switch between EFK and PLG logging solutions.
+These instructions detail how to switch between Elasticsearch, Fluentbit, and Kibana (EFK) and Promtail, Loki, and Grafana (PLG) logging solutions.
 
 The EFK stack is an open-source choice for the Kubernetes log aggregation and analysis and is comprised of the following:
 - Elasticsearch is a distributed and scalable search engine commonly used to sift through large volumes of log data.
 - Fluentbit is a log shipper. It is an open source log collection agent which support multiple data sources and output formats.
-- Kibana is a UI tool for querying, data visualization and dashboards.
+- Kibana is a User Interface (UI) tool for querying, data visualization and dashboards.
 
-Today the EFK stack (Elasticsearch, Fluentbit, and Kibana) is enabled by default in the bigbang chart.
-The EFK stack appears within the chart as follows:
+Today the EFK stack is enabled by default in the Big Bang chart. The EFK stack appears within the chart as shown in the following:
 
 ```yaml
 
@@ -26,7 +25,8 @@ fluentbit:
 
 ```
 
-If you want to use a logging solution that doesn't require a license and has a smaller footprint, Big Bang provides PLG. PLG is comprised of:
+If you want to use a logging solution that doesn't require a license and has a smaller footprint, Big Bang provides PLG. PLG is comprised of the following:
+
 - Promtail is an agent that detects targets (e.g., local log files), attaches labels to log streams from the pods, and ships them to Loki.
 - Loki is an open-source, multi-tenant log aggregation system. It can be used with Grafana and Promtail to collect and access logs.
 - Grafana is an open-source visualization platform that processes time-series data from Loki and makes the logs accessible in a web UI.
@@ -65,5 +65,4 @@ tempo:
 
 ```
 
-NOTE:
-Both Fluentbit and Promtail forward logs to Grafana Loki. Should you want a logging stack comprised solely of Grafana technologies, the PLG stack will accommodate. The use of Fluentbit to send logs (log forwarder) is still a viable option rather than Promtail, and is configured within Big Bang to ship to Loki if enabled. Big Bang's recommendation is to use Fluentbit as a log forwarder because it is more feature rich. Promtail can only send to a limited set of endpoints (e.g., Loki and S3), whereas Fluentbit can send to numerous endpoints.
+**NOTE:** Both Fluentbit and Promtail forward logs to Grafana Loki. Should you want a logging stack comprised solely of Grafana technologies, the PLG stack will accommodate. The use of Fluentbit to send logs (i.e., log forwarder) is still a viable option rather than Promtail, and is configured within Big Bang to ship to Loki if enabled. Big Bang's recommendation is to use Fluentbit as a log forwarder because it is more feature rich. Promtail can only send to a limited set of endpoints (e.g., Loki and S3), whereas Fluentbit can send to numerous endpoints.
