@@ -3,15 +3,16 @@
 [[_TOC_]]
 
 ## Video Walkthrough
-A 54min speed run with explanations video walkthrough of this sso quickstart guide can be found on the following 2 mirrored locations:
+
+A 54-minute speed run with explanations video walkthrough of this sso quickstart guide can be found on the following 2 mirrored locations:
 * [Google Drive - Video Mirror](https://drive.google.com/file/d/1xzRKhFQy4WXW97YWUFpixclLGAKfgA6Z/preview)
 * [Repo1 - Video Mirror](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/blob/master/big_bang/bigbang_sso_quickstart.mp4)
 
-> SSO values have changed since these videos were created.  The old values used in the videos should still work, but you will receive warnings that they have been deprecated.
+> SSO values have changed since these videos were created. The old values used in the videos should still work, but you will receive warnings that they have been deprecated.
 
 ## Blue Team Knowledge Drop
 
-Imagine a scenario where <https://authdemo.bigbang.dev> represents a mock-up of a custom-built mission application lacking built-in SSO, authentication, or authorization. By integrating Auth Service, we can create multiple layers of defense-in-depth. This service allows only authenticated users to access the application, enforces multi-factor authentication (MFA) for these users, and requires them to be authorized based on their group membership within their Identity Provider. This setup enables safe self-registration of users without compromising security.
+Imagine a scenario where <https://authdemo.bigbang.dev> represents a mock-up of a custom-built mission application lacking built-in SSO, authentication, or authorization. By integrating Auth Service, we can create multiple layers of defense-in-depth. This service allows only authenticated users to access the application, enforces Multi-Factor Authentication (MFA) for these users, and requires them to be authorized based on their group membership within their Identity Provider. This setup enables safe self-registration of users without compromising security.
 
 ### Enhancing Existing Applications with Authentication Proxies
 
@@ -28,41 +29,45 @@ This SSO Quick Start Guide explains how to set up an SSO demo environment, from 
 **Steps:**
 
 1. This document assumes you have already gone through and are familiar with the generic quick start guide.
-1. Given 2 VMs (each with 8 CPU cores / 32 GB ram) that are each set up for ssh, turn the 2 VMs into 2 single node k3d clusters.
-Why 2 VMs? 2 reasons:
+1. Given two VMs (each with 8 CPU cores/32 GB ram) that are each set up for ssh, turn the two VMs into two single node k3d clusters.
+
+Why two VMs? Two reasons:
+
 1. It works around k3d only supporting 1 LB, but Keycloak needs its LB with TCP_PASSTHROUGH.
-1. This mimics the way the Big Bang team recommends Keycloak be deployed in production, giving it its dedicated cluster (Note: from a technical standpoint nothing is stopping it from being hosted on the same cluster).
-1. Use Big Bang demo workflow to turn 1 k3d cluster into a Keycloak Cluster.
-1. Use Big Bang demo workflow to turn 1 k3d cluster into a Workload Cluster.
+1. This mimics the way the Big Bang team recommends Keycloak be deployed in production, giving it its dedicated cluster (**NOTE:** from a technical standpoint nothing is stopping it from being hosted on the same cluster).
+1. Use Big Bang demo workflow to turn one k3d cluster into a Keycloak Cluster.
+1. Use Big Bang demo workflow to turn one k3d cluster into a Workload Cluster.
 1. In the Keycloak Cluster:
-   * Deploy Keycloak
+   * Deploy Keycloak.
    * Create a Human User and Service Account for the authdemo service.
 1. In the Workload Cluster:
-   * Deploy a mock mission application
+   * Deploy a mock mission application.
    * Protect the mock mission application, by deploying and configuring auth service to interface with Keycloak and require users to log in to Keycloak and be in the correct authorization group before being able to access the mock mission application.
 
 ### Differences between this and the generic quick start
 
 * Topics explained in previous quick start guides won't have notes or they will be less detailed.
 * The previous quick start supported deploying k3d to either localhost or remote VM, this quick start only supports deployment to remote VMs.
-* The previous quick start supported multiple Linux distributions, this one requires Ubuntu 20.04, and it must be configured for passwordless sudo (this guide has more automation of prerequisites, so we needed a standard to automate against.)
-* The automation also assumes Admin's Laptop has a Unix Shell. (Mac, Linux, or Windows Subsystem for Linux)
-* This quick start assumes you have kubectl installed on your Administrator Workstation
+* The previous quick start supported multiple Linux distributions, this one requires Ubuntu 20.04, and it must be configured for passwordless sudo (**NOTE:** this guide has more automation of prerequisites, so we needed a standard to automate against).
+* The automation also assumes Admin's Laptop has a Unix Shell. (Mac, Linux, or Windows Subsystem for Linux).
+* This quick start assumes you have kubectl installed on your Administrator Workstation.
 
-### Additional Auth Service and Keycloak documentation can be found in these locations
+### Additional Auth Service and Keycloak Documentation 
+
+Additional Auth service and Keycloack documentation can be found in the following locations:
 
 * [Authservice](https://repo1.dso.mil/big-bang/product/packages/authservice)
 * [Authservice Architecture](../../understanding-bigbang/package-architecture/authservice.md)
 * [Keycloak](https://repo1.dso.mil/big-bang/product/packages/keycloak)
 * [Keycloak Architecture](../../understanding-bigbang/package-architecture/keycloak.md)
 
-## Step 1: Provision 2 Virtual Machines
+## Step 1: Provision Two Virtual Machines
 
-* 2 Virtual Machines each with 32GB RAM, 8-Core CPU (t3a.2xlarge for AWS users), and 100GB of disk space should be sufficient.
+* Two Virtual Machines each with 32GB RAM, 8-Core CPU (t3a.2xlarge for AWS users), and 100GB of disk space should be sufficient.
 
-## Step 2: Setup SSH to both VMs
+## Step 2: Set up SSH to Both VMs
 
-1. Setup SSH to both VMs
+1. Set up SSH to both VMs.
 
     ```shell
     # [admin@Unix_Laptop:~]
@@ -85,7 +90,7 @@ Why 2 VMs? 2 reasons:
     echo "$temp" | tee -a ~/.ssh/config  #tee -a, appends to preexisting config file
     ```
 
-1. Verify SSH works for both VMs
+1. Verify SSH works for both VMs.
 
     ```shell
     # [admin@Laptop:~]
