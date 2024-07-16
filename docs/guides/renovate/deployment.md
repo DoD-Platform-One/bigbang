@@ -31,7 +31,7 @@ packages:
 ```
 
 #### Config
-The configuration sets up a self-hosted instance of Renovate that connects with a platform. In the example we connect to GitLab using the GitLab API v4 at a specified URL.
+The configuration sets up a self-hosted instance of Renovate that connects with a platform. In the example, we connect to GitLab using the GitLab API v4 at a specified URL.
 
 ##### Auth
 It is recommended to use a repository-scoped auth token with developer access for least privilege.
@@ -42,7 +42,7 @@ The repositories key in this self-hosted renovate configuration specifies which 
 See [Self Hosted Configuration](https://docs.renovatebot.com/self-hosted-configuration/#self-hosted-configuration-options) for more details
 
 #### Cron Job
-See [Scheduling Renovate Guide](./scheduling.md)
+Refer to the [Scheduling Renovate Guide](./scheduling.md).
 
 #### Individual Package Configuration
 The configuration file for Renovate is called `renovate.json` and is located in each project's root directory. See [Package Configuration](./package-configuration.md)
