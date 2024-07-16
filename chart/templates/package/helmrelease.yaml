@@ -13,7 +13,11 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}
-  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+              {{ else }}
+                {{ default (dig "namespace" "name" $pkg $vals) "" }}
+              {{ end }}
   labels:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
@@ -21,6 +25,7 @@ metadata:
     checksum/bigbang-values: {{ (toJson $vals.values) | sha256sum }}
 spec:
   releaseName: {{ $pkg }}
+  targetNamespace: {{ dig "namespace" "name" $pkg $vals }}
   chart:
     spec:
       {{- if $vals.git }}
@@ -28,7 +33,11 @@ spec:
       sourceRef:
         kind: GitRepository
         name: {{ $pkg }}
-        namespace: {{ dig "namespace" "name" $pkg $vals }}
+        namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
+                      {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+                    {{ else }}
+                      {{ default (dig "namespace" "name" $pkg $vals) "" }}
+                    {{ end }}
       {{- else if $vals.helmRepo }}
       chart: {{ dig "helmRepo" "chartName" $pkg $vals }}
       version: {{ dig "helmRepo" "tag" nil $vals }}
