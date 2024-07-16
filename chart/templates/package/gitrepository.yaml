@@ -17,7 +17,11 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: {{ $pkg }}
-  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+              {{ else }}
+                {{ default (dig "namespace" "name" $pkg $vals) "" }}
+              {{ end }}
   labels:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}

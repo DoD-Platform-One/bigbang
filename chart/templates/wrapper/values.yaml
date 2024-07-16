@@ -6,7 +6,11 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $pkg }}-wrapper-values
-  namespace: {{ dig "namespace" "name" $pkg $vals }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+              {{ else }}
+                {{ default (dig "namespace" "name" $pkg $vals) "" }}
+              {{ end }}
 type: Opaque
 stringData:
   values.yaml: |
