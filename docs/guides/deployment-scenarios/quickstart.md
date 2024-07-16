@@ -3,7 +3,8 @@
 [[_TOC_]]
 
 ## Video Walkthrough
-A 36min speed run video walkthrough of this quickstart can be found on the following 2 mirrored locations:
+
+A 36-minute speed run video walkthrough of this quickstart can be found on the following two mirrored locations:
 * [Google Drive - Video Mirror](https://drive.google.com/file/d/1m1pR0a-lrWr_Wed4EsI8-vimkYfb06GQ/view)
 * [Repo1 - Video Mirror](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/blob/master/big_bang/bigbang_quickstart.mp4)
 
@@ -11,31 +12,32 @@ A 36min speed run video walkthrough of this quickstart can be found on the follo
 
 This quick start guide explains in beginner-friendly terminology how to complete the following tasks in under an hour:
 
-1. Turn a virtual machine (VM) into a k3d single-node Kubernetes cluster.
+1. Turn a Virtual Machine (VM) into a k3d single-node Kubernetes cluster.
 1. Deploy Big Bang on the cluster using a demonstration and local development-friendly workflow.
 
-    > Note: This guide mainly focuses on the scenario of deploying Big Bang to a remote VM with enough resources to run Big Bang [(see step 1 for recommended resources)](#step-1-provision-a-virtual-machine). If your workstation has sufficient resources, or you are willing to disable packages to lower the resource requirements, then local development is possible. This quick start guide is valid for both remote and local deployment scenarios.
+    > **NOTE:** This guide mainly focuses on the scenario of deploying Big Bang to a remote VM with enough resources to run Big Bang [(refer to step 1 for recommended resources)](#step-1-provision-a-virtual-machine). If your workstation has sufficient resources, or you are willing to disable packages to lower the resource requirements, then local development is possible. This quick start guide is valid for both remote and local deployment scenarios.
 
 1. Customize the demonstration deployment of Big Bang.
 
 ## Important Security Notice
 
-All Developer and Quick Start Guides in this repo are intended to deploy environments for development, demo, and learning purposes. There are practices that are bad for security, but make perfect sense for these use cases: using of default values, minimal configuration, tinkering with new functionality that could introduce a security misconfiguration, and even purposefully using insecure passwords and disabling security measures like Kyverno for convenience. Many applications have default username and passwords combinations stored in the public git repo, these insecure default credentials and configurations are intended to be overridden during production deployments.
+All Developer and Quick Start Guides in this repo are intended to deploy environments for development, demonstration, and learning purposes. There are practices that are bad for security, but make perfect sense for these use cases: using of default values, minimal configuration, tinkering with new functionality that could introduce a security misconfiguration, and even purposefully using insecure passwords and disabling security measures like Kyverno for convenience. Many applications have default username and passwords combinations stored in the public git repo, these insecure default credentials and configurations are intended to be overridden during production deployments.
 
-When deploying a dev / demo environment there is a high chance of deploying Big Bang in an insecure configuration. Such deployments should be treated as if they could become easily compromised if made publicly accessible.
+When deploying a dev/demo environment there is a high chance of deploying Big Bang in an insecure configuration. Such deployments should be treated as if they could become easily compromised if made publicly accessible.
 
-### Recommended Security Guidelines for Dev / Demo Deployments
+### Recommended Security Guidelines for Dev/Demo Deployments
 
-* IDEALLY these environments should be spun up on VMs with private IP addresses that are not publicly accessible. Local network access or an authenticated remote network access solution like a VPN or [sshuttle](https://github.com/sshuttle/sshuttle#readme) should be used to reach the private network.
-* DO NOT deploy publicly routable dev / demo clusters into shared VPCs (like a shared dev environment VPCs) or on VMs with IAM Roles attached. If the demo cluster were compromised, an adversary might be able to use it as a stepping stone to move deeper into an environment.
+* Ideally, these environments should be spun up on VMs with private IP addresses that are not publicly accessible. Local network access or an authenticated remote network access solution like a VPN or [sshuttle](https://github.com/sshuttle/sshuttle#readme) should be used to reach the private network.
+* DO NOT deploy publicly routable dev/demo clusters into shared VPCs (i.e., like a shared dev environment VPCs) or on VMs with IAM Roles attached. If the demo cluster were compromised, an adversary might be able to use it as a stepping stone to move deeper into an environment.
 * If you want to safely demo on Cloud Provider VMs with public IPs you must follow these guidelines:
   * Prevent Compromise:
-    * Use firewalls that only allow the 2 VMs to talk to each other and your whitelisted IP.
+    * Use firewalls that only allow the two VMs to talk to each other and your whitelisted IP.
   * Limit Blast Radius of Potential Compromise:
     * Only deploy to an isolated VPC, not a shared VPC.
     * Only deploy to VMs with no IAM roles/rights attached.
 
 ## Network Requirements Notice
+
 This install guide by default requires network connectivity from your server to external DNS providers, specifically the Google DNS server at `8.8.8.8`, you can test that your node has connectivity to this DNS server by running the command `nslookup google.com 8.8.8.8` (run this from the node).
 
 If this command returns `DNS request timed out`, then you will need to follow the steps in [troubleshooting](#Troubleshooting) to change the upstream DNS server in your kubernetes cluster to your networks DNS server.
@@ -48,12 +50,11 @@ Additionally, if your network has a proxy that has custom/internal SSL certifica
 
 `Details of how each prerequisite/dependency is quickly satisfied:`  
 
-* Operating System Prerequisite: Any Linux distribution that supports Docker should work.
-* Operating System Pre-configuration: This quick start includes easy paste-able commands to quickly satisfy this prerequisite.
-* Kubernetes Cluster Prerequisite: is implemented using k3d (k3s in Docker)
-* Default Storage Class Prerequisite: k3d ships with a local volume storage class.
-* Support for automated provisioning of Kubernetes Service of type LB Prerequisite: is implemented by taking advantage of k3d's ability to easily map port 443 of the VM to port 443 of a Dockerized LB that forwards traffic to a single Istio Ingress Gateway.
-Important limitations of this quick start guide's implementation of k3d to be aware of:
+* **Operating System Prerequisite:** Any Linux distribution that supports Docker should work.
+* **Operating System Pre-configuration:** This quick start includes easy paste-able commands to quickly satisfy this prerequisite.
+* **Kubernetes Cluster Prerequisite:** is implemented using k3d (k3s in Docker)
+* **Default Storage Class Prerequisite:** k3d ships with a local volume storage class.
+* **Support for automated provisioning of Kubernetes Service of type LB Prerequisite:** is implemented by taking advantage of k3d's ability to easily map port 443 of the VM to port 443 of a Dockerized LB that forwards traffic to a single Istio Ingress Gateway. Important limitations of this quick start guide's implementation of k3d to be aware of:
   * Multiple Ingress Gateways aren't supported by this implementation as they would each require their own LB, and this trick of using the host's port 443 only works for automated provisioning of a single service of type LB that leverages port 443.
   * Multiple Ingress Gateways makes a demoable/tinkerable KeyCloak and locally hosted SSO deployment much easier.
   * Multiple Ingress Gateways can be demoed on k3d if configuration tweaks are made, MetalLB is used, and you are developing using a local Linux Desktop. (network connectivity limitations of the implementation would only allow a the web browser on the k3d host server to see the webpages.)
@@ -70,7 +71,7 @@ Important limitations of this quick start guide's implementation of k3d to be aw
 The following requirements are recommended for Demonstration Purposes:
 
 * 1 Virtual Machine with 32GB RAM, 8-Core CPU (t3a.2xlarge for AWS users), and 100GB of disk space should be sufficient.
-* Ubuntu Server 20.04 LTS (Ubuntu comes up slightly faster than CentOS, in reality any Linux distribution with Docker installed should work)
+* Ubuntu Server 20.04 LTS (Ubuntu comes up slightly faster than CentOS, in reality any Linux distribution with Docker installed should work).
 * Most Cloud Service Provider provisioned VMs default to passwordless sudo being preconfigured, but if you're doing local development or a bare metal deployment then it's recommended that you configure passwordless sudo.
   * Steps for configuring passwordless sudo: [(source)](https://unix.stackexchange.com/questions/468416/setting-up-passwordless-sudo-on-linux-distributions)
   1. `sudo visudo`
@@ -90,14 +91,14 @@ The following requirements are recommended for Demonstration Purposes:
 
 * Network connectivity to Virtual Machine (provisioning with a public IP and a security group locked down to your IP should work. Otherwise a Bare Metal server or even a Vagrant Box Virtual Machine configured for remote ssh works fine.)
 
-> Note: If your workstation has Docker, sufficient compute, and has ports 80, 443, and 6443 free, you can use your workstation in place of a remote virtual machine and do local development.
+> **NOTE**: If your workstation has Docker, sufficient compute, and has ports 80, 443, and 6443 free, you can use your workstation in place of a remote virtual machine and do local development.
 
 ## Step 2: SSH to Remote VM
 
-* ssh and passwordless sudo should be configured on the remote machine
+* ssh and passwordless sudo should be configured on the remote machine.
 * You can skip this step if you are doing local development.
 
-1. Setup SSH
+1. Set up SSH.
 
     ```shell
     # [admin@Unix_Laptop:~]
@@ -115,7 +116,7 @@ The following requirements are recommended for Demonstration Purposes:
     echo "$temp" | tee -a ~/.ssh/config  #tee -a, appends to preexisting config file
     ```
 
-1. SSH to instance
+1. SSH to instance.
 
       ```shell
       # [admin@Laptop:~]
@@ -126,9 +127,9 @@ The following requirements are recommended for Demonstration Purposes:
 
 ## Step 3: Install Prerequisite Software
 
-Note: This guide follows the DevOps best practice of left-shifting feedback on mistakes and surfacing errors as early in the process as possible. This is done by leveraging tests and verification commands.
+**NOTE:** This guide follows the DevOps best practice of left-shifting feedback on mistakes and surfacing errors as early in the process as possible. This is done by leveraging tests and verification commands.
 
-1. Install Git
+1. Install Git.
 
     ```shell
     sudo apt install git -y
@@ -145,7 +146,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # curl -fsSL https://get.docker.com | bash && sudo usermod --append --groups docker $USER
     ```
 
-1. Logout and login to allow the `usermod` change to take effect.
+1. Log out and login to allow the `usermod` change to take effect.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -157,7 +158,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     ssh k3d
     ```
 
-1. Verify Docker Installation
+1. Verify Docker Installation.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -168,7 +169,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     Hello from Docker!
     ```
 
-1. Install k3d
+1. Install k3d.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -187,7 +188,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
     ```
 
-1. Verify k3d installation
+1. Verify k3d installation.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -199,7 +200,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     k3s version v1.26.4-k3s1 (default)
     ```
 
-1. Install kubectl
+1. Install kubectl.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -217,7 +218,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     sudo ln -s /usr/local/bin/kubectl /usr/local/bin/k
     ```
 
-1. Verify kubectl installation
+1. Verify kubectl installation.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -228,7 +229,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     Client Version: version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.5", GitCommit:"c285e781331a3785a7f436042c65c5641ce8a9e9", GitTreeState:"clean", BuildDate:"2022-03-16T15:58:47Z", GoVersion:"go1.17.8", Compiler:"gc", Platform:"linux/amd64"}
     ```
 
-1. Install Kustomize
+1. Install Kustomize.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -249,7 +250,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # sudo mv kustomize /usr/bin/kustomize
     ```
 
-1. Verify Kustomize installation
+1. Verify Kustomize installation.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -260,7 +261,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     {Version:kustomize/v4.5.4 GitCommit:cf3a452ddd6f83945d39d582243b8592ec627ae3 BuildDate:2022-03-28T23:12:45Z GoOs:linux GoArch:amd64}
     ```
 
-1. Install Helm
+1. Install Helm.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -279,7 +280,7 @@ Note: This guide follows the DevOps best practice of left-shifting feedback on m
     # curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
     ```
 
-1. Verify Helm installation
+1. Verify Helm installation.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -410,17 +411,17 @@ k3d-k3s-default-server-0   Ready    control-plane,master   11m   v1.22.7+k3s1
 
 1. Here we continue to follow the DevOps best practice of enabling early left-shifted feedback whenever possible; Before adding credentials to a configuration file and not finding out there is an issue until after we see an ImagePullBackOff error during deployment, we will do a quick left-shifted verification of the credentials.
 
-1. Look up your IronBank image pull credentials
+1. Look up your IronBank image pull credentials.
 
-    1. In a web browser go to [https://registry1.dso.mil](https://registry1.dso.mil)
-    1. Login via OIDC provider
-    1. In the top right of the page, click your name, and then User Profile
-    1. Your image pull username is labeled "Username"
-    1. Your image pull password is labeled "CLI secret"
+    1. In a web browser go to [https://registry1.dso.mil](https://registry1.dso.mil).
+    1. Login via OIDC provider.
+    1. In the top right of the page, click your name, and then User Profile.
+    1. Your image pull username is labeled "Username."
+    1. Your image pull password is labeled "CLI secret."
 
-    > Note: The image pull credentials are tied to the life cycle of an OIDC token which expires after ~3 days, so if 3 days have passed since your last login to IronBank, the credentials will stop working until you re-login to the [https://registry1.dso.mil](https://registry1.dso.mil) GUI
+    > **NOTE:** The image pull credentials are tied to the life cycle of an OIDC token which expires after ~3 days, so if 3 days have passed since your last login to IronBank, the credentials will stop working until you re-login to the [https://registry1.dso.mil](https://registry1.dso.mil) GUI.
 
-1. Verify your credentials work
+1. Verify your credentials work.
 
     ```shell
     # [ubuntu@Ubuntu_VM:~]
@@ -457,7 +458,7 @@ cd ~
 HEAD detached at (latest version)
 ```
 
-> HEAD is git speak for current context within a tree of commits
+> **NOTE:** HEAD is git speak for current context within a tree of commits.
 
 ## Step 8: Install Flux
 
@@ -617,14 +618,14 @@ This makes the command more idempotent by allowing the exact same command to wor
 bigbang is the name of the helm release that you'd see if you run `helm list -n=bigbang`. `$HOME/bigbang/chart` is a reference to the helm chart being installed.
 
 `--values https://repo1.dso.mil/big-bang/bigbang/-/raw/master/chart/ingress-certs.yaml`:  
-References demonstration HTTPS certificates embedded in the public repository. The *.bigbang.dev wildcard certificate is signed by Let's Encrypt, a free public internet Certificate Authority. Note the URL path to the copy of the cert on master branch is used instead of `$HOME/bigbang/chart/ingress-certs.yaml`, because the Let's Encrypt certs expire after 3 months, and if you deploy a tagged release of BigBang, like 1.15.0, the version of the cert stored in the tagged git commit / release of Big Bang could be expired. Referencing the master branches copy via URL ensures you receive the latest version of the cert, which won't be expired.
+References demonstration HTTPS certificates embedded in the public repository. The *.bigbang.dev wildcard certificate is signed by Let's Encrypt, a free public internet Certificate Authority. Note the URL path to the copy of the cert on master branch is used instead of `$HOME/bigbang/chart/ingress-certs.yaml`, because the Let's Encrypt certs expire after 3 months, and if you deploy a tagged release of BigBang, like 1.15.0, the version of the cert stored in the tagged git commit/release of Big Bang could be expired. Referencing the master branches copy via URL ensures you receive the latest version of the cert, which won't be expired.
 
 `--namespace=bigbang --create-namespace`:  
 Means it will install the bigbang helm chart in the bigbang namespace and create the namespace if it doesn't exist.
 
 ## Step 11: Verify Big Bang Has Had Enough Time To Finish Installing
 
-* If you try to run the command in Step 11 too soon, you'll see an ignorable temporary error message
+* If you try to run the command in Step 11 too soon, you'll see an ignorable temporary error message.
 
   ```shell
   # [ubuntu@Ubuntu_VM:~]
@@ -642,7 +643,7 @@ Means it will install the bigbang helm chart in the bigbang namespace and create
   kubectl get po -A
   ```
 
-* If after running `kubectl get po -A` (which is the shorthand of `kubectl get pods --all-namespaces`) you see something like the following, then you need to wait longer
+* If after running `kubectl get po -A` (which is the shorthand of `kubectl get pods --all-namespaces`) you see something like the following, then you need to wait longer.
 
   ```console
   NAMESPACE           NAME                                                READY   STATUS          RESTARTS   AGE
@@ -667,7 +668,7 @@ Means it will install the bigbang helm chart in the bigbang namespace and create
   logging             logging-ek-es-master-0                              0/2     Init:0/2            0      37s
   ```
 
-* Wait up to 10 minutes then re-run `kubectl get po -A`, until all pods show STATUS Running
+* Wait up to 10 minutes then re-run `kubectl get po -A`, until all pods show STATUS Running.
 
 * `helm list -n=bigbang` should also show STATUS deployed
 
@@ -688,7 +689,7 @@ Means it will install the bigbang helm chart in the bigbang namespace and create
 
 ## Step 12: Edit Your Workstation’s Hosts File To Access the Web Pages Hosted on the Big Bang Cluster
 
-Run the following command, which is the short hand equivalent of `kubectl get virtualservices --all-namespaces` to see a list of websites you'll need to add to your hosts file
+Run the following command, which is the short hand equivalent of `kubectl get virtualservices --all-namespaces` to see a list of websites you'll need to add to your hosts file.
 
 ```shell
 kubectl get vs -A
@@ -742,7 +743,7 @@ Note, default credentials for Big Bang packages can be found [here](../using-big
 
 Here's an example of post deployment customization of Big Bang.  
 After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>  
-It should make sense that the following is a valid edit
+It should make sense that the following is a valid edit.
 
 ```shell
 # [ubuntu@Ubuntu_VM:~]
@@ -773,7 +774,7 @@ kubectl get po -n=argocd
 
 ## Step 15: Implementing Mission Applications within your bigbang environment
 
-BigBang by itself serves as a jumping off point, but many users will want to implement their own mission specific applications in to the cluster. BigBang has implemented a `packages:` and `wrapper:`  section to enable and support this in a way that ensures connectivity between your mission specific requirements and existing BigBang utilities, such as istio, the monitoring stack, and network policy management. [Here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/extra-package-deployment.md) is the documentation for the `packages` utility.
+Big Bang by itself serves as a jumping off point, but many users will want to implement their own mission specific applications in to the cluster. BigBang has implemented a `packages:` and `wrapper:`  section to enable and support this in a way that ensures connectivity between your mission specific requirements and existing BigBang utilities, such as istio, the monitoring stack, and network policy management. [Here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/extra-package-deployment.md) is the documentation for the `packages` utility.
 
 We will implement a simple additional utility as a proof of concept, starting with a basic podinfo client. This will use the `wrapper` key to provide integration between bigbang and the Mission Application, without requiring the full Istio configuration to be placed inside BigBang specific keys of the dependent chart.
 
@@ -889,7 +890,7 @@ This section will provide guidance for troubleshooting problems that may occur d
 ### Changing CoreDNS upstream DNS server:
 After completing step 5, if you are unable to connect to external DNS providers using the command `nslookup google.com 8.8.8.8`, to test the connection. Then use the steps below to change the upstream DNS server to your networks DNS server. Please note that this change will not perist after a restart of the host server therefore, if you restart or shutdown your server you will need to re-apply these changes to CoreDNS. 
 
-1. Open config editor to change the CoreDNS pod configuration
+1. Open config editor to change the CoreDNS pod configuration.
 
     ```shell
     kubectl -n kube-system edit configmaps CoreDNS -o yaml 
@@ -907,30 +908,34 @@ After completing step 5, if you are unable to connect to external DNS providers 
     forward . <DNS Server IP>
     ```
 
-1. Save changes in editor (for vi use `:wq`)
+1. Save changes in editor (for vi use `:wq`).
+
 1. Verify changes in terminal output that prints new config 
 
 ### Useful Commands for Obtaining Detailed Logs from Kubernetes Cluster or Containers
-* Print all pods including information related to the status of each pod 
+
+* Print all pods including information related to the status of each pod.
 	```shell
 	kubectl get pods --all-namespaces
 	```
-* Print logs for specified pod
+* Print logs for specified pod.
 	```shell 
 	kubectl logs <pod name> -n=<namespace of pod> 
 	```
-* Print a dump of relevent information for debugging and diagnosing your kubernetes cluster
+* Print a dump of relevent information for debugging and diagnosing your kubernetes cluster.
 	```shell
 	kubectl cluster-info dump
 	```
 
-### Documentation References for command line tools used
+### Documentation References for Command Line Tools Used
+
 * Kubectl - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands 
 * k3d - https://k3d.io/v5.5.1/usage/k3s/
 * Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
 * Helm - https://helm.sh/docs/helm/helm/
 
-### NeuVector "Failed to get container"
+### NeuVector "Failed to Get Container"
+
 If the NeuVector pods come online but give errors like:
 
 ```shell
@@ -946,7 +951,8 @@ cat /sys/fs/cgroup/cgroup.controllers
 
 If you get a "No such file or directory", that means its running v1, and needs to be running v2. Follow the documentation here - https://rootlesscontaine.rs/getting-started/common/cgroup2/#checking-whether-cgroup-v2-is-already-enabled to enable v2
 
-### "Too many open files"
+### "Too Many Open Files"
+
 If the NeuVector pods fail to open, and you look at the K8s logs only to find that it's giving the "too many open files" error, you'll need to increase your inotify max's. Consider grabbing your current fs.inotify.max values and increasing them like the following
 
 ```shell
@@ -955,10 +961,12 @@ sudo sysctl fs.inotify.max_user_instances=512
 sudo sysctl fs.inotify.max_user_watches=501208
 ```
 ### Failed to provide IP to istio-system/public-ingressgateway
-As one option to provide IP to the istio-system/public-ingressgateway, metallb can be run. The following steps will demonstrate a standard configuration, however, some changes may need to be made for each individual system (specific /ets/hosts addresses, etc.)
 
-#### Step 1: K3d deploy
-To facilitate metallb, servicelb needs to be disabled on the initial install.  Replace the above k3d deploy command with the following.
+As one option to provide IP to the istio-system/public-ingressgateway, metallb can be run. The following steps will demonstrate a standard configuration, however, some changes may need to be made for each individual system (e.g., specific /ets/hosts addresses).
+
+#### Step 1: K3d Deploy
+
+To facilitate metallb, servicelb needs to be disabled on the initial install.  Replace the above k3d deploy command with the following:
 ```shell
 k3d cluster create \
   --k3s-arg "--tls-san=$SERVER_IP@server:0" \
@@ -972,6 +980,7 @@ k3d cluster create \
 ```
 
 #### Step 2: Deploy MetalLB
+
 After following the above instructions to deploy flux, deploy the metallb controller and speaker.
 ```shell
 kubectl create -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
@@ -988,7 +997,8 @@ speaker-jrddv                 1/1     Running   0          30s
 ```
 
 #### Step 3: Configure MetalLB
-Note: This step will not work if either the controller or speaker are not in a running condition.
+
+**NOTE:** This step will not work if either the controller or speaker are not in a running condition.
 
 The following configuration addresses will need to be filled with the values that match your configuration. These can typically be found by looking at your docker subnet using the 'docker network ls' command.  If there is no subnet currently configured you can use the following as an example to set up your subnet. 'docker network create --opt com.docker.network.bridge.name=$NETWORK_NAME $NETWORK_NAME --driver=bridge -o "com.docker.network.driver.mtu"="1450" --subnet=172.x.x.x/16 --gateway 172.x.x.x'. Be sure to replace the network name, subnet and gateway values as needed.
 
@@ -1017,7 +1027,9 @@ EOF
 kubectl create -f $HOME/metallb-config.yaml
 ```
 #### Step 4: Configure /etc/hosts
-Lastly configure /etc/hosts/ with the new IP Addresses (you can add your own as needed for services). You will need to fill in the values used for the subnet.
+
+Lastly, configure /etc/hosts/ with the new IP Addresses (**NOTE:** you can add your own as needed for services). You will need to fill in the values used for the subnet.
+
 ```shell
   export PASSTHROUGH_GATEWAY_IP=172.x.x.x
   export PUBLIC_GATEWAY_IP=172.x.x.x
@@ -1034,10 +1046,12 @@ Lastly configure /etc/hosts/ with the new IP Addresses (you can add your own as 
 From this point continue with the helm upgrade command above.
 
 ### WSL2 
-This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2
 
-#### NeuVector "Failed to get container"
-In you receive a similar error to the above "Failed to get container" with NeuVector it could be because of the cgroup configurations in WSL2.  WSL2 often tries to run both cgroup and cgroup v2 in a unified manner which can confuse docker and affect deployments.  To remedy this you need to create a .wslconfig file in the C:\Users\<UserName>\ directory.  In this file you need to add:
+This section will provide guidance for troubleshooting problems that may occur during your Big Bang installation specifically involving WSL2.
+
+#### NeuVector "Failed to Get Container"
+
+In you receive a similar error to the above "Failed to get container" with NeuVector it could be because of the cgroup configurations in WSL2. WSL2 often tries to run both cgroup and cgroup v2 in a unified manner which can confuse docker and affect deployments. To remedy this you need to create a .wslconfig file in the C:\Users\<UserName>\ directory.  In this file you need to add the following:
 
 ```shell
 [wsl2]
@@ -1046,14 +1060,15 @@ kernelCommandLine = cgroup_no_v1=all
 
 Once created you need to restart wsl2.
 
-If this doesn't remedy the issue and the cgroup.controllers file is still located in the /sys/fs/cgroup/unified directory you may have to modify /etc/fstab and add 
+If this doesn't remedy the issue and the cgroup.controllers file is still located in the /sys/fs/cgroup/unified directory you may have to modify /etc/fstab and add the following:
 
 ```shell
 cgroup2 /sys/fs/cgroup cgroup2 rw,nosuid,nodev,noexec,relatime,nsdelegate 0 0
 ```
 
-#### Container fails to start "Not enough memory"
-Wsl2 limits the amount of memory available to half of what your computer has.  If you have 32g or less (16g or less available) this is often not enough to run all of the standard big bang services.  If you have more available memory you can modify the initial limit by modifying (or creating) the C:\Users\<UserName>\.wslconfig file by adding:
+#### Container Fails to Start: "Not Enough Memory"
+
+Wsl2 limits the amount of memory available to half of what your computer has. If you have 32g or less (16g or less available) this is often not enough to run all of the standard big bang services. If you have more available memory you can modify the initial limit by modifying (or creating) the C:\Users\<UserName>\.wslconfig file by adding:
 
 ```shell
 [wsl2]

@@ -1,18 +1,18 @@
 # Using Big Bang with Multiple Ingress Gateways
 
-By default, Big Bang only creates one ingress for all of the packages.  Although this architecture reduces complexity, it also limits the ability to independently control network access and load balancing to groups of packages.  By configuring Big Bang for multiple ingress gateways through [Istio](https://istio.io/latest/), package access and load can be better controlled.
+By default, Big Bang only creates one ingress for all of the packages. Although this architecture reduces complexity, it also limits the ability to independently control network access and load balancing to groups of packages. By configuring Big Bang for multiple ingress gateways through [Istio](https://istio.io/latest/), package access and load can be better controlled.
 
 ## Architecture
 
 The following diagram illustrates a typical multiple ingress architecture for Big Bang with the following characteristics:
 
-- A Kubernetes cluster running on a private subnet
-- Some apps with exposure to the internet through a public network load balancer
-- Some apps without exposure to the internet through a private (aka internal) network load balancer
-- Single sign on (SSO) connected to the internet through a dedicated public network load balancer
-- A service mesh ([Istio](https://istio.io/latest/)) handling TLS for all apps except SSO
+- A Kubernetes cluster running on a private subnet.
+- Some apps with exposure to the internet through a public network load balancer.
+- Some apps without exposure to the internet through a private (aka internal) network load balancer.
+- Single Sign-On (SSO) connected to the internet through a dedicated public network load balancer.
+- A service mesh ([Istio](https://istio.io/latest/)) handling TLS for all apps except SSO.
 
-Big Bang is capable of setting up everything within the private subnet using configuration.  The public load balancers would need to be configured outside of Big Bang's deployment.
+Big Bang is capable of setting up everything within the private subnet using configuration. The public load balancers would need to be configured outside of Big Bang's deployment.
 
 ```mermaid
 graph LR
@@ -52,13 +52,13 @@ graph LR
 
 ### Load Balancers
 
-Load balancers are used to insure traffic is distributed to Istio's control plane running across the Kubernetes nodes.  In the diagram above, we only show one Kubernetes node for simplicity.  But, most clusters are run with multiple nodes.  Load balancers should be connected to all of the nodes.  It is recommended that you use Layer 3/4 network load balancers in Big Bang since Istio can handle layer 7 routing and balancing.
+Load balancers are used to ensure traffic is distributed to Istio's control plane running across the Kubernetes nodes.  In the diagram above, we only show one Kubernetes node for simplicity. However, most clusters are run with multiple nodes. Load balancers should be connected to all of the nodes. It is recommended that you use Layer 3/4 network load balancers in Big Bang since Istio can handle Layer 7 routing and balancing.
 
 #### Public Load Balancer
 
-Public load balancers must be created independent of Big Bang.  This is because the cluster is deployed in a private subnet and therefore does not have access to create resources in the public, internet-facing subnet.  In order for the load balancer, in the public subnet, to communicate to the Istio's Ingress Gateway, in the private subnet, node ports must be used.  Node ports will bind a port on each cluster node to a listener in the ingress gateway.  The load balancer will distribute traffic on that port to the cluster nodes.
+Public load balancers must be created independent of Big Bang. This is because the cluster is deployed in a private subnet and therefore, does not have access to create resources in the public, internet-facing subnet. In order for the load balancer, in the public subnet, to communicate to the Istio's Ingress Gateway, in the private subnet, node ports must be used. Node ports will bind a port on each cluster node to a listener in the ingress gateway. The load balancer will distribute traffic on that port to the cluster nodes.
 
-> Not all deployments have a public subnet.  For example, a private network that can only be accessed through a VPN would not have a public subnet and not require any public load balancers.
+> Not all deployments have a public subnet. For example, a private network that can only be accessed through a VPN would not have a public subnet and not require any public load balancers.
 
 In Big Bang, this is how you would setup an ingress gateway for Node Ports:
 
@@ -70,13 +70,13 @@ istio:
       nodePortBase: 30000  # Bind the following ports: Status <-> 30000; HTTP <-> 30001; HTTPS <-> 30002; SNI <-> 30003
 ```
 
-The load balancer can then be setup to forward HTTP traffic to all nodes on port 30001 and HTTPS traffic on all nodes to 30002.  Istio provides a ready status that can be reached via HTTP on the status port.  So, the load balancer's health check can be setup for all nodes on port 30000 to the URL `/healthz/ready`.  DNS entries should be created for each hostname to point to the load balancer's DNS.  Package endpoints can then be accessed using the FQDN from the internet.
+The load balancer can then be setup to forward HTTP traffic to all nodes on port 30001 and HTTPS traffic on all nodes to 30002. Istio provides a ready status that can be reached via HTTP on the status port. So, the load balancer's health check can be setup for all nodes on port 30000 to the URL `/healthz/ready.` DNS entries should be created for each hostname to point to the load balancer's DNS. Package endpoints can then be accessed using the FQDN from the internet.
 
-#### Private / Internal Load Balancer
+#### Private/Internal Load Balancer
 
-Private or internal load balancers can usually be created automatically by Big Bang via Istio using service annotations.  By using these annotations, a load balancer will be created for you and automatically mapped to the appropriate nodes/ports for distributing the load.
+Private or internal load balancers can usually be created automatically by Big Bang via Istio using service annotations. By using these annotations, a load balancer will be created for you and automatically mapped to the appropriate nodes/ports for distributing the load.
 
-Here is how you would setup Big Bang for a private load balancer on AWS.  For other cloud providers, review [Kubernetes internal load balancer documentation](https://kubernetes.io/docs/concepts/services-networking/_print/#internal-load-balancer):
+Here is how you would setup Big Bang for a private load balancer on AWS. For other cloud providers, review [Kubernetes internal load balancer documentation](https://kubernetes.io/docs/concepts/services-networking/_print/#internal-load-balancer):
 
 ```yaml
 istio:
@@ -90,17 +90,20 @@ istio:
           service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 ```
 
-After the load balancer is created, you will need to setup DNS entries (e.g. Route 53 on AWS) to point to the load balancer using the host names of the applications.  You should then be able to access the package endpoints from the private network using the FQDN.
+After the load balancer is created, you will need to setup DNS entries (e.g., Route 53 on AWS) to point to the load balancer using the host names of the applications. You should then be able to access the package endpoints from the private network using the FQDN.
+
 > Private network access can be achieved through SSH on a jump box (aka bastion), VPN, or other secure gateway.
 
 ### Ingress Gateways
 
-Istio's Ingress Gateways are services that sit on the edge of the Kubernetes cluster and listen for incoming traffic.  In Big Bang, the Ingress Gateways are either setup as Node Port or Load Balancer services.  As a Node Port type, ports on the node are bound to the service and incoming traffic is routed to the nodes on those ports.  As a Load Balancer type, a load balancer is automatically created and configured to communicate to the service.
+Istio's Ingress Gateways are services that sit on the edge of the Kubernetes cluster and listen for incoming traffic. In Big Bang, the Ingress Gateways are either setup as Node Port or Load Balancer services. As a Node Port type, ports on the node are bound to the service and incoming traffic is routed to the nodes on those ports. As a Load Balancer type, a load balancer is automatically created and configured to communicate to the service.
+
 > In some cases, automatic load balancer creating and configuration is not supported and a Node Port service must be used.
 
-Ingress Gateways will listen for incoming traffic on their assigned ports and forward that traffic to attached Gateways on the appropriate port.  For example, traffic may be received on port 30002 and forwarded to all attached Gateways on port 8443.
+Ingress Gateways will listen for incoming traffic on their assigned ports and forward that traffic to attached Gateways on the appropriate port. For example, traffic may be received on port 30002 and forwarded to all attached Gateways on port 8443.
 
-In Big Bang, ingress gateways can be created and configured using the `istio.ingressGateways` values.  By adding additional keys under this value, additional ingress gateways will be created.  The following is an example of setting up three Ingress Gateways to match the architecture diagram above.
+In Big Bang, ingress gateways can be created and configured using the `istio.ingressGateways` values. By adding additional keys under this value, additional ingress gateways will be created. An example of setting up three Ingress Gateways to match the architecture diagram above is provided in the following:
+
 > It is recommended that you add `-ingressgateway` on the end of the name of the key to help identify the pods created in the Kubernetes cluster.
 
 ```yaml
@@ -123,17 +126,17 @@ istio:
       nodePortBase: 30100  # Bind the following ports: Status (15021) <-> 30100; HTTP (8080) <-> 30101; HTTPS (8443) <-> 30102; SNI (15443) <-> 30103
 ```
 
-The default values for Ingress Gateways will work for most situations.  However, if you need finer control over the configuration, any of the settings in the [Kubernetes Resource Spec](https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec) can be added to `kubernetesResourceSpec` as a map.  Some examples of additional settings include environmental variables, service selectors, affinity mapping, or additional ports.
+The default values for Ingress Gateways will work for most situations. However, if you need finer control over the configuration, any of the settings in the [Kubernetes Resource Spec](https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec) can be added to `kubernetesResourceSpec` as a map. Some examples of additional settings include environmental variables, service selectors, affinity mapping, or additional ports.
 
 ### Gateways
 
-While Ingress Gateways handle traffic using ports, Gateways manage traffic using protocol and hostname.  Each Gateway must be assigned to one or more Ingress Gateways to receive traffic.  Gateways are setup to listen on ports for specific protocols and hostnames.  Traffic is then sent on to Virtual Services for further routing.
+While Ingress Gateways handle traffic using ports, Gateways manage traffic using protocol and hostname. Each Gateway must be assigned to one or more Ingress Gateways to receive traffic. Gateways are set up to listen on ports for specific protocols and hostnames. Traffic is then sent on to Virtual Services for further routing.
 
-Gateways can handle TLS encryption, including termination.  If a Gateway is setup for TLS termination, it handles the full TLS handshake during HTTPS connections and decrypts messages at the Gateway before passing traffic on the backend in the clear.  To perform this function, the Gateway must be provided a TLS private key and certificate.  There are [other TLS modes](https://istio.io/latest/docs/reference/config/networking/gateway/#ServerTLSSettings-TLSmode) supported by Gateways that may also be used.
+Gateways can handle TLS encryption, including termination. If a Gateway is set up for TLS termination, it handles the full TLS handshake during HTTPS connections and decrypts messages at the Gateway before passing traffic on the backend in the clear. To perform this function, the Gateway must be provided a TLS private key and certificate.  There are [other TLS modes](https://istio.io/latest/docs/reference/config/networking/gateway/#ServerTLSSettings-TLSmode) supported by Gateways that may also be used.
 
-In Big Bang, Gateways can be created and configured using the `istio.gateways` values.  By adding additional keys under this value, additional Gateways will be created.  By default, HTTP traffic is always redirected to HTTPS traffic in the Gateway.  The following is an example of setting up three Gateways to match the architecture diagram above.
+In Big Bang, Gateways can be created and configured using the `istio.gateways` values. By adding additional keys under this value, additional Gateways will be created. By default, HTTP traffic is always redirected to HTTPS traffic in the Gateway. An example of setting up three Gateways to match the architecture diagram above is provided in the following:
 
-> By default Big Bang uses TLS termination on Gateways.  For Keycloak, the package must manage the TLS encryption.  In that case, we use TLS passthrough on the Gateway and setup the TLS keys in the package.
+> By default Big Bang uses TLS termination on Gateways. For Keycloak, the package must manage the TLS encryption.  In that case, we use TLS passthrough on the Gateway and setup the TLS keys in the package.
 
 ```yaml
   gateways:
@@ -159,11 +162,11 @@ In Big Bang, Gateways can be created and configured using the `istio.gateways` v
         mode: "PASSTHROUGH"                             # Pass TLS encrypted traffic to application
 ```
 
-Big Bang will automatically create a secret with the TLS key and cert provided for each Gateway.  In some cases, it may be advantageous to create the secrets ahead of time and have Big Bang use them.  In this case a TLS secret named `{name of gateway}-cert` can be prepopulated with the key and `tls.key` and `tls.cert` values can be left blank.  For example, for the `private` Gateway, a `private-cert` TLS secret would be created.
+Big Bang will automatically create a secret with the TLS key and cert provided for each Gateway. In some cases, it may be advantageous to create the secrets ahead of time and have Big Bang use them.  In this case a TLS secret named `{name of gateway}-cert` can be prepopulated with the key and `tls.key` and `tls.cert` values can be left blank. For example, for the `private` Gateway, a `private-cert` TLS secret would be created.
 
 ### Virtual Services
 
-Virtual services use full URL host and path information to route incoming traffic to a Service.  Each package in Big Bang manages its own Virtual Services since the paths and ports vary for each package.  However, in order to receive traffic at the Virtual Service, it must be connected to a Gateway.  In Big Bang we configure this under each package.  The following is an example of this configuration that matches the architecture diagram above.
+Virtual services use full URL host and path information to route incoming traffic to a service. Each package in Big Bang manages its own Virtual Services since the paths and ports vary for each package. However, in order to receive traffic at the Virtual Service, it must be connected to a Gateway.  In Big Bang we configure this under each package. An example of this configuration that matches the architecture diagram above is provided in the following.
 
 ```yaml
 monitoring:
@@ -189,4 +192,4 @@ addons:
 
 ### Services and Pods
 
-Once traffic passes through the Virtual Service, it is passed to a Service.  The service may have several redundant pods and a load balancing scheme to manage incoming traffic.  It will route the traffic to the appropriate pod based on these settings.  Each package implements the service and pods differently and typically the default configuration is adequate for most deployments.
+Once traffic passes through the Virtual Service, it is passed to a Service. The service may have several redundant pods and a load balancing scheme to manage incoming traffic. It will route the traffic to the appropriate pod based on these settings. Each package implements the service and pods differently and typically the default configuration is adequate for most deployments.
