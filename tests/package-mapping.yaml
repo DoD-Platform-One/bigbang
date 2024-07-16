@@ -87,3 +87,7 @@ metricsServer:
   repoName: "metrics-server"
   hrName: "metrics-server"
   filePath: "metrics-server"
+externalSecrets:
+  repoName: "external-secrets"
+  hrName: "external-secrets"
+  filePath: "external-secrets"
