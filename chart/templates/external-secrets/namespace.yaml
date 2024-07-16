@@ -1,0 +1,13 @@
+{{- if .Values.addons.externalSecrets.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    meta.helm.sh/release-namespace: bigbang
+    meta.helm.sh/release-name: bigbang
+    app.kubernetes.io/name: external-secrets
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: enabled
+  name: external-secrets
+{{- end }}

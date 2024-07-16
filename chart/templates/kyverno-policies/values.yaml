@@ -144,6 +144,13 @@ policies:
           - source-controller*
           - kustomize-controller*
       {{- end }}
+      {{- if .Values.addons.externalSecrets.enabled }}
+      - resources:
+          namespaces:
+          - external-secrets 
+          names:
+          - external-secrets*
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:

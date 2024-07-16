@@ -1,0 +1,73 @@
+{{- $fluxSettings := merge .Values.addons.externalSecrets.flux .Values.flux -}}
+{{- if .Values.addons.externalSecrets.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-secrets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: external-secrets
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/external-secrets/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: external-secrets
+  chart:
+    spec:
+      {{- if eq .Values.addons.externalSecrets.sourceType "git" }}
+      chart: {{ .Values.addons.externalSecrets.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: external-secrets
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.externalSecrets.helmRepo.chartName }}
+      version: {{ .Values.addons.externalSecrets.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.externalSecrets.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.externalSecrets.helmRepo.repoName "allRepos" .Values.helmRepositories) -}}
+      {{- if (and .Values.addons.externalSecrets.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.externalSecrets.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettings | nindent 2 }}
+
+  {{- if .Values.addons.externalSecrets.postRenderers }}
+  postRenderers:
+  {{- toYaml .Values.addons.externalSecrets.postRenderers | nindent 2 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-external-secrets-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-external-secrets-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-external-secrets-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,24 @@
+{{- if and (eq .Values.addons.externalSecrets.sourceType "git") .Values.addons.externalSecrets.enabled  }}
+{{- $gitCredsDict := dict
+  "name" "externalSecrets"
+  "packageGitScope" .Values.addons.externalSecrets.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: external-secrets
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: external-secrets
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.externalSecrets.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.externalSecrets.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}

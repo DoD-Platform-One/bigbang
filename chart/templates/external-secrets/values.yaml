@@ -1,0 +1,26 @@
+{{- if .Values.addons.externalSecrets.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.externalSecrets "name" "external-secrets" "defaults" (include "bigbang.defaults.external-secrets" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.external-secrets" -}}
+
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- if .Values.istio.enabled }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+
+openshift: {{ .Values.openshift }}
+{{- end -}}

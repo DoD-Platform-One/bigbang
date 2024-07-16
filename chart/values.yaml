@@ -2076,6 +2076,33 @@ addons:
 
     postRenderers: []
 
+  externalSecrets:
+    # -- Toggle deployment of external secrets
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/external-secrets.git
+      tag: "0.9.18-bb.7"
+      path: "./chart"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "external-secrets"
+      tag: "0.9.18-bb.7"
+
+    # -- Override flux settings for this package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    values: {}
+
+    postRenderers: []
+
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"
