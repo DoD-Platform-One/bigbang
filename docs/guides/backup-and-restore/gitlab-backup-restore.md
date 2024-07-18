@@ -1,6 +1,7 @@
 # Gitlab Backups and Restores
 
 ## Gitlab Helm Chart Configuration
+
 1. Follow the `Backup and rename gitlab-rails-secret` task within the [Production document](../../understanding-bigbang/configuration/sample-prod-config.md).
 1. Fill in our externalStorage values, specifically `addons.gitlab.objectStorage.iamProfile` or both `.Values.addons.gitlab.objectStorage.accessKey` & `.Values.addons.gitlab.objectStorage.accessSecret` along with `.Values.addons.gitlab.objectStorage.bucketPrefix` or you can override in the name for your own bucket eg:
 ```yaml
@@ -27,21 +28,23 @@ addons:
 ## Backing up Gitlab
 
 ### Manual Steps
+
 To perform a manual complete backup of Gitlab, exec into your Gitlab Toolbox pod and run the following:
-  1. find your Gitlab Toolbox pod 
+  1. Find your Gitlab Toolbox pod.
      ```shell
      kubectl get pods -l release=gitlab,app=toolbox -n gitlab
      kubectl exec -it gitlab-toolbox-XXXXXXXXX-XXXXX -n gitlab -- /bin/sh
      ```
-  1. Execute the backup-utility command which will pull down data from the database, gitaly, and other portions of the ecosystem, tar them up and push to your configured cloud storage.
+  1. Execute the backup-utility command which will pull down data from the database, gitaly, and other portions of the ecosystem. Tar them up and push to your configured cloud storage.
      ```shell
      backup-utility --skip registry,lfs,artifacts,packages,uploads,pseudonymizer,terraformState,backups
      ```
 
-You can read more on the upstream documentation: https://docs.gitlab.com/charts/backup-restore/backup.html#create-the-backup
+You can read more on the upstream documentation: https://docs.gitlab.com/charts/backup-restore/backup.html#create-the-backup.
 
 ### Automatic Cron-based Backups
-It is recommended to setup automatic backups via Gitlab toolbox's cron settings:
+
+It is recommended to set up automatic backups via Gitlab toolbox's cron settings:
 ```yaml
 addons:
   gitlab:
@@ -66,6 +69,7 @@ addons:
 You can read more on the upstream documentation: https://docs.gitlab.com/charts/charts/gitlab/toolbox/#configuration
 
 ## Restore Gitlab
+
 1. Ensure your gitlab-rails secret is present in gitops or in-cluster and it correctly matches the database to which the chart is pointed.
    * If you need to replace or update your rails secret, once it is updated be sure to restart the following pods:
      ```shell
@@ -74,7 +78,7 @@ You can read more on the upstream documentation: https://docs.gitlab.com/charts/
      kubectl rollout -n gitlab restart deploy/gitlab-toolbox
      ```
 2. Exec into the toolbox pod and run the backup-utility command:
-   1. find your Gitlab Toolbox pod 
+   1. find your Gitlab Toolbox pod. 
      ```shell
      kubectl get pods -l release=gitlab,app=toolbox -n gitlab
      kubectl exec -it gitlab-toolbox-XXXXXXXXX-XXXXX -n gitlab -- /bin/sh
@@ -96,4 +100,4 @@ You can read more on the upstream documentation: https://docs.gitlab.com/charts/
      # Using the Timestamp
      backup-utility --restore -t TIMESTAMP_VALUE
      ```
-You can read more on the upstream documentation: https://docs.gitlab.com/charts/backup-restore/restore.html#restoring-the-backup-file
+You can read more on the upstream documentation: https://docs.gitlab.com/charts/backup-restore/restore.html#restoring-the-backup-file.
