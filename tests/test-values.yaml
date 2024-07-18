@@ -1499,9 +1499,9 @@ addons:
                   - "registry.dev.bigbang.mil"
                   - 'keycloak.dev.bigbang.mil'
                   - 'repo1.dso.mil'
-                  - "index.docker.io"
-                  - "auth.docker.io"
-                  - "production.cloudflare.docker.com"
+                  - 'registry1.dso.mil'
+                  - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+                  - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
                 location: MESH_EXTERNAL
                 ports:
                   - number: 443
