@@ -54,7 +54,7 @@ policies:
 
   # Istio services (istio ingress) can create type: NodePort services
   disallow-nodeport-services:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     {{- if $nodePortIngressGateways }}
     exclude:
       any:
@@ -71,7 +71,7 @@ policies:
 
   disallow-image-tags:
     enabled: true
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
 
   disallow-istio-injection-bypass:
     enabled: {{ .Values.istio.enabled }}
@@ -84,7 +84,7 @@ policies:
 
   disallow-namespaces:
     enabled: true
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     parameters:
       disallow:
       - bigbang
@@ -236,7 +236,7 @@ policies:
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
     enabled: false
-    validationFailureAction: audit
+    validationFailureAction: Audit
 
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
@@ -440,7 +440,7 @@ policies:
   {{- end }}
 
   restrict-capabilities:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     # NEEDS FURTHER JUSTIFICATION
     # Twistlock Defenders require the following capabilities
     # - NET_ADMIN  - Process monitoring and Iptables
@@ -486,7 +486,7 @@ policies:
     {{- end }}
 
   restrict-host-path-mount:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployNodeAgent }}
     exclude:
       any:
@@ -576,10 +576,10 @@ policies:
   # To override either disable this policy (not ideal) or add an allowed wildcard matching where local paths are provisioned.
   # See `docs/assets/configs/example/policy-overrides-k3d.yaml` for an example of how to do this for k3d.
   restrict-host-path-mount-pv:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
 
   restrict-host-path-write:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     {{- if or .Values.neuvector.enabled .Values.twistlock.enabled }}
     exclude:
       any:
@@ -628,7 +628,7 @@ policies:
     {{- end }}
 
   restrict-image-registries:
-    validationFailureAction: enforce
+    validationFailureAction: Enforce
     parameters:
       allow:
       - registry1.dso.mil
