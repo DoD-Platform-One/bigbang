@@ -104,8 +104,6 @@ cve:
 
 {{- if .Values.istio.enabled }}
 manager:
-  env:
-    ssl: false
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
