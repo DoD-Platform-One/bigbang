@@ -4,7 +4,7 @@
 
 ## Video Walkthrough
 
-A 54-minute speed run with explanations video walkthrough of this sso quickstart guide can be found on the following 2 mirrored locations:
+A 54-minute speed run with explanations video walkthrough of this Single Sign-On (SSO) quick-start guide can be found on the following two mirrored locations:
 * [Google Drive - Video Mirror](https://drive.google.com/file/d/1xzRKhFQy4WXW97YWUFpixclLGAKfgA6Z/preview)
 * [Repo1 - Video Mirror](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/blob/master/big_bang/bigbang_sso_quickstart.mp4)
 
@@ -22,14 +22,14 @@ Auth Service's Authentication Proxy offers significant security enhancements. Ev
 
 Istio, AuthService, and Keycloak are not only Free Open Source Software (FOSS) but also operate efficiently in internet-disconnected environments. We will demonstrate this capability using only Kubernetes DNS and workstation hostfile edits, avoiding the need for conventional LAN/Internet DNS configurations.
 
-## Overview
+# Overview
 
-This SSO Quick Start Guide explains how to set up an SSO demo environment, from scratch within two hours, that will allow you to demo Auth Service's functionality. You'll gain hands-on configuration experience with Auth Service, Keycloak, and a Mock Mission Application.
+This SSO quick-start guide explains how to set up an SSO demo environment, from scratch within two hours, that will allow you to demo Auth Service's functionality. You'll gain hands-on configuration experience with Auth Service, Keycloak, and a Mock Mission Application.
 
-**Steps:**
+# Steps
 
-1. This document assumes you have already gone through and are familiar with the generic quick start guide.
-1. Given two VMs (each with 8 CPU cores/32 GB ram) that are each set up for ssh, turn the two VMs into two single node k3d clusters.
+1. This document assumes you have already gone through and are familiar with the generic quick-start guide.
+1. Given two Virtual Machines (VMs) (i.e, each with 8 CPU cores/32 GB ram) that are each set up for SSH, turn the two VMs into two single node k3d clusters.
 
 Why two VMs? Two reasons:
 
@@ -44,15 +44,15 @@ Why two VMs? Two reasons:
    * Deploy a mock mission application.
    * Protect the mock mission application, by deploying and configuring auth service to interface with Keycloak and require users to log in to Keycloak and be in the correct authorization group before being able to access the mock mission application.
 
-### Differences between this and the generic quick start
+## Differences between this Guide and the Generic Quick-Start Guide
 
 * Topics explained in previous quick start guides won't have notes or they will be less detailed.
 * The previous quick start supported deploying k3d to either localhost or remote VM, this quick start only supports deployment to remote VMs.
 * The previous quick start supported multiple Linux distributions, this one requires Ubuntu 20.04, and it must be configured for passwordless sudo (**NOTE:** this guide has more automation of prerequisites, so we needed a standard to automate against).
-* The automation also assumes Admin's Laptop has a Unix Shell. (Mac, Linux, or Windows Subsystem for Linux).
+* The automation also assumes Admin's Laptop has a Unix Shell (Mac, Linux, or Windows Subsystem for Linux).
 * This quick start assumes you have kubectl installed on your Administrator Workstation.
 
-### Additional Auth Service and Keycloak Documentation 
+## Additional Auth Service and Keycloak Documentation 
 
 Additional Auth service and Keycloack documentation can be found in the following locations:
 
@@ -63,7 +63,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
 
 ## Step 1: Provision Two Virtual Machines
 
-* Two Virtual Machines each with 32GB RAM, 8-Core CPU (t3a.2xlarge for AWS users), and 100GB of disk space should be sufficient.
+* Two Virtual Machines each with 32GB RAM, 8-Core CPU (i.e., t3a.2xlarge for AWS users), and 100GB of disk space should be sufficient.
 
 ## Step 2: Set up SSH to Both VMs
 
@@ -108,13 +108,13 @@ Additional Auth service and Keycloack documentation can be found in the followin
     # [admin@Laptop:~]
     ```
 
-## Step 3: Prep work - Install dependencies and configure both VMs
+## Step 3: Prep work: Install Dependencies and Configure both VMs
 
-1. Set some Variables and push them to each VM
-   * We'll pass some environment variables into the VMs that will help with automation
-   * We'll also update the PS1 var so we can tell the 2 machines apart when ssh'd into.
-   * All of the commands in the following section are run from the Admin Laptop
-   * Note: The REGISTRY1_USERNAME and REGISTRY1_PASSWORD in the code block below, can't be blindly copy pasted.
+1. Set variables and push them to each VM.
+   * We'll pass some environment variables into the VMs that will help with automation,
+   * We'll also update the PS1 var so we can tell the two machines apart when ssh'd into.
+   * All of the commands in the following section are run from the Admin Laptop.
+   * **NOTE:** The REGISTRY1_USERNAME and REGISTRY1_PASSWORD in the code block below can't be blindly copy pasted.
 
     ```shell
     # [admin@Laptop:~]
@@ -130,7 +130,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     REGISTRY1_PASSWORD="REPLACE_ME"
     ```
 
-   * Note: The following code block can be copy pasted into the terminal as is
+   * **NOTE:** The following code block can be copy pasted into the terminal as-is.
 
     ```shell
     # [admin@Laptop:~]
@@ -144,7 +144,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     echo "Please manually verify that the IPs of your keycloak and workload k3d VMs look correct before moving on."
     ```
 
-   * Copy paste the following code block into your workstation's unix terminal.
+   * Copy and paste the following code block into your workstation's unix terminal.
      (This is using cat command to generate files. Specifically scripts templatized using environment variables.)
 
     ```shell
@@ -191,7 +191,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     EOFworkload-k3d-prepwork-commandsEOF
     ```
 
-   * Run the following against your Laptop / Workstation's Unix terminal.
+   * Run the following against your Laptop/Workstation's Unix terminal.
 
     ```shell
     # [admin@Laptop:~]
@@ -217,7 +217,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     wait command waits for background processes to finish
     ```
 
-1. Take a look at one of the VMs to understand what happened
+1. Take a look at one of the VMs to understand what happened.
 
     ```shell
     # [admin@Laptop:~]
@@ -240,8 +240,8 @@ Additional Auth service and Keycloack documentation can be found in the followin
     # [admin@Laptop:~]
     ```
 
-1. Configure host OS prerequisites and install prerequisite software on both VMs
-   * Copy paste the following to generate an automation script
+1. Configure host OS prerequisites and install prerequisite software on both VMs.
+   * Copy and paste the following to generate an automation script.
 
     ```shell
     # [admin@Laptop:~]
@@ -292,7 +292,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     EOFshared-k3d-prepwork-commandsEOF
     ```
 
-   * Copy paste the following to run the above prerequisite automation script against both VMs
+   * Copy paste the following to run the above prerequisite automation script against both VMs.
 
     ```shell
     # [admin@Laptop:~]
@@ -302,7 +302,7 @@ Additional Auth service and Keycloack documentation can be found in the followin
     wait
     ```
 
-   * Copy paste the following to run validation checks against both VMs
+   * Copy paste the following to run validation checks against both VMs.
 
     ```shell
     # [admin@Laptop:~]
@@ -319,11 +319,10 @@ Additional Auth service and Keycloack documentation can be found in the followin
     ssh workload-cluster < ~/qs/shared-k3d-prepwork-verification-commands.txt
     ```
 
-## Step 4: Create k3d cluster on both VMs and make sure you have access to both
+## Step 4: Create k3d Cluster on both VMs (and make sure you have access to both)
 
 ```text
-Note: There's no need to copy paste commands from this text box,
-      it's intended to explain some of the shell below.
+**NOTE:** There's no need to copy paste commands from this text box; it's intended to explain some of the shell below.
 
 If you were to copy paste the following into your laptop/workstation's terminal.
 ssh keycloak-cluster 'env | grep K3D_IP'
@@ -335,7 +334,7 @@ export K3D_IP=\$(cat ~/.bashrc  | grep K3D_IP | cut -d \" -f 2)
 (It's a workaround that allows the env var values to be used in a non interactive shell)
 ```
 
-* Create a k3d cluster on both VMs
+* Create a k3d cluster on both VMs.
 
 ```shell
 # [admin@Laptop:~]
@@ -367,7 +366,7 @@ ssh workload-cluster < ~/qs/shared-k3d-install-commands.txt &
 wait
 ```
 
-* Copy pasting these verification commands, will make sure you have access to both clusters.
+* Copying and pasting these verification commands will make sure you have access to both clusters.
 
 ```shell
 # [admin@Laptop:~]
@@ -383,7 +382,7 @@ kubectl get node
 
 ## Step 5: Clone Big Bang and Install Flux on both Clusters
 
-* Note after copy pasting the following block of automation, it might look stuck on "networkpolicy.networking.k8s.io/allow-webhooks created", the install_flux.sh script has logic near the end that waits for a healthy deployment, so just wait about 4 minutes. After which `kubectl get po -n=flux-system` should show a healthy deployment and you should be able to interactively use your terminal again.
+* **NOTE:** after copying and pasting the following block of automation, it might look stuck on "networkpolicy.networking.k8s.io/allow-webhooks created", the install_flux.sh script has logic near the end that waits for a healthy deployment, so just wait about four minutes. After which `kubectl get po -n=flux-system` should show a healthy deployment and you should be able to interactively use your terminal again.
 
 ```shell
 # [admin@Laptop:~]
@@ -404,7 +403,7 @@ ssh workload-cluster < ~/qs/shared-flux-install-commands.txt &
 wait
 ```
 
-* Note: It's possible for the above flux install commands to give a false error message, along the lines of "error: timed out waiting for the condition on deployments/helm-controller", if the deployment takes longer than 5 minutes, the wait for healthy logic will time out. If you follow these steps using cloud service provider infrastructure, you're unlikely to see the error. If you follow these steps on a home network lab with slower download speed you might see the error message, its ignorable, and you can use the following copy pasteable command block to verify health of the flux pods.
+* **NOTE:** It's possible for the above flux install commands to give a false error message, along the lines of "error: timed out waiting for the condition on deployments/helm-controller." If the deployment takes longer than five minutes, the wait for healthy logic will time out. If you follow these steps using cloud service provider infrastructure, you're unlikely to see the error. If you follow these steps on a home network lab with slower download speed you might see the error message, its ignorable, and you can use the following copy pasteable command block to verify health of the flux pods.
 
 ```shell
 # [admin@Laptop:~]
@@ -519,7 +518,7 @@ EOFdeploy-workloadsEOF
 ssh workload-cluster < ~/qs/deploy-workloads.txt
 ```
 
-* The following command can be used to check the status of the deployment. You can optionally re-run `kubectl get hr -A` multiple times until you see READY: True, but there's no need to wait for it to finish before moving on.
+* The following command can be used to check the status of the deployment. You can optionally re-run `kubectl get hr -A` multiple times until you see READY, but there's no need to wait for it to finish before moving on.
 
 ```shell
 sleep 5
@@ -589,7 +588,7 @@ EOFdeploy-keycloakEOF
 ssh keycloak-cluster < ~/qs/deploy-keycloak.txt
 ```
 
-## Step 8: Edit your workstation's Hosts file to access the web pages hosted on the Big Bang Clusters
+## Step 8: Edit your Workstation's Hosts File to Access the Web Pages Hosted on the Big Bang Clusters
 
 ### Linux/Mac Users
 
@@ -615,14 +614,11 @@ cat /etc/hosts
 
 * Edit similarly using method mentioned in the generic quickstart
 
-## Step 9: Make sure the clusters have had enough time to finish their deployments
+## Step 9: Make sure the Clusters have had Enough Time to Finish their Deployments
 
-* Note:
-  After copy pasting the following, you may need to wait up to 10 minutes. If you're too
-  fast you may see a temporary error about pod keycloak-0 not found. It's recommended to
-  copy paste this block of verification commands a 2nd time after 10 minutes have passed.
+* **NOTE:** After copy pasting the following, you may need to wait up to 10 minutes. If you're too fast, you may see a temporary error about pod keycloak-0 not found. It's recommended to copy and paste this block of verification commands a second time after 10 minutes have passed.
 
-* Note when you run `kubectl get svc -n=istio-system`, against each cluster, verify that EXTERNAL-IP isn't stuck in pending.
+* **NOTE:** when you run `kubectl get svc -n=istio-system`, against each cluster, verify that EXTERNAL-IP isn't stuck in pending.
 
 ```shell
 # [admin@Laptop:~]
@@ -641,13 +637,13 @@ kubectl get hr -A
 kubectl get svc -n=istio-system
 ```
 
-## Step 10: Verify that you can access websites hosted in both clusters
+## Step 10: Verify that you can Access Websites Hosted in Both Clusters
 
 * In a Web Browser visit the following 2 webpages
   * <https://keycloak.bigbang.dev>
   * <https://grafana.bigbang.dev>
 
-## Step 11: Deploy a mock mission application to the workload cluster
+## Step 11: Deploy a Mock Mission Application to the Workload Cluster
 
 ```shell
 # [admin@Laptop:~]
@@ -692,31 +688,31 @@ export KUBECONFIG=$HOME/.kube/workload-cluster
 kubectl wait --for=condition=available deployment/podinfo --timeout=3m -n=mock-mission-app
 ```
 
-## Step 12: Visit the newly added webpage
+## Step 12: Visit the Newly Added Webpage
 
-* In a browser navigate to <https://authdemo.bigbang.dev>
-* Note: authdemo currently isn't protected by the authservice AuthN/AuthZ proxy, the next steps configure that protection.
+* In a browser, navigate to <https://authdemo.bigbang.dev>.
+* **NOTE:** Authdemo currently isn't protected by the authservice AuthN/AuthZ proxy. The next steps configure that protection.
 
 ## Step 13: Create a Human User Account in Keycloak
 
-1. Visit <https://keycloak.bigbang.dev>
-1. Follow the self-registration link or visit it directly <https://keycloak.bigbang.dev/register>
-1. Create a demo account, the email you specify doesn't have to exist for demo purposes, make sure you write down the demo username and password.
+1. Visit <https://keycloak.bigbang.dev>.
+1. Follow the self-registration link or visit it directly <https://keycloak.bigbang.dev/register>.
+1. Create a demo account. The email you specify doesn't have to exist for demo purposes. Make sure you write down the demo username and password.
 1. Create an MFA device.
-1. It'll say "You need to verify your email address to activate your account" (You can ignore that and close the page.)
-1. Visit <https://keycloak.bigbang.dev/auth/admin>
-1. Log in as a keycloak admin, using the default creds of admin:password
-  (Note: The admin's initial default credentials can be specified in code, by updating helm values.)
+1. You'll recieve a message that reads: "You need to verify your email address to activate your account." You can ignore that and close the page.
+1. Visit <https://keycloak.bigbang.dev/auth/admin>.
+1. Log in as a keycloak admin, using the default creds of admin:password.
+  (**NOTE:** The admin's initial default credentials can be specified in code, by updating helm values.)
 1. In the GUI:
-   1. Navigate to: Manage/Users > [View all users] > [Edit] (your demo user)
-   1. Under "Required User Actions": Delete [Verify Email]
-   1. Under "Email Verified": Toggle Off to On
-   1. Click Save
+   1. Navigate to: Manage/Users > [View all users] > [Edit] i.e., your demo user).
+   1. Under "Required User Actions": Delete [Verify Email].
+   1. Under "Email Verified": Toggle Off to On.
+   1. Click Save.
 
-## Step 14: Create an Application Identity / Service Account / Non-Person Entity in Keycloak for the authdemo webpage
+## Step 14: Create an Application Identity/Service Account/Non-Person Entity in Keycloak for the Authdemo Webpage
 
-1. Visit <https://keycloak.bigbang.dev/auth/admin>
-1. log in as a keycloak admin, using the default creds of admin:password
+1. Visit <https://keycloak.bigbang.dev/auth/admin>.
+1. log in as a keycloak admin, using the default creds of admin:password.
 1. In the GUI:
    1. Navigate to: Manage/Groups > Impact Level 2 Authorized (double click)
       Notice the group UUID in the URL: 00eb8904-5b88-4c68-ad67-cec0d2e07aa6
@@ -732,11 +728,11 @@ kubectl wait --for=condition=available deployment/podinfo --timeout=3m -n=mock-m
    1. Under "Access Type": Change Public to Confidential
    1. Under "Valid Redirect URIs": Add "https://authdemo.bigbang.dev/login/generic_oauth"
       Note: /login/generic_oauth comes from auth service
-   1. Save
+   1. Save.
    1. Scroll up to the top of the page and you'll see a newly added [Credentials] tab, click it.
-   1. Copy the secret for the authdemo Client Application Identity, (it's labeled secret) you'll paste it into the next step
+   1. Copy the secret for the authdemo Client Application Identity, (it's labeled secret) you'll paste it into the next step.
 
-## Step 15: Deploy auth service to the workload cluster and use it to protect the mock mission app
+## Step 15: Deploy Auth Service to the Workload Cluster and use it to Protect the Mock Mission App
 
 ```shell
 # [admin@Laptop:~]
@@ -759,7 +755,7 @@ export KEYCLOAK_IDP_JWKS=$(curl https://keycloak.bigbang.dev/auth/realms/baby-yo
 export KEYCLOAK_CERTS_CA=$(curl https://letsencrypt.org/certs/isrgrootx1.pem)
 ```
 
-* You can copy paste the following command block as is
+* **NOTE:** You can copy and paste the following command block as-is.
 
 ```shell
 # [admin@Laptop:~]
@@ -817,35 +813,34 @@ ssh workload-cluster 'helm get values bigbang -n=bigbang' # You can eyeball this
 
 ## Step 16: Revisit authdemo.bigbang.dev
 
-* Go to <https://authdemo.bigbang.dev>
-* Before we were taken straight to the mock mission app webpage
-* Now* (or 30-120 seconds after copy pasting the above block of commands into the terminal), when you create a new tab and try to visit this URL it immediately redirects to a KeyCloak Log in Prompt and if you log in with your demo user, you'll a message like this:
+* Go to <https://authdemo.bigbang.dev>.
+* Before we were taken straight to the mock mission app webpage.
+* Now, or between 30 to 120 seconds after copy pasting the above block of commands into the terminal, when you create a new tab and try to visit this URL, it immediately redirects to a KeyCloak Log in Prompt. If you log in with your demo user, you'll recieve a message like this:
 
 > RBAC: access denied
 > Your account has not been granted access to this application group yet.
 
-## Step 17: Update the group membership of the user
+## Step 17: Update the Group Membership of the User
 
-1. Go to <https://keycloak.bigbang.dev/auth/admin>
-1. Login with admin:password
+1. Go to <https://keycloak.bigbang.dev/auth/admin>.
+1. Login with admin:password.
 1. In the GUI:
-   1. Navigate to: Manage/Users > [View all users] > [Edit] (your Demo user)
-   1. Click the Groups tab at the top
-   1. Click Impact Level 2 Authorized
-   1. Click [Join]
+   1. Navigate to: Manage/Users > [View all users] > [Edit] (your Demo user).
+   1. Click the Groups tab at the top.
+   1. Click Impact Level 2 Authorized.
+   1. Click [Join].
 
-> Note:
-> If you try to repeat step 16 at this stage, you'll see either an infinite loading screen or message like this:
+> **NOTE:** If you try to repeat step 16 at this stage, you'll see either an infinite loading screen or message like this:
 > `Access to authdemo.bigbang.dev was denied`
 > `You don't have authorization to view this page.`
 > `HTTP ERROR 403`
-> The reason for this is that we configured our workstation's hostfile /etc/hosts to avoid needing to configure DNS. But the 2 k3d clusters are unable to resolve the DNS Names.
-> AuthService pods on the Workload Cluster need to be able to resolve the DNS name of keycloak.bigbang.dev
-> Keycloak pod on the Keycloak Cluster needs to be able to resolve the DNS name of authdemo.bigbang.dev
+> The reason for this is that we configured our workstation's hostfile /etc/hosts to avoid needing to configure DNS. But the two k3d clusters are unable to resolve the DNS Names.
+> AuthService pods on the Workload Cluster need to be able to resolve the DNS name of keycloak.bigbang.dev.
+> Keycloak pod on the Keycloak Cluster needs to be able to resolve the DNS name of authdemo.bigbang.dev.
 
 ## Step 18: Update Inner Cluster DNS on the Workload Cluster
 
-* The following commands will show there's an issue with DNS
+* The following commands will show there's an issue with DNS.
 
 ```shell
 # [admin@Laptop:~]
@@ -900,8 +895,8 @@ kubectl exec -it test -- ping authdemo.bigbang.dev -c 1 | head -n 1
 # Now the k3d clusters can resolve the DNS to IP mappings, similar to our workstations /etc/hosts file
 ```
 
-## Step 19: Revisit authdemo.bigbang.dev
+## Step 19: Revisit Authdemo.bigbang.dev
 
-1. Visit <https://authdemo.bigbang.dev>
-1. You'll get redirected to keycloak.bigbang.dev
-1. Log in to keycloak, and afterwords you'll get redirected to authdemo.bigbang.dev
+1. Visit <https://authdemo.bigbang.dev>.
+1. You'll get redirected to keycloak.bigbang.dev.
+1. Log in to keycloak, and afterwords you'll get redirected to authdemo.bigbang.dev.
