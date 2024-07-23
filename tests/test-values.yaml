@@ -2782,6 +2782,9 @@ addons:
         enabled: true
       compactor:
         enabled: true
+        retentionResolutionRaw: 30d
+        retentionResolution5m: 30d
+        retentionResolution1h: 30d
       bbtests:
         enabled: true
         cypress:
