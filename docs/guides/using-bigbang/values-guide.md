@@ -12,7 +12,7 @@ Big Bang is a slight variation from the typical "umbrella" helm chart pattern. I
 
 The variables in Big Bang's `values.yaml` file are either passed to Flux or Helm depending on the deployment methodology. Values specific to individual packages will be passed to Flux and used to deploy the package itself. Technically speaking, when you deploy Big Bang you are deploying a number of Flux objects and Flux does the heavy lifting to deploy the actual applications. For more information on Flux, see its official [documentation](https://fluxcd.io/docs/components/).
 
-A high level conceptual graph of how values flow through Big Bang is provided below:
+A high level conceptual graph of how values flow through Big Bang is provided in the following:
 
 ```mermaid
 graph TD
@@ -42,7 +42,7 @@ Variables defined in Big Bang's [values.yaml](../../../chart/values.yaml) are va
 
 ### Big Bang Configuration Values
 
-There are a number of values in the Big Bang chart that are solely used for configuration of the Big Bang chart itself. Typically these values are used for the Flux templates (HelmRelease, GitRepository) or for secrets (registry credentials, git credentials).
+There are a number of values in the Big Bang chart that are solely used for configuration of the Big Bang chart itself. Typically these values are used for the Flux templates (e.g., HelmRelease and/or GitRepository) or for secrets (e.g., registry credentials and/or git credentials).
 
 Some examples of these values include:
 - `registryCredentials`: Used to configure the image pull secrets for every namespace
@@ -55,14 +55,14 @@ Some examples of these values include:
 
 Global values within Big Bang are used in cases where packages inherit a common configuration. These mainly include configuration for networking, common SSO provider config, and other common usability values.
 
-Some examples of these values include:
+Some examples of these values are included in the following:
 - `domain`: This value informs the VirtualService configurations for all packages
 - `openshift`: This toggle provides for configuration of any OpenShift specific values across all packages
 - `networkPolicies`: These values inform configuration of network policies (enabling, disabling, setting IP ranges)
 - `imagePullPolicy`: When set this value is used to configure all packages (and their pods) with a common pull policy
 - `sso` (top level value): The configuration set here is used to assist with packages' individual OIDC or SAML configuration, such as endpoints
 
-**Important Note**: While we use the term "global" here these values are NOT the exact same as a Helm global value. Helm globals are directly passed to all subcharts. Big Bang globals are in some cases passed directly to the package charts, but in other cases they are manipulated/customized to inform package values.
+**NOTE**: While we use the term "global" here these values are NOT the exact same as a Helm global value. Helm globals are directly passed to all subcharts. Big Bang globals are in some cases passed directly to the package charts, but in other cases they are manipulated/customized to inform package values.
 
 ### Abstracted Package Values
 
@@ -71,8 +71,8 @@ Each package generally has some configuration that is commonly used for a produc
 When these values are set they are passed through to the package itself. In some cases the Big Bang chart provides additional utility by creating any necessary secrets or toggling other values that are needed.
 
 Some examples of these values include:
-- `<package>.database`: Simplified configuration for an external database connection (user, pass, host, port, etc)
-- `<package>.objectStorage`: Similar configuration for external storage (i.e. S3)
+- `<package>.database`: Simplified configuration for an external database connection (e.g., user, pass, host, and/or port)
+- `<package>.objectStorage`: Similar configuration for external storage (i.e., S3)
 - `<package>.sso.client_id`: Specific SSO client ID for the package
 - `<package>.enterprise.license`: Enterprise license for the specific package
 

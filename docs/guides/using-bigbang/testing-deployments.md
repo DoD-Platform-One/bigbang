@@ -6,13 +6,13 @@
 3. [Resources](#resources)
  
 ## Introduction
-Big Bang leverages a sub-chart called Gluon to perform both scripted and UI tests of deployed applications.  This guide is designed to describe the basics of the UI testing portion of Gluon and how it can be extended to suit your needs.
+Big Bang leverages a sub-chart called Gluon to perform both scripted and User Interface (UI) tests of deployed applications.  This guide is designed to describe the basics of the UI testing portion of Gluon and how it can be extended to suit your needs.
 
 The UI testing is performed via a container running Cypress and can be enabled on a per-package level by setting the value of bbtests.enabled to true.  Be sure to review the values for each package as there may be additional settings related to the Cypress test under the bbtests.cypress section.  With the correct values in place, you can run a test by specifying the following command:
 
 `helm test kiali-kiali -n bigbang`
     
-    > Note: You can run the following command to grab the proper names for each helm chart deployed in Big Bang: "helm list -n bigbang"
+    > **NOTE:** You can run the following command to grab the proper names for each helm chart deployed in Big Bang: "helm list -n bigbang."
 
 Upon running the command, a new pod will be created in the same namespace as the package.  This pod will install Cypress, download a Cypress configuration file, download a file that contains custom Cypress commands, and run any available tests.  In order for the Cypress pod to run successfully, it needs to have external access to the internet and any resources it is attempting to reach out to for testing.  This communication should be allowed by default. You may also need to add exceptions if using Kyverno or Gatekeeper within Big Bang.  Links to these exceptions required can be found below in the Resources section.  
  
@@ -26,6 +26,7 @@ Additionally, test isolation has been disabled by default within Big Bang's impl
 The above command can be executed either at the beginning to ensure a clean session or at the end of any given test to ensure everything is clean before the next test.
  
 ## Extending Cypress Tests
+
 If the default provided Cypress tests are not enough for your installation of Big Bang, there are two options available to extend the behaviour to suit your needs:
  
 ### Option 1: Augment Default Tests with Custom Cypress Tests
