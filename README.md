@@ -8,9 +8,9 @@ Big Bang is a declarative, continuous delivery tool for deploying Department of 
 
 Big Bang's scope is to provide publicly available installation manifests for packages required to adhere to the DoD DevSecOps Reference Architecture and additional useful utilities. Big Bang packages are broken into three categories:
 
-- **Core:** [Core packages](./docs/understanding-bigbang/package-architecture/README.md##Core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
+- **Core:** [Core packages](./docs/understanding-bigbang/package-architecture/README.md#core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
 
-- **Add-ons:** [Addon packages](./docs/understanding-bigbang/package-architecture/README.md##Addons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
+- **Add-ons:** [Addon packages](./docs/understanding-bigbang/package-architecture/README.md#addons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
 
 - **Community:** [Community packages](https://repo1.dso.mil/big-bang/product/community) are any packages that are maintained by the broader Big Bang community (e.g., users and/or vendors). These packages could be alternatives to core or add-on packages, or even entirely new packages to help extend usage/functionality of Big Bang.
 
