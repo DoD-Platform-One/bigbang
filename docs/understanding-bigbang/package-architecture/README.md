@@ -179,11 +179,11 @@ Runtime security is the active protection of containers running in the cluster. 
 
 ## Addons
 
-Addons can be used to extend Big Bang with additional services.  All of the addons listed here are supported by the Big Bang team and integrated into the product.  There may be additional community supported Big Bang packages that are not listed here.  These packages are disabled in Big Bang by default.
+End users can extend Big Bang services beyond the core packages by enabling any of the many team-supported addon packages. Addons are supported by the Big Bang team and integrated with the core platform (Istio, Kyverno, Prometheus etc..) There are additional community-supported Big Bang packages that are not listed as addons.
 
 ### Storage Utilities
 
-Storage utilities include packages that provide services to store and retrieve temporal or persistent data in the cluster.  This category includes databases, object storage, and data caching.  It is generally advantageous to use cloud based offerings instead of these to take advantage of scalability, availability, and resiliency (e.g. backup and restore).  However, for non-critical or on-prem deployments, these utilities offer a simpler and lower cost solution.
+For non-critical or on-prem deployments where data loss is an acceptable risk, these utilities offer a simple and low-cost solution for in-cluster data persistence (databases, object / blob storage, and caches). However, if scalability, availability, and resiliency (e.g. backup and restore) are requirements, it is generally advantageous to instead use a managed, cloud based offering.
 
 |Stack|Package|Function|Repository|
 |--|--|--|--|
