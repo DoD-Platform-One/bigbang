@@ -202,13 +202,16 @@ luaScripts:
         "security.istio.-",
         "helm.-",
         "istio.-",
-        "statefulset.kubernetes.io/pod-name",
-        "apps.kuberentes.io/pod-index",
+        "statefulset.kubernetes.io/pod%-name",
         "prometheus",
         "operator.prometheus.io/name",
-        "app.kubernetes.io/managed-by",
+        "app.kubernetes.io/managed%-by",
+        "app.kubernetes.io/part%-of",
+        "apps.kuberentes.io/version",
+        "apps.kubernetes.io/pod%-index",
         "heritage",
-        "release"
+        "release",
+        "elasticsearch.k8s.elastic.co.node.-"
       }
 
       if record["kubernetes"] ~= nil then
