@@ -5,15 +5,17 @@
 {{- define "bigbang.defaults.authservice" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
+{{- $authServiceHardened := or (dig "istio" "hardened" "enabled" false .Values.monitoring.values) (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "istio" "hardened" "enabled" false .Values.monitoring.values) (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) }}
+    {{- if $authServiceHardened }}
     enabled: true
     {{- else}}
     enabled: false
     {{- end }}
+  clusterWideHardenedEnabled: {{ or .Values.istio.values.hardened.enabled .Values.addons.authservice.values.istio.clusterWideEnabled }}
 
 image: 
   pullPolicy: {{ .Values.imagePullPolicy }}
