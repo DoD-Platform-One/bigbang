@@ -5,20 +5,21 @@
 {{- define "bigbang.defaults.authservice" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-{{- $authServiceHardened := or (dig "istio" "hardened" "enabled" false .Values.monitoring.values) (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) }}
+{{- $authServiceHardened := or 
+    (default false (dig "istio" "hardened" "enabled" .Values.monitoring.values)) 
+    (default false (dig "istio" "hardened" "enabled" .Values.addons.authservice.values)) 
+    (default false (dig "hardened" "enabled" .Values.istio.values)) 
+    (default false (dig "istio" "hardened" "enabled" .Values.grafana.values)) 
+}}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ .Values.istio.enabled | default false }}
   hardened:
-    {{- if $authServiceHardened }}
-    enabled: true
-    {{- else}}
-    enabled: false
-    {{- end }}
-  clusterWideHardenedEnabled: {{ or .Values.istio.values.hardened.enabled .Values.addons.authservice.values.istio.clusterWideEnabled }}
+    enabled: {{ $authServiceHardened }}
+  clusterWideHardenedEnabled: {{ default false (dig "hardened" "enabled" .Values.istio.values) }}
 
 image: 
-  pullPolicy: {{ .Values.imagePullPolicy }}
+  pullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
   
 imagePullSecrets:
   - name: private-registry
@@ -26,13 +27,13 @@ imagePullSecrets:
 podAnnotations:
   {{ include "istioAnnotation" . }}
 
-openshift: {{ .Values.openshift }}
+openshift: {{ .Values.openshift | default false }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ .Values.monitoring.enabled | default false }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ .Values.networkPolicies.enabled | default false }}
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.haproxy.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
@@ -58,10 +59,6 @@ redis-bb:
       selector: 
         app.kubernetes.io/name: redis-bb
         app.kubernetes.io/instance: authservice-authservice
-      # conditional passes only if all conditionals are true:
-      # - istio: enabled
-      # - mTLS: SCRICT
-      # - istio injection: enabled (for logging ns)
       {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
       scheme: https
       tlsConfig:
