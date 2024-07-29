@@ -60,13 +60,13 @@ It is important to note that while Big Bang does not require/mandate usage of a 
 
 ### Cluster API
 
-* Note that there are some OS hardening and VM Image Build automation tools in here, in addition to Cluster API.
+**NOTE:** There are some OS hardening and VM Image Build automation tools in here, in addition to Cluster API.
 * <https://repo1.dso.mil/platform-one/distros/clusterapi>
 * <https://repo1.dso.mil/platform-one/distros/cluster-api/gov-image-builder>
 
 ### OpenShift
 
-1. When deploying BigBang, set the OpenShift flag to true.
+1. When deploying Big Bang, set the OpenShift flag to true.
 
     ```yaml
     # inside a values.yaml being passed to the command installing bigbang
@@ -115,8 +115,8 @@ It is important to note that while Big Bang does not require/mandate usage of a 
 
 ### RKE2
 
-* RKE2 turns PSPs on by default (see above for tips on disabling)
-* RKE2 sets selinux to enforcing by default ([see os-preconfiguration.md for selinux config](os-preconfiguration.md))
+* RKE2 turns PSPs on by default (see above for tips on disabling).
+* RKE2 sets selinux to enforcing by default ([see os-preconfiguration.md for selinux config](os-preconfiguration.md)).
 
 Since BigBang makes several assumptions about volume and load balancing provisioning by default, it's vital that the rke2 cluster must be properly configured. The easiest way to do this is through the in tree cloud providers, which can be configured through the `rke2` configuration file such as:
 

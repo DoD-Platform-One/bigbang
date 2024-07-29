@@ -9,8 +9,8 @@
 
 ## ECK Specific Configuration (ECK Is a Core BB App)
 
-Elastic Cloud on Kubernetes (Elasticsearch Operator) deployed by BigBang uses memory mapping by default. In most cases, the default address space is too low and must be configured.
-To ensure unnecessary privileged escalation containers are not used, these kernel settings should be applied before BigBang is deployed:
+Elastic Cloud on Kubernetes (i.e., Elasticsearch Operator) deployed by Big Bang uses memory mapping by default. In most cases, the default address space is too low and must be configured.
+To ensure unnecessary privileged escalation containers are not used, these kernel settings should be applied before BigB ang is deployed:
 
 ```shell
 sudo sysctl -w vm.max_map_count=262144      #(ECK crash loops without this)
@@ -42,7 +42,7 @@ linux_os_config {
 * Depending on security requirements it may be possible to set selinux in permissive mode: `sudo setenforce 0`.
 * Additional OS and Kubernetes specific configuration are required for istio to work on systems with selinux set to `Enforcing`.
 
-By default, BigBang will deploy istio configured to use `istio-init` (read more [here](https://istio.io/latest/docs/setup/additional-setup/cni/)).  To ensure istio can properly initialize envoy sidecars without container privileged escalation permissions, several system kernel modules must be pre-loaded before installing BigBang:
+By default, Big Bang will deploy istio configured to use `istio-init` (read more [here](https://istio.io/latest/docs/setup/additional-setup/cni/)).  To ensure istio can properly initialize envoy sidecars without container privileged escalation permissions, several system kernel modules must be pre-loaded before installing BigBang:
 
 ```shell
 modprobe xt_REDIRECT

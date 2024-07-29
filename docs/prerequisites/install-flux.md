@@ -25,7 +25,7 @@ kubectl create secret docker-registry private-registry \
     --namespace flux-system
 kubectl apply -k https://repo1.dso.mil/big-bang/bigbang.git//base/flux?ref=master
 ```
-Note that you can replace ```master``` in the ```kubectl apply -k``` command above with tag of the Big Bang release you need. For example:
+**NOTE:** You can replace ```master``` in the ```kubectl apply -k``` command above with tag of the Big Bang release you need. For example:
 ```
 kubectl apply -k https://repo1.dso.mil/big-bang/bigbang/bigbang.git//base/flux?ref=2.14.0
 ```
@@ -38,11 +38,11 @@ kubectl get crds | grep flux
 
 ## Advanced Installation
 
-Clone the Big Bang repo and use the awesome installation [scripts](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/scripts) directory
+Clone the Big Bang repo and use the awesome installation [scripts](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/scripts) directory.
 
 ```shell
 git clone https://repo1.dso.mil/big-bang/bigbang.git
 ./bigbang/scripts/install_flux.sh
 ```
 
-> **NOTE** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE message with required arguments needed to complete installation.
+> **NOTE:** install_flux.sh requires arguments to run properly, calling it will print out a friendly USAGE message with required arguments needed to complete installation.
