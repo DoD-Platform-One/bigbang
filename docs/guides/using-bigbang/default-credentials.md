@@ -18,7 +18,7 @@ The applications in the table below provide both SSO and built-in authentication
 | --------------------- | ---------------- | ---------------- | ---------------- |
 | Kiali | N/A | (randomly generated) | Use `kubectl -n kiali create token kiali-service-account` to create a temporary token |
 | Logging (Kibana) | `elastic` | (randomly generated) | Use `kubectl get secrets -n logging logging-ek-es-elastic-user -o go-template='{{.data.elastic \| base64decode}}'` to get the password |
-| Monitoring (Grafana) | `admin` | `prom-operator` | Default password can be overridden with Helm values `monitoring.values.grafana.adminPassword` |
+| Grafana | `admin` | `prom-operator` | Default password can be overridden with Helm values `grafana.values.adminPassword` |
 | Twistlock | `admin` | `change_this_password` | Admin account will be automatically setup on fresh installs if `init.enabled` is `true`.  Default password can be overridden by setting `twistlock.values.console.credentials.password` |
 | ArgoCD | `admin` | (randomly generated) | Use `kubectl -n argocd get secret argocd-initial-admin-secret -o go-template='{{.data.password \| base64decode}}'` to get the password. Note: If the argocd-initial-admin-secret does not exist, you will need to [reset the admin password](https://github.com/argoproj/argo-cd/blob/master/docs/faq.md#i-forgot-the-admin-password-how-do-i-reset-it). |
 | Minio | `minio` | `minio123` | Access and secret key can be overridden with Helm values `addons.minio.accesskey` and `addons.minio.secretkey` respectively |
