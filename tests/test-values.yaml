@@ -126,9 +126,7 @@ jaeger:
           # cypress_keycloak_test_enable: "true"
 
 kiali:
-  enabled: true
   sso:
-    enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
   values:
     istio:
@@ -153,8 +151,8 @@ kiali:
     cr:
       spec:
         auth:
-          # if enabling the keycloak SSO integration test, set strategy to "openid"
-          #strategy: "openid"
+          # if enabling the keycloak SSO integration test, comment out or change strategy to "openid".
+          # strategy defaults to "openid"
           strategy: "anonymous"
     resources:
       limits:
@@ -1822,7 +1820,7 @@ addons:
           envs:
             ANCHORE_CLI_URL: "https://anchore-api.dev.bigbang.mil/v1"
         cypress:
-          envs: 
+          envs:
             cypress_url: "https://anchore.dev.bigbang.mil"
 
 
