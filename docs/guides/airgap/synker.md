@@ -49,7 +49,7 @@ destination:
     port: 443
 ```
 
-If your destination repo requires credentials add them to `~/.docker/config.json`
+If your destination repo requires credentials, add them to `~/.docker/config.json`.
 
 ```json
 {
