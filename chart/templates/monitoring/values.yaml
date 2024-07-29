@@ -58,6 +58,7 @@ istio:
               name: https
           resolution: DNS
      {{- end }}
+  clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istio.values }}
   prometheus:
     enabled: true
     {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
