@@ -4,15 +4,15 @@ Currently this is in proof of concept mode, so play around with this to get an i
 
 This work was quickly developed to entertain certain paths for image packaging and deployment.
 
-## Image Packaging / Deployment
+## Image Packaging/Deployment
 
 `package_images.sh` - Proof of concept script for image packaging
 
-* Dependencies
+* Dependencies:
   * `docker` - The docker CLI tool
   * `images.txt` - A list of all requires airgap images
   * `jq` - The jq CLI tool
-* Deliverables
+* Deliverables:
   * `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
     * NOTE - `registry:2` vs `harbor` vs anything else is trivial, we can use whatever we want
     * Packaged images are loaded and retrievable immediately upon container start
@@ -22,18 +22,17 @@ This work was quickly developed to entertain certain paths for image packaging a
 
 `deploy_images.sh` - Proof of concept script for image deployment
 
-* Dependencies
+* Dependencies:
   * `docker` - The docker CLI tool
   * `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
-* Deliverables
+* Deliverables:
   * Running `registry` container with airgap images deployed and retrievable
 
 Hack commands:
-
 * `curl -sX GET http://localhost:5000/v2/_catalog | jq -r .`
   * Verify the catalog of a local running registry container
 
-## Repository Packaging / Deployment
+## Repository Packaging/Deployment
 
 Airgap Deployment is a form of deployment which does not have any direct connection to the Internet or external network during cluster setup or runtime. During installation, bigbang requires certain images and git repositories for installation. Since we will be installing in internet-disconnected environment, we need to perform extra steps to make sure these resources are available.
 
@@ -42,7 +41,7 @@ Airgap Deployment is a form of deployment which does not have any direct connect
 ### General Prerequisites
 
 * A kubernetes cluster with container mirroring support. There is a section below that covers mirroring in more detail with examples for supported clusters.
-* BigBang(BB) [release artifacts](https://repo1.dso.mil/big-bang/bigbang/-/releases).
+* Big Bang [release artifacts](https://repo1.dso.mil/big-bang/bigbang/-/releases).
 * Utility Server.
 
 ### Package Specific Prerequisites
@@ -66,7 +65,7 @@ MIME-Version: 1.0
 
 ## Utility Server
 
-Utility Server is an internet-disconnected server that will host the private registry and git server that are required to deploy bigbang. It should include these command-line tools below;
+Utility Server is an internet-disconnected server that will host the private registry and git server that are required to deploy Big Bang. It should include these command-line tools listed in the following:
 
 * `docker`: for running docker registry.
   * `registry:2` image
@@ -76,20 +75,20 @@ Utility Server is an internet-disconnected server that will host the private reg
 
 ## Git Server
 
-As part of  BB release, we provide `repositories.tar.gz` which contains all the git repositories that BB depend on for deployment. You have two options for serving up these packages for Flux.
+As part of Big Bang release, we provide `repositories.tar.gz` which contains all the git repositories that BB depend on for deployment. You have two options for serving up these packages for Flux. These options are detailed in the following:
 
 ### Option One
 
 You can follow the process below to setup git with `repositories.tar.gz` on the Utility Server.
 
-* Create Git user and SSH key
+* Create Git user and SSH key.
 
 ```shell
 sudo useradd --create-home --shell /bin/bash git
 ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
 ```
 
-* Create .SSH folder for `git` user
+* Create .SSH folder for `git` user.
 
   ```shell
   sudo su - git
@@ -98,7 +97,7 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   exit
   ```
   
-* Add client ssh key to `git` user `authorized_keys`
+* Add client ssh key to `git` user `authorized_keys`.
 
   ```shell
   sudo su
@@ -106,13 +105,13 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   exit
   ```
 
-* Extract `repositories.tar.gz` to git user home directory
+* Extract `repositories.tar.gz` to git user home directory.
 
   ```shell
   sudo tar -xvf repositories.tar.gz --directory /home/git/
   ```
 
-* Add Hostname alias
+* Add Hostname alias.
 
   ```shell
   PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
@@ -120,7 +119,7 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   sudo sed -i -e '1i'$PRIVATEIP'   'host.k3d.internal'\' /etc/hosts #only for k3d
   ```
   
-* To test the client key;
+* To test the client key, complete the following:
 
   ```shell
   GIT_SSH_COMMAND='ssh -i /[client-private-key-path] -o IdentitiesOnly=yes' git clone git@[hostname/IP]:/home/git/repos/[sample-repo]
@@ -135,19 +134,19 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
 
 There are some cases where you do not have access to or cannot create an ssh user on the utility server. It is possible to run an ssh git server on a non-standard port using Docker.
 
-* Create an SSH key
+* Create an SSH key.
 
 ```shell
 ssh-keygen  -b 4096 -t rsa -f ./identity -q -N ""
 ```
 
-* Extract `repositories.tar.gz` to your working directory
+* Extract `repositories.tar.gz` to your working directory.
 
 ```shell
 sudo tar -xvf repositories.tar.gz
 ```
 
-* Start the provided Docker image (TODO: move this to an IB image when ready)
+* Start the provided Docker image (TODO: move this to an IB image when ready).
 
 ```shell
 docker run -d -p 4001:22 -v ${PWD}/identity.pub:/home/git/.ssh/authorized_keys -v ${PWD}/repos:/home/git servicesengineering/gitshim:0.0.1
@@ -166,11 +165,11 @@ git checkout 1.3.0
 
 ## Private Registry
 
-Images needed to run BB in your cluster is packaged as part of the release in `images.tar.gz`. You can see the list of required images in `images.txt`. In our airgap environment, we need to setup a registry that our cluster can pull required images from or an existing cluster where we can copy images from `images.tar.gz` into.
+Images needed to run BB in your cluster is packaged as part of the release in `images.tar.gz`. You can see the list of required images in `images.txt`. In our airgap environment, we need to set up a registry that our cluster can pull required images from or an existing cluster where we can copy images from `images.tar.gz` into.
 
 ### Set Up
 
-To setup the registry, we will be using `registry:2` to run a  private registry with  self-signed certificate.
+To set up the registry, we will be using `registry:2` to run a  private registry with self-signed certificate.
 
 * First, untar `images.tar.gz`;
 
@@ -188,7 +187,7 @@ docker load -i registry2.tar #on your registry server
 docker load -i k3s.tar
 ```
 
-* Use the script [registry.sh](../../assets/scripts/airgap-dev/registry.sh) to create registry;
+* Use the script [registry.sh](../../assets/scripts/airgap-dev/registry.sh) to create registry.
 
 ```shell
 $ chmod +x registry.sh && sudo ./registry.sh
@@ -223,7 +222,7 @@ def21e7025c7d4ea7bbb30603955e0b7da14d077592851b327e59d78a849cb7d
 
 Installation finished ...
 
-Notes
+**Notes:** 
 =====
 
 To see images in the registry;
@@ -244,11 +243,11 @@ You can ensure the images are now loaded in the registry;
 
 ### Mirroring
 
-The images specified as part of the helm charts in BB are expected to be sourced from `registry1.dso.mil` hence this registry needs to be mirrored to the one setup above. To reduce the amount of work needed on the developer part, we will be taking advantage of container mirroring which is supported by `containerd` as well as `cri-o`. Check if your container runtime supports this as it is required for smooth developer experience when deploying BB.  You should also check documentation on how your cluster supports passing these configuration to the runtime. For example, TKG and RKE2 support such configuration for `containerd` below to enable `registry.dso.mil` and `registry1.dso.mil` .
+The images specified as part of the helm charts in Big Bang are expected to be sourced from `registry1.dso.mil` hence this registry needs to be mirrored to the one set up above. To reduce the amount of work needed on the developer part, we will be taking advantage of container mirroring which is supported by `containerd` as well as `cri-o`. Check if your container runtime supports this as it is required for smooth developer experience when deploying BB.  You should also check documentation on how your cluster supports passing these configuration to the runtime. For example, TKG and RKE2 support such configuration for `containerd` below to enable `registry.dso.mil` and `registry1.dso.mil` .
 
 ​You need to also configure your cluster with appropriate registry TLS. Please consult your cluster documentation on how to configure this.
 
-If you need to handle mirroring manually, there is an example Ansible script provided that will update the containerd mirroring and restart the container runtimes for each node in your inventory. (copy-containerd-config.yaml)
+If you need to handle mirroring manually, there is an example Ansible script provided that will update the containerd mirroring and restart the container runtimes for each node in your inventory (copy-containerd-config.yaml).
 
 #### Konvoy Cluster
 
@@ -322,7 +321,7 @@ Install Flux 2 into the cluster using the provided artifacts. These are located 
 kubectl apply -f ./scripts/deploy/flux.yaml
 ```
 
-After Flux is up and running you are ready to deploy Big Bang. We will do this using Helm. To first check to see if Flux is ready you can do.
+After Flux is up and running you are ready to deploy Big Bang. We will do this using Helm. To first check to see if Flux is ready, you have several options:
 
 You can watch to see if Flux is reconciling the projects by watching the progress.
 
@@ -395,7 +394,7 @@ git:
   existingSecret: "ssh-credentials"
 ```
 
-** Note that we substituted the name of the secret from the example to the secret created above. This value is arbitrary, so if you created your secret with a different name use that name instead.
+**Note that we substituted the name of the secret from the example to the secret created above. This value is arbitrary, so if you created your secret with a different name use that name instead.**
 
 Option 2: Put the values of your ssh keys directly in the values.yaml file.
 
@@ -447,7 +446,7 @@ git:
     knownHosts: "10.0.52.144 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPFZzQ6BmaswdhT8UWD5a/VYmZYrGv1qD3T+euf/gFjkPkeySYRIyM+Kg/UdHCHVBzc4aaFdBDmugHimZ4lbWpE="
 ```
 
-** Note the above values are all examples and are intentionally not operational keys.
+** Note the above values are all examples and are intentionally not operational keys.**
 
 Then install Big Bang using Helm.
 
@@ -456,7 +455,7 @@ Then install Big Bang using Helm.
     watch kubectl get gitrepositories,kustomizations,hr,po -A
 ```
 
-** Note that the --create-namespace isn't needed if you created it earlier, but it doesn't hurt anything.
+**Note that the --create-namespace isn't needed if you created it earlier, but it doesn't hurt anything.**
 
 You should see the different projects configure working through their reconciliation starting with "gatekeeper".
 
@@ -466,13 +465,13 @@ The third party guide assumes that you already have or are planning to install B
 
 ### Package your Git repository
 
-Packaging your repository from Git
+This section provides instructions on packaging your repository from Git.
 
 ```shell
 git clone --no-checkout https://repo1.dso.mil/big-bang/apps/third-party/kafka.git && tar -zcvf kafka-repo.tar.gz kafka
 ```
 
-This creates a tar of a full git repo without a checkout. After you have placed this git repo in its destination you can get the files to view by doing.
+This creates a tar of a full git repo without a checkout. After you have placed this git repo in its destination, you can get the files to view by doing.
 
 ```shell
 git checkout
@@ -480,13 +479,13 @@ git checkout
 
 ### Package your registry images
 
-Package image
+Package image:
 
 ```shell
 docker save -o image-name.tar image-name:image-version
 ```
 
-Unpack the image on your utility server
+Unpack the image on your utility server.
 
 ```shell
 tar -xvf image-name.tar
@@ -517,4 +516,4 @@ destination:
     port: 5000
 ```
 
-If you are using runtime mirroring the new image should be available at the original location on your cluster.
+If you are using runtime mirroring, the new image should be available at the original location on your cluster.

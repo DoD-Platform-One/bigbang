@@ -31,7 +31,7 @@
         Creates a VPC and subnets for the cluster to be deployed in.
     1. **aws/airgap/package**
 
-        Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for BB [https://repo1.dso.mil/big-bang/bigbang/-/releases](https://repo1.dso.mil/big-bang/bigbang/-/releases)
+        Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for Big Bang [https://repo1.dso.mil/big-bang/bigbang/-/releases](https://repo1.dso.mil/big-bang/bigbang/-/releases).
 
 1. **airgap up**
 
@@ -43,9 +43,9 @@
 
     1. **airgap/rke2/cluster up**
 
-        Stands up an RKE2 cluster for BB in an airgapped network. \*\* Uses terraform ./gitlab-ci/jobs/rke2/dependencies/terraform/
+        Stands up an RKE2 cluster for BB in an airgapped network. \*\* Uses terraform ./gitlab-ci/jobs/rke2/dependencies/terraform/.
 
-        Both this and the non-airgapped use the same image registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1
+        Both this and the non-airgapped use the same image registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1.
 
 1. **bigbang up**
 
