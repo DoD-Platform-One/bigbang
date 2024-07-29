@@ -6,17 +6,20 @@
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $authServiceHardened := or 
-    (default false (dig "istio" "hardened" "enabled" .Values.monitoring.values)) 
-    (default false (dig "istio" "hardened" "enabled" .Values.addons.authservice.values)) 
-    (default false (dig "hardened" "enabled" .Values.istio.values)) 
-    (default false (dig "istio" "hardened" "enabled" .Values.grafana.values)) 
+    (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
+    (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
+    (dig "hardened" "enabled" false .Values.istio.values)
+    (dig "istio" "hardened" "enabled" false .Values.grafana.values)
+    (dig "istio" "hardened" "enabled" false .Values.loki.values)
+    (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
+    (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
 }}
 
 istio:
   enabled: {{ .Values.istio.enabled | default false }}
   hardened:
     enabled: {{ $authServiceHardened }}
-  clusterWideHardenedEnabled: {{ default false (dig "hardened" "enabled" .Values.istio.values) }}
+  clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istio.values }}
 
 image: 
   pullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
