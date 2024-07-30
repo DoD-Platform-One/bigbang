@@ -2,7 +2,7 @@
 
 [[_TOC_]]
 
-Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approach to managing the Big Bang Kubernetes cluster configuration.  Using GitOps, we must securely store secrets in Git using encryption.  The private key, which is stored in key storage, is used by the continuous deployment tool to decrypt and deploy the secrets for use in the cluster.
+Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approach to managing the Big Bang Kubernetes cluster configuration. Using GitOps, we must securely store secrets in Git using encryption. The private key, which is stored in key storage, is used by the continuous deployment tool to decrypt and deploy the secrets for use in the cluster.
 
 ## SOPS
 
@@ -10,11 +10,11 @@ Big Bang follows a [GitOps](https://www.weave.works/technologies/gitops/) approa
 
 > The private key used in SOPS should **NEVER** be stored in Git along side the encrypted secrets.
 
-SOPS supports the ability to [add multiple keys](https://dev.to/stack-labs/manage-your-secrets-in-git-with-sops-common-operations-118g) to the same file so multiple key pairs can use the same secret.  This is useful for environments which may have different keys, but use the same secrets.  For each key used, SOPS writes the public key, used to encrypt, and an encrypted copy of the data to the file.  Decryption requires use of one of the private keys used.  After editing, the embedded public keys are used to re-encrypt the file for all key pairs.
+SOPS supports the ability to [add multiple keys](https://dev.to/stack-labs/manage-your-secrets-in-git-with-sops-common-operations-118g) to the same file so multiple key pairs can use the same secret. This is useful for environments which may have different keys, but use the same secrets. For each key used, SOPS writes the public key, used to encrypt, and an encrypted copy of the data to the file. Decryption requires use of one of the private keys used. After editing, the embedded public keys are used to re-encrypt the file for all key pairs.
 
 ## Create Encryption Keys
 
-To setup Big Bang with SOPS, a key pair must be created.  The private key is used for decryption and must be securely stored but accessible to the cluster.  The public key is used for encryption.  Follow the appropriate instructions below to create your key pair.
+To set up Big Bang with SOPS, a key pair must be created. The private key is used for decryption and must be securely stored but accessible to the cluster. The public key is used for encryption. Follow the appropriate instructions provided below to create your key pair.
 
 | Key Management | Key Pair Instructions | Notes |
 |--|--|--|
@@ -23,25 +23,25 @@ To setup Big Bang with SOPS, a key pair must be created.  The private key is use
 | [Google Cloud Platform (GCP) Key Management Service (KMS)](https://cloud.google.com/security-key-management) | [Link](https://github.com/mozilla/sops#encrypting-using-gcp-kms) |
 | [HashiCorp Vault](https://www.vaultproject.io/) | [Link](https://github.com/mozilla/sops#23encrypting-using-azure-key-vault) |
 
-> \*GPG is not recommended for production use because the private key can be misplaced or compromised too easily
+> GPG is not recommended for production use because the private key can be misplaced or compromised too easily.
 
 ## Configure SOPS
 
-SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly created files.  Once a file is created, the key fingerprints are stored in the file and must be re-keyed to use any changes to `.sops.yaml`.
+SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly created files. Once a file is created, the key fingerprints are stored in the file and must be re-keyed to use any changes to `.sops.yaml`.
 
-1. Follow the [SOPS instructions](https://github.com/mozilla/sops#210using-sopsyaml-conf-to-select-kmspgp-for-new-files) to configure `.sops.yaml` based on the encryption method you used.  Multiple keys of the same type can be added using the block scalar yaml construct, `>-`, and separating them by a comma and newline.
+1. Follow the [SOPS instructions](https://github.com/mozilla/sops#210using-sopsyaml-conf-to-select-kmspgp-for-new-files) to configure `.sops.yaml` based on the encryption method you used. Multiple keys of the same type can be added using the block scalar yaml construct, `>-`, and separating them by a comma and newline.
 
    > If you are using the Big Bang sample files, make sure to remove the development Big Bang key.
 
-2. Add the following regex to only encrypt data in the yaml files
+2. Add the following regex to only encrypt data in the yaml files:
 
    ```yaml
    creation_rules:
      - encrypted_regex: "^(data|stringData)$"
    ```
 
-3. Save `.sops.yaml` in the root of folder of your configuration
-4. If you have existing secrets, use the following to re-key them with the configuration in `.sops.yaml`
+3. Save `.sops.yaml` in the root of folder of your configuration.
+4. If you have existing secrets, use the following to re-key them with the configuration in `.sops.yaml`.
 
    ```shell
    # You must have the old private key to rekey the file
@@ -50,11 +50,11 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
 
 ## Deploy Private Key
 
-> This must be completed before deploying Big Bang or else deploying Secrets will fail.
+> This must be completed before deploying Big Bang or else deploying secrets will fail.
 
 ### GPG
 
-1. Deploy your SOPS private key to a secret named `sops-gpg` in the cluster
+1. Deploy your SOPS private key to a secret named `sops-gpg` in the cluster.
 
    ```shell
    gpg --export-secret-keys --armor <new key fingerprint> | kubectl create secret generic sops-gpg -n bigbang --from-file=yourkey.asc=/dev/stdin
@@ -101,7 +101,7 @@ Big Bang needs to know how to retrieve the private key so it can deploy the encr
 
 ### GPG
 
-By default, the `Kustomization` resource uses a Secret named `sops-gpg` for the private key as shown here:
+By default, the `Kustomization` resource uses a Secret named `sops-gpg` for the private key as shown in the following:
 
 ```yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -117,7 +117,7 @@ spec:
 
 ### AWS KMS
 
-Configure the `Kustomization` resource to use sops for decryption:
+Configure the `Kustomization` resource to use SOPS for decryption.
 
 ```yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -134,7 +134,7 @@ spec:
 If Big Bang is deployed within AWS, KMS key access can be handled via IAM roles and permissions on the cluster resources themselves.
 However, if the deployment is in a different environment from the KMS keys, AWS credentials may need to be provided via a secret as follows.
 
-Configure the flux-system `kustomize-controller` component with AWS credential environment variables using `kustomize`. Specific instructions for doing this may vary by deployment and environment but [an example](https://repo1.dso.mil/big-bang/customers/template/-/tree/main) is covered in the bigbang template repo. Broadly speaking, adding environment variables to the `kustomize-controller` component can be accomplished by adding a patch to the `flux/kustomization.yaml` for the target deployment or environment. An example of such a `kustomization.yaml` is shown below:
+Configure the flux-system `kustomize-controller` component with AWS credential environment variables using `kustomize`. Specific instructions for doing this may vary by deployment and environment but [an example](https://repo1.dso.mil/big-bang/customers/template/-/tree/main) is covered in the bigbang template repo. Broadly speaking, adding environment variables to the `kustomize-controller` component can be accomplished by adding a patch to the `flux/kustomization.yaml` for the target deployment or environment. An example of such a `kustomization.yaml` is shown in the following:
 
 ```yaml
 bases:
@@ -165,6 +165,8 @@ patchesStrategicMerge:
                   key: access_key_secret
 ```
 
-> Values should come from the `sops-aws-creds` secret created in [AWS KMS](#aws-kms) above
+> Values should come from the `sops-aws-creds` secret created in [AWS KMS](#aws-kms) above.
 
-TBD - Instructions on how to update for GCP, Vault
+## Instructions on how to update for GCP and Vault
+
+TBD

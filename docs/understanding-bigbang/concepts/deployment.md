@@ -4,7 +4,7 @@
 
 ## GitOps
 
-Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) approach to deployment.  All configuration changes will be pulled and reconciled with what is stored in the Git repository.  The only exception to this is the initial manifests (e.g. `dev.yaml`) which points to the Git repository and path.
+Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) approach to deployment. All configuration changes will be pulled and reconciled with what is stored in the Git repository. The only exception to this is the initial manifests (e.g., `dev.yaml`) which points to the Git repository and path.
 
 ## Installation
 
@@ -15,40 +15,40 @@ Big Bang follows a [GitOps](https://www.weave.works/blog/what-is-gitops-really) 
     kustomize build ./dev
     ```
 
-1. If you have not already done so, push configuration changes to Git
+1. If you have not already done so, push configuration changes to Git.
 
     ```shell
     git push
     ```
 
-1. Validate the Kubernetes context is correct
+1. Validate the Kubernetes context is correct.
 
     ```shell
     # This should match the environment you intend to deploy
     kubectl config current-context
     ```
 
-1. Deploy the Big Bang manifest to the cluster
+1. Deploy the Big Bang manifest to the cluster.
 
     ```shell
     kubectl apply -f dev.yaml
     ```
 
-1. [Monitor the deployment](#monitor)
+1. [Monitor the deployment](#monitor).
 
 ## Upgrade
 
-All changes to the Big Bang cluster should be made through Git.  After changes are pushed, Big Bang will automatically reconcile the difference with the cluster.
+All changes to the Big Bang cluster should be made through Git. After changes are pushed, Big Bang will automatically reconcile the difference with the cluster.
 
-> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the [sync.sh](../../..//scripts/sync.sh) script.
+> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them. This is based on the `interval` value set for polling. You can force Big Bang to immediately check for changes by running the [sync.sh](../../..//scripts/sync.sh) script.
 
-Changes to values can be tested in each environment using the named folders to override values and/or point to specific repo branches or tags.  After testing, the changes can be placed into the `./base` folder if the change is shared between all environments.
+Changes to values can be tested in each environment using the named folders to override values and/or point to specific repo branches or tags. After testing, the changes can be placed into the `./base` folder if the change is shared between all environments.
 
 ## Monitor
 
-The following commands will help you monitor the progress of the Big Bang deployment.  Review the [flowchart](./glossary.md#Diagram), if needed, to understand the progression.  Use the [Troubleshooting Guide](./troubleshooting.md) if you have failures.
+The commands detailed in this section will help you monitor the progress of the Big Bang deployment. Review the [flowchart](./glossary.md#Diagram), if needed, to understand the progression. Use the [Troubleshooting Guide](./troubleshooting.md) if you have failures.
 
-1. Verify Flux is running
+1. Verify Flux is running.
 
     ```shell
     kubectl get deploy -n flux-system
@@ -61,7 +61,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
       helm-controller           1/1     1            1           106s
     ```
 
-1. Verify the environment was pulled from the Git repo
+1. Verify the environment was pulled from the Git repo.
 
     ```shell
     kubectl get gitrepository -A
@@ -71,7 +71,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
     bigbang     environment-repo   https://repo1.dso.mil/big-bang/customers/template.git      True    Fetched revision: main/185e252f4452d897531ab0314adc7a189562be31       2m7s
    ```
 
-1. Verify the environment Kustomization properly worked
+1. Verify the environment Kustomization properly worked.
 
     ```shell
     kubectl get kustomizations -A
@@ -81,7 +81,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
       bigbang     environment   True    Applied revision: main/185e252f4452d897531ab0314adc7a189562be31     6m41s
     ```
 
-1. Verify the ConfigMaps were deployed
+1. Verify the ConfigMaps were deployed.
 
     ```shell
     kubectl get configmap -l kustomize.toolkit.fluxcd.io/namespace -A
@@ -92,7 +92,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
         bigbang     environment-d2tgb27f56        1      19m
     ```
 
-1. Verify the Secrets were deployed
+1. Verify the Secrets were deployed.
 
     ```shell
     kubectl get secrets -l kustomize.toolkit.fluxcd.io/namespace -A
@@ -103,7 +103,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
     bigbang     environment-bb-mhddkt46bd   Opaque   1      18m
     ```
 
-1. Verify the Big Bang Helm Chart was pulled
+1. Verify the Big Bang Helm Chart was pulled.
 
     ```shell
     kubectl get gitrepositories -A
@@ -113,7 +113,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
     bigbang         https://repo1.dso.mil/big-bang/bigbang.git   True    Fetched revision: master/8a4a1ddd0c9edf316f5362680cf2921baf0c3451   25m
    ```
 
-1. Verify the Big Bang Helm Chart was deployed
+1. Verify the Big Bang Helm Chart was deployed.
 
     ```shell
     kubectl get hr -A
@@ -123,7 +123,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
     bigbang     bigbang    True    Release reconciliation succeeded   28m
     ```
 
-1. Verify Big Bang package Helm charts are pulled
+1. Verify Big Bang package Helm charts are pulled.
 
     ```shell
     kubectl get gitrepository -A
@@ -141,7 +141,7 @@ The following commands will help you monitor the progress of the Big Bang deploy
     bigbang       cluster-auditor   https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git       True    Fetched revision: chart-release/598c35670db0cbdb3a48063b2d558965afe73185    8m23s
    ```
 
-1. Verify the packages get deployed
+1. Verify the packages get deployed.
 
     ```shell
     # Use watch since it take a long time to deploy
@@ -188,6 +188,6 @@ The following commands will help you monitor the progress of the Big Bang deploy
     istio-operator      pod/istio-operator-79f966cfc-rjhhc                   0/1     ContainerCreating   0          8s
     ```
 
-1. Wait until all Helm Releases, Deployments, and Pods are Ready.  Be patient, this can take 15-30 minutes.
+1. Wait until all Helm Releases, Deployments, and Pods are ready. Be patient, this can take 15-30 minutes.
 
-    > The Git repositories are monitored periodically (default is 10m) for changes.  If a change is detected, the configuration will be reconciled using Flux.  The monitoring techniques above can be used to monitor the reconciliation.
+    > The Git repositories are monitored periodically (default is 10m) for changes. If a change is detected, the configuration will be reconciled using Flux. The monitoring techniques above can be used to monitor the reconciliation.

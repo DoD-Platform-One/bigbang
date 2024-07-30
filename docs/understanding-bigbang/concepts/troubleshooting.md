@@ -1,16 +1,16 @@
 # Troubleshooting
 
-Big Bang can take a long time to run.  After making changes, it could take 10-15 minutes to take effect.  Use the [sync.sh](../../../scripts/sync.sh) script to speed this up.
+Big Bang can take a long time to run. After making changes, it could take 10-15 minutes to take effect. Use the [sync.sh](../../../scripts/sync.sh) script to speed this up.
 
-Big Bang is configured to retry failed package installations and upgrades.  Before concluding you have a failure, make sure you allow Big Bang to attempt to resolve dependencies and retry.
+Big Bang is configured to retry failed package installations and upgrades. Before concluding you have a failure, make sure you allow Big Bang to attempt to resolve dependencies and retry.
 
-## Iron Bank authentication
+## Iron Bank Authentication
 
 | Symptom | Cause | Resolution |
 |--|--|--|
-| Despite entering correct credentials, get `unauthorized: authentication required` from Iron Bank | Using a non-robot account with an expired token | Login with the non-robot account manually at `registry1.dso.mil`, then retry.  For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment |
+| Despite entering correct credentials, get `unauthorized: authentication required` from Iron Bank. | Using a non-robot account with an expired token. | Login with the non-robot account manually at `registry1.dso.mil`, then retry. For production, contact the Iron Bank team to obtain a robot account and update pull credentials to use it in your environment. |
 
-## Flux install
+## Flux Install
 
 Helpful debugging commands:
 
