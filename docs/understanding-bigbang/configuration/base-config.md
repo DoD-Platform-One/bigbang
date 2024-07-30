@@ -296,10 +296,10 @@ Kubernetes: `>=1.28.0-0`
 | monitoring.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"61.2.0-bb.0"` |  |
+| monitoring.git.tag | string | `"61.2.0-bb.2"` |  |
 | monitoring.helmRepo.repoName | string | `"registry1"` |  |
 | monitoring.helmRepo.chartName | string | `"monitoring"` |  |
-| monitoring.helmRepo.tag | string | `"61.2.0-bb.0"` |  |
+| monitoring.helmRepo.tag | string | `"61.2.0-bb.2"` |  |
 | monitoring.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
@@ -365,10 +365,10 @@ Kubernetes: `>=1.28.0-0`
 | addons.authservice.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.authservice.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/authservice.git"` |  |
 | addons.authservice.git.path | string | `"./chart"` |  |
-| addons.authservice.git.tag | string | `"1.0.1-bb.3"` |  |
+| addons.authservice.git.tag | string | `"1.0.1-bb.4"` |  |
 | addons.authservice.helmRepo.repoName | string | `"registry1"` |  |
 | addons.authservice.helmRepo.chartName | string | `"authservice"` |  |
-| addons.authservice.helmRepo.tag | string | `"1.0.1-bb.3"` |  |
+| addons.authservice.helmRepo.tag | string | `"1.0.1-bb.4"` |  |
 | addons.authservice.flux | object | `{}` | Flux reconciliation overrides specifically for the Authservice Package |
 | addons.authservice.values | object | `{}` | Values to passthrough to the authservice chart: https://repo1.dso.mil/big-bang/product/packages/authservice.git |
 | addons.authservice.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -518,10 +518,10 @@ Kubernetes: `>=1.28.0-0`
 | addons.anchore.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.anchore.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
 | addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"2.7.0-bb.2"` |  |
+| addons.anchore.git.tag | string | `"2.7.0-bb.6"` |  |
 | addons.anchore.helmRepo.repoName | string | `"registry1"` |  |
 | addons.anchore.helmRepo.chartName | string | `"anchore"` |  |
-| addons.anchore.helmRepo.tag | string | `"2.7.0-bb.2"` |  |
+| addons.anchore.helmRepo.tag | string | `"2.7.0-bb.6"` |  |
 | addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchore.enterprise | object | `{"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
