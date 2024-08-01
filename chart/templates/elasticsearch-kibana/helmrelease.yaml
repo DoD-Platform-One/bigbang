@@ -12,6 +12,8 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/elasticsearch-kibana/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: warn
   targetNamespace: logging
   chart:
     spec:
