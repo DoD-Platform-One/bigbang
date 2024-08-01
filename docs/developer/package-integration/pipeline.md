@@ -61,19 +61,19 @@ docker push $IMGDST_REPO/$IMGDST_PROJ/$IMGNAME:$IMGTAG
     For Big Bang:
 
     ```plaintext
-    pipelines/bigbang-package.yaml@platform-one/big-bang/pipeline-templates/pipeline-templates:master
+    pipelines/bigbang-package.yaml@big-bang/pipeline-templates/pipeline-templates:master
     ```
 
     For Third party:
 
     ```plaintext
-    pipelines/third-party.yaml@platform-one/big-bang/pipeline-templates/pipeline-templates:master
+    pipelines/third-party.yaml@big-bang/pipeline-templates/pipeline-templates:master
     ```
 
     For Sandbox:
 
     ```plaintext
-    pipelines/sandbox.yaml@platform-one/big-bang/pipeline-templates/pipeline-templates:master
+    pipelines/sandbox.yaml@big-bang/pipeline-templates/pipeline-templates:master
     ```
 
 1. Add overlay values for testing into `tests/test-values.yaml.` This will be where you add values needed for running in the pipeline. For now it can be a blank, placeholder.
