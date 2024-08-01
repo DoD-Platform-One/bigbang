@@ -2069,7 +2069,6 @@ addons:
       postgresql:
         persistence:
           size: 256Mi
-      replicaCount: 1
       resources:
         requests:
           cpu: 100m
