@@ -12,6 +12,15 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/loki/values.yaml") . | sha256sum }}
 spec:
+  driftDetection:
+    mode: warn
+    ignore:
+      - paths: [""]
+        target:
+          kind: Tenant
+      - paths: [""]
+        target:
+         kind: Sidecar
   releaseName: {{ default "logging-loki" .Values.loki.releaseName }}
   targetNamespace: logging
   chart:
