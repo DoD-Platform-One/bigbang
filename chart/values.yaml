@@ -428,11 +428,11 @@ clusterAuditor:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git
     path: "./chart"
-    tag: "1.5.0-bb.20"
+    tag: "1.5.0-bb.21"
   helmRepo:
     repoName: "registry1"
     chartName: "cluster-auditor"
-    tag: "1.5.0-bb.20"
+    tag: "1.5.0-bb.21"
 
   # -- Flux reconciliation overrides specifically for the Cluster Auditor Package
   flux: {}
