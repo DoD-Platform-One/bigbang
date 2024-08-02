@@ -933,11 +933,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "8.3.6-bb.0"
+    tag: "8.3.6-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "8.3.6-bb.0"
+    tag: "8.3.6-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}

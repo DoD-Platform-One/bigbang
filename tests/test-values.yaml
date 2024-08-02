@@ -1112,9 +1112,7 @@ monitoring:
           cypress_tnr_password: "tnr_w!G33ZyAt@C8"
 
 grafana:
-  enabled: true
   sso:
-    enabled: false
     grafana:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_grafana
       scopes: "openid Grafana"
