@@ -11,6 +11,11 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.anchore.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
   ui:
     gateways:

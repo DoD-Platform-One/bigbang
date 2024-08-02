@@ -88,7 +88,6 @@ jaeger:
   values:
     istio:
       hardened:
-        enabled: true
         customAuthorizationPolicies:
           - name: "allow-intranamespace-jaeger"
             enabled: true
@@ -131,7 +130,6 @@ kiali:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-kiali"
             enabled: true
@@ -193,7 +191,6 @@ clusterAuditor:
           cypress_url: 'https://grafana.dev.bigbang.mil/d/YBgRZG6Mz/opa-violations?orgId=1'
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-cluster-auditor"
             enabled: true
@@ -459,7 +456,6 @@ kyvernoReporter:
             memory: 3Gi
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-kyvernoreporter"
             enabled: true
@@ -809,7 +805,6 @@ elasticsearchKibana:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-elasticsearchkibana"
             enabled: true
@@ -862,18 +857,11 @@ elasticsearchKibana:
             cpu: "2"
             memory: "4Gi"
 
-eckOperator:
-  values:
-    istio:
-      hardened:
-        enabled: true
-
 fluentbit:
   enabled: false
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-fluentbit"
             enabled: true
@@ -900,7 +888,6 @@ loki:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-loki"
             enabled: true
@@ -982,7 +969,6 @@ tempo:
           - "tempo.{{ .Values.domain }}"
       enabled: true
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-tempo"
             enabled: true
@@ -1042,10 +1028,6 @@ tempo:
 
 promtail:
   enabled: true
-  values:
-    istio:
-      hardened:
-        enabled: true
 
 monitoring:
   enabled: true
@@ -1066,7 +1048,6 @@ monitoring:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-monitoring"
             enabled: true
@@ -1119,7 +1100,6 @@ grafana:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-grafana"
             enabled: true
@@ -1179,7 +1159,6 @@ neuvector:
     istio:
       enabled: true
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-neuvector"
             enabled: true
@@ -1210,7 +1189,6 @@ twistlock:
   values:
     istio:
       hardened:
-        enabled: true
         customServiceEntries:
           - name: "cypress-service-entries-twistlock"
             enabled: true
@@ -1324,7 +1302,6 @@ addons:
                 limits: 2048Mi
       istio:
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-argocd"
               enabled: true
@@ -1351,9 +1328,6 @@ addons:
       minimal:
         callback_uri: "https://minimal.dev.bigbang.mil/login"
     values:
-      istio:
-        hardened:
-          enabled: true
       resources:
         requests:
           cpu: 100m
@@ -1383,7 +1357,6 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-fortify"
               enabled: true
@@ -1460,12 +1433,6 @@ addons:
           envs:
             cypress_url: "https://fortify.dev.bigbang.mil"
 
-  haproxy:
-    values:
-      istio:
-        hardened:
-          enabled: true
-
   gitlab:
     enabled: false
     sso:
@@ -1483,7 +1450,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-gitlab"
               enabled: true
@@ -1607,7 +1573,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-gitlab-runner"
               enabled: true
@@ -1680,7 +1645,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "anchore-allow-cypress-tests"
               enabled: true
@@ -1838,7 +1802,6 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: "allow-intranamespace-sonarqube"
               enabled: true
@@ -1907,7 +1870,6 @@ addons:
         console:
           enabled: false
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: "allow-intranamespace-minio-operator"
               enabled: true
@@ -1942,7 +1904,6 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: "allow-intranamespace-minio"
               enabled: true
@@ -2014,10 +1975,6 @@ addons:
 
   mattermostOperator:
     enabled: false
-    values:
-      istio:
-        hardened:
-          enabled: true
 
   mattermost:
     enabled: false
@@ -2034,7 +1991,6 @@ addons:
         enabled: true
       istio:
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: "test-for-allowing-monitoring"
               enabled: true
@@ -2196,7 +2152,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-nexus"
               enabled: true
@@ -2288,7 +2243,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: "allow-intranamespace-keycloak"
               enabled: true
@@ -2502,7 +2456,6 @@ addons:
             service_registration "kubernetes" {}
       istio:
         hardened:
-          enabled: true
           customAuthorizationPolicies:
             - name: allow-egress-instance-metadata
               enabled: true
@@ -2523,9 +2476,6 @@ addons:
   metricsServer:
     enabled: false
     values:
-      istio:
-        hardened:
-          enabled: true
       replicas: 1
       bbtests:
         enabled: true
@@ -2542,7 +2492,6 @@ addons:
       istio:
         enabled: true
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "allow-npm-for-cypress-tests"
               enabled: true
@@ -2722,7 +2671,6 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-thanos"
               enabled: true
@@ -2818,9 +2766,6 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_holocron
     values:
-      istio:
-        hardened:
-          enabled: true
       bbtests:
         enabled: true
         cypress:
@@ -2839,7 +2784,6 @@ addons:
     values:
       istio:
         hardened:
-          enabled: true
           customServiceEntries:
           - name: "cypress-service-entries-eckoperator"
             enabled: true

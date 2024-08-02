@@ -16,6 +16,12 @@ istio:
   api:
     gateways:
     - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.minio.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
 
 {{- if .Values.istio.enabled }}
 annotations:

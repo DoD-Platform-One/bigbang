@@ -21,6 +21,11 @@ annotations:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.externalSecrets.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
 
 openshift: {{ .Values.openshift }}
 {{- end -}}

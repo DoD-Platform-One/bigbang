@@ -176,6 +176,11 @@ postgresql:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.holocron.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   injection: enabled
   holocron:
     gateways:

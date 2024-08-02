@@ -5,7 +5,7 @@
 {{- define "bigbang.defaults.authservice" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-{{- $authServiceHardened := or 
+{{- $authServiceHardened := or
     (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
     (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
     (dig "hardened" "enabled" false .Values.istio.values)

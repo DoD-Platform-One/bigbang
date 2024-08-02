@@ -11,6 +11,12 @@ imagePullSecrets:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlabRunner }}
 
 

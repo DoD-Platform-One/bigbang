@@ -22,6 +22,11 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
   keycloak:
     enabled: true

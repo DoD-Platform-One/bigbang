@@ -13,6 +13,11 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.promtail.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
 
 loki:
   enabled: {{ .Values.loki.enabled }}

@@ -22,6 +22,10 @@ istio:
     - istio-system/{{ default "public" .Values.addons.mattermost.ingress.gateway }}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
   hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.mattermost.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
     clusterAuditor:
       enabled: {{ .Values.clusterAuditor.enabled }}
     kyvernoReporter:
