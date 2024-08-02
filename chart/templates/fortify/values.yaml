@@ -17,6 +17,11 @@ domain: {{ .Values.domain }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   fortify:
     gateways:
     - istio-system/{{ default "public" .Values.addons.fortify.ingress.gateway }}

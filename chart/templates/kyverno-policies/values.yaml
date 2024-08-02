@@ -144,6 +144,17 @@ policies:
           - source-controller*
           - kustomize-controller*
       {{- end }}
+      {{- if .Values.addons.thanos.enabled }}
+      - resources:
+          namespaces:
+          - thanos
+          kinds:
+          - Pod
+          - Deployment
+          - StatefulSet
+          names:
+          - thanos-compactor*
+      {{- end }}
       {{- if .Values.addons.externalSecrets.enabled }}
       - resources:
           namespaces:

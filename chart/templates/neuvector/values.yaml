@@ -11,6 +11,11 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.neuvector.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   neuvector:
     gateways:
     - istio-system/{{ default "public" .Values.neuvector.ingress.gateway }}

@@ -16,6 +16,11 @@ domain: {{ $domainName }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.jaeger.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   jaeger:
     enabled: {{ .Values.istio.enabled }}
     gateways:

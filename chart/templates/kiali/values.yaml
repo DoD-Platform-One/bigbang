@@ -15,6 +15,10 @@ image:
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.kiali.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
   kiali:

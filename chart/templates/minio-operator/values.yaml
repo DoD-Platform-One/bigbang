@@ -45,6 +45,12 @@ networkPolicies:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.minio.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   console:
     gateways:
     - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}

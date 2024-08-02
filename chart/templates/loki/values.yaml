@@ -12,11 +12,15 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) (dig "hardened" "enabled" false .Values.istio.values) }}
-    enabled: true
-    {{- else }}
-    enabled: false
-    {{- end }}
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
+      (dig "istio" "hardened" "enabled" false .Values.loki.values)
+      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
+      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
+    }}
 
 imagePullSecrets:
   - name: private-registry

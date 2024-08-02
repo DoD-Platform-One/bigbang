@@ -15,6 +15,11 @@ OpenShift:
 
 istio:
   enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
   sonarqube:
     gateways:
     - istio-system/{{ default "public" .Values.addons.sonarqube.ingress.gateway }}

@@ -39,11 +39,15 @@ istio:
   {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
   enabled: {{ .Values.istio.enabled }}
   hardened:
-    {{- if or (dig "istio" "hardened" "enabled" false .Values.monitoring.values) (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values) (dig "hardened" "enabled" false .Values.istio.values) (dig "istio" "hardened" "enabled" false .Values.grafana.values) }}
-    enabled: true
-    {{- else }}
-    enabled: false
-    {{- end }}
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
+      (dig "istio" "hardened" "enabled" false .Values.loki.values)
+      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
+      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
+    }}
     {{- if and (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
     customServiceEntries:
       - name: egress-object-store
