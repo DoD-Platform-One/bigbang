@@ -8,14 +8,14 @@ Please read through the documentation linked here and in the [understanding Big 
 
 ## Communications
 
-Join MatterMost channels to ask questions and communicate with the team. Here is the list of relevant Mattermost channels for BigBang development:  
+Join MatterMost channels to ask questions and communicate with the team. Here is the list of relevant Mattermost channels for Big Bang development:  
 
 * [Value Stream - Big Bang](https://chat.il2.dso.mil/platform-one/channels/team---big-bang)
 * [Topic - Big Bang Documentation](https://chat.il2.dso.mil/platform-one/channels/topic-big-bang-documentation)
 
 ## Set up a Development Environment
 
-[Development Environment](./development-environment.md)
+[Set up a Development Environment](./development-environment.md).
 
 ## Package Requirements
 
@@ -23,16 +23,16 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 
 ## Package Development
 
-[Develop a Big Bang Package](./develop-package.md)
+[Develop a Big Bang Package](./develop-package.md).
 
 ## Add Package to Big Bang
 
-[Integrate Package with Big Bang](./package-integration/README.md)
+[Integrate Package with Big Bang](./package-integration/README.md).
 
 ## Package Owner Overview
 
-[Package Owner Requirements & Overview](./package-integration/ownership.md)
+[Package Owner Requirements & Overview](./package-integration/ownership.md).
 
 ## Big Bang Code Through Party Bus Pipeline
 
-[Code Through Party Bus MDO Pipeline](./mdo-partybus-pipelines.md)
+[Code Through Party Bus MDO Pipeline](./mdo-partybus-pipelines.md).
