@@ -1,6 +1,6 @@
-# BigBang GitLab CI Workflow
+# Big Bang GitLab Continuous Integration (CI) Workflow
 
-The following is meant to serve as an overview of the pipeline stages required to get a commit merged. There are package, bigbang, and infrastructure pipelines.
+This document is meant to serve as an overview of the pipeline stages required to get a commit merged. There are package, bigbang, and infrastructure pipelines.
 
 [[_TOC_]]
 
@@ -10,7 +10,7 @@ The following is meant to serve as an overview of the pipeline stages required t
 
   These run on a privileged node pool with limited access to allow for docker in docker k3d clusters.
   * Package runners:
-      * Separate runners for each BBTOC stage; graduated, incubating, and sandbox.
+      * Separate runners for each BBTOC stage: graduated, incubating, and sandbox.
       * These run package k3d pipelines.
   * bigbang runner:
       * Runner used specifically for the bigbang repo.
@@ -37,7 +37,7 @@ This pipeline is triggered by the following for individual bigbang packages:
 
 ![Package Pipeline](../assets/imgs/developer/package-pipeline.png)
 
-[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer/ci workflow changes. It is provided here for ease of use.
+[Link to draw.io diagram file](../assets/diagrams/developer/bb-gitlab-ci-diagram.drawio). This diagram file should be modified on draw.io and exported into this repository when the developer/CI workflow changes. It is provided here for ease of use.
 
 ### Chart Update Check
 
@@ -58,7 +58,7 @@ This stage checks the MR description to ensure the `## Upgrade Notices` section 
 
 ### Package Tests
 
-This stage verifies several easy-to-check assumptions, including:
+This stage verifies several easy-to-check assumptions, including the following:
 
 * Does package successfully install?
 * Does package successfully upgrade (from master)?
@@ -191,10 +191,10 @@ Currently, there are three test scripts that test the following:
 
 ### Teardown
 
-Infrastructure teardown happens in the reverse sequence as to which they are deployed, and the pipeline will ensure these teardown jobs are _always_ ran, regardless of whether or not the previous jobs were successful.
+Infrastructure teardown happens in the reverse sequence as to which they are deployed, and the pipeline will ensure these teardown jobs are *always* ran, regardless of whether or not the previous jobs were successful.
 
 Combined with terraform's declarative remote state, the "always on" teardown ensures no orphaned resources are left over once tests are run.
 
 Within the teardown process, the commit scoped terraform workspace is also deleted to ensure the remote state remains clean.
 
-For example, if an RKE2 cluster fails to provision, a full teardown of BigBang, RKE2, and the network will be run, even though BigBang was never deployed.  This will result in 2 failing jobs (RKE2 up and BigBang down), but will ensure that no infrastructure resources become orphaned.
+For example, if an RKE2 cluster fails to provision, a full teardown of bigbang, RKE2, and the network will be run, even though BigBang was never deployed.  This will result in two failing jobs (i.e., RKE2 up and bigbang down), but will ensure that no infrastructure resources become orphaned.
