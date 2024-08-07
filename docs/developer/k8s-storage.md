@@ -1,6 +1,6 @@
 # Kubernetes Storage Options
 
-Use this data to assist in your CSI decision. However, when using a cloud provider we suggest you use their Kubernetes CSI.
+Use this data to assist in your CSI decision. However, when using a cloud provider, we suggest you use their Kubernetes CSI.
 
 ## Feature Matrix
 
@@ -32,12 +32,12 @@ Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example
 
 ### Requirements
 
-- Must be using AWS
+- Must be using AWS.
 
 ### Notes
 
 - Apache License 2.0
-- Very easy to install and use, apply CSI spec and you are ready.
+- Very easy to install and use; apply CSI spec and you are ready.
 
 ## Azure Disk CSI
 
@@ -45,12 +45,12 @@ Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example
 
 ### Requirements
 
-- Must be using Azure
+- Must be using Azure.
 
 ### Notes
 
 - Apache License 2.0
-- Very easy to install and use, apply CSI spec and you are ready.
+- Very easy to install and use; apply CSI spec and you are ready.
 
 ## Longhorn
 
@@ -63,20 +63,20 @@ Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example
 ### Notes
 
 - Apache License 2.0
-- Easiest to install
+- Easiest to install.
 - Built-in backup tool.
-- Documented airgap install process. [Docs](https://longhorn.io/docs/1.1.0/advanced-resources/deploy/airgap/)
+- Documented airgap install process: [Docs](https://longhorn.io/docs/1.1.0/advanced-resources/deploy/airgap/).
 - GUI provides data and observability; replica status, cluster health status, backup status, and backup initiation/recovery.
-- Native backup to S3 or NFS
+- Native backup to S3 or NFS.
 
 ## OpenEBS
 
-[Website/Docs](https://openebs.io/)
+- [Website/Docs](https://openebs.io/)
 
 ### Requirements
 
-- Blank and un-partitioned attached disk(s)
-- RWX is in Alpha and requires work. [OpenEBS RWX Docs](https://docs.openebs.io/docs/next/rwm.html)
+- Blank and un-partitioned attached disk(s).
+- RWX is in Alpha and requires work; [OpenEBS RWX Docs](https://docs.openebs.io/docs/next/rwm.html).
 
 ### Notes
 
@@ -101,8 +101,8 @@ Benchmarks were tested on AWS with GP2 ebs volumes using using FIO, see [example
 
 ### Notes
 
-- Rook - Apache License 2.0.
-- Ceph - dual licensed under the LGPL version 2.1 or 3.0
+- Rook: Apache License 2.0.
+- Ceph: dual licensed under the LGPL version 2.1 or 3.0.
 - Very Fast
 
 ## Portworx
