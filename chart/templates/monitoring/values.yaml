@@ -403,9 +403,6 @@ sso:
 prometheus-node-exporter:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-  serviceAccount:
-    imagePullSecrets:
-    - name: private-registry
 
 
   {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
@@ -464,8 +461,6 @@ defaultRules:
 kube-state-metrics:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-  - name: private-registry
   {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
   prometheus:
     monitor:
