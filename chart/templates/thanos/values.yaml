@@ -59,7 +59,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 storegateway:
-  enabled: true
+  enabled: false
 
 query:
   dnsDiscovery:
