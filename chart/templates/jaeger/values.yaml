@@ -50,9 +50,21 @@ elasticsearch:
 sso:
   enabled: {{ .Values.jaeger.sso.enabled }}
 
-{{- if or .Values.jaeger.sso.enabled .Values.istio.enabled }}
+{{- if .Values.kiali.enabled }}
+extraLabels:
+  app: jaeger-jaeger-jaeger-operator
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
+{{- if or .Values.jaeger.sso.enabled .Values.istio.enabled .Values.kiali.enabled }}
 jaeger:
   spec:
+    {{- if .Values.kiali.enabled }}
+    labels:
+      {{- include "kialiAppLabel" . | nindent 6 }}
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+    {{- end }}
+    {{- if or .Values.jaeger.sso.enabled .Values.istio.enabled }}
     {{- $jaegerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
     {{- $jaegerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     allInOne:
@@ -73,6 +85,7 @@ jaeger:
       annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
+    {{- end }}
     {{- if .Values.istio.enabled }}
     agent:
       annotations:
