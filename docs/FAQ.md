@@ -2,10 +2,10 @@
 
 ## Costs and licensing Fees
 
-> Will a user, government program, or support contract incur any costs, other
+> Will a user, Government program, or support contract incur any costs, other
 than their own labor, for installing and using Big Bang?
 
-Big Bang itself is open-source, and you do not need to pay Platform One
+Big Bang itself is open-source. You do not need to pay Platform One
 to use it in your environment.
 
 Our baseline includes multiple software components, with a variety
@@ -13,22 +13,22 @@ of open-source and commercial licenses. Details of these components and
 their licensing models can be found in
 [Big Bang Licensing Model Overview.](./understanding-bigbang/licensing-model.md)
 
-In Big Bang 2.0, our default core components will be open source, though paid
+In Big Bang 2.0, our default core components will be open source; however, paid
 alternatives will remain available.
 
 You are in complete control over which components you install in your
 environment, and choose whether or not to use commercial software.
-However, your Approving Official may require certain commercial applications for a cATO.
+However, your Approving Official may require certain commercial applications for a continuous Authority to Operate (cATO).
 
-> Are users required to set up a "contract" with Platform One in order to
+> Are users required to set up a contract with Platform One in order to
 use Big Bang?
 
 No. Big Bang is open source, and can be used by you and your organization
 without payment to Platform One.
 
-Platform One does offer optional hosting and support contracts:
+Platform One does offer optional hosting and support contracts. These are listed in the following:
 
-- Our Big Bang Integration Team helps customers install, upgrade, and operate BigBang on customer hardware and in customer environments.
+- Our Big Bang Integration Team helps customers install, upgrade, and operate Big Bang on customer hardware and in customer environments.
 - Our Digital Twin service will deploy an instance of your application to
   our testing clusters, so we can ensure that changes to our baseline won't break your integration tests. Providing you with customized release notes for your environment.
 - [Party Bus](https://p1.dso.mil/products/party-bus) is a managed environment and
@@ -83,7 +83,7 @@ managed Big Bang Platform as a Service (PaaS) solution, or one of the [Big Bang 
 
 ## Change Control
 
-> How do you manage change control on Big Bang? How can we be notified of changed?
+> How do you manage change control on Big Bang? How can we be notified of changes?
 
 Big Bang has a two-week release cadence. You can view our
 [release schedule](https://docs-bigbang.dso.mil/latest/#Navigating-our-documentation),
