@@ -1623,11 +1623,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
       path: "./chart"
-      tag: "1.22.0-bb.4"
+      tag: "1.22.0-bb.5"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost-operator"
-      tag: "1.22.0-bb.4"
+      tag: "1.22.0-bb.5"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
     flux: {}
