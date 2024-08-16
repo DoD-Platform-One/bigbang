@@ -795,6 +795,28 @@ kyvernoPolicies:
           disallow:
           - bigbang
 
+eckOperator:
+  # -- Toggle deployment of ECK Operator.
+  enabled: false
+  values:
+    istio:
+      hardened:
+        customServiceEntries:
+        - name: "cypress-service-entries-eckoperator"
+          enabled: true
+          spec:
+            hosts:
+              - 'registry.npmjs.org'
+              - 'download.cypress.io'
+              - 'cdn.cypress.io'
+              - 'repo1.dso.mil'
+            location: MESH_EXTERNAL
+            ports:
+              - number: 443
+                protocol: TLS
+                name: https
+            resolution: DNS
+            
 elasticsearchKibana:
   enabled: false
   sso:
@@ -2775,28 +2797,6 @@ addons:
             limits:
               cpu: "2"
               memory: "2G"
-
-  eckOperator:
-    # -- Toggle deployment of ECK Operator.
-    enabled: false
-    values:
-      istio:
-        hardened:
-          customServiceEntries:
-          - name: "cypress-service-entries-eckoperator"
-            enabled: true
-            spec:
-              hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
 
   externalSecrets:
     values:
