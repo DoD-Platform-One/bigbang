@@ -61,6 +61,11 @@ promtail:
 {{- end }}
 
 loki:
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
   extraMemberlistConfig:
     bind_addr:
       - ${MY_POD_IP}
