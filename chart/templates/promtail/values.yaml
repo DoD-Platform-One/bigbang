@@ -48,6 +48,12 @@ podAnnotations:
 imagePullSecrets:
   - name: private-registry
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{- include "kialiAppLabel" . | nindent 2 }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 {{- if .Values.loki.enabled }}
 config:
   clients:
