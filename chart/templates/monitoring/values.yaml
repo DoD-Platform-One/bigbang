@@ -92,13 +92,19 @@ alertmanager:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or .Values.monitoring.sso.enabled $istioInjection }}
+    {{- if or .Values.monitoring.sso.enabled $istioInjection .Values.kiali.enabled }}
     podMetadata:
-      {{- if .Values.monitoring.sso.enabled }}
+      {{- if or .Values.monitoring.sso.enabled .Values.kiali.enabled }}
       {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
       {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
       labels:
+        {{- if .Values.monitoring.sso.enabled }}
         {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
+        {{- end }}
+        {{- if .Values.kiali.enabled }}
+        app: alertmanager
+        {{- include "kialiVersionLabel" . | nindent 8 }}
+        {{- end }}
       {{- end }}
       {{- if $istioInjection }}
       annotations:
@@ -146,7 +152,6 @@ prometheus:
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
   {{- end }}
-
   prometheusSpec:
     {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
     alertingEndpoints:
@@ -220,14 +225,18 @@ prometheus:
     enableFeatures:
       - remote-write-receiver
     {{- end }}
-    {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled }}
+    {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled .Values.kiali.enabled }}
     podMetadata:
-      {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) }}
+      {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) .Values.kiali.enabled }}
       labels:
         {{- if .Values.monitoring.sso.enabled }}
         {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
         {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
         {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
+        {{- end }}
+        {{- if .Values.kiali.enabled }}
+        app: prometheus
+        {{- include "kialiVersionLabel" . | nindent 8 }}
         {{- end }}
         {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
         vault-ingress: "true"
@@ -403,6 +412,11 @@ sso:
 prometheus-node-exporter:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    app: prometheus-node-exporter
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
 
 
   {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
@@ -486,6 +500,11 @@ kube-state-metrics:
     {{ include "istioAnnotation" . }}
   {{- end }}
   {{- end }}
+  {{- if .Values.kiali.enabled }}
+  customLabels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
 
 prometheusOperator:
   image:
@@ -497,6 +516,10 @@ prometheusOperator:
     patch:
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
@@ -525,4 +548,3 @@ prometheusOperator:
   {{- end }}
 {{ toYaml $overlays }}
 {{- end }}
-
