@@ -2205,23 +2205,29 @@ addons:
             docker_host: "containers.dev.bigbang.mil"
 
   velero:
-    istio:
-      hardened:
-        enabled: true
-        customServiceEntries:
-          - name: "cypress-service-entries-velero"
-            enabled: true
-            spec:
-              hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-
     enabled: false
     plugins:
     - aws
     values:
+      istio:
+        hardened:
+          customServiceEntries:
+            - name: "cypress-service-entries-velero"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                exportTo:
+                  - "."
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       serviceAccount:
         server:
           name: velero

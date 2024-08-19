@@ -1742,11 +1742,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "6.7.0-bb.7"
+      tag: "6.7.0-bb.8"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "6.7.0-bb.7"
+      tag: "6.7.0-bb.8"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
