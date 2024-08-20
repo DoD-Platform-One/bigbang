@@ -6,9 +6,7 @@ kind: Namespace
 metadata:
   name: nexus-repository-manager
   labels:
-    {{- if .Values.istio.enabled }}
-    istio-injection: {{ dig "istio" "injection" "enabled" $nexusValues }}
-    {{- end }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" $nexusValues) "enabled")) }}
     app.kubernetes.io/name: "nexus-repository-manager"
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}

@@ -6,6 +6,6 @@ metadata:
     app.kubernetes.io/name: gitlab-runner
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlabRunner }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled")) }}
   name: gitlab-runner
 {{- end }}

@@ -5,9 +5,7 @@ kind: Namespace
 metadata:
   name: {{ $pkg }}
   labels:
-    {{- if .Values.istio.enabled }}
-    istio-injection: enabled
-    {{- end }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" (get .Values.addons $pkg)) "enabled")) }}
     app.kubernetes.io/name: {{ $pkg }}
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}

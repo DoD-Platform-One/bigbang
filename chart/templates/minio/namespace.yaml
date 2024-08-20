@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: minio
   labels:
-    istio-injection: enabled
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.minio) "enabled")) }}
     app.kubernetes.io/name: minio
     app.kubernetes.io/component: "application-utilities"
     {{- include "commonLabels" . | nindent 4}}
