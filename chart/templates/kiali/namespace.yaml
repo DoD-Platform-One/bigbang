@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: kiali
   labels:
-    istio-injection: enabled
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.kiali) "enabled")) }}
     app.kubernetes.io/name: kiali
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}

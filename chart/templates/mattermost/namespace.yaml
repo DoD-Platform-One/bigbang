@@ -7,6 +7,6 @@ metadata:
     app.kubernetes.io/name: mattermost
     app.kubernetes.io/component: "collaboration-tools"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.mattermost }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.mattermost) "enabled")) }}
   name: mattermost
 {{- end }}

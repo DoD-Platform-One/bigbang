@@ -8,6 +8,6 @@ metadata:
     app.kubernetes.io/name: external-secrets
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: enabled
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.externalSecrets) "enabled")) }}
   name: external-secrets
 {{- end }}

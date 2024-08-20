@@ -7,5 +7,5 @@ metadata:
     app.kubernetes.io/name: sonarqube
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled")) }}
 {{- end }}

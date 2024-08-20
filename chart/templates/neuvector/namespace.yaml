@@ -7,7 +7,5 @@ metadata:
     app.kubernetes.io/name: neuvector
     app.kubernetes.io/component: "sandbox"
     {{- include "commonLabels" . | nindent 4}}
-    {{- if .Values.istio.enabled }}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.neuvector }}
-    {{- end }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
 {{- end }}

@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: jaeger
   labels:
-    istio-injection: enabled
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.jaeger) "enabled")) }}
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
