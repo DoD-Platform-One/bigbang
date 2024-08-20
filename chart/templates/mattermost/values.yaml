@@ -88,16 +88,42 @@ enterprise:
 {{- if and .username .password .host .port .database }}
 database:
   secret: "mattermost-database-secret"
+postgresql:
+  secret: "mattermost-database-secret"
 {{- else }}
 postgresql:
   image:
     pullSecrets:
       - private-registry
+  {{- if and .username .password .host .port .database }}
+  secret: "mattermost-database-secret"
+  {{- else }}
+  secret: "mattermost-dbcreds"
+  {{- end }}
   install: true
   {{- if $istioInjection }}
   primary:
     podAnnotations:
       {{ include "istioAnnotation" $ }}
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+      runAsUser: 1001
+      runAsGroup: 1001
+    containerSecurityContext:
+      enabled: true
+      runAsUser: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+      capabilities:
+        drop:
+          - ALL
+    #permissions for initContainers
+    volumePermissions:
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
   readReplicas:
     podAnnotations:
       {{ include "istioAnnotation" $ }}
