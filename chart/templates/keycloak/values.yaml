@@ -38,6 +38,12 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{- include "kialiAppLabel" . | nindent 2 }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
@@ -64,12 +70,28 @@ serviceMonitor:
 {{- if .Values.addons.keycloak.database.host }}
 postgresql:
   enabled: false
-{{- else if $istioInjection }}
+{{- else if or $istioInjection .Values.kiali.enabled }}
 postgresql:
   primary:
-    {{ include "istioAnnotation" . }}
+    {{- if $istioInjection }}
+    annotations:
+      {{- include "istioAnnotation" . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.kiali.enabled }}
+    podLabels:
+      {{- include "kialiAppLabel" . | nindent 6 }}
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+    {{- end }}
   readReplicas:
-    {{ include "istioAnnotation" . }}
+    {{- if $istioInjection }}
+    annotations:
+      {{- include "istioAnnotation" . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.kiali.enabled }}
+    podLabels:
+      {{- include "kialiAppLabel" . | nindent 6 }}
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+    {{- end }}
 {{- end }}
 
 {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
