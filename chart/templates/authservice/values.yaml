@@ -30,6 +30,12 @@ imagePullSecrets:
 podAnnotations:
   {{ include "istioAnnotation" . }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{- include "kialiAppLabel" . | nindent 2 }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 openshift: {{ .Values.openshift | default false }}
 
 monitoring:
@@ -49,8 +55,9 @@ autoscaling:
   maxReplicas: 3
 {{- end }}
 
-{{- if and (dig "redis" "enabled" false .Values.addons.authservice.values) .Values.monitoring.enabled }}
+{{- if and (dig "redis" "enabled" false .Values.addons.authservice.values) (or .Values.monitoring.enabled .Values.kiali.enabled) }}
 redis-bb:
+  {{- if .Values.monitoring.enabled }}
   metrics:
     enabled: true 
     image:
@@ -73,6 +80,17 @@ redis-bb:
     prometheusRule:
       enabled: true 
       namespace: monitoring
+  {{- end }}
+  {{- if .Values.kiali.enabled }}
+  master:
+    podLabels:
+      app: authservice-authservice-redis-bb-master
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+  replica:
+    podLabels:
+      app: authservice-authservice-redis-bb-replica
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+  {{- end }}
 {{- end }}
 
 {{- $legacy := and .Values.sso.oidc.realm .Values.sso.oidc.host -}}
