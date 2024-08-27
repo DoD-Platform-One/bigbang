@@ -9,6 +9,37 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
+{{- if .Values.kiali.enabled }}
+api:
+  labels:
+    app: {{ "{{ template \"enterprise.api.fullname\" . }}" | quote }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+analyzer:
+  labels:
+    app: {{ "{{ template \"enterprise.analyzer.fullname\" . }}" | quote }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+catalog:
+  labels:
+    app: {{ "{{ template \"enterprise.catalog.fullname\" . }}" | quote }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+simpleQueue:
+  labels:
+    app: {{ "{{ template \"enterprise.simpleQueue.fullname\" . }}" | quote }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+notifications:
+  labels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+reports:
+  labels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+policyEngine:
+  labels:
+    app: {{ "{{ template \"enterprise.policyEngine.fullname\" . }}" | quote }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+{{- end }}
+
 istio:
   enabled: {{ .Values.istio.enabled }}
   hardened:
@@ -77,18 +108,34 @@ postgresql:
   externalEndpoint: "{{ .Values.addons.anchore.database.host }}"
   postgresPort: {{ .Values.addons.anchore.database.port }}
   {{- end }}
-
+  {{- if .Values.kiali.enabled }}
+  primary:
+    podLabels:
+      {{- include "kialiAppLabel" . | nindent 6 }}
+      {{- include "kialiVersionLabel" . | nindent 6 }}
+  {{- end }}
 {{- if .Values.addons.anchore.adminPassword }}
 anchoreConfig:
   default_admin_password: {{ .Values.addons.anchore.adminPassword }}
 {{- end }}
 
 feeds:
+  {{- if .Values.kiali.enabled }}
+  labels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
   istio:
     enabled: {{ .Values.istio.enabled }}
     injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
 
   feeds-db:
+    {{- if .Values.kiali.enabled }}
+    primary:
+      podLabels:
+        {{- include "kialiAppLabel" . | nindent 8 }}
+        {{- include "kialiVersionLabel" . | nindent 8 }}
+    {{- end }}
     {{- if .Values.istio.enabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
@@ -106,6 +153,11 @@ feeds:
 ui:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecretName: private-registry
+  {{- if .Values.kiali.enabled }}
+  labels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
 
 ui-redis:
   {{- if and .Values.addons.anchore.redis.host .Values.addons.anchore.redis.port .Values.addons.anchore.redis.password }}
