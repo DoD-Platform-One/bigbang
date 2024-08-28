@@ -33,8 +33,13 @@ operator:
       value: ""
     - name: PROMETHEUS_NAMESPACE
       value: "monitoring"
-  {{- end }}    
-    
+  {{- end }}
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
