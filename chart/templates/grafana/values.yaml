@@ -99,6 +99,12 @@ podAnnotations:
   {{- end }}
 {{- end }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  app: {{ "{{ template \"grafana.fullname\" . }}" | quote }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 {{- if or .Values.monitoring.enabled .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
 datasources:
   datasourcesbb.yaml:
