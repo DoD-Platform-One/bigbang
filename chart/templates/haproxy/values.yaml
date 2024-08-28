@@ -114,4 +114,9 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
     }}
 openshift: {{ .Values.openshift }}  
+{{- if .Values.kiali.enabled }}
+podLabels:
+  app: {{ "{{ template \"haproxy.name\" . }}" | quote }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
 {{- end -}}
