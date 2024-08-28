@@ -25,6 +25,11 @@ injector:
   annotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
+  {{- if .Values.kiali.enabled }}
+  extraLabels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
+  {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
 
@@ -32,6 +37,11 @@ server:
   {{- if .Values.istio.enabled }}
   annotations:
     {{ include "istioAnnotation" . }}
+  {{- end }}
+  {{- if .Values.kiali.enabled }}
+  extraLabels:
+    {{- include "kialiAppLabel" . | nindent 4 }}
+    {{- include "kialiVersionLabel" . | nindent 4 }}
   {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
