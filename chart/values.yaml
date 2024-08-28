@@ -594,7 +594,7 @@ elasticsearchKibana:
 
     # -- Elasticsearch/Kibana OIDC client secret
     client_secret: ""
-  
+
   # -- Elasticsearch/Kibana Service Account Annotations
   serviceAccountAnnotations:
     elasticsearch: {}
@@ -712,7 +712,7 @@ loki:
 
   # -- Loki architecture.  Options are monolith and scalable
   strategy: monolith
-  
+
   # -- Loki clusterName identifier for Promtail and Dashboards
   clusterName: ""
 
@@ -1119,11 +1119,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio-operator.git
       path: "./chart"
-      tag: "6.0.2-bb.1"
+      tag: "6.0.2-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-operator"
-      tag: "6.0.2-bb.1"
+      tag: "6.0.2-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
@@ -1148,11 +1148,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
-      tag: "6.0.2-bb.2"
+      tag: "6.0.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-instance"
-      tag: "6.0.2-bb.2"
+      tag: "6.0.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
@@ -1308,7 +1308,7 @@ addons:
       repoName: "registry1"
       chartName: "gitlab-runner"
       tag: "0.66.0-bb.1"
-      
+
 
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
@@ -1983,7 +1983,7 @@ addons:
 
       # -- OIDC Client Secret to use for Holocron
       client_secret: ""
-      
+
       # -- Holocron SSO group roles: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
       groups:
         admin: ""
@@ -2028,8 +2028,8 @@ addons:
 
       # -- OIDC Client Secret to use for Thanos
       client_secret: ""
-    
-    #Enable S3 Object Storage for Thanos-sidecar https://thanos.io/tip/components/sidecar.md/ and enables Thanos Store Gateway by default https://thanos.io/tip/components/store.md/ 
+
+    #Enable S3 Object Storage for Thanos-sidecar https://thanos.io/tip/components/sidecar.md/ and enables Thanos Store Gateway by default https://thanos.io/tip/components/store.md/
     objectStorage:
       # -- S3 compatible endpoint to use for connection information.
       # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
