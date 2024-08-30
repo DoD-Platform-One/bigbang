@@ -6,6 +6,7 @@ Micro Focus Fortify Software Security Center(SSC) or simply "**[Fortify](https:/
 - [Fortify Architecture](https://www.microfocus.com/documentation/fortify-software-security-center/2310/SSC_Help_23.1.0/index.htm#SSC_UG/A_Install_Env.htm?TocPath=Part%2520I%253A%2520Deploying%2520Fortify%2520Software%2520Security%2520Center%257CPreparing%2520for%2520%2520Fortify%2520Software%2520Security%2520Center%2520Deployment%257C_____2)
 
 The following table provides descriptions of the required and optional Fortify Software Security Center installation components in the illustration.
+
 | Component | Description |
 | --- | --- |
 | Fortify SSC Server | Fortify Software Security Center is delivered as a Web Archive (WAR) file run by Tomcat Server or as a Helm chart for Kubernetes deployment. |
@@ -20,10 +21,15 @@ The following table provides descriptions of the required and optional Fortify S
 | Fortify ScanCentral DAST |(Optional) A dynamic application security testing tool that you can use to configure and run dynamic scans of your web applications from Fortify Software Security Center. |
 | Fortify WebInspect |(Optional) Analysis agent that connects with Fortify WebInspect agents to retrieve potential dynamic issues. |
 | Fortify Security Content update server |Used to acquire and update Security Content. |
+
 **Important! **Fortify does not support load balancing across multiple Fortify Software Security Center servers.
+
 ## Big Bang Touchpoints
+
 ### KyvernoPolicies
+
 When deploying to k3d, the `validationFailureAction` for the `restrict-host-path-mount-pv` policy should be set to `audit`. This can be done by modifying `chart/values.yaml` file or passing an override file with the values set as seen below. This is for development purposes only: production should use the default setting of `enforce`.
+
 ```yaml
 kyvernoPolicies:
   values:
@@ -31,12 +37,15 @@ kyvernoPolicies:
       restrict-host-path-mount-pv:
         validationFailureAction: audit
 ```
+
 ## Licensing
 By default, Big Bang will deploy Fortify without a license. if you have a license, you can add your license via the values file as shown below:
+
 ```yaml
 addons:
   fortify:
     fortify_license: |
       <license>
 ```
+
 **Note**: This should be added via encrypted values to protect the license
