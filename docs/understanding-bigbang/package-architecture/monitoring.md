@@ -6,7 +6,7 @@ Monitoring in Bigbang is deployed using the upstream chart  [kube-prometheus-sta
 
 Installs the kube-prometheus stack, a collection of Kubernetes manifests, Grafana dashboards, and Prometheus rules combined with documentation and scripts to provide easy to operate end-to-end Kubernetes cluster monitoring with Prometheus using the Prometheus Operator.
 
- ```mermaid
+```mermaid
 graph LR
   subgraph "Monitoring"
     alertmanagerpods("AlertManager Pod(s)") --> monitoringpods("Monitoring Pod(s)")
