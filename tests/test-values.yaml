@@ -676,15 +676,6 @@ kyvernoPolicies:
           - '63999'
           - '>= 64000 & < 65000'
           - '> 65000'
-      restrict-image-registries:
-        exclude:
-          any:
-          # ArgoCD deploys a test app as part of its Cypress test
-          - resources:
-              namespaces:
-              - argocd
-              names:
-              - guestbook-ui-*
       restrict-volume-types:
         exclude:
           any:
@@ -1311,6 +1302,9 @@ addons:
             limits:
               cpu: 4
               memory: 12Gi
+        scripts:
+          envs:
+            ARGOCD_SERVER: "https://argocd.dev.bigbang.mil"
         istio:
           sidecar:
             resources:
