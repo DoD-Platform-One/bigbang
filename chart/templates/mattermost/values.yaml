@@ -144,6 +144,7 @@ postgresql:
     podAnnotations:
       {{ include "istioAnnotation" $ }}
   {{- end }}
+
 {{- end }}
 {{- end }}
 
