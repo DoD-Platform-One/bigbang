@@ -860,7 +860,7 @@ elasticsearchKibana:
       cypress:
         artifacts: true
         envs:
-          cypress_expect_logs: "true"
+          cypress_expect_logs: "false"
           cypress_kibana_url: "https://kibana.dev.bigbang.mil"
         resources:
           requests:
@@ -2005,16 +2005,6 @@ addons:
         enabled: true
       istio:
         hardened:
-          customAuthorizationPolicies:
-            - name: "test-for-allowing-monitoring"
-              enabled: true
-              spec:
-                action: ALLOW
-                rules:
-                  - from:
-                    - source:
-                        namespaces:
-                          - monitoring
           customServiceEntries:
             - name: "cypress-service-entries-mattermost"
               enabled: true

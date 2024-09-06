@@ -466,9 +466,9 @@ EOF
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
-    --user-data file://$HOME/aws/userdata.txt \
-    --block-device-mappings file://$HOME/aws/device_mappings.json \
-    --instance-market-options file://$HOME/aws/spot_options.json \
+    --user-data file://../aws/userdata.txt \
+    --block-device-mappings file://../aws/device_mappings.json \
+    --instance-market-options file://../aws/spot_options.json \
     ${additional_create_instance_options} \
     | jq -r '.Instances[0].InstanceId'`
 
