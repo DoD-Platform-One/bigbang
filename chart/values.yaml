@@ -1463,11 +1463,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/fortify.git
       path: "./chart"
-      tag: "1.1.2320154-bb.17"
+      tag: "1.1.2320154-bb.18"
     helmRepo:
       repoName: "registry1"
       chartName: "fortify-ssc"
-      tag: "1.1.2320154-bb.17"
+      tag: "1.1.2320154-bb.18"
 
     # -- Flux reconciliation overrides specifically for the Fortify Package
     flux: {}
