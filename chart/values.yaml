@@ -384,11 +384,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.89.0-bb.0"
+    tag: "1.89.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.89.0-bb.0"
+    tag: "1.89.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}

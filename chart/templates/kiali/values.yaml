@@ -7,6 +7,9 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
+sso:
+  enabled: {{ .Values.kiali.sso.enabled }}
+
 openshift: {{ .Values.openshift}}
 
 image:
