@@ -75,13 +75,25 @@ postgresql:
   enabled: false
   {{- else }}
 postgresql:
-  {{- if $istioInjection }}
+  {{- if or $istioInjection $.Values.kiali.enabled}}
   master:
+    {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" $ }}
+    {{- end }}
+    {{- if $.Values.kiali.enabled }}
+    podLabels:
+      {{- include "kialiVersionLabel" $ | nindent 6 }}
+    {{- end }}
   slave:
+    {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" $ }}
+    {{- end }}
+    {{- if $.Values.kiali.enabled }}
+    podLabels:
+      {{- include "kialiVersionLabel" $ | nindent 6 }}
+    {{- end }}
   {{- end }}
   # Use internal database, defaults are fine
   enabled: true
@@ -90,4 +102,10 @@ postgresql:
   {{- end }}
 {{- end }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 {{- end -}}
+
