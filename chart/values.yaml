@@ -2058,12 +2058,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
-      tag: "15.7.20-bb.0"
+      tag: "15.7.20-bb.1"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "15.7.20-bb.0"
+      tag: "15.7.20-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Thanos Package
     flux: {}
