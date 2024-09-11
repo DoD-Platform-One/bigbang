@@ -92,6 +92,8 @@ Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specifi
 - To report a cybersecurity concern, follow this [link](https://jira.il2.dso.mil/servicedesk/customer/portal/81).
 - Never push secrets or certificates into our repository.
 
+- Big Bang does not recommend using internal databases for production deployments. Please look into having external databases, each application will have guides to deploy production system.
+
 # Community Contributions to DoD-Platform-One via Github
 
 ## How to Contribute
