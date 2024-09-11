@@ -42,4 +42,10 @@ monitoring:
 sso:
   enabled: {{ default "false" .Values.addons.fortify.sso.enabled }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{- include "kialiAppLabel" . | nindent 2 }}
+  {{- include "kialiVersionLabel" . | nindent 2 }}
+{{- end }}
+
 {{- end }}
