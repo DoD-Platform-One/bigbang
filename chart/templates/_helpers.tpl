@@ -143,6 +143,7 @@ Build common set of file extensions to include/exclude
     /**/*.txt
     /**/*.sh
     !/chart/tests/scripts/*.sh
+    !/chart/wait/*.sh
 {{- end -}}
 
 {{/*
