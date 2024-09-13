@@ -36,22 +36,15 @@ graph LR
 
 ## Integration w/ Big Bang
 
-Big Bang's integration with Keycloak requires special considerations and configuration compared to other applications.  This document will help you get it setup correctly.
+Big Bang's integration with Keycloak requires special considerations and configuration compared to other applications. This document will help you set it up.
 
 ### Keycloak with Other Apps
 
-Due to the sensitivity of Keycloak, Big Bang does not support deploying KeyCloak and any other add-ons.  But, Keycloak can be deployed with the core Big Bang applications (e.g. Istio, Monitoring, Logging).  The URL to access these core apps is under the `admin` subdomain to avoid [a problem with overlapping certificates](#certificate-overlap-problem).  For example, in the `bigbang.dev` domain, to access Prometheus, you would go to `https://prometheus.admin.bigbang.dev`.  Keycloak would still be accessed at `https://keycloak.bigbang.dev`.
 
 > The `admin` subdomain is only used when Keycloak is enabled
 
 ### Keycloak's Custom Image
-
-The upstream [Keycloak Helm chart](https://repo1.dso.mil/big-bang/product/packages/keycloak) is customized for use in Platform One.  It contains the following modifications from a standard Keycloak deployment:
-
-- Customized Platform One registration plugin
-
-Additional customization can be added through values.  For example:
-
+The upstream [Keycloak Helm chart](https://repo1.dso.mil/big-bang/product/packages/keycloak) has customizations for use in Platform One, such as its [registration plugin](https://repo1.dso.mil/big-bang/product/plugins/keycloak-p1-auth-plugin). Additional customization can be added through Helm input values.  For example:
 ```yaml
 addons:
   keycloak:
@@ -161,17 +154,17 @@ addons:
 
 #### Certificate Overlap Problem
 
-> This problem automatically worked around by Big Bang if you have non-overlapping certificates as [recommended above](#keycloak-tls).  Youc an skip this section unless you want the gritty details.
+> This problem automatically worked around by Big Bang if you have non-overlapping certificates as [recommended above](#keycloak-tls).  You can skip this section unless you want the gritty details.
 
 Modern browsers will reuse established TLS connections when the destination's IP and port are the same and the current certificate is valid.  See the [HTTP/2 spec](https://httpwg.org/specs/rfc7540.html#rfc.section.9.1.1) for details.  If our cluster has a single load balancer and listens on port 443 for multiple apps, then the IP address and port for all apps in the cluster will be the same from the browser's point of view.  Normally, this isn't a problem because Big Bang uses TLS termination for all applications.  The encryption occurs between Istio and the browser no matter which hostname you use, so the connection can be reused without problems.
 
 With Keycloak, we need to passthrough TLS rather than terminate it at Istio.  If we have other apps, like Kiali, that are TLS terminated, Istio needs two server entries in its Gateway to passthrough TLS for hosts matching `keycloak.bigbang.dev` and to terminate TLS for other hosts.  If the certificate used for TLS is valid for both Keycloak and other apps (e.g. the cert includes a SAN of `*.bigbang.dev`), then the browser thinks it can reuse connections between the applications (the IP, port, and cert are the same).  If you access a TLS terminated app first (e.g. `kiali.bigbang.dev`), then try to access `keycloak.bigbang.dev`, the browser tries to reuse the connection to the terminated app, resulting in a [data leak](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11767) to the terminated app and a 404 error in the browser.  Istio is [supposed to handle this](https://github.com/istio/istio/issues/13589) situation, but does not.
 
-To workaround this situation, you have to isolate the applications by IP, port, or certificate so the browser will not reuse the connection between them.  You can use external load balancers or different ingress ports to create unique IPs or ports for the applications.  Or you can create non-overlapping certs for the applications.  This does not prevent you from using wildcard certs, since you could have one cert for `*.bigbang.dev` and another for `*.admin.bigbang.dev` that don't overlap.  Alternatively, you can create one cert for `kiali.bigbang.dev` and other TLS terminated apps and another cert for `keycloak.bigbang.dev`.
+To work around this situation, you have to isolate the applications by IP, port, or certificate so the browser will not reuse the connection between them.  You can use external load balancers or different ingress ports to create unique IPs or ports for the applications.  Or you can create non-overlapping certs for the applications.  This does not prevent you from using wildcard certs, since you could have one cert for `*.bigbang.mil` and another for `*.admin.bigbang.mil` that don't overlap.  Alternatively, you can create one cert for `kiali.bigbang.mil` and other TLS terminated apps and another cert for `keycloak.bigbang.mil`.
 
-> All of the core and addon apps are TLS terminated except Keycloak.
+> All the core and addon apps are TLS terminated except Keycloak.
 
-## Big Bang Touchpoints
+## Big Bang Touch-points
 
 ### GUI
 
@@ -207,7 +200,7 @@ Logging is automatic for Keycloak when the Logging package is enabled in Big Ban
 
 ### Monitoring
 
-When the Monitoring package is enabled, Big Bang will turn on Keycloak's production of Prometheus metrics and setup a Service Monitor to scrape those metrics.  By default, metrics for the `datasources` (db), `undertow` (http), and `jgroup` subsystems are enabled.
+When the Monitoring package is enabled, Big Bang will turn on Keycloak's production of Prometheus metrics and set up a Service Monitor to scrape those metrics.  By default, metrics for the `datasources` (db), `undertow` (http), and `jgroup` subsystems are enabled.
 
 ### Health Checks
 
@@ -243,7 +236,7 @@ Keycloak is available under the [Apache License 2.0](https://github.com/keycloak
 
 ## High Availability
 
-By default Big Bang deploys Keycloak with two replicas in a high availability cluster configuration.  It is already configured to support cache sharing, anti-affinity, failovers, and rolling updates. If you wish to increase or decrease the number of replicas you must first make sure you are pointed to an external database, and then the replicas can be increased, all of which can be set in `values.yaml`:
+By default, Big Bang deploys Keycloak with two replicas in a high availability cluster configuration.  It is already configured to support cache sharing, anti-affinity, fail-overs, and rolling updates. If you wish to increase or decrease the number of replicas you must first make sure you are pointed to an external database, and then the replicas can be increased, all of which can be set in `values.yaml`:
 
 ```yaml
 addons:
