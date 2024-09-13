@@ -810,11 +810,11 @@ tempo:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
-    tag: "1.10.3-bb.0"
+    tag: "1.10.3-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "tempo"
-    tag: "1.10.3-bb.0"
+    tag: "1.10.3-bb.1"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
