@@ -2085,12 +2085,13 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/external-secrets.git
-      tag: "0.9.18-bb.7"
+      tag: ""
+      branch: "test_config_issue"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "external-secrets"
-      tag: "0.9.18-bb.7"
+      tag: "0.9.20-bb.3"
 
     # -- Override flux settings for this package
     flux: {}
