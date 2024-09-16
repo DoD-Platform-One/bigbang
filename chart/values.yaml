@@ -2085,8 +2085,7 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/external-secrets.git
-      tag: ""
-      branch: "test_config_issue"
+      tag: "0.9.20-bb.3"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
