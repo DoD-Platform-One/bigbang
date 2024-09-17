@@ -42,7 +42,7 @@ istio:
     - istio-system/{{ default "public" .Values.addons.thanos.ingress.gateway }}
 
 {{- with .Values.addons.thanos.objectStorage }}
-{{- if or $.Values.addons.thanos.values.minio.enabled (and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region))) }}
+{{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
   enabled: true
 {{- end }}
