@@ -40,7 +40,6 @@ istio:
   thanos:
     gateways:
     - istio-system/{{ default "public" .Values.addons.thanos.ingress.gateway }}
-
 {{- with .Values.addons.thanos.objectStorage }}
 {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
@@ -61,11 +60,6 @@ monitoring:
 
 storegateway:
   enabled: false
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 
 query:
   dnsDiscovery:
@@ -84,65 +78,15 @@ query:
     {{- if (dig "values" "storegateway" "enabled" false .Values.addons.thanos) }}
     - dns+thanos-storegateway.thanos.svc.cluster.local:10901
     {{- end }}
-  {{- if or .Values.addons.thanos.sso.enabled .Values.kiali.enabled }}
+  {{- if .Values.addons.thanos.sso.enabled }}
+  {{- $thanosAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+  {{- $thanosAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
   podLabels:
-    {{- if .Values.addons.thanos.sso.enabled }}
-    {{- $thanosAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-    {{- $thanosAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
-    {{- end }}
-    {{- if .Values.kiali.enabled }}
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-    {{- end }}
   {{- end }}
-
-{{- if and (dig "queryFrontend" "enabled" true .Values.addons.thanos.values) $.Values.kiali.enabled }}
-queryFrontend:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "bucketweb" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-bucketweb:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "ruler" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-ruler:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "receive" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-receive:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "bucketweb" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-receiveDistributor:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if or .Values.addons.thanos.values.compactor.enabled (not (.Values.addons.thanos.objectStorage.endpoint | empty)) }}
-compactor:
-  enabled: true
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
-{{- end }}
 
 {{- if not (.Values.addons.thanos.objectStorage.endpoint | empty) }}
+
 objstoreConfig: |-
   type: s3
   config:
@@ -157,8 +101,12 @@ storegateway:
   useEndpointGroup: true
   endpoint: {{ .Values.addons.thanos.objectStorage.endpoint }}
 
+compactor:
+  enabled: true
+
 query:
   extraFlags:
     - "--endpoint=dns+monitoring-monitoring-kube-thanos-discovery.monitoring.svc.cluster.local:{{- dig "values" "query" "containerPorts" "grpc" 10901 .Values.addons.thanos }}"
+
 {{- end }}
 {{- end }}
