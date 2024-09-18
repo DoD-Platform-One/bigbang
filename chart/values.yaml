@@ -701,11 +701,11 @@ loki:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
     path: "./chart"
-    tag: "6.12.0-bb.1"
+    tag: "6.12.0-bb.4"
   helmRepo:
     repoName: "registry1"
     chartName: "loki"
-    tag: "6.12.0-bb.1"
+    tag: "6.12.0-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
   flux: {}
@@ -810,11 +810,11 @@ tempo:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
-    tag: "1.10.3-bb.1"
+    tag: "1.10.3-bb.5"
   helmRepo:
     repoName: "registry1"
     chartName: "tempo"
-    tag: "1.10.3-bb.1"
+    tag: "1.10.3-bb.5"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -933,11 +933,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "8.4.6-bb.1"
+    tag: "8.5.1-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "8.4.6-bb.1"
+    tag: "8.5.1-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
