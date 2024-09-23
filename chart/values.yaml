@@ -758,11 +758,11 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.7.8-bb.1"
+    tag: "2.7.8-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
-    tag: "2.7.8-bb.1"
+    tag: "2.7.8-bb.3"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
