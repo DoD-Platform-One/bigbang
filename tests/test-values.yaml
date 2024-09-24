@@ -2532,132 +2532,34 @@ addons:
         enabled: false
       externalURL: https://harbor.dev.bigbang.mil
       nginx:
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
+        replicas: 2
       portal:
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
+        replicas: 2
       core:
+        replicas: 2
         secretName: "ci-only"
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-      jobservice:
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-      registry:
-        registry:
-          resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-        controller:
-          resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-      chartmuseum:
-        resources:
-        requests:
-          memory: 200Mi
-          cpu: 80m
-        limits:
-          cpu: 80m
-          memory: 200Mi
+      #jobservice:
+      #registry:
+        #registry:
+        #controller:
+      #chartmuseum:
       trivy:
         resources:
           requests:
-            cpu: 80m
-            memory: 200Mi
+            cpu: 160m
+            memory: 300Mi
           limits:
-            cpu: 80m
-            memory: 200Mi
-      notary:
-        server:
-          resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-        signer:
-          resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-      database:
-        type: external
-        internal:
-          resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            cpu: 80m
-            memory: 200Mi
-          initContainer:
-            migrator: {}
-            permissions: {}
-            resources:
-              requests:
-                memory: 100Mi
-                cpu: 80m
-              limits:
-                cpu: 80m
-                memory: 100Mi
-      postgresql:
-        resources:
-          requests:
-            cpu: "200m"
-            memory: "200Mi"
-          limits:
-            cpu: "200m"
-            memory: "200Mi"
-      redis:
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 80m
-          limits:
-            memory: 200Mi
-            cpu: 80m
+            cpu: 300m
+            memory: 500Mi
+      #notary:
+        #server:
+        #signer:
+      #database:
+        #internal:
+      #postgresql:
+      #redis:
       exporter:
-        resources:
-        requests:
-          memory: 200Mi
-          cpu: 80m
-        limits:
-          cpu: 80m
-          memory: 200Mi
+        replicas: 2
       bbtests:
         enabled: true
         cypress:
@@ -2665,7 +2567,7 @@ addons:
           envs:
             cypress_url: "https://harbor.dev.bigbang.mil"
         scripts:
-          image: "registry1.dso.mil/bigbang-ci/devops-tester:1.0.0"
+          image: "registry1.dso.mil/bigbang-ci/devops-tester:1.1.1"
           envs:
             HARBOR_REGISTRY: "harbor.dev.bigbang.mil"
 
