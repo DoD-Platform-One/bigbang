@@ -44,7 +44,7 @@ podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 
-secrets:
+configSecret:
   accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
   secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
 
