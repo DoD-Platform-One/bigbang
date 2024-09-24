@@ -70,7 +70,7 @@ loki:
     bind_addr:
       - ${MY_POD_IP}
   storage:
-    {{- if (eq .Values.loki.strategy "monolith") }}
+    {{- if (and (eq .Values.loki.strategy "monolith") (not (dig "minio" "enabled" false .Values.loki.values))) }}
     type: "filesystem"
     {{- else }}
     type: "s3"
@@ -82,7 +82,7 @@ loki:
       accessKeyId: {{ .Values.loki.objectStorage.accessKey }}
       secretAccessKey: {{ .Values.loki.objectStorage.accessSecret }}
     {{- end }}
-  {{- if (eq .Values.loki.strategy "monolith") }}
+  {{- if (and (eq .Values.loki.strategy "monolith") (not (dig "minio" "enabled" false .Values.loki.values))) }}
   rulerConfig:
     storage:
       type: local
