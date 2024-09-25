@@ -31,4 +31,9 @@ istio:
     }}
 
 openshift: {{ .Values.openshift }}
+{{- if .Values.kiali.enabled }}
+podLabels:
+  {{ include "kialiVersionLabel" . | indent 2 }}
+{{- end }}
+
 {{- end -}}
