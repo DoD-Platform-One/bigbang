@@ -90,7 +90,7 @@ ingressGateways:
 {{- range $name, $values := .Values.istio.ingressGateways }}
   {{ if ne $values.enabled false }}
   {{ $name | nindent 2 }}:
-    {{- toYaml (merge (dict "k8s" $values.kubernetesResourceSpec) (fromYaml (include "istio.ingressgateway.k8s" $values))) | nindent 4 }}
+    {{- toYaml (merge (dict "k8s" $values.kubernetesResourceSpec) (dict "k8s" $values.k8s) (fromYaml (include "istio.ingressgateway.k8s" $values))) | nindent 4 }}
     {{- if $values.extraLabels }}
     {{- toYaml (dict "extraLabels" $values.extraLabels) | nindent 4 }}
     {{- end}}
@@ -121,6 +121,7 @@ gateways:
         number: 8443
         protocol: HTTPS
       {{- end }}
+      {{- if eq $servervalues.port.protocol "HTTPS"}}
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $servervalues) }}
         mode: {{ $tlsMode }}
@@ -132,12 +133,18 @@ gateways:
         minProtocolVersion: {{ $tlsMinVersion }}
         {{- end }}
       {{- end }}
+      {{- if and (eq $servervalues.port.protocol "HTTP") (hasKey $servervalues "tls") (hasKey $servervalues.tls "httpsRedirect") }}
+      tls:
+        httpsRedirect: {{ $servervalues.tls.httpsRedirect | default false }}
+      {{- end }}
+      {{- end }}
     {{- else if ($values.ports) }}
     {{- range $values.ports }}
     - hosts:
       {{- tpl ($values.hosts | default (list) | toYaml) $ | nindent 8 }}
       port:
       {{- tpl ( . | default (list) | toYaml) $ | nindent 8 }}
+      {{- if eq $values.ports.protocol "HTTPS" }}
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $values) }}
         mode: {{ $tlsMode }}
@@ -148,6 +155,11 @@ gateways:
         {{- if $tlsMinVersion }}
         minProtocolVersion: {{ $tlsMinVersion }}
         {{- end }}
+      {{- end }}
+      {{- if and (eq $values.port.protocol "HTTP") (hasKey $values "tls") (hasKey $values.tls "httpsRedirect") }}
+      tls:
+        httpsRedirect: {{ $values.tls.httpsRedirect | default false }}
+      {{- end }}
     {{- end }}
     {{- else }}
     - hosts:
