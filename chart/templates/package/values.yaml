@@ -23,7 +23,9 @@ stringData:
   values.yaml: |
     bigbang:
       {{- include "values-bigbang" $.Values | nindent 6 }}
-  {{- tpl (toYaml $vals.values) $ | nindent 4 }}
+    {{- if $vals.values -}}
+    {{- tpl (toYaml $vals.values) $ | nindent 4 }}
+    {{- end }}
   {{ else }}
   {{- tpl (toYaml $vals.values) $ | nindent 2 }}
   {{ end }}
