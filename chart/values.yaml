@@ -490,11 +490,11 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
-    tag: "3.2.6-bb.2"
+    tag: "3.2.6-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno"
-    tag: "3.2.6-bb.2"
+    tag: "3.2.6-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
