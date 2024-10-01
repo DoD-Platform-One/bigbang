@@ -316,11 +316,11 @@ istioOperator:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
     path: "./chart"
-    tag: "1.22.4-bb.0"
+    tag: "1.22.5-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-operator"
-    tag: "1.22.4-bb.0"
+    tag: "1.22.5-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Istio Operator Package
   flux: {}
