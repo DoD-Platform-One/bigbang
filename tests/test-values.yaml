@@ -2513,7 +2513,6 @@ addons:
                   - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
                   - 'download.cypress.io'
                   - 'cdn.cypress.io'
-                  - 'harbor.dev.bigbang.mil'
                   - 'repo1.dso.mil'
                   - 'index.docker.io'
                   - 'auth.docker.io'
