@@ -1455,12 +1455,6 @@ addons:
     flux:
       timeout: 30m
     values:
-      upgradeCheck:
-        annotations:
-          sidecar.istio.io/inject: "true"
-      shared-secrets:
-        annotations:
-          sidecar.istio.io/inject: "true"
       istio:
         enabled: true
         hardened:
@@ -1493,13 +1487,10 @@ addons:
         resources:
           requests:
             cpu: 10m
-          limits: {}
       gitlab:
         webservice:
           minReplicas: 1
           maxReplicas: 1
-          helmTests:
-            enabled: false
         sidekiq:
           minReplicas: 1
           maxReplicas: 1
@@ -1509,37 +1500,20 @@ addons:
         gitaly:
           persistence:
             size: 256Mi
-          resources:
-            ## values raised to help pass CI after default values for gitaly are fixed then can revert to original request.
-            #requests:
-            #  cpu: 50m
-            #limits: {}
-            requests:
-              cpu: 400m
-              memory: 600Mi
-            limits:
-              cpu: 400m
-              memory: 600Mi
         shared-secrets:
           resources:
             requests:
               cpu: 10m
-            limits: {}
         migrations:
-          # required annotation when istio.hardened.enabled = true
-          annotations:
-            sidecar.istio.io/inject: "true"
           resources:
             requests:
               cpu: 10m
-            limits: {}
         toolbox:
           persistence:
             size: 256Mi
           resources:
             requests:
               cpu: 10m
-            limits: {}
       registry:
         hpa:
           minReplicas: 1
@@ -1551,17 +1525,12 @@ addons:
           resources:
             requests:
               cpu: 10m
-            limits: {}
       minio:
-        # required annotation when istio.hardened.enabled = true
-        jobAnnotations:
-          sidecar.istio.io/inject: "true"
         persistence:
           size: 256Mi
         resources:
           requests:
             cpu: 50m
-          limits: {}
       redis:
         master:
           persistence:
@@ -1572,7 +1541,6 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_url: https://gitlab.dev.bigbang.mil
         scripts:
