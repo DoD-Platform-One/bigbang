@@ -2103,6 +2103,25 @@ addons:
 
     postRenderers: []
 
+  alloy:
+    # -- Toggle deployment of grafana alloy
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
+      tag: "1.5.0-bb.5"
+      path: "./chart"
+
+    values: {}
+
+    postRenderers: []
+
+    # -- Flux reconciliation overrides specifically for the alloy package
+    flux: {}
+
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"
@@ -2215,3 +2234,5 @@ packages:
 
     # -- Values to pass through to package Helm chart
     values: {}
+
+    

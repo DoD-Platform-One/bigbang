@@ -937,6 +937,7 @@ policies:
           - monitoring-monitoring-kube-state-metrics*
           - monitoring-monitoring-kube-operator*
           - prometheus-monitoring-monitoring-kube-prometheus*
+          - monitoring-alloy-*
       - namespace: anchore
         pods:
           allow:

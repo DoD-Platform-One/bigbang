@@ -1,0 +1,74 @@
+{{- $fluxSettingsMonitoring := merge .Values.addons.alloy.flux .Values.flux -}}
+{{- if .Values.addons.alloy.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: alloy
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/alloy/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: monitoring
+  chart:
+    spec:
+      {{- if eq .Values.addons.alloy.sourceType "git" }}
+      chart: {{ .Values.addons.alloy.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: alloy
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.alloy.helmRepo.chartName }}
+      version: {{ .Values.addons.alloy.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.alloy.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.alloy.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.alloy.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.alloy.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
+
+  {{- if .Values.addons.alloy.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.alloy.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-alloy-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-alloy-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-alloy-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # TODO: DRY this up
+  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+

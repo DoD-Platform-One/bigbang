@@ -619,6 +619,7 @@ kyvernoPolicies:
               - fortify
               - thanos
               - holocron
+              - alloy
               names:
               - "*-cypress-test*"
         parameters:
@@ -659,6 +660,7 @@ kyvernoPolicies:
               - fortify
               - thanos
               - holocron
+              - alloy
               names:
               - "*-cypress-test*"
           - resources:
@@ -706,6 +708,7 @@ kyvernoPolicies:
               - fortify
               - thanos
               - holocron
+              - alloy
               names:
               - "*-cypress-test*"
       update-image-pull-policy:
@@ -758,6 +761,13 @@ kyvernoPolicies:
               - velero
               names:
               - velero-backup-restore-test*
+          - resources:
+              namespaces:
+              - alloy
+              names:
+              - alloy-config-validator*
+              - alloy-config-analysis*
+              - alloy-test*
       require-non-root-user:
         exclude:
           any:
@@ -781,6 +791,14 @@ kyvernoPolicies:
               - twistlock
               names:
               - volume-upgrade-job*
+          - resources:
+              namespaces:
+              - alloy
+              names:
+              - alloy-config-validator*
+              - alloy-config-analysis*
+              - alloy-test*
+      require-non-root-user:
       disallow-namespaces:
         parameters:
           disallow:

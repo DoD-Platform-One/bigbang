@@ -1,0 +1,14 @@
+{{- /* Create secret */ -}}
+{{- if .Values.addons.alloy.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.alloy "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.alloy" -}}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- end }}
