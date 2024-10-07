@@ -57,9 +57,13 @@ config:
         Suppress_Type_Name       On
         Retry_Limit              False
         Replace_Dots             On
+        {{- if and .Values.istio.enabled (dig "istio" "elasticsearch" "enabled" false .Values.elasticsearchKibana.values) }}
+        tls                      Off
+        {{- else }}
         tls                      On
         tls.verify               On
         tls.ca_file              /etc/elasticsearch/certs/ca.crt
+        {{- end }}
         storage.total_limit_size {{ dig "storage" "total_limit_size" "10G" .Values.fluentbit.values }}
     [OUTPUT]
         Name                     es
