@@ -1362,9 +1362,7 @@ addons:
     values:
       resources:
         requests:
-          cpu: 100m
           memory: 100Mi
-        limits: {}
       redis:
         enabled: true
       redis-bb:
