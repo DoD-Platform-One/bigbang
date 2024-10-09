@@ -1659,116 +1659,91 @@ addons:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       sso:
         resources:
           requests:
-            cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       postgresql:
         persistence:
           size: 256Mi
         resources:
           requests:
-            cpu: 200m
-            memory: 1024Mi
-          limits: {}
+            memory: 1024Mi          
         metrics:
           resources:
             requests:
-              cpu: 100m
-              memory: 200Mi
-            limits: {}
+              memory: 200Mi            
       analyzer:
         replicaCount: 1
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       api:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       catalog:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       policyEngine:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       simpleQueue:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       upgradeJob:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       feeds:
-        enabled: true
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
         feeds-db:
           resources:
             requests:
-              cpu: 100m
-              memory: 200Mi
-            limits: {}
+              memory: 200Mi            
           metrics:
             resources:
               requests:
-                cpu: 100m
-                memory: 200Mi
-              limits: {}
+                memory: 200Mi              
         feedsUpgradeJob:
           resources:
             requests:
               cpu: 100m
-              memory: 200Mi
-            limits: {}
+              memory: 200Mi            
       rbacManager:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       reports:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       notifications:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       ui:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
-          limits: {}
+            memory: 200Mi          
       ui-redis:
-        enabled: true
         replica:
           replicaCount: 0
           autoscaling:
