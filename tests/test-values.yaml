@@ -2352,15 +2352,6 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
     values:
-      minio:
-        enabled: false
-        disableSSL: true
-        endpoint: minio
-        accessKey: "minio"
-        secretKey: "minio123"
-        bucketName: vault-data
-      autoInit:
-        enabled: true
       global:
         tlsDisable: false
       injector:
@@ -2380,7 +2371,6 @@ addons:
           VAULT_SKIP_VERIFY: "true"
           VAULT_LOG_FORMAT: "json"
         dataStorage:
-          enabled: true
           size: 256Mi
         auditStorage:
           size: 256Mi
@@ -2389,7 +2379,6 @@ addons:
           replicas: 1
           apiAddr: "https://vault.dev.bigbang.mil"
           raft:
-            enabled: true
             config: |
               ui = true
 
@@ -2457,7 +2446,6 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_vault_url: "https://vault.dev.bigbang.mil"
 
