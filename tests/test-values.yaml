@@ -2208,7 +2208,6 @@ addons:
           config:
             region: velero
       credentials:
-        useSecret: true
         secretContents:
           cloud: |
             [default]
