@@ -2241,7 +2241,6 @@ addons:
                   - source:
                       namespaces:
                       - keycloak
-      replicas: 1
       resources:
         requests:
           cpu: 250m
