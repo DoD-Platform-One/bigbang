@@ -2657,7 +2657,6 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           resources:
             requests:
               cpu: "2"
