@@ -2114,7 +2114,6 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          artifacts: true
           envs:
             cypress_nexus_url: "https://nexus.dev.bigbang.mil"
         scripts:
