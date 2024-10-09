@@ -1415,12 +1415,6 @@ addons:
           limits:
             cpu: 1
             memory: 500Mi
-          requests:
-            cpu: 250m
-            memory: 64Mi
-      trust_store_password: dsoppassword
-      key_store_password: dsoppassword
-      key_store_cert_password : dsoppassword
       fortify_autoconfig: |
           appProperties:
             host.validation: false
@@ -1432,8 +1426,6 @@ addons:
             migration.enabled: true
             migration.username: root
             migration.password: password
-      fortify_license: |
-        <License>
       mysql:
         primary:
           resources:
@@ -1456,9 +1448,6 @@ addons:
             limits:
               cpu: 100m
               memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 256Mi
       bbtests:
         enabled: true
         cypress: # note `cypress:*`` is different than in the fortify chart test-values.yaml
