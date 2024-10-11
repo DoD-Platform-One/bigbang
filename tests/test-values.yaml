@@ -416,8 +416,6 @@ gatekeeper:
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
           - default/restrict-volume-types-.?
-    bbtests:
-      enabled: true
 
 kyverno:
   values:
