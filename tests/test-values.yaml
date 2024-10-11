@@ -1151,14 +1151,6 @@ grafana:
           gnetId: 741
           revision: 1
           datasource: Prometheus
-    downloadDashboards:
-      resources:
-        limits:
-          cpu: 20m
-          memory: 20Mi
-        requests:
-          cpu: 20m
-          memory: 20Mi
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
@@ -1174,7 +1166,6 @@ grafana:
     bbtests:
       enabled: true
       cypress:
-        artifacts: true
         envs:
           cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
 
