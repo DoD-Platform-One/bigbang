@@ -250,7 +250,7 @@ This will:
   * enable full Kiali label tracking of pods
 */}}
 {{- define "kialiVersionLabel" -}}
-version: {{ .Chart.AppVersion | quote }}
+version: {{ "{{ .Chart.AppVersion }}" | quote }}
 {{- end -}}
 
 {{- /* Helpers below this line are in support of the Big Bang extensibility feature */ -}}
