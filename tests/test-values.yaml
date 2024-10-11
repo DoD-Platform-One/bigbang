@@ -1028,7 +1028,6 @@ tempo:
     bbtests:
       enabled: true
       cypress:
-        artifacts: true
         envs:
           cypress_url: 'https://tempo.dev.bigbang.mil'
           cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3100'
@@ -1044,10 +1043,6 @@ tempo:
           TEMPO_METRICS_URL: 'http://tempo-tempo.tempo.svc:3100'
 
     persistence:
-      enabled: true
-      # storageClassName: local-path
-      accessModes:
-        - ReadWriteOnce
       size: 5Gi
 
     tempoQuery:
