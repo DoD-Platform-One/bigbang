@@ -876,9 +876,7 @@ elasticsearchKibana:
     bbtests:
       enabled: true
       cypress:
-        artifacts: true
         envs:
-          cypress_expect_logs: "false"
           cypress_kibana_url: "https://kibana.dev.bigbang.mil"
         resources:
           requests:
