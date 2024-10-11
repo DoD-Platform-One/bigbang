@@ -585,7 +585,6 @@ kyvernoPolicies:
           allow:
           - 192.168.0.1
       restrict-external-names:
-        enabled: true
         parameters:
           allow:
           - allowed
@@ -711,10 +710,6 @@ kyvernoPolicies:
               - alloy
               names:
               - "*-cypress-test*"
-      update-image-pull-policy:
-        parameters:
-          update:
-          - to: Always
       update-image-registry:
         parameters:
           update:
