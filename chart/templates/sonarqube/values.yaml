@@ -101,11 +101,5 @@ postgresql:
     port: {{ .port }}
   {{- end }}
 {{- end }}
-
-{{- if .Values.kiali.enabled }}
-podLabels:
-  {{- include "kialiVersionLabel" . | nindent 2 }}
-{{- end }}
-
 {{- end -}}
 

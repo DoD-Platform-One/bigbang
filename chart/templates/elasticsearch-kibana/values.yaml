@@ -83,11 +83,6 @@ kibana:
   podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 
 {{- if not .Values.elasticsearchKibana.serviceAccountAnnotations.kibana }}
   serviceAccountAnnotations: {}
@@ -99,10 +94,6 @@ monitoring:
 
 metrics:
   enabled: {{ .Values.monitoring.enabled }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
   {{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana) "enabled") .Values.istio.enabled) }}
   {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.elasticsearchKibana.values) "STRICT") $istioInjection }}
   serviceMonitor:
@@ -118,11 +109,6 @@ elasticsearch:
   imagePullSecrets:
     - name: private-registry
   master:
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiAppLabel" . | nindent 6 }}
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
     initContainers:
       - name: elastic-internal-init-filesystem
         securityContext:
@@ -149,11 +135,6 @@ elasticsearch:
       {{ include "istioAnnotation" . }}
     {{- end }}
   data:
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiAppLabel" . | nindent 6 }}
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
     initContainers:
       - name: elastic-internal-init-filesystem
         securityContext:
@@ -180,11 +161,6 @@ elasticsearch:
       {{ include "istioAnnotation" . }}
     {{- end }}
   ingest:
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiAppLabel" . | nindent 6 }}
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
     initContainers:
       - name: elastic-internal-init-filesystem
         securityContext:
@@ -211,11 +187,6 @@ elasticsearch:
       {{ include "istioAnnotation" . }}
     {{- end }}
   ml:
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiAppLabel" . | nindent 6 }}
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
     initContainers:
       - name: elastic-internal-init-filesystem
         securityContext:
@@ -242,11 +213,6 @@ elasticsearch:
       {{ include "istioAnnotation" . }}
     {{- end }}
   coord:
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiAppLabel" . | nindent 6 }}
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
     initContainers:
       - name: elastic-internal-init-filesystem
         securityContext:
