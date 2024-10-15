@@ -5,16 +5,16 @@ kubeVersion: '>=1.28.0-0'
 description: Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 type: application
 keywords:
-    - platform1
-    - bigbang
+  - platform1
+  - bigbang
 home: https://p1.dso.mil/products/big-bang
 sources:
-    - https://repo1.dso.mil/big-bang/bigbang
+  - https://repo1.dso.mil/big-bang/bigbang
 maintainers:
-    - name: Michael Martin
-      email: michaelmartin@seed-innovations.com
-    - name: Chris O'Connell
-      email: coconnell@bridgephase.com
-    - name: Andrew Shoell
-      email: a.shoell@wearemetronome.com
+  - name: Michael Martin
+    email: michaelmartin@seed-innovations.com
+  - name: Chris O'Connell
+    email: coconnell@bridgephase.com
+  - name: Andrew Shoell
+    email: a.shoell@wearemetronome.com
 icon: https://p1.dso.mil/img/Big_Bang_Color_Logo_White_text.b04263b1.png
