@@ -31,12 +31,6 @@ istio:
     kyvernoReporter:
       enabled: {{ .Values.kyvernoReporter.enabled }}
 
-{{- if .Values.kiali.enabled }}
-podLabels:
-  {{- include "kialiAppLabel" . | nindent 2 }}
-  {{- include "kialiVersionLabel" . | nindent 2 }}
-{{- end }}
-
 {{- if $istioInjection }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
@@ -109,11 +103,6 @@ postgresql:
   install: true
   {{- if $istioInjection }}
   primary:
-    {{- if $.Values.kiali.enabled }}
-    podLabels:
-      app: {{ "{{ template \"postgresql.v1.primary.fullname\" . }}" | quote }}
-      {{- include "kialiVersionLabel" $ | nindent 6 }}
-    {{- end }}
     podAnnotations:
       {{ include "istioAnnotation" $ }}
     podSecurityContext:
@@ -136,11 +125,6 @@ postgresql:
           drop:
             - ALL
   readReplicas:
-    {{- if $.Values.kiali.enabled }}
-    podLabels:
-      app: {{ "{{ template \"postgresql.v1.readReplica.fullname\" . }}" | quote }}
-      {{- include "kialiVersionLabel" $ | nindent 6 }}
-    {{- end }}
     podAnnotations:
       {{ include "istioAnnotation" $ }}
   {{- end }}

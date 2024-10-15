@@ -10,12 +10,6 @@
 loki:
   enabled: {{ .Values.loki.enabled }}
 
-{{- if .Values.kiali.enabled }}
-podLabels:
-  {{- include "kialiAppLabel" . | nindent 2 }}
-  {{- include "kialiVersionLabel" . | nindent 2 }}
-{{- end }}
-
 elasticsearchKibana:
   enabled: {{.Values.elasticsearchKibana.enabled }}
 

@@ -30,10 +30,6 @@ controller:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
   {{- if or .Values.monitoring.enabled .Values.neuvector.sso.enabled }}
   secret:
     enabled: true
@@ -104,28 +100,16 @@ enforcer:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 cve:
   updater:
     {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-    {{- end }}
   scanner:
     {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
-    {{- end }}
-    {{- if .Values.kiali.enabled }}
-    podLabels:
-      {{- include "kialiVersionLabel" . | nindent 6 }}
     {{- end }}
 {{- end }}
 
@@ -134,10 +118,6 @@ manager:
   {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
-  {{- end }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiVersionLabel" . | nindent 4 }}
   {{- end }}
 {{- end }}
 
