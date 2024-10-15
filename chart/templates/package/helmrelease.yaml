@@ -75,15 +75,15 @@ spec:
   dependsOn:
     {{- if $gatekeeperDep }}
     - name: gatekeeper
-      namespace: {{ default "bigbang" $.Values.namespace }}
+      namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
     {{- if $kyvernoDep }}
     - name: kyverno-policies
-      namespace: {{ default "bigbang" $.Values.namespace }}
+      namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
     {{- if $istioDep }}
     - name: istio
-      namespace: {{ default "bigbang" $.Values.namespace }}
+      namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end -}}
     {{- if $vals.dependsOn }}
     {{- toYaml $vals.dependsOn | nindent 4 }}
