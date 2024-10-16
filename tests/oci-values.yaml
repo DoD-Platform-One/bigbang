@@ -16,195 +16,195 @@ helmRepositories:
 istio:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 istioOperator:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 kiali:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 kyverno:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 kyvernoPolicies:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 kyvernoReporter:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 promtail:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 loki:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 neuvector:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 tempo:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 monitoring:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 grafana:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 twistlock:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 fluentbit:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 jaeger:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 eckOperator:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 elasticsearchKibana:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 clusterAuditor:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 gatekeeper:
   sourceType: "helmRepo"
   helmRepo:
-    cosignVerify: true
+    cosignVerify: false
 
 addons:
   argocd:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
   
   authservice:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
   
   minioOperator:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   minio:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   gitlab:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   gitlabRunner:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   nexusRepositoryManager:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
   
   sonarqube:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   haproxy:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   anchore:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   mattermostOperator:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   mattermost:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   velero:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
     
   keycloak:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   vault:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   metricsServer:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
   
   harbor:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
   
   thanos:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   fortify:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
 
   holocron:
     sourceType: "helmRepo"
     helmRepo:
-      cosignVerify: true
+      cosignVerify: false
