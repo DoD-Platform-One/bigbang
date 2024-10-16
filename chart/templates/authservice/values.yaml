@@ -30,12 +30,6 @@ imagePullSecrets:
 podAnnotations:
   {{ include "istioAnnotation" . }}
 
-{{- if .Values.kiali.enabled }}
-podLabels:
-  {{- include "kialiAppLabel" . | nindent 2 }}
-  {{- include "kialiVersionLabel" . | nindent 2 }}
-{{- end }}
-
 openshift: {{ .Values.openshift | default false }}
 
 monitoring:
@@ -80,16 +74,6 @@ redis-bb:
     prometheusRule:
       enabled: true 
       namespace: monitoring
-  {{- end }}
-  {{- if .Values.kiali.enabled }}
-  master:
-    podLabels:
-      app: authservice-authservice-redis-bb-master
-      {{- include "kialiVersionLabel" . | nindent 6 }}
-  replica:
-    podLabels:
-      app: authservice-authservice-redis-bb-replica
-      {{- include "kialiVersionLabel" . | nindent 6 }}
   {{- end }}
 {{- end }}
 

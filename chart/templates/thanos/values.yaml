@@ -61,11 +61,6 @@ monitoring:
 
 storegateway:
   enabled: false
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 
 query:
   dnsDiscovery:
@@ -91,55 +86,11 @@ query:
     {{- $thanosAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
     {{- end }}
-    {{- if .Values.kiali.enabled }}
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-    {{- end }}
   {{- end }}
-
-{{- if and (dig "queryFrontend" "enabled" true .Values.addons.thanos.values) $.Values.kiali.enabled }}
-queryFrontend:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "bucketweb" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-bucketweb:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "ruler" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-ruler:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "receive" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-receive:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
-
-{{- if and (dig "bucketweb" "enabled" false .Values.addons.thanos.values) .Values.kiali.enabled }}
-receiveDistributor:
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-{{- end }}
 
 {{- if or (dig "compactor" "enabled" false .Values.addons.thanos.values) (not (.Values.addons.thanos.objectStorage.endpoint | empty)) }}
 compactor:
   enabled: true
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 {{- end }}
 
 {{- if not (.Values.addons.thanos.objectStorage.endpoint | empty) }}

@@ -231,28 +231,6 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
 {{- end -}}
 {{- end -}}
 
-{{/*
-App Label for Kiali trace correlation
-To be used for Kiali-required labels on pods
-This will:
-  * enable proper linking of Jaeger traces in Kiali
-  * enable full Kiali label tracking of pods
-*/}}
-{{- define "kialiAppLabel" -}}
-app: {{ "{{ .Chart.Name }}" | quote }}
-{{- end -}}
-
-{{/*
-Version label for Kiali trace correlation
-To be used for Kiali-required labels on pods
-This will:
-  * enable proper linking of Jaeger traces in Kiali
-  * enable full Kiali label tracking of pods
-*/}}
-{{- define "kialiVersionLabel" -}}
-version: {{ "{{ .Chart.AppVersion }}" | quote }}
-{{- end -}}
-
 {{- /* Helpers below this line are in support of the Big Bang extensibility feature */ -}}
 
 {{- /* Converts the string in . to a legal Kubernetes resource name */ -}}

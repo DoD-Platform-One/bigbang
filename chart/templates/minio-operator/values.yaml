@@ -34,11 +34,6 @@ operator:
     - name: PROMETHEUS_NAMESPACE
       value: "monitoring"
   {{- end }}
-  {{- if .Values.kiali.enabled }}
-  podLabels:
-    {{- include "kialiAppLabel" . | nindent 4 }}
-    {{- include "kialiVersionLabel" . | nindent 4 }}
-  {{- end }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
