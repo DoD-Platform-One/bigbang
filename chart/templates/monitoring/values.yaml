@@ -221,10 +221,9 @@ prometheus:
     enableFeatures:
       - remote-write-receiver
     {{- end }}
-    {{- if or $istioInjection .Values.monitoring.sso.enabled .Values.addons.vault.enabled .Values.kiali.enabled }}
     podMetadata:
-      {{- if or .Values.monitoring.sso.enabled (and .Values.networkPolicies.enabled .Values.addons.vault.enabled) .Values.kiali.enabled }}
       labels:
+        app: prometheus
         {{- if .Values.monitoring.sso.enabled }}
         {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
         {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
@@ -233,7 +232,6 @@ prometheus:
         {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
         vault-ingress: "true"
         {{- end }}
-      {{- end }}
       {{- if or $istioInjection .Values.addons.vault.enabled }}
       annotations:
         {{- if $istioInjection }}
@@ -251,7 +249,6 @@ prometheus:
         vault.hashicorp.com/role: "prometheus"
         {{- end }}
       {{- end }}
-    {{- end }}
     {{- if .Values.addons.vault.enabled }}
     additionalScrapeConfigs:
     - job_name: vault
