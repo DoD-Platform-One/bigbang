@@ -747,7 +747,7 @@ ENDSSH
   echo "  ssh -i ~/.ssh/${KeyName}.pem -o IdentitiesOnly=yes ubuntu@${PublicIP}"
   echo
   echo "To use kubectl from your local workstation you must set the KUBECONFIG environment variable:"
-  echo "  export KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-config"
+  echo "  export KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-${PROJECTTAG}-config"
   if [[ "$PRIVATE_IP" == true ]]
   then
     echo "The cluster connection will not work until you start sshuttle as described below."
