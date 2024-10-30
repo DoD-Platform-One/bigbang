@@ -1329,11 +1329,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
       path: "./chart"
-      tag: "73.0.0-bb.0"
+      tag: "73.0.0-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "nexus-repository-manager"
-      tag: "73.0.0-bb.0"
+      tag: "73.0.0-bb.1"
 
     # -- Base64 encoded license file.
     license_key: ""
