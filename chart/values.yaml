@@ -2152,7 +2152,7 @@ packages:
     # @default -- true
     enabled: false
 
-    # -- Choose source type of "git" ("helmRepo" not supported yet)
+    # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
 
     # -- Toggle wrapper functionality. See https://docs-bigbang.dso.mil/latest/docs/guides/deployment-scenarios/extra-package-deployment/#Wrapper-Deployment for more details.
