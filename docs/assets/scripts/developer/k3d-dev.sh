@@ -251,65 +251,53 @@ function create_instances
     ImageId="${AMI_ID}"
 
     # Create userdata.txt
-    mkdir -p ~/aws
-    cat << EOF > ~/aws/userdata.txt
-  MIME-Version: 1.0
-  Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
+    tmpdir=$(mktemp -d)
+    cat << EOF > "$tmpdir/userdata.txt"
+#!/usr/bin/env bash
 
-  --==MYBOUNDARY==
-  Content-Type: text/x-shellscript; charset="us-ascii"
+echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf
+echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf
 
-  #!/bin/bash
-  sudo -- bash -c 'sysctl -w vm.max_map_count=524288; \
-  echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf; \
-  sysctl -w fs.nr_open=13181252; \
-  echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf; \
-  sysctl -w fs.file-max=13181250; \
-  echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf; \
-  echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf; \
-  sysctl -w fs.inotify.max_user_instances=1024; \
-  echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf; \
-  sysctl -w fs.inotify.max_user_watches=1048576; \
-  echo "fs.may_detach_mounts=1" >> /etc/sysctl.d/fs-may_detach_mounts.conf; \
-  sysctl -w fs.may_detach_mounts=1; \
-  sysctl -p; \
-  echo "* soft nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
-  echo "* hard nofile 13181250" >> /etc/security/limits.d/ulimits.conf; \
-  echo "* soft nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
-  echo "* hard nproc  13181250" >> /etc/security/limits.d/ulimits.conf; \
-  modprobe br_netfilter; \
-  modprobe nf_nat_redirect; \
-  modprobe xt_REDIRECT; \
-  modprobe xt_owner; \
-  modprobe xt_statistic; \
-  echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf; \
-  echo "nf_nat_redirect" >> /etc/modules-load.d/istio-iptables.conf; \
-  echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf; \
-  echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf; \
-  echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf'
+echo "vm.max_map_count=524288" > /etc/sysctl.d/vm-max_map_count.conf
+echo "fs.nr_open=13181252" > /etc/sysctl.d/fs-nr_open.conf
+echo "fs.file-max=13181250" > /etc/sysctl.d/fs-file-max.conf
+echo "fs.inotify.max_user_instances=1024" > /etc/sysctl.d/fs-inotify-max_user_instances.conf
+echo "fs.inotify.max_user_watches=1048576" > /etc/sysctl.d/fs-inotify-max_user_watches.conf
+echo "fs.may_detach_mounts=1" >> /etc/sysctl.d/fs-may_detach_mounts.conf
+
+sysctl --system
+
+echo "br_netfilter" >> /etc/modules-load.d/istio-iptables.conf
+echo "nf_nat_redirect" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_REDIRECT" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_owner" >> /etc/modules-load.d/istio-iptables.conf
+echo "xt_statistic" >> /etc/modules-load.d/istio-iptables.conf
+
+systemctl restart systemd-modules-load.service
 EOF
 
     # Create the device mapping and spot options JSON files
     echo "Creating device_mappings.json ..."
-    mkdir -p ~/aws
 
     # gp3 volumes are 20% cheaper than gp2 and comes with 3000 Iops baseline and 125 MiB/s baseline throughput for free.
-    cat << EOF > ~/aws/device_mappings.json
-  [
-    {
-      "DeviceName": "/dev/sda1",
-      "Ebs": {
-        "DeleteOnTermination": true,
-        "VolumeType": "gp3",
-        "VolumeSize": ${VolumeSize},
-        "Encrypted": true
-      }
+    cat << EOF > "$tmpdir/device_mappings.json"
+[
+  {
+    "DeviceName": "/dev/sda1",
+    "Ebs": {
+      "DeleteOnTermination": true,
+      "VolumeType": "gp3",
+      "VolumeSize": ${VolumeSize},
+      "Encrypted": true
     }
-  ]
+  }
+]
 EOF
 
     echo "Creating spot_options.json ..."
-    cat << EOF > ~/aws/spot_options.json
+    cat << EOF > "$tmpdir/spot_options.json"
   {
     "MarketType": "spot",
     "SpotOptions": {
@@ -342,9 +330,9 @@ EOF
       --key-name "${KeyName}" \
       --security-group-ids "${SecurityGroupId}" \
       --instance-initiated-shutdown-behavior "terminate" \
-      --user-data file://$HOME/aws/userdata.txt \
-      --block-device-mappings file://$HOME/aws/device_mappings.json \
-      --instance-market-options file://$HOME/aws/spot_options.json \
+      --user-data "file://$tmpdir/userdata.txt" \
+      --block-device-mappings "file://$tmpdir/device_mappings.json" \
+      --instance-market-options "file://$tmpdir/spot_options.json" \
       ${additional_create_instance_options} \
       | jq -r '.Instances[0].InstanceId'`
 
@@ -593,146 +581,149 @@ EOF
 
     if [[ "$METAL_LB" == true ]]; then
       echo "Building MetalLB configuration for -m mode."
-      run <<- 'ENDSSH'
-  #run this command on remote
-  cat << EOF > metallb-config.yaml
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: default
-    namespace: metallb-system
-  spec:
-    addresses:
-    - 172.20.1.240-172.20.1.243
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: l2advertisement1
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - default
-  EOF
-ENDSSH
+      cat << EOF > "$tmpdir/metallb-config.yaml"
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+  - 172.20.1.240-172.20.1.243
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement1
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default
+EOF
+
     elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
       echo "Building MetalLB configuration for -a mode."
-      run <<ENDSSH
-  #run this command on remote
-  cat <<EOF > metallb-config.yaml
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: primary
-    namespace: metallb-system
-    labels:
-      privateIp: "$PrivateIP"
-      publicIp: "$PublicIP"
-  spec:
-    addresses:
-    - "172.20.1.241/32"
-    serviceAllocation:
-      priority: 100
-      namespaces:
-        - istio-system
-      serviceSelectors:
-        - matchExpressions:
-            - {key: app, operator: In, values: [public-ingressgateway]}
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: secondary
-    namespace: metallb-system
-    labels:
-      privateIp: "$PrivateIP2"
-      publicIp: "$SecondaryIP"
-  spec:
-    addresses:
-    - "172.20.1.240/32"
-    serviceAllocation:
-      priority: 100
-      namespaces:
-        - istio-system
-      serviceSelectors:
-        - matchExpressions:
-            - {key: app, operator: In, values: [passthrough-ingressgateway]}
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: primary
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - primary
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: secondary
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - secondary
-  EOF
-ENDSSH
+      cat << EOF > "$tmpdir/metallb-config.yaml"
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: primary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP"
+    publicIp: "$PublicIP"
+spec:
+  addresses:
+  - "172.20.1.241/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [public-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: secondary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP2"
+    publicIp: "$SecondaryIP"
+spec:
+  addresses:
+  - "172.20.1.240/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [passthrough-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: primary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - primary
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: secondary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - secondary
+EOF
 
-      run <<ENDSSH
-  cat <<EOF > primaryProxy.yaml
-  ports:
-    443.tcp:
-      - 172.20.1.241
-  settings:
-    workerConnections: 1024
-  EOF
-ENDSSH
+      cat << EOF > "$tmpdir/primary-proxy.yaml"
+ports:
+  443.tcp:
+    - 172.20.1.241
+settings:
+  workerConnections: 1024
+EOF
 
-      run <<ENDSSH
-  cat <<EOF > secondaryProxy.yaml
-  ports:
-    443.tcp:
-      - 172.20.1.240
-  settings:
-    workerConnections: 1024
-  EOF
-ENDSSH
+      cat << EOF > "$tmpdir/secondary-proxy.yaml"
+ports:
+  443.tcp:
+    - 172.20.1.240
+settings:
+  workerConnections: 1024
+EOF
 
-      run "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/ubuntu/primaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
-      run "docker run -d --name=secondaryProxy --network=k3d-network -p $PrivateIP2:443:443 -v /home/ubuntu//secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+      scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes "$tmpdir/primary-proxy.yaml" ubuntu@${PublicIP}:/home/ubuntu/primary-proxy.yaml
+      scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes "$tmpdir/secondary-proxy.yaml" ubuntu@${PublicIP}:/home/ubuntu/secondary-proxy.yaml
+
+      run "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/ubuntu/primary-proxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+      run "docker run -d --name=secondaryProxy --network=k3d-network -p $PrivateIP2:443:443 -v /home/ubuntu/secondary-proxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
     fi
+
+    scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes "$tmpdir/metallb-config.yaml" ubuntu@${PublicIP}:/home/ubuntu/metallb-config.yaml
 
     run "kubectl create -f metallb-config.yaml"
   fi
 
+  cat << EOF > "$tmpdir/dns-update.sh"
+#!/usr/bin/env bash
+mkdir -p /root/.kube
+cp /home/ubuntu/.kube/config /root/.kube/config
+sed -i '/dev.bigbang.mil/d' /etc/hosts
+EOF
+
   if [[ "$METAL_LB" == true ]]; then
-    run <<- 'ENDSSH'
-    # run this command on remote
-    # fix /etc/hosts for new cluster
-    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-    sudo bash -c "echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.240  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-    kubectl delete pod -n kube-system -l k8s-app=kube-dns
-ENDSSH
+  cat << EOF >> "$tmpdir/dns-update.sh"
+echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts
+echo '172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' >> /etc/hosts
+echo '172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil' >> /etc/hosts
+echo '## end dev.bigbang.mil section' >> /etc/hosts
+
+kubectl get configmap -n kube-system coredns -o yaml | sed '/^		172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
+EOF
   elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
-    run <<ENDSSH
-      # run this command on remote
-      # fix /etc/hosts for new cluster
-      sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-      sudo bash -c "echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
-      sudo bash -c "echo $PrivateIP2  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-      sudo bash -c "echo $PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-      sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-      # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-      kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-      kubectl delete pod -n kube-system -l k8s-app=kube-dns
-ENDSSH
+
+  cat << EOF >> "$tmpdir/dns-update.sh"
+echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts
+echo '$PrivateIP2	keycloak.dev.bigbang.mil vault.dev.bigbang.mil' >> /etc/hosts
+echo '$PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil' >> /etc/hosts
+echo '## end dev.bigbang.mil section' >> /etc/hosts
+
+kubectl get configmap -n kube-system coredns -o yaml | sed '/^		.* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
+EOF
   fi
+
+  cat << EOF >> "$tmpdir/dns-update.sh"
+kubectl delete pod -n kube-system -l k8s-app=kube-dns
+EOF
+
+  scp -i ~/.ssh/${KeyName}.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes "$tmpdir/dns-update.sh" ubuntu@${PublicIP}:/home/ubuntu/dns-update.sh
+  run "sudo bash /home/ubuntu/dns-update.sh"
 
   echo
   echo "================================================================================"
