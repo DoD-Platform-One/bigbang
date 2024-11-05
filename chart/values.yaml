@@ -1188,11 +1188,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
-      tag: "8.2.9-bb.4"
+      tag: "8.3.6-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab"
-      tag: "8.2.9-bb.4"
+      tag: "8.3.6-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
