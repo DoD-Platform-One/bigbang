@@ -1327,6 +1327,15 @@
           "existingSecret": {
             "type": "string"
           },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "generic",
+              "aws",
+              "azure",
+              "gcp"
+            ]
+          },
           "type": {
             "type": "string",
             "enum": [
@@ -1358,6 +1367,18 @@
               "username",
               "password"
             ]
+          },
+          {
+            "required": [
+              "provider"
+            ],
+            "not": {
+              "properties": {
+                "provider": {
+                  "const": "generic"
+                }
+              }
+            }
           }
         ],
         "required": [
