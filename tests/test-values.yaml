@@ -909,6 +909,8 @@ loki:
   strategy: scalable
   values:
     istio:
+      loki:
+        enabled: true
       hardened:
         customServiceEntries:
           - name: "cypress-service-entries-loki"
