@@ -10,10 +10,10 @@ Configuration of Big Bang is achieved by overriding default values set in the pa
 graph TD
   pkg[Package values]
   -->bb[Big Bang values]
-  -->base-s[`base/secrets.enc.yaml` values]
-  -->base-c[`base/configmap.yaml` values]
-  -->env-s[`<env>/secrets.enc.yaml` values]
-  -->env-c[`<env>/configmap.yaml` values]
+  -->base-s[*base/secrets.enc.yaml* values]
+  -->base-c[*base/configmap.yaml* values]
+  -->env-s[*<env>/secrets.enc.yaml* values]
+  -->env-c[*<env>/configmap.yaml* values]
 ```
 
 In all four cases, Big Bang reads a single key named `values.yaml` that contains the data to override.  See the [Big Bang environment template](https://repo1.dso.mil/big-bang/customers/template) for examples on how to use these files to override values.
