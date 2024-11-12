@@ -828,6 +828,9 @@ policies:
           # Twistlock Defender enforces various policies that may involve the K8s cluster itself
           # Enforcing said policies requires access to the API to get/list resources
           - twistlock-defender-ds-*
+          # bb-twistlock-upgrade-job requires patch/get/list/update/etc to deployments daemonsets pv's and pvc
+          # More details in twistlock/chart/templates/bigbang/upgrade-job.yaml
+          - bb-twistlock-twistlock-upgrade-job-*
       - namespace: logging
         pods:
           allow:
