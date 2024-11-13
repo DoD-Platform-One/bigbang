@@ -714,7 +714,7 @@ echo '$PrivateIP2	keycloak.dev.bigbang.mil vault.dev.bigbang.mil' >> /etc/hosts
 echo '$PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil' >> /etc/hosts
 echo '## end dev.bigbang.mil section' >> /etc/hosts
 
-kubectl get configmap -n kube-system coredns -o yaml | sed '/^		.* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
+kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
 EOF
   fi
 
