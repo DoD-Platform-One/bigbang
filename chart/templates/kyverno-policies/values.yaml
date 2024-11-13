@@ -111,6 +111,7 @@ policies:
           names:
           - neuvector-enforcer-pod*
           - neuvector-controller-pod*
+          - neuvector-scanner-pod*
       {{- end }}
   {{- end }}
 
@@ -204,7 +205,9 @@ policies:
           - neuvector
           names:
           - neuvector-enforcer-pod*
+          - neuvector-cert-upgrader-job-*
           - neuvector-controller-pod*
+          - neuvector-scanner-pod*
           - neuvector-prometheus-exporter-pod*
       {{- end }}
       {{- if .Values.addons.holocron.enabled }}
@@ -354,6 +357,7 @@ policies:
           names:
           - neuvector-enforcer-pod-*
           - neuvector-controller-pod-*
+          - neuvector-cert-upgrader-job-*
       {{- end }}
     {{- end }}
 
@@ -577,6 +581,7 @@ policies:
           - neuvector
           names:
           - neuvector-enforcer-pod*
+          - neuvector-cert-upgrader-job-*
           - neuvector-controller-pod*
       {{- end }}
       {{- if $deployNodeAgent }}
@@ -887,6 +892,7 @@ policies:
           allow:
           - neuvector-manager-pod-*
           - neuvector-scanner-pod-*
+          - neuvector-cert-upgrader-job-*
           - neuvector-controller-pod-*
           - neuvector-enforcer-pod-*
           - neuvector-updater-pod-*
