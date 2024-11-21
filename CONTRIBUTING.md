@@ -94,6 +94,8 @@ Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specifi
 
 - Big Bang does not recommend using internal databases for production deployments. Please look into having external databases, each application will have guides to deploy production system.
 
+- For questions on CVEs and remediation, email Andrew Vu Big Bang Cyber Lead (andrew.vu.9@us.af.mil) or message on MatterMost IL4 (andrew.vu.9) for more information.
+
 # Community Contributions to DoD-Platform-One via Github
 
 ## How to Contribute
