@@ -103,3 +103,9 @@ on the [Big Bang Universe.](https://universe.bigbang.dso.mil/)
 
 It would also be useful to review
 [Understanding Big Bang.](https://docs-bigbang.dso.mil/latest/docs/understanding-bigbang/?h=understanding+bigbang%2F)
+
+## New Packages
+
+> How do I get a new package integrated into Big Bang?
+
+To integrate a new package into Big Bang, follow the steps outlined in the [package integration documents](developer/package-integration/README.md) and the [developing a package document](developer/develop-package.md).

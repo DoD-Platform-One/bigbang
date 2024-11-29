@@ -6,7 +6,7 @@ Big Bang includes many different packages that provide services to the ecosystem
 
 ## Technical Oversight Committee (TOC)
 
-The Big Bang TOC supports users and contributors of the Big Bang ecosystem.  If you would like to add, modify, or remove packages in Big Bang, we encourage you to attend the TOC to discuss your ideas.  You can find details in [the BBTOC repository](https://repo1.dso.mil/big-bang/product/bbtoc).
+The Big Bang TOC supports users and contributors of the Big Bang ecosystem.  If you would like to add, modify, or remove packages in Big Bang, we encourage you to attend the TOC to discuss your ideas.  You can find details in [the BBTOC repository](https://repo1.dso.mil/big-bang/product/bbtoc), specifically in the [Package Maintenance Tracks](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/main/process/Package%20Maintenance%20Tracks.md) document.
 
 ## Dependency Tree
 
