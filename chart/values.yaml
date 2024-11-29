@@ -1778,11 +1778,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "2.5.1-bb.1"
+      tag: "2.5.1-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
-      tag: "2.5.1-bb.1"
+      tag: "2.5.1-bb.2"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
