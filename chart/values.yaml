@@ -1900,12 +1900,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
-      tag: "1.15.1-bb.1"
+      tag: "1.16.0-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "harbor"
-      tag: "1.15.1-bb.1"
+      tag: "1.16.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
