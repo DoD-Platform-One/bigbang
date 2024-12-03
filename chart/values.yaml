@@ -384,11 +384,11 @@ kiali:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
     path: "./chart"
-    tag: "1.89.7-bb.1"
+    tag: "2.1.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "kiali"
-    tag: "1.89.7-bb.1"
+    tag: "2.1.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
   flux: {}
@@ -515,11 +515,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.2.6-bb.0"
+    tag: "3.2.6-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.2.6-bb.0"
+    tag: "3.2.6-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux: {}
@@ -648,11 +648,11 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
-    tag: "0.47.10-bb.1"
+    tag: "0.48.2-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "fluentbit"
-    tag: "0.47.10-bb.1"
+    tag: "0.48.2-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -933,11 +933,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "8.6.0-bb.0"
+    tag: "8.6.2-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "8.6.0-bb.0"
+    tag: "8.6.2-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux: {}
@@ -1531,11 +1531,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "3.1.1-bb.1"
+      tag: "3.1.1-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore"
-      tag: "3.1.1-bb.1"
+      tag: "3.1.1-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
@@ -1742,11 +1742,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "7.2.2-bb.2"
+      tag: "7.2.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "7.2.2-bb.2"
+      tag: "7.2.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -1778,11 +1778,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
       path: "./chart"
-      tag: "2.5.1-bb.1"
+      tag: "2.5.1-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "keycloak"
-      tag: "2.5.1-bb.1"
+      tag: "2.5.1-bb.2"
 
     database:
       # -- Hostname of a pre-existing database to use for Keycloak.
@@ -1900,12 +1900,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
-      tag: "1.15.1-bb.1"
+      tag: "1.16.0-bb.2"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "harbor"
-      tag: "1.15.1-bb.1"
+      tag: "1.16.0-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Jaeger Package
     flux: {}
@@ -2058,12 +2058,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
-      tag: "15.7.27-bb.3"
+      tag: "15.8.1-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "15.7.27-bb.3"
+      tag: "15.8.1-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Thanos Package
     flux: {}
