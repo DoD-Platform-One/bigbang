@@ -257,8 +257,8 @@ policies:
     validationFailureAction: Audit
     parameters:
       require:
-      - app
-      - version
+      - app.kubernetes.io/name
+      - app.kubernetes.io/version
       
   require-istio-on-namespaces:
     enabled: {{ .Values.istio.enabled }}
