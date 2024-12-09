@@ -78,8 +78,8 @@ patches:
             - name: manager
               resources:
                 limits:
-                  cpu: 900m
-                  memory: 1Gi
+                  cpu: 1800m
+                  memory: 2Gi
                 requests:
                   cpu: 900m
                   memory: 1Gi
@@ -108,8 +108,8 @@ patches:
             - name: manager
               resources:
                 limits:
-                  cpu: 300m
-                  memory: 600Mi
+                  cpu: 600m
+                  memory: 1200Mi
                 requests:
                   cpu: 300m
                   memory: 600Mi
@@ -138,8 +138,8 @@ patches:
             - name: manager
               resources:
                 limits:
-                  cpu: 100m
-                  memory: 200Mi
+                  cpu: 200m
+                  memory: 400Mi
                 requests:
                   cpu: 100m
                   memory: 200Mi
@@ -168,8 +168,8 @@ patches:
             - name: manager
               resources:
                 limits:
-                  cpu: 300m
-                  memory: 384Mi
+                  cpu: 600m
+                  memory: 800Mi
                 requests:
                   cpu: 300m
                   memory: 384Mi
