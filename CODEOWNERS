@@ -1,5 +1,9 @@
 # Big Bang Maintainers
 * @michaelmartin @chris.oconnell @andrewshoell @troymobley
 
-# Additional Documentation Maintainer
-docs/ @michaelmartin @chris.oconnell @andrewshoell @troymobley
+[Documentation] @michaelmartin @chris.oconnell @andrewshoell @troymobley
+docs/
+*.md
+
+[Blog] @troymobley
+blog/
