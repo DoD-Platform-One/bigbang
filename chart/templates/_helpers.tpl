@@ -165,7 +165,7 @@ metadata:
   namespace: {{ .root.Release.Namespace }}
 type: generic
 stringData:
-  common: |
+  common: ""
   defaults: {{- toYaml .defaults | nindent 4 }}
   overlays: |
     {{- toYaml .package.values | nindent 4 }}
