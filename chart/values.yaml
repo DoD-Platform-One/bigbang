@@ -1914,16 +1914,6 @@ addons:
     ingress:
       gateway: ""
 
-    sso:
-      # -- Toggle SSO for Harbor on and off
-      enabled: false
-
-      # -- OIDC Client ID to use for Harbor
-      client_id: ""
-
-      # -- OIDC Client Secret to use for Harbor
-      client_secret: ""
-
     # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values: {}
 
