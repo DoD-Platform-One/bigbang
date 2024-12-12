@@ -125,7 +125,7 @@ gateways:
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $servervalues) }}
         mode: {{ $tlsMode }}
-        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") (eq $tlsMode "OPTIONAL_MUTUAL") }}
         credentialName: {{ $index }}-{{ $name }}-cert
         {{- end }}
         {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
@@ -148,7 +148,7 @@ gateways:
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $values) }}
         mode: {{ $tlsMode }}
-        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") (eq $tlsMode "OPTIONAL_MUTUAL") }}
         credentialName: {{ $name }}-cert
         {{- end }}
         {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
@@ -171,7 +171,7 @@ gateways:
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $values) }}
         mode: {{ $tlsMode }}
-        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") }}
+        {{- if or (eq $tlsMode "SIMPLE") (eq $tlsMode "MUTUAL") (eq $tlsMode "OPTIONAL_MUTUAL") }}
         credentialName: {{ $name }}-cert
         {{- end }}
         {{- $tlsMinVersion := (dig "tls" "minProtocolVersion" "" $values) }}
