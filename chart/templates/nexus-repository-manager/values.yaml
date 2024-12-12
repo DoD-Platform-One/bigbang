@@ -65,6 +65,8 @@ nexus:
   {{- end }}
 
 license_key: "{{ $nexusValues.license_key }}"
+realms:
+  - "NexusAuthenticatingRealm"
 
 {{- if $nexusValues.sso.enabled }}
 sso:
@@ -83,9 +85,7 @@ sso:
     validateResponseSignature: "true"
     validateAssertionSignature: "true"
     idpMetadata: '{{ default (dig "saml" "metadata" "" .Values.sso) (dig "sso" "idp_data" "idpMetadata" "" $nexusValues) }}'
-  realm:
-    - "NexusAuthenticatingRealm"
-    - "SamlRealm"
+
   role:
     {{- range $nexusValues.sso.role }}
     - id: {{ .id | quote }}
