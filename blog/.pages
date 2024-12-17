@@ -1,4 +1,5 @@
 nav:
+  - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
   - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
   - Cypress Testing In Depth: cypress-testing.md
   - BigBang.mil Domain & dev Certificate: dev-bigbang-mil-certificate.md
