@@ -121,7 +121,7 @@ gateways:
         number: 8443
         protocol: HTTPS
       {{- end }}
-      {{- if eq $servervalues.port.protocol "HTTPS"}}
+      {{- if or (eq $servervalues.port.protocol "HTTPS") (eq $servervalues.port.protocol "TLS") }}
       tls:
         {{- $tlsMode := (dig "tls" "mode" "SIMPLE" $servervalues) }}
         mode: {{ $tlsMode }}
