@@ -1878,6 +1878,8 @@ addons:
 
   mattermost:
     enabled: false
+    database:
+      ssl_mode: require
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_mattermost
@@ -1885,6 +1887,20 @@ addons:
     elasticsearch:
       enabled: true
     values:
+      networkPolicies:
+        enabled: true
+        additionalPolicies:
+          - name: postgresql-egress
+            spec: 
+              podSelector: {}
+              policyTypes:
+                - Egress
+              egress:
+                - to: 
+                  ports:
+                    - protocol: TCP 
+                      port: 5432
+                      endPort: 5432
       enterprise:
         enabled: true
       monitoring:
@@ -1892,6 +1908,17 @@ addons:
       istio:
         hardened:
           customServiceEntries:
+            - name: "postgresql-service-entries"
+              enabled: true 
+              spec:
+                hosts:
+                  - "cirds.cqkqilzbp4x2.us-gov-west-1.rds.amazonaws.com"
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 5432
+                    protocol: TCP
+                    name: postgresql
+                resolution: DNS
             - name: "cypress-service-entries-mattermost"
               enabled: true
               spec:
@@ -1911,6 +1938,8 @@ addons:
                 resolution: DNS
 
       postgresql:
+        install: false
+        ssl_mode: require
         persistence:
           size: 256Mi
       resources:
