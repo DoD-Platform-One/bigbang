@@ -6,7 +6,7 @@
     "dependencyDashboardTitle": "Renovate: Update Dependencies",
     "draftPR": true,
     "enabledManagers": ["helm-values","regex"],
-    "labels": ["renovate","kind::maintenance"],
+    "labels": ["renovate","kind::maintenance","kind::Tools & Automation"],
     "packageRules": [
         {
             "matchDatasources": ["docker"],
