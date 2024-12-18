@@ -1,4 +1,4 @@
-{{- if and (eq .Values.addons.minio.sourceType "git") (not .Values.offline) .Values.addons.minio.enabled }}
+{{- if and (eq .Values.addons.minio.sourceType "git") (not .Values.offline) (or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled) }}
 {{- $gitCredsDict := dict
   "name" "minio"
   "packageGitScope" .Values.addons.minio.git
