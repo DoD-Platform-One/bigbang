@@ -24,6 +24,7 @@ metadata:
     {{- end }}
 spec:
   releaseName: {{ $pkg }}-wrapper
+  targetNamespace: {{ dig "namespace" "name" $pkg $vals }}
   chart:
     spec:
       {{- if (eq $.Values.wrapper.sourceType "git") }}
