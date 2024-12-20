@@ -55,7 +55,7 @@ function getDefaultAmi() {
 
 function update_ec2_security_group
 {
-  # Lookup the security group created to get the ID
+  # Look up the security group created to get the ID
   echo -n Retrieving ID for security group ${SGname} ...
   #### SecurityGroupId=$(aws ec2 describe-security-groups --output json --no-cli-pager --group-names ${SGname} --query "SecurityGroups[0].GroupId" --output text)
   SecurityGroupId=$(aws ec2 describe-security-groups --filter Name=vpc-id,Values=$VPC_ID Name=group-name,Values=$SGname --query 'SecurityGroups[*].[GroupId]' --output text)
@@ -349,7 +349,7 @@ EOF
     echo "Waiting for instance ${InstId} to be ready ..."
     aws ec2 wait instance-running --output json --no-cli-pager --instance-ids ${InstId} &> /dev/null
 
-    # allow some extra seconds for the instance to be fully initiallized
+    # allow some extra seconds for the instance to be fully initialized
     echo "Almost there, 15 seconds to go..."
     sleep 15
 
@@ -852,6 +852,7 @@ for tooldependency in "${tooldependencies[@]}"
   done
 sed_gsed="sed"
 # verify sed version if mac
+# alias prohibited, symlinks permitted
 uname="$(uname -s)"
 if [[ "${uname}" == "Darwin" ]]; then
   if [[ $(command -v gsed) ]]; then
@@ -867,7 +868,7 @@ if [[ "${missingtool}" == 1 ]]; then
   exit 1
 fi
 
-# getting AWs user name
+# getting AWS user name
 AWSUSERNAME=$( aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/' )
 
 # check for aws username environment variable. If not found then terminate script
@@ -880,7 +881,7 @@ else
 fi
 
 
-####Configure Environment
+#### Configure Environment
 # Identify which VPC to create the spot instance in
 VPC="${VPC_ID}"  # default VPC
 RESET_K3D=false
