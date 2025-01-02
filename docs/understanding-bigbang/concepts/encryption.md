@@ -84,8 +84,38 @@ SOPS uses `.sops.yaml` as a configuration file for which keys to use for newly c
          ```
 
 ### GCP KMS
+  - If using a GCP KMS key, you can skip the section: "Create GPG Encryption Key". Instead, in your .sops.yaml file (note - this is a hidden file at the root of this directory) use this configuration instead
+  of the GPG config:
+  ```yaml
+  creation_rules:
+    - encrypted_regex: '^(data|stringData)$'
+      gcp_kms: <gcp resource name of key>
+  ```
+  Key resource name should look like: ```projects/{PROJECT_ID}/locations/global/keyRings/{KEY_RING_NAME}/cryptoKeys/{KEY_NAME}_**```
 
-TBD - [This article](https://blog.doit-intl.com/injecting-secrets-from-aws-gcp-or-vault-into-a-kubernetes-pod-d5a0e84ba892) may help to automate secret consumption in Kubernetes.
+  If you get errors about the key not working, try re-logging in to GCP:  
+
+  ```gcloud auth application-default login```  
+
+  And make sure you have the right project set:  
+
+  ```gcloud config set project <project_id>```  
+
+
+  Also make sure you have these IAM roles on your GCP account:
+  ```shell
+  roles/container.admin  
+  roles/iam.serviceAccountAdmin  
+  ```
+
+  The KMS key also needs IAM permissions, and needs to be linked back to the flux-controller in the cluster. You need to create a service account and role binding, then manually annotate it:
+
+  ```kubectl annotate serviceaccount kustomize-controller --namespace flux-system iam.gke.io/gcp-service-account=flux-service-account@<project_id>.iam.gserviceaccount.com```
+
+  GCP uses Workload Identity to allow the flux-controller to use the service account, good references for this setup are here. Make sure you enable Workload Identity on the cluster nodes:  
+  [GCP Docs](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)  
+  [Medium Article](https://medium.com/the-telegraph-engineering/binding-gcp-accounts-to-gke-service-accounts-with-terraform-dfca4e81d2a0)
+
 
 ### Azure KeyVault
 

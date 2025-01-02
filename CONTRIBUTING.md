@@ -100,7 +100,7 @@ Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specifi
 
 ## How to Contribute
 
-1. Fork this repository, develop, and test your changes.
+1. Fork this repository, develop, and test your changes. (if you do not have permissions to fork the repository, You can download the repo as a tar.gz file and upload to your own repo in your Gitlab instance instead)
 1. Submit a pull request.
 1. Keep an eye out for comments. From bots and maintainers to ensure CI is passing and issues or suggestions are addressed.
 
