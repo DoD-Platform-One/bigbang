@@ -164,12 +164,4 @@ mattermostEnvs:
   # required for Keycloak >= 20.X to work with gitlab auth pointed to Keycloak
   MM_GITLABSETTINGS_SCOPE: openid
 
-existingSecretEnvs:
-  # Forces mattermost to use the DB_CONNECTION_STRING in the secret and respect changes in that value
-  - name: MM_SQLSETTINGS_DATASOURCE
-    valueFrom:
-      secretKeyRef:
-        key: DB_CONNECTION_STRING  
-        name: "mattermost-dbcreds"
-
 {{- end -}}
