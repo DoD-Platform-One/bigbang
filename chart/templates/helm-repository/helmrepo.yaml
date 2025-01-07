@@ -5,7 +5,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ $.Release.Namespace }}
 spec:
-  provider: {{ $.Values.flux.provider | default "generic" }}
+  provider: {{ .provider | default "generic" }}
   interval: {{ $.Values.flux.interval }}
   type: {{ .type | default "default" }}
   url: {{ .repository }}
