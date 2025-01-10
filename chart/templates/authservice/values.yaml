@@ -187,7 +187,8 @@ chains:
     {{- end }}
   {{- end }}
 
-  {{- if and .Values.tempo.enabled .Values.tempo.sso.enabled }}
+  {{- $tempoQueryEnabled := (dig "tempoQuery" "enabled" false .Values.tempo.values) }}
+  {{- if and $tempoQueryEnabled .Values.tempo.enabled .Values.tempo.sso.enabled }}
   tempo:
     match:
       header: ":authority"

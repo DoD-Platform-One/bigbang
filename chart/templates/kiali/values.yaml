@@ -88,8 +88,9 @@ cr:
           password: "secret:grafana-auth:password"
         {{- end }}
       tracing:
-        enabled: {{ or .Values.tempo.enabled .Values.jaeger.enabled }}
-        {{- if and .Values.tempo.enabled (not .Values.jaeger.enabled)}}
+        {{- $tempoQueryEnabled := (dig "tempoQuery" "enabled" false .Values.tempo.values) }}
+        enabled: {{ or (and .Values.tempo.enabled $tempoQueryEnabled) .Values.jaeger.enabled }}
+        {{- if and $tempoQueryEnabled (not .Values.jaeger.enabled) }}
         in_cluster_url: "http://tempo-tempo.tempo.svc.cluster.local:16686"
         {{- $tracingUrl := first (dig "istio" "tempoQuery" "hosts" list .Values.tempo.values) }}
         url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
