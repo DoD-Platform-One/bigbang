@@ -109,6 +109,7 @@ alertmanager:
     {{- end }}
   {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
   serviceMonitor:
+    fallbackScrapeProtocol: "PrometheusText1.0.0"
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -140,6 +141,7 @@ prometheus:
     enabled: true
     {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
     serviceMonitor:
+    fallbackScrapeProtocol: "PrometheusText1.0.0"
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -254,6 +256,7 @@ prometheus:
     {{- if .Values.addons.vault.enabled }}
     additionalScrapeConfigs:
     - job_name: vault
+      fallback_scrape_protocol: PrometheusText1.0.0
       metrics_path: /v1/sys/metrics
       params:
         format: ['prometheus']
@@ -282,6 +285,7 @@ prometheus:
     # service then set this appropriately.
     {{- if (dig "globalServiceEndpointMetrics" "enabled" false .Values.monitoring) }}
     - job_name: 'kubernetes-service-endpoints'
+      fallback_scrape_protocol: PrometheusText1.0.0
       kubernetes_sd_configs:
         - role: endpoints
       scheme: https
@@ -334,6 +338,8 @@ prometheus:
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
     {{- if (dig "globalPodEndpointMetrics" "enabled" false .Values.monitoring) }}
     - job_name: 'kubernetes-pods'
+
+      fallback_scrape_protocol: PrometheusText1.0.0
 
       kubernetes_sd_configs:
         - role: pod
