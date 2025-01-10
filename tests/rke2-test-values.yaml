@@ -288,8 +288,6 @@ addons:
               cpu: 20m
             limits: null
       postgresql:
-        install: false
-        ssl_mode: require
         persistence:
           size: 256Mi
         metrics:
