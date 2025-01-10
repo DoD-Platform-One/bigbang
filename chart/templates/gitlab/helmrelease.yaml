@@ -41,10 +41,14 @@ spec:
 
 
   {{- toYaml $fluxSettingsGitlab | nindent 2 }}
-
-  {{- if .Values.addons.gitlab.postRenderers }}
+  {{- if or .Values.addons.gitlab.postRenderers .Values.monitoring.enabled }}
   postRenderers:
-  {{ toYaml .Values.addons.gitlab.postRenderers | nindent 4 }}
+  {{- if .Values.monitoring.enabled }}
+  {{ include "gitlab.serviceMonitorPostRenderers" . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.addons.gitlab.postRenderers }}
+  {{ toYaml . | nindent 4 }}
+  {{- end }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-gitlab-values
