@@ -218,8 +218,7 @@ prometheus:
       - name: "config-reloader"
         imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- if .Values.tempo.enabled }}
-    enableFeatures:
-      - remote-write-receiver
+    enableRemoteWriteReceiver: true
     {{- end }}
     podMetadata:
       labels:
