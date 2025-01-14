@@ -1,13 +1,13 @@
 resources:
-  - https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
+  - https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
 
 images:
   - name: quay.io/metallb/controller
     newName: registry1.dso.mil/ironbank/opensource/metallb/controller
-    newTag: v0.13.12
+    newTag: v0.14.9
   - name: quay.io/metallb/speaker
     newName: registry1.dso.mil/ironbank/opensource/metallb/speaker
-    newTag: v0.13.12
+    newTag: v0.14.9
 
 patches:
   - target:
