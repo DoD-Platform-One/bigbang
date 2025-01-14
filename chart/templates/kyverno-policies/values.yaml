@@ -279,6 +279,98 @@ policies:
           - istio-operator
           - istio-system
 
+  add-default-securitycontext:
+    validationFailureAction: Enforce
+    {{ if .Values.istio.enabled }}
+    parameters:
+      excludeContainers:
+        - istio-init
+        {{ if not .Values.addons.holocron.database.host }}
+        - init-chmod-data
+        {{- end }}
+    {{ else if not .Values.addons.holocron.database.host }}
+    parameters:
+      excludeContainers:
+        - init-chmod-data
+    {{- end }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled }}
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+      {{- if $deployNodeAgent }}
+      # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
+      # mounted inside velero/node agent pods.
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - node-agent*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
+      # - read logs from `/var/log` to watch for malicious processes
+      # - audit modifications to `/etc/passwd` (watching for suspicious changes)
+      # - access the container runtime socket (observing all running containers on a node)
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+          - volume-upgrade-job*
+      {{- end }}
+      # For GitLab runner CI jobs that require root access
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          names:
+          - runner-*
+      {{- end }}
+      {{- if .Values.fluentbit.enabled }}
+      # Fluentbit requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
+      # and then granting permissions recursively on /var/log.
+      - resources:
+          namespaces:
+          - fluentbit
+          names:
+          - fluentbit-fluent-bit*
+      {{- end }}
+      {{- if .Values.promtail.enabled }}
+      # promtail requires access to journalctl as well as /var/log.  This would require modifications
+      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
+      # and then granting permissions recursively on /var/log.
+      # promtail requires access to /run/promtail for its buffering and persistent state.
+      - resources:
+          namespaces:
+          - promtail
+          names:
+          - promtail-promtail*
+      {{- end }}
+      {{- if .Values.neuvector.enabled }}
+      # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector-enforcer-pod-*
+          - neuvector-controller-pod-*
+          - neuvector-cert-upgrader-job-*
+      {{- end }}
+      {{- if .Values.addons.mattermost.enabled }}
+        # Mattermost fails when policy was implemented
+      - resources:
+          namespaces:
+          - mattermost
+          - mattermost-operator
+          names:
+          - mattermost-*
+      {{- end }}
+    {{- end }}
+
+
   require-non-root-group:
     validationFailureAction: Enforce
     {{ if .Values.istio.enabled }}
