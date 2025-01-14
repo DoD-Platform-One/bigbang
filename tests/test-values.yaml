@@ -791,7 +791,36 @@ kyvernoPolicies:
               - alloy-config-validator*
               - alloy-config-analysis*
               - alloy-test*
-      require-non-root-user:
+      add-default-securitycontext:
+        exclude:
+          any:
+          - resources:
+              namespaces:
+              - metallb-system
+              names:
+              - speaker-*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook*
+          - resources:
+              namespaces:
+              - velero
+              names:
+              - velero-backup-restore-test*
+          - resources:
+              namespaces:
+              - twistlock
+              names:
+              - volume-upgrade-job*
+          - resources:
+              namespaces:
+              - alloy
+              names:
+              - alloy-config-validator*
+              - alloy-config-analysis*
+              - alloy-test*
       disallow-namespaces:
         parameters:
           disallow:
