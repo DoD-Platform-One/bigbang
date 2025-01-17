@@ -150,7 +150,7 @@ PLATFORM ONE LOKI WARNING:
 {{- if and $.Values.jaeger.enabled .Values.tempo.enabled }}
 PLATFORM ONE TRACING WARNING:
   You have enabled both Jaeger and Tempo Tracing Engines.  This is permitted during beta testing of Tempo.
-  After the beta period, only one Tracing engine will be supported at one time, with Tempo becoming the default supported engine over a direct Jaeger installation. Tempo will deploy with Tempo-Query, a Jaeger frontend with Tempo as the backend.
+  After the beta period, only one Tracing engine will be supported at one time, with Tempo becoming the default supported engine over a direct Jaeger installation. Grafana has a built-in Tempo data source that can be used to query Tempo and visualize traces. 
 {{- end }}
 
 {{- if $.Values.addons.mattermost.enabled }}
