@@ -457,11 +457,11 @@ gatekeeper:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/policy.git
     path: "./chart"
-    tag: "3.18.1-bb.0"
+    tag: "3.18.2-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "gatekeeper"
-    tag: "3.18.1-bb.0"
+    tag: "3.18.2-bb.0"
 
   # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
   flux:
