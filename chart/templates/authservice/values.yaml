@@ -187,31 +187,6 @@ chains:
     {{- end }}
   {{- end }}
 
-  {{- $tempoQueryEnabled := (dig "tempoQuery" "enabled" false .Values.tempo.values) }}
-  {{- if and $tempoQueryEnabled .Values.tempo.enabled .Values.tempo.sso.enabled }}
-  tempo:
-    match:
-      header: ":authority"
-    {{- $tempoHosts := (dig "istio" "tempoQuery" "hosts" dict .Values.tempo.values) }}
-    {{- if $tempoHosts }}
-      prefix: {{ tpl ($tempoHosts | first) $ }}
-    callback_uri: https://{{ tpl ($tempoHosts | first) $ }}/login
-    {{- else if .Values.jaeger.enabled }}
-      prefix: {{ printf "tempo.%s" $domainName }}
-    callback_uri: https://tempo.{{ $domainName }}/login
-    {{- else }}
-      prefix: {{ printf "tracing.%s" $domainName }}
-    callback_uri: https://tracing.{{ $domainName }}/login
-    {{- end }}
-    client_id: "{{ .Values.tempo.sso.client_id }}"
-    client_secret: "{{ .Values.tempo.sso.client_secret }}"
-    {{- if not $legacy }}
-    authorization_uri: {{ include "sso.oidc.auth" . }}
-    token_uri: {{ include "sso.oidc.token" . }}
-    logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
-    {{- end }}
-  {{- end }}
-
   {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
   prometheus:
     match:
