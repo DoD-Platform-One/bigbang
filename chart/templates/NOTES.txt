@@ -1,4 +1,4 @@
-Thank you for supporting PlatformOne!
+Thank you for supporting Platform One!
 
 {{ if $.Values.addons.gitlab.enabled }}
 Gitlab is enabled.
@@ -68,7 +68,7 @@ gitlab-backup-tmp
 {{ else }}
 PLATFORM ONE GITLAB WARNING:
   You have enabled an internal postgres database in the BigBang configuration.
-  PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
+  Platform One does not support this option for production deployments because your persistent data can be permanently lost.
   This option should only be used for development or CI pipelines.
 {{- end -}}
 
@@ -76,7 +76,7 @@ PLATFORM ONE GITLAB WARNING:
 {{ else }}
 PLATFORM ONE GITLAB WARNING:
   You have enabled a MinIO internal service in the BigBang configuration.
-  PlatformOne does not support this option for production deployments because your persistent data can be permanently lost.
+  Platform One does not support this option for production deployments because your persistent data can be permanently lost.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
@@ -86,20 +86,20 @@ Anchore is enabled.
 {{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.database) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal postgres database (main-db) in the values configuration.
-  PlatformOne does not support this option for production deployments.
+  Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- if $.Values.addons.anchore.enterprise.enabled }}
 {{- if not (and $.Values.addons.anchore.redis.host $.Values.addons.anchore.redis.port $.Values.addons.anchore.redis.password) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal redis database in the values configuration.
-  PlatformOne does not support this option for production deployments.
+  Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.feeds_database) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal postgres database (feeds-db) in the values configuration.
-  PlatformOne does not support this option for production deployments.
+  Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
@@ -159,7 +159,7 @@ Mattermost is enabled.
 {{- if not (and .username .password .host .port .database .ssl_mode) }}
 PLATFORM ONE MATTERMOST WARNING:
   You have enabled an internal postgres database in the values configuration.
-  PlatformOne does not support this option for production deployments.
+  Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
@@ -167,7 +167,7 @@ PLATFORM ONE MATTERMOST WARNING:
 {{- if not (and .endpoint .accessKey .accessSecret .bucket) }}
 PLATFORM ONE MATTERMOST WARNING:
   You have enabled an internal Minio instance in the values configuration.
-  PlatformOne does not support this option for production deployments.
+  Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
