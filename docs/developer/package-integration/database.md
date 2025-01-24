@@ -8,13 +8,15 @@ If the package you are integrating connects to a database, you will need to foll
 
 ## Integration
 
-Stateful applications in Big Bang use two different common patterns to connect to a database. 
+Stateful applications in Big Bang use two different common patterns to connect to a database. For development purposes, a third pattern is also available, but is not recommended for production.
 
 1. Package charts accept value inputs for hostname, username, and password. The package chart generates the required Kubernetes Secret and/or ConfigMap.
 
 2. Package chart accepts a secret name where all the DB connection info is defined. In these cases, we generate the secret in the Big Bang umbrella chart.
 
-Both ways will first require the following step:
+3. DEVELOPMENT ONLY: many charts have an optional dependency on a PostgreSQL (or other database) chart. In these cases, the package chart will use the PostgreSQL chart to create a database and user for the package. This is not recommended for production because it is ephemeral and not persistent.
+
+The following steps can be used to configure a database:
 
 1. Add database values for the package in bigbang/chart/values.yaml
 
