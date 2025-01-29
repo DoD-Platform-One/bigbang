@@ -71,4 +71,3 @@ spec:
   {{- end }}
   {{- end }}
 {{- end }}
-status: {}
