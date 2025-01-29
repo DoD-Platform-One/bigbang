@@ -246,6 +246,13 @@ policies:
           - twistlock-defender-ds*
           - volume-upgrade*
       {{- end }}
+      {{- if .Values.addons.mimir.enabled }}
+      - resources:
+          namespaces:
+          - mimir
+          names:
+          - mimir-mimir-smoke-test-*
+      {{- end }}
 
   # Kyverno Beta feature - https://kyverno.io/docs/writing-policies/verify-images/
   require-image-signature:
@@ -1039,6 +1046,11 @@ policies:
           - monitoring-monitoring-kube-operator*
           - prometheus-monitoring-monitoring-kube-prometheus*
           - monitoring-alloy-*
+      - namespace: mimir
+        pods:
+          allow:
+          - mimir-mimir-rollout-operator-*
+          - mimir-mimir-minio*
       - namespace: anchore
         pods:
           allow:

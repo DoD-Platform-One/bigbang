@@ -104,6 +104,14 @@ datasources:
   datasourcesbb.yaml:
     apiVersion: 1
     datasources:
+    {{- if .Values.addons.mimir.enabled }}
+    - name: Mimir
+      type: prometheus
+      uid: mimir
+      access: proxy
+      url: http://mimir-mimir-nginx.mimir.svc.cluster.local/prometheus
+      editable: true
+    {{- end }}
     {{- if .Values.monitoring.enabled }}
     {{- if .Values.addons.thanos.enabled }}
     - name: Thanos

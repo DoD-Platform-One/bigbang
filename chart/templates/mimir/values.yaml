@@ -1,0 +1,100 @@
+{{- /* Create secret */ -}}
+{{- if .Values.addons.mimir.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.mimir "name" "mimir" "defaults" (include "bigbang.defaults.mimir" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.mimir" -}}
+{{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
+{{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
+{{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+istio:
+  enabled: {{ .Values.istio.enabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
+      (dig "istio" "hardened" "enabled" false .Values.loki.values)
+      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
+      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
+      (dig "istio" "hardened" "enabled" false .Values.addons.mimir.values)
+    }}
+    {{- if and (or (dig "values" "istio" "hardened" "enabled" false .Values.addons.mimir) (dig "hardened" "enabled" false .Values.istio.values)) (contains "s3" .Values.addons.mimir.s3ObjectStorage.endpoint) }}
+    customServiceEntries:
+      - name: egress-object-store
+        enabled: true
+        spec:
+          hosts:
+          - {{(printf "%s.s3.dualstack.%s.amazonaws.com" .Values.addons.mimir.s3ObjectStorage.bucketName .Values.addons.mimir.s3ObjectStorage.region) }}
+          location: MESH_EXTERNAL
+          ports:
+            - number: 443
+              protocol: TLS
+              name: https
+          resolution: DNS
+    {{- end }}
+
+{{- if $minioEnabled }}
+minio-tenant: 
+  enabled: true
+  tenant:
+    configSecret:
+      accessKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
+      secretKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
+    defaultUserCredentials:
+        username: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.username }}
+        password: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.password }}
+{{- end }}
+
+mimir-distributed:
+  query_scheduler:
+    enabled: {{ not .Values.istio.enabled }}
+  {{- if or $minioEnabled $s3Enabled }}
+  {{- if $s3Enabled }}
+  global:
+    extraEnvFrom:
+    - secretRef:
+        name: mimir-objstore-secret
+  {{- end }}
+  mimir:
+    structuredConfig:
+    {{- if $mimirEnterpriseEnabled }}
+      admin_client:
+      backend: s3
+    {{- end }}
+      alertmanager_storage:
+        backend: s3
+      blocks_storage:
+        backend: s3
+      ruler_storage:
+        backend: s3
+      common:
+        storage:
+          backend: s3
+          s3:
+            {{- if $minioEnabled }}
+            access_key_id: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.username }}
+            endpoint: minio.mimir.svc.cluster.local
+            insecure: true
+            secret_access_key: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.password }}
+            bucket_name: mimir
+            {{- else }}
+            {{- if $s3Enabled }}
+            access_key_id: "${AWS_ACCESS_KEY_ID}" # This is a secret injected via an environment variable
+            endpoint: {{ .Values.addons.mimir.s3ObjectStorage.endpoint }}
+            insecure: {{ .Values.addons.mimir.s3ObjectStorage.insecure }}
+            secret_access_key: "${AWS_SECRET_ACCESS_KEY}" # This is a secret injected via an environment variable
+            region: {{ .Values.addons.mimir.s3ObjectStorage.region }}
+            bucket_name: {{ .Values.addons.mimir.s3ObjectStorage.bucketName }}
+          {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}

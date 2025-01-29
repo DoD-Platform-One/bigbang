@@ -2116,6 +2116,68 @@ addons:
     # -- Flux reconciliation overrides specifically for the alloy package
     flux: {}
 
+  mimir:
+    # -- Toggle deployment of Mimir
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/mimir.git
+      tag: "5.5.1-bb.3"
+      path: "./chart"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "mimir"
+      tag: "5.5.1-bb.3"
+
+    # -- Enable Mimir Enterprise
+    enterprise:
+      enabled: false
+
+    # -- Enable Big Bang MinIO dependency chart for Mimir
+    minioObjectStorage:
+      enabled: false
+      # -- MinIO root credentials
+      configSecret:
+        accessKey: "minio"
+        secretKey: "minio123" # default key, change this!
+      # Configures the Big Bang MinIO Tenant User Credentials
+      defaultUserCredentials:
+        username: "mimir-user"
+        password: "supersecret"
+    
+    # -- Configure Mimir to use S3 bucket
+    s3ObjectStorage:
+      enabled: false
+
+      # examples: "s3.amazonaws.com" "s3.us-gov-west-1.amazonaws.com" "minio.minio.svc.cluster.local:9000"
+      endpoint: ""
+
+      # -- S3 compatible region to use for connection information.
+      region: ""
+
+      # -- Access key for connecting to object storage endpoint.
+      accessKey: ""
+
+      # -- Secret key for connecting to object storage endpoint.
+      # Unencoded string data. This should be placed in the secret values and then encrypted
+      accessSecret: ""
+
+      # -- Bucket name for the Mimir bucket as YAML
+      bucketName: ""
+      
+      # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
+      insecure: false
+
+    values: {}
+
+    postRenderers: []
+
+    # -- Flux reconciliation overrides specifically for the alloy package
+    flux: {}
+
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"

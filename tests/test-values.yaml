@@ -270,6 +270,7 @@ gatekeeper:
           - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
+          - mimir/mimir-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -412,6 +413,7 @@ gatekeeper:
           - thanos/thanos-cypress-test
           - twistlock/twistlock-cypress-test
           - vault/vault-cypress-test
+          - mimir/mimir-cypress-test
           # Allow kyverno test vectors for Helm test
           - default/restrict-host-path-mount-.?
           - default/restrict-host-path-write-.?
@@ -601,6 +603,7 @@ kyvernoPolicies:
               - keycloak
               - jaeger
               - kyverno-reporter
+              - mimir
               - monitoring
               - vault
               - logging
@@ -642,6 +645,7 @@ kyvernoPolicies:
               - keycloak
               - kyverno-reporter
               - jaeger
+              - mimir
               - monitoring
               - vault
               - logging
@@ -690,6 +694,7 @@ kyvernoPolicies:
               - keycloak
               - kyverno-reporter
               - jaeger
+              - mimir
               - monitoring
               - vault
               - logging
@@ -1885,7 +1890,6 @@ addons:
             capabilities:
               drop:
               - ALL
-
       bbtests:
         # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
         # https://repo1.dso.mil/big-bang/product/packages/minio/-/issues/7
@@ -1898,6 +1902,53 @@ addons:
           envs:
             MINIO_PORT: ''
             MINIO_HOST: 'https://minio-api.dev.bigbang.mil'
+
+  mimir:
+    enabled: false
+    values:
+      istio:
+        hardened:
+          customServiceEntries:
+            - name: "cypress-service-entries-mimir"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'repo1.dso.mil'
+                  - 'grafana.dev.bigbang.mil'
+                  - 'optimizationguide-pa.googleapis.com'
+                  - 'clientservices.googleapis.com'
+                  - 'accounts.google.com'
+                  - 'redirector.gvt1.com'
+                  - 'content-autofill.googleapis.com'
+                  - 'safebrowsing.googleapis.com'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
+      bbtests:
+        enabled: true
+        cypress:
+          artifacts: true
+          envs:
+            cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
+        scripts:
+          envs:
+            MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
+    minioObjectStorage:
+      enabled: true
+    networkPolicies:
+      enabled: true
+    imagePullSecrets:
+      - name: private-registry
+    console:
+      persistence:
+        size: 5Gi
+      localVolumeUpgrade: true
 
   mattermostOperator:
     enabled: false
