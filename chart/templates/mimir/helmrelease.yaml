@@ -1,0 +1,74 @@
+{{- $fluxSettingsMimir := merge .Values.addons.mimir.flux .Values.flux -}}
+{{- if .Values.addons.mimir.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mimir
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: mimir
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/mimir/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: mimir
+  chart:
+    spec:
+      {{- if eq .Values.addons.mimir.sourceType "git" }}
+      chart: {{ .Values.addons.mimir.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: mimir
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.mimir.helmRepo.chartName }}
+      version: {{ .Values.addons.mimir.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.mimir.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.mimir.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.mimir.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.mimir.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsMimir | nindent 2 }}
+  {{- if or .Values.addons.mimir.postRenderers .Values.istio.enabled }}
+  postRenderers:
+  {{- if .Values.istio.enabled }}
+  {{ include "mimir.istioPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.addons.mimir.postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-mimir-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-mimir-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-mimir-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  # TODO: DRY this up
+  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+    - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+status: {}

@@ -164,6 +164,23 @@ prometheus:
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
 
+    {{- if .Values.addons.mimir.enabled }}
+    remoteWrite:
+      {{- if .Values.istio.enabled }}
+      # I promise it's not a typo; the port is 80 even though it's TLS
+      - url: https://mimir-mimir-nginx.mimir.svc.cluster.local:80/api/v1/push
+      {{- else }}
+      - url: http://mimir-mimir-nginx.mimir.svc.cluster.local/api/v1/push
+      {{- end }}
+        {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+        {{- end }}
+    {{- end }}
+
     {{- if $thanosEnabled }}
     thanos:
     
