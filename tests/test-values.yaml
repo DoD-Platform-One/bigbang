@@ -1868,6 +1868,9 @@ addons:
       tenant:
         pools:
         - name: pool-0
+          labels:
+            app: minio
+            app.kubernetes.io/name: minio
           servers: 3
           volumesPerServer: 4
           size: 256Mi
@@ -1999,6 +2002,9 @@ addons:
         tenant:
           pools:
           - name: pool-0
+            labels:
+              app: minio
+              app.kubernetes.io/name: minio
             servers: 1
             volumesPerServer: 4
             size: 256Mi
@@ -2562,6 +2568,9 @@ addons:
         tenant:
           pools:
           - name: pool-0
+            labels:
+              app: minio
+              app.kubernetes.io/name: minio
             servers: 1
             volumesPerServer: 4
             size: 256Mi
