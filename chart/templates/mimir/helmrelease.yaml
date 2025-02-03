@@ -59,7 +59,7 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
@@ -67,6 +67,10 @@ spec:
   {{- end }}
   {{- if .Values.kyvernoPolicies.enabled }}
     - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.addons.minioOperator.enabled }}
+    - name: minio-operator
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- end }}
