@@ -18,9 +18,15 @@ RESET_K3D=false
 USE_WEAVE=false
 TERMINATE_INSTANCE=true
 QUIET=false
+TMPDIR=$(mktemp -d)
 
 ### Uninitialized globals
 
+# The quickstart instructions have the user set these. Not all users
+# will have these set. But this will prevent (some) users from getting
+# a prompt when they go to install metallb.
+REGISTRY_USERNAME=${REGISTRY1_USERNAME:-}
+REGISTRY_PASSWORD=${REGISTRY1_TOKEN:-}
 CLOUD_RECREATE_INSTANCE=false
 INIT_SCRIPT=""
 RUN_BATCH_FILE=""
@@ -46,6 +52,7 @@ SecondaryIP=""
 
 # get the current script dir
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+trap "rm -fr ${TMPDIR}" EXIT
 
 function process_arguments {
   while [ -n "$1" ]; do # while loop starts
@@ -352,6 +359,7 @@ function run_batch_execute() {
     echo "You can debug it by logging into the system:" >&2
     echo
     k3dsshcmd >&2
+    rm -f ${RUN_BATCH_FILE}
     exit 1
   fi
   rm -f ${RUN_BATCH_FILE}
@@ -376,7 +384,10 @@ function runwithreturn() {
 }
 
 function getPrivateIP2() {
-  echo $(aws ec2 describe-instances --output json --no-cli-pager --instance-ids "${InstId}" | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress')
+  if [[ "$PrivateIP2" == "" ]]; then
+    export PrivateIP2=$(aws ec2 describe-instances --output json --no-cli-pager --instance-ids "${InstId}" | jq -r '.Reservations[0].Instances[0].NetworkInterfaces[0].PrivateIpAddresses[] | select(.Primary==false) | .PrivateIpAddress')
+  fi
+  echo $PrivateIP2
 }
 
 function getDefaultAmi() {
@@ -475,7 +486,7 @@ function destroy_instances {
   echo "SecurityGroup name to be deleted: ${SGname}"
   aws ec2 delete-security-group --group-name=${SGname} &>/dev/null
   echo "KeyPair to be deleted: ${KeyName}"
-  aws ec2 delete-key-pair --key-name ${KeyName}-${PROJECT} &>/dev/null
+  aws ec2 delete-key-pair --key-name ${KeyName} &>/dev/null
   ALLOCATIONIDs=($(aws ec2 describe-addresses --output text --filters "Name=tag:Owner,Values=${AWSUSERNAME}" "Name=tag:Project,Values=${PROJECTTAG}" --query "Addresses[].AllocationId"))
   for i in "${ALLOCATIONIDs[@]}"; do
     echo -n "Releasing Elastic IP $i ..."
@@ -517,7 +528,7 @@ function install_k3d {
   k3d_command+=" --k3s-arg \"--disable=traefik@server:0\" --k3s-arg \"--disable=metrics-server@server:0\""
 
   # Port mappings to support Istio ingress + API access
-  if [[ -z "${PrivateIP2}" ]]; then
+  if [[ -z "$(getPrivateIP2)" ]]; then
     k3d_command+=" --port ${PrivateIP}:80:80@loadbalancer --port ${PrivateIP}:443:443@loadbalancer --api-port 6443"
   fi
 
@@ -562,11 +573,17 @@ function install_k3d {
   fi
 
   run_batch_new
+  if [[ $RESET_K3D == "true" ]]; then
+    # We may be recreating k3d on an existing cluster, so clean house first
+    run_batch_add "k3d cluster delete --all"
+    run_batch_add "docker ps -aq | xargs docker stop || true"
+    run_batch_add "docker ps -aq | xargs docker rm -f || true"
+    run_batch_add "docker system prune -a -f --volumes"
+    run_batch_add "docker network remove k3d-network || true"
+    run_batch_add "sudo systemctl restart docker"
+  fi
   run_batch_add "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v${K3D_VERSION} bash"
   run_batch_add "k3d version"
-  # We may be recreating k3d on an existing cluster, so clean house first
-  run_batch_add "k3d cluster delete --all"
-  run_batch_add "(docker network list --filter name=k3d-network --quiet | grep -E '[A-Za-z0-9]+') && docker network remove k3d-network"
   run_batch_add "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
   run_batch_add "${k3d_command}"
   run_batch_execute
@@ -615,8 +632,9 @@ function install_metallb {
     until [[ ${REGISTRY_PASSWORD} ]]; do
       read -s -p "Please enter your Registry1 password: " REGISTRY_PASSWORD
     done
-    scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/metallb/* ${SSHUSER}@${PublicIP}:/tmp/metallb
 
+    scp -r -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/metallb ${SSHUSER}@${PublicIP}:/tmp/
+    
     run_batch_add "kubectl create namespace metallb-system"
     run_batch_add "kubectl create secret docker-registry registry1 \
       --docker-server=registry1.dso.mil \
@@ -624,141 +642,119 @@ function install_metallb {
       --docker-password=${REGISTRY_PASSWORD} \
       -n metallb-system"
 
-    run_batch_add "mkdir /tmp/metallb"
     run_batch_add "kubectl apply -k /tmp/metallb"
     # Wait for controller to be live so that validating webhooks function when we apply the config
     run_batch_add 'echo "Waiting for MetalLB controller..."'
-    run_batch_add "kubectl wait --for=condition=available --timeout 120s -n metallb-system deployment controller"
+    run_batch_add "kubectl wait --for=condition=available --timeout 300s -n metallb-system deployment controller"
     run_batch_add 'echo "MetalLB is installed"'
 
 
     if [[ "$METAL_LB" == true ]]; then
       echo "Building MetalLB configuration for -m mode."
-      run_batch_add <<-'ENDSSH'
-  #run this command on remote
-  cat << EOF > metallb-config.yaml
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: default
-    namespace: metallb-system
-  spec:
-    addresses:
-    - 172.20.1.240-172.20.1.243
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: l2advertisement1
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - default
+      cat << EOF > ${TMPDIR}/metallb-config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+  - 172.20.1.240-172.20.1.243
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement1
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - default
 EOF
-ENDSSH
     elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
       echo "Building MetalLB configuration for -a mode."
-      run_batch_add <<ENDSSH
-  #run this command on remote
-  cat <<EOF > metallb-config.yaml
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: primary
-    namespace: metallb-system
-    labels:
-      privateIp: "$PrivateIP"
-      publicIp: "$PublicIP"
-  spec:
-    addresses:
-    - "172.20.1.241/32"
-    serviceAllocation:
-      priority: 100
-      namespaces:
-        - istio-system
-      serviceSelectors:
-        - matchExpressions:
-            - {key: app, operator: In, values: [public-ingressgateway]}
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: IPAddressPool
-  metadata:
-    name: secondary
-    namespace: metallb-system
-    labels:
-      privateIp: "$PrivateIP2"
-      publicIp: "$SecondaryIP"
-  spec:
-    addresses:
-    - "172.20.1.240/32"
-    serviceAllocation:
-      priority: 100
-      namespaces:
-        - istio-system
-      serviceSelectors:
-        - matchExpressions:
-            - {key: app, operator: In, values: [passthrough-ingressgateway]}
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: primary
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - primary
-  ---
-  apiVersion: metallb.io/v1beta1
-  kind: L2Advertisement
-  metadata:
-    name: secondary
-    namespace: metallb-system
-  spec:
-    ipAddressPools:
-    - secondary
+      cat <<EOF > ${TMPDIR}/metallb-config.yaml
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: primary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP"
+    publicIp: "$PublicIP"
+spec:
+  addresses:
+  - "172.20.1.241/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [public-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: secondary
+  namespace: metallb-system
+  labels:
+    privateIp: "$PrivateIP2"
+    publicIp: "$SecondaryIP"
+spec:
+  addresses:
+  - "172.20.1.240/32"
+  serviceAllocation:
+    priority: 100
+    namespaces:
+      - istio-system
+    serviceSelectors:
+      - matchExpressions:
+          - {key: app, operator: In, values: [passthrough-ingressgateway]}
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: primary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - primary
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: secondary
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - secondary
 EOF
-ENDSSH
 
-      run_batch_add <<ENDSSH
-  cat <<EOF > primaryProxy.yaml
-  ports:
-    443.tcp:
-      - 172.20.1.241
-  settings:
-    workerConnections: 1024
+    cat <<EOF > ${TMPDIR}/primaryProxy.yaml
+ports:
+  443.tcp:
+    - 172.20.1.241
+settings:
+  workerConnections: 1024
 EOF
-ENDSSH
 
-      run_batch_add <<ENDSSH
-  cat <<EOF > secondaryProxy.yaml
-  ports:
-    443.tcp:
-      - 172.20.1.240
-  settings:
-    workerConnections: 1024
+    cat <<EOF > ${TMPDIR}/secondaryProxy.yaml
+ports:
+  443.tcp:
+    - 172.20.1.240
+settings:
+  workerConnections: 1024
 EOF
-ENDSSH
 
+      scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/primaryProxy.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
+      scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/secondaryProxy.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
       run_batch_add "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/${SSHUSER}/primaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
-      run_batch_add "docker run -d --name=secondaryProxy --network=k3d-network -p $PrivateIP2:443:443 -v /home/${SSHUSER}//secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+      run_batch_add "docker run -d --name=secondaryProxy --network=k3d-network -p $(getPrivateIP2):443:443 -v /home/${SSHUSER}/secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
     fi
 
-    run_batch_add "kubectl create -f metallb-config.yaml"
-    if [[ "$METAL_LB" == "true" ]]; then
-      run_batch_add <<-'ENDSSH'
-    # run this command on remote
-    # fix /etc/hosts for new cluster
-    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-    sudo bash -c "echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.240  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-    kubectl delete pod -n kube-system -l k8s-app=kube-dns
-ENDSSH
-    fi
+    scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/metallb-config.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
+    run_batch_add "kubectl create -f /home/${SSHUSER}/metallb-config.yaml"
     run_batch_execute
   fi
 }
@@ -785,7 +781,7 @@ function print_instructions {
   fi
   echo
 
-  if [[ "$METAL_LB" == true ]]; then     # using MetalLB
+  if [[ "$METAL_LB" == true ]] ; then     # using MetalLB
     if [[ "$PRIVATE_IP" == true ]]; then # using MetalLB and private IP
       echo "Start sshuttle in a separate terminal window:"
       echo "  sshuttle --dns -vr ${SSHUSER}@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ${SSHKEY} -D 127.0.0.1:12345'"
@@ -875,11 +871,13 @@ function initialize_instance {
     modprobe xt_REDIRECT; \
     modprobe xt_owner; \
     modprobe xt_statistic; \
+    sysctl --system; \
     echo br_netfilter >> /etc/modules-load.d/istio-iptables.conf; \
     echo nf_nat_redirect >> /etc/modules-load.d/istio-iptables.conf; \
     echo xt_REDIRECT >> /etc/modules-load.d/istio-iptables.conf; \
     echo xt_owner >> /etc/modules-load.d/istio-iptables.conf; \
-    echo xt_statistic >> /etc/modules-load.d/istio-iptables.conf\" "
+    echo xt_statistic >> /etc/modules-load.d/istio-iptables.conf; \
+    systemctl restart systemd-modules-load.service\" "
 
   if [[ "$INIT_SCRIPT" != "" ]]; then
     echo "Running init script"
@@ -904,6 +902,8 @@ function initialize_instance {
     run_batch_add "sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y"
   fi
   run_batch_execute
+
+  install_docker
 }
 
 function cloud_aws_prep_objects {
@@ -955,25 +955,11 @@ function cloud_aws_request_spot_instance
   echo "Using AMI image id ${AMI_ID}"
   ImageId="${AMI_ID}"
 
-  # Create userdata.txt
-  mkdir -p ~/aws
-  cat <<EOF >~/aws/userdata.txt
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
-
---==MYBOUNDARY==
-Content-Type: text/x-shellscript; charset="us-ascii"
-
-#!/bin/bash
-'
-EOF
-
   # Create the device mapping and spot options JSON files
   echo "Creating device_mappings.json ..."
-  mkdir -p ~/aws
 
   # gp3 volumes are 20% cheaper than gp2 and comes with 3000 Iops baseline and 125 MiB/s baseline throughput for free.
-  cat <<EOF >~/aws/device_mappings.json
+  cat <<EOF >${TMPDIR}/device_mappings.json
 [
   {
     "DeviceName": "/dev/sda1",
@@ -988,7 +974,7 @@ EOF
 EOF
 
   echo "Creating spot_options.json ..."
-  cat <<EOF >~/aws/spot_options.json
+  cat <<EOF >${TMPDIR}/spot_options.json
 {
   "MarketType": "spot",
   "SpotOptions": {
@@ -1019,9 +1005,8 @@ EOF
     --key-name "${KeyName}" \
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
-    --user-data file://$HOME/aws/userdata.txt \
-    --block-device-mappings file://$HOME/aws/device_mappings.json \
-    --instance-market-options file://$HOME/aws/spot_options.json \
+    --block-device-mappings file://${TMPDIR}/device_mappings.json \
+    --instance-market-options file://${TMPDIR}/spot_options.json \
     ${additional_create_instance_options} |
     jq -r '.Instances[0].InstanceId')
 
@@ -1081,7 +1066,7 @@ function cloud_aws_assign_ip_addresses
       echo "Previously allocated secondary Elastic IP ${SecondaryIP} found."
     fi
     echo -n "Associating Secondary IP ${SecondaryIP} address to instance ${InstId}..."
-    EIP2_ASSOCIATION_ID=$(aws ec2 associate-address --output json --no-cli-pager --instance-id ${InstId} --private-ip ${PrivateIP2} --public-ip $SecondaryIP | jq -r '.AssociationId')
+    EIP2_ASSOCIATION_ID=$(aws ec2 associate-address --output json --no-cli-pager --instance-id ${InstId} --private-ip $(getPrivateIP2) --public-ip $SecondaryIP | jq -r '.AssociationId')
     echo "${EIP2_ASSOCIATION_ID}"
     EIP2_ID=$(aws ec2 describe-addresses --public-ips ${SecondaryIP} | jq -r '.Addresses[].AllocationId')
     aws ec2 create-tags --resources ${EIP2_ID} --tags Key="lastused",Value="${CURRENT_EPOCH}"
@@ -1093,7 +1078,7 @@ function cloud_aws_assign_ip_addresses
 function cluster_mgmt_select_action_for_existing {
   echo "💣 Big Bang Cluster Management 💣"
   PS3="Please select an option: "
-  options=("Re-create K3D cluster" "Recreate the EC2 instance from scratch" "Do Nothing")
+  options=("Re-create K3D cluster" "Recreate the cloud instance from scratch" "Do Nothing")
 
   select opt in "${options[@]}"; do
     case $opt in
@@ -1112,7 +1097,7 @@ function cluster_mgmt_select_action_for_existing {
       fi
       break
       ;;
-    "Recreate the instance from scratch")
+    "Recreate the cloud instance from scratch")
       # Code for recreating the EC2 instance from scratch
       CLOUD_RECREATE_INSTANCE=true
       break
@@ -1182,18 +1167,31 @@ function cloud_aws_create_instances {
 }
 
 function fix_etc_hosts {
-  if [[ "$ATTACH_SECONDARY_IP" == true ]] && [[ "$METAL_LB" != "true" ]]; then
-    run <<ENDSSH
-      # run this command on remote
-      # fix /etc/hosts for new cluster
-      sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-      sudo bash -c "echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
-      sudo bash -c "echo $PrivateIP2  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-      sudo bash -c "echo $PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-      sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-      # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-      kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $PrivateIP2 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-      kubectl delete pod -n kube-system -l k8s-app=kube-dns
+    if [[ "$METAL_LB" == "true" ]]; then
+      run <<ENDSSH
+    # run this command on remote
+    # fix /etc/hosts for new cluster
+    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
+    sudo bash -c "echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts"
+    sudo bash -c "echo 172.20.1.240  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo 172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
+    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
+    kubectl delete pod -n kube-system -l k8s-app=kube-dns
+ENDSSH
+    elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
+      run <<ENDSSH
+    # run this command on remote
+    # fix /etc/hosts for new cluster
+    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
+    sudo bash -c "echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
+    sudo bash -c "echo $(getPrivateIP2)  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo $PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
+    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
+    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
+    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $(getPrivateIP2) keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
+    kubectl delete pod -n kube-system -l k8s-app=kube-dns
 ENDSSH
   fi
 }
@@ -1203,7 +1201,6 @@ function create_instances {
     cloud_${CLOUDPROVIDER}_create_instances
   fi
   initialize_instance
-  install_docker
   install_k3d
   install_kubectl
   install_metallb
