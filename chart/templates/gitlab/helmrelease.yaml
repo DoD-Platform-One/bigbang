@@ -44,10 +44,10 @@ spec:
   {{- if or .Values.addons.gitlab.postRenderers .Values.monitoring.enabled }}
   postRenderers:
   {{- if .Values.monitoring.enabled }}
-  {{ include "gitlab.serviceMonitorPostRenderers" . | nindent 2 }}
+  {{ include "gitlab.serviceMonitorPostRenderers" . | nindent 4 }}
   {{- end }}
   {{- with .Values.addons.gitlab.postRenderers }}
-  {{ toYaml . | nindent 2 }}
+  {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- end }}
   valuesFrom:
