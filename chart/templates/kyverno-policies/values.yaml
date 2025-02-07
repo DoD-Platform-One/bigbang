@@ -593,20 +593,31 @@ policies:
       - NET_ADMIN
       - NET_RAW
       {{- end }}
-    {{- if .Values.twistlock.enabled }}
     # Twistlock Defenders run as root to perform real time scanning on the nodes/cluster, including:
     # - read logs from `/var/log` to watch for malicious processes
     # - audit modifications to `/etc/passwd` (watching for suspicious changes)
     # - access the container runtime socket (observing all running containers on a node)
+    {{- if or .Values.twistlock.enabled .Values.addons.alloy.enabled }}
     exclude:
       any:
+      {{- if .Values.twistlock.enabled }}
       - resources:
           namespaces:
           - twistlock
           names:
           - twistlock-defender-ds*
+      {{- end }}
+      {{- if .Values.addons.alloy.enabled }}
+      - resources:
+          namespaces:
+          - monitoring
+          names:
+          - monitoring-alloy-alloy-metrics*
+          - monitoring-alloy-alloy-receiver*
+          - monitoring-alloy-alloy-logs*
+          - monitoring-alloy-alloy-singleton*
+      {{- end }}
     {{- end }}
-
   restrict-host-path-mount:
     validationFailureAction: Enforce
     {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled $deployNodeAgent }}
