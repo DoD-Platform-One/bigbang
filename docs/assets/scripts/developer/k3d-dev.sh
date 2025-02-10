@@ -11,7 +11,7 @@ SSHUSER=ubuntu
 action=create_instances
 ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
 BIG_INSTANCE=false
-METAL_LB=false
+METAL_LB=true
 PRIVATE_IP=false
 PROJECTTAG=default
 RESET_K3D=false
@@ -80,12 +80,12 @@ function process_arguments {
       ;;
 
     -m)
-      echo "-m option passed to install MetalLB"
-      if [[ "${ATTACH_SECONDARY_IP}" = false ]]; then
-        METAL_LB=true
-      else
-        echo "Disabling -m option because -a was specified."
-      fi
+      echo "-m option is deprecated (default behavior is to install and use metallb)"
+      ;;
+
+    -M)
+      echo "Disabling metalLB"
+      METAL_LB=false
       ;;
 
     -a)
@@ -162,7 +162,8 @@ function process_arguments {
       echo "========= These options apply regardless of cloud provider ================"
       echo
       echo " -K   recreate the k3d cluster on the host"
-      echo " -m   create k3d cluster with metalLB load balancer"
+      echo " -m   create k3d cluster with metalLB load balancer (this option is deprecated - this is now the default behavior)"
+      echo " -M   do NOT use a metalLB load balancer"
       echo " -p   use private IP for security group and k3d cluster"
       echo " -t   Set the project tag on the instance (for managing multiple instances)"
       echo " -w   install the weave CNI instead of the default flannel CNI"
