@@ -3,7 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.loki" -}}
-hostname: {{ .Values.hostname }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
 
 clusterName: ""
 
@@ -11,7 +14,7 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ .Values.istio.enabled }}
-  {{- if or 
+  {{- if or
       (dig "hardened" "enabled" false .Values.istio.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
