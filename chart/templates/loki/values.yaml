@@ -165,14 +165,6 @@ gateway:
           fieldPath: status.podIP
 {{- end }}
 
-{{- with .Values.loki.objectStorage }}
-{{- if and (eq $.Values.loki.strategy "scalable") (not (and .endpoint .region)) }}
-minio:
-  enabled: true
-
-{{- end }}
-{{- end }}
-
 # Allows users to deploy distributed mode but calls out that we do not support it
 {{- if (eq .Values.loki.strategy "distributed") }}
 deploymentMode: Distributed
