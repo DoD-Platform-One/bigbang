@@ -48,6 +48,11 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
       (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
     }}
+    loki:
+      enabled: {{ and .Values.loki.enabled (or
+        (dig "hardened" "enabled" false .Values.istio.values)
+        (dig "istio" "hardened" "enabled" false .Values.monitoring.values))
+      }}
     {{- if and (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
     customServiceEntries:
       - name: egress-object-store
