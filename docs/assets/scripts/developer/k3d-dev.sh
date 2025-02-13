@@ -59,19 +59,19 @@ function process_arguments {
 
     case "$1" in
 
-    -t)
-      echo "-t option passed to use additional tags on instance"
+    -t|--project-tag)
+      echo "-t|--project-tag option passed to use additional tags on instance"
       shift
       PROJECTTAG=$1
       ;;
 
-    -b)
-      echo "-b option passed for big k3d cluster using M5 instance"
+    -b|--big-instance)
+      echo "-b|--big-instance option passed for big k3d cluster using M5 instance"
       BIG_INSTANCE=true
       ;;
 
-    -p)
-      echo "-p option passed to create k3d cluster with private ip"
+    -p|--use-private-ip)
+      echo "-p|--use-private-ip option passed to create k3d cluster with private ip"
       if [[ "${ATTACH_SECONDARY_IP}" = false ]]; then
         PRIVATE_IP=true
       else
@@ -79,123 +79,144 @@ function process_arguments {
       fi
       ;;
 
-    -m)
+    -m|--use-metallb)
       echo "-m option is deprecated (default behavior is to install and use metallb)"
       ;;
 
-    -M)
+    -M|--disable-metallb)
       echo "Disabling metalLB"
       METAL_LB=false
       ;;
 
-    -a)
+    -a|--attach-secondary-public-ip)
       echo "-a option passed to create secondary public IP (-p and -m flags are skipped if set)"
       PRIVATE_IP=false
       METAL_LB=false
       ATTACH_SECONDARY_IP=true
       ;;
 
-    -d)
+    -d|--destroy-cloud-instance)
       echo "-d option passed to destroy the AWS resources"
       action=destroy_instances
       ;;
 
-    -i)
+    -i|--init-script)
       echo "-i option passed to send init script to k3d instance"
       shift
       INIT_SCRIPT=$1
       ;;
 
-    -H)
+    -H|--existing-public-ip)
       echo "-H option passed to use existing system public IP"
       shift
       PublicIP=$1
       ;;
 
-    -P)
+    -P|--existing-private-ip)
       echo "-P option passed to use existing system private IP"
       shift
       PrivateIP=$1
       ;;
 
-    -U)
+    -U|--ssh-username)
       echo "-U option passed to provide username for connecting to existing system"
       shift
       SSHUSER=$1
       ;;
 
-    -k)
+    -k|--ssh-keyfile)
       echo "-k option passed to provide SSH key for connecting to existing system"
       shift
       SSHKEY=$1
       ;;
 
-    -c)
+    -c|--cloud-provider)
       echo "-c option passed to specify cloud provider"
       shift
       CLOUDPROVIDER=$1
       ;;
 
-    -T)
+    -T|--no-terminate)
       echo "-T option passed to prevent instance termination"
       TERMINATE_INSTANCE=false
       ;;
-    -q)
+    -q|--quiet)
       QUIET=true
       ;;
 
-    -h)
+    -h|--help)
       echo "Usage:"
       echo "k3d-dev.sh [options]"
       echo ""
-      echo " -c CLOUD             Use the given CLOUD for cloud infra provisioning [aws]"
+      echo " -c|--cloud-provider CLOUD        Use the given CLOUD for cloud"
+      echo "                                  infra provisioning [aws]"
       echo
-      echo "========= The following options ONLY APPLY with [-c aws] =================="
+      echo "========= The following options ONLY APPLY with [-c aws] =========="
       echo
-      echo " -b   use BIG M5 instance. Default is m5a.4xlarge"
-      echo " -a   attach secondary Public IP (overrides -p and -m flags)"
-      echo " -d   destroy related AWS resources"
-      echo " -R   recreate the EC2 instance (shortcut for -d and running again with same flags)"
-      echo " -r   Report on all instances owned by your user"
-      echo " -u   Update security group for instances"
+      echo " -b|--big-instance                use BIG M5 instance. Default is "
+      echo "                                  m5a.4xlarge"
+      echo " -a|--attach-secondary-public-ip  attach secondary Public IP"
+      echo "                                  (overrides -p and -m flags)"
+      echo " -d|--destroy-cloud-instance      destroy related cloud resources"
+      echo " -R|--recreate-cloud-instance     recreate the cloud instance"
+      echo "                                  (shortcut for -d and running "
+      echo "                                  again with same flags)"
+      echo " -r|--report-cloud-instances      Report on all cloud instances"
+      echo "                                  owned by your user"
+      echo " -u|--update-cloud-instance       Update security rules for "
+      echo "                                  cloud instances"
       echo
       echo "========= These options apply regardless of cloud provider ================"
       echo
-      echo " -K   recreate the k3d cluster on the host"
-      echo " -m   create k3d cluster with metalLB load balancer (this option is deprecated - this is now the default behavior)"
-      echo " -M   do NOT use a metalLB load balancer"
-      echo " -p   use private IP for security group and k3d cluster"
-      echo " -t   Set the project tag on the instance (for managing multiple instances)"
-      echo " -w   install the weave CNI instead of the default flannel CNI"
-      echo " -i /path/to/script   initialization script to pass to instance before configuring it"
-      echo " -U username          username to use when connecting to existing system in -P"
-      echo " -T   Don't terminate the instance after 8 hours"
-      echo " -q   suppress the final completion message"
+      echo " -K|--recreate-k3d                recreate the k3d cluster on host"
+      echo " -m|--use-metallb                 create k3d cluster with metalLB"
+      echo "                                  load balancer (default)"
+      echo " -M|--disable-metallb             Don't use a metalLB load balancer"
+      echo " -p|--use-private-ip              use private IP for security group"
+      echo "                                  and k3d cluster"
+      echo " -t|--project-tag                 Set the project tag on the cloud instance"
+      echo "                                  (for managing multiple instances)"
+      echo " -w|--use-weave-cni               install the weave CNI instead of the"
+      echo "                                  default flannel CNI"
+      echo " -i|--init-script SCRIPTFILE      initialization script to pass to"
+      echo "                                  instance before configuring it"
+      echo " -U|--ssh-username USERNAME       username to use when connecting"
+      echo "                                  to existing system in -P (default"
+      echo "                                  value depends on cloud provider,"
+      echo "                                  no default value when using -H)"
+      echo " -T|--no-terminate                Don't terminate the instance after"
+      echo "                                  8 hours"
+      echo " -q|--quiet                       suppress the final completion message"
       echo
       echo "========= These options override -c and use your own infrastructure ======="
       echo
-      echo " -H xxx.xxx.xxx.xxx   Public IP address of existing system to configure"
-      echo " -P xxx.xxx.xxx.xxx   private IP address of existing system to configure (if not provided and -H is set, the value of -H is assumed)"
-      echo " -k /path/to/key/file SSH key to use when connecting to cluster instance"
+      echo " -H|--existing-public-ip IPADDR   Public IP address of existing"
+      echo "                                  system to configure"
+      echo " -P|--existing-private-ip IPADDR  Private IP address of existing"
+      echo "                                  system to configure (if not provided"
+      echo "                                  and -H is set, the value of -H is "
+      echo "                                  assumed)"
+      echo " -k|--ssh-keyfile KEYFILE         SSH key to use when connecting to "
+      echo "                                  cluster instance"
       echo
-      echo " -h   output help"
+      echo " -h|--help                        output this help"
       exit 0
       ;;
-    -K)
+    -K|--recreate-k3d)
       RESET_K3D=true
       ;;
-    -R)
+    -R|--recreate-cloud-instance)
       CLOUD_RECREATE_INSTANCE=true
       ;;
-    -u)
+    -u|--update-cloud-instance)
       action=update_instances
       ;;
 
-    -r)
+    -r|--report-cloud-instances)
       action=report_instances
       ;;
 
-    -w)
+    -w|--use-weave-cni)
       echo "-w option passed to use Weave CNI"
       USE_WEAVE=true
       ;;
