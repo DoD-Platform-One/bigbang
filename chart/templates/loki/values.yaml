@@ -153,9 +153,6 @@ backend:
           fieldPath: status.podIP
 gateway:
   enabled: true
-  service:
-    labels:
-      prometheus.io/service-monitor: "false"
   extraArgs:
     - -config.expand-env=true
   extraEnv:
