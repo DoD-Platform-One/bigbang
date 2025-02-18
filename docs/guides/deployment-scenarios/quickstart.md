@@ -12,6 +12,7 @@ An SRE with a reasonable amount of experience operating in a command line enviro
 1. Install [jq](https://jqlang.github.io/jq/download/).
 1. Install [yq](https://github.com/mikefarah/yq/#install). yq needs to be available in your system path PATH as `yq`, so we recommend not using a dockerized installation.
 1. Install kubectl. Follow the instructions for [windows](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/), [macos](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/) or [linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/). (If you are running on WSL in Windows, you should install kubectl using the package manager inside of WSL to install kubectl.)
+1. Install [sshuttle](https://sshuttle.readthedocs.io/en/stable/installation.html)
 1. [Install helm](https://helm.sh/docs/intro/install/).
 1. [Install the Flux CLI](https://fluxcd.io/flux/installation/).
 1. Ensure you have bash version 4 installed. Linux and Windows with WSL users probably don't need to worry about this. For Mac OS users, install bash4 with homebrew or a similar package manager, as the bash that ships with Mac OS is hopelessly old. Mac OS users will use `/opt/homebrew/bin/bash` whenever `bash` is mentioned in this guide.
@@ -64,20 +65,40 @@ Eventually the bigbang release process will finish, and you'll see output like t
 
 ```
 ==================================================================================
-                          INSTALLATION   COMPLETE
+                          INSTALLATION   COMPLETE                                                                 
+                                                                                                                  SAVE THE FOLLOWING INSTRUCTIONS INTO A TEMPORARY TEXT DOCUMENT SO THAT YOU DON'T LOSE THEM
+                                                                                                                  
+ssh to instance:                                         
+  ssh -i ${SSHKEY} -o IdentitiesOnly=yes ${SSHUSER}@${PublicIP}                    
+                                                                                                                  
+To use kubectl from your local workstation you must set the KUBECONFIG environment variable:                      
+  export KUBECONFIG=~/.kube/${PublicIP}-dev-quickstart-config
 
-To access your kubernetes cluster via kubectl, export this variable in your shell:
+OPTION 1: ACCESS APPLICATIONS WITH WEB BROWSER ONLY
+To access apps from browser only start ssh with application-level port forwarding:
+  ssh -i ${SSHKEY}  ${SSHUSER}@${PublicIP} -D 127.0.0.1:12345
+Do not edit /etc/hosts on your local workstation.
+Edit /etc/hosts on the EC2 instance. Sample /etc/host entries have already been added there.
+Manually add more hostnames as needed.
+The IPs to use come from the istio-system services of type LOADBALANCER EXTERNAL-IP that are created when Istio is
+ deployed.
+You must use Firefox browser with with manual SOCKs v5 proxy configuration to localhost with port 12345.
+Also ensure 'Proxy DNS when using SOCKS v5' is checked.
+Or, with other browsers like Chrome you could use a browser plugin like foxyproxy to do the same thing as Firefox.
 
-    export KUBECONFIG=~/.kube/192.168.1.123-quickstart-dev-config
+OPTION 2: ACCESS APPLICATIONS WITH WEB BROWSER AND COMMAND LINE
+To access apps from browser and from the workstation command line start sshuttle in a separate terminal window.
+  sshuttle --dns -vr ${SSHUSER}@${PublicIP} 172.20.1.0/24 --ssh-cmd 'ssh -i ${SSHKEY}'
+  
+Edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with applicat
+ion hostnames.
+Here is an example. You might have to change this depending on the number of gateways you configure for k8s cluste
+r.
+  # METALLB ISTIO INGRESS IPs
+  172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil
+  172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil
 
-To access your kubernetes cluster in your browser, add this line to your hosts file:
-
-    192.168.1.123        alertmanager.dev.bigbang.mil prometheus.dev.bigbang.mil grafana.dev.bigbang.mil
-
-To SSH to the instance running your cluster, use this command:
-
-    ssh -i ~/.ssh/192.168.1.123-dev-quickstart.pem -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ubuntu@192.168.1.123
-================================================================================
+==================================================================================
 ```
 
 Congratulations, it's ready!
@@ -100,30 +121,33 @@ The quickstart.sh script performs several actions:
 
 ### Fix DNS to access the services in your browser
 
-You can now access your bigbang kubernetes cluster from the command line using `kubectl`, but you will need to perform one extra step to easily access bigbang services in your web browser. You will need to manually override some DNS settings to send specific website requests to your kubernetes cluster. This was included in the final message of the quickstart, but here are the instructions again.
+You can now access your bigbang kubernetes cluster from the command line using `kubectl`, but you will need to perform one extra step to easily access bigbang services in your web browser (or from the command line using utilities like `curl`). You will need to manually override some DNS settings to send specific website requests to your kubernetes cluster. This was included in the final message of the quickstart, but here are the instructions again.
 
 **Remember to un-do this step when you are done experimenting with the bigbang quickstart.**
 
-#### Linux/Mac Users
+You need to edit your system hosts file to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with application hostnames. Your cluster is configured with two different gateways for different methods of TLS termination, and each gateway has its own IP.
 
-Run this command in your terminal:
+Open your system hosts file in your favorite editor. You will need to run the editor with administrator privileges in order to edit the hosts file. The file is in different locations for different operating systems:
 
-```shell
-echo YOUR_VM_IP       $(kubectl get virtualservices -A -o json | jq -r .items[].spec.hosts[0] | tr "\n" "\t") | sudo tee -a /etc/hosts
+* Linux/Mac : `/etc/hosts`
+* Windows: `C:\Windows\System32\drivers\etc\hosts`
+
+Add the following lines at the end of the file:
+
+```
+172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil
+172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil
 ```
 
-#### Windows Users
+### Start a lightweight VPN into your k3d cluster
 
-Run this command in your bash terminal, and copy the output to your clipboard.
+Now, start the sshuttle command in a separate terminal window. This acts as a lightweight VPN that redirects traffic through the VM running your k3d cluster. Although the load balancer IP addresses are considered "external" from k3d's perspective, they are in fact not publicly accessible, but are internal and must be accessed through this lightweight VPN. Don't let the terminology confuse you. You will need to provide administrator privileges (sudo) on your workstation for this to function.
 
 ```shell
-echo YOUR_VM_IP       $(kubectl get virtualservices -A -o json | jq -r .items[].spec.hosts[0] | tr "\n" "\t")
+sshuttle --dns -vr ${SSHUSER}@${PublicIP} 172.20.1.0/24 --ssh-cmd 'ssh -i ${SSHKEY}'
 ```
 
-1. Right click Notepad -> Run as Administrator
-1. Open C:\Windows\System32\drivers\etc\hosts
-1. Add the line from your clipboard to the bottom of the file
-1. Save and close
+You will need to leave this command running for as long as you want to access your cluster.
 
 ### Access a BigBang Service
 
