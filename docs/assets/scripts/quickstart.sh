@@ -352,17 +352,8 @@ function main {
     echo "=================================================================================="
     echo "                          INSTALLATION   COMPLETE"
     echo ""
-    echo "To access your kubernetes cluster via kubectl, export this variable in your shell:"
+    build_k3d_cluster --print-instructions
     echo
-    echo "    export KUBECONFIG=${KUBECONFIG}"
-    echo
-    echo "To access your kubernetes cluster in your browser, add this line to your hosts file:"
-    echo
-    echo "    ${arg_host}        ${services}"
-    echo
-    echo "To SSH to the instance running your cluster, use this command:"
-    echo
-    echo "    ssh -i ${arg_keyfile} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${arg_username}@${arg_host}"
     echo "=================================================================================="
     set +e
 }
