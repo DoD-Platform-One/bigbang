@@ -1,0 +1,89 @@
+{{- define "bigbang.istio-gateway-secrets" -}}
+{{- $root := . -}}
+{{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+---
+{{- include "values-secret" (dict 
+  "root" $root 
+  "name" (printf "istio-%s-gateway" $name)
+  "defaults" ($gw.defaults | toYaml)
+  "package" (dict "values" $gw.overlays)
+) }}
+{{- end }}
+{{- end -}}
+
+{{- define "bigbang.defaults.istio-gateway" -}}
+gateways:
+  public:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+    imagePullSecrets:
+      - name: private-registry
+
+    networkPolicies:
+      enabled: {{ .Values.networkPolicies.enabled }}
+      controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+    labels:
+      istio: ingressgateway
+
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
+
+    gateway:
+      servers:
+      - hosts:
+        - '*.{{ .Values.domain }}'
+        port:
+          name: http
+          number: 8080
+          protocol: HTTP
+        tls:
+          httpsRedirect: true
+      - hosts:
+        - '*.{{ .Values.domain }}'
+        port:
+          name: https
+          number: 8443
+          protocol: HTTPS
+        tls:
+          credentialName: public-cert
+          mode: SIMPLE
+
+  passthrough:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+    imagePullSecrets:
+      - name: private-registry
+
+    networkPolicies:
+      enabled: {{ .Values.networkPolicies.enabled }}
+      controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+    labels:
+      istio: ingressgateway
+
+    monitoring:
+      enabled: {{ .Values.monitoring.enabled }}
+
+    gateway:
+      servers:
+      - hosts:
+        - '*.{{ .Values.domain }}'
+        port:
+          name: http
+          number: 8080
+          protocol: HTTP
+        tls:
+          httpsRedirect: true
+      - hosts:
+        - '*.{{ .Values.domain }}'
+        port:
+          name: https
+          number: 8443
+          protocol: HTTPS
+        tls:
+          mode: PASSTHROUGH
+{{- end -}}
+
+{{- if and .Values.istioCore.enabled .Values.istioGateway.enabled }}
+{{- include "bigbang.istio-gateway-secrets" . }}
+{{- end }}

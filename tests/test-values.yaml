@@ -78,6 +78,10 @@ istio:
       dashboard:
         auth:
           strategy: "anonymous"
+istioCore:
+  enabled: false
+istioGateway:
+  enabled: false
 jaeger:
   enabled: false
   sso:
