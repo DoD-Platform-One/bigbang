@@ -2125,12 +2125,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mimir.git
-      tag: "5.5.1-bb.4"
+      tag: "5.5.1-bb.6"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "mimir"
-      tag: "5.5.1-bb.4"
+      tag: "5.5.1-bb.6"
 
     # -- Enable Mimir Enterprise
     enterprise:

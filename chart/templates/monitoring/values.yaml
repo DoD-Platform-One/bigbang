@@ -173,9 +173,9 @@ prometheus:
     remoteWrite:
       {{- if .Values.istio.enabled }}
       # I promise it's not a typo; the port is 80 even though it's TLS
-      - url: https://mimir-mimir-nginx.mimir.svc.cluster.local:80/api/v1/push
+      - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
       {{- else }}
-      - url: http://mimir-mimir-nginx.mimir.svc.cluster.local/api/v1/push
+      - url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
       {{- end }}
         {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
         tlsConfig:
