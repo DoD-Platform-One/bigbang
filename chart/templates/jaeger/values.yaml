@@ -15,18 +15,18 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.jaeger.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
   jaeger:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ include "istioEnabled" . }}
     gateways:
-    - istio-system/{{ default "public" .Values.jaeger.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.jaeger.ingress.gateway }}
 
-{{- if .Values.istio.enabled }}
+{{- if include "istioEnabled" . }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -34,7 +34,7 @@ annotations:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   # conditional passes only for default istio: enabled, mTLS: SCRICT
-  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.jaeger.values) "STRICT") }}
+  {{- if and (include "istioEnabled" . ) (eq (dig "istio" "mtls" "mode" "STRICT" .Values.jaeger.values) "STRICT") }}
   serviceMonitor:
     scheme: https
     tlsConfig:
@@ -51,10 +51,10 @@ sso:
   enabled: {{ .Values.jaeger.sso.enabled }}
 
 
-{{- if or .Values.jaeger.sso.enabled .Values.istio.enabled .Values.kiali.enabled }}
+{{- if or .Values.jaeger.sso.enabled (include "istioEnabled" .) .Values.kiali.enabled }}
 jaeger:
   spec:
-    {{- if or .Values.jaeger.sso.enabled .Values.istio.enabled }}
+    {{- if or .Values.jaeger.sso.enabled (include "istioEnabled" .) }}
     {{- $jaegerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
     {{- $jaegerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
     allInOne:
@@ -62,7 +62,7 @@ jaeger:
       labels:
         {{ $jaegerAuthserviceKey }}: {{ $jaegerAuthserviceValue }}
       {{- end }}
-      {{- if .Values.istio.enabled }}
+      {{- if include "istioEnabled" . }}
       annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
@@ -71,12 +71,12 @@ jaeger:
       labels:
         {{ $jaegerAuthserviceKey }}: {{ $jaegerAuthserviceValue }}
       {{- end }}
-      {{- if .Values.istio.enabled }}
+      {{- if include "istioEnabled" . }}
       annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if include "istioEnabled" . }}
     agent:
       annotations:
         {{ include "istioAnnotation" . }}
@@ -92,6 +92,8 @@ openshift:
   enabled: {{ .Values.openshift }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
     {{- $gateway := default "public" .Values.jaeger.ingress.gateway }}

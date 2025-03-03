@@ -16,7 +16,7 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.kiali.values)
@@ -26,9 +26,9 @@ istio:
       enabled: {{ .Values.monitoring.enabled }}
   kiali:
     gateways:
-    - istio-system/{{ default "public" .Values.kiali.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.kiali.ingress.gateway }}
 
-{{- if .Values.istio.enabled }}
+{{- if include "istioEnabled" . }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -43,9 +43,12 @@ elasticsearch:
   enabled: {{ .Values.elasticsearchKibana.enabled }}
 cr:
   spec:
+    {{- if .Values.istioCore.enabled }}
+    istio_namespace: istio-system
+    {{- end}}
     deployment:
       image_pull_policy: {{ .Values.imagePullPolicy }}
-      {{- if .Values.istio.enabled }}
+      {{- if include "istioEnabled" . }}
       pod_annotations:
         {{ include "istioAnnotation" . }}
       {{- end }}
@@ -97,6 +100,7 @@ cr:
             - app_label: istiod
               is_core: true
               is_proxy: false
+            {{- if .Values.istio.enabled }}
             {{- range $name, $values := .Values.istio.ingressGateways }}
             {{ if ne $values.enabled false }}
             - app_label: {{ $name }}
@@ -111,6 +115,23 @@ cr:
               is_proxy: true
             {{- end }}
             {{- end }}
+            {{- end }}
+            {{- if .Values.istioGatewayPublic.enabled }}
+            - app_label: public-ingressgateway
+              is_core: true
+              is_proxy: true
+              namespace: istio-gateway
+            {{- end }}
+            {{- if .Values.istioGatewayPassthrough.enabled }}
+            - app_label: passthrough-ingressgateway
+              is_core: true
+              is_proxy: true
+              namespace: istio-gateway
+            {{- end }}
+        {{- if .Values.istioCore.enabled }}
+        ingress_gateway_namespace: istio-gateway
+        egress_gateway_namespace: istio-gateway
+        {{- end }}
     api:
       namespaces:
         # bigbang watches all!
@@ -118,8 +139,16 @@ cr:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
+    {{- if .Values.istio.enabled }}
     {{- $gateway := default "public" .Values.kiali.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.istioCore.enabled }}
+    app: public-ingressgateway
+    istio: ingressgateway
+    {{- end }}
 {{- end -}}

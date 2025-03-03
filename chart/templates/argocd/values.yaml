@@ -142,7 +142,7 @@ repoServer:
   {{- end }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)
@@ -151,13 +151,15 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.argocd }}
   argocd:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.argocd.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.argocd.ingress.gateway }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.argocd.ingress.gateway }}

@@ -18,10 +18,10 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") .Values.istio.enabled) }}
+{{- $istioInjection := (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled")) }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values)
@@ -31,7 +31,7 @@ istio:
   keycloak:
     enabled: true
     gateways:
-    - istio-system/{{ default "public" .Values.addons.keycloak.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPassthroughGateway" . ) .Values.addons.keycloak.ingress.gateway }}
 
 {{- if $istioInjection }}
 podAnnotations:
@@ -41,6 +41,8 @@ podAnnotations:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- $gateway := default "passthrough" .Values.addons.keycloak.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}

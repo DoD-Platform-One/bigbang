@@ -1,0 +1,34 @@
+{{- $pkg := "istioCore" }}
+
+{{- /* Create secret */ -}}
+{{- if (get .Values $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" ($pkg | kebabcase) "defaults" (include (printf "bigbang.defaults.%s" $pkg | kebabcase) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.istio-core" -}}
+createNamespace: true
+
+enterprise: {{ .Values.istioCore.enterprise }}
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+imagePullSecrets:
+  - private-registry
+
+istiod:
+  networkPolicies:
+    enabled: {{ .Values.networkPolicies.enabled }}
+    controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+  monitoring:
+    enabled: {{ .Values.monitoring.enabled }}
+    
+{{- if .Values.addons.authservice.enabled }}
+  meshConfig:
+    extensionProviders:
+      - name: "authservice"
+        envoyExtAuthzGrpc:
+          service: "authservice.authservice.svc.cluster.local"
+          port: "10003"
+{{- end }}
+
+{{- end }}

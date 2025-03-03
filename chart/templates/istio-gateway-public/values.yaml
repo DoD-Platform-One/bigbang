@@ -1,0 +1,47 @@
+{{- $pkg := "istioGatewayPublic" }}
+
+{{- /* Create secret */ -}}
+{{- if (get .Values $pkg).enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" ($pkg | kebabcase) "defaults" (include (printf "bigbang.defaults.%s" $pkg | kebabcase) .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.istio-gateway-public" -}}
+createNamespace: true
+
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+imagePullSecrets:
+  - name: private-registry-public
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+labels:
+  istio: ingressgateway
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+gateway:
+  servers:
+  - hosts:
+    - '*.{{ .Values.domain }}'
+    port:
+      name: http
+      number: 8080
+      protocol: HTTP
+    tls:
+      httpsRedirect: true
+  - hosts:
+    - '*.{{ .Values.domain }}'
+    port:
+      name: https
+      number: 8443
+      protocol: HTTPS
+    tls:
+      credentialName: public-cert
+      mode: SIMPLE
+{{- end -}}

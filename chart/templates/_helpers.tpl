@@ -438,4 +438,45 @@ data:
   {{- end -}}
 {{- end -}}
 
+{{- /* Returns namespace of istio gateways */ -}}
+{{- define "istioGatewayNamespace" -}}
+{{- if .Values.istio.enabled -}}
+  {{- print "istio-system" -}}
+{{- else -}}
+  {{- print "istio-gateway" -}}
+{{- end -}}
+{{- end -}}
 
+{{- /* Returns name of istio public gateway */ -}}
+{{- define "istioPublicGateway" -}}
+{{- if .Values.istio.enabled -}}
+  {{- print "public" -}}
+{{- else -}}
+  {{- print "public-ingressgateway" -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Returns name of istio passthrough gateway */ -}}
+{{- define "istioPassthroughGateway" -}}
+{{- if .Values.istio.enabled -}}
+  {{- print "passthrough" -}}
+{{- else -}}
+  {{- print "passthrough-ingressgateway" -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Returns true if either istio or istioCore is enabled */ -}}
+{{- define "istioEnabled" -}}
+{{ or .Values.istio.enabled .Values.istioCore.enabled }}
+{{- end -}}
+
+{{- /* Returns name of istio Namespace Selector*/ -}}
+{{- define "istioNamespaceSelector" -}}
+{{- if .Values.istioCore.enabled -}}
+ingress: istio-gateway
+egress: istio-core
+{{- else -}}
+ingress: istio-controlplane
+egress: istio-controlplane
+{{- end -}}
+{{- end -}}

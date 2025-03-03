@@ -69,6 +69,10 @@ spec:
     - name: istio
       namespace: {{ .Release.Namespace }}
     {{- end }}
+    {{- if .Values.istioCore.enabled }}
+    - name: istio-core
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
     {{- if .Values.kyvernoPolicies.enabled }}
     - name: kyverno-policies
       namespace: {{ .Release.Namespace }}

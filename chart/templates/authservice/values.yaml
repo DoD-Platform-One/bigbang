@@ -1,4 +1,4 @@
-{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled) (and .Values.addons.holocron.enabled .Values.addons.holocron.sso.enabled)) }}
+{{- if and (include "istioEnabled" .) (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled) (and .Values.addons.holocron.enabled .Values.addons.holocron.sso.enabled)) }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
 {{- end }}
 
@@ -16,7 +16,7 @@
 }}
 
 istio:
-  enabled: {{ .Values.istio.enabled | default false }}
+  enabled: {{ (include "istioEnabled" .) | default false }}
   hardened:
     enabled: {{ $authServiceHardened }}
   clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istio.values }}
@@ -37,6 +37,8 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled | default false }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.haproxy.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
@@ -63,7 +65,7 @@ redis-bb:
       selector: 
         app.kubernetes.io/name: redis-bb
         app.kubernetes.io/instance: authservice-authservice
-      {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
+      {{- if and (include "istioEnabled" .) (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem

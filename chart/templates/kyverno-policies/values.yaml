@@ -55,7 +55,7 @@ policies:
   # Istio services (istio ingress) can create type: NodePort services
   disallow-nodeport-services:
     validationFailureAction: Enforce
-    {{- if $nodePortIngressGateways }}
+    {{- if or $nodePortIngressGateways .Values.istioCore.enabled }}
     exclude:
       any:
       - resources:
@@ -67,6 +67,20 @@ policies:
           {{- end }}
           namespaces:
           - "istio-system"
+      {{- if .Values.istioCore.enabled }}
+      - resources:
+          kinds:
+          - Service
+          names:
+          {{- if .Values.istioGatewayPassthrough.enabled }}
+          - "istio-gateway-passthrough-ingressgateway"
+          {{- end }}
+          {{- if .Values.istioGatewayPublic }}
+          - "public-ingressgateway"
+          {{- end }}
+          namespaces:
+          - "istio-gateway"
+      {{- end }}
     {{- end }}
 
   disallow-image-tags:
@@ -74,13 +88,14 @@ policies:
     validationFailureAction: Enforce
 
   disallow-istio-injection-bypass:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ include "istioEnabled" . }}
     exclude:
       any:
       # Istio does not inject itself
       - resources:
           namespaces:
           - istio-system
+          - istio-gateway
 
   disallow-namespaces:
     enabled: true
@@ -268,7 +283,7 @@ policies:
       - app.kubernetes.io/version
       
   require-istio-on-namespaces:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ include "istioEnabled" . }}
     exclude:
       any:
       - resources:
@@ -285,6 +300,7 @@ policies:
           # Istio does not inject itself
           - istio-operator
           - istio-system
+          - istio-gateway
 
   add-default-securitycontext:
     validationFailureAction: Enforce
@@ -380,7 +396,7 @@ policies:
 
   require-non-root-group:
     validationFailureAction: Enforce
-    {{ if .Values.istio.enabled }}
+    {{ if include "istioEnabled" . }}
     parameters:
       excludeContainers:
         - istio-init
@@ -398,6 +414,13 @@ policies:
       - resources:
           namespaces:
           - kube-system
+      {{ if .Values.istioCore.enabled }}
+      - resources:
+          namespaces:
+          - istio-system
+          names:
+          - istiod*
+      {{- end }}
       {{- if $deployNodeAgent }}
       # Velero.  The node agent backup tool requires root group access to see the host's runtime pod directory which is
       # mounted inside velero/node agent pods.
@@ -462,7 +485,7 @@ policies:
 
   require-non-root-user:
     validationFailureAction: Enforce
-    {{ if .Values.istio.enabled }}
+    {{ if include "istioEnabled" . }}
     parameters:
       excludeContainers:
         - istio-init
@@ -586,7 +609,7 @@ policies:
       allow:
       # Defaults from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
       - NET_BIND_SERVICE
-      {{- if .Values.istio.enabled }}
+      {{- if include "istioEnabled" . }}
       # Istio requires NET_ADMIN and NET_RAW for sidecar init: https://istio.io/latest/docs/ops/deployment/requirements/#pod-requirements
       # It uses these permissions to setup iptables for network routing
       # Cannot create exclusion since sidecar is injected in most containers, so allow the capabilities globally
@@ -1128,7 +1151,7 @@ policies:
           - gitlab-runner-*
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
 
 {{- end }}
 

@@ -56,10 +56,14 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.addons.vault.enabled }}
+  {{- if or .Values.gatekeeper.enabled (include "istioEnabled" .) .Values.kyvernoPolicies.enabled .Values.addons.vault.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.istioCore.enabled }}
+    - name: istio-core
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.gatekeeper.enabled }}
