@@ -12,6 +12,18 @@ istioOperator:
   repoName: "istio-operator"
   hrName: "istio-operator"
   filePath: "istio-operator"
+istioCore:
+  repoName: "istio-core"
+  hrName: "istio-core"
+  filePath: "istio-core"
+istioGatewayPublic:
+  repoName: "istio-gateway"
+  hrName: "public-ingressgateway"
+  filePath: "istio-gateway-public"
+istioGatewayPassthrough:
+  repoName: "istio-gateway"
+  hrName: "passthrough-ingressgateway"
+  filePath: "istio-gateway-passthrough"
 clusterAuditor:
   repoName: "cluster-auditor"
   hrName: "cluster-auditor"

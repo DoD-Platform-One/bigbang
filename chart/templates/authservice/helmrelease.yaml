@@ -1,5 +1,5 @@
 {{- $fluxSettingsAuthservice := merge .Values.addons.authservice.flux .Values.flux -}}
-{{- if and .Values.istio.enabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{- if and (include "istioEnabled" .) (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -63,6 +63,10 @@ spec:
   {{- end }}
   {{- if .Values.monitoring.enabled }}
   - name: monitoring
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.istioCore.enabled }}
+  - name: istio-core
     namespace: {{ .Release.Namespace }}
   {{- end }}
 {{- end }}

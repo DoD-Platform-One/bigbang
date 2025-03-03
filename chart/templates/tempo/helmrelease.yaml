@@ -56,7 +56,7 @@ spec:
     - name: {{ .Release.Name }}-tempo-values
       kind: Secret
       valuesKey: "overlays"
-  {{- if or .Values.monitoring.enabled .Values.istio.enabled .Values.tempo.sso.enabled }}
+  {{- if or .Values.monitoring.enabled .Values.tempo.sso.enabled (include "istioEnabled" .) }}
   dependsOn:
     {{- if  .Values.monitoring.enabled }}
     - name: monitoring
@@ -68,6 +68,10 @@ spec:
     {{- end }}
     {{- if .Values.istio.enabled }}
     - name: istio
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.istioCore.enabled }}
+    - name: istio-core
       namespace: {{ .Release.Namespace }}
     {{- end }}
   {{- end }}

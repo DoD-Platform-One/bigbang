@@ -4,7 +4,7 @@
 
 {{- define "bigbang.defaults.tempo" -}}
 
-{{- if .Values.istio.enabled }}
+{{- if include "istioEnabled" . }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -51,14 +51,22 @@ serviceAccount:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
+    {{- if .Values.istio.enabled }}
     {{- $gateway := default "public" .Values.tempo.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.istioCore.enabled }}
+    app: public-ingressgateway
+    istio: ingressgateway
+    {{- end }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.tempo.values)
@@ -71,7 +79,7 @@ istio:
       - "tempo.{{ .Values.domain }}"
     {{- end }}
     gateways:
-    - istio-system/{{ default "public" .Values.tempo.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.tempo.ingress.gateway }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -81,7 +89,7 @@ serviceMonitor:
   # conditional passes only if all conditionals are true:
   # - istio: enabled
   # - mTLS: SCRICT
-  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
+  {{- if and (include "istioEnabled" .) (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem

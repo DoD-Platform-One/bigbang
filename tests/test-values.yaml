@@ -55,7 +55,6 @@ flux:
 networkPolicies:
   enabled: true
   #controlPlaneCidr: 172.16.0.0/12
-
 istio:
   enabled: true
   ingressGateways:
@@ -79,7 +78,6 @@ istio:
       dashboard:
         auth:
           strategy: "anonymous"
-
 jaeger:
   enabled: false
   sso:
@@ -2213,7 +2211,7 @@ addons:
   keycloak:
     enabled: false
     ingress:
-      gateway: "passthrough"
+      gateway: ""
       key: "" # Gets added via chart/ingress-certs.yaml
       cert: "" # Gets added via chart/ingress-certs.yaml
     values:

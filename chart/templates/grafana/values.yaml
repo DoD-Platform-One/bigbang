@@ -8,7 +8,7 @@
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled") .Values.istio.enabled) }}
+{{- $istioInjection := (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled")) }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
@@ -18,6 +18,8 @@ flux:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
     {{- $gateway := default "public" .Values.grafana.ingress.gateway }}
@@ -34,7 +36,7 @@ gitlabRunner:
 
 istio:
   {{- $grafanaInjection := dig "istio" "injection" "enabled" .Values.grafana }}
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -48,7 +50,7 @@ istio:
   grafana:
     enabled: true
     gateways:
-    - istio-system/{{ default "public" .Values.grafana.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.grafana.ingress.gateway }}
   injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
 
 anchore:
@@ -237,7 +239,7 @@ datasources:
 {{- end }}
 
 grafana.ini:
-  {{- if .Values.istio.enabled }}
+  {{- if include "istioEnabled" . }}
   server:
     root_url: https://grafana.{{ $domainName }}/
   {{- end }}

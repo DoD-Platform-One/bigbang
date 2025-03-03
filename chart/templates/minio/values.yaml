@@ -9,13 +9,13 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   console:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.minio.ingress.gateway }}
   api:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.minio.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.minio.ingress.gateway }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
@@ -23,7 +23,7 @@ istio:
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
 
-{{- if .Values.istio.enabled }}
+{{- if include "istioEnabled" . }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

@@ -57,10 +57,14 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{ if or .Values.istio.enabled .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.elasticsearchKibana.enabled }}
+  {{ if or (include "istioEnabled" .) .Values.monitoring.enabled .Values.jaeger.sso.enabled .Values.elasticsearchKibana.enabled }}
   dependsOn:
   {{- if .Values.istio.enabled }}
     - name: istio
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+    {{- if .Values.istioCore.enabled }}
+    - name: istio-core
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.monitoring.enabled }}

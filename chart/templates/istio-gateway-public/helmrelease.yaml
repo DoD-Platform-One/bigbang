@@ -1,0 +1,75 @@
+{{- $fluxSettingsIstioGatewayPublic := merge .Values.istioGatewayPublic.flux .Values.flux -}}
+{{- if and .Values.istioCore.enabled .Values.istioGatewayPublic.enabled }}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: public-ingressgateway
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-gateway
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" $ | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-gateway-public/values.yaml") $ | sha256sum }}
+spec:
+  releaseName: public-ingressgateway
+  targetNamespace: istio-gateway
+  chart:
+    spec:
+      {{- if eq $.Values.istioGatewayPublic.sourceType "git" }}
+      chart: {{ $.Values.istioGatewayPublic.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: istio-gateway-public
+        namespace: {{ $.Release.Namespace }}
+      {{- else }}
+      chart: {{ $.Values.istioGatewayPublic.helmRepo.chartName }}
+      version: {{ $.Values.istioGatewayPublic.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ $.Values.istioGatewayPublic.helmRepo.repoName }}
+        namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $.Values.istioGatewayPublic.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $.Values.istioGatewayPublic.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $.Values.istioGatewayPublic.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsIstioGatewayPublic | nindent 2 }}
+
+  {{- if $.Values.istioGatewayPublic.postRenderers }}
+  postRenderers:
+  {{ toYaml $.Values.istioGatewayPublic.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ $.Release.Name }}-istio-gateway-public-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ $.Release.Name }}-istio-gateway-public-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ $.Release.Name }}-istio-gateway-public-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: istio-core
+      namespace: {{ $.Release.Namespace }}
+    {{- if $.Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- if $.Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- if $.Values.istioGatewayPassthrough.enabled }}
+    - name: passthrough-ingressgateway
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+{{- end }}

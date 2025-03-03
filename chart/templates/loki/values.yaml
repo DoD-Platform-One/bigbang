@@ -13,8 +13,8 @@ clusterName: ""
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
-  {{- if or
+  enabled: {{ include "istioEnabled" . }}
+  {{- if or 
       (dig "hardened" "enabled" false .Values.istio.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
@@ -34,6 +34,10 @@ istio:
     minioOperator:
       enabled: {{ .Values.addons.minioOperator.enabled }}
   {{- end }}
+  loki:
+    enabled: true
+    gateways:
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) }}
 
 imagePullSecrets:
   - name: private-registry
@@ -44,13 +48,15 @@ image:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
+    {{- if and (include "istioEnabled" . ) (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -102,7 +108,7 @@ loki:
     filesystem:
       directory: /var/loki/chunks
   {{- end }}
-  {{- if .Values.istio.enabled }}
+  {{- if include "istioEnabled" . }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}

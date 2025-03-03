@@ -1,0 +1,24 @@
+{{- if and (eq .Values.istioGatewayPublic.sourceType "git") (not .Values.offline) .Values.istioGatewayPublic.enabled }}
+{{- $gitCredsDict := dict
+  "name" "istioGatewayPublic"
+  "packageGitScope" .Values.istioGatewayPublic.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: istio-gateway-public
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-gateway-public
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.istioGatewayPublic.git.repo }}
+  ref:
+    {{- include "validRef" .Values.istioGatewayPublic.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}
