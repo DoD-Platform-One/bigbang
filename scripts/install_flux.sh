@@ -11,6 +11,7 @@ FLUX_KUSTOMIZATION="${FLUX_SCRIPT_DIR}/../base/flux"
 REGISTRY_URL=registry1.dso.mil
 FLUX_SECRET=private-registry
 WAIT_TIMEOUT=300
+NAMESPACE=flux-system
 
 #
 # helper functions
@@ -26,12 +27,13 @@ usage: $(basename "$0") <arguments>
 -u|--registry-username   - (required) registry username to use for flux installation
 -p|--registry-password   - (optional, prompted if no existing secret) registry password to use for flux installation
 -w|--wait-timeout        - (optional, default: 120) how long to wait; in seconds, for each key flux resource component
+-n|--flux-namespace      - (optional, default: flux-system) the namespace to use when deploying flux resources
 EOF
 }
 
 # check for existing pull secret
 function check_secrets {
-  if kubectl get secrets/"$FLUX_SECRET" -n flux-system >/dev/null 2>&1; then
+  if kubectl get secrets/"$FLUX_SECRET" -n $NAMESPACE >/dev/null 2>&1; then
     #the secret exists
     FLUX_SECRET_EXISTS=0
   else
@@ -113,6 +115,15 @@ while (("$#")); do
       exit 1
     fi
     ;;
+  # namespace for the flux installation optional argument
+  -n | --flux-namespace)
+    if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+      NAMESPACE=$2
+      shift 2
+    else
+      shift
+    fi
+    ;;
   # help flag
   -h | --help)
     help
@@ -152,21 +163,21 @@ if [ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 1 ]; then
   echo "REGISTRY_URL: $REGISTRY_URL"
   echo "REGISTRY_USERNAME: $REGISTRY_USERNAME"
 
-  echo "Creating flux-system namespace so that the docker-registry secret can be added first."
+  echo "Creating $NAMESPACE namespace so that the docker-registry secret can be added first."
   kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: flux-system
+  name: $NAMESPACE
 EOF
 
-  echo "Creating secret $FLUX_SECRET in namespace flux-system"
-  kubectl create secret docker-registry "$FLUX_SECRET" -n flux-system \
+  echo "Creating secret $FLUX_SECRET in namespace $NAMESPACE"
+  kubectl create secret docker-registry "$FLUX_SECRET" -n $NAMESPACE \
     --docker-server="$REGISTRY_URL" \
     --docker-username="$REGISTRY_USERNAME" \
     --docker-password="$REGISTRY_PASSWORD" \
     --docker-email="$REGISTRY_EMAIL" \
-    --dry-run=client -o yaml | kubectl apply -n flux-system -f -
+    --dry-run=client -o yaml | kubectl apply -n $NAMESPACE -f -
 fi
 
 #
@@ -177,20 +188,28 @@ KUBECTL_VERSION=$(kubectl version --client --output=yaml | awk '/gitVersion:/ {p
 KUBECTL_MIN_VERSION="1.26.0"
 
 if [ "$(printf '%s\n' "$KUBECTL_MIN_VERSION" "$KUBECTL_VERSION" | sort -V | head -n1)" = "$KUBECTL_MIN_VERSION" ]; then
-  kubectl kustomize "$FLUX_KUSTOMIZATION" | sed "s/registry1.dso.mil/${REGISTRY_URL}/g" | kubectl apply -f -
+  kubectl kustomize "$FLUX_KUSTOMIZATION" |
+    sed "s/name: flux-system/name: ${NAMESPACE}/g" |
+    sed "s/namespace: flux-system/namespace: ${NAMESPACE}/g" |
+    sed "s/registry1.dso.mil/${REGISTRY_URL}/g" |
+    kubectl apply -f -
 else
   if [ command -v kustomize ] >/dev/null 2>&1; then
     echo "Kustomize not found"
     exit 1
   else
-    kustomize build "$FLUX_KUSTOMIZATION" | sed "s/registry1.dso.mil/${REGISTRY_URL}/g" | kubectl apply -f -
+    kustomize build "$FLUX_KUSTOMIZATION" |
+      sed "s/name: flux-system/name: ${NAMESPACE}/g" |
+      sed "s/namespace: flux-system/namespace: ${NAMESPACE}/g" |
+      sed "s/registry1.dso.mil/${REGISTRY_URL}/g" |
+      kubectl apply -f -
   fi
 fi
 
 #
 # verify flux
 #
-kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n "flux-system" "deployment/helm-controller"
-kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n "flux-system" "deployment/source-controller"
-kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n "flux-system" "deployment/kustomize-controller"
-kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n "flux-system" "deployment/notification-controller"
+kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n $NAMESPACE "deployment/helm-controller"
+kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n $NAMESPACE "deployment/source-controller"
+kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n $NAMESPACE "deployment/kustomize-controller"
+kubectl wait --for=condition=available --timeout "${WAIT_TIMEOUT}s" -n $NAMESPACE "deployment/notification-controller"
