@@ -13,6 +13,8 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/external-secrets/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: external-secrets
+  driftDetection:
+    mode: disabled
   chart:
     spec:
       {{- if eq .Values.addons.externalSecrets.sourceType "git" }}

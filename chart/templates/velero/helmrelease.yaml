@@ -13,6 +13,8 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/velero/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: velero
+  driftDetection:
+    mode: warn
   chart:
     spec:
       {{- if eq .Values.addons.velero.sourceType "git" }}
