@@ -1447,7 +1447,6 @@ addons:
       timeout: 30m
     values:
       istio:
-        enabled: true
         hardened:
           customServiceEntries:
             - name: "cypress-service-entries-gitlab"
@@ -1542,7 +1541,6 @@ addons:
     enabled: false
     values:
       istio:
-        enabled: true
         hardened:
           customServiceEntries:
             - name: "cypress-service-entries-gitlab-runner"
@@ -1606,7 +1604,6 @@ addons:
         "TBD"
     values:
       istio:
-        enabled: true
         hardened:
           customServiceEntries:
             - name: "anchore-allow-cypress-tests"
@@ -2121,7 +2118,6 @@ addons:
                   forceBasicAuth: true
                   httpPort: 5000
       istio:
-        enabled: true
         hardened:
           customServiceEntries:
             - name: "cypress-service-entries-nexus"
@@ -2216,7 +2212,6 @@ addons:
       cert: "" # Gets added via chart/ingress-certs.yaml
     values:
       istio:
-        enabled: true
         hardened:
           customAuthorizationPolicies:
             - name: "allow-intranamespace-keycloak"
@@ -2452,7 +2447,6 @@ addons:
     # -- Values to pass through to Harbor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values:
       istio:
-        enabled: true
         hardened:
           customServiceEntries:
             - name: "allow-npm-for-cypress-tests"
@@ -2632,7 +2626,6 @@ addons:
     values:
       istio:
         hardened: 
-          enabled: true
           customServiceEntries:
             - name: "cypress-service-entries-holocron"
               enabled: true
@@ -2658,9 +2651,6 @@ addons:
 
   externalSecrets:
     values:
-      istio:
-        hardened:
-          enabled: true
       bbtests:
         enabled: true
         cypress:
