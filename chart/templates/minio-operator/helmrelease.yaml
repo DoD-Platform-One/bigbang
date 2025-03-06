@@ -9,6 +9,8 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: minio-operator
+  driftDetection:
+    mode: warn
   chart:
     spec:
       {{- if eq .Values.addons.minioOperator.sourceType "git" }}
