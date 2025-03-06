@@ -162,9 +162,6 @@ postgresql:
       postgresql: {{ .Values.addons.holocron.database.port }}
   {{- end }}
     
-  image:
-    repository: ironbank/opensource/postgres/postgresql
-    tag: "15.5"
   auth:
     secretKey: password
     username: {{ .Values.addons.holocron.database.username }}
