@@ -653,11 +653,11 @@ Kubernetes: `>=1.29.0-0`
 | addons.holocron.enabled | bool | `false` | Toggle deployment of Holocron. |
 | addons.holocron.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.holocron.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/holocron.git"` |  |
-| addons.holocron.git.tag | string | `"1.0.12"` |  |
+| addons.holocron.git.tag | string | `"1.0.13"` |  |
 | addons.holocron.git.path | string | `"./chart"` |  |
 | addons.holocron.helmRepo.repoName | string | `"registry1"` |  |
 | addons.holocron.helmRepo.chartName | string | `"holocron"` |  |
-| addons.holocron.helmRepo.tag | string | `"1.0.12"` |  |
+| addons.holocron.helmRepo.tag | string | `"1.0.13"` |  |
 | addons.holocron.collectorAuth.existingSecret | string | `""` | Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide -- Default keys for secret are: -- gitlab-scm-0, gitlab-workflow-0, gitlab-build-0, jira-workflow-0, sonarqube-project-analysis-0 -- If not provided, one will be created |
 | addons.holocron.collectorAuth.gitlabToken | string | `"mygitlabtoken"` | Tokens for the secret to be created |
 | addons.holocron.collectorAuth.jiraToken | string | `"myjiratoken"` |  |
