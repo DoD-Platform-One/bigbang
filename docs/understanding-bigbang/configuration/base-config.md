@@ -67,39 +67,6 @@ Kubernetes: `>=1.29.0-0`
 | networkPolicies.nodeCidr | string | `""` | Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks. use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range. Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs) |
 | networkPolicies.vpcCidr | string | `"0.0.0.0/0"` | VPC CIDR, defaults to 0.0.0.0/0 In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3. Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network. Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint. |
 | imagePullPolicy | string | `"IfNotPresent"` | Global ImagePullPolicy value for all packages Permitted values are: None, Always, IfNotPresent |
-| istioCore.status | string | `"alpha"` |  |
-| istioCore.enabled | bool | `false` | Toggle deployment of Istio (helm deployment of istio-base and istiod) |
-| istioCore.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| istioCore.git.repo | string | `"https://repo1.dso.mil/big-bang/apps/sandbox/istio-core.git"` |  |
-| istioCore.git.path | string | `"./chart"` |  |
-| istioCore.git.branch | string | `"main"` |  |
-| istioCore.helmRepo.repoName | string | `"registry1"` |  |
-| istioCore.helmRepo.chartName | string | `"istio-core"` |  |
-| istioCore.values | object | `{"istiod":{"pilot":{"env":{"ENABLE_NATIVE_SIDECARS":"true"}}}}` | Values to passthrough to the istiod chart |
-| istioCore.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Gateway Package |
-| istioCore.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| istioGatewayPublic.status | string | `"alpha"` |  |
-| istioGatewayPublic.enabled | bool | `false` | Toggle deployment of the Istio public ingress gateway |
-| istioGatewayPublic.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| istioGatewayPublic.git.repo | string | `"https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git"` |  |
-| istioGatewayPublic.git.path | string | `"./chart"` |  |
-| istioGatewayPublic.git.branch | string | `"main"` |  |
-| istioGatewayPublic.helmRepo.repoName | string | `"registry1"` |  |
-| istioGatewayPublic.helmRepo.chartName | string | `"istio-gateway"` |  |
-| istioGatewayPublic.values | object | `{}` | set the tls key/cert tls:   key: ""   cert: "" -- Values to passthrough to the istio-gateway chart |
-| istioGatewayPublic.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Gateway Package |
-| istioGatewayPublic.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| istioGatewayPassthrough.status | string | `"alpha"` |  |
-| istioGatewayPassthrough.enabled | bool | `false` | Toggle deployment of the Istio passthrough ingress gateway |
-| istioGatewayPassthrough.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| istioGatewayPassthrough.git.repo | string | `"https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git"` |  |
-| istioGatewayPassthrough.git.path | string | `"./chart"` |  |
-| istioGatewayPassthrough.git.branch | string | `"main"` |  |
-| istioGatewayPassthrough.helmRepo.repoName | string | `"registry1"` |  |
-| istioGatewayPassthrough.helmRepo.chartName | string | `"istio-gateway"` |  |
-| istioGatewayPassthrough.values | object | `{}` | Values to passthrough to the istio-gateway chart |
-| istioGatewayPassthrough.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Gateway Package |
-| istioGatewayPassthrough.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | istio.enabled | bool | `true` | Toggle deployment of Istio. |
 | istio.mtls.mode | string | `"STRICT"` | STRICT = Allow only mutual TLS traffic, PERMISSIVE = Allow both plain text and mutual TLS traffic |
 | istio.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
