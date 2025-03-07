@@ -161,6 +161,86 @@ imagePullPolicy: IfNotPresent
 # Istio
 #
 
+istioCore:
+  status: "alpha"
+  # -- Toggle deployment of Istio (helm deployment of istio-base and istiod)
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-core.git
+    path: "./chart"
+    branch: "main"
+    # tag:
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio-core"
+    # tag:
+  # -- Values to passthrough to the istiod chart
+  values:
+    # k8s 1.29+ native sidecars ~ https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates
+    # prevent jobs from hanging ~ https://istio.io/latest/blog/2023/native-sidecars/#sidecar-woes
+    istiod:
+      pilot:
+        env:
+          ENABLE_NATIVE_SIDECARS: 'true'
+    # # enable Tetrate FIPS compliant Istio images
+    # defaults:
+    #   global:
+    #     enterprise: true
+  # -- Flux reconciliation overrides specifically for the Istio Gateway Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+istioGatewayPublic:
+  status: "alpha"
+  # -- Toggle deployment of the Istio public ingress gateway
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git
+    path: "./chart"
+    branch: "main"
+    # tag:
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio-gateway"
+    # tag:
+  # -- set the tls key/cert
+  # tls:
+  #   key: ""
+  #   cert: ""
+  # -- Values to passthrough to the istio-gateway chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Istio Gateway Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+istioGatewayPassthrough:
+  status: "alpha"
+  # -- Toggle deployment of the Istio passthrough ingress gateway
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git
+    path: "./chart"
+    branch: "main"
+    # tag: 
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio-gateway"
+    # tag:
+  # -- Values to passthrough to the istio-gateway chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Istio Gateway Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 istio:
   # -- Toggle deployment of Istio.
   enabled: true
@@ -1930,12 +2010,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/holocron.git
-      tag: "1.0.13"
+      tag: "1.0.12"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "holocron"
-      tag: "1.0.13"
+      tag: "1.0.12"
 
     collectorAuth:
       # -- Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
