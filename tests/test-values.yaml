@@ -2630,6 +2630,21 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_holocron
     values:
+      istio:
+        hardened: 
+          enabled: true
+          customServiceEntries:
+            - name: "cypress-service-entries-holocron"
+              enabled: true
+              spec:
+                hosts:
+                  - 'repo1.dso.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       bbtests:
         enabled: true
         cypress:
