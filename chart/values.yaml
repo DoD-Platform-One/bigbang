@@ -2015,7 +2015,7 @@ addons:
     helmRepo:
       repoName: "registry1"
       chartName: "holocron"
-      tag: "1.0.12"
+      tag: "1.0.13"
 
     collectorAuth:
       # -- Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide
