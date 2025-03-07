@@ -171,11 +171,11 @@ istioCore:
     repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-core.git
     path: "./chart"
     branch: "main"
-    tag: ""
+    tag: "1.2.3-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-core"
-    tag: ""
+    tag: "1.2.3-bb.3"
   # -- Values to passthrough to the istiod chart
   values:
     # k8s 1.29+ native sidecars ~ https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates
@@ -203,11 +203,11 @@ istioGatewayPublic:
     repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git
     path: "./chart"
     branch: "main"
-    tag: ""
+    tag: "1.2.3-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-gateway"
-    tag: ""
+    tag: "1.2.3-bb.3"
   # -- set the tls key/cert
   # tls:
   #   key: ""
@@ -229,11 +229,11 @@ istioGatewayPassthrough:
     repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git
     path: "./chart"
     branch: "main"
-    tag: 1.2.3
+    tag: "1.2.3-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "istio-gateway"
-    tag: 1.2.3
+    tag: "1.2.3-bb.3"
   # -- Values to passthrough to the istio-gateway chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio Gateway Package
