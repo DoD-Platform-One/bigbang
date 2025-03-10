@@ -1941,6 +1941,12 @@ addons:
         scripts:
           envs:
             MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
+      mimir-distributed:
+        mimir:
+          structuredConfig:
+            limits:
+              max_global_series_per_user: 0
+
     minioObjectStorage:
       enabled: true
     networkPolicies:
