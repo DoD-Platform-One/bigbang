@@ -116,18 +116,16 @@ cr:
             {{- end }}
             {{- end }}
             {{- end }}
-            {{- if .Values.istioGatewayPublic.enabled }}
-            - app_label: public-ingressgateway
+            {{- if .Values.istioGateway.enabled }}
+            {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+            {{- if eq $gw.type "ingressgateway" }}
+            - app_label: {{ $gw.serviceName }}
               is_core: true
               is_proxy: true
               namespace: istio-gateway
-            {{- end }}
-            {{- if .Values.istioGatewayPassthrough.enabled }}
-            - app_label: passthrough-ingressgateway
-              is_core: true
-              is_proxy: true
-              namespace: istio-gateway
-            {{- end }}
+            {{- end -}}
+            {{- end -}}
+            {{- end -}}
         {{- if .Values.istioCore.enabled }}
         ingress_gateway_namespace: istio-gateway
         egress_gateway_namespace: istio-gateway

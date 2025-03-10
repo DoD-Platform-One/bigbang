@@ -66,20 +66,17 @@ policies:
           - {{ $name }}
           {{- end }}
           namespaces:
-          - "istio-system"
-      {{- if .Values.istioCore.enabled }}
+          - istio-system
+      {{- if and .Values.istioCore.enabled .Values.istioGateway.enabled }}
       - resources:
           kinds:
           - Service
           names:
-          {{- if .Values.istioGatewayPassthrough.enabled }}
-          - "istio-gateway-passthrough-ingressgateway"
-          {{- end }}
-          {{- if .Values.istioGatewayPublic }}
-          - "public-ingressgateway"
-          {{- end }}
+          {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+          - {{ $gw.serviceName }}
+          {{ end -}}
           namespaces:
-          - "istio-gateway"
+          - istio-gateway
       {{- end }}
     {{- end }}
 

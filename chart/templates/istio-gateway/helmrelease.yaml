@@ -1,0 +1,84 @@
+{{- $fluxSettingsIstioGateway := merge .Values.istioGateway.flux .Values.flux -}}
+{{- if and .Values.istioCore.enabled .Values.istioGateway.enabled }}
+{{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: {{ $gw.serviceName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-gateway-{{ $name }}
+    app.kubernetes.io/component: core
+    {{- include "commonLabels" $ | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-gateway/values.yaml") $ | sha256sum }}
+spec:
+  releaseName: {{ $gw.serviceName }}
+  targetNamespace: istio-gateway
+  chart:
+    spec:
+      {{- if eq $.Values.istioGateway.sourceType "git" }}
+      chart: {{ $.Values.istioGateway.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: istio-gateway
+        namespace: {{ $.Release.Namespace }}
+      {{- else }}
+      chart: {{ $.Values.istioGateway.helmRepo.chartName }}
+      version: {{ $.Values.istioGateway.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ $.Values.istioGateway.helmRepo.repoName }}
+        namespace: {{ $.Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" $.Values.istioGateway.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and $.Values.istioGateway.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" $.Values.istioGateway.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsIstioGateway | nindent 2 }}
+
+  {{- if $.Values.istioGateway.postRenderers }}
+  {{- if kindIs "slice" $.Values.istioGateway.postRenderers }}
+  postRenderers:
+  {{ toYaml $.Values.istioGateway.postRenderers | nindent 4 }}
+  {{- end }}
+  {{- if kindIs "map" $.Values.istioGateway.postRenderers }}
+  {{- $postRenderers := get $.Values.istioGateway.postRenderers $name }}
+  {{- if $postRenderers }}
+  postRenderers:
+  {{ $postRenderers | toYaml | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  
+  valuesFrom:
+    - name: {{ $.Release.Name }}-istio-{{ $name }}-gateway-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ $.Release.Name }}-istio-{{ $name }}-gateway-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ $.Release.Name }}-istio-{{ $name }}-gateway-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: istio-core
+      namespace: {{ $.Release.Namespace }}
+    {{- if $.Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+    {{- if $.Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ $.Release.Namespace }}
+    {{- end }}
+status: {}
+{{- end }}
+{{- end }}

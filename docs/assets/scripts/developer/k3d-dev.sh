@@ -703,6 +703,7 @@ spec:
     priority: 100
     namespaces:
       - istio-system
+      - istio-gateway
     serviceSelectors:
       - matchExpressions:
           - {key: app, operator: In, values: [public-ingressgateway]}
@@ -722,6 +723,7 @@ spec:
     priority: 100
     namespaces:
       - istio-system
+      - istio-gateway
     serviceSelectors:
       - matchExpressions:
           - {key: app, operator: In, values: [passthrough-ingressgateway]}
