@@ -2005,11 +2005,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
-      tag: "3.12.2-bb.1"
+      tag: "3.12.2-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "metrics-server"
-      tag: "3.12.2-bb.1"
+      tag: "3.12.2-bb.2"
 
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
