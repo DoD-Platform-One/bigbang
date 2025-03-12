@@ -256,12 +256,6 @@
       ],
       "additionalProperties": true
     },
-    "istioGatewayPublic": {
-      "type": "object"
-    },
-    "istioGatewayPassthrough": {
-      "type": "object"
-    },
     "istioGateway": {
       "properties": {
         "enabled": true,
