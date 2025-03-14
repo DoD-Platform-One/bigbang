@@ -2234,12 +2234,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
-      tag: "2.0.4-bb.1"
+      tag: "2.0.16-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "k8s-monitoring"
-      tag: "2.0.4-bb.1"
+      tag: "2.0.16-bb.0"
 
     values: {}
 
