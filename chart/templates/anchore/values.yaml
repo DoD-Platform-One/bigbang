@@ -10,7 +10,7 @@ domain: {{ $domainName }}
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.anchore.values)
@@ -19,10 +19,10 @@ istio:
   injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
   ui:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
+      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.anchore.ingress.gateway }}
   api:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.anchore.ingress.gateway }}
+      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.anchore.ingress.gateway }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -40,6 +40,8 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.anchore.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
