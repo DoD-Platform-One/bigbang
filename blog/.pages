@@ -1,4 +1,5 @@
 nav:
+  - Big Bang 3.0 - Operatorless Istio Migration: bb-3-0-operatorless-istio-migration.md
   - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
   - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
   - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
