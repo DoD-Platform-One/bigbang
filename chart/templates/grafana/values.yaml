@@ -305,7 +305,6 @@ extraSecretMounts:
 {{- if .Values.monitoring.enabled }}
 serviceMonitor:
   enabled: true
-{{- end }}
 {{- if $istioInjection }}
   scheme: https
   tlsConfig:
@@ -313,6 +312,7 @@ serviceMonitor:
     certFile: /etc/prom-certs/cert-chain.pem
     keyFile: /etc/prom-certs/key.pem
     insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+{{- end }}
 {{- end }}
 {{- end }}
 
