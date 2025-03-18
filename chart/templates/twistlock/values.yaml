@@ -28,6 +28,8 @@ imagePullSecrets:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- $gateway := default "public" .Values.twistlock.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
@@ -36,7 +38,7 @@ networkPolicies:
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.twistlock.values)
@@ -44,7 +46,7 @@ istio:
     }}
   console:
     gateways:
-    - istio-system/{{ default "public" .Values.twistlock.ingress.gateway }}
+     - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.twistlock.ingress.gateway }}
 
 {{- if .Values.istio.enabled }}
 annotations:
