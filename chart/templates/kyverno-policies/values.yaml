@@ -13,6 +13,72 @@ waitforready:
   - name: private-registry
 
 policies:
+  add-default-capability-drop:
+    validationFailureAction: Enforce
+    exclude:
+      any:
+      {{- if .Values.neuvector.enabled }}
+      # Neuvector needs access to host to inspect network traffic
+      - resources:
+          namespaces:
+          - neuvector
+          names:
+          - neuvector-enforcer-pod*
+          - neuvector-cert-upgrader-job*
+          - neuvector-controller-pod*
+          - neuvector-scanner-pod*
+          - neuvector-prometheus-exporter-pod*
+      {{- end }}
+      {{- if .Values.addons.holocron.enabled }}
+      - resources:
+          namespaces:
+          - holocron
+          names:
+          - holocron-postgresql-0
+      {{- end }}
+      {{- if .Values.addons.velero.enabled }}
+      - resources:
+          namespaces:
+          - velero
+          names:
+          - velero-backup-restore-test*
+      {{- end }}
+      {{- if .Values.addons.gitlabRunner.enabled }}
+      - resources:
+          namespaces:
+          - gitlab-runner
+          names:
+          - runner*
+      {{- end }}
+      {{- if .Values.addons.gitlab.enabled }}
+      - resources:
+          namespaces:
+          - gitlab
+          names:
+          - webservice-test-runner*
+      {{- end }}
+      {{- if .Values.twistlock.enabled }}
+      - resources:
+          namespaces:
+          - twistlock
+          names:
+          - twistlock-defender-ds*
+          - volume-upgrade*
+      {{- end }}
+      {{- if .Values.addons.mimir.enabled }}
+      - resources:
+          namespaces:
+          - mimir
+          names:
+          - mimir-mimir-smoke-test*
+      {{- end }}
+      {{- if .Values.addons.vault.enabled }}
+      - resources:
+          namespaces:
+          - vault
+          names:
+          - vault-vault-job-init*
+      {{- end }}
 
   {{- if or .Values.twistlock.enabled .Values.neuvector.enabled }}
   disallow-host-namespaces:

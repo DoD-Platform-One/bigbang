@@ -503,6 +503,21 @@ kyvernoPolicies:
     # Parameters are copied from kyverno policies for test vectors
     # Exclusions are for allowing other helm tests to function
     policies:
+      add-default-capability-drop:
+        exclude:
+          any:
+          # Need to be able to test the `require-drop-all-capabilities` policy
+          # without this policy mutating the podspecs and adding the "missing" capability
+          - resources:
+              namespaces:
+              - default
+              names:
+              - require-drop-all-capabilities*
+          - resources:
+              namespaces:
+              - argocd
+              names:
+              - guestbook-ui-*
       clone-configs:
         parameters:
           clone:
