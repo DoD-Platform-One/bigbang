@@ -9,14 +9,14 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") .Values.istio.enabled) }}
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") (include "istioEnabled" .)) }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
 
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
@@ -26,10 +26,10 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
   gitlab:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.gitlab.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.gitlab.ingress.gateway }}
   registry:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.gitlab.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.gitlab.ingress.gateway }}
 
 # Used for istio SSO serviceEntry
 sso:
@@ -46,6 +46,8 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+    {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
 redis:
@@ -280,7 +282,7 @@ global:
     pullPolicy: {{ .Values.imagePullPolicy }}
     
   istio:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ include "istioEnabled" . }}
     injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
 
   hosts:
