@@ -1280,11 +1280,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/minio.git
       path: "./chart"
-      tag: "7.0.0-bb.2"
+      tag: "7.0.0-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "minio-instance"
-      tag: "7.0.0-bb.2"
+      tag: "7.0.0-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
