@@ -88,34 +88,6 @@ jaeger:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
   values:
-    istio:
-      hardened:
-        customAuthorizationPolicies:
-          - name: "allow-intranamespace-jaeger"
-            enabled: true
-            spec:
-              action: ALLOW
-              rules:
-              - from:
-                - source:
-                    namespaces:
-                    - jaeger
-        customServiceEntries:
-          - name: "cypress-service-entries-jaeger"
-            enabled: true
-            spec:
-              hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-                - 'tracing.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
     bbtests:
       enabled: true
       cypress:
@@ -125,7 +97,6 @@ jaeger:
           # cypress_tnr_username: "cypress"
           # cypress_tnr_password: "tnr_w!G33ZyAt@C8"
           # cypress_keycloak_test_enable: "true"
-
 kiali:
   sso:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
