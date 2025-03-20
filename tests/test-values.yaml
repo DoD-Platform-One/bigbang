@@ -1773,7 +1773,7 @@ addons:
       account:
         adminPassword: new_admin_password
         currentAdminPassword: admin
-      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.0.0
+      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
 
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core
