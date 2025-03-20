@@ -408,6 +408,11 @@ kyverno:
           requests:
             cpu: 1
             memory: 768Mi
+    features:
+      policyexceptions:
+        enabled: true
+        # -- Restrict policy exceptions to a single namespace
+        namespace: 'kyverno'
     bbtests:
       enabled: true
 
@@ -818,7 +823,36 @@ kyvernoPolicies:
         parameters:
           disallow:
           - bigbang
-
+    additionalPolicyExceptions:
+      testpolicyexception:
+        enabled: true
+        kind: PolicyException
+        namespace: "kyverno"
+        annotations:
+          policies.kyverno.io/title: Test PolicyException
+          policies.kyverno.io/category: Test
+          policies.kyverno.io/subject: Pod
+          policies.kyverno.io/description: >-
+            This Test PolicyException allows pods to deploy busybox for debugging.
+        # -- PolicyException specification.  See `kubectl explain policyexceptions.spec`
+        spec:
+          exceptions:
+          #Name of Policy for exception
+          - policyName: block-ephemeral-containers
+            ruleNames:
+            - block-ephemeral-containers
+          match:
+            any:
+            - resources:
+                kinds:
+                - Pod
+                names:
+                - important-tool*
+          conditions:
+            any:
+            - key: "{{ request.object.metadata.labels.app || '' }}"
+              operator: Equals
+              value: busybox
 eckOperator:
   # -- Toggle deployment of ECK Operator.
   enabled: false
