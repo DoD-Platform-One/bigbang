@@ -1,10 +1,10 @@
-{{- if and (not .Values.monitoring.enabled) (not .Values.grafana.enabled ) .Values.addons.alloy.enabled }}
+{{- if .Values.addons.alloy.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: monitoring
+  name: alloy
   labels:
-    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/name: alloy
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
     istio-injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
