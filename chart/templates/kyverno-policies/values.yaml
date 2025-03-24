@@ -696,12 +696,12 @@ policies:
       {{- if .Values.addons.alloy.enabled }}
       - resources:
           namespaces:
-          - monitoring
+          - alloy
           names:
-          - monitoring-alloy-alloy-metrics*
-          - monitoring-alloy-alloy-receiver*
-          - monitoring-alloy-alloy-logs*
-          - monitoring-alloy-alloy-singleton*
+          - alloy-alloy-metrics*
+          - alloy-alloy-receiver*
+          - alloy-alloy-logs*
+          - alloy-alloy-singleton*
       {{- end }}
     {{- end }}
   restrict-host-path-mount:
@@ -1142,7 +1142,10 @@ policies:
           - monitoring-monitoring-kube-state-metrics*
           - monitoring-monitoring-kube-operator*
           - prometheus-monitoring-monitoring-kube-prometheus*
-          - monitoring-alloy-*
+      - namespace: alloy
+        pods:
+          allow:
+          - alloy-*
       - namespace: mimir
         pods:
           allow:
