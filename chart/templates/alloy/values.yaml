@@ -26,4 +26,18 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.addons.alloy.values)
     }}
 
+k8s-monitoring:
+  {{- range $service := list "alloy-metrics" "alloy-log" }} # Add/Remove Alloy Micro-Services as Alloy Configurations Change
+  {{ $service }}:
+    serviceMonitor:
+      enabled: {{ $.Values.monitoring.enabled }}
+      {{- if and (include "istioEnabled" $) (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.addons.alloy.values) "STRICT") }}
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+  {{- end }}
+
 {{- end }}
