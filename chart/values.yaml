@@ -168,7 +168,7 @@ istioCore:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-core.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-core.git
     path: "./chart"
     branch: "main"
     #tag:
@@ -198,7 +198,7 @@ istioGateway:
   enabled: false
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-gateway.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
     branch: "main"
     #tag:
