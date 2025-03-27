@@ -8,13 +8,13 @@
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") .Values.istio.enabled) }}
+{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled")) }}
 
 OpenShift:
   enabled: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values)
@@ -22,7 +22,7 @@ istio:
     }}
   sonarqube:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.sonarqube.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.sonarqube.ingress.gateway }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
 
 monitoring:
