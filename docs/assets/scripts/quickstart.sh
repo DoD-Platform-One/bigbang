@@ -60,19 +60,7 @@ function checkout_pipeline_templates {
     git checkout ${arg_pipeline_templates_version}
 }
 
-function destroy_k3d_cluster {
-    if [[ "${arg_cloud_provider}" != "" ]]; then
-        arg_cloud="-c ${arg_cloud_provider}"
-    fi
-
-    ${BIG_BANG_REPO}/docs/assets/scripts/developer/k3d-dev.sh \
-        -t quickstart \
-        ${arg_cloud} \
-        -d
-}
-
-function build_k3d_cluster {
-    args=""
+function build_k3d_arguments {
     if [[ "${arg_privateip}" != "" ]]; then
         args="${args} -P ${arg_privateip}"
     fi
@@ -97,12 +85,22 @@ function build_k3d_cluster {
     if [[ "${arg_recreate_cloud}" == "true" ]]; then
         args="${args} -R"
     fi
+    echo "${args}"   
+}
 
+function destroy_k3d_cluster {
+    ${BIG_BANG_REPO}/docs/assets/scripts/developer/k3d-dev.sh \
+        -t quickstart \
+        $(build_k3d_arguments) \
+        -d
+}
+
+function build_k3d_cluster {
     ${BIG_BANG_REPO}/docs/assets/scripts/developer/k3d-dev.sh \
         -t quickstart \
         -T \
         -q \
-        ${args} \
+        $(build_k3d_arguments) \
         $@
 }
 
