@@ -14,7 +14,7 @@ image:
 imagePullSecrets:
 - name: private-registry
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 istio:
   enabled: true
 podAnnotations:
@@ -26,7 +26,7 @@ kyvernoPlugin:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -36,7 +36,7 @@ ui:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -45,7 +45,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   grafana:
     namespace: monitoring
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   serviceMonitor:
     scheme: https
     tlsConfig:
