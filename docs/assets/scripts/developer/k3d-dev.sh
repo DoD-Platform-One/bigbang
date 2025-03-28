@@ -526,7 +526,7 @@ function install_docker {
   run_batch_add 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
   run_batch_add "sudo DEBIAN_FRONTEND=noninteractive apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"
   # Add your base user to the Docker group so that you do not need sudo to run docker commands
-  run_batch_add "sudo usermod -aG docker ubuntu"
+  run_batch_add "sudo usermod -aG docker ${SSHUSER}"
   run_batch_execute
 }
 
