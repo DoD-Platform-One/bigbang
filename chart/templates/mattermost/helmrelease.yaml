@@ -16,6 +16,10 @@ spec:
   targetNamespace: mattermost
   driftDetection:
     mode: disabled
+    ignore:
+     - paths: ["/spec/size"]
+       target:
+         kind: Mattermost
   chart:
     spec:
       {{- if eq .Values.addons.mattermost.sourceType "git" }}
