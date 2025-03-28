@@ -54,6 +54,8 @@ csi:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}  
   ingressLabels:
     {{- $gateway := default "public" .Values.addons.vault.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
@@ -63,7 +65,7 @@ networkPolicies:
   vpcCidr: {{ .Values.networkPolicies.vpcCidr }}  
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.vault.values)
@@ -71,7 +73,7 @@ istio:
     }}
   vault:
     gateways:
-      - istio-system/{{ default "public" .Values.addons.vault.ingress.gateway }}
+      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.vault.ingress.gateway }}
     {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
     tls:
       cert: {{ .Values.addons.vault.ingress.cert | quote }}
