@@ -672,34 +672,6 @@ Kubernetes: `>=1.29.0-0`
 | addons.harbor.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.harbor.values | object | `{}` | Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git |
 | addons.harbor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| addons.holocron.enabled | bool | `false` | Toggle deployment of Holocron. |
-| addons.holocron.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| addons.holocron.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/holocron.git"` |  |
-| addons.holocron.git.tag | string | `"1.0.13"` |  |
-| addons.holocron.git.path | string | `"./chart"` |  |
-| addons.holocron.helmRepo.repoName | string | `"registry1"` |  |
-| addons.holocron.helmRepo.chartName | string | `"holocron"` |  |
-| addons.holocron.helmRepo.tag | string | `"1.0.13"` |  |
-| addons.holocron.collectorAuth.existingSecret | string | `""` | Name of existing secret with auth tokens for collector services: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide -- Default keys for secret are: -- gitlab-scm-0, gitlab-workflow-0, gitlab-build-0, jira-workflow-0, sonarqube-project-analysis-0 -- If not provided, one will be created |
-| addons.holocron.collectorAuth.gitlabToken | string | `"mygitlabtoken"` | Tokens for the secret to be created |
-| addons.holocron.collectorAuth.jiraToken | string | `"myjiratoken"` |  |
-| addons.holocron.collectorAuth.sonarToken | string | `"mysonartoken"` |  |
-| addons.holocron.jira.enabled | bool | `false` | If there is a Jira deployment, enable a collector for it |
-| addons.holocron.jira.service.name | string | `""` | The service name to communicate with |
-| addons.holocron.jira.service.label | object | `{"key":"value"}` | If network policies are enabled, a label to match the namespace for egress policy |
-| addons.holocron.flux | object | `{}` | Flux reconciliation overrides specifically for the Holocron Package |
-| addons.holocron.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`). The default is "public". |
-| addons.holocron.sso.enabled | bool | `false` | Toggle SSO for Holocron on and off |
-| addons.holocron.sso.client_id | string | `""` | OIDC Client ID to use for Holocron |
-| addons.holocron.sso.client_secret | string | `""` | OIDC Client Secret to use for Holocron |
-| addons.holocron.sso.groups | object | `{"admin":"","leadership":""}` | Holocron SSO group roles: https://repo1.dso.mil/groups/big-bang/apps/sandbox/holocron/-/wikis/Administrator-Guide |
-| addons.holocron.database.host | string | `""` | Hostname of a pre-existing PostgreSQL database to use for Gitlab. -- Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
-| addons.holocron.database.port | int | `5432` | Port of a pre-existing PostgreSQL database to use for Gitlab. |
-| addons.holocron.database.database | string | `"holocron"` | Database name to connect to on host. |
-| addons.holocron.database.username | string | `"holocron"` | Username to connect as to external database, the user must have all privileges on the database. |
-| addons.holocron.database.password | string | `"holocron"` | Database password for the username used to connect to the existing database. |
-| addons.holocron.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| addons.holocron.values | object | `{}` | Values to passthrough to the Holocron chart: https://repo1.dso.mil/big-bang/product/packages/holocron.git |
 | addons.thanos.enabled | bool | `false` | Toggle deployment of thanos |
 | addons.thanos.sso.enabled | bool | `false` | Toggle SSO for Thanos on and off |
 | addons.thanos.sso.client_id | string | `""` | OIDC Client ID to use for Thanos |

@@ -203,8 +203,3 @@ addons:
     sourceType: "helmRepo"
     helmRepo:
       cosignVerify: false
-
-  holocron:
-    sourceType: "helmRepo"
-    helmRepo:
-      cosignVerify: false
