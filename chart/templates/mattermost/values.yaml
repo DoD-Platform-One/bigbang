@@ -16,10 +16,10 @@ image:
 {{ $istioInjection := (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.mattermost) "enabled")) }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   chat:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.mattermost.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.mattermost.ingress.gateway }}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
   hardened:
     enabled: {{ or
