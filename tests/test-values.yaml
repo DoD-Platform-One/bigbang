@@ -224,7 +224,6 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
-          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -367,7 +366,6 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
-          - holocron/holocron-cypress-test
           - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
@@ -611,7 +609,6 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
-              - holocron
               - alloy
               names:
               - "*-cypress-test*"
@@ -653,7 +650,6 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
-              - holocron
               - alloy
               names:
               - "*-cypress-test*"
@@ -702,7 +698,6 @@ kyvernoPolicies:
               - harbor
               - fortify
               - thanos
-              - holocron
               - alloy
               names:
               - "*-cypress-test*"
@@ -2645,45 +2640,3 @@ addons:
           insecure: true
           trace:
             enable: true
-
-  # ----------------------------------------------------------------------------------------------------------------------
-  # Holocron
-  #
-  holocron:
-    # -- Toggle deployment of holocron
-    enabled: false
-    sso:
-      enabled: false
-      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_holocron
-    values:
-      istio:
-        hardened: 
-          customServiceEntries:
-            - name: "cypress-service-entries-holocron"
-              enabled: true
-              spec:
-                hosts:
-                  - 'repo1.dso.mil'
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
-      bbtests:
-        enabled: true
-        cypress:
-          resources:
-            requests:
-              cpu: "2"
-              memory: "2G"
-            limits:
-              cpu: "2"
-              memory: "2G"
-
-  externalSecrets:
-    values:
-      bbtests:
-        enabled: true
-        cypress:
-          artifacts: true

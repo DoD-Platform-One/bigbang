@@ -1252,18 +1252,6 @@
             }
           }
         },
-        "holocron": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ],
-          "properties": {
-            "istio": {
-              "$ref": "#/$defs/istio"
-            }
-          }
-        },
         "thanos": {
           "allOf": [
             {
