@@ -16,7 +16,7 @@ externalURL: https://fortify.{{ .Values.domain }}
 domain: {{ .Values.domain }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values)
@@ -24,15 +24,17 @@ istio:
     }}
   fortify:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.fortify.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.fortify.ingress.gateway }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.fortify.ingress.gateway }}
+    {{- $gateway := default (include "istioPublicGateway" . ) .Values.addons.fortify.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 openshift: {{ .Values.openshift }}
 
