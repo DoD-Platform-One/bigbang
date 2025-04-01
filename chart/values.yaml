@@ -1148,6 +1148,38 @@ twistlock:
 
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
+# BBCTL Dashboards
+#
+# Requires monitoring, grafana, loki, and promtail to be deployed
+bbctl:
+    # -- Toggle deployment of the bbctl dashboards
+  enabled: true
+
+  sourceType: "git"
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/bbctl.git
+    tag: "1.0.0-bb.2"
+    path: "./chart"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "bbctl"
+    tag: "1.0.0-bb.2"
+
+  repoCredentials:
+    repo: "repo1.dso.mil"
+    username: ""
+    password: ""
+
+  # -- Override flux settings for this package
+  flux: {}
+
+  values: {}
+
+  postRenderers: []
 
 #
 # ----------------------------------------------------------------------------------------------------------------------

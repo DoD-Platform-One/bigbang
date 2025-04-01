@@ -1,0 +1,10 @@
+{{- if and .Values.bbctl.enabled .Values.loki.enabled .Values.promtail.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bbctl
+  labels:
+    app.kubernetes.io/name: bbctl
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled")) }}
+{{- end }}

@@ -1276,6 +1276,47 @@ twistlock:
       scripts:
         envs:
           twistlock_host: "https://twistlock.dev.bigbang.mil"
+bbctl:
+  enabled: true
+  values:
+    istio:
+      hardened:
+        customServiceEntries:
+          - name: "cypress-service-entries-bbctl"
+            enabled: true
+            spec:
+              hosts:
+                - 'registry.npmjs.org'
+                - 'download.cypress.io'
+                - 'cdn.cypress.io'
+                - 'repo1.dso.mil'
+                - 'grafana.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+        customAuthorizationPolicies:
+          - name: "allow-intranamespace-bctl"
+            enabled: true
+            spec:
+              action: ALLOW
+              rules:
+              - from:
+                - source:
+                    namespaces:
+                    - loki
+                    - grafana
+                    - promtail
+                    - monitoring
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
+          cypress_grafana_username: 'admin'
+          cypress_grafana_password: 'prom-operator'
 
 # Addons are toggled based on labels in CI
 addons:
