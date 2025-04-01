@@ -1,0 +1,23 @@
+{{- if and .Values.bbctl.enabled .Values.loki.enabled .Values.promtail.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
+{{- $gitCredsDict := dict
+  "name" "bbctl"
+  "packageGitScope" .Values.bbctl.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: bbctl
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: bbctl
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.bbctl.git.repo }}
+  ref:
+    {{- include "validRef" .Values.bbctl.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}

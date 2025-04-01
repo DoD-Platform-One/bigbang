@@ -108,6 +108,12 @@ loki:
     filesystem:
       directory: /var/loki/chunks
   {{- end }}
+  # The bbctl violations dashboard output can be larger than the default loki line limit of 256KB
+  # Setting max_line_size = 0 removes the limit so the data can be ingested properly
+  {{- if .Values.bbctl.enabled }}
+  limits_config:
+    max_line_size: 0
+  {{- end }}
   {{- if include "istioEnabled" . }}
   podAnnotations:
     {{ include "istioAnnotation" . }}

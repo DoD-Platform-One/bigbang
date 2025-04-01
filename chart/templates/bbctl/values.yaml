@@ -1,0 +1,61 @@
+{{- if and .Values.bbctl.enabled .Values.loki.enabled .Values.promtail.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.bbctl "name" "bbctl" "defaults" (include "bigbang.defaults.bbctl" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.bbctl" -}}
+
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+registryCredentials:
+{{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
+{{ with index .Values.registryCredentials 0 }}
+  registry: "{{ .registry }}"
+  username: "{{ .username }}"
+  password: "{{ .password }}"
+{{- end }}
+{{ else }}
+{{ toYaml .Values.registryCredentials }}
+{{- end }}
+
+credentialsFile:
+  credentials:
+  {{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
+  {{- range $item := .Values.registryCredentials }}
+  - uri: {{ $item.registry }}
+    username: {{ $item.username }}
+    password: {{ $item.password }}
+  {{- end }}
+  {{ else }}
+  - uri: {{ .Values.registryCredentials.registry }}
+    username: {{ .Values.registryCredentials.username }}
+    password: {{ .Values.registryCredentials.password }}
+  {{- end }}
+  - uri: "{{ .Values.bbctl.repoCredentials.repo }}"
+    username: "{{ .Values.bbctl.repoCredentials.username }}"
+    password: "{{ .Values.bbctl.repoCredentials.password }}"
+
+baseConfig:
+  skip-update-check: true
+  preflight-check:
+    {{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
+    {{ with index .Values.registryCredentials 0 }}
+    registryserver: "https://{{ .registry }}"
+    registryusername: {{ .username }}
+    registrypassword: {{ .password }}
+    {{- end }}
+    {{ else }}
+    registryserver: "https://{{ .Values.registryCredentials.registry }}"
+    registryusername: {{ .Values.registryCredentials.username }}
+    registrypassword: {{ .Values.registryCredentials.password }}
+    {{- end }}
+
+istio:
+  enabled: {{ include "istioEnabled" . }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.bbctl.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
+
+{{- end -}}
