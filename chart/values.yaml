@@ -1156,7 +1156,7 @@ twistlock:
 # Requires monitoring, grafana, loki, and promtail to be deployed
 bbctl:
     # -- Toggle deployment of the bbctl dashboards
-  enabled: true
+  enabled: false
 
   sourceType: "git"
 
