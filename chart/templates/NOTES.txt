@@ -126,9 +126,17 @@ PLATFORM ONE LOGGING WARNING:
   {{- end }}
 {{- end }}
 
-{{- if and .Values.promtail.enabled .Values.fluentbit.enabled }}
+
+{{- $fluentbitEnabled := .Values.fluentbit.enabled }}
+{{- $promtailEnabled := .Values.promtail.enabled }}
+{{- $alloyLogsEnabled := or (dig "k8s-monitoring" "alloy-logs" "enabled" false .Values.addons.alloy.values) (dig "alloyLogs" "enabled" false .Values.addons.alloy) }}
+{{- $loggerCount := add $fluentbitEnabled $promtailEnabled $alloyLogsEnabled }}
+{{- if ge $loggerCount 2 }}
 PLATFORM ONE LOGGING WARNING:
-  You have enabled both Promtail and Fluentbit (log forwarders). This is not a supported configuration and you may see conflicts as a result of both applications attempting to ship logs.
+  You have enabled multiple log collectors.  This is not a supported configuration and you may see conflicts as a result of multiple applications attempting to ship logs.
+    - Fluentbit Enabled: {{ $fluentbitEnabled }}
+    - Promtail Enabled: {{ $promtailEnabled }}
+    - Alloy Enabled: {{ $alloyLogsEnabled }}
 {{- end }}
 
 {{- if and .Values.loki.enabled .Values.elasticsearchKibana.enabled }}
@@ -419,4 +427,10 @@ PLATFORM ONE THANOS WARNING:
 PLATFORM ONE LOKI WARNING:
   BigBang does not support the Loki Distributed deployment mode. For production deployments,
   please set your strategy to "scalable" or "monolithic"
+{{- end }}
+
+{{- if .Values.promtail.enabled }}
+DEPRECATION NOTICE:
+  Grafana Promtail has been deprecated and will be removed in a future Big Bang release. 
+  Big Bang will be migrating to Grafana Alloy (https://docs-bigbang.dso.mil/latest/packages/alloy/) as the core log aggregator. 
 {{- end }}
