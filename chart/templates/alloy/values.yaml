@@ -4,6 +4,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.alloy" -}}
+{{- $alloyMetricsEnabled := (.Values.addons.alloy.alloyMetrics.enabled) }}
+{{- $alloyLogsEnabled := (.Values.addons.alloy.alloyLogs.enabled) }}
+{{- $alloyTracesEnabled := (.Values.addons.alloy.alloyTraces.enabled) }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
@@ -40,4 +44,48 @@ k8s-monitoring:
       {{- end }}
   {{- end }}
 
+  destinations:
+    {{- if and $alloyMetricsEnabled .Values.monitoring.enabled }}
+    - name: prometheus
+      type: prometheus
+      url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+    {{- end }}
+    {{- if and $alloyMetricsEnabled .Values.addons.mimir.enabled }}
+    - name: mimir
+      type: prometheus
+      url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+    {{- end }}
+    {{- if and $alloyLogsEnabled .Values.loki.enabled }}
+    - name: loki
+      type: loki
+      url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
+    {{- end }}
+    {{- if and $alloyTracesEnabled .Values.tempo.enabled }}
+    - name: tempo
+      type: otlp
+      metrics:
+        enabled: false
+      logs:
+        enabled: false
+      traces:
+        enabled: true
+      url: tempo-tempo.tempo.svc.cluster.local:4317
+      tls: {}
+    {{- end }}
+  {{- if and $alloyMetricsEnabled (or .Values.monitoring.enabled .Values.addons.mimir.enabled) }}
+  alloy-metrics:
+    enabled: true 
+  {{- end }}
+  {{- if and $alloyLogsEnabled .Values.loki.enabled }}
+  alloy-logs:
+    enabled: true
+  podLogs:
+    enabled: true
+  {{- end }}
+  {{- if and $alloyTracesEnabled .Values.tempo.enabled }}
+  alloy-receiver:
+    enabled: true
+  applicationObservability:
+    enabled: true
+  {{- end }}
 {{- end }}
