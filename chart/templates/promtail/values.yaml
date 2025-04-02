@@ -25,7 +25,7 @@ loki:
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
   # conditional passes only for default istio: enabled, mTLS: SCRICT
-  {{- if and (include "istioEnabled" . ) (eq (dig "istio" "mtls" "mode" "STRICT" .Values.promtail.values) "STRICT") }}
+  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.promtail.values) "STRICT") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem
@@ -40,8 +40,10 @@ monitoring:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
-{{- if include "istioEnabled" . }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
