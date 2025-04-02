@@ -2241,6 +2241,16 @@ addons:
       chartName: "k8s-monitoring"
       tag: "2.0.16-bb.2"
 
+    # -- Toggle Alloy to collect logs 
+    alloyLogs:
+      enabled: true
+    # -- Toggle Alloy to scrape metrics
+    alloyMetrics:
+      enabled: true
+    # -- Toggle Alloy to receive traces
+    alloyTraces:
+      enabled: false
+
     values: {}
 
     postRenderers: []
