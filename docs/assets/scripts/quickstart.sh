@@ -336,7 +336,7 @@ function main {
     if [[ "${actions}" =~ "deploy" ]]; then
         deploy_flux
 
-        deploy_bigbang ${arg_argv}
+        deploy_bigbang ${arg_argv[@]}
     fi
 
     if [[ "${actions}" =~ "wait" ]]; then
