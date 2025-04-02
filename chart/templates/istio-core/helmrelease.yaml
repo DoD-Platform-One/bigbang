@@ -12,6 +12,7 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-core/values.yaml") . | sha256sum }}
 spec:
+  releaseName: istio-core
   targetNamespace: istio-system
   chart:
     spec:

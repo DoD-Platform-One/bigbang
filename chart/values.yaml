@@ -170,12 +170,11 @@ istioCore:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-core.git
     path: "./chart"
-    branch: "main"
-    #tag:
+    tag: 1.23.3-bb.4
   helmRepo:
     repoName: "registry1"
     chartName: "istio-core"
-    #tag:
+    tag: 1.23.3-bb.4
   # -- Values to passthrough to the istiod chart
   values:
     # k8s 1.29+ native sidecars ~ https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates
@@ -200,12 +199,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    branch: "main"
-    #tag:
+    tag: 1.23.3-bb.3
   helmRepo:
     repoName: "registry1"
     chartName: "istio-gateway"
-    #tag:
+    tag: 1.23.3-bb.3
   values: {}
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
