@@ -365,7 +365,7 @@ Kubernetes: `>=1.29.0-0`
 | twistlock.sso.groups | string | `""` | Groups attribute (optional) |
 | twistlock.values | object | `{}` | Values to passthrough to the twistlock chart: https://repo1.dso.mil/big-bang/product/packages/twistlock.git |
 | twistlock.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| bbctl.enabled | bool | `true` | Toggle deployment of the bbctl dashboards |
+| bbctl.enabled | bool | `false` | Toggle deployment of the bbctl dashboards |
 | bbctl.sourceType | string | `"git"` |  |
 | bbctl.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/bbctl.git"` |  |
 | bbctl.git.tag | string | `"1.0.0-bb.2"` |  |
