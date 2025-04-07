@@ -5,7 +5,7 @@
 {{- define "bigbang.defaults.velero" -}}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ include "istioEnabled" .  }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.velero.values)
@@ -51,6 +51,8 @@ metrics:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
 openshift: {{ .Values.openshift }}

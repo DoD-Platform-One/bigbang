@@ -7,5 +7,5 @@ metadata:
     app.kubernetes.io/name: velero
     app.kubernetes.io/component: "cluster-utilities"
     {{- include "commonLabels" . | nindent 4 }}
-    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.velero) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true" ) (eq (dig "istio" "injection" "enabled" .Values.addons.velero) "enabled")) }}
 {{- end }}
