@@ -8,6 +8,12 @@
 {{- $alloyLogsEnabled := (.Values.addons.alloy.alloyLogs.enabled) }}
 {{- $alloyTracesEnabled := (.Values.addons.alloy.alloyTraces.enabled) }}
 
+{{- $lokiWriteDestUrl := ternary
+    "http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push"
+    "http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push"
+    (eq .Values.loki.strategy "monolith")
+}}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
@@ -58,7 +64,7 @@ k8s-monitoring:
     {{- if and $alloyLogsEnabled .Values.loki.enabled }}
     - name: loki
       type: loki
-      url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
+      url: {{ $lokiWriteDestUrl }}
     {{- end }}
     {{- if and $alloyTracesEnabled .Values.tempo.enabled }}
     - name: tempo
