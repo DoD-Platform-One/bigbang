@@ -13,7 +13,6 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/bbctl/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: bbctl
-  interval: 5m
   chart:
     spec:
       {{- if eq .Values.bbctl.sourceType "git" }}
@@ -37,6 +36,7 @@ spec:
           name: {{ printf "%s-cosign-pub" .Values.bbctl.helmRepo.repoName }}
       {{- end }}
       {{- end }}
+      interval: 5m
 
   {{- toYaml $fluxSettingsbbctl | nindent 2 }}
 

@@ -182,6 +182,12 @@ grafana:
       cypress:
         artifacts: false
 
+bbctl:
+  values:
+    bbtests:
+      cypress:
+        artifacts: false
+
 # Addons are toggled based on labels in CI
 addons:
   argocd:
