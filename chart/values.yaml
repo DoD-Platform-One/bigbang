@@ -170,11 +170,11 @@ istioCore:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-core.git
     path: "./chart"
-    tag: 1.23.3-bb.4
+    tag: 1.25.1-bb.1
   helmRepo:
     repoName: "registry1"
     chartName: "istio-core"
-    tag: 1.23.3-bb.4
+    tag: 1.25.1-bb.1
   # -- Values to passthrough to the istiod chart
   values:
     # k8s 1.29+ native sidecars ~ https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates
