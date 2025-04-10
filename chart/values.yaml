@@ -176,17 +176,13 @@ istioCore:
     chartName: "istio-core"
     tag: 1.25.1-bb.1
   # -- Values to passthrough to the istiod chart
-  values:
-    # k8s 1.29+ native sidecars ~ https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates
-    # prevent jobs from hanging ~ https://istio.io/latest/blog/2023/native-sidecars/#sidecar-woes
-    istiod:
-      pilot:
-        env:
-          ENABLE_NATIVE_SIDECARS: 'true'
-    # # enable Tetrate FIPS compliant Istio images
-    # defaults:
-    #   global:
-    #     enterprise: true
+  values: {}
+  # use Tetrate's Enterprise FIPS compliant Istio image
+  #   istiod:
+  #     global:
+  #       hub: registry1.dso.mil/ironbank/tetrate/istio
+  #       tag: 1.25.1-tetratefipslatest1
+
   # -- Flux reconciliation overrides specifically for the Istio Gateway Package
   flux: {}
   # -- Post Renderers.  See docs/postrenders.md
@@ -205,6 +201,17 @@ istioGateway:
     chartName: "istio-gateway"
     tag: 1.23.3-bb.3
   values: {}
+  # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
+  #   gateways:
+  #     passthrough:
+  #       image:
+  #         repo: registry1.dso.mil/ironbank/tetrate/istio/proxyv2
+  #         tag: 1.25.1-tetratefipslatest1
+  #     public:
+  #       image:
+  #         repo: registry1.dso.mil/ironbank/tetrate/istio/proxyv2
+  #         tag: 1.25.1-tetratefipslatest1
+  #
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
   #     public:
