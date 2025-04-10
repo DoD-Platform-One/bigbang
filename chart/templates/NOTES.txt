@@ -145,6 +145,12 @@ PLATFORM ONE LOGGING WARNING:
   If using Elastic for other functionality, deploying both applications is acceptable.
 {{- end }}
 
+{{- if and (and .Values.addons.alloy.enabled .Values.addons.alloy.alloyLogs.enabled) (not .Values.loki.enabled) }}
+PLATFORM ONE LOGGING WARNING:
+  You have enabled Alloy with logging but have not enabled Loki.
+  Please enable Loki or disable .Values.addons.alloy.alloyLogs
+{{- end }}
+
 {{- if and $.Values.loki.enabled (dig "values" "global" "createGlobalConfig" false $.Values.loki) }}
 PLATFORM ONE LOKI WARNING:
   You still have Loki global values set but this version of Loki has changed significantly, please review the latest production document within the Loki package repo: https://repo1.dso.mil/big-bang/product/packages/loki/-/blob/main/docs/production.md
