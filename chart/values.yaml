@@ -177,13 +177,13 @@ istioCore:
     tag: 1.25.1-bb.1
   # -- Values to passthrough to the istiod chart
   values: {}
-  # use Tetrate's Enterprise FIPS compliant Istio image
+  # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
   #   istiod:
   #     global:
   #       hub: registry1.dso.mil/ironbank/tetrate/istio
   #       tag: 1.25.1-tetratefipslatest1
 
-  # -- Flux reconciliation overrides specifically for the Istio Gateway Package
+  # -- Flux reconciliation overrides specifically for the Istio Core Package
   flux: {}
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
@@ -200,6 +200,7 @@ istioGateway:
     repoName: "registry1"
     chartName: "istio-gateway"
     tag: 1.25.1-bb.1
+  # -- Values to passthrough to the gateway chart(s)
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
   #   gateways:
