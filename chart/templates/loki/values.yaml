@@ -33,6 +33,8 @@ istio:
       enabled: {{ .Values.fluentbit.enabled }}
     minioOperator:
       enabled: {{ .Values.addons.minioOperator.enabled }}
+    alloy:
+      enabled: {{ .Values.addons.alloy.enabled }}
   {{- end }}
   loki:
     enabled: true
