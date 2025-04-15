@@ -190,7 +190,9 @@ istioCore:
 
 istioGateway:
   status: "alpha"
+  # -- Toggle deployment of Istio Gateway(s)  
   enabled: false
+  # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
