@@ -161,27 +161,47 @@ imagePullPolicy: IfNotPresent
 # Istio
 #
 
-istioCore:
-  status: "alpha"
+istioCRDs:
+  status: "beta"
   # -- Toggle deployment of Istio (helm deployment of istio-base and istiod)
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/istio-core.git
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds.git
     path: "./chart"
-    tag: 1.25.1-bb.1
+    tag: 1.25.1-bb.0
   helmRepo:
     repoName: "registry1"
-    chartName: "istio-core"
-    tag: 1.25.1-bb.1
+    chartName: "istio-crds"
+    tag: 1.25.1-bb.0
+  # -- Values to passthrough to the istiod chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Istio Core Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
+istiod:
+  status: "beta"
+  # -- Toggle deployment of Istio (helm deployment of istio-base and istiod)
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istiod.git
+    path: "./chart"
+    tag: 1.25.1-bb.0
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istiod"
+    tag: 1.25.1-bb.0
   # -- Values to passthrough to the istiod chart
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
-  #   istiod:
+  #   upstream:
   #     global:
   #       hub: registry1.dso.mil/ironbank/tetrate/istio
-  #       tag: 1.25.1-tetratefipslatest1
 
   # -- Flux reconciliation overrides specifically for the Istio Core Package
   flux: {}
@@ -189,7 +209,7 @@ istioCore:
   postRenderers: []
 
 istioGateway:
-  status: "alpha"
+  status: "beta"
   # -- Toggle deployment of Istio Gateway(s)  
   enabled: false
   # -- Choose source type of "git" or "helmRepo"

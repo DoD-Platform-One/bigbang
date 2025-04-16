@@ -30,7 +30,7 @@ networkPolicies:
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
     {{- end }}
-    {{- if .Values.istioCore.enabled }}
+    {{- if .Values.istiod.enabled }}
     app: public-ingressgateway
     istio: ingressgateway
     {{- end }}

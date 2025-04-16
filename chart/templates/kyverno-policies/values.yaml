@@ -115,7 +115,7 @@ policies:
   # Istio services (istio ingress) can create type: NodePort services
   disallow-nodeport-services:
     validationFailureAction: Enforce
-    {{- if or $nodePortIngressGateways .Values.istioCore.enabled }}
+    {{- if or $nodePortIngressGateways .Values.istiod.enabled }}
     exclude:
       any:
       - resources:
@@ -127,7 +127,7 @@ policies:
           {{- end }}
           namespaces:
           - istio-system
-      {{- if and .Values.istioCore.enabled .Values.istioGateway.enabled }}
+      {{- if and .Values.istiod.enabled .Values.istioGateway.enabled }}
       - resources:
           kinds:
           - Service
@@ -461,7 +461,7 @@ policies:
       - resources:
           namespaces:
           - kube-system
-      {{ if .Values.istioCore.enabled }}
+      {{ if .Values.istiod.enabled }}
       - resources:
           namespaces:
           - istio-system

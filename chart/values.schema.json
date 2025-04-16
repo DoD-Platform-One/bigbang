@@ -14,8 +14,9 @@
     "flux",
     "networkPolicies",
     "imagePullPolicy",
-    "istioCore",
+    "istioCRDs",
     "istioGateway",
+    "istiod",
     "istio",
     "istioOperator",
     "jaeger",
@@ -240,7 +241,7 @@
         "IfNotPresent"
       ]
     },
-    "istioCore": {
+    "istioCRDs": {
       "properties": {
         "enabled": true,
         "sourceType": true,
@@ -255,6 +256,26 @@
           "$ref": "#/$defs/basePackage"
         }
       ],
+      "additionalProperties": true
+    },
+    "istiod": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "additionalProperties": true
+    },
+    "istioCore": {
       "additionalProperties": true
     },
     "istioGateway": {
