@@ -15,15 +15,17 @@
 ## Migration Process  
   
 Istio can be migrated from the old operator packages to the new helm-based packages in-place with a few steps.
-### Step 1 : Swap `istio` for `istioCore`
-Disable the old istio package and enable the new istioCore package:
+### Step 1 : Swap `istio` for `istioCRDs` and `istiod`
+Disable the old istio package and enable the new `istioCRDs` and `istiod` packages:
 ```yaml
 istioOperator:
   enabled: true
 istio:
   enabled: false
   
-istioCore:
+istioCRDs:
+  enabled: true
+istiod:
   enabled: true
 istioGateway:
   enabled: false
@@ -42,7 +44,9 @@ istioOperator:
 istio:
   enabled: false
   
-istioCore:
+istioCRDs:
+  enabled: true
+istiod:
   enabled: true
 istioGateway:
   enabled: true

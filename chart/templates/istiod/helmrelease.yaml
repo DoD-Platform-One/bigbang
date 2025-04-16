@@ -1,0 +1,75 @@
+{{- $fluxSettingsIstioCore := merge .Values.istiod.flux .Values.flux -}}
+{{- if .Values.istiod.enabled }}
+{{- if not .Values.istioCRDs.enabled }}
+{{- fail "istiod requires istioCRDs to be enabled" }}
+{{- end }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istiod
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istiod
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istiod/values.yaml") . | sha256sum }}
+spec:
+  releaseName: istiod
+  targetNamespace: istio-system
+  chart:
+    spec:
+      {{- if eq .Values.istiod.sourceType "git" }}
+      chart: {{ .Values.istiod.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: istiod
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.istiod.helmRepo.chartName }}
+      version: {{ .Values.istiod.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.istiod.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istiod.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.istiod.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.istiod.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsIstioCore | nindent 2 }}
+
+  {{- if .Values.istiod.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.istiod.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-istiod-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-istiod-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-istiod-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: istio-crds
+      namespace: {{ .Release.Namespace }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled }}
+    {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+  {{- end }}
+{{- end }}

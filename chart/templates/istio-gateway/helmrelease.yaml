@@ -1,5 +1,5 @@
 {{- $fluxSettingsIstioGateway := merge .Values.istioGateway.flux .Values.flux -}}
-{{- if and .Values.istioCore.enabled .Values.istioGateway.enabled }}
+{{- if and .Values.istiod.enabled .Values.istioGateway.enabled }}
 {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -69,7 +69,7 @@ spec:
       valuesKey: "overlays"
 
   dependsOn:
-    - name: istio-core
+    - name: istiod
       namespace: {{ $.Release.Namespace }}
     {{- if $.Values.gatekeeper.enabled }}
     - name: gatekeeper

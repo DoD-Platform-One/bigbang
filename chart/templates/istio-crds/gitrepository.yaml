@@ -1,0 +1,24 @@
+{{- if and (eq .Values.istioCRDs.sourceType "git") (not .Values.offline) .Values.istioCRDs.enabled }}
+{{- $gitCredsDict := dict
+  "name" "istioCRDs"
+  "packageGitScope" .Values.istioCRDs.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: istio-crds
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-crds
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.istioCRDs.git.repo }}
+  ref:
+    {{- include "validRef" .Values.istioCRDs.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}

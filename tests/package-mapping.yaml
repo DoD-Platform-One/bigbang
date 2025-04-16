@@ -12,10 +12,14 @@ istioOperator:
   repoName: "istio-operator"
   hrName: "istio-operator"
   filePath: "istio-operator"
-istioCore:
-  repoName: "istio-core"
-  hrName: "istio-core"
-  filePath: "istio-core"
+istiod:
+  repoName: "istiod"
+  hrName: "istiod"
+  filePath: "istiod"
+istioCRDs:
+  repoName: "istio-crds"
+  hrName: "istio-crds"
+  filePath: "istio-crds"
 istioGateway:
   repoName: "istio-gateway"
   hrName: "public-ingressgateway"
