@@ -7,5 +7,5 @@ metadata:
     app.kubernetes.io/name: alloy
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
+    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.alloy) "enabled")) }}
 {{- end }}

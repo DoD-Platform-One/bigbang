@@ -51,7 +51,7 @@ config:
         Suppress_Type_Name       On
         Retry_Limit              False
         Replace_Dots             On
-        {{- if and .Values.istio.enabled (dig "istio" "elasticsearch" "enabled" false .Values.elasticsearchKibana.values) }}
+        {{- if and (eq (include "istioEnabled" .) "true") (dig "istio" "elasticsearch" "enabled" false .Values.elasticsearchKibana.values) }}
         tls                      Off
         {{- else }}
         tls                      On
@@ -143,9 +143,12 @@ image:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.fluentbit.values)
@@ -167,7 +170,7 @@ serviceMonitor:
   # - istio: enabled
   # - mTLS: SCRICT
   # - istio injection: enabled (for logging ns)
-  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.fluentbit.values) "STRICT") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana.values) "enabled") }}
+  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.fluentbit.values) "STRICT") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana.values) "enabled") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem

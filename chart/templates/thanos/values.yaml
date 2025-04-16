@@ -17,7 +17,7 @@ externalURL: https://thanos.{{ .Values.domain }}
 domain: {{ .Values.domain }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
@@ -39,7 +39,7 @@ istio:
   {{- end }}
   thanos:
     gateways:
-    - istio-system/{{ default "public" .Values.addons.thanos.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) }}
 
 {{- with .Values.addons.thanos.objectStorage }}
 {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
@@ -55,6 +55,8 @@ networkPolicies:
     {{- $gateway := default "public" .Values.addons.thanos.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

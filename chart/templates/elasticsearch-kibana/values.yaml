@@ -13,7 +13,7 @@ openshift: {{ .Values.openshift }}
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -26,10 +26,10 @@ istio:
     }}
   kibana:
     gateways:
-    - istio-system/{{ default "public" .Values.elasticsearchKibana.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.elasticsearchKibana.ingress.gateway }}
   elasticsearch:
     gateways:
-    - istio-system/{{ default "public" .Values.elasticsearchKibana.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.elasticsearchKibana.ingress.gateway }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -37,6 +37,8 @@ networkPolicies:
     {{- $gateway := default "public" .Values.elasticsearchKibana.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 {{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.addons.mattermost.enabled }}
 mattermost:
@@ -79,7 +81,7 @@ sso:
 kibana:
   imagePullSecrets:
     - name: private-registry
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}
@@ -130,7 +132,7 @@ elasticsearch:
             drop:
               - ALL
       {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -156,7 +158,7 @@ elasticsearch:
             drop:
               - ALL
       {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -182,7 +184,7 @@ elasticsearch:
             drop:
               - ALL
       {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if or (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -208,7 +210,7 @@ elasticsearch:
             drop:
               - ALL
       {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -234,7 +236,7 @@ elasticsearch:
             drop:
               - ALL
       {{- end }}
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}

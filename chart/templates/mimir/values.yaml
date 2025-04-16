@@ -4,18 +4,23 @@
 {{- end }}
 
 {{- define "bigbang.defaults.mimir" -}}
+
 {{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
+{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -56,7 +61,7 @@ minio-tenant:
 
 mimir-distributed:
   query_scheduler:
-    enabled: {{ not .Values.istio.enabled }}
+    enabled: {{ not (eq (include "istioEnabled" .) "true") }}
   {{- if or $minioEnabled $s3Enabled }}
   {{- if $s3Enabled }}
   global:
