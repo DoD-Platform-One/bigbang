@@ -14,7 +14,7 @@ waitforready:
 
 policies:
   add-default-capability-drop:
-    validationFailureAction: Enforce
+    enabled: true
     exclude:
       any:
       {{- if .Values.neuvector.enabled }}
@@ -55,6 +55,7 @@ policies:
           namespaces:
           - twistlock
           names:
+          - twistlock-console*
           - twistlock-defender-ds*
           - volume-upgrade*
       {{- end }}
@@ -352,7 +353,7 @@ policies:
           - istio-gateway
 
   add-default-securitycontext:
-    validationFailureAction: Enforce
+    enabled: true
     {{ if .Values.istio.enabled }}
     parameters:
       excludeContainers:
@@ -382,6 +383,7 @@ policies:
           namespaces:
           - twistlock
           names:
+          - twistlock-console*
           - twistlock-defender-ds*
           - volume-upgrade-job*
       {{- end }}
