@@ -12,7 +12,7 @@ image:
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.promtail.values)

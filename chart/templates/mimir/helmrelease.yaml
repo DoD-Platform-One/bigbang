@@ -38,9 +38,9 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsMimir | nindent 2 }}
-  {{- if or .Values.addons.mimir.postRenderers .Values.istio.enabled }}
+  {{- if or .Values.addons.mimir.postRenderers (eq (include "istioEnabled" .) "true") }}
   postRenderers:
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   {{ include "mimir.istioPostRenderers" . | nindent 2 }}
   {{- end }}
   {{- with .Values.addons.mimir.postRenderers }}
@@ -59,11 +59,16 @@ spec:
       valuesKey: "overlays"
 
   # TODO: DRY this up
-  {{- if or .Values.istio.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
+  {{- if or (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
   dependsOn:
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if .Values.istioCore.enabled }}
+    - name: istio-core 
+      namespace: {{ .Release.Namespace }}
+  {{- else }}
     - name: istio
       namespace: {{ .Release.Namespace }}
+  {{- end }}
   {{- end }}
   {{- if .Values.kyvernoPolicies.enabled }}
     - name: kyverno-policies
