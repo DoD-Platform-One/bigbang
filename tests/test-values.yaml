@@ -2342,7 +2342,7 @@ addons:
             quarkus.properties: '{{ .Files.Get "resources/dev/quarkus.properties" }}'
       extraInitContainers: |-
         - name: plugin
-          image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.5.7
+          image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.6.7
           imagePullPolicy: Always
           command:
           - sh
@@ -2390,6 +2390,8 @@ addons:
         - name: quarkusproperties
           mountPath: /opt/keycloak/conf/quarkus.properties
           subPath: quarkus.properties
+      networkPolicies:
+        enabled: true    
 
   vault:
     enabled: false
