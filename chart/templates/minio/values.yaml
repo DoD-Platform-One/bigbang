@@ -44,10 +44,6 @@ podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 
-configSecret:
-  accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
-  secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}
-
 tenant:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
@@ -55,9 +51,14 @@ tenant:
     name: private-registry
   metrics:
     enabled: {{ .Values.monitoring.enabled }}
+  configSecret:
+    accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
+    secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}  
   {{- if .Values.monitoring.enabled }}
   env:
     - name: MINIO_PROMETHEUS_AUTH_TYPE
       value: "public"
   {{- end }}
 {{- end -}}
+
+
