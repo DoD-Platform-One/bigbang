@@ -275,9 +275,6 @@
       ],
       "additionalProperties": true
     },
-    "istioCore": {
-      "additionalProperties": true
-    },
     "istioGateway": {
       "properties": {
         "enabled": true,

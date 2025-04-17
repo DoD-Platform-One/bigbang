@@ -515,7 +515,7 @@ data:
 {{- end -}}
 {{- end -}}
 
-{{- /* Returns true if either istio or istioCore is enabled */ -}}
+{{- /* Returns true if either istio or istiod is enabled */ -}}
 {{- define "istioEnabled" -}}
 {{ or .Values.istio.enabled .Values.istiod.enabled }}
 {{- end -}}
