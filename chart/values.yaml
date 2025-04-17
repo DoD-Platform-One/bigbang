@@ -2272,10 +2272,10 @@ addons:
       # -- S3 compatible region to use for connection information.
       region: ""
 
-      # -- Access key for connecting to object storage endpoint.
+      # -- Access key for connecting to object storage endpoint. If using IRSA annotation this should be left blank.
       accessKey: ""
 
-      # -- Secret key for connecting to object storage endpoint.
+      # -- Secret key for connecting to object storage endpoint. If using IRSA annotation this should be left blank.
       # Unencoded string data. This should be placed in the secret values and then encrypted
       accessSecret: ""
 
@@ -2284,6 +2284,11 @@ addons:
       
       # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
       insecure: false
+
+    # -- Mimir Service Account Annotations 
+    serviceAccountAnnotations: {}
+      ## Example IRSA Service Account Annotation
+      # eks.amazonaws.com/role-arn: "<S3_ROLE_ARN>" 
 
     values: {}
 
