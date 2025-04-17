@@ -62,8 +62,8 @@ spec:
   {{- if or (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
   dependsOn:
   {{- if (eq (include "istioEnabled" .) "true") }}
-  {{- if .Values.istioCore.enabled }}
-    - name: istio-core 
+  {{- if .Values.istiod.enabled }}
+    - name: istiod
       namespace: {{ .Release.Namespace }}
   {{- else }}
     - name: istio
