@@ -17,7 +17,8 @@
 
 | Package | Status | Monitoring | Tracing | Network Policies | mTLS |
 |----|----|----|----|----|----|
-| [Istio Core _(beta)_](https://repo1.dso.mil/big-bang/product/packages/istio-core) |  ![Istio Core Build](https://repo1.dso.mil/big-bang/product/packages/istio-core/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
+| [Istio CRDs _(beta)_](https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds) |  ![Istio CRDs Build](https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
+| [Istio Daemon _(beta)_](https://repo1.dso.mil/big-bang/apps/sandbox/istiod) |  ![Istio Core Build](https://repo1.dso.mil/big-bang/apps/sandbox/istiod/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Gateway _(beta)_](https://repo1.dso.mil/big-bang/product/packages/istio-gateway) |  ![Istio Gateway Build](https://repo1.dso.mil/big-bang/product/packages/istio-gateway/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Operator](https://repo1.dso.mil/big-bang/product/packages/istio-operator) |  ![Istio Operator Build](https://repo1.dso.mil/big-bang/product/packages/istio-operator/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/641) | Yes |
 | [Istio Controlplane](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane) |  ![Istio Controlplane Build](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/632) | Yes |
