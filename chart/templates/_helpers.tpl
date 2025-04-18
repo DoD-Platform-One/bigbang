@@ -184,10 +184,10 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $gwType := dig "labels" "istio" "" $mergedGW -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
       
       {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
-        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
+        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
       {{ end -}}
       
       {{- $gwRecord := dict -}}

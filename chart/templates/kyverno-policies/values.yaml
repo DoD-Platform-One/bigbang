@@ -143,6 +143,20 @@ policies:
   disallow-image-tags:
     enabled: true
     validationFailureAction: Enforce
+    exclude:
+      any:
+      # istio/gateway sets the deployment image to `auto` by default
+      # and does not expose any way for the chart consumer to modify
+      # it. The idea is `istiod` will inject the correct image at
+      # pod creation based on `istiod`'s proxy config.
+      {{- if .Values.istioGateway.enabled }}
+      - resources:
+          namespaces:
+          - istio-gateway
+          names:
+          - '*-ingressgateway'
+          - '*-egressgateway'
+      {{- end }}
 
   disallow-istio-injection-bypass:
     enabled: {{ include "istioEnabled" . }}
@@ -860,6 +874,20 @@ policies:
       allow:
       - registry1.dso.mil
       - registry.dso.mil
+    exclude:
+      any:
+      # istio/gateway sets the deployment image to `auto` by default
+      # and does not expose any way for the chart consumer to modify
+      # it. The idea is `istiod` will inject the correct image at
+      # pod creation based on `istiod`'s proxy config.
+      {{- if .Values.istioGateway.enabled }}
+      - resources:
+          namespaces:
+          - istio-gateway
+          names:
+          - '*-ingressgateway'
+          - '*-egressgateway'
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.promtail.enabled .Values.twistlock.enabled }}
   restrict-selinux-type:
