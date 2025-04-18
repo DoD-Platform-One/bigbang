@@ -163,7 +163,7 @@ imagePullPolicy: IfNotPresent
 
 istioCRDs:
   status: "beta"
-  # -- Toggle deployment of Istio (helm deployment of istio-base and istiod)
+  # -- Toggle deployment of Istio CRDs
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -175,16 +175,16 @@ istioCRDs:
     repoName: "registry1"
     chartName: "istio-crds"
     tag: 1.25.1-bb.0
-  # -- Values to passthrough to the istiod chart
+  # -- Values to passthrough to the Istio CRDs chart
   values: {}
-  # -- Flux reconciliation overrides specifically for the Istio Core Package
+  # -- Flux reconciliation overrides specifically for the Istio CRDs Package
   flux: {}
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
 istiod:
   status: "beta"
-  # -- Toggle deployment of Istio (helm deployment of istio-base and istiod)
+  # -- Toggle deployment of istiod
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -217,24 +217,13 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.25.1-bb.1
+    tag: 1.25.1-bb.3
   helmRepo:
     repoName: "registry1"
     chartName: "istio-gateway"
-    tag: 1.25.1-bb.1
+    tag: 1.25.1-bb.3
   # -- Values to passthrough to the gateway chart(s)
   values: {}
-  # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
-  #   gateways:
-  #     passthrough:
-  #       image:
-  #         repo: registry1.dso.mil/ironbank/tetrate/istio/proxyv2
-  #         tag: 1.25.1-tetratefipslatest1
-  #     public:
-  #       image:
-  #         repo: registry1.dso.mil/ironbank/tetrate/istio/proxyv2
-  #         tag: 1.25.1-tetratefipslatest1
-  #
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
   #     public:
@@ -246,8 +235,9 @@ istioGateway:
   # EXAMPLE: Create an entirely new ingress gateway
   #   gateways:
   #     custom: # name of the gateway; will be templated to custom-ingressgateway
-  #       labels:
-  #         istio: ingressgateway
+  #       upstream:
+  #         labels:
+  #           istio: ingressgateway
   #       gateway:
   #         servers:
   #         - hosts:
@@ -277,8 +267,9 @@ istioGateway:
   #     # https://istio.io/latest/docs/tasks/traffic-management/egress/egress-gateway/
   #     # https://istio.io/latest/blog/2023/egress-sni/
   #     outbound: # name of the gateway; will be templated to outbound-egressgateway
-  #       labels:
-  #         istio: egressgateway
+  #       upstream:
+  #         labels:
+  #           istio: egressgateway
   #       gateway:
   #         servers:
   #         - port:
