@@ -145,7 +145,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - istio-operator
         - istio-system
 
-  {{- if or .Values.monitoring.enabled .Values.twistlock.enabled }}
+  {{- if or .Values.monitoring.enabled .Values.twistlock.enabled .Values.addons.alloy.enabled }}
   restrictedTaint:
     parameters:
       excludedResources:
@@ -155,6 +155,9 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       - twistlock/twistlock-defender-ds-.*
+      {{- end }}
+      {{- if .Values.addons.alloy.enabled }}
+      - alloy/alloy-alloy-logs-.*
       {{- end }}
   {{- end }}
 
