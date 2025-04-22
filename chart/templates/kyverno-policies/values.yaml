@@ -249,6 +249,17 @@ policies:
           names:
           - external-secrets*
       {{- end }}
+      {{- if .Values.gatekeeper.enabled }}
+      - resources:
+          namespaces:
+          - gatekeeper-system
+          kinds:
+          - Pod
+          - Deployment
+          names:
+          - gatekeeper-audit*
+          - gatekeeper-controller-manager*
+      {{- end }}
 
   {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled }}
   disallow-tolerations:
