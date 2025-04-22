@@ -11,7 +11,7 @@
 domain: {{ $domainName }}
 hostname: nexus
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ eq (include "istioEnabled" .) "true" }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false $nexusValues.values)
@@ -20,7 +20,7 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" $nexusValues }}
   nexus:
     gateways:
-    - istio-system/{{ default "public" $nexusValues.ingress.gateway }}
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" .) $nexusValues.ingress.gateway }}
 
 openshift: {{ .Values.openshift }}
 
@@ -44,6 +44,8 @@ monitoring:
   {{- end }}
 
 networkPolicies:
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
     {{- $gateway := default "public" $nexusValues.ingress.gateway }}
