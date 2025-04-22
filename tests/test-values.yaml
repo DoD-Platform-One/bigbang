@@ -2215,6 +2215,7 @@ addons:
         scripts:
           envs:
             docker_host: "containers.dev.bigbang.mil"
+            docker_host_tls_enabled: "true"
 
   velero:
     enabled: false
