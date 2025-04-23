@@ -191,11 +191,11 @@ istiod:
   git:
     repo: https://repo1.dso.mil/big-bang/apps/sandbox/istiod.git
     path: "./chart"
-    tag: 1.25.1-bb.0
+    tag: 1.25.2-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istiod"
-    tag: 1.25.1-bb.0
+    tag: 1.25.2-bb.0
   # -- Values to passthrough to the istiod chart
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
