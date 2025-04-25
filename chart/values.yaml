@@ -2149,12 +2149,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/thanos.git
-      tag: "15.9.1-bb.3"
+      tag: "16.0.2-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "thanos"
-      tag: "15.9.1-bb.3"
+      tag: "16.0.2-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Thanos Package
     flux: {}
