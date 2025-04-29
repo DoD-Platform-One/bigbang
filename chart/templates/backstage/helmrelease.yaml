@@ -1,0 +1,72 @@
+{{- $fluxSettingsBackstage := merge .Values.addons.backstage.flux .Values.flux -}}
+{{- if .Values.addons.backstage.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: backstage
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: backstage
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/backstage/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: backstage
+  chart:
+    spec:
+      {{- if eq .Values.addons.backstage.sourceType "git" }}
+      chart: {{ .Values.addons.backstage.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: backstage
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.backstage.helmRepo.chartName }}
+      version: {{ .Values.addons.backstage.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.backstage.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.backstage.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.addons.backstage.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.backstage.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsBackstage | nindent 2 }}
+
+  {{- if .Values.addons.backstage.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.addons.backstage.postRenderers | nindent 4 }}
+  {{- end }}
+
+  valuesFrom:
+    - name: {{ .Release.Name }}-backstage-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-backstage-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-backstage-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or .Values.grafana.enabled .Values.istio.enabled }}
+  dependsOn:
+  {{- if .Values.istio.enabled }}
+  - name: istio
+    namespace: {{ .Release.Namespace}}
+  {{- end}}
+  {{- if .Values.grafana.enabled }}
+  - name: grafana
+    namespace: {{ .Release.Namespace }}
+  - name: kyverno
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

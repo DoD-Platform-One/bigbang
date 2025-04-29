@@ -1,0 +1,105 @@
+{{- if .Values.addons.backstage.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.backstage "name" "backstage" "defaults" (include "bigbang.defaults.backstage" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.backstage" -}}
+
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.backstage) "enabled") .Values.istio.enabled) }}
+
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+
+istio:
+  enabled: {{ include "istioEnabled" . }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.backstage.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.addons.backstage }}
+  backstage:
+    gateways:
+    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.backstage.ingress.gateway }}
+
+
+{{- if .Values.grafana.enabled }}
+# protect from undeclared values error by nesting the child within parent helm templating check. 
+grafana:
+  url: &grafanaUrl {{ (((((.Values.addons).backstage).values).grafana).url) | default "monitoring-grafana.monitoring.svc.cluster.local" }}
+  http: &grafanaHttp {{ (((((.Values.addons).backstage).values).grafana).http) | default "http" }}
+  externalUrl: &grafanaExternalUrl {{ (((((.Values.addons).backstage).values).grafana).externalUrl) | default (printf "https://%s.%s" "grafana" .Values.domain) }}
+{{- end }}
+
+backstage:
+  backstage:
+    {{- if .Values.grafana.enabled }}
+    extraEnvVars:
+      - name: GRAFANA_HTTP
+        value: *grafanaHttp
+      - name: GRAFANA_URL
+        value: *grafanaUrl
+      - name: GRAFANA_DOMAIN
+        value: *grafanaExternalUrl
+    extraEnvVarsSecrets:
+      - grafana-api-token
+    initContainers:
+      - name: backstage-grafana-token
+        image: registry1.dso.mil/ironbank/big-bang/base:2.1.0
+        command: ["/bin/sh"]
+        args: ["-c", "export SVCACCT_ID=$(curl -X POST -H 'Content-Type: application/json' -d '{\"name\": \"backstage-viewer-{{ (randAlphaNum 5) }}\", \"role\": \"Viewer\"}' ${GRAFANA_HTTP}://${GRAFANA_ADMIN}:${GRAFANA_PASS}@${GRAFANA_URL}/api/serviceaccounts | jq -r '.id') && kubectl create secret -n backstage generic grafana-api-token --from-literal=GRAFANA_TOKEN=$(curl -X POST -H 'Content-Type: application/json' -d '{\"name\": \"backstage-grafana-{{ (randAlphaNum 5) }}\"}' ${GRAFANA_HTTP}://${GRAFANA_ADMIN}:${GRAFANA_PASS}@${GRAFANA_URL}/api/serviceaccounts/${SVCACCT_ID}/tokens | jq -r '.key') --dry-run=client -o yaml | kubectl apply -f -"]
+        env:
+          - name: GRAFANA_URL
+            value: *grafanaUrl
+          - name: GRAFANA_HTTP
+            value: *grafanaHttp
+          - name: GRAFANA_ADMIN
+            valueFrom:
+              secretKeyRef:
+                name: monitoring-grafana
+                key: admin-user
+          - name: GRAFANA_PASS
+            valueFrom:
+              secretKeyRef:
+                name: monitoring-grafana
+                key: admin-password
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          capabilities:
+            drop:
+              - ALL
+    {{- end }}
+    {{- if .Values.addons.backstage.sso.enabled }}
+    appConfig:
+      app:
+        baseUrl: https://backstage.{{ .Values.domain }}
+      backend:
+        baseUrl: https://backstage.{{ .Values.domain }}
+      auth:
+        session:
+          secret: "XxNl2b+/hGH7w7RJk8c5LXNOBh6+kzysxgYXlMK5Pgo="
+        environment: development
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: false
+          keycloak:
+            development:
+              metadataUrl: "{{ .Values.sso.url }}/.well-known/openid-configuration"
+              clientId: "{{ .Values.addons.backstage.sso.client_id }}"
+              clientSecret: "{{ .Values.addons.backstage.sso.client_secret }}"
+              prompt: auto
+
+    {{- end }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+
+{{- end -}}
+

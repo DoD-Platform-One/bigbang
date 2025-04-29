@@ -249,6 +249,19 @@ policies:
           names:
           - external-secrets*
       {{- end }}
+      {{- if .Values.addons.backstage.enabled }}
+      - resources:
+          namespaces:
+          - backstage
+          kinds:
+          - Pod
+          - Deployment
+          - ReplicaSet
+          - ServiceAccount
+          names:
+          - backstage
+          - backstage*
+      {{- end }}
       {{- if .Values.gatekeeper.enabled }}
       - resources:
           namespaces:

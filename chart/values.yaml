@@ -1255,6 +1255,46 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
+  backstage:
+    # -- Toggle deployment of Backstage.
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/backstage.git
+      path: "./chart"
+      tag: "2.5.1-bb.0"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "backstage"
+      tag: "2.5.1-bb.0"
+
+    # -- Flux reconciliation overrides specifically for the Backstage Package
+    flux: { }
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle SSO for Backstage on and off
+      enabled: false
+
+      # -- Backstage OIDC client ID
+      client_id: ""
+
+      # -- Backstage OIDC client secret
+      client_secret: ""
+
+
+    # -- Values to passthrough to the Backstage chart: https://repo1.dso.mil/big-bang/product/packages/backstage.git
+    values: { }
+
+    # -- Post Renderers.  See docs/postrenders.md
+    postRenderers: [ ]
+
   authservice:
     # -- Toggle deployment of Authservice.
     # if enabling authservice, a filter needs to be provided by either enabling

@@ -215,6 +215,7 @@ gatekeeper:
           excludedResources:
           - anchore/anchore-cypress-test
           - argocd/argocd-cypress-test
+          - backstage/backstage-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - fortify/fortify-cypress-test
           - fortify/fortify-ssc-cypress-test
@@ -358,6 +359,7 @@ gatekeeper:
           excludedResources:
           - anchore/anchore-cypress-test
           - argocd/argocd-cypress-test
+          - backstage/backstage-cypress-test
           - cluster-auditor/cluster-auditor-cypress-test
           - fortify/fortify-ssc-cypress-test
           - gitlab/gitlab-cypress-test
@@ -583,6 +585,7 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
+              - backstage
               - gitlab
               - gitlab-runner
               - kiali
@@ -624,6 +627,7 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
+              - backstage
               - gitlab
               - gitlab-runner
               - kiali
@@ -672,6 +676,7 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
+              - backstage
               - gitlab
               - gitlab-runner
               - kiali
@@ -1399,6 +1404,32 @@ addons:
                     protocol: HTTP
                     name: http
                 resolution: DNS
+
+  backstage:
+    enabled: false
+    values:
+      bbtests:
+        enabled: true
+        cypress:
+          envs:
+            cypress_url: "https://backstage.dev.bigbang.mil"
+      backstage:
+        backstage:
+          appConfig:
+            organization:
+              name: "P1"
+            auth:
+              environment: development
+              providers:
+                guest:
+                  # because we use NODE_ENV: production, we must set this to allow guest development login
+                  dangerouslyAllowOutsideDevelopment: true
+            proxy:
+              '/grafana/api':
+                # May be a public or an internal DNS
+                target: "https://example.com"
+                headers:
+                  Authorization: "Bearer abc-123"
 
   authservice:
     enabled: false
