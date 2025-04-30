@@ -317,6 +317,8 @@ gatekeeper:
           excludedResources:
           # Allow kyverno test vectors for Helm test
           - default/restrict-sysctls-.?
+          - istio-gateway/public-ingressgateway-.*
+          - istio-gateway/passthrough-ingressgateway-.*
       readOnlyRoot:
         parameters:
           excludedResources:

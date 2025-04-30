@@ -1,5 +1,5 @@
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-{{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- if and (eq (include "istioEnabled" .) "true") .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 {{- $gitCredsDict := dict
   "name" "haproxy"
   "packageGitScope" .Values.addons.haproxy.git

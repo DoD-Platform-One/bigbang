@@ -42,5 +42,5 @@ grafana:
   namespace: monitoring
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
 {{- end -}}

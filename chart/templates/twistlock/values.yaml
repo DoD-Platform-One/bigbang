@@ -14,7 +14,7 @@ monitoring:
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.twistlock.values) "STRICT") }}
+    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.twistlock.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -48,7 +48,7 @@ istio:
     gateways:
      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.twistlock.ingress.gateway }}
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

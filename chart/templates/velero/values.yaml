@@ -14,7 +14,7 @@ istio:
 
 domain: {{ .Values.domain }}
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -37,7 +37,7 @@ metrics:
   serviceMonitor:
     enabled: true
     additionalLabels: {}
-    {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem

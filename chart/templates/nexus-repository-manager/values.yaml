@@ -34,7 +34,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   serviceMonitor:
     createMetricsUser: {{ .Values.monitoring.enabled }}
-  {{- if and .Values.istio.enabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -55,7 +55,7 @@ networkPolicies:
 nexus:
   imagePullSecrets:
     - name: private-registry
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}

@@ -17,7 +17,7 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.addons.metricsServer.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
-  injection: {{ ternary "enabled" "disabled" .Values.istio.enabled }}
+  injection: {{ ternary "enabled" "disabled" (eq (include "istioEnabled" .) "true") }}
 
 
 {{- if (eq (include "istioEnabled" .) "true") }}

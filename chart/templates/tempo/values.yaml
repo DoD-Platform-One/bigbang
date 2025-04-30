@@ -55,7 +55,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     {{- $gateway := default "public" .Values.tempo.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}

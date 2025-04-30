@@ -6,5 +6,5 @@ metadata:
   labels:
     app.kubernetes.io/name: bbctl
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled")) }}
 {{- end }}

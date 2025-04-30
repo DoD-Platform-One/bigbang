@@ -520,6 +520,15 @@ data:
 {{ or .Values.istio.enabled .Values.istiod.enabled }}
 {{- end -}}
 
+{{- /* Returns the name of the appropriate HelmRelease depending on which is enabled. */ -}}
+{{- define "istioHelmRelease" -}}
+{{- if .Values.istiod.enabled -}}
+istiod
+{{- else -}}
+istio
+{{- end -}}
+{{- end -}}
+
 {{- /* Returns name of istio Namespace Selector*/ -}}
 {{- define "istioNamespaceSelector" -}}
 {{- if .Values.istiod.enabled -}}

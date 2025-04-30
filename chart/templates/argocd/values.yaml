@@ -24,7 +24,7 @@ global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") .Values.istio.enabled) }}
+{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") (eq (include "istioEnabled" .) "true")) }}
 {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}

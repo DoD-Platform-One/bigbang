@@ -57,16 +57,12 @@ spec:
       valuesKey: "overlays"
 
   dependsOn:
-  {{- if .Values.istio.enabled }}
-  - name: istio
+  {{- if (eq (include "istioEnabled" .) "true") }}
+  - name: {{ include "istioHelmRelease" . }}
     namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.monitoring.enabled }}
   - name: monitoring
-    namespace: {{ .Release.Namespace }}
-  {{- end }}
-  {{- if .Values.istiod.enabled }}
-  - name: istiod
     namespace: {{ .Release.Namespace }}
   {{- end }}
 {{- end }}
