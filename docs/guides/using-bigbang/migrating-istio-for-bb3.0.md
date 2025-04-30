@@ -51,7 +51,7 @@ Give the cluster a few minutes for all helm releases to become `ready`.
 
 Removal of the operator and the enablement of the new gateway package reinstantiates cluster gateways.
 
-When migrating gateway configurations, see [the examples here](../../../chart/values.yaml#L206-301) as a reference to format values and configure postRenderers.
+When migrating gateway configurations, see [the examples here](../../../chart/values.yaml#L226-312) as a reference to format values and configure postRenderers.
 
 ```yaml
 istioOperator:
