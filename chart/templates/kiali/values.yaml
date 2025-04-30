@@ -100,7 +100,7 @@ cr:
             - app_label: istiod
               is_core: true
               is_proxy: false
-            {{- if .Values.istio.enabled }}
+            {{- if (eq (include "istioEnabled" .) "true") }}
             {{- range $name, $values := .Values.istio.ingressGateways }}
             {{ if ne $values.enabled false }}
             - app_label: {{ $name }}
@@ -140,7 +140,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     {{- $gateway := default "public" .Values.kiali.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}

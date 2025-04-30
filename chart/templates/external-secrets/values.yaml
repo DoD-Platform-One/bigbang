@@ -14,13 +14,13 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.externalSecrets.values)

@@ -58,12 +58,8 @@ spec:
   # TODO: DRY this up
   {{- if or .Values.gatekeeper.enabled (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.addons.vault.enabled }}
   dependsOn:
-  {{- if .Values.istio.enabled }}
-    - name: istio
-      namespace: {{ .Release.Namespace }}
-  {{- end }}
-  {{- if .Values.istiod.enabled }}
-    - name: istiod
+  {{- if (eq (include "istioEnabled" .) "true") }}
+    - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.gatekeeper.enabled }}

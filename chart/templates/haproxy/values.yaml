@@ -1,5 +1,5 @@
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-{{- if and .Values.istio.enabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- if and (eq (include "istioEnabled" .) "true") .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.haproxy "name" "haproxy-sso" "defaults" (include "bigbang.defaults.haproxy-sso" .)) }}
 {{- end }}
 
@@ -101,7 +101,7 @@ image:
 containerPorts:
   http: 8080
 istio:
-  enabled: {{ .Values.istio.enabled }}
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.haproxy.values)
