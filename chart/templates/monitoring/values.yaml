@@ -62,7 +62,7 @@ istio:
         (dig "istio" "hardened" "enabled" false .Values.monitoring.values))
       }}
     alloy:
-      enabled: {{ and .Values.addons.alloy.enabled (or
+      enabled: {{ and .Values.alloy.enabled (or
         (dig "hardened" "enabled" false .Values.istio.values)
         (dig "istio" "hardened" "enabled" false .Values.monitoring.values))
       }}

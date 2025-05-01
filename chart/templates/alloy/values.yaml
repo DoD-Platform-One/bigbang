@@ -1,10 +1,10 @@
 {{- /* Create secret */ -}}
-{{- if .Values.addons.alloy.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.alloy "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
+{{- if .Values.alloy.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.alloy "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.alloy" -}}
-{{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.addons.alloy) }}
+{{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
 
 {{- $lokiWriteDestUrl := ternary
     "http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push"
@@ -12,7 +12,7 @@
     (eq .Values.loki.strategy "monolith")
 }}
 
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.alloy) "enabled")) }}
+{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -35,7 +35,7 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
       (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.mimir.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.alloy.values)
+      (dig "istio" "hardened" "enabled" false .Values.alloy.values)
     }}
 
 k8s-monitoring:
@@ -50,7 +50,7 @@ k8s-monitoring:
     enabled: true
     serviceMonitor:
       enabled: {{ $.Values.monitoring.enabled }}
-      {{- if and (include "istioEnabled" $) (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.addons.alloy.values) "STRICT") }}
+      {{- if and (include "istioEnabled" $) (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.alloy.values) "STRICT") }}
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
         certFile: /etc/prom-certs/cert-chain.pem

@@ -1054,6 +1054,26 @@
       },
       "additionalProperties": false
     },
+    "alloy": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "alloyLogs": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "istio": {
+          "$ref": "#/$defs/istio"
+        }
+      },
+      "additionalProperties": false
+    },
     "addons": {
       "type": "object",
       "properties": {
@@ -1318,13 +1338,6 @@
           }
         },
         "externalSecrets": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ]
-        },
-        "alloy": {
           "allOf": [
             {
               "$ref": "#/$defs/basePackage"

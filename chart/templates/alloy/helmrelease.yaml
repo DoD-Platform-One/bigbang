@@ -1,6 +1,6 @@
-{{- $fluxSettingsAlloy := merge .Values.addons.alloy.flux .Values.flux -}}
-{{- $isStrictIstio := and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.alloy.values) "STRICT") -}}
-{{- if .Values.addons.alloy.enabled }}
+{{- $fluxSettingsAlloy := merge .Values.alloy.flux .Values.flux -}}
+{{- $isStrictIstio := and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.alloy.values) "STRICT") -}}
+{{- if .Values.alloy.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -16,35 +16,35 @@ spec:
   releaseName: alloy
   chart:
     spec:
-      {{- if eq .Values.addons.alloy.sourceType "git" }}
-      chart: {{ .Values.addons.alloy.git.path }}
+      {{- if eq .Values.alloy.sourceType "git" }}
+      chart: {{ .Values.alloy.git.path }}
       sourceRef:
         kind: GitRepository
         name: alloy
         namespace: {{ .Release.Namespace }}
       {{- else }}
-      chart: {{ .Values.addons.alloy.helmRepo.chartName }}
-      version: {{ .Values.addons.alloy.helmRepo.tag }}
+      chart: {{ .Values.alloy.helmRepo.chartName }}
+      version: {{ .Values.alloy.helmRepo.tag }}
       sourceRef:
         kind: HelmRepository
-        name: {{ .Values.addons.alloy.helmRepo.repoName }}
+        name: {{ .Values.alloy.helmRepo.repoName }}
         namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.alloy.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.alloy.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.alloy.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.alloy.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
       verify:
         provider: cosign
         secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.alloy.helmRepo.repoName }}
+          name: {{ printf "%s-cosign-pub" .Values.alloy.helmRepo.repoName }}
       {{- end }}
       {{- end }}
       interval: 5m
   {{- toYaml $fluxSettingsAlloy | nindent 2 }}
-  {{- if or .Values.addons.alloy.postRenderers (and .Values.monitoring.enabled $isStrictIstio ) }}
+  {{- if or .Values.alloy.postRenderers (and .Values.monitoring.enabled $isStrictIstio ) }}
   postRenderers:
   {{- if and .Values.monitoring.enabled $isStrictIstio }}
   {{- include "alloy.istioPostRenderers" . | nindent 4 }}
   {{- end }}
-  {{- with .Values.addons.alloy.postRenderers }}
+  {{- with .Values.alloy.postRenderers }}
   {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- end }}

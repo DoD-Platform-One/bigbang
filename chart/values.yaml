@@ -1199,8 +1199,39 @@ bbctl:
   values: {}
 
   postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Alloy
 #
+alloy:
+  # -- Toggle deployment of grafana alloy
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
+    tag: "2.0.23-bb.0"
+    path: "./chart"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "k8s-monitoring"
+    tag: "2.0.23-bb.0"
+
+  # -- Toggle Alloy to collect logs 
+  alloyLogs:
+    enabled: true
+
+  values: {}
+
+  postRenderers: []
+
+  # -- Flux reconciliation overrides specifically for the alloy package
+  flux: {}
+# ----------------------------------------------------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------------------------------------------------
 #
 addons:
@@ -2233,33 +2264,6 @@ addons:
     values: {}
 
     postRenderers: []
-
-  alloy:
-    # -- Toggle deployment of grafana alloy
-    enabled: false
-
-    # -- Choose source type of "git" or "helmRepo"
-    sourceType: "git"
-
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
-      tag: "2.0.23-bb.0"
-      path: "./chart"
-    helmRepo:
-      repoName: "registry1"
-      chartName: "k8s-monitoring"
-      tag: "2.0.23-bb.0"
-
-    # -- Toggle Alloy to collect logs 
-    alloyLogs:
-      enabled: true
-
-    values: {}
-
-    postRenderers: []
-
-    # -- Flux reconciliation overrides specifically for the alloy package
-    flux: {}
 
   mimir:
     # -- Toggle deployment of Mimir

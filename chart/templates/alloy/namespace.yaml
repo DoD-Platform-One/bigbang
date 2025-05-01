@@ -1,4 +1,4 @@
-{{- if .Values.addons.alloy.enabled }}
+{{- if .Values.alloy.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -7,5 +7,5 @@ metadata:
     app.kubernetes.io/name: alloy
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.alloy) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
 {{- end }}
