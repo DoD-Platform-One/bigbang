@@ -1,7 +1,7 @@
-{{- if and (eq .Values.addons.alloy.sourceType "git") (not .Values.offline) .Values.addons.alloy.enabled }}
+{{- if and (eq .Values.alloy.sourceType "git") (not .Values.offline) .Values.alloy.enabled }}
 {{- $gitCredsDict := dict
   "name" "alloy"
-  "packageGitScope" .Values.addons.alloy.git
+  "packageGitScope" .Values.alloy.git
   "rootScope" .
   "releaseName" .Release.Name
 }}
@@ -15,9 +15,9 @@ metadata:
     {{- include "commonLabels" . | nindent 4}}
 spec:
   interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.alloy.git.repo }}
+  url: {{ .Values.alloy.git.repo }}
   ref:
-    {{- include "validRef" .Values.addons.alloy.git | nindent 4 }}
+    {{- include "validRef" .Values.alloy.git | nindent 4 }}
   {{ include "gitIgnore" . }}
   {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
 {{- end }}

@@ -34,7 +34,7 @@ istio:
     minioOperator:
       enabled: {{ .Values.addons.minioOperator.enabled }}
     alloy:
-      enabled: {{ .Values.addons.alloy.enabled }}
+      enabled: {{ .Values.alloy.enabled }}
   {{- end }}
   loki:
     enabled: true
