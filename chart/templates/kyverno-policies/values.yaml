@@ -1280,6 +1280,7 @@ policies:
         pods:
           allow:
           - gitlab-shared-secrets*
+          - gitlab-script-test
       - namespace: gitlab-runner
         pods:
           allow:
