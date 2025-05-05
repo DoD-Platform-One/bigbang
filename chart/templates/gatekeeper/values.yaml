@@ -106,7 +106,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     enabled: false
 
   namespacesHaveIstio:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ (eq (include "istioEnabled" .) "true") }}
     parameters:
       excludedResources:
         # Kuberentes control plane does not use Istio
@@ -121,6 +121,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # Istio does not inject itself
         - istio-operator
         - istio-system
+        - istio-gateway
         # Kyverno is installed prior to Istio
         - kyverno
 
@@ -138,12 +139,13 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   {{- end }}
 
   podsHaveIstio:
-    enabled: {{ .Values.istio.enabled }}
+    enabled: {{ (eq (include "istioEnabled" .) "true") }}
     match:
       excludedNamespaces:
         # Istio does not inject sidecars in itself
         - istio-operator
         - istio-system
+        - istio-gateway
 
   {{- if or .Values.monitoring.enabled .Values.twistlock.enabled .Values.alloy.enabled }}
   restrictedTaint:

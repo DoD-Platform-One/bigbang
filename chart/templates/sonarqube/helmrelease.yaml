@@ -64,12 +64,8 @@ spec:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
   {{- end }}
-  {{- if .Values.istio.enabled }}
-    - name: istio
-      namespace: {{ .Release.Namespace }}
-  {{- end }}
-  {{- if .Values.istiod.enabled }}
-    - name: istiod
+  {{- if (eq (include "istioEnabled" .) "true") }}
+    - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- if .Values.kyvernoPolicies.enabled }}
