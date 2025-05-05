@@ -20,7 +20,7 @@ networkPolicies:
 
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

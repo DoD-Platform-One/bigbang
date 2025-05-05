@@ -16,7 +16,7 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.addons.anchore.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
-  injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
+  injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
   ui:
     gateways:
       - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.anchore.ingress.gateway }}
@@ -26,7 +26,7 @@ istio:
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
-  {{- if and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
+  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
   {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchore) "STRICT") }}
   serviceMonitor:
     scheme: "https"
@@ -66,7 +66,7 @@ global:
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 postgresql:
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end}}
@@ -86,11 +86,11 @@ anchoreConfig:
 
 feeds:
   istio:
-    enabled: {{ .Values.istio.enabled }}
-    injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
+    enabled: {{ (eq (include "istioEnabled" .) "true") }}
+    injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
 
   feeds-db:
-    {{- if .Values.istio.enabled }}
+    {{- if (eq (include "istioEnabled" .) "true") }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -115,7 +115,7 @@ ui-redis:
   auth:
     password: {{ .Values.addons.anchore.redis.password }}
   {{- end }}
-  {{- if .Values.istio.enabled }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
   master:
     podAnnotations:
       {{ include "istioAnnotation" . }}
@@ -138,7 +138,7 @@ ui-redis:
       selector:
         app.kubernetes.io/name: anchore-ui-redis
         app.kubernetes.io/instance: anchore
-      {{- if and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
+      {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled") }}
       {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchore) "STRICT") }}
       scheme: "https"
       tlsConfig:

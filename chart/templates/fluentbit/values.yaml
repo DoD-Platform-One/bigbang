@@ -185,7 +185,7 @@ dashboards:
   namespace: monitoring
 {{- end }}
 
-{{- if .Values.istio.enabled }}
+{{- if (eq (include "istioEnabled" .) "true") }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
