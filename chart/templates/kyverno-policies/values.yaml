@@ -1178,7 +1178,7 @@ policies:
           - argocd-argocd-dex-server-*
           # argocd-upgrade-job interacts with CRDs
           # More details in argocd/chart/templates/bigbang/upgrade-job.yaml
-          - argocd-upgrade-job
+          - argocd-upgrade-job-*
           # argocd server pods interact with secrets, configmaps, events, and CRDs
           # More details in argocd/chart/templates/argocd-server/role.yaml
           - argocd-argocd-server-*
