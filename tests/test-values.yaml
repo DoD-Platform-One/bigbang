@@ -823,6 +823,12 @@ kyvernoPolicies:
         parameters:
           disallow:
           - bigbang
+      restrict-image-registries:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - gitlab
     additionalPolicyExceptions:
       testpolicyexception:
         enabled: true
