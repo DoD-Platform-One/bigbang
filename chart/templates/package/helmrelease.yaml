@@ -8,6 +8,7 @@
 {{- end -}}
 
 {{- $fluxSettings := merge (default $vals.flux (dict)) $.Values.flux -}}
+{{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
 
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -70,7 +71,7 @@ spec:
   {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
   {{- $kyvernoDep := $.Values.kyvernoPolicies.enabled -}}
   {{- /* Wait on istio if sidecar is enabled */ -}}
-  {{- $istioDep := (and $.Values.istio.enabled (eq "enabled" (dig "istio" "injection" "enabled" $vals))) -}}
+  {{- $istioDep := (and $istioEnabled (eq "enabled" (dig "istio" "injection" "enabled" $vals))) -}}
   {{- if or $gatekeeperDep $kyvernoDep $istioDep $vals.dependsOn }}
   dependsOn:
     {{- if $gatekeeperDep }}
@@ -82,9 +83,9 @@ spec:
       namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
     {{- if $istioDep }}
-    - name: istio
+    - name: {{ include "istioHelmRelease" $ }}
       namespace: {{ default "bigbang" $.Release.namespace }}
-    {{- end -}}
+    {{- end }}
     {{- if $vals.dependsOn }}
     {{- toYaml $vals.dependsOn | nindent 4 }}
     {{- end }}
