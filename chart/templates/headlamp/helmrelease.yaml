@@ -1,0 +1,75 @@
+{{- $fluxSettings := merge .Values.addons.headlamp.flux .Values.flux -}}
+{{- if .Values.addons.headlamp.enabled }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: headlamp
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: headlamp
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/headlamp/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: headlamp
+  driftDetection:
+    mode: disabled
+  chart:
+    spec:
+      {{- if eq .Values.addons.headlamp.sourceType "git" }}
+      chart: {{ .Values.addons.headlamp.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: headlamp
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.addons.headlamp.helmRepo.chartName }}
+      version: {{ .Values.addons.headlamp.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.addons.headlamp.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.headlamp.helmRepo.repoName "allRepos" .Values.helmRepositories) -}}
+      {{- if (and .Values.addons.headlamp.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.addons.headlamp.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettings | nindent 2 }}
+
+  {{- if .Values.addons.headlamp.postRenderers }}
+  postRenderers:
+  {{- toYaml .Values.addons.headlamp.postRenderers | nindent 2 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-headlamp-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-headlamp-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-headlamp-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  {{- if or (eq (include "istioEnabled" . ) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  dependsOn:
+  {{- if (eq (include "istioEnabled" .) "true") }}
+    - name: {{ include "istioHelmRelease" . }}
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

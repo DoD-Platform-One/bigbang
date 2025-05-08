@@ -249,6 +249,13 @@ policies:
           names:
           - external-secrets*
       {{- end }}
+      {{- if .Values.addons.headlamp.enabled }}
+      - resources:
+          namespaces:
+          - headlamp
+          names:
+          - headlamp*
+      {{- end }}
       {{- if .Values.addons.backstage.enabled }}
       - resources:
           namespaces:
@@ -1071,6 +1078,7 @@ policies:
       - monitoring
       - gitlab
       - gitlab-runner
+      - headlamp
 
   update-automountserviceaccounttokens:
     enabled: true
@@ -1285,6 +1293,10 @@ policies:
         pods:
           allow:
           - gitlab-runner-*
+      - namespace: headlamp
+        pods:
+          allow:
+          - headlamp-*
 
 istio:
   enabled: {{ include "istioEnabled" . }}

@@ -1,0 +1,50 @@
+{{- if .Values.addons.headlamp.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.headlamp "name" "headlamp" "defaults" (include "bigbang.defaults.headlamp" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.headlamp" -}}
+
+image:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+  serviceMonitor:
+    # conditional passes only for default istio: enabled, mTLS: STRICT
+    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.headlamp.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+
+{{- if (eq (include "istioEnabled" .) "true") }}
+annotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
+
+istio:
+  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.headlamp.values)
+      (dig "hardened" "enabled" false .Values.istio.values)
+    }}
+
+openshift: {{ .Values.openshift }}
+{{- end -}}
+
+{{- with .Values.addons.headlamp.sso }}
+config:
+  oidc:
+    enabled: {{ .enabled }}
+    clientId: {{ .client_id }}
+    clientSecret: {{ .client_secret | default "no-secret" }}
+    issuerURL: {{ default (include "sso.oidc.auth" $) .auth_endpoint }}
+{{- end }}
