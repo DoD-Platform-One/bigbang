@@ -99,33 +99,13 @@ kiali:
   sso:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
   values:
-    istio:
-      hardened:
-        customServiceEntries:
-          - name: "cypress-service-entries-kiali"
-            enabled: true
-            spec:
-              hosts:
-                - 'kiali.dev.bigbang.mil'
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-    cr:
-      spec:
-        auth:
-          # if enabling the keycloak SSO integration test, comment out or change strategy to "openid".
-          # strategy defaults to "openid"
-          strategy: "anonymous"
-    resources:
-      limits:
-        cpu: "1"
+    upstream:
+      cr:
+        spec:
+          auth:
+            # if enabling the keycloak SSO integration test, comment out or change strategy to "openid".
+            # strategy defaults to "openid"
+            strategy: "anonymous"
     bbtests:
       enabled: true
       cypress:
@@ -136,15 +116,6 @@ kiali:
           #cypress_keycloak_test_enable: "true"
           #cypress_keycloak_username: "cypress"
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
-        resources:
-          requests:
-            cpu: 3
-            memory: 4Gi
-          limits:
-            cpu: 3
-            memory: 4Gi
-
-
 clusterAuditor:
   enabled: false
   values:
