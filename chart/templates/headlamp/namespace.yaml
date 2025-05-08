@@ -1,0 +1,13 @@
+{{- if .Values.addons.headlamp.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    meta.helm.sh/release-namespace: bigbang
+    meta.helm.sh/release-name: bigbang
+    app.kubernetes.io/name: headlamp
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.headlamp) "enabled")) }}
+  name: headlamp
+{{- end }}

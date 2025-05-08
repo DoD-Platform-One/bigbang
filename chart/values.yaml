@@ -2332,6 +2332,48 @@ addons:
     # -- Flux reconciliation overrides specifically for the alloy package
     flux: {}
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Headlamp
+#
+  headlamp:
+    # -- Toggle deployment of headlamp
+    enabled: false
+
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: "git"
+
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/packages/headlamp.git
+      tag: "0.30.1-bb.1"
+      path: "./chart"
+    helmRepo:
+      repoName: "registry1"
+      chartName: "headlamp"
+      tag: "0.30.1-bb.1"
+
+    # -- Override flux settings for this package
+    flux: {}
+
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    ingress:
+      gateway: ""
+
+    sso:
+      # -- Toggle OIDC SSO for Headlamp on and off.
+      # Enabling this option will auto-create any required secrets.
+      enabled: false
+
+      # -- Headlamp OIDC client ID
+      client_id: ""
+
+      # -- Headlamp OIDC client secret
+      client_secret: ""
+
+    values: {}
+
+    postRenderers: []
+
+
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"

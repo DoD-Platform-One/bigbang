@@ -110,3 +110,7 @@ externalSecrets:
   repoName: "external-secrets"
   hrName: "external-secrets"
   filePath: "external-secrets"
+headlamp:
+  repoName: "headlamp"
+  hrName: "headlamp"
+  filePath: "headlamp"
