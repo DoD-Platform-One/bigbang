@@ -38,7 +38,6 @@ istio:
     }}
 
 openshift: {{ .Values.openshift }}
-{{- end -}}
 
 {{- with .Values.addons.headlamp.sso }}
 config:
@@ -48,3 +47,4 @@ config:
     clientSecret: {{ .client_secret | default "no-secret" }}
     issuerURL: {{ default (include "sso.oidc.auth" $) .auth_endpoint }}
 {{- end }}
+{{- end -}}
