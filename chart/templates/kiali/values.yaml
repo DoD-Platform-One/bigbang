@@ -39,101 +39,96 @@ oidcCaCert: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Value
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
-elasticsearch:
-  enabled: {{ .Values.elasticsearchKibana.enabled }}
-cr:
-  spec:
-    {{- if .Values.istiod.enabled }}
-    istio_namespace: istio-system
-    {{- end}}
-    deployment:
-      image_pull_policy: {{ .Values.imagePullPolicy }}
-      {{- if include "istioEnabled" . }}
-      pod_annotations:
-        {{ include "istioAnnotation" . }}
-      {{- end }}
-      hpa:
-        spec:
-          maxReplicas: 2
-          minReplicas: 1
-          targetCPUUtilizationPercentage: 80
-    server:
-      web_port: "443"
-    auth:
-      {{- if .Values.kiali.sso.enabled }}
-      strategy: openid
-      openid:
-        client_id: "{{ .Values.kiali.sso.client_id }}"
-        disable_rbac: true
-        issuer_uri: "{{ include "sso.url" . }}"
-        scopes:
-        - openid
-        - email
-        username_claim: {{ dig "oidc" "claims" "email" "email" .Values.sso }}
-      {{- else }}
-      strategy: token
-      {{- end }}
-    external_services:
-      grafana:
-        enabled: {{ .Values.grafana.enabled }}
-        {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.grafana.values) }}
-        url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
-        {{- if .Values.grafana.enabled }}
-        auth:
-          {{- if (dig "admin" "existingSecret" "" .Values.grafana.values) }}
-          {{- $userKey := (dig "admin" "userKey" "admin-user" .Values.grafana.values) }}
-          {{- with lookup "v1" "Secret" "monitoring" .Values.grafana.values.admin.existingSecret }}
-          username: {{ (get .data $userKey | b64dec) | default "admin" }}
-          {{- end }}
-          {{- else }}
-          username: {{ dig "adminUser" "admin" .Values.grafana.values }}
-          {{- end }}
-          password: "secret:grafana-auth:password"
+upstream:
+  cr:
+    spec:
+      {{- if .Values.istiod.enabled }}
+      istio_namespace: istio-system
+      {{- end}}
+      deployment:
+        image_pull_policy: {{ .Values.imagePullPolicy }}
+        {{- if include "istioEnabled" . }}
+        pod_annotations:
+          {{ include "istioAnnotation" . }}
         {{- end }}
-      tracing:
-        enabled: {{ .Values.jaeger.enabled }}
-        {{- $tracingUrl := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
-        url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
-      istio:
-        component_status:
-          components:
-            - app_label: istiod
-              is_core: true
-              is_proxy: false
-            {{- if (eq (include "istioEnabled" .) "true") }}
-            {{- range $name, $values := .Values.istio.ingressGateways }}
-            {{ if ne $values.enabled false }}
-            - app_label: {{ $name }}
-              is_core: true
-              is_proxy: true
-            {{- end }}
-            {{- end }}
-            {{- range $name, $values := .Values.istio.values.ingressGateways }}
-            {{ if ne $values.enabled false }}
-            - app_label: {{ $name }}
-              is_core: true
-              is_proxy: true
-            {{- end }}
-            {{- end }}
-            {{- end }}
-            {{- if .Values.istioGateway.enabled }}
-            {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
-            {{- if eq $gw.type "ingressgateway" }}
-            - app_label: {{ $gw.serviceName }}
-              is_core: true
-              is_proxy: true
-              namespace: istio-gateway
-            {{- end -}}
-            {{- end -}}
-            {{- end -}}
-        {{- if .Values.istiod.enabled }}
-        ingress_gateway_namespace: istio-gateway
-        egress_gateway_namespace: istio-gateway
+        hpa:
+          spec:
+            maxReplicas: 2
+            minReplicas: 1
+            targetCPUUtilizationPercentage: 80
+      server:
+        web_port: "443"
+      auth:
+        {{- if .Values.kiali.sso.enabled }}
+        strategy: openid
+        openid:
+          client_id: "{{ .Values.kiali.sso.client_id }}"
+          disable_rbac: true
+          issuer_uri: "{{ include "sso.url" . }}"
+          scopes:
+          - openid
+          - email
+          username_claim: {{ dig "oidc" "claims" "email" "email" .Values.sso }}
+        {{- else }}
+        strategy: token
         {{- end }}
-    api:
-      namespaces:
-        # bigbang watches all!
-        exclude: []
+      external_services:
+        grafana:
+          enabled: {{ .Values.grafana.enabled }}
+          {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.grafana.values) }}
+          url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
+          {{- if .Values.grafana.enabled }}
+          auth:
+            {{- if (dig "admin" "existingSecret" "" .Values.grafana.values) }}
+            {{- $userKey := (dig "admin" "userKey" "admin-user" .Values.grafana.values) }}
+            {{- with lookup "v1" "Secret" "monitoring" .Values.grafana.values.admin.existingSecret }}
+            username: {{ (get .data $userKey | b64dec) | default "admin" }}
+            {{- end }}
+            {{- else }}
+            username: {{ dig "adminUser" "admin" .Values.grafana.values }}
+            {{- end }}
+            password: "secret:grafana-auth:password"
+          {{- end }}
+        tracing:
+          enabled: {{ .Values.jaeger.enabled }}
+          {{- $tracingUrl := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
+          url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
+        istio:
+          component_status:
+            components:
+              - app_label: istiod
+                is_core: true
+                is_proxy: false
+              {{- if (eq (include "istioEnabled" .) "true") }}
+              {{- range $name, $values := .Values.istio.ingressGateways }}
+              {{ if ne $values.enabled false }}
+              - app_label: {{ $name }}
+                is_core: true
+                is_proxy: true
+              {{- end }}
+              {{- end }}
+              {{- range $name, $values := .Values.istio.values.ingressGateways }}
+              {{ if ne $values.enabled false }}
+              - app_label: {{ $name }}
+                is_core: true
+                is_proxy: true
+              {{- end }}
+              {{- end }}
+              {{- end }}
+              {{- if .Values.istioGateway.enabled }}
+              {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+              {{- if eq $gw.type "ingressgateway" }}
+              - app_label: {{ $gw.serviceName }}
+                is_core: true
+                is_proxy: true
+                namespace: istio-gateway
+              {{- end -}}
+              {{- end -}}
+              {{- end -}}
+          {{- if .Values.istiod.enabled }}
+          ingress_gateway_namespace: istio-gateway
+          egress_gateway_namespace: istio-gateway
+          {{- end }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
