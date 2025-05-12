@@ -6,21 +6,22 @@
 {{- end }}
 
 {{- define "bigbang.defaults.metrics-server" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.metricsServer.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
-  injection: {{ ternary "enabled" "disabled" (eq (include "istioEnabled" .) "true") }}
+  injection: {{ ternary "enabled" "disabled" $istioEnabled }}
 
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}

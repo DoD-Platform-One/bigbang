@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.keycloak" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 replicas: 2
 
 imagePullSecrets:
@@ -18,10 +19,10 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
-{{- $istioInjection := (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled")) }}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values)

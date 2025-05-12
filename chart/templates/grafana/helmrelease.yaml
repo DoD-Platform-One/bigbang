@@ -1,5 +1,6 @@
 {{- $fluxSettingsMonitoring := merge .Values.grafana.flux .Values.flux -}}
 {{- if .Values.grafana.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -57,10 +58,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
   {{- end }}

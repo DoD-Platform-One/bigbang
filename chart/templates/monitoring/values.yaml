@@ -3,12 +3,13 @@
 {{- end }}
 
 {{- define "bigbang.defaults.monitoring" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled")) }}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled") }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
@@ -25,7 +26,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
@@ -45,7 +46,7 @@ gitlabRunner:
 
 istio:
   {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -125,7 +126,7 @@ alertmanager:
         {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
-  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
   serviceMonitor:
     scheme: https
     tlsConfig:
@@ -156,7 +157,7 @@ prometheus:
 
   thanosServiceMonitor:
     enabled: true
-    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
     serviceMonitor:
       scheme: https
       tlsConfig:
@@ -167,7 +168,7 @@ prometheus:
     {{- end }}
   {{- end }}
   prometheusSpec:
-    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
     alertingEndpoints:
     - name: monitoring-monitoring-kube-alertmanager
       namespace: monitoring
@@ -184,13 +185,13 @@ prometheus:
 
     {{- if .Values.addons.mimir.enabled }}
     remoteWrite:
-      {{- if (eq (include "istioEnabled" . ) "true") }}
+      {{- if $istioEnabled }}
       # I promise it's not a typo; the port is 80 even though it's TLS
       - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
       {{- else }}
       - url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
       {{- end }}
-        {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
+        {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem

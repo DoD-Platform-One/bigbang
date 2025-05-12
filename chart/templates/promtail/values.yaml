@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.promtail" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 hostname: {{ .Values.hostname }}
 
@@ -12,7 +13,7 @@ image:
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.promtail.values)
@@ -25,7 +26,7 @@ loki:
 serviceMonitor:
   enabled: {{ .Values.monitoring.enabled }}
   # conditional passes only for default istio: enabled, mTLS: SCRICT
-  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.promtail.values) "STRICT") }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.promtail.values) "STRICT") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem
@@ -43,7 +44,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

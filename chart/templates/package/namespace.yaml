@@ -1,5 +1,6 @@
 {{- /* Used for creating namespaces that package's use. */ -}}
 {{- /* If two packages reside in the same namespace, set namespace.create=false in one of them. */ -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 {{- range $pkg, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "namespace" "create" true $vals) -}}
 {{- $pkg = include "resourceName" $pkg -}}
@@ -10,7 +11,7 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
-    {{- if (eq (include "istioEnabled" $) "true") }}
+    {{- if $istioEnabled }}
     istio-injection: {{ tpl ((dig "istio" "injection" "enabled" $vals)) $ }}
     {{- end }}
     {{- if (dig "namespace" "labels" nil $vals) -}}

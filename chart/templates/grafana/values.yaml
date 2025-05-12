@@ -3,12 +3,13 @@
 {{- end }}
 
 {{- define "bigbang.defaults.grafana" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled")) }}
+{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled")) }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
@@ -36,7 +37,7 @@ gitlabRunner:
 
 istio:
   {{- $grafanaInjection := dig "istio" "injection" "enabled" .Values.grafana }}
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -239,7 +240,7 @@ datasources:
 {{- end }}
 
 grafana.ini:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   server:
     root_url: https://grafana.{{ $domainName }}/
   {{- end }}

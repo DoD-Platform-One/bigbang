@@ -3,13 +3,14 @@
 {{- end }}
 
 {{- define "bigbang.defaults.minio" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   console:
     gateways:
     - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.minio.ingress.gateway }}
@@ -23,7 +24,7 @@ istio:
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
 
-{{- if include "istioEnabled" . }}
+{{- if $istioEnabled }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

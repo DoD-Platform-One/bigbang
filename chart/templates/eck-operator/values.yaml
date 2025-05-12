@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.eck-operator" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 license:
   trial: {{ .Values.elasticsearchKibana.license.trial }}
   keyJSON: |
@@ -11,7 +12,7 @@ license:
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 podAnnotations:
   traffic.sidecar.istio.io/includeInboundPorts: "*"
   traffic.sidecar.istio.io/excludeInboundPorts: "9443"
@@ -21,7 +22,7 @@ podAnnotations:
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)

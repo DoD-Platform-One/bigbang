@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.loki" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -13,7 +14,7 @@ clusterName: ""
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   {{- if or 
       (dig "hardened" "enabled" false .Values.istio.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -58,7 +59,7 @@ monitoring:
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -116,7 +117,7 @@ loki:
   limits_config:
     max_line_size: 0
   {{- end }}
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}

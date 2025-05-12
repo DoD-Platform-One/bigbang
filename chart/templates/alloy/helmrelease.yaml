@@ -1,6 +1,7 @@
 {{- $fluxSettingsAlloy := merge .Values.alloy.flux .Values.flux -}}
-{{- $isStrictIstio := and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.alloy.values) "STRICT") -}}
 {{- if .Values.alloy.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $isStrictIstio := and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.alloy.values) "STRICT") -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -59,10 +60,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  # TODO: DRY this up
-  {{- if or .Values.gatekeeper.enabled (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.loki.enabled }}
+  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.loki.enabled }}
   dependsOn:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
   {{- end }}

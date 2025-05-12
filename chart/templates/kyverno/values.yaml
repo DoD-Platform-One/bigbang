@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 replicaCount: 3
 
 image:
@@ -42,5 +43,5 @@ grafana:
   namespace: monitoring
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
 {{- end -}}

@@ -5,6 +5,7 @@
 {{- define "bigbang.defaults.fluentbit" -}}
 {{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 {{- if (not $disableDefault) }}
 loki:
@@ -51,7 +52,7 @@ config:
         Suppress_Type_Name       On
         Retry_Limit              False
         Replace_Dots             On
-        {{- if and (eq (include "istioEnabled" .) "true") (dig "istio" "elasticsearch" "enabled" false .Values.elasticsearchKibana.values) }}
+        {{- if and $istioEnabled (dig "istio" "elasticsearch" "enabled" false .Values.elasticsearchKibana.values) }}
         tls                      Off
         {{- else }}
         tls                      On
@@ -148,7 +149,7 @@ networkPolicies:
 
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.fluentbit.values)
@@ -170,7 +171,7 @@ serviceMonitor:
   # - istio: enabled
   # - mTLS: SCRICT
   # - istio injection: enabled (for logging ns)
-  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.fluentbit.values) "STRICT") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana.values) "enabled") }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.fluentbit.values) "STRICT") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana.values) "enabled") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem
@@ -185,7 +186,7 @@ dashboards:
   namespace: monitoring
 {{- end }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

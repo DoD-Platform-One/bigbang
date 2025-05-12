@@ -1,6 +1,7 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- if $nexusValues.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -8,7 +9,7 @@ metadata:
   labels:
     istio-injection: {{ ternary "enabled" "disabled" 
       (and 
-        (eq (include "istioEnabled" .) "true") 
+        $istioEnabled 
         (eq (dig "istio" "injection" "enabled" $nexusValues) "enabled")
       ) 
     }}

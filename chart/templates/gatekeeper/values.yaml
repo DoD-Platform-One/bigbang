@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gatekeeper" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecrets:
@@ -106,7 +107,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     enabled: false
 
   namespacesHaveIstio:
-    enabled: {{ (eq (include "istioEnabled" .) "true") }}
+    enabled: {{ $istioEnabled }}
     parameters:
       excludedResources:
         # Kuberentes control plane does not use Istio
@@ -139,7 +140,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
   {{- end }}
 
   podsHaveIstio:
-    enabled: {{ (eq (include "istioEnabled" .) "true") }}
+    enabled: {{ $istioEnabled }}
     match:
       excludedNamespaces:
         # Istio does not inject sidecars in itself

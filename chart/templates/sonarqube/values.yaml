@@ -3,18 +3,19 @@
 {{- end }}
 
 {{- define "bigbang.defaults.sonarqube" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled")) }}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") }}
 
 OpenShift:
   enabled: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values)

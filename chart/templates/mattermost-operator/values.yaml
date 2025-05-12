@@ -5,6 +5,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.mattermostOperator" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 imagePullSecrets:
   - name: private-registry
 
@@ -23,7 +24,7 @@ networkPolicies:
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.mattermostOperator.values)

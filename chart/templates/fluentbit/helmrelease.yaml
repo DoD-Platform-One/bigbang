@@ -1,5 +1,6 @@
 {{- $fluxSettingsFluentbit := merge .Values.fluentbit.flux .Values.flux -}}
 {{- if .Values.fluentbit.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -59,7 +60,7 @@ spec:
       valuesKey: "overlays"
 
   {{/* To support a "standalone" fluentbit for shipping to central location we conditionally depend on logging enabled */}}
-  {{- if or .Values.elasticsearchKibana.enabled .Values.gatekeeper.enabled (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.kyverno.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.elasticsearchKibana.enabled .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.kyverno.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if .Values.elasticsearchKibana.enabled }}
     - name: ek
@@ -73,7 +74,7 @@ spec:
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
     {{- end }}

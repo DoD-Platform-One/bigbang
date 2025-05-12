@@ -1,6 +1,7 @@
 {{- $fluxSettingsHaProxy := merge .Values.addons.haproxy.flux .Values.flux -}}
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-{{- if and (eq (include "istioEnabled" .) "true") .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- if and $istioEnabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

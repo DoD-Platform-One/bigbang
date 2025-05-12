@@ -1,5 +1,6 @@
 {{- $fluxSettingsMimir := merge .Values.addons.mimir.flux .Values.flux -}}
 {{- if .Values.addons.mimir.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -38,9 +39,9 @@ spec:
       interval: 5m
 
   {{- toYaml $fluxSettingsMimir | nindent 2 }}
-  {{- if or .Values.addons.mimir.postRenderers (eq (include "istioEnabled" .) "true") }}
+  {{- if or .Values.addons.mimir.postRenderers $istioEnabled }}
   postRenderers:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   {{ include "mimir.istioPostRenderers" . | nindent 2 }}
   {{- end }}
   {{- with .Values.addons.mimir.postRenderers }}
@@ -58,10 +59,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  # TODO: DRY this up
-  {{- if or (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
+  {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
   dependsOn:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
   {{- end }}

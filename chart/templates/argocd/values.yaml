@@ -3,6 +3,8 @@
 {{- end }}
 
 {{- define "bigbang.defaults.argocd" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -24,7 +26,6 @@ global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
     - name: private-registry
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") (eq (include "istioEnabled" .) "true")) }}
 {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
@@ -60,6 +61,8 @@ redis:
 {{- end }}
 
 redis-bb:
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
   {{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
   enabled: false
   {{- else }}
@@ -142,7 +145,7 @@ repoServer:
   {{- end }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)

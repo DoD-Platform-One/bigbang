@@ -8,10 +8,11 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 {{- $domainName := default .Values.domain .Values.hostname }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 domain: {{ $domainName }}
 hostname: nexus
 istio:
-  enabled: {{ eq (include "istioEnabled" .) "true" }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false $nexusValues.values)
@@ -34,7 +35,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   serviceMonitor:
     createMetricsUser: {{ .Values.monitoring.enabled }}
-  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -55,7 +56,7 @@ networkPolicies:
 nexus:
   imagePullSecrets:
     - name: private-registry
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}

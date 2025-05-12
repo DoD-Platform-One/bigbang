@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.clusterauditor" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 elasticsearch:
   imagePullSecrets:
     - name: private-registry
@@ -20,13 +21,13 @@ networkPolicies:
 
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.clusterAuditor.values)

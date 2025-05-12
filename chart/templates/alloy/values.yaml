@@ -5,6 +5,7 @@
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 {{- $lokiWriteDestUrl := ternary
     "http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push"
@@ -12,7 +13,7 @@
     (eq .Values.loki.strategy "monolith")
 }}
 
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
+{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -24,7 +25,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -50,7 +51,7 @@ k8s-monitoring:
     enabled: true
     serviceMonitor:
       enabled: {{ $.Values.monitoring.enabled }}
-      {{- if and (include "istioEnabled" $) (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.alloy.values) "STRICT") }}
+      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.alloy.values) "STRICT") }}
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
         certFile: /etc/prom-certs/cert-chain.pem

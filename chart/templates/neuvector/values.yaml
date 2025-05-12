@@ -1,4 +1,7 @@
 {{- define "bigbang.defaults.neuvector" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled") -}}
+
 # Includes suffix of "A1a" to ensure password always meets default minimum password requirements
 {{- $neuvectorMetricsPass := join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2))}}
 
@@ -7,10 +10,8 @@ domain: {{ default .Values.domain .Values.hostname }}
 
 openshift: {{ .Values.openshift }}
 
-{{ $istioInjection := (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
-
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.neuvector.values)
@@ -24,7 +25,7 @@ istio:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-{{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled $.Values.kiali.enabled}}
+{{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled }}
 controller:
   {{- if $istioInjection }}
   podAnnotations:
@@ -94,31 +95,20 @@ monitor:
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
 
 
-{{- if or $istioInjection $.Values.kiali.enabled }}
+{{- if $istioInjection }}
 enforcer:
-  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
-  {{- end }}
 cve:
   updater:
-    {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
-    {{- end }}
   scanner:
-    {{- if $istioInjection }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
-    {{- end }}
-{{- end }}
-
-{{- if or (include "istioEnabled" .) $.Values.kiali.enabled }}
 manager:
-  {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
-  {{- end }}
 {{- end }}
 
 networkPolicies:
@@ -127,7 +117,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
     {{- $gateway := default "public" .Values.neuvector.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}

@@ -1,5 +1,6 @@
 {{- $fluxSettingsMinioOperator := merge .Values.addons.minioOperator.flux .Values.flux -}}
 {{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -61,13 +62,13 @@ spec:
     imagePullSecrets:
       - name: private-registry
 
-  {{- if or .Values.gatekeeper.enabled (eq (include "istioEnabled" .) "true") .Values.kyvernoPolicies.enabled }}
+  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ .Release.Namespace }}
     {{- end }}
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
     {{- end }}

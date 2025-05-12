@@ -9,14 +9,15 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") (include "istioEnabled" .)) }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
 
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioInjection }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
@@ -282,7 +283,7 @@ global:
     pullPolicy: {{ .Values.imagePullPolicy }}
     
   istio:
-    enabled: {{ include "istioEnabled" . }}
+    enabled: {{ $istioInjection }}
     injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
 
   hosts:

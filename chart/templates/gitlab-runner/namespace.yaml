@@ -1,4 +1,5 @@
 {{- if .Values.addons.gitlabRunner.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -6,6 +7,6 @@ metadata:
     app.kubernetes.io/name: gitlab-runner
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled")) }}
   name: gitlab-runner
 {{- end }}
