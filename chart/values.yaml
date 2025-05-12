@@ -1245,14 +1245,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      #tag: "7.8.26-bb.0"
-      tag: ""
-      branch: "istio-logic-fixes"
-      
+      tag: "7.9.0-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "7.8.26-bb.0"
+      tag: "7.9.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
