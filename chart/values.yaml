@@ -1224,6 +1224,9 @@ alloy:
   alloyLogs:
     enabled: true
 
+  # -- Additional Alloy destinations not included in Big Bang
+  additionalDestinations: []
+
   values: {}
 
   postRenderers: []
