@@ -164,7 +164,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.alloy.enabled }}
   selinuxPolicy:
     parameters:
       excludedResources:
@@ -179,6 +179,10 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- if .Values.promtail.enabled }}
       # Promtail needs selinux option type spc_t
       - promtail/promtail
+      {{- end }}
+      {{- if .Values.alloy.enabled }}
+      # Alloy requires selinux option type spc_t
+      - alloy/alloy
       {{- end }}
   {{- end }}
 
