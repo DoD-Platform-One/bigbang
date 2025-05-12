@@ -920,7 +920,7 @@ policies:
           - '*-egressgateway'
       {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.promtail.enabled .Values.twistlock.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.alloy.enabled }}
   restrict-selinux-type:
     exclude:
       any:
@@ -950,6 +950,17 @@ policies:
           - twistlock
           names:
           - twistlock-defender-ds*
+      {{- end }}
+      {{- if .Values.alloy.enabled }}
+      - resources:
+          namespaces:
+          - alloy
+          names:
+          # Alloy requires SELinux option type 'spc_t' for privileged host volume mounting on SELinux enabled systems
+          # Alloy mounts the following hostPaths:
+          # - `/var/log`: to tail node logs (e.g. journal) and pod logs
+          # - `/var/lib/docker/containers`: to tail container logs
+          - alloy-alloy-logs-*
       {{- end }}
   {{- end }}
 
