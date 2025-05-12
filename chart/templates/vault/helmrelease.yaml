@@ -1,6 +1,7 @@
 {{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
 
 {{- if .Values.addons.vault.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -58,10 +59,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  # TODO: DRY this up
-  {{- if or (eq (include "istioEnabled" .) "true") (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
+  {{- if or $istioEnabled (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
   dependsOn:
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
     {{- end }}

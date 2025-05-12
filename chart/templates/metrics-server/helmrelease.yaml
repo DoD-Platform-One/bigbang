@@ -3,6 +3,7 @@
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}
 {{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -62,9 +63,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or (eq (include "istioEnabled" .) "true") .Values.monitoring.enabled }}
+  {{- if or $istioEnabled .Values.monitoring.enabled }}
   dependsOn:
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     - name: {{ include "istioHelmRelease" . }}
       namespace: {{ .Release.Namespace }}
     {{- end }}

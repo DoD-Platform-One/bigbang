@@ -1,5 +1,6 @@
 {{- $fluxSettingsArgo := merge .Values.addons.argocd.flux .Values.flux -}}
 {{- if .Values.addons.argocd.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -56,9 +57,9 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.monitoring.enabled (eq (include "istioEnabled" .) "true") }}
+  {{- if or .Values.monitoring.enabled $istioEnabled }}
   dependsOn:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   - name: {{ include "istioHelmRelease" . }}
     namespace: {{ .Release.Namespace }}
   {{- end }}

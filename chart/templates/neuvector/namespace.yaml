@@ -1,4 +1,5 @@
 {{- if .Values.neuvector.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -7,5 +8,5 @@ metadata:
     app.kubernetes.io/name: neuvector
     app.kubernetes.io/component: "sandbox"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
 {{- end }}

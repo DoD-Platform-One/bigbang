@@ -1,4 +1,5 @@
 {{- if .Values.clusterAuditor.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -8,6 +9,6 @@ metadata:
     app.kubernetes.io/name: cluster-auditor
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.clusterAuditor) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.clusterAuditor) "enabled")) }}
   name: cluster-auditor
 {{- end }}

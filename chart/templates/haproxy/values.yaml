@@ -1,9 +1,11 @@
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-{{- if and (eq (include "istioEnabled" .) "true") .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- if and $istioEnabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.haproxy "name" "haproxy-sso" "defaults" (include "bigbang.defaults.haproxy-sso" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.haproxy-sso" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $haproxyAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
@@ -101,7 +103,7 @@ image:
 containerPorts:
   http: 8080
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.haproxy.values)

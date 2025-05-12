@@ -3,9 +3,10 @@
 {{- end }}
 
 {{- define "bigbang.defaults.velero" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 istio:
-  enabled: {{ include "istioEnabled" .  }}
+  enabled: {{ $istioEnabled  }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.velero.values)
@@ -14,7 +15,7 @@ istio:
 
 domain: {{ .Values.domain }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -37,7 +38,7 @@ metrics:
   serviceMonitor:
     enabled: true
     additionalLabels: {}
-    {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem

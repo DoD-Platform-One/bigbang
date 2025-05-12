@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kiali" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -16,7 +17,7 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.kiali.values)
@@ -28,7 +29,7 @@ istio:
     gateways:
     - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.kiali.ingress.gateway }}
 
-{{- if include "istioEnabled" . }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
@@ -42,7 +43,7 @@ monitoring:
 upstream:
   cr:
     spec:
-      {{- if .Values.istiod.enabled }}
+      {{- if $istioEnabled }}
       istio_namespace: istio-system
       {{- end}}
       deployment:
@@ -99,7 +100,7 @@ upstream:
               - app_label: istiod
                 is_core: true
                 is_proxy: false
-              {{- if (eq (include "istioEnabled" .) "true") }}
+              {{- if $istioEnabled }}
               {{- range $name, $values := .Values.istio.ingressGateways }}
               {{ if ne $values.enabled false }}
               - app_label: {{ $name }}
@@ -135,7 +136,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- if (eq (include "istioEnabled" .) "true") }}
+    {{- if $istioEnabled }}
     {{- $gateway := default "public" .Values.kiali.ingress.gateway }}
     {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
     {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}

@@ -4,11 +4,12 @@
 {{- end }}
 
 {{- define "bigbang.defaults.mimir" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 {{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
-{{- $istioInjection := (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
+{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -20,7 +21,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
@@ -60,7 +61,7 @@ minio-tenant:
 {{- end }}
 mimir-distributed:
   query_scheduler:
-    enabled: {{ not (eq (include "istioEnabled" .) "true") }}
+    enabled: {{ not $istioEnabled }}
   {{- if or $minioEnabled $s3Enabled }}
   {{- if and $s3Enabled .Values.addons.mimir.s3ObjectStorage.accessSecret .Values.addons.mimir.s3ObjectStorage.accessKey }}
   global:

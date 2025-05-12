@@ -1,5 +1,6 @@
 {{- $fluxSettingsAuthservice := merge .Values.addons.authservice.flux .Values.flux -}}
-{{- if and (include "istioEnabled" .) (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- if and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -57,7 +58,7 @@ spec:
       valuesKey: "overlays"
 
   dependsOn:
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   - name: {{ include "istioHelmRelease" . }}
     namespace: {{ .Release.Namespace }}
   {{- end }}

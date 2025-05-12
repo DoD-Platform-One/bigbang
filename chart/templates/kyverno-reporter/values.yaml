@@ -5,6 +5,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno-reporter" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 global:
   fullnameOverride: kyverno-reporter
@@ -14,7 +15,7 @@ image:
 imagePullSecrets:
 - name: private-registry
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 istio:
   enabled: true
 podAnnotations:
@@ -26,7 +27,7 @@ kyvernoPlugin:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -36,7 +37,7 @@ ui:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
   - name: private-registry
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -45,7 +46,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
   grafana:
     namespace: monitoring
-  {{- if (eq (include "istioEnabled" .) "true") }}
+  {{- if $istioEnabled }}
   serviceMonitor:
     scheme: https
     tlsConfig:

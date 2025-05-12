@@ -1,4 +1,5 @@
 {{- if .Values.addons.anchore.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -6,6 +7,6 @@ metadata:
     app.kubernetes.io/name: anchore
     app.kubernetes.io/component: "security"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (include "istioEnabled" .) (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}    
+    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}    
   name: anchore
 {{- end }}

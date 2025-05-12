@@ -1,4 +1,5 @@
 {{- if .Values.addons.externalSecrets.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -8,6 +9,6 @@ metadata:
     app.kubernetes.io/name: external-secrets
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.externalSecrets) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.externalSecrets) "enabled")) }}
   name: external-secrets
 {{- end }}

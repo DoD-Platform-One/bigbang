@@ -6,6 +6,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.harbor" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 imagePullSecrets:
 - name: private-registry
@@ -16,7 +17,7 @@ externalURL: https://harbor.{{ .Values.domain }}
 domain: {{ .Values.domain }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values)
@@ -46,7 +47,7 @@ serviceMonitor:
   # conditional passes only if all conditionals are true:
   # - istio: enabled
   # - mTLS: SCRICT
-  {{- if and (eq (include "istioEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
   scheme: https
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem

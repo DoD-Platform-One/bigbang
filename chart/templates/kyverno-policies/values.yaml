@@ -5,7 +5,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno-policies" -}}
-
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 {{- $deployNodeAgent := (and .Values.addons.velero.enabled (dig "deployNodeAgent" false .Values.addons.velero.values)) }}
 
 waitforready:
@@ -159,7 +159,7 @@ policies:
       {{- end }}
 
   disallow-istio-injection-bypass:
-    enabled: {{ include "istioEnabled" . }}
+    enabled: {{ $istioEnabled }}
     exclude:
       any:
       # Istio does not inject itself
@@ -378,7 +378,7 @@ policies:
       - app.kubernetes.io/version
 
   require-istio-on-namespaces:
-    enabled: {{ include "istioEnabled" . }}
+    enabled: {{ $istioEnabled }}
     exclude:
       any:
       - resources:
@@ -399,7 +399,7 @@ policies:
 
   add-default-securitycontext:
     enabled: true
-    {{ if (eq (include "istioEnabled" .) "true") }}
+    {{ if $istioEnabled }}
     parameters:
       excludeContainers:
         - istio-init
@@ -495,7 +495,7 @@ policies:
 
   require-non-root-group:
     validationFailureAction: Enforce
-    {{ if include "istioEnabled" . }}
+    {{ if $istioEnabled }}
     parameters:
       excludeContainers:
         - istio-init
@@ -587,7 +587,7 @@ policies:
 
   require-non-root-user:
     validationFailureAction: Enforce
-    {{ if include "istioEnabled" . }}
+    {{ if $istioEnabled }}
     parameters:
       excludeContainers:
         - istio-init
@@ -714,7 +714,7 @@ policies:
       allow:
       # Defaults from https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
       - NET_BIND_SERVICE
-      {{- if include "istioEnabled" . }}
+      {{- if $istioEnabled }}
       # Istio requires NET_ADMIN and NET_RAW for sidecar init: https://istio.io/latest/docs/ops/deployment/requirements/#pod-requirements
       # It uses these permissions to setup iptables for network routing
       # Cannot create exclusion since sidecar is injected in most containers, so allow the capabilities globally
@@ -1299,7 +1299,7 @@ policies:
           - headlamp-*
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
 
 {{- end }}
 

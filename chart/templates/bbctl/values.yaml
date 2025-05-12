@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.bbctl" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -51,7 +52,7 @@ baseConfig:
     {{- end }}
 
 istio:
-  enabled: {{ include "istioEnabled" . }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.bbctl.values)

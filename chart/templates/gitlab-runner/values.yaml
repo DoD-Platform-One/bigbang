@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gitlab-runner" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
@@ -10,7 +11,7 @@ imagePullSecrets:
 - name: private-registry
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true")}}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
@@ -32,7 +33,7 @@ metrics:
     enabled: {{ .Values.monitoring.enabled }}
 
 # When istio injected, add an annotation with the istio version to the manager pods only
-{{- if (and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") (eq (include "istioEnabled" .) "true")) }}
+{{- if and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

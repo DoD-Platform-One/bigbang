@@ -3,6 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.external-secrets" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -14,13 +15,13 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
+{{- if $istioEnabled }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
 istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
+  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.externalSecrets.values)
