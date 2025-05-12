@@ -2699,11 +2699,11 @@ addons:
   # External Secrets
   #
   externalSecrets:
+    enabled: false
     values:
       bbtests:
         enabled: true
-        cypress:
-          artifacts: true
+        
   # ----------------------------------------------------------------------------------------------------------------------
   # Headlamp
   #
