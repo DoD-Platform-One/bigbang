@@ -1063,6 +1063,7 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
+        "additionalDestinations": true,
         "alloyLogs": {
           "enabled": {
             "type": "boolean"

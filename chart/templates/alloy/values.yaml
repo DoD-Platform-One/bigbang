@@ -46,7 +46,10 @@ k8s-monitoring:
       type: loki
       url: {{ $lokiWriteDestUrl }}
     {{- end }}
-  {{- if and $alloyLogsEnabled .Values.loki.enabled }}
+  {{- if .Values.alloy.additionalDestinations }}
+  {{- toYaml .Values.alloy.additionalDestinations | nindent 4 }}
+  {{- end }}
+  {{- if $alloyLogsEnabled }}
   alloy-logs:
     enabled: true
     serviceMonitor:
@@ -60,5 +63,17 @@ k8s-monitoring:
       {{- end }}
   podLogs:
     enabled: true
+    destinations:
+      {{- if .Values.loki.enabled }}
+      - loki
+      {{- end }}
+      {{- if .Values.alloy.additionalDestinations }}
+      {{- range $dest := .Values.alloy.additionalDestinations }}
+      {{- if eq (lower $dest.type) "loki" }}
+      - {{ $dest.name }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    collector: alloy-logs
   {{- end }}
 {{- end }}

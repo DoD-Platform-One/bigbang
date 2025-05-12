@@ -145,10 +145,13 @@ PLATFORM ONE LOGGING WARNING:
   If using Elastic for other functionality, deploying both applications is acceptable.
 {{- end }}
 
-{{- if and (and .Values.alloy.enabled .Values.alloy.alloyLogs.enabled) (not .Values.loki.enabled) }}
+{{- if and (and .Values.alloy.enabled .Values.alloy.alloyLogs.enabled) (not .Values.loki.enabled) (not .Values.alloy.additionalDestinations) }}
 PLATFORM ONE LOGGING WARNING:
-  You have enabled Alloy with logging but have not enabled Loki.
-  Please enable Loki or disable .Values.alloy.alloyLogs
+  You have enabled Alloy with logging but a logging destination has not been configured.
+  Resolution Options:
+    1. Enable Loki: Set .Values.loki.enabled=true
+    2. For external or custom destinations, add an additional destination of type "loki": Configure .Values.alloy.additionalDestinations see https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/docs/destinations
+    3. Disable Alloy Logging: Set .Values.alloy.alloyLogs.enabled=false
 {{- end }}
 
 {{- if and $.Values.loki.enabled (dig "values" "global" "createGlobalConfig" false $.Values.loki) }}
