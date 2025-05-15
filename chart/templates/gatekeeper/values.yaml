@@ -139,6 +139,14 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         {{- end }}
   {{- end }}
 
+  {{- if .Values.istioGateway.enabled }}
+  noSysctls:
+    parameters:
+      excludedResources:
+      # Allow safe sysctl used by ingressgateways
+      - istio-gateway/.*
+  {{- end }}
+
   podsHaveIstio:
     enabled: {{ $istioEnabled }}
     match:
