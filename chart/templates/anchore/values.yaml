@@ -3,9 +3,9 @@
 {{- end }}
 
 {{- define "bigbang.defaults.anchore" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
 domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
