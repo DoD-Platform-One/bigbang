@@ -66,12 +66,14 @@ istioGateway:
     gateways:
       custom:
         # This does not get passed to the gateway-api chart.
-        # Instead, a `Secret` is created called "<gateway-name>-cert"
+        # Instead, a `Secret` is created called for each certificate listed
         # in the gateway namespace composed of these values
-        tls:
-          cert: ...
-          key: ...
-          ca: ...
+        gatewayCerts:
+          - name: custom-cert
+            tls:
+              cert: ...
+              key: ...
+              ca: ...
 
         # These values are used to configure the `Gateway` CR we
         # create in the istio-gateway chart.
@@ -92,7 +94,7 @@ istioGateway:
                 number: 8443
                 protocol: HTTPS
               tls:
-                credentialName: custom-cert # this should match the <gateway-name>-cert pattern to select the right secret
+                credentialName: custom-cert # this should match the <name> property in the list of certs under <gatewayCerts> to select the right secret
                 mode: SIMPLE
 
         # Everything under upstream gets passed through our istio-gateway chart

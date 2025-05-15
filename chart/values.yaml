@@ -227,14 +227,21 @@ istioGateway:
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
   #     public:
-  #       tls:
-  #         key: "<my-key>"
-  #         cert: "<my-cert>"
-  #         minProtocolVersion: "<my-min-protocol-version>"
+  #       gatewayCerts:
+  #         - name: public-cert
+  #           tls:
+  #             key: "<my-key>"
+  #             cert: "<my-cert>"
+  #       minProtocolVersion: "<my-min-protocol-version>"
   #
   # EXAMPLE: Create an entirely new ingress gateway
   #   gateways:
   #     custom: # name of the gateway; will be templated to custom-ingressgateway
+  #       gatewayCerts:
+  #         - name: custom-cert
+  #           tls:
+  #             key: "<my-key>"
+  #             cert: "<my-cert>"
   #       upstream:
   #         labels:
   #           istio: ingressgateway
@@ -255,7 +262,7 @@ istioGateway:
   #             number: 8443
   #             protocol: HTTPS
   #           tls:
-  #             credentialName: public-cert
+  #             credentialName: custom-cert
   #             mode: SIMPLE
   #
   # EXAMPLE: Disable the existing passthrough gateway
