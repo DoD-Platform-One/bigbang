@@ -181,6 +181,7 @@ gatekeeper:
           # Allow kyverno test vectors for Helm test
           - default/c.?
           - default/i.?
+          - gitlab/.*
       allowedHostFilesystem:
         parameters:
           excludedResources:
