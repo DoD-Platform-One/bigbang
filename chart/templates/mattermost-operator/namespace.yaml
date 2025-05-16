@@ -1,7 +1,7 @@
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
 {{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
 {{- if or $mmOpValues.enabled .Values.addons.mattermost.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: v1
 kind: Namespace
 metadata:

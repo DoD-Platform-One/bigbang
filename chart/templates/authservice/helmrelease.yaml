@@ -1,5 +1,5 @@
 {{- $fluxSettingsAuthservice := merge .Values.addons.authservice.flux .Values.flux -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- if and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

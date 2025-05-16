@@ -5,7 +5,7 @@
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 
 {{- $lokiWriteDestUrl := ternary
     "http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push"

@@ -3,7 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.external-secrets" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}

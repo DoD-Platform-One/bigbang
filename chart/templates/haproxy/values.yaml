@@ -1,11 +1,11 @@
 {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- if and $istioEnabled .Values.monitoring.enabled .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.haproxy "name" "haproxy-sso" "defaults" (include "bigbang.defaults.haproxy-sso" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.haproxy-sso" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $haproxyAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}

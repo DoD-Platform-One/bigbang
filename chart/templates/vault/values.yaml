@@ -3,7 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.vault" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 # temporary shim name for vault ingressgateway name while we migrate to operatorless gateway
 {{- $gatewayResourceName := ternary (printf "%s-ingressgateway" .Values.addons.vault.ingress.gateway) .Values.addons.vault.ingress.gateway .Values.istioGateway.enabled }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
