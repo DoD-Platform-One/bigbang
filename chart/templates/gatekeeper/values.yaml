@@ -3,7 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gatekeeper" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecrets:

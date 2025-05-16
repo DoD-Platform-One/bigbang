@@ -1,6 +1,6 @@
 {{- $fluxSettingsAlloy := merge .Values.alloy.flux .Values.flux -}}
 {{- if .Values.alloy.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $isStrictIstio := and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.alloy.values) "STRICT") -}}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

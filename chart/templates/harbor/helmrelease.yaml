@@ -1,7 +1,7 @@
 {{- $pkg := "harbor" }}
 {{- $fluxSettingsHarbor := merge .Values.addons.harbor.flux .Values.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

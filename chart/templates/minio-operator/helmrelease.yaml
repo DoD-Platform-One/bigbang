@@ -1,6 +1,6 @@
 {{- $fluxSettingsMinioOperator := merge .Values.addons.minioOperator.flux .Values.flux -}}
 {{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

@@ -6,7 +6,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.thanos" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $thanosS3Endpoint := (printf "%s.s3.dualstack.%s.amazonaws.com" .Values.addons.thanos.objectStorage.bucket .Values.addons.thanos.objectStorage.region) }}
 
 imagePullSecrets:

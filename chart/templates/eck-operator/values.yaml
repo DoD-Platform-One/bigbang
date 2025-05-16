@@ -3,7 +3,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.eck-operator" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 license:
   trial: {{ .Values.elasticsearchKibana.license.trial }}
   keyJSON: |
