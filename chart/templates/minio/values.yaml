@@ -13,10 +13,10 @@ istio:
   enabled: {{ $istioEnabled }}
   console:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.minio.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
   api:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.minio.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
@@ -36,9 +36,7 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.minio.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.minio "root" .) | nindent 4 }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 

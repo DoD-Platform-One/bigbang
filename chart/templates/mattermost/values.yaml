@@ -20,7 +20,7 @@ istio:
   enabled: {{ $istioEnabled }}
   chat:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.mattermost.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.mattermost.ingress.gateway "root" .)}}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
   hardened:
     enabled: {{ or
@@ -73,9 +73,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.mattermost.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.mattermost "root" .) | nindent 4 }}
 
 global:
   imagePullSecrets:

@@ -32,7 +32,7 @@ istio:
   keycloak:
     enabled: true
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPassthroughGateway" . ) .Values.addons.keycloak.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "default" "passthrough" "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
 
 {{- if $istioInjection }}
 podAnnotations:
@@ -45,9 +45,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- $gateway := default "passthrough" .Values.addons.keycloak.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "default" "passthrough" "pkg" .Values.addons.keycloak "root" .) | nindent 4 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

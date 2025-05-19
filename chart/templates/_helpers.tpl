@@ -539,3 +539,44 @@ ingress: istio-controlplane
 egress: istio-controlplane
 {{- end -}}
 {{- end -}}
+
+{{- /*
+Gets the gateway selector configuration for a package
+Args:
+    - default: The default gateway name to use if none specified (default: "public")
+    - pkg: The package values (e.g. .Values.addons.argocd)
+    - root: The root context
+*/}}
+{{- define "getGatewaySelector" -}}
+{{- $default := default "public" .default }}
+{{- $gateway := default $default .pkg.ingress.gateway }}
+{{- if .root.Values.istioGateway.enabled }}
+  {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
+  {{- $gw := get $gateways $gateway }}
+  {{- if $gw }}
+    {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
+  {{- end }}
+{{- else }}
+  {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .root.Values.istio) "istio" nil }}
+  {{- toYaml (dig "values" "gateways" $gateway "selector" $default .root.Values.istio) }}
+{{- end }}
+{{- end -}}
+
+{{- /*
+Gets the gateway name for a package
+Args:
+    - default: The default gateway name to use if none specified (default: "public")
+    - gateway: The gateway name
+    - root: The root context
+*/}}
+{{- define "getGatewayName" -}}
+{{- $default := default "public" .default }}
+{{- $gateway := default $default .gateway }}
+{{- if .root.Values.istioGateway.enabled }}
+  {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
+  {{- $gw := get $gateways $gateway }}
+  {{- printf "istio-gateway/%s" $gw.serviceName }}
+{{- else }}
+  {{- printf "istio-system/%s" $gateway }}
+{{- end }}
+{{- end -}}
