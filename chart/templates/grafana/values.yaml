@@ -23,9 +23,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.grafana.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.grafana "root" .) | nindent 4 }}
 
 openshift: {{ .Values.openshift }}
 
@@ -51,7 +49,7 @@ istio:
   grafana:
     enabled: true
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.grafana.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.grafana.ingress.gateway "root" .)}}
   injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
 
 anchore:

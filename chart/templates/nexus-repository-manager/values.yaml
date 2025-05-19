@@ -21,7 +21,7 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" $nexusValues }}
   nexus:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" .) $nexusValues.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" $nexusValues.ingress.gateway "root" .)}}
 
 openshift: {{ .Values.openshift }}
 
@@ -49,9 +49,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
-    {{- $gateway := default "public" $nexusValues.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" $nexusValues "root" .) | nindent 4 }}
 
 nexus:
   imagePullSecrets:

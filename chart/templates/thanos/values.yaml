@@ -40,7 +40,7 @@ istio:
   {{- end }}
   thanos:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.thanos.ingress.gateway "root" .)}}
 
 {{- with .Values.addons.thanos.objectStorage }}
 {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
@@ -53,9 +53,7 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.thanos.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.thanos "root" .) | nindent 4 }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 

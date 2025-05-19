@@ -40,7 +40,7 @@ istio:
   loki:
     enabled: true
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) }}
+      - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
 
 imagePullSecrets:
   - name: private-registry
