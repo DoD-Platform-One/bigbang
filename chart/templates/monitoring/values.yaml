@@ -27,13 +27,7 @@ networkPolicies:
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
     {{- if $istioEnabled }}
-    {{- $gateway := default "public" .Values.monitoring.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.istiod.enabled }}
-    app: public-ingressgateway
-    istio: ingressgateway
+    {{- include "getGatewaySelector" (dict "pkg" .Values.monitoring "root" .) | nindent 4 }}
     {{- end }}
 
 openshift: {{ .Values.openshift }}
@@ -90,7 +84,7 @@ istio:
     namespace: authservice
     {{- end }}
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.monitoring.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
   alertmanager:
     enabled: true
     {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
@@ -99,7 +93,7 @@ istio:
     namespace: authservice
     {{- end }}
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.monitoring.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
   injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
 
 alertmanager:

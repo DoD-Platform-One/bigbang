@@ -19,7 +19,7 @@ istio:
     }}
   neuvector:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.monitoring.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.neuvector.ingress.gateway "root" .)}}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
 monitoring:
@@ -118,13 +118,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
   {{- if $istioEnabled }}
-    {{- $gateway := default "public" .Values.neuvector.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
-  {{- end }}
-  {{- if .Values.istiod.enabled }}
-    app: public-ingressgateway
-    istio: ingressgateway
+  {{- include "getGatewaySelector" (dict "pkg" .Values.neuvector "root" .) | nindent 4 }}
   {{- end }}
 {{- end }}
 

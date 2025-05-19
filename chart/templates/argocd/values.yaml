@@ -154,7 +154,7 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.argocd }}
   argocd:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.argocd.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.argocd.ingress.gateway "root" .)}}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -165,9 +165,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.argocd.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.argocd "root" .) | nindent 4 }}
 
 {{- if .Values.addons.argocd.sso.enabled }}
 sso:

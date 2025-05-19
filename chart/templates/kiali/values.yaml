@@ -27,7 +27,7 @@ istio:
       enabled: {{ .Values.monitoring.enabled }}
   kiali:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.kiali.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
 
 {{- if $istioEnabled }}
 podAnnotations:
@@ -136,13 +136,5 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- if $istioEnabled }}
-    {{- $gateway := default "public" .Values.kiali.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
-    {{- end }}
-    {{- if .Values.istiod.enabled }}
-    app: public-ingressgateway
-    istio: ingressgateway
-    {{- end }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.kiali "root" .) | nindent 4 }}
 {{- end -}}

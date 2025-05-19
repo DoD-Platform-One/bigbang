@@ -25,7 +25,7 @@ istio:
   jaeger:
     enabled: {{ $istioEnabled }}
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.jaeger.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.jaeger.ingress.gateway "root" .)}}
 
 {{- if $istioEnabled }}
 annotations:
@@ -98,9 +98,7 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.jaeger.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.jaeger "root" .) | nindent 4 }}
 
 webhookCertGen:
   image:
