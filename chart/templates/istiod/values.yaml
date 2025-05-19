@@ -14,6 +14,9 @@ networkPolicies:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+authservice:
+  enabled: {{ .Values.addons.authservice.enabled }}
+
 upstream:
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -38,6 +41,8 @@ upstream:
           port: "10003"
     {{- end }}
   {{- end }}
-
+{{ if and .Values.addons.authservice.enabled .Values.sso.certificateAuthority.cert }}
+  jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert }}
+{{- end }}
 {{- end }}
 
