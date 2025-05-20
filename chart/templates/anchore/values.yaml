@@ -20,10 +20,10 @@ istio:
   injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
   ui:
     gateways:
-      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.anchore.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchore.ingress.gateway "root" .)}}
   api:
     gateways:
-      - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.anchore.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchore.ingress.gateway "root" .)}}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -44,9 +44,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.anchore.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.anchore "root" .) | nindent 4 }}
 
 {{- if .Values.addons.anchore.enterprise.licenseYaml }}
 enterpriseLicenseYaml: |

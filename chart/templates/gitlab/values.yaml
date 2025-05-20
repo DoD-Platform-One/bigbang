@@ -27,10 +27,10 @@ istio:
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
   gitlab:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.gitlab.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.gitlab.ingress.gateway "root" .)}}
   registry:
     gateways:
-    - {{ include "istioGatewayNamespace" . }}/{{ default (include "istioPublicGateway" . ) .Values.addons.gitlab.ingress.gateway }}
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.gitlab.ingress.gateway "root" .)}}
 
 # Used for istio SSO serviceEntry
 sso:
@@ -43,9 +43,7 @@ monitoring:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.gitlab.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.gitlab "root" .) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   istioNamespaceSelector:
     {{ include "istioNamespaceSelector" . | nindent 4 }}
