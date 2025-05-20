@@ -190,6 +190,14 @@ bbctl:
 
 # Addons are toggled based on labels in CI
 addons:
+  mimir:
+    values:
+      bbtests:
+        cypress:
+          artifacts: false
+      mimir-distributed:
+        global:
+          dnsService: rke2-coredns-rke2-coredns
   argocd:
     values:
       bbtests:
@@ -508,36 +516,7 @@ addons:
       bbtests:
         cypress:
           artifacts: false
-      postgresql:
-        persistence:
-          size: 256Mi
-      resources:
-        requests:
-          cpu: 200m
-          memory: 256Mi
-        limits: null
-      minio:
-        tenant:
-          pools:
-          - name: pool-0
-            servers: 1
-            volumesPerServer: 4
-            size: 256Mi
-            resources:
-              requests:
-                cpu: 250m
-                memory: 512Mi
-              limits: null
-            securityContext:
-              runAsUser: 1001
-              runAsGroup: 1001
-              fsGroup: 1001
-              runAsNonRoot: true
-            containerSecurityContext:
-              runAsUser: 1001
-              runAsGroup: 1001
-              runAsNonRoot: true
-            
+
   nexusRepositoryManager:
     values:
       bbtests:
