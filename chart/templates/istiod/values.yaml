@@ -42,7 +42,7 @@ upstream:
     {{- end }}
   {{- end }}
 {{ if and .Values.addons.authservice.enabled .Values.sso.certificateAuthority.cert }}
-  jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert }}
+  jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert  | quote }}
 {{- end }}
 {{- end }}
 
