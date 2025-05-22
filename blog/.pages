@@ -3,6 +3,7 @@ nav:
   - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
   - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
   - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
+  - Kubernetes Management with Headlamp and the Flux Plugin: headlamp.md
   - Cypress Testing In Depth: cypress-testing.md
   - BigBang.mil Domain & dev Certificate: dev-bigbang-mil-certificate.md
   - 2.0 New Features: 2-0-new-features.md
