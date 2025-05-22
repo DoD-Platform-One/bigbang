@@ -47,9 +47,14 @@ spec:
 
   {{- toYaml $fluxSettingsMetrics | nindent 2 }}
 
-  {{- if .Values.addons.metricsServer.postRenderers }}
+  {{- if or .Values.addons.metricsServer.postRenderers .Values.addons.metricsServer.automountServiceAccountToken }}
   postRenderers:
-  {{ toYaml .Values.addons.metricsServer.postRenderers | nindent 4 }}
+  {{- if .Values.addons.metricsServer.automountServiceAccountToken }}
+  {{ include "metricsServer.automountServiceAccountTokenPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{ with .Values.addons.metricsServer.postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
   {{- end }}
 
   valuesFrom:
