@@ -162,7 +162,6 @@ imagePullPolicy: IfNotPresent
 #
 
 istioCRDs:
-  status: "beta"
   # -- Toggle deployment of Istio CRDs
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
@@ -183,7 +182,6 @@ istioCRDs:
   postRenderers: []
 
 istiod:
-  status: "beta"
   # -- Toggle deployment of istiod
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
@@ -209,7 +207,6 @@ istiod:
   postRenderers: []
 
 istioGateway:
-  status: "beta"
   # -- Toggle deployment of Istio Gateway(s)  
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
