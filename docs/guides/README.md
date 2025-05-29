@@ -20,6 +20,7 @@ The guides included here are not all inclusive of every situation. Please open a
 [Quickstart](./deployment-scenarios/quickstart.md) |
 [Multiple Ingress](./deployment-scenarios/multiple-ingress.md) |
 [SSO Quickstart](./deployment-scenarios/sso-quickstart.md)
+[Appliance Mode](./deployment-scenarios/appliance-mode.md)
 
 ### Airgap Deployments
 

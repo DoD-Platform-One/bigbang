@@ -1,4 +1,10 @@
-# Promtail
+# Promtail [DEPRECATED]
+
+## DEPRECATION NOTICE
+
+Grafana Promtail has been deprecated and is no longer maintained by Big Bang.
+
+Big Bang will be migrating to [Grafana Alloy](https://docs-bigbang.dso.mil/latest/packages/alloy/) as the core log collector. 
 
 ## Overview
 

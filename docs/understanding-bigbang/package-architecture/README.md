@@ -18,12 +18,12 @@ flowchart LR
     direction BT
 
     subgraph L[Logging]
-      subgraph EFK[Default]
-        Kibana & Fluentbit --> Elastic
+      subgraph ALG[Default]
+        Alloy & Grafana --> Loki
       end
-      subgraph PLG[Alternative]
-      style PLG stroke-dasharray: 10 10
-        Promtail[Promtail*] --> Loki[Loki*]
+      subgraph EFK[Alternative]
+      style EFK stroke-dasharray: 10 10
+        Kibana & Fluentbit --> Elastic
       end
     end
 
@@ -51,12 +51,12 @@ flowchart LR
     end
 
     subgraph DT[Distributed Tracing]
-      subgraph J[Default]
-        Jaeger ----> Elastic
-      end
-      subgraph T[Alternative]
-      style T stroke-dasharray: 10 10
+      subgraph T[Default]
         Tempo[Tempo*] -.-> Grafana
+      end
+      subgraph J[Alernative]
+      style J stroke-dasharray: 10 10
+        Jaeger ----> Elastic
       end
     end
 
@@ -131,11 +131,11 @@ A logging stack is a set of scalable tools that can aggregate logs from cluster 
 
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
+|X|ALG|[Alloy](./alloy.md)|Forwarder|[alloy](https://repo1.dso.mil/big-bang/product/packages/alloy)|
+|X|ALG|[Loki](./loki.md)|Storage|[loki](https://repo1.dso.mil/big-bang/product/packages/loki)|
 | |EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/big-bang/product/packages/eck-operator)
 | |EFK|[Elasticsearch / Kibana](./elasticsearch-kibana.md)|Storage & Visualization|[policy](https://repo1.dso.mil/big-bang/product/packages/policy)|
 | |EFK|[Fluentbit](./fluentbit.md)|Forwarder|[fluentbit](https://repo1.dso.mil/big-bang/product/packages/fluentbit)|
-|X|PLG|[Loki](./loki.md)|Storage|[loki](https://repo1.dso.mil/big-bang/product/packages/loki)|
-|X|PLG|[Promtail](./promtail.md)|Forwarder|[promtail](https://repo1.dso.mil/big-bang/product/packages/promtail)|
 > PLG stack uses Grafana, deployed in [monitoring](#monitoring), for visualization.
 
 ### Policy Enforcement
