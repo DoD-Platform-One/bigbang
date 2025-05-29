@@ -565,7 +565,8 @@ Args:
 {{- $gateway := default $default .gateway }}
 {{- if .root.Values.istioGateway.enabled }}
   {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
-  {{- $gw := get $gateways $gateway }}
+  {{- $gwlookup := get $gateways $gateway }}
+  {{- $gw := default (dict "serviceName" $default) $gwlookup }}
   {{- printf "istio-gateway/%s" $gw.serviceName }}
 {{- else }}
   {{- printf "istio-system/%s" $gateway }}
