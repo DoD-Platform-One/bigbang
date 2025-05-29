@@ -13,7 +13,7 @@ When you come out the other side of this process, you will have a k3d kubernetes
 * [Istio](https://docs-bigbang.dso.mil/latest/packages/istio-operator/) service mesh
 * [Kiali](https://docs-bigbang.dso.mil/latest/packages/kiali/) service mesh observability tool 
 * [Kyverno](https://docs-bigbang.dso.mil/latest/packages/kyverno/) policy engine
-* [Loki](https://docs-bigbang.dso.mil/latest/packages/loki/) log aggregation via [Promtail](https://docs-bigbang.dso.mil/latest/packages/promtail/)
+* [Loki](https://docs-bigbang.dso.mil/latest/packages/loki/) log aggregation via [alloy](https://docs-bigbang.dso.mil/latest/packages/alloy/)
 * [metrics-server](https://docs-bigbang.dso.mil/latest/packages/metrics-server/) metrics collector
 * [Tempo](https://docs-bigbang.dso.mil/latest/packages/tempo/) trace collector for Grafana
 * [Grafana](https://docs-bigbang.dso.mil/latest/packages/grafana/) dashboards

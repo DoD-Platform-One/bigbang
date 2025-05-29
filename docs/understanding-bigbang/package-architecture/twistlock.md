@@ -16,8 +16,8 @@ graph LR
     ig(Ingress Gateway) --"App Port"--> twistlockservice
   end
   subgraph "Logging"
-    twistlockpods("Twistlock Pod(s)") --"Logs"--> fluent(Fluentbit) --> logging-ek-es-http
-    logging-ek-es-http{{Elastic Service<br />logging-ek-es-http}} --> elastic[(Elastic Storage)]
+    twistlockpods("Twistlock Pod(s)") --"Logs"--> alloy --> logging-loki
+    logging-loki{{Loki Service<br />logging-loki}} --> loki[(Loki Storage)]
   end
   subgraph "Monitoring"
     svcmonitor("Service Monitor") --"Metrics Port"--> twistlockservice
@@ -32,7 +32,7 @@ Twistlock Console serves as the user interface within Twistlock. The graphical
 user interface (GUI) lets you define policy, configure and control your Twistlock deployment, and view the overall health (from a security perspective) of your container environment
 
 ### Logging
-In order to enable logging this can only be done via the console UI. Logging can be enabled by clicking on the `Manage` dropdown and click `Alerts`. Under the `Logging` tab the option for `Stdout` can be set to Enabled. This allows for options for logging to stdout to be scraped by fluentbit/promtail OR log to the underlying hosts.
+In order to enable logging this can only be done via the console UI. Logging can be enabled by clicking on the `Manage` dropdown and click `Alerts`. Under the `Logging` tab the option for `Stdout` can be set to Enabled. This allows for options for logging to stdout to be scraped by alloy/fluentbit OR log to the underlying hosts.
 
 
 ### Install Defender

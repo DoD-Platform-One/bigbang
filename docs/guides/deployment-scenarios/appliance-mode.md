@@ -15,7 +15,7 @@ There is a values.yaml file in this same directory which provides an example of 
 | Kiali | Not enough value to justify running in smaller footprint |
 | Monitoring | Prometheus/Alertmanager/Grafana for monitoring/alerting |
 | ECK | Too heavy for reduced compute |
-| Loki/Promtail | need logging |
+| Loki/Alloy | need logging |
 | Gatekeeper/Kyverno | Static environment on edge, compliance will be validated in development/cloud |
 | Cluster Auditor/Kyerno Reporter | Static environment on edge, compliance will be validated in development/cloud |
 | Twistlock/Neuvector | Runtime security at least |

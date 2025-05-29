@@ -7,7 +7,7 @@ Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation 
 ```mermaid
 flowchart TD
    S3[(S3)]
-   Promtail/FluentBit--> Loki
+   Alloy/FluentBit--> Loki
    Grafana --> Loki --> S3
 ```
 
@@ -17,7 +17,7 @@ flowchart TD
    S3[(S3)]
    read[Loki Read] --> S3
    write[Loki Write]
-   Promtail/FluentBit--> write --> S3
+   Alloy/FluentBit--> write --> S3
    Grafana --> read
 ```
 
@@ -28,7 +28,7 @@ flowchart TD
    g[GEL Gateway] --> a[Admin API]  
    a[Admin API]
    end
-   Promtail/FluentBit--> g[GEL Gateway] --> Loki --> S3
+   Alloy/FluentBit--> g[GEL Gateway] --> Loki --> S3
    Grafana --> g[GEL Gateway]
 ```
 
@@ -119,7 +119,7 @@ Loki has no UI packaged with it. Grafana is the frontend to view logs which are 
 
 ### Logging
 
-Within Big Bang, logs are captured by fluentbit or promtail and shipped to your logging engine (Loki when ECK not installed, ECK when it's installed or both).
+Within Big Bang, logs are captured by alloy or fluentbit and shipped to your logging engine (Loki when ECK not installed, ECK when it's installed or both).
 
 ### Health Checks
 
@@ -133,4 +133,4 @@ When using the `scalable` deployment strategy without filling in `loki.objectSto
 
 Loki can be deployed by itself but since it's so closely tied with Grafana, the monitoring package is set as a required dependency within Big Bang so both are setup and auto-configured.
 
-As mentioned above, Loki requires a log forwarder in the cluster to receive logs. You can use either one of fluentbit or promtail but Loki will not fail to install if neither one are installed via Big Bang.
+As mentioned above, Loki requires a log forwarder in the cluster to receive logs. You can use either one of alloy or fluentbit but Loki will not fail to install if neither one are installed via Big Bang.

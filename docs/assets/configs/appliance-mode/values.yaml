@@ -95,13 +95,10 @@ eckOperator:
 fluentbit:
   enabled: false
 
-promtail:
+alloy:
   enabled: true
-  values:
-    resources:
-      requests:
-        cpu: 50m
-        memory: 32Mi
+  alloyLogs:
+    enabled: true
 
 loki:
   enabled: true

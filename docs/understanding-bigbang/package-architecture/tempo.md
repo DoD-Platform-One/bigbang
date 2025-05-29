@@ -124,7 +124,7 @@ tempo:
 
 ### Logging
 
-Within Big Bang, logs are captured by fluentbit or promtail and shipped to your logging engine (Loki when ECK not installed, ECK when it's installed or both).
+Within Big Bang, logs are captured by alloy or fluentbit and shipped to your logging engine (Loki when ECK not installed, ECK when it's installed or both).
 
 ### Health Checks
 

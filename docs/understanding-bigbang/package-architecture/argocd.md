@@ -26,10 +26,10 @@ graph LR
   end
 
   subgraph "Logging"
-    argocdservice1("argocd") --> fluent(Fluentbit) --> logging-ek-es-http
-    logging-ek-es-http{{Elastic Service<br />logging-ek-es-http}} --> elastic[(Elastic Storage)]
+    argocdservice1("argocd") --"Logs"--> alloy --> logging-loki
+    logging-loki{{Loki Service<br />logging-loki}} --> loki[(Loki Storage)]
   end
-
+  
   subgraph "Monitoring"
     svcmonitor("Service Monitor") --> argocdservice1("argocd")
     Prometheus --> svcmonitor("Service Monitor")
@@ -165,7 +165,7 @@ addons:
         logFormat: text           
 ```
 
-_Note:_ within Big Bang, logs are captured by fluentbit or promtail and shipped to your enabled logging stack (ECK by default, PLG is also available).
+_Note:_ within Big Bang, logs are captured by alloy or fluentbit and shipped to your enabled logging stack (ECK by default, PLG is also available).
 
 ### Monitoring
 
