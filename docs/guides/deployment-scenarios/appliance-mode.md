@@ -17,7 +17,7 @@ There is a values.yaml file in this same directory which provides an example of 
 | ECK | Too heavy for reduced compute |
 | Loki/Alloy | need logging |
 | Gatekeeper/Kyverno | Static environment on edge, compliance will be validated in development/cloud |
-| Cluster Auditor/Kyerno Reporter | Static environment on edge, compliance will be validated in development/cloud |
+| Cluster Auditor/Kyverno Reporter | Static environment on edge, compliance will be validated in development/cloud |
 | Twistlock/Neuvector | Runtime security at least |
 
 Review and reference [the values file in the configs folder to deploy BigBang in Appliance Mode](../../assets/configs/appliance-mode/values.yaml).

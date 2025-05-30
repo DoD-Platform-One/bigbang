@@ -24,10 +24,6 @@ istioGateway:
   repoName: "istio-gateway"
   hrName: "public-ingressgateway"
   filePath: "istio-gateway"
-clusterAuditor:
-  repoName: "cluster-auditor"
-  hrName: "cluster-auditor"
-  filePath: "cluster-auditor"
 gatekeeper:
   repoName: "policy"
 kyvernoPolicies:

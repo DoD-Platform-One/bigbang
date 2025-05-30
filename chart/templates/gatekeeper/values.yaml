@@ -1,4 +1,4 @@
-{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.gatekeeper.enabled }}
 {{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.gatekeeper" .))) "name" "gatekeeper" "defaults" (include "bigbang.defaults.gatekeeper" .)) }}
 {{- end }}
 

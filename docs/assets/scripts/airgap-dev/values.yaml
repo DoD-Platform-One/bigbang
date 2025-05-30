@@ -39,16 +39,6 @@ istioOperator:
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/istio-operator
 
-clusterAuditor:
-  enabled: true
-  git:
-    repo: ssh://git@host.k3d.internal/home/git/repos/cluster-auditor
-  values:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 0.5Gi
-
 monitoring:
   enabled: true
   git:

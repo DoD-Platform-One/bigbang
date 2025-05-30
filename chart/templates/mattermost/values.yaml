@@ -27,8 +27,6 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.addons.mattermost.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
-    clusterAuditor:
-      enabled: {{ .Values.clusterAuditor.enabled }}
     kyvernoReporter:
       enabled: {{ .Values.kyvernoReporter.enabled }}
 

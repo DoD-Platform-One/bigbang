@@ -14,17 +14,6 @@ istio:
               memory: 256Mi
             limits: null
 
-clusterAuditor:
-  values:
-    bbtests:
-      cypress:
-        artifacts: false
-    resources:
-      requests:
-        cpu: 300m
-        memory: 300Mi
-      limits: null
-    
 gatekeeper:
   values:
     bbtests:

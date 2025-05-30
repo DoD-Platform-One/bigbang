@@ -1,4 +1,4 @@
-{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.gatekeeper.enabled }}
 apiVersion: v1
 kind: Namespace
 metadata:

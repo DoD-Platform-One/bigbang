@@ -78,7 +78,7 @@ Flux settings are used to setup the default continuous deployment configuration 
 
 ### Package
 
-Each package (e.g. `istio`, `clusterAuditor`) has configuration to control how Big Bang deploys the package
+Each package (e.g. `istio`) has configuration to control how Big Bang deploys the package
 
 | Key | Description | Type | Default |
 |--|--|--|--|

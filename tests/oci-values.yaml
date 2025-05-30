@@ -98,11 +98,6 @@ elasticsearchKibana:
   helmRepo:
     cosignVerify: false
 
-clusterAuditor:
-  sourceType: "helmRepo"
-  helmRepo:
-    cosignVerify: false
-
 gatekeeper:
   sourceType: "helmRepo"
   helmRepo:
