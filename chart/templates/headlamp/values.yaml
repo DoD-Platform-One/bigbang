@@ -22,6 +22,8 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
 {{- if (eq (include "istioEnabled" .) "true") }}
@@ -36,6 +38,9 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.addons.headlamp.values)
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
+  headlamp:
+    gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.headlamp.ingress.gateway "root" .)}}
 
 openshift: {{ .Values.openshift }}
 
