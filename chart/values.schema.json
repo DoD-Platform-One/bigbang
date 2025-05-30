@@ -294,6 +294,7 @@
     },
     "istio": {
       "properties": {
+        "status": true,
         "enabled": true,
         "mtls": {
           "type": "object"
@@ -323,6 +324,7 @@
     },
     "istioOperator": {
       "properties": {
+        "status": true,
         "enabled": true,
         "sourceType": true,
         "git": true,

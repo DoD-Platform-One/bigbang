@@ -317,6 +317,7 @@ istioGateway:
 
 istio:
   # -- Toggle deployment of Istio.
+  status: "deprecated"
   enabled: true
   mtls:
     # -- STRICT = Allow only mutual TLS traffic,
@@ -462,6 +463,7 @@ istio:
   postRenderers: []
 
 istioOperator:
+  status: "deprecated"
   # -- Toggle deployment of Istio Operator.
   enabled: true
 
