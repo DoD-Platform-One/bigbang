@@ -116,40 +116,6 @@ kiali:
           #cypress_keycloak_test_enable: "true"
           #cypress_keycloak_username: "cypress"
           #cypress_keycloak_password: "tnr_w!G33ZyAt@C8"
-clusterAuditor:
-  enabled: false
-  values:
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits: {}
-    bbtests:
-      enabled: true
-      cypress:
-        envs:
-          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
-          cypress_prometheus_url: 'https://prometheus.dev.bigbang.mil'
-          cypress_url: 'https://grafana.dev.bigbang.mil/d/YBgRZG6Mz/opa-violations?orgId=1'
-    istio:
-      hardened:
-        customServiceEntries:
-          - name: "cypress-service-entries-cluster-auditor"
-            enabled: true
-            spec:
-              hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-                - 'grafana.dev.bigbang.mil'
-                - 'prometheus.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
 
 gatekeeper:
   enabled: false

@@ -1,4 +1,4 @@
-{{- if and (eq .Values.gatekeeper.sourceType "git") (not .Values.offline) (or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled) }}
+{{- if and (eq .Values.gatekeeper.sourceType "git") (not .Values.offline) (.Values.gatekeeper.enabled) }}
 {{- $gitCredsDict := dict
   "name" "gatekeeper"
   "packageGitScope" .Values.gatekeeper.git

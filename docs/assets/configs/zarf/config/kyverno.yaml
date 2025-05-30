@@ -1,8 +1,6 @@
 # Use Kyverno instead of Gatekeeper
 gatekeeper:
   enabled: false
-clusterAuditor:
-  enabled: false
 kyverno:
   enabled: true
 kyvernoPolicies:

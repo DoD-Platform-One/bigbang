@@ -1,5 +1,5 @@
 {{- $fluxSettingsGatekeeper := merge .Values.gatekeeper.flux .Values.flux -}}
-{{- if or .Values.gatekeeper.enabled .Values.clusterAuditor.enabled }}
+{{- if .Values.gatekeeper.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

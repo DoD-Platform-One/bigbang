@@ -165,17 +165,6 @@ Kubernetes: `>=1.29.0-0`
 | kiali.sso.client_secret | string | `""` | OIDC Client Secret to use for Kiali |
 | kiali.values | object | `{}` | Values to pass through to Kiali chart: https://repo1.dso.mil/big-bang/product/packages/kiali |
 | kiali.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| clusterAuditor.enabled | bool | `false` | Toggle deployment of Cluster Auditor. |
-| clusterAuditor.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| clusterAuditor.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git"` |  |
-| clusterAuditor.git.path | string | `"./chart"` |  |
-| clusterAuditor.git.tag | string | `"1.5.0-bb.25"` |  |
-| clusterAuditor.helmRepo.repoName | string | `"registry1"` |  |
-| clusterAuditor.helmRepo.chartName | string | `"cluster-auditor"` |  |
-| clusterAuditor.helmRepo.tag | string | `"1.5.0-bb.25"` |  |
-| clusterAuditor.flux | object | `{}` | Flux reconciliation overrides specifically for the Cluster Auditor Package |
-| clusterAuditor.values | object | `{}` | Values to passthrough to the cluster auditor chart: https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git |
-| clusterAuditor.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | gatekeeper.enabled | bool | `false` | Toggle deployment of OPA Gatekeeper. |
 | gatekeeper.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | gatekeeper.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/policy.git"` |  |
