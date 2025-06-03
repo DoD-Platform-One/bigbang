@@ -28,9 +28,6 @@ istioOperator:
           cpu: 100m
           memory: 128Mi
 
-jaeger:
-  enabled: false
-
 kiali:
   enabled: false
 

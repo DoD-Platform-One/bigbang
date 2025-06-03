@@ -83,11 +83,6 @@ fluentbit:
   helmRepo:
     cosignVerify: false
 
-jaeger:
-  sourceType: "helmRepo"
-  helmRepo:
-    cosignVerify: false
-
 eckOperator:
   sourceType: "helmRepo"
   helmRepo:

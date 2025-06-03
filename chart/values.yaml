@@ -488,49 +488,6 @@ istioOperator:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
-jaeger:
-  # -- Toggle deployment of Jaeger.
-  enabled: false
-
-  # -- Choose source type of "git" or "helmRepo"
-  sourceType: "git"
-
-  git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
-    path: "./chart"
-    tag: "2.57.0-bb.8"
-  helmRepo:
-    repoName: "registry1"
-    chartName: "jaeger"
-    tag: "2.57.0-bb.8"
-
-  # -- Flux reconciliation overrides specifically for the Jaeger Package
-  flux:
-    install:
-      crds: CreateReplace
-    upgrade:
-      crds: CreateReplace
-
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
-  ingress:
-    gateway: ""
-
-  sso:
-    # -- Toggle SSO for Jaeger on and off
-    enabled: false
-
-    # -- OIDC Client ID to use for Jaeger
-    client_id: ""
-
-    # -- OIDC Client Secret to use for Jaeger
-    client_secret: ""
-
-  # -- Values to pass through to Jaeger chart: https://repo1.dso.mil/big-bang/product/packages/jaeger.git
-  values: {}
-
-  # -- Post Renderers.  See docs/postrenders.md
-  postRenderers: []
-
 kiali:
   # -- Toggle deployment of Kiali.
   enabled: true
@@ -2142,7 +2099,7 @@ addons:
       chartName: "harbor"
       tag: "1.16.2-bb.4"
 
-    # -- Flux reconciliation overrides specifically for the Jaeger Package
+    # -- Flux reconciliation overrides specifically for the Harbor Package
     flux: {}
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".

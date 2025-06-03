@@ -1243,11 +1243,6 @@ policies:
         pods:
           allow:
           - anchore-ui-redis-*
-      - namespace: jaeger
-        pods:
-          allow:
-          - jaeger-jaeger-jaeger-operator-*
-          - jaeger-clean-svc-monitor
       - namespace: fortify
         # Omitting the serviceAccount and pods section forces the policy to apply to
         # all of the serviceAccounts and pods in the namespace

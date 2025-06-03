@@ -1,4 +1,4 @@
-jaeger:
+tempo:
   sso:
     enabled: true
     client_id: "id"

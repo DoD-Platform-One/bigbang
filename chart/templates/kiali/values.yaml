@@ -93,10 +93,7 @@ upstream:
         {{- if or .Values.istiod.enabled .Values.tempo.enabled }}
         tracing:
           enabled: true
-          {{- if .Values.jaeger.enabled }}
-          {{- $tracingUrl := first (dig "istio" "jaeger" "hosts" list .Values.jaeger.values) }}
-          url: https://{{ tpl ($tracingUrl | default (printf "%s.%s" "tracing" $domainName )) . }}
-          {{- else if .Values.tempo.enabled }}
+          {{- if .Values.tempo.enabled }}
           internal_url: http://tempo-tempo.tempo.svc.cluster.local:3100
           provider: tempo
           {{- end}}
