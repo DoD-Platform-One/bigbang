@@ -1,10 +1,11 @@
 nav:
+  - Big Bang 3.0 - Overview of changes in Big Bang 3.0 Release: big-bang-3-0.md
   - Big Bang 3.0 - Operatorless Istio Migration: bb-3-0-operatorless-istio-migration.md
-  - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
-  - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
   - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
   - Kubernetes Management with Headlamp and the Flux Plugin: headlamp.md
   - Cypress Testing In Depth: cypress-testing.md
+  - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
+  - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
   - BigBang.mil Domain & dev Certificate: dev-bigbang-mil-certificate.md
   - 2.0 New Features: 2-0-new-features.md
   - 2.0 Breaking Changes: 2-0-breaking-changes.md
