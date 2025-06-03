@@ -68,11 +68,6 @@ istio:
       (dig "hardened" "enabled" false .Values.istio.values)
     }}
   tempoQuery:
-    # Set TempoQuery UI to "tempo." if Jaeger is enabled
-    {{- if .Values.jaeger.enabled }}
-    hosts:
-      - "tempo.{{ .Values.domain }}"
-    {{- end }}
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.tempo.ingress.gateway "root" .)}}
 

@@ -3,7 +3,7 @@
 #### Columns
 
 1. Monitoring: `Metrics scraping with Prometheus and dedicated Grafana Dashboards/PrometheusRule alerts as appropriate`
-2. Tracing: `Tempo or Jaeger connections for tracing application traffic`
+2. Tracing: `Tempo connections for tracing application traffic`
 3. Network Policies: `Network Policies for restricting network connectivity`
 4. mTLS: `Istio Injected, with either a Strict or Permissive Mutual TLS Mode`
 
@@ -22,7 +22,6 @@
 | [Istio Gateway](https://repo1.dso.mil/big-bang/product/packages/istio-gateway) |  ![Istio Gateway Build](https://repo1.dso.mil/big-bang/product/packages/istio-gateway/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Operator](https://repo1.dso.mil/big-bang/product/packages/istio-operator) |  ![Istio Operator Build](https://repo1.dso.mil/big-bang/product/packages/istio-operator/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/641) | Yes |
 | [Istio Controlplane](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane) |  ![Istio Controlplane Build](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/632) | Yes |
-| [Jaeger](https://repo1.dso.mil/big-bang/product/packages/jaeger) |  ![Jaeger Build](https://repo1.dso.mil/big-bang/product/packages/jaeger/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/602) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1295) |
 | [Kiali](https://repo1.dso.mil/big-bang/product/packages/kiali) |  ![Kiali Build](https://repo1.dso.mil/big-bang/product/packages/kiali/badges/main/pipeline.svg) | No | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/589) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1296) |
 | [Monitoring](https://repo1.dso.mil/big-bang/product/packages/monitoring) |  ![Monitoring Build](https://repo1.dso.mil/big-bang/product/packages/monitoring/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/509) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1900) |
 | [Grafana](https://repo1.dso.mil/big-bang/product/packages/grafana) |  ![Grafana Build](https://repo1.dso.mil/big-bang/product/packages/grafana/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2929) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/2929) |

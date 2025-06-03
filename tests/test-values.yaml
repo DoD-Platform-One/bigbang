@@ -86,21 +86,6 @@ istio:
           strategy: "anonymous"
 istioGateway:
   enabled: true
-jaeger:
-  enabled: false
-  sso:
-    enabled: false
-    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_jaeger
-  values:
-    bbtests:
-      enabled: true
-      cypress:
-        envs:
-          cypress_url: "https://tracing.dev.bigbang.mil"
-          # uncomment following variables for sso keycloak testing in bb
-          # cypress_tnr_username: "cypress"
-          # cypress_tnr_password: "tnr_w!G33ZyAt@C8"
-          # cypress_keycloak_test_enable: "true"
 kiali:
   sso:
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kiali
@@ -169,7 +154,6 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
-          - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
           - kyverno-reporter/kyverno-reporter-cypress-test
@@ -314,7 +298,6 @@ gatekeeper:
           - gitlab/gitlab-runner-cypress-test
           - gitlab-runner/gitlab-runner-cypress-test
           - harbor/harbor-cypress-test
-          - jaeger/jaeger-cypress-test
           - keycloak/keycloak-cypress-test
           - kiali/kiali-cypress-test
           - kyverno-reporter/kyverno-reporter-cypress-test
@@ -544,7 +527,6 @@ kyvernoPolicies:
               - mattermost
               - nexus-repository-manager
               - keycloak
-              - jaeger
               - kyverno-reporter
               - mimir
               - monitoring
@@ -589,7 +571,6 @@ kyvernoPolicies:
               - nexus-repository-manager
               - keycloak
               - kyverno-reporter
-              - jaeger
               - mimir
               - monitoring
               - vault
@@ -640,7 +621,6 @@ kyvernoPolicies:
               - nexus-repository-manager
               - keycloak
               - kyverno-reporter
-              - jaeger
               - mimir
               - monitoring
               - vault

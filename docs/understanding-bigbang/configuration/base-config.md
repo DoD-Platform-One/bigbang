@@ -134,21 +134,6 @@ Kubernetes: `>=1.29.0-0`
 | istioOperator.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Operator Package |
 | istioOperator.values | object | `{}` | Values to passthrough to the istio-operator chart: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git |
 | istioOperator.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| jaeger.enabled | bool | `false` | Toggle deployment of Jaeger. |
-| jaeger.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| jaeger.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/jaeger.git"` |  |
-| jaeger.git.path | string | `"./chart"` |  |
-| jaeger.git.tag | string | `"2.57.0-bb.8"` |  |
-| jaeger.helmRepo.repoName | string | `"registry1"` |  |
-| jaeger.helmRepo.chartName | string | `"jaeger"` |  |
-| jaeger.helmRepo.tag | string | `"2.57.0-bb.8"` |  |
-| jaeger.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Jaeger Package |
-| jaeger.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
-| jaeger.sso.enabled | bool | `false` | Toggle SSO for Jaeger on and off |
-| jaeger.sso.client_id | string | `""` | OIDC Client ID to use for Jaeger |
-| jaeger.sso.client_secret | string | `""` | OIDC Client Secret to use for Jaeger |
-| jaeger.values | object | `{}` | Values to pass through to Jaeger chart: https://repo1.dso.mil/big-bang/product/packages/jaeger.git |
-| jaeger.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kiali.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kiali.git"` |  |

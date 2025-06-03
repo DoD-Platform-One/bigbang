@@ -37,15 +37,13 @@ istiod:
           targetAverageUtilization: 60
 {{- end }}
 
-{{- if or .Values.jaeger.enabled .Values.tempo.enabled }}
+{{- if .Values.tempo.enabled }}
 tracing:
   enabled: true
-  {{- if .Values.tempo.enabled }}
   address: tempo-tempo.tempo.svc
   port: 9411
   sampling: 100
   max_path_tag_length: 99999
-  {{- end }}
 {{- end }}
 
 {{- if .Values.tempo.enabled }}
@@ -60,7 +58,7 @@ imagePullSecrets:
 openshift: {{ .Values.openshift }}
 
 authservice:
-  enabled: {{ or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.jaeger.enabled .Values.jaeger.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) }}
+  enabled: {{ or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
