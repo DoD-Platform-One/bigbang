@@ -1278,6 +1278,7 @@ bbctl:
     bbtests:
       enabled: true
       cypress:
+        artifacts: true
         envs:
           cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
           cypress_grafana_username: 'admin'
