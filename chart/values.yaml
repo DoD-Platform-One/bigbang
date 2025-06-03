@@ -207,7 +207,7 @@ istiod:
   postRenderers: []
 
 istioGateway:
-  # -- Toggle deployment of Istio Gateway(s)  
+  # -- Toggle deployment of Istio Gateway(s)
   enabled: false
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
@@ -1067,11 +1067,11 @@ twistlock:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/twistlock.git
     path: "./chart"
-    tag: "0.20.1-bb.0"
+    tag: "0.20.1-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "twistlock"
-    tag: "0.20.1-bb.0"
+    tag: "0.20.1-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
@@ -1152,7 +1152,7 @@ alloy:
     chartName: "k8s-monitoring"
     tag: "2.0.27-bb.0"
 
-  # -- Toggle Alloy to collect logs 
+  # -- Toggle Alloy to collect logs
   alloyLogs:
     enabled: true
 
@@ -2234,7 +2234,7 @@ addons:
       defaultUserCredentials:
         username: "mimir-user"
         password: "supersecret"
-    
+
     # -- Configure Mimir to use S3 bucket
     s3ObjectStorage:
       enabled: false
@@ -2254,14 +2254,14 @@ addons:
 
       # -- Bucket name for the Mimir bucket as YAML
       bucketName: ""
-      
+
       # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
       insecure: false
 
-    # -- Mimir Service Account Annotations 
+    # -- Mimir Service Account Annotations
     serviceAccountAnnotations: {}
       ## Example IRSA Service Account Annotation
-      # eks.amazonaws.com/role-arn: "<S3_ROLE_ARN>" 
+      # eks.amazonaws.com/role-arn: "<S3_ROLE_ARN>"
 
     values: {}
 
@@ -2425,4 +2425,4 @@ packages:
     # -- Values to pass through to package Helm chart
     values: {}
 
-    
+
