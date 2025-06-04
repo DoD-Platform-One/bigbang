@@ -41,8 +41,12 @@ spec:
 
   {{- toYaml $fluxSettings | nindent 2 }}
 
-  {{- if (get .Values $pkg).postRenderers }}
+  
   postRenderers:
+  {{- if $istioEnabled }}
+  {{ include "KyvernoReporter.ServiceMonitorPostRenderer" . | nindent 2 }}
+  {{- end }}
+  {{- if (get .Values $pkg).postRenderers }}
   {{ toYaml (get .Values $pkg).postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:

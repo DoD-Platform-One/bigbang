@@ -22,17 +22,9 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
-kyvernoPlugin:
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-  - name: private-registry
-  {{- if $istioEnabled }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end }}
 
 ui:
+  enabled: true
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
   imagePullSecrets:
@@ -42,27 +34,14 @@ ui:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
+  # monitoring contains configurations related to monitoring
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  # -- Enables the Prometheus Operator integration
+  enabled: true
   grafana:
-    namespace: monitoring
-  {{- if $istioEnabled }}
-  serviceMonitor:
-    scheme: https
-    tlsConfig:
-      caFile: /etc/prom-certs/root-cert.pem
-      certFile: /etc/prom-certs/cert-chain.pem
-      keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  kyverno:
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  {{- end }}
+    dashboards:
+      enabled: true
+      namespace: monitoring
 
 openshift: {{ .Values.openshift }}
 
