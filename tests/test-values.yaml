@@ -1039,7 +1039,7 @@ tempo:
           memory: 128Mi
 
 promtail:
-  enabled: true
+  enabled: false
 
 monitoring:
   flux:
@@ -1264,7 +1264,7 @@ bbctl:
           cypress_grafana_username: 'admin'
           cypress_grafana_password: 'prom-operator'
 alloy:
-  enabled: false
+  enabled: true
 # Addons are toggled based on labels in CI
 addons:
   argocd:
