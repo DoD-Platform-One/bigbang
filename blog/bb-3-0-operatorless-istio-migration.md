@@ -109,7 +109,7 @@ when we have a clear path for ambient mode, we’ll share updates.
 ✅ **Review your Gateway configurations and prepare for standalone Helm-based
 deployment.**
 
-✅ **Keep an eye out for migration documentation and automation tools.**
+✅ **Keep an eye out for [migration documentation](https://docs-bigbang.dso.mil/latest/docs/guides/using-bigbang/migrating-istio-for-bb3.0/) and automation tools.**
 
 ✅ **Engage with the community to provide feedback or raise concerns.**
 

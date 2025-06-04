@@ -9,13 +9,13 @@
   are _Beta_ in
   [Big Bang 2.51](https://repo1.dso.mil/big-bang/bigbang/-/releases)
 - These packages will be generally available and stable for production use in
-  2.52 (or 2.53)
+  2.54
 - The
   [istio-operator](https://repo1.dso.mil/big-bang/product/packages/istio-operator)
   and
   [istio-controlplane](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane)
   packages will no longer be present in Big Bang 3.0
-- Therefore, migrate from Istio Operator to Istio Helm in BB 2.53 or 2.54 before
+- Therefore, migrate from Istio Operator to Istio Helm in BB 2.54 before
   upgrading BB to 3.0
 
 ## Considerations
