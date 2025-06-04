@@ -623,11 +623,11 @@ kyvernoReporter:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
     path: ./chart
-    tag: "3.0.3-bb.1"
+    tag: "3.0.3-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-reporter"
-    tag: "3.0.3-bb.1"
+    tag: "3.0.3-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
