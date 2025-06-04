@@ -216,6 +216,17 @@ NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP  PORT(S)
 public-ingressgateway LoadBalancer 10.43.110.109 172.16.88.88 15021:31155/TCP,80:31302/TCP,443:31046/TCP
 ```
 
+There have been reports of orphaned `LoadBalancer` `Service`s left in the `istio-system` namespace after the migration, that were originally deployed by the operator. It's unclear what causes this to happen, and it is not consistently reproducible, but they should be checked for, as they will incur cloud costs.
+
+```bash
+kubectl -n istio-system get service --field-selector spec.type=LoadBalancer
+NAMESPACE      NAME                         TYPE           CLUSTER-IP     EXTERNAL-IP    PORT(S)                                      AGE
+istio-system   passthrough-ingressgateway   LoadBalancer   10.43.57.3     172.20.1.240   15021:31859/TCP,80:32262/TCP,443:31243/TCP   2m15s
+istio-system   public-ingressgateway        LoadBalancer   10.43.156.28   172.20.1.241   15021:31241/TCP,80:31688/TCP,443:31597/TCP   2m15s
+```
+
+If these still exist post-migration, they should be deleted.
+
 The migration process is now complete.
 
 ## Troubleshooting
