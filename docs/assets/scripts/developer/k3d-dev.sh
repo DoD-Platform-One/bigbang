@@ -515,6 +515,8 @@ function destroy_instances {
     aws ec2 release-address --allocation-id $i
     echo "done"
   done
+
+  echo "Cloud resource cleanup complete"
 }
 
 function update_instances {
@@ -949,6 +951,13 @@ function cloud_aws_prep_objects {
   aws ec2 describe-key-pairs --output json --no-cli-pager --key-names ${KeyName} >/dev/null 2>&1 || keypair=missing
   if [ "${keypair}" == "missing" ]; then
     echo -n -e "missing\nCreating key pair ${KeyName} ... "
+    # Create SSH key directory if it does not exist
+    SSHKEY_DIR=$(dirname -- "$SSHKEY")
+    if [[ ! -d "$SSHKEY_DIR" ]]; then
+      printf "Creating directory %s...\n" "$SSHKEY_DIR"
+      mkdir -p -- "$SSHKEY_DIR"
+      chmod 700 "$SSHKEY_DIR"
+    fi
     aws ec2 create-key-pair --output json --no-cli-pager --key-name ${KeyName} | jq -r '.KeyMaterial' >${SSHKEY}
     chmod 600 ${SSHKEY}
     echo done
