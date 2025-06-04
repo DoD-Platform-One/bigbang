@@ -1,4 +1,4 @@
-{{- if and (eq .Values.bbctl.sourceType "git") (not .Values.offline) .Values.bbctl.enabled .Values.loki.enabled .Values.alloy.enabled .Values.alloy.alloyLogs.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
+{{- if and (eq .Values.bbctl.sourceType "git") (not .Values.offline) .Values.bbctl.enabled }}
 {{- $gitCredsDict := dict
   "name" "bbctl"
   "packageGitScope" .Values.bbctl.git
