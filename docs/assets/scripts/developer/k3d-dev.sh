@@ -265,8 +265,16 @@ function cloud_aws_toolnames {
 }
 
 function cloud_aws_configure {
-  # getting AWS user name
-  AWSUSERNAME=$(aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/')
+  # getting AWS ARN
+  ARN=$(aws sts get-caller-identity --query Arn --output text)
+  # Getting the proper username
+  if echo "$ARN" | grep ".*assumed-role.*"; then
+    RAW_USERNAME=$(echo "$ARN" | cut -f 3 -d '/')
+    AWSUSERNAME=$(echo "$RAW_USERNAME" | cut -d '@' -f 1)
+    AWSUSERNAME+=$(echo "$RAW_USERNAME" | cut -d '@' -f 2)
+  else
+    AWSUSERNAME=$(echo "$ARN" | cut -f 2 -d '/')
+  fi
 
   SGname="${AWSUSERNAME}-dev-${PROJECTTAG}"
   KeyName="${AWSUSERNAME}-dev-${PROJECTTAG}"
