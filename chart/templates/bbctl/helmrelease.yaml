@@ -1,5 +1,5 @@
 {{- $fluxSettingsbbctl := merge .Values.bbctl.flux .Values.flux -}}
-{{- if and .Values.bbctl.enabled .Values.loki.enabled .Values.promtail.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
+{{- if and .Values.bbctl.enabled .Values.loki.enabled .Values.alloy.enabled .Values.alloy.alloyLogs.enabled .Values.monitoring.enabled .Values.grafana.enabled }}
 
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -63,6 +63,6 @@ spec:
       namespace: {{ .Release.Namespace }}
     - name: loki
       namespace: {{ .Release.Namespace }}
-    - name: promtail
+    - name: alloy
       namespace: {{ .Release.Namespace }}
 {{- end }}

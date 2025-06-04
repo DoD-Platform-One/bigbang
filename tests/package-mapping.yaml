@@ -53,13 +53,13 @@ promtail:
 loki:
   dependencies:
     - "minioOperator"
-    - "promtail"
+    - "alloy"
 bbctl:
   repoName: "bbctl"
   dependencies:
     - "loki"
     - "grafana"
-    - "promtail"
+    - "alloy"
     - "monitoring"
 minioOperator:
   repoName: "minio-operator"

@@ -164,10 +164,10 @@ PLATFORM ONE LOKI WARNING:
   You still have Loki gel values set but this version of Loki has changed significantly, please review the latest grafana enterprise document within the Loki package repo: https://repo1.dso.mil/big-bang/product/packages/loki/-/blob/main/docs/grafana-enterprise.md
 {{- end }}
 
-{{- if and .Values.bbctl.enabled (or (not .Values.loki.enabled) (not .Values.promtail.enabled) (not .Values.monitoring.enabled) (not .Values.grafana.enabled)) }}
+{{- if and .Values.bbctl.enabled (or (not .Values.loki.enabled) (not .Values.alloy.enabled) (not .Values.alloy.alloyLogs.enabled) (not .Values.monitoring.enabled) (not .Values.grafana.enabled)) }}
 PLATFORM ONE BBCTL WARNING:
   You have enabled the bbctl Grafana dashboards package but one or more of the dependencies are disabled.
-  Please ensure Loki, Promtail, Grafana, and Monitoring are all enabled when using the bbctl package.
+  Please ensure Loki, Alloy, Grafana, and Monitoring are all enabled when using the bbctl package.
 {{- end }}
 
 {{- if $.Values.addons.mattermost.enabled }}
