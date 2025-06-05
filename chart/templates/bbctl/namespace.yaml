@@ -1,4 +1,4 @@
-{{- if .Values.bbctl.enabled }}
+{{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: v1
 kind: Namespace

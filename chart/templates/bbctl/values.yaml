@@ -1,4 +1,4 @@
-{{- if .Values.bbctl.enabled }}
+{{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.bbctl "name" "bbctl" "defaults" (include "bigbang.defaults.bbctl" .)) }}
 {{- end }}
 
