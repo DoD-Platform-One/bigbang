@@ -15,8 +15,6 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/vault/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: vault
-  driftDetection:
-    mode: warn
   chart:
     spec:
       {{- if eq .Values.addons.vault.sourceType "git" }}

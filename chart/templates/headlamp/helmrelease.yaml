@@ -13,8 +13,6 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/headlamp/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: headlamp
-  driftDetection:
-    mode: disabled
   chart:
     spec:
       {{- if eq .Values.addons.headlamp.sourceType "git" }}

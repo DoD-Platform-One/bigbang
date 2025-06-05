@@ -1,5 +1,6 @@
 {{- $fluxSettingsBackstage := merge .Values.addons.backstage.flux .Values.flux -}}
 {{- if .Values.addons.backstage.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -56,10 +57,10 @@ spec:
       kind: Secret
       valuesKey: "overlays"
 
-  {{- if or .Values.grafana.enabled .Values.istio.enabled }}
+  {{- if or .Values.grafana.enabled $istioEnabled }}
   dependsOn:
-  {{- if .Values.istio.enabled }}
-  - name: istio
+  {{- if $istioEnabled }}
+  - name: {{ include "istioHelmRelease" . }}
     namespace: {{ .Release.Namespace}}
   {{- end}}
   {{- if .Values.grafana.enabled }}
