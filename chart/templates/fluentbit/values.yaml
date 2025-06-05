@@ -224,7 +224,10 @@ luaScripts:
         "apps.kubernetes.io/pod%-index",
         "heritage",
         "release",
-        "elasticsearch.k8s.elastic.co.node.-"
+        "elasticsearch.k8s.elastic.co.node.-",
+        "vault_active",
+        "vault_initialized",
+        "vault_perf_standby"
       }
 
       if record["kubernetes"] ~= nil then
