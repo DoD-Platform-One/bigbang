@@ -13,12 +13,6 @@ metadata:
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/thanos/values.yaml") . | sha256sum }}
 spec:
-  driftDetection:
-    mode: warn
-    ignore:
-      - paths: [""]
-        target:
-          kind: Tenant
   releaseName: {{ $pkg }}
   targetNamespace: {{ $pkg }}
   chart:

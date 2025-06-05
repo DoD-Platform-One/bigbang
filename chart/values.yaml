@@ -123,6 +123,8 @@ flux:
   interval: 2m
   test:
     enable: false
+  driftDetection:
+    mode: enabled # Valid Modes disabled | enabled | warn 
   install:
     remediation:
       retries: -1
@@ -177,7 +179,9 @@ istioCRDs:
   # -- Values to passthrough to the Istio CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CRDs Package
-  flux: {}
+  flux:
+    driftDetection:
+      mode: warn
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -202,7 +206,9 @@ istiod:
   #       hub: registry1.dso.mil/ironbank/tetrate/istio
 
   # -- Flux reconciliation overrides specifically for the Istio Core Package
-  flux: {}
+  flux:
+    driftDetection:
+      mode: warn
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -580,7 +586,12 @@ kyverno:
     tag: "3.3.6-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: CustomResourceDefinition
 
   # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}
@@ -605,7 +616,13 @@ kyvernoPolicies:
     tag: "3.3.4-bb.10"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: ClusterPolicy
+    
 
   # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
   values: {}
@@ -791,7 +808,15 @@ loki:
     tag: "6.30.1-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Loki Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: Tenant
+        - paths: [""]
+          target:
+           kind: Sidecar
 
   # -- Loki architecture.  Options are monolith and scalable
   strategy: monolith
@@ -871,7 +896,18 @@ neuvector:
     group_mapped_roles: []
 
   # -- Flux reconciliation overrides specifically for the Neuvector Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: Cronjob    
+        - paths: [""]
+          target:
+            kind: Lease    
+        - paths: [""]
+          target:
+            kind: Secret   
 
   # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
@@ -973,6 +1009,14 @@ monitoring:
       crds: CreateReplace
     upgrade:
       crds: CreateReplace
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: Alertmanager    
+        - paths: [""]
+          target:
+            kind: Prometheus 
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -1231,11 +1275,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/backstage.git
       path: "./chart"
-      tag: "2.5.2-bb.2"
+      tag: "2.5.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "backstage"
-      tag: "2.5.2-bb.2"
+      tag: "2.5.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Backstage Package
     flux: { }
@@ -1844,7 +1888,12 @@ addons:
       tag: "10.8.1-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
-    flux: {}
+    flux:
+      driftDetection:
+        ignore:
+          - paths: ["/spec/size"]
+            target:
+            kind: Mattermost  
 
     # -- Mattermost Enterprise functionality.
     enterprise:
@@ -2031,7 +2080,12 @@ addons:
       tag: "0.30.0-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Vault Package
-    flux: {}
+    flux:
+      driftDetection:
+        ignore:
+          - paths: [""]
+            target:
+              kind: MutatingWebhookConfiguration      
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
@@ -2166,7 +2220,12 @@ addons:
       tag: "16.0.2-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Thanos Package
-    flux: {}
+    flux:
+      driftDetection:
+        ignore:
+          - paths: [""]
+            target:
+              kind: Tenant
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
