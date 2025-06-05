@@ -1,5 +1,5 @@
 {{- $fluxSettingsbbctl := merge .Values.bbctl.flux .Values.flux -}}
-{{- if .Values.bbctl.enabled }}
+{{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
