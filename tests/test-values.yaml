@@ -63,27 +63,6 @@ istioOperator:
   enabled: false
 istio:
   enabled: false
-  ingressGateways:
-    passthrough-ingressgateway:
-      type: "LoadBalancer"
-  gateways:
-    passthrough:
-      ingressGateway: "passthrough-ingressgateway"
-      hosts:
-      - "*.{{ .Values.domain }}"
-      tls:
-        mode: "PASSTHROUGH"
-    public:
-      tls:
-        key: "" # Gets added via chart/ingress-certs.yaml
-        cert: "" # Gets added via chart/ingress-certs.yaml
-  values:
-    hardened:
-      enabled: true
-    kiali:
-      dashboard:
-        auth:
-          strategy: "anonymous"
 istioGateway:
   enabled: true
 kiali:
