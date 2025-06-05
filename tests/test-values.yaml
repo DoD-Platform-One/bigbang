@@ -1265,6 +1265,22 @@ bbctl:
           cypress_grafana_password: 'prom-operator'
 alloy:
   enabled: true
+  alloyLogs:
+    enabled: true
+  values:
+    k8s-monitoring:
+      destinations:
+        - name: loki
+          type: loki
+          url: http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push
+      alloy-logs:
+        enabled: true
+      podLogs:
+        enabled: true
+        destinations:
+          - loki
+        collector: alloy-logs
+
 # Addons are toggled based on labels in CI
 addons:
   argocd:
