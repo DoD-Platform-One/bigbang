@@ -1027,6 +1027,9 @@ monitoring:
         - paths: [""]
           target:
             kind: Prometheus 
+        - paths: [""]
+          target:
+            kind: PrometheusRule
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
