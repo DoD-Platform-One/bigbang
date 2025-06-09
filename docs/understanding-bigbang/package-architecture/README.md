@@ -19,10 +19,10 @@ flowchart LR
 
     subgraph L[Logging]
       subgraph ALG[Default]
-        Alloy & Grafana --> Loki
+        Alloy[Alloy] --> Loki[Loki]
       end
       subgraph EFK[Alternative]
-      style EFK stroke-dasharray: 10 10
+        style EFK stroke-dasharray: 10 10
         Kibana & Fluentbit --> Elastic
       end
     end
@@ -33,37 +33,34 @@ flowchart LR
     end
 
     subgraph PE[Policy Enforcement]
-      subgraph KyvernoStack[Default]
-      direction BT
-        KyvernoReporter[Kyverno Reporter*] --> Kyverno[Kyverno*]
-      end
       subgraph CA[Alternative]
       style CA stroke-dasharray: 10 10
       direction BT
-        ClusterAuditor --> OPA[OPA Gatekeeper]
+        OPA[OPA Gatekeeper]
+      end
+      subgraph KyvernoStack[Default]
+      direction BT
+        KyvernoReporter[Kyverno Reporter] --> Kyverno[Kyverno]
       end
     end
 
     subgraph RS[Runtime Security]
-      subgraph TL[Default]
+      subgraph CC[Alternative]
+        style CC stroke-dasharray: 10 10
         Twistlock[Prisma Cloud Compute]
+      end
+      subgraph TL[Default]
+        Neuvector[Neuvector]
       end
     end
 
     subgraph DT[Distributed Tracing]
-      subgraph T[Default]
-        Tempo[Tempo*] -.-> Grafana
-      end
-      subgraph J[Alernative]
-      style J stroke-dasharray: 10 10
-        Jaeger ----> Elastic
-      end
+      Tempo[Tempo] --> Grafana
     end
 
     subgraph SM[Service Mesh]
-      Jaeger --> Istio
-      Tempo -.-> Istio
-      Kiali --> Jaeger & Istio & Prometheus
+      Tempo --> Istio
+      Kiali --> Istio & Prometheus
     end
   end
 ```
@@ -84,7 +81,7 @@ flowchart LR
 
     subgraph "Security"
     direction BT
-      Anchore
+      Anchore[Anchore Enterprise]
       Authservice --> I[Istio]
       Keycloak
       Vault[Vault*]
@@ -121,8 +118,9 @@ A service mesh is a dedicated infrastructure layer for making service-to-service
 
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
-|X|Istio|Istio Operator|Operator|[istio-operator](https://repo1.dso.mil/big-bang/product/packages/istio-operator)|
-|X|Istio|[Istio](./istio.md)|Control Plane|[istio-controlplane](https://repo1.dso.mil/big-bang/product/packages/istio-controlplane)|
+|X|Istio|Istio CRDs |CRDs|[istio-crds](https://repo1.dso.mil/big-bang/product/packages/istio-crds)|
+|X|Istio|Istiod |Control Plane|[istiod](https://repo1.dso.mil/big-bang/product/packages/istiod)|
+|X|Istio|Istio Gateway | Ingress Gateway |[istio-gateway](https://repo1.dso.mil/big-bang/product/packages/istio-gateway)|
 |X|Istio|[Kiali](./kiali.md)|Management Console|[kiali](https://repo1.dso.mil/big-bang/product/packages/kiali)|
 
 ### Logging
@@ -134,9 +132,9 @@ A logging stack is a set of scalable tools that can aggregate logs from cluster 
 |X|ALG|[Alloy](./alloy.md)|Forwarder|[alloy](https://repo1.dso.mil/big-bang/product/packages/alloy)|
 |X|ALG|[Loki](./loki.md)|Storage|[loki](https://repo1.dso.mil/big-bang/product/packages/loki)|
 | |EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/big-bang/product/packages/eck-operator)
-| |EFK|[Elasticsearch / Kibana](./elasticsearch-kibana.md)|Storage & Visualization|[policy](https://repo1.dso.mil/big-bang/product/packages/policy)|
+| |EFK|[Elasticsearch / Kibana](./elasticsearch-kibana.md)|Storage & Visualization|[elasticsearch-kibana](https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana)|
 | |EFK|[Fluentbit](./fluentbit.md)|Forwarder|[fluentbit](https://repo1.dso.mil/big-bang/product/packages/fluentbit)|
-> PLG stack uses Grafana, deployed in [monitoring](#monitoring), for visualization.
+> ALG stack uses the Grafana package, deployed in [monitoring](#monitoring), for visualization.
 
 ### Policy Enforcement
 
@@ -145,7 +143,6 @@ Policy Enforcement is the ability to validate Kubernetes resources against compl
 |Default|Stack|Package|Function|Repositories|
 |--|--|--|--|--|
 | |Gatekeeper|[OPA Gatekeeper](./opa-gatekeeper.md)|Engine & Policies|[policy](https://repo1.dso.mil/big-bang/product/packages/policy)|
-| |Gatekeeper|[Cluster Auditor](./cluster-auditor.md)|Reporting|[cluster-auditor](https://repo1.dso.mil/big-bang/product/packages/cluster-auditor)|
 |X|Kyverno|[Kyverno](./kyverno.md)|Engine|[kyverno](https://repo1.dso.mil/big-bang/product/packages/kyverno)|
 |X|Kyverno|Kyverno Policies|Policies|[kyverno-policies](https://repo1.dso.mil/big-bang/product/packages/kyverno-policies)|
 |X|Kyverno|Kyverno Reporter|Reporting|[kyverno-reporter](https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter)|
@@ -165,7 +162,6 @@ Distributed tracing is a method of tracking application transactions as they flo
 
 |Default|Package|Repositories|
 |--|--|--|
-| |[Jaeger](./jaeger.md)|[jaeger](https://repo1.dso.mil/big-bang/product/packages/jaeger)|
 |X|[Tempo](./tempo.md)|[tempo](https://repo1.dso.mil/big-bang/product/packages/tempo)|
 
 ### Runtime Security
@@ -174,8 +170,8 @@ Runtime security is the active protection of containers running in the cluster. 
 
 |Default|Package|Repositories|
 |--|--|--|
-| |[Prisma Cloud Compute](./twistlock.md) (AKA Twistlock) ![License Required](https://img.shields.io/badge/License_Required-orange)|[twistlock](https://repo1.dso.mil/big-bang/product/packages/twistlock)|
 |X|[Neuvector](./neuvector.md)|[neuvector](https://repo1.dso.mil/big-bang/product/packages/neuvector)|
+| |[Prisma Cloud Compute](./twistlock.md) (AKA Twistlock) ![License Required](https://img.shields.io/badge/License_Required-orange)|[twistlock](https://repo1.dso.mil/big-bang/product/packages/twistlock)|
 
 ## Addons
 

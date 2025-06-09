@@ -6,7 +6,6 @@ This document includes details on credentials to access each package in a defaul
 
 Although the below applications have no built in authentication, Big Bang's helm values can be configured to deploy authservice in front of these endpoints. Authservice is an Authentication Proxy that can integrate with SSO providers like Keycloak.
 
-- Jaeger
 - Monitoring (Prometheus)
 - Monitoring (Alertmanager)
 
