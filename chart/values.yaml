@@ -182,6 +182,11 @@ istioCRDs:
   flux:
     driftDetection:
       mode: warn
+      ignore:
+      - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
+        target:
+          kind: ValidatingWebhookConfiguration
+          name: istiod-default-validator
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -209,6 +214,11 @@ istiod:
   flux:
     driftDetection:
       mode: warn
+      ignore:
+      - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
+        target:
+          kind: ValidatingWebhookConfiguration
+          name: istio-validator-istio-system
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
