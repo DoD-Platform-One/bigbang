@@ -2,7 +2,7 @@
 
 ## Overview
 
-[Kiali](https://kiali.io/) is a console for managing your Istio service mesh. It provides graphical views of networking interactions, metrics, and configuration options for the mesh. To aggregate this data it interacts with Prometheus, Grafana, and Jaeger.
+[Kiali](https://kiali.io/) is a console for managing your Istio service mesh. It provides graphical views of networking interactions, metrics, and configuration options for the mesh. To aggregate this data it interacts with Prometheus, Grafana.
 
 Big Bang's implementation uses the [Kiali operator](https://github.com/kiali/kiali-operator) to provide custom resources and manage the deployment.
 
@@ -27,15 +27,15 @@ graph LR
   end
 
   subgraph "Tracing"
-    Kialipods("Kiali Pod(s)") --> queryservice{{Query Service<br />jaeger-query}} --> jaeger(Jaeger)
+    Kialipods("Kiali Pod(s)") --> queryservice{{Query Service<br />tempo-tempo}} --> temp(Tempo)
   end
 ```
 
-NOTE: Prometheus is required for Kiali to function properly; Jaeger and Grafana are optional (although all are part of Big Bang Core).
+NOTE: Prometheus is required for Kiali to function properly; Tempo and Grafana are optional (although all are part of Big Bang Core).
 
 ### Storage
 
-Kiali does not have any persistent storage, all data is accessed live/directly from Jaeger/Monitoring services.
+Kiali does not have any persistent storage, all data is accessed live/directly from Tempo services.
 
 ### Istio Configuration
 
@@ -58,7 +58,7 @@ Kiali is also pre-configured with knowledge of the BB Istio stack for monitoring
 
 ### External Service Configuration
 
-Kiali in Big Bang is preconfigured with the service information to connect to Big Bang's deployments of Prometheus, Grafana, and Jaeger. If you wish to configure Kiali with different external services rather than the BB provided ones, you can do that via values overrides:
+Kiali in Big Bang is preconfigured with the service information to connect to Big Bang's deployments of Prometheus, Grafana, and Tempo. If you wish to configure Kiali with different external services rather than the BB provided ones, you can do that via values overrides:
 
 ```yaml
 kiali:
@@ -72,7 +72,7 @@ kiali:
           ...
 ```
 
-Since both Prometheus and Jaeger are open to Kiali via the service address there is no authentication needed for them. Grafana authentication will be set up automatically using the admin account for Grafana.
+Since both Prometheus and Tempo are open to Kiali via the service address there is no authentication needed for them. Grafana authentication will be set up automatically using the admin account for Grafana.
 
 Important note: If you modify the Grafana admin username/password via the UI or another method besides Helm values (`monitoring.values.grafana.adminPassword` or `monitoring.values.grafana.admin.existingSecret`), Kiali will not be autoconfigured with this knowledge. This is due to limitations in where/how Grafana stores the "live" password. If you do modify your Grafana username/password in one of these ways, it is recommended to pass these values to your Grafana install via one of the below methods where they will also be picked up by Kiali:
 
@@ -164,4 +164,4 @@ Kiali is open source and released under [Apache License v2](https://www.apache.o
 
 Since Kiali is used to observe the Istio service mesh it is tightly coupled with Istio and dependent on Istio being deployed.
 
-Big Bang's implementation of Kiali is dependent on Monitoring (Prometheus and Grafana) and Jaeger as well. While these services are not required for setup, Kiali will be missing information if one or more of them are not deployed (note that all are part of the core BB stack).
+Big Bang's implementation of Kiali is dependent on Monitoring (Prometheus and Grafana) and Tempo as well. While these services are not required for setup, Kiali will be missing information if one or more of them are not deployed (note that all are part of the core BB stack).

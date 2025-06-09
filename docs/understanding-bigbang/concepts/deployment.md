@@ -138,7 +138,6 @@ The commands detailed in this section will help you monitor the progress of the 
     bigbang       twistlock         https://repo1.dso.mil/big-bang/product/packages/twistlock.git   True    Fetched revision: chart-release/faf038197291915713e0f213a4e35991e72f73f6    8m23s
     bigbang       gatekeeper        https://repo1.dso.mil/big-bang/product/packages/policy.git                True    Fetched revision: chart-release/1a5f32c8e7f672c3b5937b604e5f38eaa08ce246    8m23s
     bigbang       monitoring        https://repo1.dso.mil/big-bang/product/packages/monitoring.git            True    Fetched revision: release-v0.2.x/ca60bedcc106b95beb0bf9ccdc6e0e759e6fd6bf   8m23s
-    bigbang       cluster-auditor   https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git       True    Fetched revision: chart-release/598c35670db0cbdb3a48063b2d558965afe73185    8m23s
    ```
 
 1. Verify the packages get deployed.
@@ -160,8 +159,6 @@ The commands detailed in this section will help you monitor the progress of the 
     bigbang       helmrelease.helm.toolkit.fluxcd.io/efk                        False    dependency 'bigbang/eck-operator' is not ready         62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/logging-operator           False    dependency 'bigbang/gatekeeper' is not ready           62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/twistlock                  False    dependency 'bigbang/gatekeeper' is not ready           62s
-    bigbang       helmrelease.helm.toolkit.fluxcd.io/cluster-auditor-policies   False    dependency 'bigbang/gatekeeper' is not ready           62s
-    bigbang       helmrelease.helm.toolkit.fluxcd.io/cluster-auditor            False    dependency 'bigbang/gatekeeper' is not ready           62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/certmanager                True     Release reconciliation succeeded                       62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/monitoring                 False    dependency 'bigbang/gatekeeper' is not ready           62s
 

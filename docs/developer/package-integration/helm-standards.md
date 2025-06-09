@@ -23,9 +23,6 @@ For another example in using the [`kube-prometheus-stack`](https://github.com/pr
         kiali:
             client_id: kiali
             client_secret: "change_me"
-        jaeger:
-            client_id: jaeger
-            client_secret: "change_me"
     ```
 
     or like this if there is a single user interface:

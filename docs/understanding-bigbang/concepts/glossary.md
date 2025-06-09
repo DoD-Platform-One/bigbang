@@ -43,7 +43,6 @@ The following packages are included in a default deployment of Big Bang:
 |Name|Description|Helm Chart Repo|
 |--|--|--|
 |[Istio](https://istio.io/)|[Service Mesh](https://www.redhat.com/en/topics/microservices/what-is-a-service-mesh)|[Link](https://repo1.dso.mil/big-bang/product/packages/servicemesh.git)|
-|Cluster Auditor| |[Link](https://repo1.dso.mil/big-bang/product/packages/cluster-auditor.git)|
 |[Open Policy Agent Gatekeeper](https://github.com/open-policy-agent/gatekeeper)| Policy Management | [Link](https://repo1.dso.mil/big-bang/product/packages/policy.git)|
 |[Elastic Cloud on Kubernetes (ECK)](https://www.elastic.co/guide/en/cloud-on-k8s/current/index.html)| Logging; Incl. Elasticsearch & Kibana |[Link](https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git)|
 |[Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/)| Monitoring |[Link](https://repo1.dso.mil/big-bang/product/packages/monitoring.git)|
