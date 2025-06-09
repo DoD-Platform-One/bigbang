@@ -901,7 +901,7 @@ neuvector:
       ignore:
         - paths: [""]
           target:
-            kind: Cronjob    
+            kind: CronJob    
         - paths: [""]
           target:
             kind: Lease    
