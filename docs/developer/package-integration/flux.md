@@ -284,9 +284,11 @@ To validate that the Helm chart is working, perform the following steps to deplo
       enabled: false
 
     # Istio
-    istioOperator:
+    istioCRDs:
       enabled: false
-    istio:
+    istiod:
+      enabled: false
+    istioGateway:
       enabled: false
 
     # Gatekeeper

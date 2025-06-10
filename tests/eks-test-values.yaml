@@ -3,23 +3,6 @@
 networkPolicies:
   controlPlaneCidr: 10.0.0.0/8
 
-istio:
-  values:
-    global: 
-      proxy:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 256Mi
-          limits: null
-    defaultConfig:
-      proxyMetadata:
-        ISTIO_META_DNS_CAPTURE: "true"
-        ISTIO_META_DNS_AUTO_ALLOCATE: "true"
-    bbtests:
-      cypress:
-        artifacts: false
-
 neuvector:
   values:
     k3s:

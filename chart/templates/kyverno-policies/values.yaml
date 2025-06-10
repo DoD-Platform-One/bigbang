@@ -100,13 +100,13 @@ policies:
   {{- end }}
 
   {{- $nodePortIngressGateways := list }}
-  {{- range $name, $values := .Values.istio.ingressGateways }}
+  {{- range $name, $values := .Values.istioGateway.values.gateways }}
   {{- if eq $values.type "NodePort" }}
   {{- $nodePortIngressGateways = append $nodePortIngressGateways $name }}
   {{- end }}
   {{- end }}
 
-  {{- range $name, $values := .Values.istio.values.ingressGateways }}
+  {{- range $name, $values := .Values.istioGateway.values.gateways }}
   {{- if eq (dig "k8s" "service" "type" "LoadBalancer" $values) "NodePort" }}
   {{- $nodePortIngressGateways = append $nodePortIngressGateways $name }}
   {{- end }}
@@ -393,7 +393,6 @@ policies:
           # Flux is installed prior to Istio
           - flux-system
           # Istio does not inject itself
-          - istio-operator
           - istio-system
           - istio-gateway
 
@@ -1059,7 +1058,6 @@ policies:
     enabled: true
     namespaces:
       - istio-system
-      - istio-operator
       - twistlock
       - argocd
       - logging
@@ -1100,11 +1098,6 @@ policies:
           - istiod-*
           - passthrough-ingressgateway-*
           - public-ingressgateway-*
-      - namespace: istio-operator
-        pods:
-          allow:
-          - istiod-*
-          - istio-operator-*
       - namespace: twistlock
         pods:
           allow:

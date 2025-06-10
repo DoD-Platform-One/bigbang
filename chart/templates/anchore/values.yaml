@@ -15,7 +15,7 @@ istio:
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.anchore.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
   injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchore) "enabled")) }}
   ui:

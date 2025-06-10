@@ -67,10 +67,7 @@ networkPolicies:
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.vault.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
-    }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.vault.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
   vault:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.addons.vault.ingress.gateway "root" .)}}

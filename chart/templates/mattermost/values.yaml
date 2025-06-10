@@ -25,7 +25,7 @@ istio:
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.mattermost.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
     kyvernoReporter:
       enabled: {{ .Values.kyvernoReporter.enabled }}

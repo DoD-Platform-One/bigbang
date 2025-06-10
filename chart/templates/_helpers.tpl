@@ -268,16 +268,16 @@ bigbang.addValueIfSet can be used to nil check parameters before adding them to 
 Annotation for Istio version
 */}}
 {{- define "istioAnnotation" -}}
-{{- if (eq .Values.istio.sourceType "git") -}}
-{{- if .Values.istio.git.semver -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.semver | trimSuffix (regexFind "-bb.*" .Values.istio.git.semver) }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
-{{- else if .Values.istio.git.tag -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.tag | trimSuffix (regexFind "-bb.*" .Values.istio.git.tag) }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
-{{- else if .Values.istio.git.branch -}}
-bigbang.dev/istioVersion: {{ .Values.istio.git.branch }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
+{{- if (eq .Values.istiod.sourceType "git") -}}
+{{- if .Values.istiod.git.semver -}}
+bigbang.dev/istioVersion: {{ .Values.istiod.git.semver | trimSuffix (regexFind "-bb.*" .Values.istiod.git.semver) }}
+{{- else if .Values.istiod.git.tag -}}
+bigbang.dev/istioVersion: {{ .Values.istiod.git.tag | trimSuffix (regexFind "-bb.*" .Values.istiod.git.tag) }}
+{{- else if .Values.istiod.git.branch -}}
+bigbang.dev/istioVersion: {{ .Values.istiod.git.branch }}
 {{- end -}}
 {{- else -}}
-bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.enterprise }}-enterprise{{ end }}
+bigbang.dev/istioVersion: {{ .Values.istiod.helmRepo.tag }}
 {{- end -}}
 {{- end -}}
 
@@ -310,7 +310,7 @@ bigbang.dev/istioVersion: {{ .Values.istio.helmRepo.tag }}{{ if .Values.istio.en
 
 {{- /* Prints istio version */ -}}
 {{- define "istioVersion" -}}
-  {{- regexReplaceAll "-bb.+$" (coalesce .Values.istio.git.semver .Values.istio.git.tag .Values.istio.git.branch) "" -}}
+  {{- regexReplaceAll "-bb.+$" (coalesce .Values.istiod.git.semver .Values.istiod.git.tag .Values.istiod.git.branch) "" -}}
 {{- end -}}
 
 {{- /* Returns an SSO host */ -}}
@@ -490,7 +490,7 @@ data:
 
 {{- /* Returns name of istio public gateway */ -}}
 {{- define "istioPublicGateway" -}}
-{{- if .Values.istio.enabled -}}
+{{- if .Values.istioGateway.enabled -}}
   {{- print "public" -}}
 {{- else -}}
   {{- print "public-ingressgateway" -}}
@@ -506,29 +506,20 @@ data:
 {{- end -}}
 {{- end -}}
 
-{{- /* Returns true if either istio or istiod is enabled */ -}}
+{{- /* Returns true if istiod is enabled */ -}}
 {{- define "istioEnabled" -}}
-{{ or .Values.istio.enabled .Values.istiod.enabled }}
+{{ .Values.istiod.enabled }}
 {{- end -}}
 
-{{- /* Returns the name of the appropriate HelmRelease depending on which is enabled. */ -}}
+{{- /* Returns the name of the Istio HelmRelease. */ -}}
 {{- define "istioHelmRelease" -}}
-{{- if .Values.istiod.enabled -}}
 istiod
-{{- else -}}
-istio
-{{- end -}}
 {{- end -}}
 
 {{- /* Returns name of istio Namespace Selector*/ -}}
 {{- define "istioNamespaceSelector" -}}
-{{- if .Values.istiod.enabled -}}
 ingress: istio-gateway
 egress: istio-system
-{{- else -}}
-ingress: istio-controlplane
-egress: istio-controlplane
-{{- end -}}
 {{- end -}}
 
 {{- /*
@@ -547,9 +538,6 @@ Args:
   {{- if $gw }}
     {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
   {{- end }}
-{{- else }}
-  {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .root.Values.istio) "istio" nil }}
-  {{- toYaml (dig "values" "gateways" $gateway "selector" $default .root.Values.istio) }}
 {{- end }}
 {{- end -}}
 

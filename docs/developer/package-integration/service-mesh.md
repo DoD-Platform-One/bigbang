@@ -143,9 +143,11 @@ Set the following in `bigbang/values.yaml` to enable Istio for integration testi
 
 ```yaml
 # Update existing values
-istioOperator:
+istioCRDs:
   enabled: true
-istio:
+istiod:
+  enabled: true
+istioGateway:
   enabled: true
 
 # Add new value
@@ -219,7 +221,7 @@ Test the following items to ensure Istio is working properly with your applicati
     helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f ~/bigbang/chart/ingress-certs.yaml -f bigbang/values.yaml --set registryCredentials.username=<your Iron Bank username> --set registryCredentials.password=<your Iron Bank PAT> bigbang-podinfo bigbang
     ```
 
-1. Watch the `GitRepository`, `HelmRelease`, and `Pods` by running `watch kubectl get gitrepo,hr,po -A`.  Istio operator, Istio control plane, and the package should all be installed.
+1. Watch the `GitRepository`, `HelmRelease`, and `Pods` by running `watch kubectl get gitrepo,hr,po -A` as the packages are installed.
 
 1. Troubleshoot any deployment errors
 

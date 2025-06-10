@@ -8,6 +8,6 @@ metadata:
     app.kubernetes.io/name: headlamp
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
-    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istio.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.headlamp) "enabled")) }}
+    istio-injection: {{ ternary "enabled" "disabled" (and .Values.istiod.enabled (eq (dig "istio" "injection" "enabled" .Values.addons.headlamp) "enabled")) }}
   name: headlamp
 {{- end }}

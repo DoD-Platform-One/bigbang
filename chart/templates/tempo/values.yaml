@@ -63,10 +63,7 @@ networkPolicies:
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.tempo.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
-    }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.tempo.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
   tempoQuery:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.tempo.ingress.gateway "root" .)}}

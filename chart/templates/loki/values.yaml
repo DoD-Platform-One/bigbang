@@ -16,7 +16,7 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ $istioEnabled }}
   {{- if or 
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
       (dig "istio" "hardened" "enabled" false .Values.grafana.values)

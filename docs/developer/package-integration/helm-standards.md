@@ -6,7 +6,7 @@ This document describes the technical guidelines that should be in place when bu
 
 Big Bang packages follow a standard semantic versioning scheme for both the package tag and the chart version. The package tag will always be in line with the chart version (not the `appVersion`). To distinguish between BigBang specific changes within the semantic version of the upstream chart, a suffix of `-bb.#` will be added to _all_ charts and tags.
 
-For example, for the upstream [`istio-operator`](https://github.com/istio/istio/tree/1.7.3/manifests/charts/istio-operator) pinned at version `1.7.3`, the Big Bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.7.3-bb.0`. If in the same `istio-operator` release, Big Bang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.7.3-bb.1`.
+For example, for the upstream [`istio-gateway`](https://github.com/istio/istio/tree/1.26.0/manifests/charts/gateway) pinned at version `1.26.0`, the Big Bang version (with the modified `values.yaml` for an Iron Bank image) will be tagged `1.26.0-bb.0`. If in the same `istio-gateway` release, Big Bang requires chart modifications (such as to support `imagePullSecrets`), then the new version becomes `1.26.0-bb.0`.
 
 For another example in using the [`kube-prometheus-stack`](https://github.com/prometheus-community/helm-charts/tree/kube-prometheus-stack-12.2.2/charts/kube-prometheus-stack), the upstream is versioned at `12.2.2`, meaning BigBang's initial fork will be `12.2.2-bb.0`. Future additions, such as adding `VirtualServices` for the ingresses, bumps to the `-bb.#` will happen in sequence every time BigBang updates the chart within the same version.
 

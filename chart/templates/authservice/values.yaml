@@ -10,7 +10,7 @@
 {{- $authServiceHardened := or
     (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
     (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-    (dig "hardened" "enabled" false .Values.istio.values)
+    (dig "hardened" "enabled" false .Values.istiod.values)
     (dig "istio" "hardened" "enabled" false .Values.grafana.values)
     (dig "istio" "hardened" "enabled" false .Values.loki.values)
     (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
@@ -21,7 +21,7 @@ istio:
   enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $authServiceHardened }}
-  clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istio.values }}
+  clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
 
 image: 
   pullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
@@ -42,9 +42,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
-    {{- $gateway := default "public" .Values.addons.haproxy.ingress.gateway }}
-    {{- $default := dict "app" (dig "gateways" $gateway "ingressGateway" nil .Values.istio) "istio" nil }}
-    {{- toYaml (dig "values" "gateways" $gateway "selector" $default .Values.istio) | nindent 4 }}
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.haproxy "root" .) | nindent 4 }}
 
 {{- if or (dig "redis" "enabled" false .Values.addons.authservice.values) (dig "global" "redis_server_uri" "" .Values.addons.authservice.values) }}
 autoscaling:

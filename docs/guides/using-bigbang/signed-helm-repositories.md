@@ -60,12 +60,17 @@ helmRepositories:
         ...
         -----END PUBLIC KEY-----
 
-istio:
+istioCRDs:
   sourceType: "helmRepo"
   helmRepo:
     cosignVerify: true
 
-istioOperator:
+istiod:
+  sourceType: "helmRepo"
+  helmRepo:
+    cosignVerify: true
+
+istioGateway:
   sourceType: "helmRepo"
   helmRepo:
     cosignVerify: true

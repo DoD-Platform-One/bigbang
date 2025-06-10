@@ -29,15 +29,20 @@ elasticsearchKibana:
   git:
     repo: ssh://git@host.k3d.internal/home/git/repos/elasticsearch-kibana
 
-istio:
+istioCRDs:
   enabled: true
   git:
-    repo: ssh://git@host.k3d.internal/home/git/repos/istio-controlplane
+    repo: ssh://git@host.k3d.internal/home/git/repos/istio-crds
 
-istioOperator:
+istiod:
   enabled: true
   git:
-    repo: ssh://git@host.k3d.internal/home/git/repos/istio-operator
+    repo: ssh://git@host.k3d.internal/home/git/repos/istiod
+
+istioGateway:
+  enabled: true
+  git:
+    repo: ssh://git@host.k3d.internal/home/git/repos/istio-gateway
 
 monitoring:
   enabled: true

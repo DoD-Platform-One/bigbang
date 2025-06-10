@@ -22,9 +22,9 @@ istio:
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
-    {{- if and (or (dig "values" "istio" "hardened" "enabled" false .Values.addons.thanos) (dig "hardened" "enabled" false .Values.istio.values)) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
+    {{- if and (or (dig "values" "istio" "hardened" "enabled" false .Values.addons.thanos) (dig "hardened" "enabled" false .Values.istiod.values)) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
     customServiceEntries:
       - name: egress-object-store
         enabled: true

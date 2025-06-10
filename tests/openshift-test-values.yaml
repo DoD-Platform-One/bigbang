@@ -1,17 +1,4 @@
 openshift: true
-istio:
-  values:
-    profile: "openshift"
-    ingressGateways:
-      public-ingressgateway:
-        k8s:
-          hpaSpec:
-            minReplicas: 3
-            maxReplicas: 5
-    values:
-      pilot:
-        env:
-          "ENABLE_NATIVE_SIDECARS": "false"
 gatekeeper:
   values:
     violations:
@@ -21,11 +8,9 @@ gatekeeper:
           excludedResources:
           # Allow kyverno pods
           - kyverno/kyverno-.*
-          - istio-operator/istio-operator-.*
-          - istio-operator/istiod-hook-.*
           - istio-system/istiod-.*
-          - istio-system/public-ingressgateway-.*
-          - istio-system/passthrough-ingressgateway-.*
+          - istio-gateway/public-ingressgateway-.*
+          - istio-gateway/passthrough-ingressgateway-.*
           - eck-operator/elastic-operator-.*
           - minio-operator/minio-operator-.*
           - minio-operator/console-.*

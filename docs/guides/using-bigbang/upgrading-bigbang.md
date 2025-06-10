@@ -23,24 +23,24 @@ Upgrading a single package in Big Bang is done by changing the tag in the values
 For a git repository:
 
 ```yaml
-istio:
+istiod:
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istiod.git
     path: "./chart"
-    tag: "1.17.1-bb.1"
+    tag: "1.26.0-bb.0"
 
 ```
 
 For a helm repository:
 
 ```yaml
-istio:
+istiod:
   sourceType: "helmRepo"
   helmRepo:
     repoName: "registry1"
-    chartName: "istio"
-    tag: "1.17.1-bb.1"
+    chartName: "istiod"
+    tag: "1.26.0-bb.0"
 ```
 
 These values are in `chart/values.yaml` of the Big Bang helm chart.
@@ -52,7 +52,7 @@ To upgrade your umbrella deployment of Big Bang when using the [Customer Templat
 ```yaml
 namespace: bigbang
 resources:
-  - git::https://repo1.dso.mil/big-bang/bigbang.git//base?ref=1.57.1
+  - https://repo1.dso.mil/big-bang/bigbang.git//base?ref=1.57.1
 ```
 
 - Edit the environment specific Kustomization (ex: `dev/kustomization.yaml`) to use the new version under the [ref/patch section](https://repo1.dso.mil/big-bang/customers/template/-/blob/main/dev/kustomization.yaml#L18-21).
@@ -76,8 +76,9 @@ Verify all the helm releases have succeeded
 NAMESPACE   NAME              AGE    READY   STATUS
 bigbang     kyverno           5h1m   True    Release reconciliation succeeded
 bigbang     kyvernopolicies   5h1m   True    Release reconciliation succeeded
-bigbang     istio-operator    5h1m   True    Release reconciliation succeeded
-bigbang     istio             5h1m   True    Release reconciliation succeeded
+bigbang     istio-crds        5h1m   True    Release reconciliation succeeded
+bigbang     istiod            5h1m   True    Release reconciliation succeeded
+bigbang     istio-gateway     5h1m   True    Release reconciliation succeeded
 ```
 
 ### Verify Pods
@@ -97,19 +98,8 @@ monitoring          alertmanager-monitoring-monitoring-kube-alertmanager-0      
    - There may be cases where you are hoping to use new features in a new package version, as such it can be beneficial to validate that package did update to the new version as expected.
    - It can also be important to validate Istio sidecar versions, especially for packages outside of Big Bang core/addons. See an example of checking the image version of the running pod below:
 ```bash
-❯ k get pod -n istio-system istiod-78c5bf85fc-68xv6 -o yaml
-apiVersion: v1
-kind: Pod
-spec:
-  affinity: {}
-  containers:
-  - args:
-    image: registry1.dso.mil/ironbank/opensource/istio/pilot:1.17.1
-...
-status:
-  containerStatuses:
-  - containerID: containerd://451827d87a5209b4cb10ff074d986f00ec3bd7d36082cb49b8612e3a48eea9b7
-    image: registry1.dso.mil/ironbank/opensource/istio/pilot:1.17.1
+❯ kubectl get po -n istio-system -o yaml|grep image|head -1
+      image: registry1.dso.mil/ironbank/opensource/istio/pilot:1.25.2
 ```
 ### Check Package Usability
  - Validate the UI for web applications loads properly.

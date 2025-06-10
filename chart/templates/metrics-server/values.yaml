@@ -32,10 +32,7 @@ upstream:
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.metricsServer.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
-    }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.metricsServer.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
   injection: {{ ternary "enabled" "disabled" $istioEnabled }}
 
 networkPolicies:

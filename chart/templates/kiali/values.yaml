@@ -19,10 +19,7 @@ image:
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.kiali.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
-    }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
   kiali:
@@ -105,14 +102,14 @@ upstream:
                 is_core: true
                 is_proxy: false
               {{- if $istioEnabled }}
-              {{- range $name, $values := .Values.istio.ingressGateways }}
+              {{- range $name, $values := .Values.istioGateway.values.gateways }}
               {{ if ne $values.enabled false }}
               - app_label: {{ $name }}
                 is_core: true
                 is_proxy: true
               {{- end }}
               {{- end }}
-              {{- range $name, $values := .Values.istio.values.ingressGateways }}
+              {{- range $name, $values := .Values.istioGateway.values.gateways }}
               {{ if ne $values.enabled false }}
               - app_label: {{ $name }}
                 is_core: true

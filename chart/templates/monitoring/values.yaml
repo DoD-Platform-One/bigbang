@@ -43,24 +43,18 @@ istio:
   enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or
+      (dig "hardened" "enabled" false .Values.istiod.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
       (dig "istio" "hardened" "enabled" false .Values.grafana.values)
       (dig "istio" "hardened" "enabled" false .Values.loki.values)
       (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
       (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
     }}
     loki:
-      enabled: {{ and .Values.loki.enabled (or
-        (dig "hardened" "enabled" false .Values.istio.values)
-        (dig "istio" "hardened" "enabled" false .Values.monitoring.values))
-      }}
+      enabled: {{ and .Values.loki.enabled (or (dig "hardened" "enabled" false .Values.istiod.values) (dig "istio" "hardened" "enabled" false .Values.monitoring.values)) }}
     alloy:
-      enabled: {{ and .Values.alloy.enabled (or
-        (dig "hardened" "enabled" false .Values.istio.values)
-        (dig "istio" "hardened" "enabled" false .Values.monitoring.values))
-      }}
+      enabled: {{ and .Values.alloy.enabled (or (dig "hardened" "enabled" false .Values.istiod.values) (dig "istio" "hardened" "enabled" false .Values.monitoring.values)) }}
     {{- if and (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
     customServiceEntries:
       - name: egress-object-store
@@ -75,7 +69,7 @@ istio:
               name: https
           resolution: DNS
      {{- end }}
-  clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istio.values }}
+  clusterWideHardenedEnabled: {{ (dig "hardened" "enabled" false .Values.istiod.values) }}
   prometheus:
     enabled: true
     {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
