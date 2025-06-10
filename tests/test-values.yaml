@@ -55,6 +55,10 @@ flux:
 networkPolicies:
   enabled: true
   #controlPlaneCidr: 172.16.0.0/12
+
+# This will be removed when we remove the workaround
+disableAutomaticPassthroughValues: true
+
 istiod:
   enabled: true
   values:
