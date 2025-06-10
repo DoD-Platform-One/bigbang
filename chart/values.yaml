@@ -163,6 +163,12 @@ networkPolicies:
 # Permitted values are: None, Always, IfNotPresent
 imagePullPolicy: IfNotPresent
 
+# -- Flag for temporary workaround for passthrough chart migrations
+# This is the global flag to disable automatic passthrough values for all packages.
+# Alternatively, you can set this flag to `true` in the individual package values to disable passthrough for that package.
+# This will be removed in a future release.
+disableAutomaticPassthroughValues: false
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
 #
