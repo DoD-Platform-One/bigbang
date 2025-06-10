@@ -13,10 +13,7 @@ openshift: {{ .Values.openshift }}
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.neuvector.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
-    }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.neuvector.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
   neuvector:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.neuvector.ingress.gateway "root" .)}}

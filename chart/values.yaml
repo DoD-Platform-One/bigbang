@@ -124,7 +124,7 @@ flux:
   test:
     enable: false
   driftDetection:
-    mode: enabled # Valid Modes disabled | enabled | warn 
+    mode: enabled # Valid Modes disabled | enabled | warn
   install:
     remediation:
       retries: -1
@@ -165,7 +165,7 @@ imagePullPolicy: IfNotPresent
 
 istioCRDs:
   # -- Toggle deployment of Istio CRDs
-  enabled: false
+  enabled: true
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
@@ -192,7 +192,7 @@ istioCRDs:
 
 istiod:
   # -- Toggle deployment of istiod
-  enabled: false
+  enabled: true
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
@@ -224,7 +224,7 @@ istiod:
 
 istioGateway:
   # -- Toggle deployment of Istio Gateway(s)
-  enabled: false
+  enabled: true
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
@@ -330,179 +330,6 @@ istioGateway:
   #           - op: add
   #             path: /metadata/annotations/bigbang.dev~1example
   #             value: example
-
-istio:
-  # -- Toggle deployment of Istio.
-  status: "deprecated"
-  enabled: true
-  mtls:
-    # -- STRICT = Allow only mutual TLS traffic,
-    # PERMISSIVE = Allow both plain text and mutual TLS traffic
-    mode: STRICT
-
-  # -- Choose source type of "git" or "helmRepo"
-  sourceType: "git"
-
-  git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
-    path: "./chart"
-    tag: "1.23.6-bb.1"
-  helmRepo:
-    repoName: "registry1"
-    chartName: "istio"
-    tag: "1.23.6-bb.1"
-    # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI).  Set to 'false' to disable verification.
-    # cosignVerify:
-
-  # -- Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support,
-  # validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription
-  enterprise: false
-
-  # Ingress gateways are created based on the key name.  Adding more keys will add ingress gateways.
-  # Ingress gateways are setup in a Horizontal Pod Autoscaler with 1 to 5 replicas
-  # Besides some ports needed by Istio, only ports 80 and 443 are opened
-  # Ingress gateways that require more configuration can be completed using `istio.values`
-  ingressGateways:
-    public-ingressgateway:
-      type: "LoadBalancer" # or "NodePort"
-      kubernetesResourceSpec: {} # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
-
-    # private-ingressgateway:
-    #   type: "LoadBalancer" # or "NodePort"
-    #   kubernetesResourceSpec: # https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#KubernetesResourcesSpec
-    #     serviceAnnotations: # Example for AWS internal load balancer
-    #       service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    #       service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-
-    # passthrough-ingressgateway:
-    #   type: "NodePort" # or "LoadBalancer"
-    #   # Node ports are assigned starting from nodePortBase.  The nodePortBase specifies the start of a range of 4 unused node ports.
-    #   # Node port will be assigned as follows: Port 15021 (Status) = nodePortBase, Port 80 = nodePortBase+1, Port 443 = nodePortBase+2, Port 15443 (SNI) = nodePortBase+3
-    #   # Node port base should be in the range from 30000 to 32764
-    #   nodePortBase: 32000  # Alternatively, the kubernetesResourceSpec can be used to configure all port parameters
-
-  gateways:
-    public:
-      ingressGateway: "public-ingressgateway"
-      hosts:
-        - "*.{{ .Values.domain }}"
-      # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-      autoHttpRedirect:
-        enabled: true
-      tls:
-        key: ""
-        cert: ""
-        minProtocolVersion: ""
-    # private:
-    #   ingressGateway: "private-ingressgateway"
-    #   hosts:
-    #   - "example.bigbang.dev"
-    #   ports:
-    #     - name: tls-2
-    #       number: 1234
-    #       protocol: TCP
-    #     - name: tls
-    #       number: 5678
-    #       protocol: TCP
-    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-    #   autoHttpRedirect:
-    #     enabled: false
-    #   tls:
-    #     key: ""
-    #     cert: ""
-    #     minProtocolVersion: ""
-    # passthrough:
-    #   ingressGateway: "passthrough-ingressgateway"
-    #   hosts:
-
-    ####
-    # Alternate multi-server configuration method
-    ####
-    # private:
-    #   ingressGateway: "private-ingressgateway"
-    #   servers:
-    #   - hosts:
-    #     - "example.bigbang.dev"
-    #     port:
-    #       name: tls-1
-    #       number: 1234
-    #       protocol: TCP
-    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-    #     autoHttpRedirect:
-    #       enabled: false
-    #     tls:
-    #       key: ""
-    #       cert: ""
-    #       minProtocolVersion: ""
-    #   - hosts:
-    #     - "example.bigbang.dev"
-    #     port:
-    #       name: tls-2
-    #       number: 5678
-    #       protocol: TCP
-    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-    #     autoHttpRedirect:
-    #       enabled: false
-    #     tls:
-    #       key: ""
-    #       cert: ""
-    #       minProtocolVersion: ""
-    # passthrough:
-    #   ingressGateway: "passthrough-ingressgateway"
-    #   hosts:
-    #   - "*.{{ .Values.domain }}"
-    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-    #   autoHttpRedirect:
-    #     enabled: true
-    #   tls:
-    #     mode: "PASSTHROUGH"
-    # mutual:
-    #   ingressGateway: "mutual-ingressgateway"
-    #   hosts:
-    #   - "*.{{ .Values.domain }}"
-    #   # -- Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect.
-    #   autoHttpRedirect:
-    #     enabled: true
-    #   tls:
-    #     mode: MUTUAL
-    #     cert: ""
-    #     key: ""
-    #     ca: ""
-
-  # -- Flux reconciliation overrides specifically for the Istio Package
-  flux: {}
-
-  # -- Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git
-  values: {}
-
-  # -- Post Renderers.  See docs/postrenders.md
-  postRenderers: []
-
-istioOperator:
-  status: "deprecated"
-  # -- Toggle deployment of Istio Operator.
-  enabled: true
-
-  # -- Choose source type of "git" or "helmRepo"
-  sourceType: "git"
-
-  git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
-    path: "./chart"
-    tag: "1.23.6-bb.0"
-  helmRepo:
-    repoName: "registry1"
-    chartName: "istio-operator"
-    tag: "1.23.6-bb.0"
-
-  # -- Flux reconciliation overrides specifically for the Istio Operator Package
-  flux: {}
-
-  # -- Values to passthrough to the istio-operator chart: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git
-  values: {}
-
-  # -- Post Renderers.  See docs/postrenders.md
-  postRenderers: []
 
 kiali:
   # -- Toggle deployment of Kiali.

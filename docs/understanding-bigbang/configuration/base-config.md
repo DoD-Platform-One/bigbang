@@ -100,40 +100,6 @@ Kubernetes: `>=1.29.0-0`
 | istioGateway.values | object | `{}` | Values to passthrough to the gateway chart(s) |
 | istioGateway.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Gateway Package |
 | istioGateway.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md The istioGateway package supports advanced postRenderer definitions. If an array of postRenderers is provided, the postRenderers will be applied to all gateways. If a map of postRenderers is provided, the postRenderers will be applied only to their respective gateways. The map key must match the gateway name for the postRenderers to be applied to that gateway. You cannot mix array and map postRenderers. |
-| istio.status | string | `"deprecated"` | Toggle deployment of Istio. |
-| istio.enabled | bool | `true` |  |
-| istio.mtls.mode | string | `"STRICT"` | STRICT = Allow only mutual TLS traffic, PERMISSIVE = Allow both plain text and mutual TLS traffic |
-| istio.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| istio.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git"` |  |
-| istio.git.path | string | `"./chart"` |  |
-| istio.git.tag | string | `"1.23.6-bb.1"` |  |
-| istio.helmRepo.repoName | string | `"registry1"` |  |
-| istio.helmRepo.chartName | string | `"istio"` |  |
-| istio.helmRepo.tag | string | `"1.23.6-bb.1"` |  |
-| istio.enterprise | bool | `false` | Tetrate Istio Distribution - Tetrate provides FIPs verified Istio and Envoy software and support, validated through the FIPs Boring Crypto module. Find out more from Tetrate - https://www.tetrate.io/tetrate-istio-subscription |
-| istio.ingressGateways.public-ingressgateway.type | string | `"LoadBalancer"` |  |
-| istio.ingressGateways.public-ingressgateway.kubernetesResourceSpec | object | `{}` |  |
-| istio.gateways.public.ingressGateway | string | `"public-ingressgateway"` |  |
-| istio.gateways.public.hosts[0] | string | `"*.{{ .Values.domain }}"` |  |
-| istio.gateways.public.autoHttpRedirect | object | `{"enabled":true}` | Controls default HTTP/8080 server entry with HTTP to HTTPS Redirect. |
-| istio.gateways.public.tls.key | string | `""` |  |
-| istio.gateways.public.tls.cert | string | `""` |  |
-| istio.gateways.public.tls.minProtocolVersion | string | `""` |  |
-| istio.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Package |
-| istio.values | object | `{}` | Values to passthrough to the istio-controlplane chart: https://repo1.dso.mil/big-bang/product/packages/istio-controlplane.git |
-| istio.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| istioOperator.status | string | `"deprecated"` |  |
-| istioOperator.enabled | bool | `true` | Toggle deployment of Istio Operator. |
-| istioOperator.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| istioOperator.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/istio-operator.git"` |  |
-| istioOperator.git.path | string | `"./chart"` |  |
-| istioOperator.git.tag | string | `"1.23.6-bb.0"` |  |
-| istioOperator.helmRepo.repoName | string | `"registry1"` |  |
-| istioOperator.helmRepo.chartName | string | `"istio-operator"` |  |
-| istioOperator.helmRepo.tag | string | `"1.23.6-bb.0"` |  |
-| istioOperator.flux | object | `{}` | Flux reconciliation overrides specifically for the Istio Operator Package |
-| istioOperator.values | object | `{}` | Values to passthrough to the istio-operator chart: https://repo1.dso.mil/big-bang/product/packages/istio-operator.git |
-| istioOperator.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | kiali.enabled | bool | `true` | Toggle deployment of Kiali. |
 | kiali.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kiali.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kiali.git"` |  |

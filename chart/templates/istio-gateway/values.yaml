@@ -2,14 +2,14 @@
 {{- $root := . -}}
 {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
 ---
-{{- include "values-secret" (dict 
+{{ include "values-secret" (dict 
   "root" $root 
   "name" (printf "istio-%s-gateway" $name)
   "defaults" ($gw.defaults | toYaml)
   "package" (dict "values" $gw.overlays)
 ) }}
 {{- end }}
-{{- end -}}
+{{- end }}
 
 {{- define "bigbang.defaults.istio-gateway" -}}
 gateways:
@@ -91,7 +91,7 @@ gateways:
 
       labels:
         istio: ingressgateway
-{{- end -}}
+{{- end }}
 
 {{- if and .Values.istiod.enabled .Values.istioGateway.enabled }}
 {{- include "bigbang.istio-gateway-secrets" . }}

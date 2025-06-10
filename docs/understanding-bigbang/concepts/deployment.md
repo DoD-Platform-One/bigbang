@@ -154,8 +154,9 @@ The commands detailed in this section will help you monitor the progress of the 
     bigbang       helmrelease.helm.toolkit.fluxcd.io/bigbang                    True     Release reconciliation succeeded                       64s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/gatekeeper                 True     Release reconciliation succeeded                       62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/eck-operator               False    dependency 'bigbang/gatekeeper' is not ready           62s
-    bigbang       helmrelease.helm.toolkit.fluxcd.io/istio-operator             Unknown  Reconciliation in progress                             62s
-    bigbang       helmrelease.helm.toolkit.fluxcd.io/istio                      False    dependency 'bigbang/istio-operator' is not ready       62s
+    bigbang       helmrelease.helm.toolkit.fluxcd.io/istio-crds                 True     Release reconciliation succeeded                       63s
+    bigbang       helmrelease.helm.toolkit.fluxcd.io/istiod                     Unknown  Reconciliation in progress                             62s
+    bigbang       helmrelease.helm.toolkit.fluxcd.io/istio-gateway              False    dependency 'bigbang/istiod' is not ready               62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/efk                        False    dependency 'bigbang/eck-operator' is not ready         62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/logging-operator           False    dependency 'bigbang/gatekeeper' is not ready           62s
     bigbang       helmrelease.helm.toolkit.fluxcd.io/twistlock                  False    dependency 'bigbang/gatekeeper' is not ready           62s
@@ -164,14 +165,14 @@ The commands detailed in this section will help you monitor the progress of the 
 
     NAMESPACE           NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
     kube-system         deployment.apps/local-path-provisioner          1/1     1            1           4m48s
-    kube-system         deployment.product/packagesdns                         1/1     1            1           4m48s
+    kube-system         deployment.product/packagesdns                  1/1     1            1           4m48s
     flux-system         deployment.apps/helm-controller                 1/1     1            1           4m6s
     flux-system         deployment.apps/notification-controller         1/1     1            1           4m6s
     flux-system         deployment.apps/source-controller               1/1     1            1           4m7s
     flux-system         deployment.apps/kustomize-controller            1/1     1            1           4m7s
     gatekeeper-system   deployment.apps/gatekeeper-controller-manager   1/1     1            1           2m8s
     gatekeeper-system   deployment.apps/gatekeeper-audit                1/1     1            1           2m8s
-    istio-operator      deployment.apps/istio-operator                  0/1     1            0           8s
+    istiod              deployment.apps/istiod                          0/1     1            0           8s
 
     NAMESPACE           NAME                                                 READY   STATUS              RESTARTS   AGE
     kube-system         pod/local-path-provisioner-6d59f47c7-s6rln           1/1     Running             0          4m36s
@@ -182,7 +183,7 @@ The commands detailed in this section will help you monitor the progress of the 
     flux-system         pod/kustomize-controller-5cfb78859c-n85xn            1/1     Running             0          4m6s
     gatekeeper-system   pod/gatekeeper-controller-manager-5b9cf6c85d-cqd8t   1/1     Running             0          2m8s
     gatekeeper-system   pod/gatekeeper-audit-7db49c54d5-pwzwh                1/1     Running             0          2m8s
-    istio-operator      pod/istio-operator-79f966cfc-rjhhc                   0/1     ContainerCreating   0          8s
+    istiod              pod/istiod-79f966cfc-rjhhc                           0/1     ContainerCreating   0          8s
     ```
 
 1. Wait until all Helm Releases, Deployments, and Pods are ready. Be patient, this can take 15-30 minutes.

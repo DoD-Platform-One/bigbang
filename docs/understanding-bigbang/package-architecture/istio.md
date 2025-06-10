@@ -45,9 +45,9 @@ Aside from the packages that it can integrate with, Istio provides no storage re
 By default, Istio is configured with 1 istiod replica, but it can be configured in the Big Bang values to use horizontal pod autoscaling:
 
 ```yaml
-istio:
+istiod:
   values:
-    istiod:
+    upstream:
       replicaCount: 1
       hpaSpec:
         minReplicas: 1
@@ -57,9 +57,9 @@ istio:
 Likewise, the ingress gateway replicas can be specified and extra ingress gateways can be configured:
 
 ```yaml
-istio:
+istioGateway:
   values:
-    ingressGateway:
+    upstream:
       minReplicas: 1
       maxReplicas: 5
     extraIngressGateways:
@@ -71,7 +71,11 @@ istio:
 Big Bang can be configured to deploy [Kiali](https://repo1.dso.mil/big-bang/product/packages/kiali) (a management console that provides dashboards, observability, and other robust capabilities) and [Tempo](https://repo1.dso.mil/big-bang/product/packages/tempo) (a distributed tracing backend), which can help you visualize your Istio mesh. To enable Kialia and Tempo, simply update the Big Bang values.yaml:
 
 ```yaml
-istio:
+istioCRDs:
+  enabled: true
+istiod:
+  enabled: true
+istioGateway:
   enabled: true
 tempo:
   enabled: true
@@ -93,8 +97,8 @@ Grafana (part of the monitoring packages) is a standalone component of Big Bang 
 
 There are standard readiness probes built into the envoy sidecars and istio containers. See [here](https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/#ReadinessProbe) for more info.
 
-You can get events in an istio-injected namespace to see if your sidecars are unhealthy or having issues. To check the health/status of the istio installation, run `kubectl get istiooperators -n istio-system`.
+### Dependent Packages
 
-### Dependant Packages
-
-- istio-operator
+- istio-crds
+- istiod
+- istio-gateway

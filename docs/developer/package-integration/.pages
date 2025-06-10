@@ -4,7 +4,7 @@ nav:
   - Documentation: documentation.md
   - Flux: flux.md
   - Helm Standards: helm-standards.md
-  - Istio Hardened: istioHardened.md
+  - Istio Hardened: istio-hardened.md
   - Monitoring: monitoring.md
   - Network Policies: network-policies.md
   - Ownership: ownership.md

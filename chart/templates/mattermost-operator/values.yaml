@@ -12,7 +12,7 @@ imagePullSecrets:
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-{{- if .Values.istio.enabled }}
+{{- if $istioEnabled  }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end}}
@@ -28,7 +28,7 @@ istio:
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.mattermostOperator.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
 
 monitoring:

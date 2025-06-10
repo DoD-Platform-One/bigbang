@@ -22,7 +22,7 @@ istio:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
   gitlab:

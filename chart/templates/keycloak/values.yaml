@@ -26,7 +26,7 @@ istio:
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
     }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
   keycloak:

@@ -20,7 +20,7 @@ istio:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "hardened" "enabled" false .Values.istio.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
       (dig "istio" "hardened" "enabled" false .Values.grafana.values)
       (dig "istio" "hardened" "enabled" false .Values.loki.values)
       (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)

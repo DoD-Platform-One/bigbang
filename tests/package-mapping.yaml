@@ -6,12 +6,6 @@
 #   dependencies: A list of all packages that should also be deployed in CI if this one is enabled. These names should match the other package(s) values keys.
 # Note: For any locations where the value matches the top level key, these can be left blank.
 
-istio:
-  repoName: "istio-controlplane"
-istioOperator:
-  repoName: "istio-operator"
-  hrName: "istio-operator"
-  filePath: "istio-operator"
 istiod:
   repoName: "istiod"
   hrName: "istiod"

@@ -120,7 +120,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         # Flux is installed prior to Istio
         - flux-system
         # Istio does not inject itself
-        - istio-operator
         - istio-system
         - istio-gateway
         # Kyverno is installed prior to Istio
@@ -152,7 +151,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
     match:
       excludedNamespaces:
         # Istio does not inject sidecars in itself
-        - istio-operator
         - istio-system
         - istio-gateway
 
