@@ -125,6 +125,10 @@ flux:
     enable: false
   driftDetection:
     mode: enabled # Valid Modes disabled | enabled | warn
+    ignore: 
+      - paths: [""] # ignore all jobs, as jobs with ttlSecondsAfterFinished are not handled
+        target:
+          kind: Job
   install:
     remediation:
       retries: -1
@@ -187,6 +191,9 @@ istioCRDs:
         target:
           kind: ValidatingWebhookConfiguration
           name: istiod-default-validator
+      - paths: [""]
+        target:
+          kind: Job
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -219,6 +226,9 @@ istiod:
         target:
           kind: ValidatingWebhookConfiguration
           name: istio-validator-istio-system
+      - paths: [""]
+        target:
+          kind: Job
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -302,7 +312,21 @@ istioGateway:
   #           mode: ISTIO_MUTUAL
 
   # -- Flux reconciliation overrides specifically for the Istio Gateway Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: PeerAuthentication
+            namespace: "istio-gateway"
+        - paths: [""]
+          target:
+            kind: AuthorizationPolicy
+            namespace: "istio-gateway"
+        - paths: [""]
+          target:
+            kind: NetworkPolicy
+            namespace: "istio-gateway"
   # -- Post Renderers.  See docs/postrenders.md
   # The istioGateway package supports advanced postRenderer definitions. If an array of postRenderers is provided, the
   # postRenderers will be applied to all gateways. If a map of postRenderers is provided, the postRenderers
@@ -348,7 +372,12 @@ kiali:
     tag: "2.9.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kiali Package
-  flux: {}
+  flux:
+    driftDetection:
+      ignore:
+        - paths: [""] # The Kiali kind is updated during runtime
+          target:
+            kind: Kiali
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -429,6 +458,9 @@ kyverno:
         - paths: [""]
           target:
             kind: CustomResourceDefinition
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}
@@ -459,7 +491,9 @@ kyvernoPolicies:
         - paths: [""]
           target:
             kind: ClusterPolicy
-    
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
   values: {}
@@ -516,6 +550,17 @@ elasticsearchKibana:
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
     timeout: 20m
+    driftDetection:
+      ignore:
+        - paths: [""]
+          target:
+            kind: Kibana
+        - paths: [""]
+          target:
+            kind: Elasticsearch
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -654,6 +699,9 @@ loki:
         - paths: [""]
           target:
            kind: Sidecar
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Loki architecture.  Options are monolith and scalable
   strategy: monolith
@@ -738,13 +786,16 @@ neuvector:
       ignore:
         - paths: [""]
           target:
-            kind: CronJob    
+            kind: CronJob
         - paths: [""]
           target:
-            kind: Lease    
+            kind: Lease
         - paths: [""]
           target:
-            kind: Secret   
+            kind: Secret
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
@@ -850,13 +901,16 @@ monitoring:
       ignore:
         - paths: [""]
           target:
-            kind: Alertmanager    
+            kind: Alertmanager
         - paths: [""]
           target:
-            kind: Prometheus 
+            kind: Prometheus
         - paths: [""]
           target:
             kind: PrometheusRule
+        - paths: [""]
+          target:
+            kind: Job
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -1731,9 +1785,12 @@ addons:
     flux:
       driftDetection:
         ignore:
-          - paths: ["/spec/size"]
+          - paths: [""]
             target:
-            kind: Mattermost  
+              kind: Mattermost
+          - paths: [""]
+            target:
+              kind: Job
 
     # -- Mattermost Enterprise functionality.
     enterprise:
@@ -1925,7 +1982,10 @@ addons:
         ignore:
           - paths: [""]
             target:
-              kind: MutatingWebhookConfiguration      
+              kind: MutatingWebhookConfiguration
+          - paths: [""]
+            target:
+              kind: Job
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
@@ -2066,6 +2126,9 @@ addons:
           - paths: [""]
             target:
               kind: Tenant
+          - paths: [""]
+            target:
+              kind: Job
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
