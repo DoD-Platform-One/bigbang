@@ -10,11 +10,6 @@
 global:
   fullnameOverride: kyverno-reporter
 
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-imagePullSecrets:
-- name: private-registry
-
 {{- if $istioEnabled }}
 istio:
   enabled: true
@@ -22,33 +17,49 @@ podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
-
-ui:
-  enabled: true
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-  - name: private-registry
-  {{- if $istioEnabled }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end }}
-
-  # monitoring contains configurations related to monitoring
-monitoring:
-  # -- Enables the Prometheus Operator integration
-  enabled: true
-  grafana:
-    dashboards:
-      enabled: true
-      namespace: monitoring
-
-openshift: {{ .Values.openshift }}
-
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
+openshift: {{ .Values.openshift }}
+
+upstream:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
+  ui:
+    enabled: true
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+    imagePullSecrets:
+    - name: private-registry
+    {{- if $istioEnabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+  
+  plugin:
+    kyverno:
+      enabled: true
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+      imagePullSecrets:
+      - name: private-registry
+      {{- if $istioEnabled }}
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+      {{- end }}
+
+
+  # monitoring contains configurations related to monitoring
+  monitoring:
+    # -- Enables the Prometheus Operator integration
+    enabled: {{ .Values.monitoring.enabled }}
+    grafana:
+      dashboards:
+        enabled: {{ or .Values.monitoring.enabled .Values.grafana.enabled }}
+        namespace: monitoring
 {{- end -}}
