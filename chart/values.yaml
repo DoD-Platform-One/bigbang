@@ -129,6 +129,9 @@ flux:
       - paths: [""] # ignore all jobs, as jobs with ttlSecondsAfterFinished are not handled
         target:
           kind: Job
+      - paths: [""] # ignore all stateful sets, as stateful sets seem to have issues with drift detection around finding cluster state when calculating diffs
+        target:
+          kind: StatefulSet
   install:
     remediation:
       retries: -1
@@ -200,6 +203,9 @@ istioCRDs:
       - paths: [""]
         target:
           kind: Job
+      - paths: [""]
+        target:
+          kind: StatefulSet
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -235,6 +241,9 @@ istiod:
       - paths: [""]
         target:
           kind: Job
+      - paths: [""]
+        target:
+          kind: StatefulSet
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -467,6 +476,9 @@ kyverno:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}
@@ -500,6 +512,9 @@ kyvernoPolicies:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
   values: {}
@@ -567,6 +582,9 @@ elasticsearchKibana:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -708,6 +726,9 @@ loki:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Loki architecture.  Options are monolith and scalable
   strategy: monolith
@@ -802,6 +823,9 @@ neuvector:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Values to passthrough to the Neuvector chart: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
   values: {}
@@ -917,6 +941,9 @@ monitoring:
         - paths: [""]
           target:
             kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
   ingress:
@@ -1797,6 +1824,9 @@ addons:
           - paths: [""]
             target:
               kind: Job
+          - paths: [""]
+            target:
+              kind: StatefulSet
 
     # -- Mattermost Enterprise functionality.
     enterprise:
@@ -1992,6 +2022,9 @@ addons:
           - paths: [""]
             target:
               kind: Job
+          - paths: [""]
+            target:
+              kind: StatefulSet
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
@@ -2135,6 +2168,9 @@ addons:
           - paths: [""]
             target:
               kind: Job
+          - paths: [""]
+            target:
+              kind: StatefulSet
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
