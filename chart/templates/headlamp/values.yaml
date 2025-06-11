@@ -44,12 +44,12 @@ istio:
 
 openshift: {{ .Values.openshift }}
 
-{{- with .Values.addons.headlamp.sso }}
+{{- if .Values.addons.headlamp.sso.enabled }}
 config:
   oidc:
-    enabled: {{ .enabled }}
-    clientId: {{ .client_id }}
-    clientSecret: {{ .client_secret | default "no-secret" }}
-    issuerURL: {{ default (include "sso.oidc.auth" $) .auth_endpoint }}
+    clientID: {{ .Values.addons.headlamp.sso.client_id }}
+    clientSecret: {{ .Values.addons.headlamp.sso.client_secret }}
+    issuerURL: {{ .Values.sso.url }}
+    scopes: "email,profile"
 {{- end }}
 {{- end -}}
