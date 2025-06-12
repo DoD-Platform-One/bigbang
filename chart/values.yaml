@@ -460,11 +460,11 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
-    tag: "3.3.6-bb.3"
+    tag: "3.3.6-bb.5"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno"
-    tag: "3.3.6-bb.3"
+    tag: "3.3.6-bb.5"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux:
@@ -479,6 +479,10 @@ kyverno:
         - paths: [""]
           target:
             kind: StatefulSet
+    install:
+      crds: CreateReplace
+    upgrade:
+      crds: CreateReplace
 
   # -- Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
   values: {}

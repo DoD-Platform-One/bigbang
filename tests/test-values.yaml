@@ -121,7 +121,6 @@ gatekeeper:
           - default/c.?
           - default/i.?
           - gitlab/.*
-          - kyverno/.*
       allowedHostFilesystem:
         parameters:
           excludedResources:
@@ -306,7 +305,7 @@ gatekeeper:
 
 kyverno:
   values:
-    kyverno:
+    upstream:
       networkPolicies:
         externalRegistries:
           allowEgress: true

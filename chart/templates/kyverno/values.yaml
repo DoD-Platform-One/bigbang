@@ -4,44 +4,46 @@
 
 {{- define "bigbang.defaults.kyverno" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-replicaCount: 3
 
-image:
-  pullSecrets:
-  - name: private-registry
-  pullPolicy: {{ .Values.imagePullPolicy }}
-
-openshift: {{ .Values.openshift }}
+istio:
+  enabled: {{ $istioEnabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
-serviceMonitor:
-  enabled: {{ .Values.monitoring.enabled }}
-  dashboards:
+openshift: {{ .Values.openshift }}
+
+upstream:
+
+  fullnameOverride: kyverno-kyverno
+
+  replicaCount: 3
+
+  image:
+    pullSecrets:
+    - name: private-registry
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+  grafana:
+    enabled: {{ .Values.monitoring.enabled }}
     namespace: monitoring
 
-admissionController:
-  serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+  admissionController:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.enabled }}
 
-backgroundController:
-  serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+  backgroundController:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.enabled }}
 
-cleanupController:
-  serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+  cleanupController:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.enabled }}
 
-reportsController:
-  serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+  reportsController:
+    serviceMonitor:
+      enabled: {{ .Values.monitoring.enabled }}
 
-grafana:
-  enabled: {{ .Values.monitoring.enabled }}
-  namespace: monitoring
 
-istio:
-  enabled: {{ $istioEnabled }}
 {{- end -}}
