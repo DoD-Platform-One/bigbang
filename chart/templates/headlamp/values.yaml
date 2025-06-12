@@ -4,6 +4,9 @@
 
 {{- define "bigbang.defaults.headlamp" -}}
 
+{{- $domainName := default .Values.domain .Values.hostname }}
+domain: {{ $domainName }}
+
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
