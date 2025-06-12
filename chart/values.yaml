@@ -255,11 +255,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.25.3-bb.2
+    tag: 1.25.3-bb.3
   helmRepo:
     repoName: "registry1"
     chartName: "istio-gateway"
-    tag: 1.25.3-bb.2
+    tag: 1.25.3-bb.3
   # -- Values to passthrough to the gateway chart(s)
   values: {}
   # EXAMPLE: Set the tls key/cert for the existing public gateway
