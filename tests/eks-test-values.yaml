@@ -283,7 +283,7 @@ addons:
         resources:
           requests:
             cpu: 100m
-          limits: null
+
       redis:
         master:
           persistence:
@@ -466,7 +466,6 @@ addons:
             requests:
               cpu: 250m
               memory: 512Mi
-            limits: null
           securityContext:
             runAsUser: 1001
             runAsGroup: 1001
@@ -504,7 +503,6 @@ addons:
               requests:
                 cpu: 250m
                 memory: 512Mi
-              limits: null
             securityContext:
               runAsUser: 1001
               runAsGroup: 1001
