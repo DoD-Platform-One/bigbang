@@ -48,6 +48,14 @@ The Big Bang team will continue maintaining Big Bang packages, but without forki
 
 You may have already seen this pattern in a few packages, like Kiali, Backstage, and Operatorless Istio, with many more adopting it in 3.0. Watch the Upgrade Notices in the Release Notes for instructions on how to update your deployments as we roll out this change.
 
+### Anchore Enterprise rename
+
+We are making a **breaking** change to the Anchore Enterprise package name in Big Bang 3.0. The package will now be declared as `anchoreEnterprise` instead of `anchore` in the Big Bang umbrella `values.yaml` file.
+If teams deploy Anchore enterprise with a statefulset postgres db you should confirm data retention policy with your in cluster storage.
+Teams using external cluster storage like RDS should be unaffected.
+
+This change aligns with the upstream Anchore project's removal of their open-source Anchore Engine package, which was deprecated in favor of the enterprise version. This package will also be moving towards community support in the future, so please be aware that it will not receive the same level of support as other Big Bang packages.
+
 ### 💨 Quickstart Templates are Even Quicker
 
 Big Bang 3.0 accelerates onboarding with revamped customer templates and a streamlined quickstart guide, complete with an automated deployment script for faster setup. We've also improved documentation around best practices for production configuration, making it easier to configure your cluster for optimal performance.
