@@ -15,90 +15,200 @@ Several of Big Bang's packages have dependencies on other packages.  A Dependenc
 ```mermaid
 flowchart LR
   subgraph Core
-    direction BT
+  direction LR
 
-    subgraph L[Logging]
-      subgraph ALG[Default]
-        Alloy[Alloy] --> Loki[Loki]
+    subgraph Group2
+      style Group2 fill:transparent,stroke:transparent,color:transparent
+      direction LR
+
+      subgraph RS[Runtime Security]
+        subgraph NV[Default]
+          Neuvector[Neuvector]
+        end
+        subgraph CC[Alternative]
+          style CC stroke-dasharray: 10 10
+          Twistlock[Prisma Cloud Compute]
+        end
       end
-      subgraph EFK[Alternative]
-        style EFK stroke-dasharray: 10 10
-        Kibana & Fluentbit --> Elastic
+
+      subgraph PE[Policy Enforcement]
+        subgraph KyvernoStack[Default]
+        direction BT
+          KyvernoReporter[Kyverno Reporter]
+          Kyverno[Kyverno]
+        end
+        subgraph CA[Alternative]
+          style CA stroke-dasharray: 10 10
+          OPA[OPA Gatekeeper]
+        end
       end
+
+      %% PE Dependencies
+      KyvernoReporter --> Kyverno
+
     end
 
-    subgraph M[Monitoring]
+    subgraph Group1
+      style Group1 fill:transparent,stroke:transparent,color:transparent
+      direction BT
+
+      subgraph SM[Service Mesh]
+        Kiali[Kiali]
+        Istio[Istio]
+      end
+
+      subgraph DT[Distributed Tracing]
+        Tempo[Tempo]
+      end
+
+      subgraph L[Logging]
+        subgraph ALG[Default]
+          Alloy[Alloy]
+          Loki[Loki]
+        end
+        subgraph EFK[Alternative]
+          style EFK stroke-dasharray: 10 10
+          direction BT
+          Kibana[Kibana]
+          Fluentbit[Fluentbit]
+          Elastic[Elastic]
+        end
+      end
+
+      subgraph M[Monitoring]
+        Grafana[Grafana]
+        Prometheus[Prometheus]
+      end
+
+      %% Forces DT subgraph under SM subgraph
+      DT ~~~ SM
+
+
+      %% SM Dependencies
+      Kiali --> Istio
+      Kiali --> Prometheus
+      Tempo --> Istio
+
+      %% ALG Dependencies
+      Alloy -.-> Prometheus
+      Alloy --> Loki
+      Alloy -.-> Tempo
+
       Grafana --> Prometheus
       Grafana -.-> Loki
-    end
+      Grafana --> Tempo
+      Grafana -.-> Alloy
 
-    subgraph PE[Policy Enforcement]
-      subgraph CA[Alternative]
-      style CA stroke-dasharray: 10 10
-      direction BT
-        OPA[OPA Gatekeeper]
-      end
-      subgraph KyvernoStack[Default]
-      direction BT
-        KyvernoReporter[Kyverno Reporter] --> Kyverno[Kyverno]
-      end
-    end
+      %% EFK Dependencies
+      Kibana --> Elastic
+      Fluentbit --> Elastic
 
-    subgraph RS[Runtime Security]
-      subgraph CC[Alternative]
-        style CC stroke-dasharray: 10 10
-        Twistlock[Prisma Cloud Compute]
-      end
-      subgraph TL[Default]
-        Neuvector[Neuvector]
-      end
     end
-
-    subgraph DT[Distributed Tracing]
-      Tempo[Tempo] --> Grafana
-    end
-
-    subgraph SM[Service Mesh]
-      Tempo --> Istio
-      Kiali --> Istio & Prometheus
-    end
+      Group1 ~~~ Group2
   end
 ```
 
 ```mermaid
-flowchart LR
+flowchart BT
   subgraph AddOns
-    subgraph AppUtils[Application Utilities]
-      MinIO
+  direction BT
+
+    subgraph Row2[ ]
+      style Row2 fill:transparent,stroke:transparent
+      direction LR
+
+      subgraph DT[DevSecOps Tools]
+      style DT stroke-dasharray: 10 10
+        subgraph ContDeploy[CI/CD]
+        direction BT
+          GLRunners[GitLab Runners]
+          GitLab
+          ArgoCD
+        end
+        subgraph DT-1[ ]
+        style DT-1 fill:transparent,stroke:transparent
+        direction LR
+
+          subgraph Scan[Vulnerability Scanning]
+          direction BT
+            Anchore
+            Fortify
+            Sonarqube
+          end
+
+          subgraph DT-2[ ]
+          style DT-2 fill:transparent,stroke:transparent
+          direction BT
+            subgraph Repo[Repositories]
+            direction BT
+              Harbor
+              Nexus[Nexus Repository]
+            end
+            subgraph UI[Dashboards and UIs]
+              Backstage
+            end
+          end
+
+        end
+      end
+
+      subgraph Collab[Collaboration]
+        Mattermost
+      end
+
+      subgraph Storage[Storage & Backup]
+      direction BT
+        MinIO
+        Velero
+      end
+      
+    
     end
 
-    subgraph ClusterUtils[Cluster Utilities]
-    direction BT
-      ArgoCD
-      Metrics[Metrics Server]
-      Velero
-    end
+    subgraph Row1[ ]
+      style Row1 fill:transparent,stroke:transparent
+      direction BT
 
-    subgraph "Security"
-    direction BT
-      Anchore[Anchore Enterprise]
-      Authservice --> I[Istio]
-      Keycloak
-      Vault[Vault*]
-    end
+        subgraph Obs[Observability]
+          Metrics[Metrics Server]
+          Mimir
+          Thanos
+          Headlamp
+        end
 
-    subgraph "Collaboration"
-    direction BT
-      Mattermost
-    end
+        subgraph SM[Secrets Management]
+          Vault[Vault*]
+          ESO[External Secrets]
+        end
 
-    subgraph "Developer Tools"
-    direction BT
-      GLRunners[GitLab Runners] --> GitLab
-      Nexus[Nexus Repository]
-      Sonarqube
+        subgraph Sec[SSO]
+        direction LR
+          Authservice
+          Keycloak
+        end
+
+    Istio
+    formattingNode[ ]:::invisible
+    
     end
+      
+    %% Dependencies
+    Authservice --> Istio
+    GLRunners --> GitLab
+
+    %% Row 1 Formatters
+    Vault ~~~ formattingNode
+    %%Mattermost ~~~ formattingNode
+    Metrics ~~~ formattingNode
+
+    %%Row 2 Formatters
+    Row2 ~~~ Row1
+    Collab ~~~ DT
+    Storage ~~~ DT
+
   end
+
+classDef invisible fill:transparent,stroke:transparent,color:transparent
 ```
 
 > Footnotes:
@@ -131,9 +241,10 @@ A logging stack is a set of scalable tools that can aggregate logs from cluster 
 |--|--|--|--|--|
 |X|ALG|[Alloy](./alloy.md)|Forwarder|[alloy](https://repo1.dso.mil/big-bang/product/packages/alloy)|
 |X|ALG|[Loki](./loki.md)|Storage|[loki](https://repo1.dso.mil/big-bang/product/packages/loki)|
-| |EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/big-bang/product/packages/eck-operator)
+| |EFK|Elastic Cloud on Kubernetes (ECK) Operator|Operator|[eck-operator](https://repo1.dso.mil/big-bang/product/packages/eck-operator)|
 | |EFK|[Elasticsearch / Kibana](./elasticsearch-kibana.md)|Storage & Visualization|[elasticsearch-kibana](https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana)|
 | |EFK|[Fluentbit](./fluentbit.md)|Forwarder|[fluentbit](https://repo1.dso.mil/big-bang/product/packages/fluentbit)|
+
 > ALG stack uses the Grafana package, deployed in [monitoring](#monitoring), for visualization.
 
 ### Policy Enforcement
@@ -177,35 +288,34 @@ Runtime security is the active protection of containers running in the cluster. 
 
 End users can extend Big Bang services beyond the core packages by enabling any of the many team-supported addon packages. Addons are supported by the Big Bang team and integrated with the core platform (Istio, Kyverno, Prometheus etc..) There are additional community-supported Big Bang packages that are not listed as addons.
 
-### Storage Utilities
+### Single Sign-On
 
-For non-critical or on-prem deployments where data loss is an acceptable risk, these utilities offer a simple and low-cost solution for in-cluster data persistence (databases, object / blob storage, and caches). However, if scalability, availability, and resiliency (e.g. backup and restore) are requirements, it is generally advantageous to instead use a managed, cloud based offering.
-
-|Stack|Package|Function|Repository|
-|--|--|--|--|
-|MinIO|MinIO Operator|Operator|[minio-operator](https://repo1.dso.mil/big-bang/product/packages/minio-operator)|
-|MinIO|[MinIO](./minio.md)|S3 Object Storage|[minio](https://repo1.dso.mil/big-bang/product/packages/minio)|
-
-### Cluster Utilities
-
-Cluster utilities add functionality to Kubernetes clusters rather than applications.  Examples include resource utilization, cluster backup and restore, continuos deployment, or load balancers.
+Single sign-on tools include packages that provide centralized authentication and authorization. This includes identity providers, authentication proxies, and session management.
 
 |Package|Function|Repository|
 |--|--|--|
-|[ArgoCD](./argocd.md)|Continuous Deployment|[argocd](https://repo1.dso.mil/big-bang/product/packages/argocd)
-|Metrics Server|Monitors pod CPU & memory utilization|[metrics-server](https://repo1.dso.mil/big-bang/product/packages/metrics-server)|
-|[Velero](./velero.md)|Cluster Backup & Restore|[velero](https://repo1.dso.mil/big-bang/product/packages/velero)|
-
-### Security
-
-Security packages add additional security features for protecting services or data from unauthorized access or exploitation.  This includes things like identity providers (IdP), identity brokers, authentication (AuthN), authorization (AuthZ), single sign-on (SSO), security scanning, intrusion detection/prevention, and sensitive data protection.
-
-|Package|Function|Repository|
-|--|--|--|
-|[Anchore](./anchore.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise)|
 |[Authservice](./authservice.md)|Istio extension for Single Sign-On (SSO)|[authservice](https://repo1.dso.mil/big-bang/product/packages/authservice)|
 |[Keycloak](./keycloak.md)|IdP, Identity Broker, AuthN/Z|[keycloak](https://repo1.dso.mil/big-bang/product/packages/keycloak)|
+
+### Secrets Management
+
+Secrets management tools include packages that securely store, distribute, and rotate sensitive data such as passwords, API keys, and certificates. This includes encrypted storage, dynamic secrets generation, and access policies.
+
+|Package|Function|Repository|
+|--|--|--|
 |[Vault](./vault.md)|Sensitive Data Access Control|[vault](https://repo1.dso.mil/big-bang/product/packages/vault)|
+|[External Secrets](./external-secrets-operator.md)|Secrets management|[external-secrets](https://repo1.dso.mil/big-bang/product/packages/external-secrets)|
+
+### Observability
+
+Observability tools include packages for collecting, storing, and visualizing system telemetry. This includes metrics collection, long-term storage, dashboards, and monitoring interfaces for logs, metrics, and traces.
+
+|Package|Function|Repository|
+|--|--|--|
+|[Metrics Server](./metricserver.md)|Monitors pod CPU & memory utilization|[metrics-server](https://repo1.dso.mil/big-bang/product/packages/metrics-server)|
+|[Mimir](./mimir.md)|Long-term storage for Prometheus metrics|[mimir](https://repo1.dso.mil/big-bang/product/packages/mimir)|
+|Headlamp|Cluster management dashboard|[headlamp](https://repo1.dso.mil/big-bang/product/packages/headlamp)|
+|Thanos|Multi-cluster Prometheus setup|[thanos](https://repo1.dso.mil/big-bang/product/packages/thanos)|
 
 ### Collaboration
 
@@ -216,16 +326,31 @@ Collaboration tools provide environments to help teams work together online.  Ch
 |Mattermost|Mattermost Operator|Operator|[mattermost-operator](https://repo1.dso.mil/big-bang/product/packages/mattermost-operator)|
 |Mattermost|[Mattermost](./mattermost.md)|Chat|[mattermost](https://repo1.dso.mil/big-bang/product/packages/mattermost)|
 
-### Developer Tools
+### Storage & Backup Utilities
 
-Developer tools include packages that a programmer would use to plan, author, test, debug, or control code.  This includes repositories, bug / feature tracking, pipelines, code analysis, automated tests, and development environments.
+For non-critical or on-prem deployments where data loss is an acceptable risk, these utilities offer a simple and low-cost solution for in-cluster data persistence (databases, object / blob storage, and caches). However, if scalability, availability, and resiliency (e.g. backup and restore) are requirements, it is generally advantageous to instead use a managed, cloud based offering.
+
+|Stack|Package|Function|Repository|
+|--|--|--|--|
+|MinIO|MinIO Operator|Operator|[minio-operator](https://repo1.dso.mil/big-bang/product/packages/minio-operator)|
+|MinIO|[MinIO](./minio.md)|S3 Object Storage|[minio](https://repo1.dso.mil/big-bang/product/packages/minio)|
+|Velero|[Velero](./velero.md)|Cluster Backup & Restore|[velero](https://repo1.dso.mil/big-bang/product/packages/velero)|
+
+### DevSecOps Tools
+
+DevSecOps tools include packages that programmers and security teams use to plan, author, test, debug, secure, deploy, and control code. This includes repositories, bug / feature tracking, pipelines, code analysis, security scanning, vulnerability assessment, automated tests, container registries, deployment orchestration, developer portals, and development environments.
 
 |Stack|Package|Function|Repository|
 |--|--|--|--|
 |GitLab|[GitLab](./gitlab.md)|Code repository, issue tracking, release planning, security and compliance scanning, pipelines, artifact repository, wiki|[gitLab](https://repo1.dso.mil/big-bang/product/packages/gitlab)|
 |GitLab|GitLab Runner|Executor for GitLab pipelines|[gitlab-runner](https://repo1.dso.mil/big-bang/product/packages/gitlab-runner)|
-|Nexus|[Nexus Repository Manager](./nexusRepositoryManager.md)|Artifact repository|[nexus](https://repo1.dso.mil/big-bang/product/packages/nexus)
-|Sonarqube|[Sonarqube](./sonarqube.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube)
+|ArgoCD|[ArgoCD](./argocd.md)|Continuous Deployment|[argocd](https://repo1.dso.mil/big-bang/product/packages/argocd)|
+|Anchore|[Anchore](./anchore.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise)|
+|Fortify|[Fortify](./fortify.md)|Security scanning tool|[fortify](https://repo1.dso.mil/big-bang/product/packages/fortify)|
+|Sonarqube|[Sonarqube](./sonarqube.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube)|
+|Nexus|[Nexus Repository Manager](./nexusRepositoryManager.md)|Artifact repository|[nexus](https://repo1.dso.mil/big-bang/product/packages/nexus)|
+|Harbor|[Harbor](./harbor.md)|Container registry|[harbor](https://repo1.dso.mil/big-bang/product/packages/harbor)|
+|Backstage|[Backstage](./backstage.md)|Developer portal platform|[backstage](https://repo1.dso.mil/big-bang/product/packages/backstage)|
 
 ## Further Information
 
