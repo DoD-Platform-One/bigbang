@@ -181,7 +181,7 @@ istioCRDs:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-crds.git
     path: "./chart"
     tag: 1.25.3-bb.0
   helmRepo:
@@ -214,7 +214,7 @@ istiod:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/apps/sandbox/istiod.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/istiod.git
     path: "./chart"
     tag: 1.25.3-bb.3
   helmRepo:
@@ -2084,7 +2084,7 @@ addons:
     sourceType: "git"
 
     git:
-      repo: https://repo1.dso.mil/platform-one/big-bang/apps/sandbox/harbor.git
+      repo: https://repo1.dso.mil/big-bang/product/packages/harbor.git
       tag: "1.17.1-bb.0"
       path: "./chart"
     helmRepo:
