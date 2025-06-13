@@ -391,6 +391,9 @@
         "istio": {
           "$ref": "#/$defs/istio"
         },
+        "ingress": {
+          "$ref": "#/$defs/ingress"
+        },
         "disableAutomaticPassthroughValues": true
       },
       "allOf": [
