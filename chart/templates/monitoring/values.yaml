@@ -396,8 +396,8 @@ prometheus:
     {{- end }}
 
 
-anchore:
-  enabled: {{ .Values.addons.anchore.enabled }}
+anchoreEnterprise:
+  enabled: {{ .Values.addons.anchoreEnterprise.enabled }}
 
 kiali:
   enabled: {{ .Values.kiali.enabled }}

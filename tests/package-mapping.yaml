@@ -74,8 +74,10 @@ nexusRepositoryManager:
   filePath: "nexus-repository-manager"
 haproxy:
   hrName: "haproxy-sso"
-anchore:
+anchoreEnterprise:
   repoName: "anchore-enterprise"
+  hrName: "anchore-enterprise"
+  # filePath: "anchore-enterprise"
 mattermostOperator:
   repoName: "mattermost-operator"
   hrName: "mattermost-operator"

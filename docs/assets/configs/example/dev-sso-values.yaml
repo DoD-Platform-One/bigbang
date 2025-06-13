@@ -228,7 +228,7 @@ addons:
       login: login
       name: name
       email: email
-  anchore:
+  anchoreEnterprise:
     adminPassword: admin
     sso:
       enabled: true

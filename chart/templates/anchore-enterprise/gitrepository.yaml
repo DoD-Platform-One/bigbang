@@ -1,0 +1,20 @@
+{{- if and (eq .Values.addons.anchoreEnterprise.sourceType "git") .Values.addons.anchoreEnterprise.enabled  }}
+{{- $gitCredsDict := dict
+  "name" "anchore-enterprise"
+  "packageGitScope" .Values.addons.anchoreEnterprise.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: anchore-enterprise
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.addons.anchoreEnterprise.git.repo }}
+  ref:
+    {{- include "validRef" .Values.addons.anchoreEnterprise.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}
