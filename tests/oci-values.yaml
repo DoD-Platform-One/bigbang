@@ -159,7 +159,7 @@ addons:
     helmRepo:
       cosignVerify: false
 
-  anchore:
+  anchoreEnterprise:
     sourceType: "helmRepo"
     helmRepo:
       cosignVerify: false

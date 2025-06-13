@@ -52,8 +52,8 @@ istio:
       - {{ include "getGatewayName" (dict "gateway" .Values.grafana.ingress.gateway "root" .)}}
   injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
 
-anchore:
-  enabled: {{ .Values.addons.anchore.enabled }}
+anchoreEnterprise:
+  enabled: {{ .Values.addons.anchoreEnterprise.enabled }}
 
 kiali:
   enabled: {{ .Values.kiali.enabled }}

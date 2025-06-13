@@ -24,7 +24,6 @@ helmRepositories: []
   #       R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
   #       -----END PUBLIC KEY-----
 
-
 # -- Single set of registry credentials used to pull all images deployed by BigBang.
 registryCredentials:
   registry: registry1.dso.mil
@@ -125,7 +124,7 @@ flux:
     enable: false
   driftDetection:
     mode: enabled # Valid Modes disabled | enabled | warn
-    ignore: 
+    ignore:
       - paths: [""] # ignore all jobs, as jobs with ttlSecondsAfterFinished are not handled
         target:
           kind: Job
@@ -722,7 +721,7 @@ loki:
             kind: Tenant
         - paths: [""]
           target:
-           kind: Sidecar
+            kind: Sidecar
         - paths: [""]
           target:
             kind: Job
@@ -735,7 +734,6 @@ loki:
 
   # -- Loki clusterName identifier for Promtail and Dashboards
   clusterName: ""
-
 
   objectStorage:
     # -- S3 compatible endpoint to use for connection information.
@@ -1077,7 +1075,7 @@ twistlock:
 #
 # Requires monitoring, grafana, loki, and promtail to be deployed
 bbctl:
-    # -- Toggle deployment of the bbctl dashboards
+  # -- Toggle deployment of the bbctl dashboards
   enabled: true
 
   sourceType: "git"
@@ -1209,7 +1207,7 @@ addons:
       tag: "2.5.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Backstage Package
-    flux: { }
+    flux: {}
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
@@ -1225,12 +1223,11 @@ addons:
       # -- Backstage OIDC client secret
       client_secret: ""
 
-
     # -- Values to passthrough to the Backstage chart: https://repo1.dso.mil/big-bang/product/packages/backstage.git
-    values: { }
+    values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
-    postRenderers: [ ]
+    postRenderers: []
 
   authservice:
     # -- Toggle deployment of Authservice.
@@ -1469,7 +1466,6 @@ addons:
       chartName: "gitlab-runner"
       tag: "0.75.1-bb.2"
 
-
     # -- Flux reconciliation overrides specifically for the Gitlab Runner Package
     flux: {}
 
@@ -1681,7 +1677,7 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
-  anchore:
+  anchoreEnterprise:
     # -- Toggle deployment of Anchore.
     enabled: false
 
@@ -2113,7 +2109,7 @@ addons:
     enabled: false
 
     sso:
-        # -- Toggle SSO for Thanos on and off
+      # -- Toggle SSO for Thanos on and off
       enabled: false
 
       # -- OIDC Client ID to use for Thanos
@@ -2274,9 +2270,9 @@ addons:
     # -- Flux reconciliation overrides specifically for the alloy package
     flux: {}
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Headlamp
-#
+  # ----------------------------------------------------------------------------------------------------------------------
+  # Headlamp
+  #
   headlamp:
     # -- Toggle deployment of headlamp
     enabled: false
@@ -2315,7 +2311,6 @@ addons:
 
     postRenderers: []
 
-
 # -- Wrapper chart for integrating Big Bang components alongside a package
 wrapper:
   # -- Choose source type of "git" or "helmRepo"
@@ -2353,7 +2348,7 @@ packages:
     # @default -- false
     wrapper:
       enabled: false
-    # -- After deployment, patch wrapper resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
+      # -- After deployment, patch wrapper resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
       postRenderers: []
 
     # -- Use a kustomize deployment rather than Helm
@@ -2428,5 +2423,3 @@ packages:
 
     # -- Values to pass through to package Helm chart
     values: {}
-
-

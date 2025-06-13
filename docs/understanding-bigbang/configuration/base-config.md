@@ -532,34 +532,34 @@ Kubernetes: `>=1.29.0-0`
 | addons.haproxy.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.haproxy.values | object | `{}` | Values to passthrough to the haproxy chart: https://repo1.dso.mil/big-bang/product/packages/haproxy.git |
 | addons.haproxy.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| addons.anchore.enabled | bool | `false` | Toggle deployment of Anchore. |
-| addons.anchore.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| addons.anchore.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
-| addons.anchore.git.path | string | `"./chart"` |  |
-| addons.anchore.git.tag | string | `"3.7.0-bb.0"` |  |
-| addons.anchore.helmRepo.repoName | string | `"registry1"` |  |
-| addons.anchore.helmRepo.chartName | string | `"anchore"` |  |
-| addons.anchore.helmRepo.tag | string | `"3.7.0-bb.0"` |  |
-| addons.anchore.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
-| addons.anchore.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
-| addons.anchore.enterprise | object | `{"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
-| addons.anchore.enterprise.licenseYaml | string | `"FULL LICENSE\n"` | License for Anchore Enterprise. Enterprise is the only option available for the chart starting with chart major version 2.X. For formatting examples see https://repo1.dso.mil/big-bang/product/packages/CHART.md#enabling-enterprise-services |
-| addons.anchore.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
-| addons.anchore.sso.enabled | bool | `false` | Toggle SAML SSO for Anchore on and off. Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license). |
-| addons.anchore.sso.client_id | string | `""` | Anchore SAML client ID |
-| addons.anchore.sso.role_attribute | string | `""` | Anchore SAML client role attribute |
-| addons.anchore.database.host | string | `""` | Hostname of a pre-existing PostgreSQL database to use for Anchore. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
-| addons.anchore.database.port | string | `""` | Port of a pre-existing PostgreSQL database to use for Anchore. |
-| addons.anchore.database.username | string | `""` | Username to connect as to external database, the user must have all privileges on the database. |
-| addons.anchore.database.password | string | `""` | Database password for the username used to connect to the existing database. |
-| addons.anchore.database.database | string | `""` | Database name to connect to on host (Note: database name CANNOT contain hyphens). |
-| addons.anchore.database.feeds_database | string | `""` | Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens). Only required for enterprise edition of anchore. By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/big-bang/product/packages/CHART.md#handling-dependencies |
-| addons.anchore.redis.host | string | `""` | Hostname of a pre-existing Redis to use for Anchore Enterprise. Entering connection info will enable external redis and will auto-create any required secrets. Anchore only requires redis for enterprise deployments and will not provision an instance if using external |
-| addons.anchore.redis.port | string | `""` | Port of a pre-existing Redis to use for Anchore Enterprise. |
-| addons.anchore.redis.username | string | `""` | OPTIONAL: Username to connect to a pre-existing Redis (for password-only auth leave empty) |
-| addons.anchore.redis.password | string | `""` | Password to connect to pre-existing Redis. |
-| addons.anchore.values | object | `{}` | Values to passthrough to the anchore chart: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git |
-| addons.anchore.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
+| addons.anchoreEnterprise.enabled | bool | `false` | Toggle deployment of Anchore. |
+| addons.anchoreEnterprise.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
+| addons.anchoreEnterprise.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
+| addons.anchoreEnterprise.git.path | string | `"./chart"` |  |
+| addons.anchoreEnterprise.git.tag | string | `"3.7.0-bb.0"` |  |
+| addons.anchoreEnterprise.helmRepo.repoName | string | `"registry1"` |  |
+| addons.anchoreEnterprise.helmRepo.chartName | string | `"anchore"` |  |
+| addons.anchoreEnterprise.helmRepo.tag | string | `"3.7.0-bb.0"` |  |
+| addons.anchoreEnterprise.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
+| addons.anchoreEnterprise.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
+| addons.anchoreEnterprise.enterprise | object | `{"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
+| addons.anchoreEnterprise.enterprise.licenseYaml | string | `"FULL LICENSE\n"` | License for Anchore Enterprise. Enterprise is the only option available for the chart starting with chart major version 2.X. For formatting examples see https://repo1.dso.mil/big-bang/product/packages/CHART.md#enabling-enterprise-services |
+| addons.anchoreEnterprise.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
+| addons.anchoreEnterprise.sso.enabled | bool | `false` | Toggle SAML SSO for Anchore on and off. Enabling this option will auto-create any required secrets (Note: SSO requires an Enterprise license). |
+| addons.anchoreEnterprise.sso.client_id | string | `""` | Anchore SAML client ID |
+| addons.anchoreEnterprise.sso.role_attribute | string | `""` | Anchore SAML client role attribute |
+| addons.anchoreEnterprise.database.host | string | `""` | Hostname of a pre-existing PostgreSQL database to use for Anchore. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
+| addons.anchoreEnterprise.database.port | string | `""` | Port of a pre-existing PostgreSQL database to use for Anchore. |
+| addons.anchoreEnterprise.database.username | string | `""` | Username to connect as to external database, the user must have all privileges on the database. |
+| addons.anchoreEnterprise.database.password | string | `""` | Database password for the username used to connect to the existing database. |
+| addons.anchoreEnterprise.database.database | string | `""` | Database name to connect to on host (Note: database name CANNOT contain hyphens). |
+| addons.anchoreEnterprise.database.feeds_database | string | `""` | Feeds database name to connect to on host (Note: feeds database name CANNOT contain hyphens). Only required for enterprise edition of anchore. By default, feeds database will be configured with the same username and password as the main database. For formatting examples on how to use a separate username and password for the feeds database see https://repo1.dso.mil/big-bang/product/packages/CHART.md#handling-dependencies |
+| addons.anchoreEnterprise.redis.host | string | `""` | Hostname of a pre-existing Redis to use for Anchore Enterprise. Entering connection info will enable external redis and will auto-create any required secrets. Anchore only requires redis for enterprise deployments and will not provision an instance if using external |
+| addons.anchoreEnterprise.redis.port | string | `""` | Port of a pre-existing Redis to use for Anchore Enterprise. |
+| addons.anchoreEnterprise.redis.username | string | `""` | OPTIONAL: Username to connect to a pre-existing Redis (for password-only auth leave empty) |
+| addons.anchoreEnterprise.nterprise.redis.password | string | `""` | Password to connect to pre-existing Redis. |
+| addons.anchoreEnterprise.values | object | `{}` | Values to passthrough to the anchoreEnterprise.chart: https://repo1.dso.mil/big-bang/product/packages/anchore.enterprise.git |
+| addons.anchoreEnterprise.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.mattermostOperator.enabled | bool | `false` | Toggle deployment of Mattermost Operator. |
 | addons.mattermostOperator.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.mattermostOperator.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git"` |  |

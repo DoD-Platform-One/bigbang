@@ -1625,7 +1625,7 @@ addons:
             cypress_gitlab_username: "gitlabrunner_user"
             cypress_gitlab_password: "Runner_PaSsw0rd123"
 
-  anchore:
+  anchoreEnterprise:
     enabled: false
     sso:
       enabled: false

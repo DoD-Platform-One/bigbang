@@ -1131,7 +1131,7 @@
             }
           }
         },
-        "anchore": {
+        "anchoreEnterprise": {
           "allOf": [
             {
               "$ref": "#/$defs/basePackage"
