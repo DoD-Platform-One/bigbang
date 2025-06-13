@@ -82,7 +82,7 @@ addons:
     enabled: false
     git:
       repo: ssh://git@host.k3d.internal/home/git/repos/gitlab-runner
-  anchore:
+  anchoreEnterprise:
     enabled: false
     git:
       repo: ssh://git@host.k3d.internal/home/git/repos/anchore-enterprise

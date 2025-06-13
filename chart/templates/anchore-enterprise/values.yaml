@@ -1,0 +1,155 @@
+{{- if .Values.addons.anchoreEnterprise.enabled }}
+{{- include "values-secret" (dict "root" $ "package" .Values.addons.anchoreEnterprise "name" "anchore-enterprise" "defaults" (include "bigbang.defaults.anchoreEnterprise" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.anchoreEnterprise" -}}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false .Values.addons.anchoreEnterprise.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
+    }}
+  injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
+  ui:
+    gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
+  api:
+    gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+  {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
+  {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+  serviceMonitor:
+    scheme: "https"
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+  {{- end }}
+  {{- end }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  ingressLabels:
+    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.anchoreEnterprise "root" .) | nindent 4 }}
+
+{{- if .Values.addons.anchoreEnterprise.enterprise.licenseYaml }}
+enterpriseLicenseYaml: |
+  {{ .Values.addons.anchoreEnterprise.enterprise.licenseYaml | nindent 2 }}
+{{- end }}
+
+sso:
+  enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
+  spEntityId: {{ .Values.addons.anchoreEnterprise.sso.client_id }}
+  {{- $anchoreUrl := first (dig "istio" "ui" "hosts" list .Values.addons.anchoreEnterprise.values) }}
+  acsUrl: https://{{ tpl ($anchoreUrl | default (printf "%s.%s" "anchore" $domainName)) . }}/service/sso/auth/keycloak
+  idpMetadataUrl: "{{ include "sso.saml.descriptor" . }}"
+  roleAttribute: {{ .Values.addons.anchoreEnterprise.sso.role_attribute }}
+
+global:
+  imagePullSecretName: private-registry
+
+imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+postgresql:
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end}}
+  imagePullSecrets: private-registry
+  {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
+  enabled: false
+  postgresUser: {{ .Values.addons.anchoreEnterprise.database.username }}
+  postgresPassword: {{ .Values.addons.anchoreEnterprise.database.password }}
+  postgresDatabase: {{ .Values.addons.anchoreEnterprise.database.database }}
+  externalEndpoint: "{{ .Values.addons.anchoreEnterprise.database.host }}"
+  postgresPort: {{ .Values.addons.anchoreEnterprise.database.port }}
+  {{- end }}
+{{- if .Values.addons.anchoreEnterprise.adminPassword }}
+anchoreConfig:
+  default_admin_password: {{ .Values.addons.anchoreEnterprise.adminPassword }}
+{{- end }}
+
+feeds:
+  istio:
+    enabled: {{ $istioEnabled }}
+    injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
+
+  feeds-db:
+    {{- if $istioEnabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+    imagePullSecrets: private-registry
+    {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.feeds_database }}
+    enabled: false
+    postgresUser: {{ .Values.addons.anchoreEnterprise.database.username }}
+    postgresPassword: {{ .Values.addons.anchoreEnterprise.database.password }}
+    postgresDatabase: {{ .Values.addons.anchoreEnterprise.database.feeds_database }}
+    externalEndpoint: "{{ .Values.addons.anchoreEnterprise.database.host }}"
+    postgresPort: {{ .Values.addons.anchoreEnterprise.database.port }}
+    {{- end }}
+
+ui:
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecretName: private-registry
+
+ui-redis:
+  {{- if and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password }}
+  enabled: false
+  externalEndpoint: "redis://{{ .Values.addons.anchoreEnterprise.redis.username | default "nouser" }}:{{ .Values.addons.anchoreEnterprise.redis.password }}@{{ .Values.addons.anchoreEnterprise.redis.host }}:{{ .Values.addons.anchoreEnterprise.redis.port }}"
+  auth:
+    password: {{ .Values.addons.anchoreEnterprise.redis.password }}
+  {{- end }}
+  {{- if $istioEnabled }}
+  master:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  replica:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
+  image:
+    pullSecrets:
+      - private-registry
+  {{- if and .Values.monitoring.enabled (not (and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password)) }}
+  metrics:
+    enabled: true
+    image:
+      pullSecrets:
+        - private-registry
+    serviceMonitor:
+      enabled: true
+      namespace: anchore
+      selector:
+        app.kubernetes.io/name: anchore-ui-redis
+        app.kubernetes.io/instance: anchore
+      {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
+      {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+      scheme: "https"
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- end }}
+      {{- end }}
+    prometheusRule:
+      enabled: true
+      namespace: monitoring
+  {{- end }}
+
+{{- end }}

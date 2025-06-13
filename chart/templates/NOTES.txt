@@ -81,35 +81,35 @@ PLATFORM ONE GITLAB WARNING:
 {{- end }}
 {{- end }}
 
-{{- if $.Values.addons.anchore.enabled }}
-Anchore is enabled.
-{{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.database) }}
+{{- if $.Values.addons.anchoreEnterprise.enabled }}
+Anchore Enterprise is enabled.
+{{- if not (and $.Values.addons.anchoreEnterprise.database.host $.Values.addons.anchoreEnterprise.database.port $.Values.addons.anchoreEnterprise.database.username $.Values.addons.anchoreEnterprise.database.password $.Values.addons.anchoreEnterprise.database.database) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal postgres database (main-db) in the values configuration.
   Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
-{{- if $.Values.addons.anchore.enterprise.enabled }}
-{{- if not (and $.Values.addons.anchore.redis.host $.Values.addons.anchore.redis.port $.Values.addons.anchore.redis.password) }}
+{{- if $.Values.addons.anchoreEnterprise.enterprise.enabled }}
+{{- if not (and $.Values.addons.anchoreEnterprise.redis.host $.Values.addons.anchoreEnterprise.redis.port $.Values.addons.anchoreEnterprise.redis.password) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal redis database in the values configuration.
   Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
-{{- if not (and $.Values.addons.anchore.database.host $.Values.addons.anchore.database.port $.Values.addons.anchore.database.username $.Values.addons.anchore.database.password $.Values.addons.anchore.database.feeds_database) }}
+{{- if not (and $.Values.addons.anchoreEnterprise.database.host $.Values.addons.anchoreEnterprise.database.port $.Values.addons.anchoreEnterprise.database.username $.Values.addons.anchoreEnterprise.database.password $.Values.addons.anchoreEnterprise.database.feeds_database) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal postgres database (feeds-db) in the values configuration.
   Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
-{{- if and ($.Values.addons.anchore.enterprise.enabled) (not $.Values.addons.anchore.enterprise.licenseYaml) }}
+{{- if and ($.Values.addons.anchoreEnterprise.enterprise.enabled) (not $.Values.addons.anchoreEnterprise.enterprise.licenseYaml) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an enterprise Anchore in the values configuration, but not provided a license.
   Your deployment will fail without a license, please review your configuration and supply a license
   or disable the enterprise features.
 {{- end }}
-{{- if and ($.Values.addons.anchore.sso.enabled) (not $.Values.addons.anchore.enterprise.enabled) }}
+{{- if and ($.Values.addons.anchoreEnterprise.sso.enabled) (not $.Values.addons.anchoreEnterprise.enterprise.enabled) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled SSO in the values configuration, but not enabled enterprise Anchore.
   Your SSO configuration will be ignored, the Anchore UI is only available for enterprise deployments.
