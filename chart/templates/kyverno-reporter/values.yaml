@@ -5,7 +5,9 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno-reporter" -}}
+{{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+domain: {{ $domainName }}
 
 global:
   fullnameOverride: kyverno-reporter
@@ -13,6 +15,9 @@ global:
 {{- if $istioEnabled }}
 istio:
   enabled: true
+  kyvernoReporter:
+    gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.kyvernoReporter.ingress.gateway "root" .)}}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

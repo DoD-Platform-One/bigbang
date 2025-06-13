@@ -535,14 +535,18 @@ kyvernoReporter:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
     path: ./chart
-    tag: "3.1.1-bb.0"
+    tag: "3.1.1-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-reporter"
-    tag: "3.1.1-bb.0"
+    tag: "3.1.1-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
+
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  ingress:
+    gateway: ""
 
   # -- Values to passthrough to the kyverno reporter chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter.git
   values: {}
