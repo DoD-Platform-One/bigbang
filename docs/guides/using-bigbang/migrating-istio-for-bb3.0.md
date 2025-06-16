@@ -186,6 +186,15 @@ Give the cluster a few minutes for all helm releases to become `ready`.
 
 ### Step 2 : Disable `istioOperator` and enable `istioGateway`
 
+> 🚧 <span style="color: orange">**WARNING**</span>
+>
+> An issue has been identified with the OCI configuration for the istio
+> gateways. The istio-gateway package is referencing the non-existent
+> `istio-gateway` OCI artifact instead of the correct `gateway` artifact. If
+> deploying Big Bang with OCI artifacts (`sourceType: helmRepo`), when
+> performing the istio migration in 2.54, you _must_ override
+> `istioGateway.helmRepo.chartName` to `gateway`.
+
 Removal of the operator and the enablement of the new gateway package
 reinstantiates cluster gateways.
 
@@ -216,7 +225,11 @@ NAME                  TYPE         CLUSTER-IP    EXTERNAL-IP  PORT(S)
 public-ingressgateway LoadBalancer 10.43.110.109 172.16.88.88 15021:31155/TCP,80:31302/TCP,443:31046/TCP
 ```
 
-There have been reports of orphaned `LoadBalancer` `Service`s left in the `istio-system` namespace after the migration, that were originally deployed by the operator. It's unclear what causes this to happen, and it is not consistently reproducible, but they should be checked for, as they will incur cloud costs.
+There have been reports of orphaned `LoadBalancer` `Service`s left in the
+`istio-system` namespace after the migration, that were originally deployed by
+the operator. It's unclear what causes this to happen, and it is not
+consistently reproducible, but they should be checked for, as they will incur
+cloud costs.
 
 ```bash
 kubectl -n istio-system get service --field-selector spec.type=LoadBalancer
