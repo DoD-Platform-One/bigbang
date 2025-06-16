@@ -77,7 +77,6 @@ haproxy:
 anchoreEnterprise:
   repoName: "anchore-enterprise"
   hrName: "anchore-enterprise"
-  # filePath: "anchore-enterprise"
 mattermostOperator:
   repoName: "mattermost-operator"
   hrName: "mattermost-operator"
