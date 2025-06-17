@@ -1,0 +1,3 @@
+flux:
+  driftDetection:
+    mode: false
