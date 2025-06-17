@@ -15,7 +15,7 @@ images:
   newTag: v1.6.0
 - name: ghcr.io/fluxcd/source-controller
   newName: registry1.dso.mil/ironbank/fluxcd/source-controller
-  newTag: v1.6.0
+  newTag: v1.6.1
 
 patches:
   - target:
