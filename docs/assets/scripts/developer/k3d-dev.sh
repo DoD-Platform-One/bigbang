@@ -48,7 +48,7 @@ EIP1_ID=""
 EIP2_ASSOCIATION_ID=""
 EIP2_ID=""
 EXISTING_VPC=""
-SUBNET_ID=""
+SUBNET_ID=${SUBNET_ID:-""}
 SecondaryIP=""
 
 # get the current script dir
