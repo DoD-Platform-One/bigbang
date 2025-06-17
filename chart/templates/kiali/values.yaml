@@ -13,31 +13,25 @@ sso:
 
 openshift: {{ .Values.openshift}}
 
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
   kiali:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
-
-{{- if $istioEnabled }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
 
 {{- if and .Values.kiali.enabled .Values.kiali.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso))  }}
 oidcCaCert: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | quote }}
 {{- end }}
 
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
 upstream:
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . | nindent 4 }}
+  {{- end }}
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
   cr:
     spec:
       {{- if $istioEnabled }}
