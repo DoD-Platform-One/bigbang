@@ -1481,300 +1481,372 @@
       "properties": {}
     },
     "flux": {
-      "install": {
-        "description": "Install holds the configuration for Helm install actions for this HelmRelease.",
-        "type": "object",
-        "properties": {
-          "crds": {
-            "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Create` and if omitted CRDs are installed but not updated. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are applied (installed) during Helm install action. With this option users can opt-in to CRD replace existing CRDs on Helm install actions, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
-            "type": "string",
-            "enum": [
-              "Skip",
-              "Create",
-              "CreateReplace"
-            ]
-          },
-          "createNamespace": {
-            "description": "CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.",
-            "type": "boolean"
-          },
-          "disableHooks": {
-            "description": "DisableHooks prevents hooks from running during the Helm install action.",
-            "type": "boolean"
-          },
-          "disableOpenAPIValidation": {
-            "description": "DisableOpenAPIValidation prevents the Helm install action from validating rendered templates against the Kubernetes OpenAPI Schema.",
-            "type": "boolean"
-          },
-          "disableWait": {
-            "description": "DisableWait disables the waiting for resources to be ready after a Helm install has been performed.",
-            "type": "boolean"
-          },
-          "disableWaitForJobs": {
-            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm install has been performed.",
-            "type": "boolean"
-          },
-          "remediation": {
-            "description": "Remediation holds the remediation configuration for when the Helm install action for the HelmRelease fails. The default is to not perform any action.",
-            "type": "object",
-            "properties": {
-              "ignoreTestFailures": {
-                "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an install action but fail. Defaults to 'Test.IgnoreFailures'.",
-                "type": "boolean"
-              },
-              "remediateLastFailure": {
-                "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false'.",
-                "type": "boolean"
-              },
-              "retries": {
-                "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using an uninstall, is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
-                "type": "integer"
+      "type": "object",
+      "properties": {
+        "driftDetection": {
+          "description": "DriftDetection holds the configuration for detecting and handling differences between the manifest in the Helm storage and the resources currently existing in the cluster.  Note: this field is provisional to the v2beta2 API, and not actively used by v2beta1 HelmReleases.",
+          "type": "object",
+          "properties": {
+            "ignore": {
+              "description": "Ignore contains a list of rules for specifying which changes to ignore during diffing.",
+              "type": "array",
+              "items": {
+                "description": "IgnoreRule defines a rule to selectively disregard specific changes during the drift detection process.",
+                "type": "object",
+                "required": [
+                  "paths"
+                ],
+                "properties": {
+                  "paths": {
+                    "description": "Paths is a list of JSON Pointer (RFC 6901) paths to be excluded from consideration in a Kubernetes object.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "target": {
+                    "description": "Target is a selector for specifying Kubernetes objects to which this rule applies. If Target is not set, the Paths will be ignored for all Kubernetes objects within the manifest of the Helm release.",
+                    "type": "object",
+                    "properties": {
+                      "annotationSelector": {
+                        "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                        "type": "string"
+                      },
+                      "group": {
+                        "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                        "type": "string"
+                      },
+                      "labelSelector": {
+                        "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Name to match resources with.",
+                        "type": "string"
+                      },
+                      "namespace": {
+                        "description": "Namespace to select resources from.",
+                        "type": "string"
+                      },
+                      "version": {
+                        "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
               }
-            }
-          },
-          "replace": {
-            "description": "Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.",
-            "type": "boolean"
-          },
-          "skipCRDs": {
-            "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present. \n Deprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
-            "type": "boolean"
-          },
-          "timeout": {
-            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.",
-            "type": "string",
-            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-          }
-        }
-      },
-      "interval": {
-        "description": "Interval at which to reconcile the Helm release.",
-        "type": "string",
-        "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-      },
-      "kubeConfig": {
-        "description": "KubeConfig for reconciling the HelmRelease on a remote cluster. When used in combination with HelmReleaseSpec.ServiceAccountName, forces the controller to act on behalf of that Service Account at the target cluster. If the --default-service-account flag is set, its value will be used as a controller level fallback for when HelmReleaseSpec.ServiceAccountName is empty.",
-        "type": "object",
-        "required": [
-          "secretRef"
-        ],
-        "properties": {
-          "secretRef": {
-            "description": "SecretRef holds the name of a secret that contains a key with the kubeconfig file as the value. If no key is set, the key will default to 'value'. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling Kubernetes resources.",
-            "type": "object",
-            "required": [
-              "name"
-            ],
-            "properties": {
-              "key": {
-                "description": "Key in the Secret, when not specified an implementation-specific default key is used.",
-                "type": "string"
-              },
-              "name": {
-                "description": "Name of the Secret.",
-                "type": "string"
-              }
+            },
+            "mode": {
+              "description": "Mode defines how differences should be handled between the Helm manifest and the manifest currently applied to the cluster. If not explicitly set, it defaults to DiffModeDisabled.",
+              "type": "string",
+              "enum": [
+                "enabled",
+                "warn",
+                "disabled"
+              ]
             }
           }
-        }
-      },
-      "maxHistory": {
-        "description": "MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.",
-        "type": "integer"
-      },
-      "persistentClient": {
-        "description": "PersistentClient tells the controller to use a persistent Kubernetes client for this release. When enabled, the client will be reused for the duration of the reconciliation, instead of being created and destroyed for each (step of a) Helm action. \n This can improve performance, but may cause issues with some Helm charts that for example do create Custom Resource Definitions during installation outside Helm's CRD lifecycle hooks, which are then not observed to be available by e.g. post-install hooks. \n If not set, it defaults to true.",
-        "type": "boolean"
-      },
-      "releaseName": {
-        "description": "ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.",
-        "type": "string",
-        "maxLength": 53,
-        "minLength": 1
-      },
-      "rollback": {
-        "description": "Rollback holds the configuration for Helm rollback actions for this HelmRelease.",
-        "type": "object",
-        "properties": {
-          "cleanupOnFail": {
-            "description": "CleanupOnFail allows deletion of new resources created during the Helm rollback action when it fails.",
-            "type": "boolean"
-          },
-          "disableHooks": {
-            "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
-            "type": "boolean"
-          },
-          "disableWait": {
-            "description": "DisableWait disables the waiting for resources to be ready after a Helm rollback has been performed.",
-            "type": "boolean"
-          },
-          "disableWaitForJobs": {
-            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm rollback has been performed.",
-            "type": "boolean"
-          },
-          "force": {
-            "description": "Force forces resource updates through a replacement strategy.",
-            "type": "boolean"
-          },
-          "recreate": {
-            "description": "Recreate performs pod restarts for the resource if applicable.",
-            "type": "boolean"
-          },
-          "timeout": {
-            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.",
-            "type": "string",
-            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+        },
+        "install": {
+          "description": "Install holds the configuration for Helm install actions for this HelmRelease.",
+          "type": "object",
+          "properties": {
+            "crds": {
+              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Create` and if omitted CRDs are installed but not updated.  Skip: do neither install nor replace (update) any CRDs.  Create: new CRDs are created, existing CRDs are neither updated nor deleted.  CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted.  By default, CRDs are applied (installed) during Helm install action. With this option users can opt-in to CRD replace existing CRDs on Helm install actions, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+              "type": "string",
+              "enum": [
+                "Skip",
+                "Create",
+                "CreateReplace"
+              ]
+            },
+            "createNamespace": {
+              "description": "CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.",
+              "type": "boolean"
+            },
+            "disableHooks": {
+              "description": "DisableHooks prevents hooks from running during the Helm install action.",
+              "type": "boolean"
+            },
+            "disableOpenAPIValidation": {
+              "description": "DisableOpenAPIValidation prevents the Helm install action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+              "type": "boolean"
+            },
+            "disableWait": {
+              "description": "DisableWait disables the waiting for resources to be ready after a Helm install has been performed.",
+              "type": "boolean"
+            },
+            "disableWaitForJobs": {
+              "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm install has been performed.",
+              "type": "boolean"
+            },
+            "remediation": {
+              "description": "Remediation holds the remediation configuration for when the Helm install action for the HelmRelease fails. The default is to not perform any action.",
+              "type": "object",
+              "properties": {
+                "ignoreTestFailures": {
+                  "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an install action but fail. Defaults to 'Test.IgnoreFailures'.",
+                  "type": "boolean"
+                },
+                "remediateLastFailure": {
+                  "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false'.",
+                  "type": "boolean"
+                },
+                "retries": {
+                  "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using an uninstall, is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                  "type": "integer"
+                }
+              }
+            },
+            "replace": {
+              "description": "Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.",
+              "type": "boolean"
+            },
+            "skipCRDs": {
+              "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present.  Deprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
+              "type": "boolean"
+            },
+            "timeout": {
+              "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.",
+              "type": "string",
+              "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+            }
           }
-        }
-      },
-      "serviceAccountName": {
-        "description": "The name of the Kubernetes service account to impersonate when reconciling this HelmRelease.",
-        "type": "string"
-      },
-      "storageNamespace": {
-        "description": "StorageNamespace used for the Helm storage. Defaults to the namespace of the HelmRelease.",
-        "type": "string",
-        "maxLength": 63,
-        "minLength": 1
-      },
-      "suspend": {
-        "description": "Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.",
-        "type": "boolean"
-      },
-      "test": {
-        "description": "Test holds the configuration for Helm test actions for this HelmRelease.",
-        "type": "object",
-        "properties": {
-          "enable": {
-            "description": "Enable enables Helm test actions for this HelmRelease after an Helm install or upgrade action has been performed.",
-            "type": "boolean"
-          },
-          "ignoreFailures": {
-            "description": "IgnoreFailures tells the controller to skip remediation when the Helm tests are run but fail. Can be overwritten for tests run after install or upgrade actions in 'Install.IgnoreTestFailures' and 'Upgrade.IgnoreTestFailures'.",
-            "type": "boolean"
-          },
-          "timeout": {
-            "description": "Timeout is the time to wait for any individual Kubernetes operation during the performance of a Helm test action. Defaults to 'HelmReleaseSpec.Timeout'.",
-            "type": "string",
-            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-          }
-        }
-      },
-      "timeout": {
-        "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm action. Defaults to '5m0s'.",
-        "type": "string",
-        "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-      },
-      "uninstall": {
-        "description": "Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.",
-        "type": "object",
-        "properties": {
-          "deletionPropagation": {
-            "description": "DeletionPropagation specifies the deletion propagation policy when a Helm uninstall is performed.",
-            "type": "string",
-            "default": "background",
-            "enum": [
-              "background",
-              "foreground",
-              "orphan"
-            ]
-          },
-          "disableHooks": {
-            "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
-            "type": "boolean"
-          },
-          "disableWait": {
-            "description": "DisableWait disables waiting for all the resources to be deleted after a Helm uninstall is performed.",
-            "type": "boolean"
-          },
-          "keepHistory": {
-            "description": "KeepHistory tells Helm to remove all associated resources and mark the release as deleted, but retain the release history.",
-            "type": "boolean"
-          },
-          "timeout": {
-            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.",
-            "type": "string",
-            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-          }
-        }
-      },
-      "upgrade": {
-        "description": "Upgrade holds the configuration for Helm upgrade actions for this HelmRelease.",
-        "type": "object",
-        "properties": {
-          "cleanupOnFail": {
-            "description": "CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.",
-            "type": "boolean"
-          },
-          "crds": {
-            "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Skip` and if omitted CRDs are neither installed nor upgraded. \n Skip: do neither install nor replace (update) any CRDs. \n Create: new CRDs are created, existing CRDs are neither updated nor deleted. \n CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted. \n By default, CRDs are not applied during Helm upgrade action. With this option users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
-            "type": "string",
-            "enum": [
-              "Skip",
-              "Create",
-              "CreateReplace"
-            ]
-          },
-          "disableHooks": {
-            "description": "DisableHooks prevents hooks from running during the Helm upgrade action.",
-            "type": "boolean"
-          },
-          "disableOpenAPIValidation": {
-            "description": "DisableOpenAPIValidation prevents the Helm upgrade action from validating rendered templates against the Kubernetes OpenAPI Schema.",
-            "type": "boolean"
-          },
-          "disableWait": {
-            "description": "DisableWait disables the waiting for resources to be ready after a Helm upgrade has been performed.",
-            "type": "boolean"
-          },
-          "disableWaitForJobs": {
-            "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm upgrade has been performed.",
-            "type": "boolean"
-          },
-          "force": {
-            "description": "Force forces resource updates through a replacement strategy.",
-            "type": "boolean"
-          },
-          "preserveValues": {
-            "description": "PreserveValues will make Helm reuse the last release's values and merge in overrides from 'Values'. Setting this flag makes the HelmRelease non-declarative.",
-            "type": "boolean"
-          },
-          "remediation": {
-            "description": "Remediation holds the remediation configuration for when the Helm upgrade action for the HelmRelease fails. The default is to not perform any action.",
-            "type": "object",
-            "properties": {
-              "ignoreTestFailures": {
-                "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an upgrade action but fail. Defaults to 'Test.IgnoreFailures'.",
-                "type": "boolean"
-              },
-              "remediateLastFailure": {
-                "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false' unless 'Retries' is greater than 0.",
-                "type": "boolean"
-              },
-              "retries": {
-                "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using 'Strategy', is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
-                "type": "integer"
-              },
-              "strategy": {
-                "description": "Strategy to use for failure remediation. Defaults to 'rollback'.",
-                "type": "string",
-                "enum": [
-                  "rollback",
-                  "uninstall"
-                ]
+        },
+        "interval": {
+          "description": "Interval at which to reconcile the Helm release. This interval is approximate and may be subject to jitter to ensure efficient use of resources.",
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+        },
+        "kubeConfig": {
+          "description": "KubeConfig for reconciling the HelmRelease on a remote cluster. When used in combination with HelmReleaseSpec.ServiceAccountName, forces the controller to act on behalf of that Service Account at the target cluster. If the --default-service-account flag is set, its value will be used as a controller level fallback for when HelmReleaseSpec.ServiceAccountName is empty.",
+          "type": "object",
+          "required": [
+            "secretRef"
+          ],
+          "properties": {
+            "secretRef": {
+              "description": "SecretRef holds the name of a secret that contains a key with the kubeconfig file as the value. If no key is set, the key will default to 'value'. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling Kubernetes resources.",
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "key": {
+                  "description": "Key in the Secret, when not specified an implementation-specific default key is used.",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name of the Secret.",
+                  "type": "string"
+                }
               }
             }
-          },
-          "timeout": {
-            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.",
-            "type": "string",
-            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
           }
+        },
+        "maxHistory": {
+          "description": "MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.",
+          "type": "integer"
+        },
+        "persistentClient": {
+          "description": "PersistentClient tells the controller to use a persistent Kubernetes client for this release. When enabled, the client will be reused for the duration of the reconciliation, instead of being created and destroyed for each (step of a) Helm action.  This can improve performance, but may cause issues with some Helm charts that for example do create Custom Resource Definitions during installation outside Helm's CRD lifecycle hooks, which are then not observed to be available by e.g. post-install hooks.  If not set, it defaults to true.",
+          "type": "boolean"
+        },
+        "releaseName": {
+          "description": "ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.",
+          "type": "string",
+          "maxLength": 53,
+          "minLength": 1
+        },
+        "rollback": {
+          "description": "Rollback holds the configuration for Helm rollback actions for this HelmRelease.",
+          "type": "object",
+          "properties": {
+            "cleanupOnFail": {
+              "description": "CleanupOnFail allows deletion of new resources created during the Helm rollback action when it fails.",
+              "type": "boolean"
+            },
+            "disableHooks": {
+              "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+              "type": "boolean"
+            },
+            "disableWait": {
+              "description": "DisableWait disables the waiting for resources to be ready after a Helm rollback has been performed.",
+              "type": "boolean"
+            },
+            "disableWaitForJobs": {
+              "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm rollback has been performed.",
+              "type": "boolean"
+            },
+            "force": {
+              "description": "Force forces resource updates through a replacement strategy.",
+              "type": "boolean"
+            },
+            "recreate": {
+              "description": "Recreate performs pod restarts for the resource if applicable.",
+              "type": "boolean"
+            },
+            "timeout": {
+              "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.",
+              "type": "string",
+              "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+            }
+          }
+        },
+        "serviceAccountName": {
+          "description": "The name of the Kubernetes service account to impersonate when reconciling this HelmRelease.",
+          "type": "string"
+        },
+        "storageNamespace": {
+          "description": "StorageNamespace used for the Helm storage. Defaults to the namespace of the HelmRelease.",
+          "type": "string",
+          "maxLength": 63,
+          "minLength": 1
+        },
+        "suspend": {
+          "description": "Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.",
+          "type": "boolean"
+        },
+        "test": {
+          "description": "Test holds the configuration for Helm test actions for this HelmRelease.",
+          "type": "object",
+          "properties": {
+            "enable": {
+              "description": "Enable enables Helm test actions for this HelmRelease after an Helm install or upgrade action has been performed.",
+              "type": "boolean"
+            },
+            "ignoreFailures": {
+              "description": "IgnoreFailures tells the controller to skip remediation when the Helm tests are run but fail. Can be overwritten for tests run after install or upgrade actions in 'Install.IgnoreTestFailures' and 'Upgrade.IgnoreTestFailures'.",
+              "type": "boolean"
+            },
+            "timeout": {
+              "description": "Timeout is the time to wait for any individual Kubernetes operation during the performance of a Helm test action. Defaults to 'HelmReleaseSpec.Timeout'.",
+              "type": "string",
+              "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+            }
+          }
+        },
+        "timeout": {
+          "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm action. Defaults to '5m0s'.",
+          "type": "string",
+          "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+        },
+        "uninstall": {
+          "description": "Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.",
+          "type": "object",
+          "properties": {
+            "deletionPropagation": {
+              "description": "DeletionPropagation specifies the deletion propagation policy when a Helm uninstall is performed.",
+              "type": "string",
+              "default": "background",
+              "enum": [
+                "background",
+                "foreground",
+                "orphan"
+              ]
+            },
+            "disableHooks": {
+              "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+              "type": "boolean"
+            },
+            "disableWait": {
+              "description": "DisableWait disables waiting for all the resources to be deleted after a Helm uninstall is performed.",
+              "type": "boolean"
+            },
+            "keepHistory": {
+              "description": "KeepHistory tells Helm to remove all associated resources and mark the release as deleted, but retain the release history.",
+              "type": "boolean"
+            },
+            "timeout": {
+              "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.",
+              "type": "string",
+              "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+            }
+          }
+        },
+        "upgrade": {
+          "description": "Upgrade holds the configuration for Helm upgrade actions for this HelmRelease.",
+          "type": "object",
+          "properties": {
+            "cleanupOnFail": {
+              "description": "CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.",
+              "type": "boolean"
+            },
+            "crds": {
+              "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Skip` and if omitted CRDs are neither installed nor upgraded.  Skip: do neither install nor replace (update) any CRDs.  Create: new CRDs are created, existing CRDs are neither updated nor deleted.  CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted.  By default, CRDs are not applied during Helm upgrade action. With this option users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+              "type": "string",
+              "enum": [
+                "Skip",
+                "Create",
+                "CreateReplace"
+              ]
+            },
+            "disableHooks": {
+              "description": "DisableHooks prevents hooks from running during the Helm upgrade action.",
+              "type": "boolean"
+            },
+            "disableOpenAPIValidation": {
+              "description": "DisableOpenAPIValidation prevents the Helm upgrade action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+              "type": "boolean"
+            },
+            "disableWait": {
+              "description": "DisableWait disables the waiting for resources to be ready after a Helm upgrade has been performed.",
+              "type": "boolean"
+            },
+            "disableWaitForJobs": {
+              "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm upgrade has been performed.",
+              "type": "boolean"
+            },
+            "force": {
+              "description": "Force forces resource updates through a replacement strategy.",
+              "type": "boolean"
+            },
+            "preserveValues": {
+              "description": "PreserveValues will make Helm reuse the last release's values and merge in overrides from 'Values'. Setting this flag makes the HelmRelease non-declarative.",
+              "type": "boolean"
+            },
+            "remediation": {
+              "description": "Remediation holds the remediation configuration for when the Helm upgrade action for the HelmRelease fails. The default is to not perform any action.",
+              "type": "object",
+              "properties": {
+                "ignoreTestFailures": {
+                  "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an upgrade action but fail. Defaults to 'Test.IgnoreFailures'.",
+                  "type": "boolean"
+                },
+                "remediateLastFailure": {
+                  "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false' unless 'Retries' is greater than 0.",
+                  "type": "boolean"
+                },
+                "retries": {
+                  "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using 'Strategy', is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                  "type": "integer"
+                },
+                "strategy": {
+                  "description": "Strategy to use for failure remediation. Defaults to 'rollback'.",
+                  "type": "string",
+                  "enum": [
+                    "rollback",
+                    "uninstall"
+                  ]
+                }
+              }
+            },
+            "timeout": {
+              "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.",
+              "type": "string",
+              "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+            }
+          }
+        },
+        "values": {
+          "description": "Values holds the values for this Helm release.",
+          "x-kubernetes-preserve-unknown-fields": true
         }
-      },
-      "values": {
-        "description": "Values holds the values for this Helm release.",
-        "x-kubernetes-preserve-unknown-fields": true
       }
     },
     "git": {

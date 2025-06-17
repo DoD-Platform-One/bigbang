@@ -1,0 +1,11 @@
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+  driftDetection:
+    mode: warn
+    ignore:
+    - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
+      target:
+        kind: ValidatingWebhookConfiguration
+        name: istiod-default-validator

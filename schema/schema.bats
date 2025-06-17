@@ -112,3 +112,9 @@ invalid() {
   valid monitoring
   invalid monitoring
 }
+
+# Test flux schema validation
+@test "helm template validate flux schema" {
+  valid flux
+  invalid flux
+}
