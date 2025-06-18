@@ -4,11 +4,11 @@
 
 ## Big Bang in 1 hour
 
-An SRE with a reasonable amount of experience operating in a command line environment, equipped with a fast internet connection and a workstation they can install software on, should be able to complete this process and have an operational [Big Bang](https://repo1.dso.mil/big-bang/bigbang) dev environment in 1 hour or less.
+A seasoned SRE, proficient in command line operations, equipped with a high-speed internet connection and a workstation capable of software installations, should be able to set up and have a fully operational [Big Bang](https://repo1.dso.mil/big-bang/bigbang) development environment within an hour.
 
 ### What You Will Get
 
-When you come out the other side of this process, you will have a k3d kubernetes cluster, running 3 virtualized kubernetes nodes on a single compute instance, with a fully functioning Big Bang installation, consisting of the following components:
+Upon completing this process, you will have a k3d Kubernetes cluster running three virtualized Kubernetes nodes on a single compute instance, with a fully operational Big Bang installation. This installation will include the following components:
 
 * [Istio-CRDs](https://docs-bigbang.dso.mil/latest/packages/istio-crds/) Istio custom resources
 * [Istiod](https://docs-bigbang.dso.mil/latest/packages/istiod/) Istio service mesh
@@ -21,25 +21,26 @@ When you come out the other side of this process, you will have a k3d kubernetes
 * [Grafana](https://docs-bigbang.dso.mil/latest/packages/grafana/) dashboards
 * [Neuvector](https://docs-bigbang.dso.mil/latest/packages/grafana/) container lifecycle security management
 
-It is important to remember that Big Bang is capable of deploying [many other packages](https://docs-bigbang.dso.mil/latest/packages/), but each of those packages requires additional configuration on the part of the user. Big Bang, in its default state, is a cohesive platform upon which other packages may be deployed. The goal of the quickstart is to bring that platform up quickly. The procedure for bringing up any specific package (such as mattermost) or for modeling any specific use case (such as Party Bus) is beyond the scope of the quickstart. Refer to individual package documentation for more information. 
+Big Bang can deploy [numerous other packages](https://docs-bigbang.dso.mil/latest/packages/), each requiring additional user configuration. In its default state, Big Bang serves as a cohesive platform for deploying these packages. Quick Start aims to rapidly set up this platform. Procedures for deploying specific packages (e.g., Mattermost) or modeling specific use cases (e.g., Party Bus) are beyond the scope of the Quick Start. For more information, refer to the individual package documentation
 
 ### Satisfy the Prerequisites
 
-1. Ensure your workstation has a functional GNU environment with `git`. Mac OS and Linux should be good to go out of the box. For Windows, the **only** supported method for this guide is to install WSL and run a WSL bash terminal, following the rest of the guide as a Linux user inside WSL.
-1. Install [jq](https://jqlang.github.io/jq/download/) on your workstation.
-1. Install [yq](https://github.com/mikefarah/yq/#install) on your workstation (version `>= 4.45.1`). yq needs to be available in your system path PATH as `yq`, so we recommend not using a dockerized installation.
-1. Install kubectl on your workstation. Follow the instructions for [windows](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/), [macos](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/) or [linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/). (If you are running on WSL in Windows, you should install kubectl using the package manager inside of WSL to install kubectl.)
-1. Install [sshuttle](https://sshuttle.readthedocs.io/en/stable/installation.html) on your workstation
-1. [Install helm](https://helm.sh/docs/intro/install/) on your workstation.
-1. [Install the Flux CLI](https://fluxcd.io/flux/installation/) on your workstation.
-1. Ensure you have bash version 4 installed on your workstation. Linux and Windows with WSL users probably don't need to worry about this. For Mac OS users, install bash4 with homebrew or a similar package manager, as the bash that ships with Mac OS is hopelessly old. Mac OS users will use `/opt/homebrew/bin/bash` whenever `bash` is mentioned in this guide.
-1. Ensure you have an account on [PlatformOne RegistryOne](https://registry1.dso.mil). You will need your username and access token ("CLI Secret") for this process. (To retrieve your token, login to registry1, click your name in the top right, and copy the "CLI Secret" field.)
-1. If you do not plan to deploy the bigbang quickstart cluster onto your own VM, and want the quickstart script to provision an AWS VM for you, you need to install and configure [the AWS cli](https://aws.amazon.com/cli/) on your workstation for your AWS account.
-1. Select a location on your workstation for the quickstart script to check out the bigbang code from repo1. The quickstart will check out [a copy of the big-bang code](https://repo1.dso.mil/big-bang/bigbang) and some helper scripts into a location you provide on your workstation.
+Ensure your workstation has a functional GNU environment with Git. Mac OS and Linux should work out of the box. For Windows, the only supported method for this guide is to install WSL and run a WSL bash terminal, following the rest of the guide as a Linux user inside WSL.
 
-### Download the Quickstart Script
+1. **Install [jq](https://jqlang.github.io/jq/download/)** on your workstation.
+1. **Install [yq](https://github.com/mikefarah/yq/#install)** on your workstation (version `>= 4.45.1`). yq needs to be available in your system path PATH as `yq`, so we recommend not using a dockerized installation.
+1. **Install kubectl** on your workstation. Follow the instructions for [windows](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/), [macos](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/) or [linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/). (If you are running on WSL in Windows, you should install kubectl using the package manager inside of WSL to install kubectl.)
+1. **Install [sshuttle](https://sshuttle.readthedocs.io/en/stable/installation.html)** on your workstation
+1. **Install [helm](https://helm.sh/docs/intro/install/)** on your workstation.
+1. **Install the [Flux CLI](https://fluxcd.io/flux/installation/)** on your workstation.
+1. Ensure you have **bash version 4** installed on your workstation. Linux and Windows with WSL users probably don't need to worry about this. For Mac OS users, install bash4 with homebrew or a similar package manager, as the bash that ships with Mac OS is hopelessly old. Mac OS users will use `/opt/homebrew/bin/bash` whenever `bash` is mentioned in this guide.
+1. Ensure you have an account on **[PlatformOne RegistryOne](https://registry1.dso.mil)**. You will need your username and access token ("CLI Secret") for this process. (To retrieve your token, login to registry1, click your name in the top right, and copy the "CLI Secret" field.)
+1. If you do not plan to deploy the Big Bang Quick Start cluster onto your own VM, and want the Quick Start script to provision an AWS VM for you, you need to **install and configure the [AWS CLI](https://aws.amazon.com/cli/)** on your workstation for your AWS account.
+1. Select a location on your workstation for the Quick Start script to check out the Big Bang code from repo1. The Quick Start will check out [a copy of the Big Bang code](https://repo1.dso.mil/big-bang/bigbang) and some helper scripts into a location you provide on your workstation.
 
-Run the following commands in your workstation's terminal to download the quickstart script, which you will use in the next step:
+### Download the Quick Start Script
+
+Run the following commands in your workstation's terminal to download the Quick Start script, which you will use in the next step:
 
 ```
 export REGISTRY1_USERNAME=YOUR_REGISTRY1_USERNAME
@@ -53,8 +54,9 @@ curl --output quickstart.sh https://repo1.dso.mil/big-bang/bigbang/-/raw/master/
 
 #### Using a VM or other hardware you built yourself
 
-1. Spin up an Ubuntu VM somewhere with 8 CPUs and 32gB of RAM. Make sure you can SSH to it. It doesn't matter what cloud provider you're using, it can even be on your local system if you have enough horsepower for it. 
-1. Run the following command in your workstation's terminal:
+Spin up an Ubuntu VM with 8 CPUs and 32gB of RAM. Ensure you can SSH to it. The cloud provider doesn't matter, it can even be on your local system if it has sufficient resources.
+
+Run the following command in your workstation's terminal:
 
 ```
 bash quickstart.sh
@@ -65,8 +67,8 @@ bash quickstart.sh
 
 #### Using Amazon Web Services
 
-1. If your system is already configured to use AWS via the `aws-cli` and you don't want to go to the trouble of building your own VM, the quickstart can attempt to do it for you; simply run the quickstart with no arguments. Pay attention to the script output; the IP addresses of the created AWS EC2 instance will be printed after the cluster is built and before big bang is deployed. You may need these later.
-    1. The quickstart is only so smart, and AWS environments can vary greatly. If the quickstart is not able to build an EC2 instance in AWS for you, please go build an EC2 instance suitable for your use case, then come back and follow the instructions for "Using a VM or other hardware you built yourself".
+1. If your system is already configured to use AWS via the aws-cli and you prefer not to build your own VM, you can run the Quick Start without any arguments. The Quick Start will attempt to create an AWS EC2 instance for you. Pay close attention to the script output; the IP addresses of the created AWS EC2 instance will be displayed after the cluster is built and before Big Bang is deployed. You may need these IP addresses later.
+1. Please note that Quick Start has its limitations, and AWS environments can vary significantly. If Quick Start is unable to build an EC2 instance in AWS for you, you will need to manually create an EC2 instance that suits your requirements. Once done, follow the instructions under "Using a VM or other hardware you built yourself."
 1. Run the following commands in your workstation's terminal:
 
 ```
@@ -77,9 +79,9 @@ bash quickstart.sh
 
 The process takes about 45 minutes. Make a sandwich, go for a walk, play with the dog. Check on it every 10 minutes or so. Once the command finishes, your cluster should be ready to use. Proceed to fix your DNS and access your big bang installation.
 
-If it seems like it's taking too long, the script will tell you what it's currently waiting on. The most frequent cause of long delays is slow connection between your cluster and registry1. All container images are fetched from registry1, so if your cluster is running on a slow internet uplink, this process can take a long time the first time bigbang is deployed. If your helmreleases say `PodInitializing` or `ContainerInitializing` or `Init:2/3` for a long time, this is usually the cause. There's not much cure for this but patience. Try contemplating the nature of the universe, marvel at the fact that object oriented COBOL exists in `current year`, or peruse the Commander's reading list.
+If it seems like it's taking too long, the script will tell you what it's currently waiting on. The most frequent cause of long delays is slow connection between your cluster and registry1. All container images are fetched from registry1, so if your cluster is running on a slow internet uplink, this process can take a long time the first time Big Bang is deployed. If your helmreleases say `PodInitializing` or `ContainerInitializing` or `Init:2/3` for a long time, this is usually the cause. There's not much cure for this but patience. Try contemplating the nature of the universe, marvel at the fact that object oriented COBOL exists in `current year`, or peruse the Commander's reading list.
 
-Eventually the bigbang release process will finish, and you'll see output like this:
+Eventually the Big Bang release process will finish, and you'll see output like this:
 
 ```
 ==================================================================================
@@ -139,9 +141,9 @@ The quickstart.sh script performs several actions:
 
 ### Fix DNS to access the services in your browser
 
-You can now access your bigbang kubernetes cluster from your workstation's command line using `kubectl`, but you will need to perform one extra step to easily access bigbang services in your web browser (or from the command line using utilities like `curl`). You will need to manually override some DNS settings to send specific website requests to your kubernetes cluster. This was included in the final message of the quickstart, but here are the instructions again.
+You can now access your Big Bang kubernetes cluster from your workstation's command line using `kubectl`, but you will need to perform one extra step to easily access Big Bang services in your web browser (or from the command line using utilities like `curl`). You will need to manually override some DNS settings to send specific website requests to your kubernetes cluster. This was included in the final message of the Quick Start, but here are the instructions again.
 
-**Remember to un-do this step when you are done experimenting with the bigbang quickstart.**
+**Remember to un-do this step when you are done experimenting with the Big Bang Quick Start.**
 
 You need to edit your system hosts file to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with application hostnames. Your cluster is configured with two different gateways for different methods of TLS termination, and each gateway has its own IP.
 
@@ -167,7 +169,7 @@ sshuttle --dns -vr ${SSHUSER}@${PublicIP} 172.20.1.0/24 --ssh-cmd 'ssh -i ${SSHK
 
 You will need to leave this command running for as long as you want to access your cluster.
 
-### Access a BigBang Service
+### Access a Big Bang Service
 
 In a browser, visit one of the sites that you just added to your hosts file.
 
@@ -175,7 +177,7 @@ Note, default credentials for Big Bang packages can be found [here](../using-big
 
 ### Tinker With It
 
-You can use the quickstart script to update your bigbang quickstart deployment with your own modifications. Here's an example of post deployment customization of Big Bang.  After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>, you can see that this will enable the ArgoCD addon, which is not enabled by default.
+You can use the Quick Start script to update your Big Bang Quick Start deployment with your own modifications. Here's an example of post deployment customization of Big Bang.  After looking at <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/values.yaml>, you can see that this will enable the ArgoCD addon, which is not enabled by default.
 
 ```shell
 # [ubuntu@Ubuntu_VM:~]
@@ -217,11 +219,11 @@ kubectl get po -n=argocd
 
 ... And you can update your hosts file from the previous step to include the ArgoCD address from the virtualservice, and view it in your browser.
 
-### Implementing Mission Applications within your bigbang environment
+### Implementing Mission Applications within your Big Bang environment
 
-Big Bang by itself serves as a jumping off point, but many users will want to implement their own mission specific applications in to the cluster. BigBang has implemented a `packages:` and `wrapper:`  section to enable and support this in a way that ensures connectivity between your mission specific requirements and existing BigBang utilities, such as istio, the monitoring stack, and network policy management. [Here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/extra-package-deployment.md) is the documentation for the `packages` utility.
+Big Bang by itself serves as a jumping off point, but many users will want to implement their own mission specific applications in to the cluster. Big Bang has implemented a `packages:` and `wrapper:`  section to enable and support this in a way that ensures connectivity between your mission specific requirements and existing Big Bang utilities, such as istio, the monitoring stack, and network policy management. [Here](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/extra-package-deployment.md) is the documentation for the `packages` utility.
 
-We will implement a simple additional utility as a proof of concept, starting with a basic podinfo client. This will use the `wrapper` key to provide integration between bigbang and the Mission Application, without requiring the full Istio configuration to be placed inside BigBang specific keys of the dependent chart.
+We will implement a simple additional utility as a proof of concept, starting with a basic podinfo client. This will use the `wrapper` key to provide integration between Big Bang and the Mission Application, without requiring the full Istio configuration to be placed inside Big Bang specific keys of the dependent chart.
 
 
 ```shell
@@ -393,7 +395,7 @@ This section will provide guidance for troubleshooting problems that may occur d
 
 ### Rebuilding your kubernetes cluster on your instance
 
-If you encounter an error during the creation of your kubernetes cluster, it may be beneficial to restart the process from scratch, completely rebuilding the cluster. This is not always necessary, but if necessary, you can do so with the `--recreate-k3d` option to the quickstart:
+If you encounter an error during the creation of your kubernetes cluster, it may be beneficial to restart the process from scratch, completely rebuilding the cluster. This is not always necessary, but if necessary, you can do so with the `--recreate-k3d` option to the Quick Start:
 
 ```
 bash quickstart.sh --recreate-k3d
