@@ -17,8 +17,8 @@
 
 | Package | Status | Monitoring | Tracing | Network Policies | mTLS |
 |----|----|----|----|----|----|
-| [Istio CRDs](https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds) |  ![Istio CRDs Build](https://repo1.dso.mil/big-bang/apps/sandbox/istio-crds/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
-| [Istio Daemon](https://repo1.dso.mil/big-bang/apps/sandbox/istiod) |  ![Istio Core Build](https://repo1.dso.mil/big-bang/apps/sandbox/istiod/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
+| [Istio CRDs](https://repo1.dso.mil/big-bang/product/packages/istio-crds) |  ![Istio CRDs Build](https://repo1.dso.mil/big-bang/product/packages/istio-crds/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
+| [Istio Daemon](https://repo1.dso.mil/big-bang/product/packages/istiod) |  ![Istio Core Build](https://repo1.dso.mil/big-bang/product/packages/istiod/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Gateway](https://repo1.dso.mil/big-bang/product/packages/istio-gateway) |  ![Istio Gateway Build](https://repo1.dso.mil/big-bang/product/packages/istio-gateway/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Kiali](https://repo1.dso.mil/big-bang/product/packages/kiali) |  ![Kiali Build](https://repo1.dso.mil/big-bang/product/packages/kiali/badges/main/pipeline.svg) | No | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/589) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1296) |
 | [Monitoring](https://repo1.dso.mil/big-bang/product/packages/monitoring) |  ![Monitoring Build](https://repo1.dso.mil/big-bang/product/packages/monitoring/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/509) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1900) |
