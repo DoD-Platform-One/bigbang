@@ -10,7 +10,7 @@ Service mesh management receives a major upgrade in 3.0 with the **removal of th
 
 By migrating to direct Helm deployments, Big Bang adopts recommended practices for Istio management and improves its overall security posture through the removal of the high-privilege operator. This transition also offers a standardized and more secure method for managing Istio configurations, simplifying installation and upgrades, and paving the way for [Ambient Mode](https://istio.io/latest/docs/ambient/overview/) integration in future releases.
 
-Be advised, **this is a breaking change**, but our engineers have worked hard to make the migration as straightforward as possible for our community. For step-by-step instructions and insights, please refer to our dedicated Operatorless Istio [blog post](https://docs-bigbang.dso.mil/latest/blog/bb-3-0-operatorless-istio-migration/) and our detailed [migration guide](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/using-bigbang/migrating-istio-for-bb3.0.md). To ensure a seamless transition, users are strongly encouraged to begin the migration process now. Operatorless Istio reached General Availability in Big Bang versions 2.53 and 2.54.
+Be advised, **this is a breaking change**, but our engineers have worked hard to make the migration as straightforward as possible for our community. For step-by-step instructions and insights, please refer to our dedicated Operatorless Istio [blog post](https://docs-bigbang.dso.mil/latest/docs/guides/using-bigbang/migrating-istio-for-bb3.0/) and our detailed [migration guide](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/using-bigbang/migrating-istio-for-bb3.0.md). To ensure a seamless transition, users are strongly encouraged to begin the migration process now. Operatorless Istio reached General Availability in Big Bang versions 2.53 and 2.54.
 
 ### 🧰 Grafana Alloy Replaces Promtail
 
@@ -18,7 +18,7 @@ Keeping with the theme of deprecated packages, we’re also replacing our primar
 
 Much of this transition is already complete. Alloy-logging features were added to Big Bang in version 2.51, and the Alloy chart was moved into Core in 2.53. With Alloy enabled by default in 3.0 and Promtail disabled, we'll be removing Promtail entirely from Big Bang in release 3.5.0, after which the package will move to Community-supported.
 
-Users with custom Promtail configurations will need to convert and test their setups with Alloy before release 3.5.0. To assist with this transition, please refer to [Grafana's migration guide](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/) for detailed instructions, and the [Big Bang ADR](https://repo1.dso.mil/big-bang/bigbang/-/blob/7fa70f7b4cc4ca66c20ac28b74f19c265eaa798a/docs/adrs/0004-alloy-replacing-promtail.md) for general information about this change.  
+Users with custom Promtail configurations will need to convert and test their setups with Alloy before release 3.5.0. To assist with this transition, please refer to [Grafana's migration guide](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/) for detailed instructions, and the [Big Bang ADR](https://docs-bigbang.dso.mil/latest/docs/adrs/0004-alloy-replacing-promtail/?h=4/) for general information about this change.  
 
 ### 🛡️ Flux Drift Detection By Default
 
@@ -26,7 +26,7 @@ With Big Bang 3.0, **drift detection** will be enabled by default on our **Flux 
 
 This feature will prevent unwanted deviations between the desired and actual cluster state, ensuring that any unauthorized changes made through the Kubernetes API will be automatically reverted during Flux's reconciliation process. With drift detection enabled, Flux will actively monitor for discrepancies between the intended configuration and the current state of the cluster. If a drift is detected, changes will be automatically reverted for more efficient operation.
 
-While drift detection will be enabled by default for most existing HelmReleases, a few newer packages, such as Backstage or the charts that comprise Operatorless Istio, will have it implemented in subsequent releases. For more information about this upcoming change, [click here](https://repo1.dso.mil/big-bang/bigbang/-/blob/7fa70f7b4cc4ca66c20ac28b74f19c265eaa798a/docs/adrs/0005-drift-detection.md)!
+While drift detection will be enabled by default for most existing HelmReleases, a few newer packages, such as Backstage or the charts that comprise Operatorless Istio, will have it implemented in subsequent releases. For more information about this upcoming change, [click here](https://docs-bigbang.dso.mil/latest/docs/adrs/0006-drift-detection/?h=drift+d/)!
 
 ### 💡 The Universe Expands: Headlamp, Backstage, and Compliance Dashboard
 
