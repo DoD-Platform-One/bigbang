@@ -191,7 +191,7 @@ stringData:
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
 
-  {{- $defaultImagePullConfig := dict 
+  {{- $defaultImagePullConfig := dict
     "imagePullPolicy" .Values.imagePullPolicy
     "imagePullSecrets" (list (dict "name" "private-registry"))
   -}}
@@ -217,7 +217,7 @@ stringData:
       
       {{- $gwOverlays := dig "gateways" $name dict $.Values.istioGateway.values -}}
       {{- if $gwOverlays }}
-        {{- $gwRecord = set $gwRecord "overlays" (merge $gwOverlays $defaultImagePullConfig) -}}
+        {{- $gwRecord = set $gwRecord "overlays" (merge $gwOverlays (dict "upstream" $defaultImagePullConfig)) -}}
       {{ end -}}
       
       {{- $enabledGateways = set $enabledGateways $name $gwRecord -}}
