@@ -55,6 +55,8 @@ networkPolicies:
 
 openshift: {{ .Values.openshift }}
 
+fullnameOverride: "velero"
+
 imagePullSecrets:
 - name: private-registry
 
