@@ -1,0 +1,28 @@
+#########################
+# Disable Core Packages #
+#########################
+bbctl:
+  enabled: false
+monitoring:
+  enabled: false
+grafana:
+  enabled: false
+neuvector:
+  enabled: false
+loki:
+  enabled: false
+promtail:
+  enabled: false
+tempo:
+  enabled: false
+kyvernoReporter:
+  enabled: false
+kiali:
+  enabled: false
+gatekeeper:
+  enabled: false
+alloy:
+  enabled: false
+addons:
+  minioOperator:
+    enabled: false
