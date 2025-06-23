@@ -2,6 +2,9 @@
 {{- $root := . -}}
 {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
 ---
+{{- if and (typeIs "map[string]interface {}" $gw) (hasKey $gw "overlays") }}
+  {{ $_ := unset $gw.overlays "gatewayCerts" }}
+{{- end }}
 {{ include "values-secret" (dict 
   "root" $root 
   "name" (printf "istio-%s-gateway" $name)
@@ -16,9 +19,6 @@ gateways:
   public:
     networkPolicies:
       enabled: {{ .Values.networkPolicies.enabled }}
-
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
 
     gateway:
       servers:
@@ -56,9 +56,6 @@ gateways:
   passthrough:
     networkPolicies:
       enabled: {{ .Values.networkPolicies.enabled }}
-
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
 
     gateway:
       servers:
