@@ -47,6 +47,9 @@ Sample post-renderer config:
 
 Big Bang internally created template files(e.g. `NetworkPolicy`s, `AuthorizationPolicy`s, etc.) will still be created under the `chart/templates/bigbang/` directory, with the aim being that commonly utilized template files will be consolidated into a repository within repo1.dso.mil for all packages to pull from in the future.
 
+When creating the new package wrapper values.yaml, the bb team will add Big Bang specific values to the top of the file, upstream package overrides can be added below. The team will only include Big Bang overrides or values that we deem essential for users in the packages values.yaml file. 
+We will no longer maintain a modified clone of the upstream package values file, just a package wrapper values file for overrides and bb values. Users can view all potential values from the charts/<chartBundle.tgz> within the package. Example can be found [here](https://repo1.dso.mil/big-bang/product/packages/kiali/-/blob/main/chart/values.yaml?ref_type=heads) for Kiali
+
 ## Consequences 
 
 Users will no longer be able to view the package values directly in the Big Bang package git repository. The `values.yaml` file will exist in a passthrough sub-chart tarfile bundle, which is still stored in the git repo, but not viewable from the GitLab console directly. The upstream GitHub repository for each sub-chart linked in the Big Bang chart's `README` can be used for viewing the `values.yaml` file and template files, however users should take care to ensure they are viewing the correct version of the files that is deployed via the passthrough sub-chart.
