@@ -1811,7 +1811,7 @@ addons:
             cypress_url: "https://sonarqube.dev.bigbang.mil"
             cypress_url_setup: "https://sonarqube.dev.bigbang.mil/setup"
       account:
-        adminPassword: new_admin_password
+        adminPassword: New_admin_password!2
         currentAdminPassword: admin
       curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
 
