@@ -1,9 +1,9 @@
 # Big Bang Maintainers
-* @michaelmartin @chris.oconnell @andrewshoell @troymobley @chris1
+* @michaelmartin @chris.oconnell @andrewshoell @chris1
 
-[Documentation] @michaelmartin @chris.oconnell @andrewshoell @troymobley @chris1
+[Documentation] @michaelmartin @chris.oconnell @andrewshoell @chris1
 docs/
 *.md
 
-[Blog] @troymobley @chris1
+[Blog] @chris1
 blog/
