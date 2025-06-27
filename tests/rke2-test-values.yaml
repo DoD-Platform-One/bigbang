@@ -507,11 +507,12 @@ addons:
       bbtests:
         cypress:
           artifacts: false
-      resources:
-        requests:
-          cpu: 100m
-          memory: 256Mi
-        limits: null
+      upstream:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits: null
 
   harbor:
     values:

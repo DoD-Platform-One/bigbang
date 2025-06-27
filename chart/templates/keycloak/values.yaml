@@ -14,12 +14,22 @@ image:
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
-openshift: {{ .Values.openshift }}
-
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
+{{- $monioringEnabled := .Values.monitoring.enabled }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  ingressLabels:
+    {{- include "getGatewaySelector" (dict "default" "passthrough" "pkg" .Values.addons.keycloak "root" .) | nindent 4 }}
+
+monitoring:
+  enabled: {{ $monioringEnabled }}
+
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -34,39 +44,100 @@ istio:
     gateways:
       - {{ include "getGatewayName" (dict "default" "passthrough" "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
 
-{{- if $istioInjection }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
+upstream:
+  replicas: 2
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+  imagePullSecrets:
+  - name: private-registry
 
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "default" "passthrough" "pkg" .Values.addons.keycloak "root" .) | nindent 4 }}
-
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
-serviceMonitor:
-  enabled: {{ .Values.monitoring.enabled }}
-  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.keycloak.values) "STRICT") }}
-  scheme: https
-  tlsConfig:
-    caFile: /etc/prom-certs/root-cert.pem
-    certFile: /etc/prom-certs/cert-chain.pem
-    keyFile: /etc/prom-certs/key.pem
-    # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    insecureSkipVerify: true
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
   {{- end }}
 
-{{- if .Values.addons.keycloak.database.host }}
+  serviceMonitor:
+    enabled: {{ $monioringEnabled }}
+    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.keycloak.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
+    {{- end }}
+
+  {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
+  secrets:
+    {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+    tlscert:
+      stringData:
+        tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
+    tlskey:
+      stringData:
+        tls.key: {{ .Values.addons.keycloak.ingress.key  | quote }}
+    {{- end }}
+
+    {{- with .Values.addons.keycloak.database }}
+    {{- if .host }}
+    env:
+      stringData:
+        # keep legacy ENVs for backwards compatibility
+        DB_USER: {{ .username | quote }}
+        DB_PASSWORD: {{ .password | quote }}
+        DB_VENDOR: {{ default "postgres" .type }}
+        DB_ADDR: {{ .host }}
+        DB_PORT: {{ .port | quote }}
+        DB_DATABASE: {{ .database }}
+        # Quarkus ENVs
+        KC_DB_USERNAME: {{ .username | quote }}
+        KC_DB_PASSWORD: {{ .password | quote }}
+        KC_DB: {{ default "postgres" .type }}
+        KC_DB_URL_HOST: {{ .host }}
+        KC_DB_URL_PORT: {{ .port | quote }}
+        KC_DB_URL_DATABASE: {{ .database }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+  extraVolumes: |
+    - name: tlscert
+      secret:
+        secretName: keycloak-tlscert
+    - name: tlskey
+      secret:
+        secretName: keycloak-tlskey
+
+  extraVolumeMounts: |
+    # keep /etc/x509/https/ for legacy backwards compatibility
+    - name: tlscert
+      mountPath: /etc/x509/https/tls.crt
+      subPath: tls.crt
+      readOnly: true
+    - name: tlskey
+      mountPath: /etc/x509/https/tls.key
+      subPath: tls.key
+      readOnly: true
+    # Quarkus cert paths
+    - name: tlscert
+      mountPath: /opt/keycloak/conf/tls.crt
+      subPath: tls.crt
+      readOnly: true
+    - name: tlskey
+      mountPath: /opt/keycloak/conf/tls.key
+      subPath: tls.key
+      readOnly: true
+  {{- end }}
+
 postgresql:
+  global:
+    imagePullSecrets:
+    - private-registry
+{{- if .Values.addons.keycloak.database.host }}
   enabled: false
 {{- else if or $istioInjection .Values.kiali.enabled }}
-postgresql:
   primary:
     {{- if $istioInjection }}
     annotations:
@@ -78,68 +149,4 @@ postgresql:
       {{- include "istioAnnotation" . | nindent 6 }}
     {{- end }}
 {{- end }}
-
-{{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
-secrets:
-  {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
-  tlscert:
-    stringData:
-      tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
-  tlskey:
-    stringData:
-      tls.key: {{ .Values.addons.keycloak.ingress.key  | quote }}
-  {{- end }}
-
-  {{- with .Values.addons.keycloak.database }}
-  {{- if .host }}
-  env:
-    stringData:
-      # keep legacy ENVs for backwards compatibility
-      DB_USER: {{ .username | quote }}
-      DB_PASSWORD: {{ .password | quote }}
-      DB_VENDOR: {{ default "postgres" .type }}
-      DB_ADDR: {{ .host }}
-      DB_PORT: {{ .port | quote }}
-      DB_DATABASE: {{ .database }}
-      # Quarkus ENVs
-      KC_DB_USERNAME: {{ .username | quote }}
-      KC_DB_PASSWORD: {{ .password | quote }}
-      KC_DB: {{ default "postgres" .type }}
-      KC_DB_URL_HOST: {{ .host }}
-      KC_DB_URL_PORT: {{ .port | quote }}
-      KC_DB_URL_DATABASE: {{ .database }}
-  {{- end }}
-  {{- end }}
-{{- end }}
-
-{{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
-extraVolumesBigBang:
-  - name: tlscert
-    secret:
-      secretName: keycloak-tlscert
-  - name: tlskey
-    secret:
-      secretName: keycloak-tlskey
-
-extraVolumeMountsBigBang:
-  # keep /etc/x509/https/ for legacy backwards compatibility
-  - name: tlscert
-    mountPath: /etc/x509/https/tls.crt
-    subPath: tls.crt
-    readOnly: true
-  - name: tlskey
-    mountPath: /etc/x509/https/tls.key
-    subPath: tls.key
-    readOnly: true
-  # Quarkus cert paths
-  - name: tlscert
-    mountPath: /opt/keycloak/conf/tls.crt
-    subPath: tls.crt
-    readOnly: true
-  - name: tlskey
-    mountPath: /opt/keycloak/conf/tls.key
-    subPath: tls.key
-    readOnly: true
-{{- end }}
-
 {{- end }}
