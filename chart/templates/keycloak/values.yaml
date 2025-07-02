@@ -4,6 +4,7 @@
 
 {{- define "bigbang.defaults.keycloak" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
 replicas: 2
 
 imagePullSecrets:
@@ -56,6 +57,27 @@ upstream:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
+  {{- if $tlsEnabled }}
+  http:
+    internalScheme: HTTPS
+  {{- end }}
+
+  extraEnv: |
+    - name: KC_HTTPS_CLIENT_AUTH
+      value: request
+    - name: KC_TRUSTSTORE_PATHS
+      value: /etc/ssl/certs/
+    - name: KC_HOSTNAME
+      value: keycloak.{{ .Values.domain }}
+    - name: KC_HOSTNAME_STRICT
+      value: "true"
+    {{- if $tlsEnabled }}
+    - name: KC_HTTPS_CERTIFICATE_FILE
+      value: /opt/keycloak/conf/tls.crt
+    - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+      value: /opt/keycloak/conf/tls.key
+    {{- end }}
+
   serviceMonitor:
     enabled: {{ $monioringEnabled }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
@@ -71,7 +93,7 @@ upstream:
 
   {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
   secrets:
-    {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+    {{- if $tlsEnabled }}
     tlscert:
       stringData:
         tls.crt: {{ .Values.addons.keycloak.ingress.cert | quote }}
@@ -101,14 +123,14 @@ upstream:
     {{- end }}
     {{- end }}
   {{- end }}
-  {{- if and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key }}
+  {{- if $tlsEnabled }}
   extraVolumes: |
     - name: tlscert
       secret:
-        secretName: keycloak-tlscert
+        secretName: keycloak-upstream-tlscert
     - name: tlskey
       secret:
-        secretName: keycloak-tlskey
+        secretName: keycloak-upstream-tlskey
 
   extraVolumeMounts: |
     # keep /etc/x509/https/ for legacy backwards compatibility
