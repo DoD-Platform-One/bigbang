@@ -11,6 +11,12 @@ domain: {{ $domainName }}
 sso:
   enabled: {{ .Values.kiali.sso.enabled }}
 
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+tracing:
+  enabled: {{ .Values.tempo.enabled }}
+
 openshift: {{ .Values.openshift}}
 
 istio:
@@ -132,4 +138,13 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- include "getGatewaySelector" (dict "pkg" .Values.kiali "root" .) | nindent 4 }}
+  bundled:
+    kubeApiAccess:
+      controlPlaneCidrs:
+      - {{ .Values.networkPolicies.controlPlaneCidr }}
+  package:
+    allow-grafana-mesh-egress:
+      enabled: {{ .Values.grafana.enabled }}
+    allow-tempo-mesh-egress:
+      enabled: {{ .Values.tempo.enabled }}
 {{- end -}}
