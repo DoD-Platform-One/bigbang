@@ -1416,6 +1416,13 @@ addons:
       # examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000"
       endpoint: ""
 
+      # -- S3 compatible service endpoint for use with Minio or aws S3.  See: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage
+      # Setting this allows the registry to use a different endpoint than the global `objectStorage.endpoint` documented above.
+      # `objectStorage.endpoint` must be set in order for `objectStorage.regionendpoint` endpoint to be used.  See: https://docs.gitlab.com/administration/object_storage/
+      # Also note rails.s3.yaml and registry.s3.yaml here for implementation parallel: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage
+      # examples:  "https://s3.us-gov-west-1.amazonaws.com" "https://minio.example.com:9000"
+      regionendpoint: ""
+
       # -- S3 compatible region to use for connection information.
       region: ""
 
