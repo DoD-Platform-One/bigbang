@@ -875,11 +875,11 @@ fluentbit:
                 - number: 443
                   protocol: TLS
                   name: https
-
-    securityContext:
-      privileged: true
     bbtests:
       enabled: true
+    upstream:
+      securityContext:
+        privileged: true
 
 
 loki:

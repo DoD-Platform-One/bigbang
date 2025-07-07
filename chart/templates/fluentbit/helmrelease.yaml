@@ -42,8 +42,9 @@ spec:
 
   {{- toYaml $fluxSettingsFluentbit | nindent 2 }}
 
-  {{- if .Values.fluentbit.postRenderers }}
   postRenderers:
+  {{ include "fluentbit.podPostRenderers" . | nindent 4 }}
+  {{- if .Values.fluentbit.postRenderers }}
   {{ toYaml .Values.fluentbit.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
