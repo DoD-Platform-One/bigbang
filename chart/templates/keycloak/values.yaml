@@ -5,13 +5,6 @@
 {{- define "bigbang.defaults.keycloak" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
-replicas: 2
-
-imagePullSecrets:
-- name: private-registry
-
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -22,15 +15,10 @@ domain: {{ $domainName }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   ingressLabels:
     {{- include "getGatewaySelector" (dict "default" "passthrough" "pkg" .Values.addons.keycloak "root" .) | nindent 4 }}
-
-monitoring:
-  enabled: {{ $monioringEnabled }}
-
 
 istio:
   enabled: {{ $istioEnabled }}
