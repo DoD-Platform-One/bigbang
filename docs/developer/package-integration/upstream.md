@@ -4,8 +4,8 @@ Before beginning the process of integrating a package into Big Bang, you will ne
 
 ## Prerequisites
 
-- [Kpt version 0.39.2](https://github.com/kptdev/kpt/releases/tag/v0.39.2) (Later versions of kpt are incompatible with Bigbang)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Helm](https://helm.sh/docs/intro/install/)
 
 > Throughout this document, we will be setting up an application called `podinfo` as a demonstration.
 
@@ -21,7 +21,7 @@ Big Bang requires a Helm chart to deploy your package. This Helm chart must be e
 
 ### Cloning Upstream
 
-To minimize maintenance, it is preferable to reuse existing Helm charts available in the community (upstream). Changes to the upstream Helm chart should be made with new files when possible, and always clearly marked as Big Bang additions.
+To minimize maintenance, we reuse existing Helm charts available in the community (upstream). _We do not fork upstream charts._ Changes to the upstream Helm chart should be avoided when possible, additional templates can be added to the chart in a /bigbang templates folder. Leverage mutating webhooks with Kyverno or postRenderers to overlay changes to an upstream chart.
 
 > Sometimes, it is not possible to find an upstream Helm chart and you must develop your own. This is beyond the scope of this document.
 
@@ -35,19 +35,36 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
     > * Does not bundle several packages together (unless they can be individually disabled); and
     > * Provides advanced features like high availability, scaling, affinity, taints/tolerations, and security context.
 
-1. Using [Kpt](https://googlecontainertools.github.io/kpt/installation/), create a clone of the package's Helm chart
+1. With the release of Big Bang 3.0, we are transitioning our package charts to a passthrough pattern. Rather than forking upstream charts with the kpt.dev tool, we now pull in charts and wrap them with a package chart. Passing the upstream chart through without modifications greatly reduces the update workload. When updating with custom modifications there are challenging merge conflicts to resolve. Passthrough pattern avoids this problem and should streamline the process of bringing in new packages and updating them via Renovate updater. 
 
-    ```shell
-    # Change these for your upstream helm chart
-    export GITREPO=https://github.com/stefanprodan/podinfo
-    export GITDIR=charts/podinfo
-    export GITTAG=5.2.1
+   Helm can be used to pull down the chart initially: 
+    
+   ```shell
+    helm pull podinfo/podinfo
+   ```
+   This will pull a number of superfluous files that we will not need for our repo. 
 
-    # Clone
-    kpt pkg get $GITREPO/$GITDIR@$GITTAG chart
-    ```
+   After that, copy the upstream `Chart.yaml` file into your repo under the `/chart` directory. Since this Chart.yaml will serve as a wrapper chart for the package, remove things like annotations from artifacthub.io and upstream maintainers. Leave version and description. As part of our integration, we want a helm.sh/images annotation with a list of deployable images from the package, as well as a number of bigbang.dev annotations. Next, in order to wrap the upstream chart, we simply add the package chart itself as a dependency in the Big Bang chart, like so: 
 
-    > Always use an release tag for `GITTAG` so your chart is immutable.  Never use a branch or `latest`.
+   ```yaml
+    apiVersion: v1
+    version: 6.9.0-bb.0
+    appVersion: 6.9.0
+    name: podinfo
+    engine: gotpl
+    description: Podinfo Helm chart for Kubernetes
+    dependencies:
+      - name: podinfo 
+        version: 6.9.0
+        repository: https://stefanprodan.github.io/podinfo
+        alias: upstream
+    kubeVersion: ">=1.23.0-0"
+    annotations:
+      bigbang.dev/maintenanceTrack: bb_integrated
+      helm.sh/images: |
+        - name: podinfo
+          image: registry1.dso.mil/ironbank/opensource/podinfo:6.9.0 
+   ```
 
 1. Add `-bb.0` suffix on `chart/Chart.yaml`, `version`.  For example:
 
@@ -56,6 +73,8 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
     ```
 
     > The `bb.#` will increment for each change we merge into our `main` branch.  It will also become our release label.
+   
+   Please note, `version` and `appVersion` are not [necessarily the same](https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/chart/Chart.yaml?ref_type=heads), especially if the chart is not maintained by the creator of the application. 
 
 1. Add the following files to the Git repository at the root:
 
@@ -205,36 +224,25 @@ To minimize maintenance, it is preferable to reuse existing Helm charts availabl
 
 ### Updating Upstream
 
-If a new version of the upstream Helm chart is released, this is how to sync it and retain the Big Bang enhancements.
+If a new version of the upstream Helm chart is released, the passthrough pattern makes updating very simple.
+1. Update the `chart.yaml` to the new chart version:
 
-```shell
-export GITTAG=6.0.0
+   ```yaml
+    apiVersion: v1
+    version: X.X.X-bb.0
+    appVersion: 6.9.0
+    name: podinfo
+    engine: gotpl
+    description: Podinfo Helm chart for Kubernetes
+    dependencies:
+      - name: podinfo 
+        version: X.X.X
+        repository: https://stefanprodan.github.io/podinfo
+        alias: upstream
+   ```
+1. Run `helm dependency update ./chart`. This will pull the new version of the chart into `chart/charts` 
+ 1. Document changes in `CHANGELOG.md` and update the `README.md` using the [gluon library script](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-package-readme.md)
 
-# Before upgrading, identify changes made to upstream chart
-kpt pkg diff chart > bb-mods-pre.txt
-
-# Sync with new Helm chart release
-kpt pkg update chart@$GITTAG --strategy alpha-git-patch
-
-# Resolve merge conflicts, if any, by
-# - Manually merging conflicts identified
-# - Add changes to git using `git add`
-# - Continuing the patch with `git am --continue`
-
-# After upgrading, identify deltas to upstream chart
-kpt pkg diff chart > bb-mods-post.txt
-
-# Look at the differences between the pre and post changes to make sure nothing was missed.  Add any missing items back into the chart
-diff bb-mods-pre.txt bb-mods-post.txt
-
-# Commit and push changes
-rm bb-mods-*.txt
-git add -A
-git commit -m "chore: update helm chart to $GITTAG"
-git push
-```
-
-> In Kpt 1.0, `alpha-git-patch` was renamed to `resource-merge`.
 
 ## Validation
 
