@@ -698,6 +698,17 @@
             }
           }
         },
+        "metricsGenerator": {
+          "type": "object",
+          "required": [
+            "enabled"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          }
+        },
         "disableAutomaticPassthroughValues": true
       },
       "additionalProperties": false
