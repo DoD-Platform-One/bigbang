@@ -862,6 +862,7 @@
         "git": true,
         "helmRepo": true,
         "flux": true,
+        "enterprise": true,
         "values": true,
         "postRenderers": true,
         "istio": {
