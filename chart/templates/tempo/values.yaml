@@ -31,11 +31,27 @@ tempo:
         forcepathstyle: true
 {{- end }}
 {{- end }}
-
-{{- if .Values.monitoring.enabled }}
+{{- if and .Values.tempo.metricsGenerator.enabled .Values.monitoring.enabled }}
   metricsGenerator:
     enabled: true
-    remoteWriteUrl: "http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
+    remoteWriteUrl: "http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090/api/v1/write"
+  per_tenant_overrides:
+    'single-tenant':
+      ingestion_rate_strategy: local
+      ingestion_rate_limit_bytes: 10485760         # 10MB/sec
+      ingestion_burst_size_bytes: 20971520         # 20MB burst
+      metrics_generator_processors:
+        - local-blocks
+        - service-graphs
+        - span-metrics
+      metrics_generator_processor_span_metrics_histogram_buckets: [0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 2.048, 4.096, 8.192, 16.384]
+      # Example spnametrics filter, filters out non-server traces
+      # metrics_generator_processor_span_metrics_filter_policies:
+      #   - include:
+      #       match_type: strict
+      #       attributes:
+      #         - key: kind
+      #           value: SPAN_KIND_SERVER
 {{- end }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
