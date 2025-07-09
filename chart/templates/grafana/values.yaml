@@ -13,6 +13,7 @@ domain: {{ $domainName }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
+{{- $enterpriseEnabled := (dig "enterprise" "enabled" false .Values.grafana) }}
 
 flux:
   enabled: true
@@ -89,6 +90,10 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
   pullSecrets:
   - private-registry
+  {{- if $enterpriseEnabled }}
+  repository: ironbank/grafana/grafana-enterprise
+  {{- end }}
+
 sidecar:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
@@ -284,13 +289,18 @@ grafana.ini:
     {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
   {{- end }}
 
-{{- if or (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+  {{- if $enterpriseEnabled }}
+  enterprise:
+    license_path: /etc/grafana/license/license.jwt
+  {{- end }}
+
+{{- if or (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) $enterpriseEnabled }}
 extraSecretMounts:
   {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
   - name: auth-generic-oauth-secret
     mountPath: /etc/secrets/auth_generic_oauth
     secretName: grafana-sso
-    defaultMode: 0440    
+    defaultMode: 0440
     readOnly: true
   {{- end }}
   {{- if and (or .Values.grafana.sso.enabled .Values.monitoring.sso.enabled) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
@@ -300,7 +310,14 @@ extraSecretMounts:
     readOnly: true
     subPath: "ca.pem"
   {{- end }}
+  {{- if $enterpriseEnabled }}
+  - name: enterprise-license
+    mountPath: /etc/grafana/license
+    secretName: grafana-enterprise-license
+    readOnly: true
+  {{- end }}
 {{- end }}
+
 {{- if .Values.monitoring.enabled }}
 serviceMonitor:
   enabled: true
@@ -312,6 +329,12 @@ serviceMonitor:
     keyFile: /etc/prom-certs/key.pem
     insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
 {{- end }}
+{{- end }}
+
+{{- if $enterpriseEnabled }}
+enterprise:
+  createSecret: {{ .Values.grafana.enterprise.createSecret | default true }}
+  license: {{ .Values.grafana.enterprise.license | quote }}
 {{- end }}
 {{- end }}
 
