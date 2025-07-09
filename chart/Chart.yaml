@@ -12,9 +12,11 @@ sources:
   - https://repo1.dso.mil/big-bang/bigbang
 maintainers:
   - name: Michael Martin
-    email: michaelmartin@seed-innovations.com
+    email: michael.martin.198.ctr@us.af.mil
   - name: Chris O'Connell
-    email: coconnell@bridgephase.com
+    email: christopher.oconnell.2.ctr@us.af.mil
   - name: Andrew Shoell
-    email: a.shoell@wearemetronome.com
+    email: andrew.shoell.ctr@us.af.mil
+  - name: Daniel Pritchett
+    email: daniel.pritchett.ctr@spaceforce.mil
 icon: https://p1.dso.mil/img/Big_Bang_Color_Logo_White_text.b04263b1.png
