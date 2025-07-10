@@ -4,24 +4,11 @@
 
 {{- define "bigbang.defaults.gitlab-runner" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-# Passthrough chart upstream config (main gitlab-runner chart values)
-upstream:
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-  imagePullSecrets:
-  - name: private-registry
+imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-  metrics:
-    enabled: {{ .Values.monitoring.enabled }}
-    serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
-
-  # When istio injected, add an annotation with the istio version to the manager pods only
-  {{- if and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end }}
-
+imagePullSecrets:
+- name: private-registry
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -40,6 +27,18 @@ networkPolicies:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
 
+# no longer necessary to directly pass through .Values.monitoring.enabled
+# the package chart uses: .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" to toggle monitoring
+metrics:
+  enabled: {{ .Values.monitoring.enabled }}
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+# When istio injected, add an annotation with the istio version to the manager pods only
+{{- if and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
+podAnnotations:
+  {{ include "istioAnnotation" . }}
+{{- end }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
