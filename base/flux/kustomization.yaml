@@ -9,13 +9,13 @@ images:
   newTag: v1.3.0
 - name: ghcr.io/fluxcd/kustomize-controller
   newName: registry1.dso.mil/ironbank/fluxcd/kustomize-controller
-  newTag: v1.6.0
+  newTag: v1.6.1
 - name: ghcr.io/fluxcd/notification-controller
   newName: registry1.dso.mil/ironbank/fluxcd/notification-controller
   newTag: v1.6.0
 - name: ghcr.io/fluxcd/source-controller
   newName: registry1.dso.mil/ironbank/fluxcd/source-controller
-  newTag: v1.6.1
+  newTag: v1.6.2
 
 patches:
   - target:
