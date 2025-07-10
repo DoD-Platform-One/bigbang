@@ -1,0 +1,190 @@
+comments: |
+  Operational deployments use a different configuration including but not limited to:
+  - a custom realm would not automatically be loaded. 
+  - needed secrets would be created independently through a GitOps process rather than using the keycloak chart to create secrets
+  - the certificate would not be inlined in the values.yaml but instead the keycloak-tlscert and keycloak-tlskey secrets are created independently through a GitOps process
+  - an external database would be used
+  - master realm would be disabled or restricted to prevent admin login
+
+  Here are some of the URL paths that are available in Keycloak 
+  Admin UI. Default credentials for development are admin:password  
+  https://keycloak.dev.bigbang.mil/auth/admin   
+  User registration and/or account page  
+  https://keycloak.dev.bigbang.mil/  
+  
+  For an example "baby-yoda" keycloak realm file that already has sso clients configured see
+    https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/chart/resources/dev/baby-yoda.json
+  Within the Keycloak Admin Console UI import your custom realm.json file. 
+
+
+domain: dev.bigbang.mil
+
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
+
+istio:
+  ingressGateways:
+    passthrough-ingressgateway:
+      type: "LoadBalancer"
+
+  gateways:
+    passthrough:
+      ingressGateway: "passthrough-ingressgateway"
+      hosts:
+      - "*.{{ .Values.domain }}"
+      tls:
+        mode: "PASSTHROUGH"
+
+addons:
+  keycloak:
+    enabled: true
+
+    ingress:
+      gateway: "passthrough"
+
+      # the cert and private key should be separated into a separate SOPS encrypted values file
+      key: |
+        -----BEGIN PRIVATE KEY-----
+        INSERT KEY HERE
+        -----END PRIVATE KEY-----
+      cert: |
+        -----BEGIN CERTIFICATE-----
+        INSERT CERT HERE
+        -----END CERTIFICATE-----
+
+    values:
+      #replicas: 3
+      autoscaling:
+        enabled: true
+        minReplcias: 2
+        maxReplicas: 5
+      command:
+        - "/opt/keycloak/bin/kc.sh"
+      args:
+        - "start"
+        # - "--import-realm"
+        # import-realm is not recommended for production/operational environments.
+        # For a new production deployment a realm file can be manually imported from the Admin Console
+
+      # https://www.keycloak.org/server/all-config
+      extraEnv: |-
+        - name: KC_HTTPS_CERTIFICATE_FILE
+          value: /opt/keycloak/conf/tls.crt
+        - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+          value: /opt/keycloak/conf/tls.key
+        - name: KC_HTTPS_CLIENT_AUTH
+          value: request
+        - name: KC_HTTPS_TRUST_STORE_FILE
+          value: /opt/keycloak/conf/truststore.jks
+        - name: KC_HTTPS_TRUST_STORE_PASSWORD
+          value: password
+        - name: KC_HOSTNAME
+          value: keycloak.dev.bigbang.mil
+        - name: KC_HOSTNAME_STRICT
+          value: "true"
+        - name: KC_LOG_LEVEL
+          value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
+      secrets:
+        env:
+          stringData:
+            # the admin credentials should be separated into a separate SOPS encrypted values file
+            KEYCLOAK_ADMIN: "admin"
+            KEYCLOAK_ADMIN_PASSWORD: "your-super-secure-password"
+            CUSTOM_REGISTRATION_CONFIG: /opt/keycloak/conf/customreg.yaml
+        customreg:
+          stringData:
+            customreg.yaml: '{{ .Files.Get "resources/dev/baby-yoda.yaml" }}'
+        realm:
+          stringData:
+            realm.json: '{{ .Files.Get "resources/dev/baby-yoda.json" }}'
+        truststore:
+          data:
+            truststore.jks: |-
+              {{ .Files.Get "resources/dev/truststore.jks" | b64enc }}
+        # This config example includes quarkus properties for changing the realm name to something other than "baby-yoda"
+        # The p1-keycloak-plugin has a custom quarkus extention for custom routing and redirects
+        # the quarkus.properties file is how you configure it
+        quarkusproperties:
+          stringData:
+            quarkus.properties: |-
+              quarkus.http.non-application-root-path=/
+              # custom redirects
+              quarkus.kc-routing.path-redirect./=/auth/realms/YOUR-REALM-NAME/account
+              quarkus.kc-routing.path-redirect./auth=/auth/realms/YOUR-REALM-NAME/account
+              quarkus.kc-routing.path-redirect./register=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/registrations?client_id=account&response_type=code
+              quarkus.kc-routing.path-prefix./oauth/authorize=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/auth
+              quarkus.kc-routing.path-filter./api/v4/user=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/userinfo
+              quarkus.kc-routing.path-filter./oauth/token=/auth/realms/YOUR-REALM-NAME/protocol/openid-connect/token
+              # block metrics and health enpoints from being exposed through the istio ingress
+              quarkus.kc-routing.path-recursive-block./metrics=8443
+              quarkus.kc-routing.path-recursive-block./health=8443
+
+
+      # This config includes an example of injecting a custom theme jar on startup
+      # Instructions for building a custom theme can be found in the Big Bang Keycloak repository
+      #    https://repo1.dso.mil/big-bang/product/packages/keycloak/-/blob/main/development/README.md
+      extraInitContainers: |-
+        - name: plugin
+          image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:X.X.X
+          imagePullPolicy: Always
+          command:
+          - sh
+          - -c
+          - | 
+            cp /app/p1-keycloak-plugin.jar /init
+            ls -l /init
+          volumeMounts:
+          - name: plugin
+            mountPath: "/init"
+        - name: custom-theme
+          image: YOUR-REGISTRY-NAME/PATH-TO-IMAGE/YOUR-CUSTOM-THEME-IMAGE-NAME:X.X.X
+          imagePullPolicy: Always
+          command:
+          - sh
+          - -c
+          - |
+            cp /app/YOUR-CUSTOM-THEME-JAR-NAME.jar /init
+            ls -l /init
+          volumeMounts:
+          - name: custom-theme
+            mountPath: "/init"    
+      extraVolumes: |-
+        - name: customreg
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-customreg
+        - name: realm
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-realm
+        - name: plugin
+          emptyDir: {}
+        - name: truststore
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-truststore
+        - name: quarkusproperties
+          secret:
+            secretName: {{ include "keycloak.fullname" . }}-quarkusproperties
+            defaultMode: 0777
+        - name: custom-theme
+          emptyDir: {}
+      extraVolumeMounts: |-
+        - name: customreg
+          mountPath: /opt/keycloak/conf/customreg.yaml
+          subPath: customreg.yaml
+          readOnly: true
+        - name: realm
+          mountPath: /opt/keycloak/data/import/realm.json
+          subPath: realm.json
+        - name: plugin
+          mountPath: /opt/keycloak/providers/p1-keycloak-plugin.jar
+          subPath: p1-keycloak-plugin.jar
+        - name: truststore
+          mountPath: /opt/keycloak/conf/truststore.jks
+          subPath: truststore.jks
+        - name: quarkusproperties
+          mountPath: /opt/keycloak/conf/quarkus.properties
+          subPath: quarkus.properties
+        - name: custom-theme
+          mountPath: /opt/keycloak/providers/YOUR-CUSTOM-THEME-JAR-NAME.jar
+          subPath: YOUR-CUSTOM-THEME-JAR-NAME.jar

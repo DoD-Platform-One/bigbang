@@ -1,7 +1,5 @@
 # Enables and configures sso for all packages using the test dev.bigbang.mil clients:
 sso:
-  url: https://login.dso.mil/auth/realms/baby-yoda
-
   name: P1 SSO
   # Entrust certificate authority for login.dso.mil
   # do not use this CA with a Keycloak deployed with a different certificate authority
