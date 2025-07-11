@@ -37,12 +37,23 @@ istio:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
+serviceMonitor:
+  enabled: {{ $.Values.monitoring.enabled }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.eckOperator.values) "STRICT") }}
+  tlsConfig:
+    caFile: /etc/prom-certs/root-cert.pem
+    certFile: /etc/prom-certs/cert-chain.pem
+    keyFile: /etc/prom-certs/key.pem
+    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
 
-imagePullSecrets:
-  - name: private-registry
+upstream:
+  imagePullSecrets:
+    - name: private-registry
 {{- end -}}
