@@ -1593,8 +1593,9 @@ addons:
           memory: 64Mi
           cpu: 50m
         limits: {}
-      runners:
-        protected: false
+      upstream:
+        runners:
+          protected: false
       networkPolicies:
         additionalPolicies:
         - name: egress-runner-jobs
