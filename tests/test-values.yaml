@@ -1766,6 +1766,23 @@ addons:
       name: name
       email: email
     values:
+      upstream:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        persistence:
+          size: 5Gi
+        postgresql:
+          persistence:
+            size: 256Mi
+        account:
+          adminPassword: New_admin_password!2
+          currentAdminPassword: admin
+        setAdminPassword:
+          newPassword: New_admin_password!2
+          currentPassword: admin
+        curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
       istio:
         hardened:
           customAuthorizationPolicies:
@@ -1794,27 +1811,13 @@ addons:
                     protocol: TLS
                     name: https
                 resolution: DNS
-      plugins:
-        install: []
-      resources:
-        requests:
-          cpu: 100m
-          memory: 200Mi
-      persistence:
-        size: 5Gi
-      postgresql:
-        persistence:
-          size: 256Mi
       bbtests:
         enabled: true
         cypress:
           envs:
             cypress_url: "https://sonarqube.dev.bigbang.mil"
             cypress_url_setup: "https://sonarqube.dev.bigbang.mil/setup"
-      account:
-        adminPassword: New_admin_password!2
-        currentAdminPassword: admin
-      curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
+
 
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core

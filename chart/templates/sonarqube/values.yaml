@@ -46,21 +46,28 @@ annotations:
 {{- end }}
 
 {{- if .Values.addons.sonarqube.sso.enabled }}
-sonarProperties:
-  sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}
-  sonar.core.serverBaseURL: https://sonarqube.{{ $domainName }}
-  sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}
-  sonar.auth.saml.providerName: {{ coalesce .Values.addons.sonarqube.sso.provider_name .Values.addons.sonarqube.sso.label .Values.sso.name }}
-  sonar.auth.saml.providerId: {{ include "sso.url" . }}
-  sonar.auth.saml.loginUrl: {{ include "sso.saml.service" . }}
-  sonar.auth.saml.certificate.secured: {{ default (include "sso.saml.cert" .) .Values.addons.sonarqube.sso.certificate }}
-  sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}
-  sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}
-  sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}
-  {{- if .Values.addons.sonarqube.sso.group }}
-  sonar.auth.saml.group.name: {{ .Values.addons.sonarqube.sso.group }}
+upstream:
+  sonarProperties:
+    # enabling saml authentication 
+    sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}   #false
+     # The base URL of the sonarqube server
+    sonar.core.serverBaseURL: https://sonarqube.{{ $domainName }}
+    # The client ID of the Sonarqube client in Keycloak
+    sonar.auth.saml.applicationId: {{ .Values.addons.sonarqube.sso.client_id }}    # "sonarqube"
+    # SSO login button label 
+    sonar.auth.saml.providerName: {{ coalesce .Values.addons.sonarqube.sso.provider_name .Values.addons.sonarqube.sso.label .Values.sso.name }} # "Keycloak SSO"
+    # You will find this in Keycloak in Realm Settings > General > Endpoints. Click on SAML 2.0 Identify Provider Metadata to obtain the XML configuration file. Search for the value 'EntityDescriptor > entityID'
+    sonar.auth.saml.providerId: {{ include "sso.url" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda"
+    sonar.auth.saml.loginUrl: {{ include "sso.saml.service" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda/protocol/saml"
+     # This is the RS256 key copied from Keycloak The value you get from ***Realm Settings > Keys > RS256.*** Click on Certificate
+    sonar.auth.saml.certificate.secured: {{ default (include "sso.saml.cert" .) .Values.addons.sonarqube.sso.certificate }}   #"-----BEGIN CERTIFICATE-----"
+    sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}   #"login" (user attribute)
+    sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}      #"username" (user attribute)
+    sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}   #"email" (user attribute)
+    {{- if .Values.addons.sonarqube.sso.group }}
+    sonar.auth.saml.group.name: {{ .Values.addons.sonarqube.sso.group }}  #"groups" (user attribute)
+    {{- end }}
   {{- end }}
-{{- end }}
 
 {{- with .Values.addons.sonarqube.database }}
   {{- if and .host .username .password .database .port }}

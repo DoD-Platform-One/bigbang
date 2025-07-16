@@ -42,10 +42,15 @@ spec:
 
   {{- toYaml $fluxSettingsSonarqube | nindent 2 }}
   
-  {{- if .Values.addons.sonarqube.postRenderers }}
+  {{- if or .Values.addons.sonarqube.postRenderers (and $istioEnabled .Values.monitoring.enabled) }}
   postRenderers:
-  {{ toYaml .Values.addons.sonarqube.postRenderers | nindent 4 }}
-  {{- end }}  
+  {{- if and $istioEnabled .Values.monitoring.enabled }}
+  {{ include "sonarqube.istioPrometheusPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.addons.sonarqube.postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-sonarqube-values
       kind: Secret
