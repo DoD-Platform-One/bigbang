@@ -208,3 +208,19 @@ addons:
     sourceType: "helmRepo"
     helmRepo:
       cosignVerify: false
+  backstage:
+    sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: false
+  externalSecrets:
+    sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: false
+  mimir:
+    sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: false
+  headlamp:
+    sourceType: "helmRepo"
+    helmRepo:
+      cosignVerify: false
