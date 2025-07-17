@@ -21,15 +21,6 @@ kyverno:
     bbtests:
       cypress:
         artifacts: false
-    networkPolicies:
-      externalRegistries:
-        allowEgress: true
-    replicaCount: 3
-    resources:
-      limits: null
-      requests:
-        cpu: 500m
-        memory: 384Mi
 
 elasticsearchKibana:
   values:
