@@ -10,56 +10,6 @@
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
-openshift:
-  enabled: {{ .Values.openshift }}
-
-createNamespace: false
-
-global:
-  {{- $argocdHosts := (dig "istio" "argocd" "hosts" dict .Values.addons.argocd.values) }}
-  {{- if $argocdHosts }}
-  domain: {{ tpl ($argocdHosts | first) $ }}
-  {{- else }}
-  domain: argocd.{{ $domainName }}
-  {{- end }}
-  image:
-    imagePullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-    - name: private-registry
-{{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-{{- end }}
-
-controller:
-  image:
-    imagePullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-    - name: private-registry
-  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
-  metrics:
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-  {{- end }}
-
-dex:
-  image:
-    imagePullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-    - name: private-registry
-
-{{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
-redis:
-  externalEndpoint: {{ .Values.addons.argocd.redis.host }}:{{ .Values.addons.argocd.redis.port }}
-  enabled: false
-{{- end }}
-
 redis-bb:
   networkPolicy:
     enabled: {{ .Values.networkPolicies.enabled }}
@@ -107,42 +57,23 @@ redis-bb:
       {{ include "istioAnnotation" . }}
 {{- end }}
 
-server:
-  image:
-    imagePullPolicy: {{ .Values.imagePullPolicy }}
-  autoscaling:
-    enabled: true
-  config:
-    # Must be enabled for plugins included in PlatformOne image.
-    kustomize.buildOptions: "--enable-alpha-plugins"
-  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
-  metrics:
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-  {{- end }}
+createNamespace: false
 
-repoServer:
+global:
+  {{- $argocdHosts := (dig "istio" "argocd" "hosts" dict .Values.addons.argocd.values) }}
+  {{- if $argocdHosts }}
+  domain: {{ tpl ($argocdHosts | first) $ }}
+  {{- else }}
+  domain: argocd.{{ $domainName }}
+  {{- end }}
   image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
-  autoscaling:
-    enabled: true
-  # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-  {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
-  metrics:
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-  {{- end }}
+  imagePullSecrets:
+    - name: private-registry
+{{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+{{- end }}
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -167,24 +98,107 @@ networkPolicies:
   ingressLabels:
     {{- include "getGatewaySelector" (dict "pkg" .Values.addons.argocd "root" .) | nindent 4 }}
 
-{{- if .Values.addons.argocd.sso.enabled }}
-sso:
-  enabled: {{ .Values.addons.argocd.sso.enabled }}
-  rbac:
-    policy.csv: |
-      {{- .Values.addons.argocd.sso.groups | nindent 6 }}
-  keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
-  config:
-    oidc.config: |
-      name: {{ default .Values.sso.name .Values.addons.argocd.sso.provider_name }}
-      issuer: {{ include "sso.url" . }}
-      clientID: {{ .Values.addons.argocd.sso.client_id }}
-      clientSecret: $oidc.keycloak.clientSecret
-      requestedScopes: ["openid","ArgoCD"]
-      {{- if (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
-      rootCA: |
-        {{- default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | nindent 8 }}
-      {{- end }}
-{{- end }}
+
+upstream:
+  {{- if .Values.addons.argocd.redis.host }}
+  externalRedis: 
+    host: {{ default "argocd-argocd-redis-bb-headless.argocd.svc.cluster.local" .Values.addons.argocd.redis.host }}
+    port: {{ default 6379 .Values.addons.argocd.redis.port }}
+  {{- end }}
+  {{- if .Values.addons.argocd.sso.enabled }}
+  configs:
+    cm:
+      oidc.config: |
+        name: {{ default .Values.sso.name .Values.addons.argocd.sso.provider_name }}
+        issuer: {{ include "sso.url" . }}
+        clientID: {{ .Values.addons.argocd.sso.client_id }}
+        clientSecret: {{ .Values.addons.argocd.sso.client_secret }}
+        requestedScopes: ["openid","ArgoCD"]
+        {{- if (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+        rootCA: |
+          {{- default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | nindent 10 }}
+        {{- end }}
+    {{- if .Values.addons.argocd.sso.groups }}
+    rbac:
+      policy.csv: |
+        {{- .Values.addons.argocd.sso.groups | nindent 8 }}
+    {{- end }}
+    {{- if .Values.addons.argocd.sso.client_secret }}
+    secret:
+      extra:
+        keycloakClientSecret: {{ .Values.addons.argocd.sso.client_secret }}
+    {{- end }} 
+  {{- end }}
+  openshift:
+    enabled: {{ .Values.openshift }}
+
+  controller:
+    image:
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+    imagePullSecrets:
+      - name: private-registry
+    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    metrics:
+      serviceMonitor:
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+    {{- end }}
+  
+  dex:
+    image:
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+    imagePullSecrets:
+      - name: private-registry
+  
+  server:
+    image:
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+    autoscaling:
+      enabled: true
+    config:
+      # Must be enabled for plugins included in PlatformOne image.
+      kustomize.buildOptions: "--enable-alpha-plugins"
+    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    metrics:
+      serviceMonitor:
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+    {{- end }}
+  
+  repoServer:
+    image:
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+    autoscaling:
+      enabled: true
+    # conditional that will attach the argocd-iam-secret environment variables containing AWS credentials from argocd values for SOPS on the repo-server deployment.
+    {{- $awskeyid := dig "addons" "argocd" "values" "awsCredentials" "awsAccessKeyId" false (.Values | merge (dict)) }}
+    {{- $awssecret := dig "addons" "argocd" "values" "awsCredentials" "awsSecretAccessKey" false (.Values | merge (dict)) }}
+    {{- if and $awskeyid $awssecret }}
+    envFrom:
+    - secretRef:
+        name: argocd-iam-secret
+    {{- end }}     
+    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    metrics:
+      serviceMonitor:
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+    {{- end }}
+
 {{- end -}}
 
