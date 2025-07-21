@@ -1213,11 +1213,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/backstage.git
       path: "./chart"
-      tag: "2.5.2-bb.4"
+      tag: "2.5.3-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "backstage"
-      tag: "2.5.2-bb.4"
+      tag: "2.5.3-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Backstage Package
     flux: {}
