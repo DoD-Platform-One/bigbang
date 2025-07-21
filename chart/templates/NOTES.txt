@@ -437,3 +437,12 @@ DEPRECATION NOTICE:
   Grafana Promtail has been deprecated and will be removed in a future Big Bang release. 
   Big Bang will be migrating to Grafana Alloy (https://docs-bigbang.dso.mil/latest/packages/alloy/) as the core log aggregator. 
 {{- end }}
+
+{{- if and .Values.addons.keycloak.enabled (not (or .Values.addons.keycloak.database.host (dig "upstream" "database" "hostname" false .Values.addons.keycloak.values))) }}
+PLATFORM ONE KEYCLOAK WARNING
+  You have enabled Keycloak with an internal database. Platform One does not 
+  support this option for production deployments. This option should only be 
+  used for development or CI pipelines. Please configure your Keycloak deployment 
+  to use an external database at either the `addons.keycloak.database` or 
+  `addons.keycloak.values.upstream.database` keys.
+{{- end }}
