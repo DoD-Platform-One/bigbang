@@ -88,13 +88,37 @@ query:
     {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
     {{- end }}
   {{- end }}
+  {{- if .Values.addons.thanos.objectStorage.endpoint }}
+  extraFlags:
+    - "--endpoint=dns+monitoring-monitoring-kube-thanos-discovery.monitoring.svc.cluster.local:{{- dig "values" "query" "containerPorts" "grpc" 10901 .Values.addons.thanos }}"
+  {{- end }}
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
 
-{{- if or (dig "compactor" "enabled" false .Values.addons.thanos.values) (not (.Values.addons.thanos.objectStorage.endpoint | empty)) }}
+queryFrontend:
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
+
+bucketweb:
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
+
+ruler:
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
+
+receive:
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
+
+{{- if or (dig "compactor" "enabled" false .Values.addons.thanos.values) .Values.addons.thanos.objectStorage.endpoint }}
 compactor:
   enabled: true
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
 {{- end }}
 
-{{- if not (.Values.addons.thanos.objectStorage.endpoint | empty) }}
+{{- if .Values.addons.thanos.objectStorage.endpoint }}
 objstoreConfig: |-
   type: s3
   config:
@@ -108,9 +132,7 @@ storegateway:
   enabled: true
   useEndpointGroup: true
   endpoint: {{ .Values.addons.thanos.objectStorage.endpoint }}
-
-query:
-  extraFlags:
-    - "--endpoint=dns+monitoring-monitoring-kube-thanos-discovery.monitoring.svc.cluster.local:{{- dig "values" "query" "containerPorts" "grpc" 10901 .Values.addons.thanos }}"
+  networkPolicy:
+    enabled: {{ .Values.networkPolicies.enabled }}
 {{- end }}
 {{- end }}
