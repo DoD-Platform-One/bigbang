@@ -6671,85 +6671,71 @@ addons:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
     values:
-      global:
-        tlsDisable: false
-      injector:
-        affinity: |
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-              - weight: 100
-                podAffinityTerm:
-                  labelSelector:
-                    matchLabels:
-                      app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
-                      app.kubernetes.io/instance: "{{ .Release.Name }}"
-                      component: webhook
-                  topologyKey: kubernetes.io/hostname
-      server:
-        extraEnvironmentVars:
-          VAULT_SKIP_VERIFY: "true"
-          VAULT_LOG_FORMAT: "json"
-        dataStorage:
-          size: 256Mi
-        auditStorage:
-          size: 256Mi
-        ha:
-          enabled: true
-          replicas: 1
-          apiAddr: "https://vault.dev.bigbang.mil"
-          raft:
-            config: |
-              ui = true
+      upstream:
+        global:
+          tlsDisable: false
+        injector:
+          affinity: |
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+                        app.kubernetes.io/instance: "{{ .Release.Name }}"
+                        component: webhook
+                    topologyKey: kubernetes.io/hostname
+        server:
+          extraEnvironmentVars:
+            VAULT_SKIP_VERIFY: "true"
+            VAULT_LOG_FORMAT: "json"
+          dataStorage:
+            size: 256Mi
+          auditStorage:
+            size: 256Mi
+          ha:
+            enabled: true
+            replicas: 1
+            apiAddr: "https://vault.dev.bigbang.mil"
+            raft:
+              config: |
+                ui = true
 
-              listener "tcp" {
-                tls_disable = false
-                address = "[::]:8200"
-                cluster_address = "[::]:8201"
-                tls_cert_file = "/vault/tls/tls.crt"
-                tls_key_file  = "/vault/tls/tls.key"
+                listener "tcp" {
+                  tls_disable = false
+                  address = "[::]:8200"
+                  cluster_address = "[::]:8201"
+                  tls_cert_file = "/vault/tls/tls.crt"
+                  tls_key_file  = "/vault/tls/tls.key"
+                  telemetry {
+                    unauthenticated_metrics_access = true
+                  }
+                }
+
+                storage "raft" {
+                  path = "/vault/data"
+
+                  retry_join {
+                    leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
+                    leader_client_cert_file = "/vault/tls/tls.crt"
+                    leader_client_key_file = "/vault/tls/tls.key"
+                    leader_tls_servername = "vault.dev.bigbang.mil"
+                  }
+                }
+
+                seal "awskms" {
+                  region     = "us-gov-west-1"
+                  kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
+                  endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+                }
+  
                 telemetry {
-                  unauthenticated_metrics_access = true
+                  prometheus_retention_time = "24h"
+                  disable_hostname = true
                 }
-              }
+                service_registration "kubernetes" {}
 
-              storage "raft" {
-                path = "/vault/data"
-
-                retry_join {
-                  leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
-                  leader_client_cert_file = "/vault/tls/tls.crt"
-                  leader_client_key_file = "/vault/tls/tls.key"
-                  leader_tls_servername = "vault.dev.bigbang.mil"
-                }
-              }
-
-              service_registration "kubernetes" {}
-
-          config: |
-            ui = true
-
-            listener "tcp" {
-              tls_disable = false
-              address = "[::]:8200"
-              cluster_address = "[::]:8201"
-              tls_cert_file = "/vault/tls/tls.crt"
-              tls_key_file  = "/vault/tls/tls.key"
-              telemetry {
-                unauthenticated_metrics_access = true
-              }
-            }
-
-            seal "awskms" {
-              region     = "us-gov-west-1"
-              kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
-              endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
-            }
-
-            telemetry {
-              prometheus_retention_time = "24h"
-              disable_hostname = true
-            }
-            service_registration "kubernetes" {}
       istio:
         hardened:
           customAuthorizationPolicies:
