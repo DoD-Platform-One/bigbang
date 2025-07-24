@@ -6,11 +6,11 @@ istioGateway:
         - name: public-cert
           tls: &publicTLS
             key: |
-              -----BEGIN EC PRIVATE KEY-----
-              MHcCAQEEIM4rQOUctfCOb5oL5C0jx/K+Ts43Z/rnTHOkL5JMaVuioAoGCCqGSM49
-              AwEHoUQDQgAEYuUj0rrvkzRV9hPJ+SaUlgeuzj5tqdyB501t1qcLyqnJ4LoAHbKH
-              bwSr77UP57GkyRYcsUr8I3/F6k7kuPU0vg==
-              -----END EC PRIVATE KEY-----
+              -----BEGIN PRIVATE KEY-----
+              MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgzitA5Ry18I5vmgvk
+              LSPH8r5Ozjdn+udMc6QvkkxpW6KhRANCAARi5SPSuu+TNFX2E8n5JpSWB67OPm2p
+              3IHnTW3WpwvKqcngugAdsodvBKvvtQ/nsaTJFhyxSvwjf8XqTuS49TS+
+              -----END PRIVATE KEY-----
             cert: |
               -----BEGIN CERTIFICATE-----
               MIIFijCCBRGgAwIBAgIQD3ar65lzuBGcR0pv+7S5FDAKBggqhkjOPQQDAzBZMQsw
