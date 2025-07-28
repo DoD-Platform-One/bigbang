@@ -1037,6 +1037,9 @@ monitoring:
     alertmanager:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
   values:
+    # Monitoring CRDs are handled in prometheus-operator-crds chart
+    crds:
+      enabled: false
     istio:
       hardened:
         customServiceEntries:

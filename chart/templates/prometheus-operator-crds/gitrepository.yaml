@@ -1,0 +1,24 @@
+{{- if and (eq .Values.prometheusOperatorCRDs.sourceType "git") (not .Values.offline) .Values.prometheusOperatorCRDs.enabled }}
+{{- $gitCredsDict := dict
+  "name" "prometheusOperatorCRDs"
+  "packageGitScope" .Values.prometheusOperatorCRDs.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: prometheus-operator-crds
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: prometheus-operator-crds
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.prometheusOperatorCRDs.git.repo }}
+  ref:
+    {{- include "validRef" .Values.prometheusOperatorCRDs.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}

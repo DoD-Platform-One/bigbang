@@ -105,3 +105,7 @@ headlamp:
   repoName: "headlamp"
   hrName: "headlamp"
   filePath: "headlamp"
+prometheusOperatorCRDs:
+  repoName: "prometheus-operator-crds"
+  hrName: "prometheus-operator-crds"
+  filePath: "prometheus-operator-crds"
