@@ -1,4 +1,4 @@
-{{- if and (not .Values.monitoring.enabled) .Values.grafana.enabled }}
+{{- if and (not .Values.prometheusOperatorCRDs.enabled) .Values.grafana.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: v1
 kind: Namespace

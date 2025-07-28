@@ -1,0 +1,9 @@
+{{- $pkg := "prometheusOperatorCRDs" }}
+
+{{- /* Create secret */ -}}
+{{- if .Values.prometheusOperatorCRDs }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "prometheus-operator-crds" "defaults" (include "bigbang.defaults.prometheus-operator-crds" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.prometheus-operator-crds" -}}
+{{- end }}

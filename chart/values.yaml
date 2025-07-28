@@ -916,6 +916,27 @@ tempo:
 
 # Monitoring
 #
+prometheusOperatorCRDs:
+  # -- Toggle deployment of Monitoring/Prometheus Operator CRDs (ServiceMonitor, PodMonitor, AlertManager, ScrapeConfigs etc..)
+  enabled: true
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/prometheus-operator-crds.git
+    path: "./chart"
+    tag: 21.0.0-bb.0
+  helmRepo:
+    repoName: "registry1"
+    chartName: "prometheus-operator-crds"
+    tag: 21.0.0-bb.0
+  # -- Values to passthrough to the Prometheus Operator CRDs chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Prometheus Operator CRDs Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 monitoring:
   # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true

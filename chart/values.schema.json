@@ -30,6 +30,7 @@
     "loki",
     "neuvector",
     "tempo",
+    "prometheusOperatorCRDs",
     "monitoring",
     "grafana",
     "twistlock",
@@ -711,6 +712,23 @@
         },
         "disableAutomaticPassthroughValues": true
       },
+      "additionalProperties": false
+    },
+    "prometheusOperatorCRDs": {
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
       "additionalProperties": false
     },
     "monitoring": {
