@@ -1095,12 +1095,12 @@ bbctl:
 
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/bbctl.git
-    tag: "2.0.0-bb.3"
+    tag: "2.1.0-bb.1"
     path: "./chart"
   helmRepo:
     repoName: "registry1"
     chartName: "bbctl"
-    tag: "2.0.0-bb.3"
+    tag: "2.1.0-bb.1"
 
   repoCredentials:
     repo: "repo1.dso.mil"
