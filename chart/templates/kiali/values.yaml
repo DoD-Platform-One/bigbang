@@ -101,22 +101,6 @@ upstream:
               - app_label: istiod
                 is_core: true
                 is_proxy: false
-              {{- if $istioEnabled }}
-              {{- range $name, $values := .Values.istioGateway.values.gateways }}
-              {{ if ne $values.enabled false }}
-              - app_label: {{ $name }}
-                is_core: true
-                is_proxy: true
-              {{- end }}
-              {{- end }}
-              {{- range $name, $values := .Values.istioGateway.values.gateways }}
-              {{ if ne $values.enabled false }}
-              - app_label: {{ $name }}
-                is_core: true
-                is_proxy: true
-              {{- end }}
-              {{- end }}
-              {{- end }}
               {{- if .Values.istioGateway.enabled }}
               {{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
               {{- if eq $gw.type "ingressgateway" }}
