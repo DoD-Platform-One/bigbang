@@ -20,42 +20,43 @@ redis-bb:
   {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-  auth:
-    enabled: false
-  {{- if .Values.monitoring.enabled }}
-  metrics:
-    enabled: true
-    image:
-      pullSecrets:
-        - private-registry
-    serviceMonitor:
+  upstream:
+    auth:
+      enabled: false
+    {{- if .Values.monitoring.enabled }}
+    metrics:
       enabled: true
-      namespace: argocd
-      selector:
-        app.kubernetes.io/name: redis-bb
-        app.kubernetes.io/instance: argocd-argocd
-      # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-      {{- end }}
-
-    prometheusRule:
-      enabled: true
-      namespace: monitoring
+      image:
+        pullSecrets:
+          - private-registry
+      serviceMonitor:
+        enabled: true
+        namespace: argocd
+        selector:
+          app.kubernetes.io/name: redis-bb
+          app.kubernetes.io/instance: argocd-argocd
+        # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
+        {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+        {{- end }}
+  
+      prometheusRule:
+        enabled: true
+        namespace: monitoring
+    {{- end }}
+  {{- if $istioInjection }}
+    master:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    replica:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
   {{- end }}
-{{- if $istioInjection }}
-  master:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  replica:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-{{- end }}
 
 createNamespace: false
 
