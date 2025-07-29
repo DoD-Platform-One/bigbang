@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 3.3.0](https://img.shields.io/badge/Version-3.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.3.1](https://img.shields.io/badge/Version-3.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -325,11 +325,11 @@ Kubernetes: `>=1.30.0-0`
 | bbctl.enabled | bool | `true` | Toggle deployment of the bbctl dashboards |
 | bbctl.sourceType | string | `"git"` |  |
 | bbctl.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/bbctl.git"` |  |
-| bbctl.git.tag | string | `"2.0.0-bb.3"` |  |
+| bbctl.git.tag | string | `"2.1.0-bb.1"` |  |
 | bbctl.git.path | string | `"./chart"` |  |
 | bbctl.helmRepo.repoName | string | `"registry1"` |  |
 | bbctl.helmRepo.chartName | string | `"bbctl"` |  |
-| bbctl.helmRepo.tag | string | `"2.0.0-bb.3"` |  |
+| bbctl.helmRepo.tag | string | `"2.1.0-bb.1"` |  |
 | bbctl.repoCredentials.repo | string | `"repo1.dso.mil"` |  |
 | bbctl.repoCredentials.username | string | `""` |  |
 | bbctl.repoCredentials.password | string | `""` |  |
@@ -426,10 +426,10 @@ Kubernetes: `>=1.30.0-0`
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"9.1.2-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"9.2.1-bb.0"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"9.1.2-bb.0"` |  |
+| addons.gitlab.helmRepo.tag | string | `"9.2.1-bb.0"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
