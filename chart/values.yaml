@@ -459,11 +459,11 @@ kyverno:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno.git
     path: "./chart"
-    tag: "3.4.4-bb.0"
+    tag: "3.4.4-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno"
-    tag: "3.4.4-bb.0"
+    tag: "3.4.4-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux:
@@ -933,7 +933,9 @@ prometheusOperatorCRDs:
   # -- Values to passthrough to the Prometheus Operator CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Prometheus Operator CRDs Package
-  flux: {}
+  flux:
+    driftDetection:
+      mode: warn
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -947,11 +949,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "75.6.1-bb.1"
+    tag: "75.6.1-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "75.6.1-bb.1"
+    tag: "75.6.1-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
