@@ -55,16 +55,4 @@ spec:
     - name: {{ .Release.Name }}-prometheus-operator-crds-values
       kind: Secret
       valuesKey: "overlays"
-
-  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled }}
-  dependsOn:
-    {{- if .Values.gatekeeper.enabled }}
-    - name: gatekeeper
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
-    {{- if .Values.kyvernoPolicies.enabled }}
-    - name: kyverno-policies
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
-  {{- end }}
 {{- end }}
