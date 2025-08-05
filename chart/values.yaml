@@ -925,11 +925,11 @@ prometheusOperatorCRDs:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/prometheus-operator-crds.git
     path: "./chart"
-    tag: 21.0.0-bb.0
+    tag: 22.0.1-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "prometheus-operator-crds"
-    tag: 21.0.0-bb.0
+    tag: 22.0.1-bb.0
   # -- Values to passthrough to the Prometheus Operator CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Prometheus Operator CRDs Package
