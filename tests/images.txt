@@ -1,0 +1,1 @@
+registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.6.7
