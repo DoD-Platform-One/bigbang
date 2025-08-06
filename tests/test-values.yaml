@@ -6773,6 +6773,43 @@ addons:
     enabled: false
     # -- Values to pass through to Harbor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values:
+      upstream:
+        expose:
+          type: clusterIP
+          tls:
+            enabled: false
+        internalTLS:
+          enabled: false
+        externalURL: https://harbor.dev.bigbang.mil
+        nginx:
+          replicas: 2
+        portal:
+          replicas: 2
+        core:
+          replicas: 2
+          secretName: "ci-only"
+        #jobservice:
+        #registry:
+          #registry:
+          #controller:
+        #chartmuseum:
+        trivy:
+          resources:
+            requests:
+              cpu: 160m
+              memory: 300Mi
+            limits:
+              cpu: 300m
+              memory: 500Mi
+        #notary:
+          #server:
+          #signer:
+        #database:
+          #internal:
+        #postgresql:
+        #redis:
+        exporter:
+          replicas: 1
       istio:
         hardened:
           customServiceEntries:
@@ -6796,42 +6833,6 @@ addons:
                     protocol: TLS
                     name: https
                 resolution: DNS
-      expose:
-        type: clusterIP
-        tls:
-          enabled: false
-      internalTLS:
-        enabled: false
-      externalURL: https://harbor.dev.bigbang.mil
-      nginx:
-        replicas: 2
-      portal:
-        replicas: 2
-      core:
-        replicas: 2
-        secretName: "ci-only"
-      #jobservice:
-      #registry:
-        #registry:
-        #controller:
-      #chartmuseum:
-      trivy:
-        resources:
-          requests:
-            cpu: 160m
-            memory: 300Mi
-          limits:
-            cpu: 300m
-            memory: 500Mi
-      #notary:
-        #server:
-        #signer:
-      #database:
-        #internal:
-      #postgresql:
-      #redis:
-      exporter:
-        replicas: 2
       bbtests:
         enabled: true
         cypress:
