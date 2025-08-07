@@ -1138,11 +1138,12 @@ grafana:
 
 neuvector:
   values:
-    enforcer:
-      podAnnotations:
-        sidecar.istio.io/proxyMemoryLimit: "2Gi"
-    k3s:
-      enabled: true
+    upstream:
+      enforcer:
+        podAnnotations:
+          sidecar.istio.io/proxyMemoryLimit: "2Gi"
+      k3s:
+        enabled: true
     istio:
       hardened:
         customServiceEntries:

@@ -8,8 +8,6 @@
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
 
-openshift: {{ .Values.openshift }}
-
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
@@ -19,47 +17,63 @@ istio:
       - {{ include "getGatewayName" (dict "gateway" .Values.neuvector.ingress.gateway "root" .)}}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  ingressLabels:
+  {{- if $istioEnabled }}
+  {{- include "getGatewaySelector" (dict "pkg" .Values.neuvector "root" .) | nindent 4 }}
+  {{- end }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-{{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled }}
-controller:
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
+upstream:
+  openshift: {{ .Values.openshift }}
+  {{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled }}
+  controller:
+    {{- if $istioInjection }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+    {{- if or .Values.monitoring.enabled .Values.neuvector.sso.enabled }}
+    secret:
+      enabled: true
+      data: 
+        {{- if .Values.monitoring.enabled }}
+        userinitcfg.yaml:
+          always_reload: true
+          users:
+          - username: metrics
+            password: {{ $neuvectorMetricsPass }}
+            role: reader
+            fullname: metrics
+        {{- end }}
+        {{- if .Values.neuvector.sso.enabled }}
+        oidcinitcfg.yaml:
+          always_reload: true
+          enable: {{ .Values.neuvector.sso.enabled }}
+          issuer: {{ default (include "sso.url" .) (tpl (default "" .Values.neuvector.sso.issuer) .) }}
+          client_id: {{ .Values.neuvector.sso.client_id }}
+          client_secret: {{ .Values.neuvector.sso.client_secret | default "no-secret" }}
+          default_role: {{ .Values.neuvector.sso.default_role }}
+          group_claim: {{ .Values.neuvector.sso.group_claim }}
+          {{- if .Values.neuvector.sso.group_mapped_roles }}
+          group_mapped_roles: 
+            {{- toYaml .Values.neuvector.sso.group_mapped_roles | nindent 10 }}
+          {{- else }}
+          group_mapped_roles: []
+          {{- end }}
+        {{- end }}
+    {{- end }}
+    {{- if and .Values.neuvector.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+    sso:
+      certificateAuthority:
+        secretName: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
+    {{- end }}
   {{- end }}
-  {{- if or .Values.monitoring.enabled .Values.neuvector.sso.enabled }}
-  secret:
-    enabled: true
-    data: 
-      {{- if .Values.monitoring.enabled }}
-      userinitcfg.yaml:
-        always_reload: true
-        users:
-        - username: metrics
-          password: {{ $neuvectorMetricsPass }}
-          role: reader
-          fullname: metrics
-      {{- end }}
-      {{- if .Values.neuvector.sso.enabled }}
-      oidcinitcfg.yaml:
-        always_reload: true
-        enable: {{ .Values.neuvector.sso.enabled }}
-        issuer: {{ default (include "sso.url" .) (tpl (default "" .Values.neuvector.sso.issuer) .) }}
-        client_id: {{ .Values.neuvector.sso.client_id }}
-        client_secret: {{ .Values.neuvector.sso.client_secret | default "no-secret" }}
-        default_role: {{ .Values.neuvector.sso.default_role }}
-        group_claim: {{ .Values.neuvector.sso.group_claim }}
-        group_mapped_roles: 
-          {{ toYaml .Values.neuvector.sso.group_mapped_roles | nindent 10 }}
-      {{- end }}
-  {{- end }}
-  {{- if and .Values.neuvector.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
-  sso:
-    certificateAuthority:
-      secretName: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
-  {{- end }}
-{{- end }}
 
 monitor:
   install: {{ .Values.monitoring.enabled }}
@@ -76,7 +90,6 @@ monitor:
     {{- end }}
     serviceMonitor:
       enabled: {{ .Values.monitoring.enabled }}
-      # conditional passes only for default istio: enabled, mTLS: SCRICT
       {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") .Values.monitoring.enabled }}
       scheme: https
       tlsConfig:
@@ -85,6 +98,7 @@ monitor:
         keyFile: /etc/prom-certs/key.pem
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
+
     svc:
       enabled: {{ .Values.monitoring.enabled }}
       type: ClusterIP
@@ -92,31 +106,22 @@ monitor:
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
 
 
-{{- if $istioInjection }}
-enforcer:
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-cve:
-  updater:
+  {{- if $istioInjection }}
+  enforcer:
     podAnnotations:
       {{ include "istioAnnotation" . }}
-  scanner:
+  cve:
+    updater:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    scanner:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+  manager:
     podAnnotations:
       {{ include "istioAnnotation" . }}
-manager:
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-{{- end }}
-
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-  {{- if $istioEnabled }}
-  {{- include "getGatewaySelector" (dict "pkg" .Values.neuvector "root" .) | nindent 4 }}
   {{- end }}
+
 {{- end }}
 
 {{- /* Create secret */ -}}
