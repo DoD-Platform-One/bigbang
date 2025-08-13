@@ -41,9 +41,6 @@ eckOperator:
 fluentbit:
   hrName: "fluentbit"
   filePath: "fluentbit"
-promtail:
-  dependencies:
-    - "loki"
 loki:
   dependencies:
     - "minioOperator"

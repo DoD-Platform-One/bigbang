@@ -28,8 +28,6 @@ istio:
     enabled: true
     monitoring:
       enabled: {{ .Values.monitoring.enabled }}
-    promtail:
-      enabled: {{ .Values.promtail.enabled }}
     fluentbit:
       enabled: {{ .Values.fluentbit.enabled }}
     minioOperator:
@@ -74,11 +72,6 @@ monitoring:
 {{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- if and .Values.fluentbit.enabled (not $disableDefaultFLB) }}
 fluentbit:
-  enabled: true
-{{- end }}
-
-{{- if .Values.promtail.enabled }}
-promtail:
   enabled: true
 {{- end }}
 

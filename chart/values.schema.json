@@ -26,7 +26,6 @@
     "elasticsearchKibana",
     "eckOperator",
     "fluentbit",
-    "promtail",
     "loki",
     "neuvector",
     "tempo",
@@ -474,27 +473,6 @@
       "additionalProperties": false
     },
     "fluentbit": {
-      "properties": {
-        "enabled": true,
-        "sourceType": true,
-        "git": true,
-        "helmRepo": true,
-        "flux": true,
-        "values": true,
-        "postRenderers": true,
-        "istio": {
-          "$ref": "#/$defs/istio"
-        },
-        "disableAutomaticPassthroughValues": true
-      },
-      "allOf": [
-        {
-          "$ref": "#/$defs/basePackage"
-        }
-      ],
-      "additionalProperties": false
-    },
-    "promtail": {
       "properties": {
         "enabled": true,
         "sourceType": true,

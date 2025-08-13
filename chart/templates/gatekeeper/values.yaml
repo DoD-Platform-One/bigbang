@@ -44,7 +44,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
         - registry1.dso.mil
         - registry.dso.mil
 
-  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.neuvector.enabled .Values.alloy.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent)}}
+  {{- if or .Values.monitoring.enabled .Values.fluentbit.enabled .Values.twistlock.enabled .Values.neuvector.enabled .Values.alloy.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent)}}
   allowedHostFilesystem:
     parameters:
       excludedResources:
@@ -63,11 +63,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       - twistlock/twistlock-defender-ds-.*
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # promtail requires hostpath volume mounts
-      # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-      - promtail/promtail-promtail-.*
       {{- end }}
       {{- if .Values.alloy.enabled }}
       # alloy pods need access to host for logs
@@ -170,7 +165,7 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.promtail.enabled .Values.alloy.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.alloy.enabled }}
   selinuxPolicy:
     parameters:
       excludedResources:
@@ -182,17 +177,13 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       # Twistlock Defenders need selinux option type spc_t
       - twistlock/twistlock-defender
       {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # Promtail needs selinux option type spc_t
-      - promtail/promtail
-      {{- end }}
       {{- if .Values.alloy.enabled }}
       # Alloy requires selinux option type spc_t
       - alloy/alloy
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.neuvector.enabled .Values.alloy.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent) }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.monitoring.enabled .Values.neuvector.enabled .Values.alloy.enabled (and .Values.addons.velero.enabled .Values.addons.velero.values.deployNodeAgent) }}
   volumeTypes:
     parameters:
       excludedResources:
@@ -210,11 +201,6 @@ violations:  # Try to keep this in alpha order to make it easier to find keys
       # Prometheus node exported requires hostpath hardcoded in upstream chart on which monitoring pkg has a direct dependency
       # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/templates/daemonset.yaml#L150
       - monitoring/monitoring-monitoring-prometheus-node-exporter-.*
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # Promtail requires hostpath volume types
-      # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-      - promtail/promtail-promtail-.*
       {{- end }}
       {{- if .Values.neuvector.enabled }}
       # Neuvector requires hostpath volume types

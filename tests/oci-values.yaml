@@ -58,11 +58,6 @@ kyvernoReporter:
   helmRepo:
     cosignVerify: false
 
-promtail:
-  sourceType: "helmRepo"
-  helmRepo:
-    cosignVerify: false
-
 loki:
   sourceType: "helmRepo"
   helmRepo:
