@@ -42,8 +42,9 @@ spec:
 
   {{- toYaml $fluxSettingsHarbor | nindent 2 }}
 
-  {{- if (get .Values.addons $pkg).postRenderers }}
   postRenderers:
+  {{ include "harbor.fixRegistryPostRender" . | nindent 2 }}
+  {{- if (get .Values.addons $pkg).postRenderers }}
   {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
