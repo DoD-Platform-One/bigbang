@@ -202,17 +202,6 @@ Kubernetes: `>=1.31.0-0`
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
 | fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| promtail.enabled | bool | `false` | Toggle deployment of Promtail. |
-| promtail.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| promtail.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/promtail.git"` |  |
-| promtail.git.path | string | `"./chart"` |  |
-| promtail.git.tag | string | `"6.16.6-bb.5"` |  |
-| promtail.helmRepo.repoName | string | `"registry1"` |  |
-| promtail.helmRepo.chartName | string | `"promtail"` |  |
-| promtail.helmRepo.tag | string | `"6.16.6-bb.5"` |  |
-| promtail.flux | object | `{}` | Flux reconciliation overrides specifically for the Promtail Package |
-| promtail.values | object | `{}` | Values to passthrough to the promtail chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git |
-| promtail.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | loki.enabled | bool | `true` | Toggle deployment of Loki. |
 | loki.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | loki.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/loki.git"` |  |
@@ -223,7 +212,7 @@ Kubernetes: `>=1.31.0-0`
 | loki.helmRepo.tag | string | `"6.30.1-bb.3"` |  |
 | loki.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Tenant"}},{"paths":[""],"target":{"kind":"Sidecar"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
-| loki.clusterName | string | `""` | Loki clusterName identifier for Promtail and Dashboards |
+| loki.clusterName | string | `""` | Loki clusterName |
 | loki.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
 | loki.objectStorage.region | string | `""` | S3 compatible region to use for connection information. |
 | loki.objectStorage.accessKey | string | `""` | Access key for connecting to object storage endpoint. |

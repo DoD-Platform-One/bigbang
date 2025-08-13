@@ -1056,9 +1056,6 @@ tempo:
           cpu: 200m
           memory: 128Mi
 
-promtail:
-  enabled: false
-
 monitoring:
   flux:
     timeout: 20m
@@ -1275,7 +1272,6 @@ bbctl:
                     namespaces:
                     - loki
                     - grafana
-                    - promtail
                     - monitoring
     bbtests:
       enabled: true

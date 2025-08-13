@@ -403,7 +403,7 @@ policies:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
     exclude:
       any:
       - resources:
@@ -449,17 +449,6 @@ policies:
           names:
           - fluentbit-fluent-bit*
       {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # promtail requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
-      # and then granting permissions recursively on /var/log.
-      # promtail requires access to /run/promtail for its buffering and persistent state.
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          - promtail-promtail*
-      {{- end }}
       {{- if .Values.neuvector.enabled }}
       # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
       - resources:
@@ -499,7 +488,7 @@ policies:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
     exclude:
       any:
       - resources:
@@ -551,17 +540,6 @@ policies:
           names:
           - fluentbit-fluent-bit*
       {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # promtail requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the  systemd-journal user group
-      # and then granting permissions recursively on /var/log.
-      # promtail requires access to /run/promtail for its buffering and persistent state.
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          - promtail-promtail*
-      {{- end }}
       {{- if .Values.neuvector.enabled }}
       # neuvector enforcers run as root to perform real time scanning on the nodes/cluster
       - resources:
@@ -596,7 +574,7 @@ policies:
       - resources:
           namespaces:
           - kube-system
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.promtail.enabled .Values.kiali.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.kiali.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
       {{- if .Values.kiali.enabled }}
       # Kiali needs exception for operator to deploy Kiali server
       - resources:
@@ -651,17 +629,6 @@ policies:
           - fluentbit
           names:
           - fluentbit-fluent-bit*
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # promtail requires access to journalctl as well as /var/log.  This would require modifications
-      # to the host operating system, creating a user, adding that user to the systemd-journal user group
-      # and then granting permissions recursively on /var/log.
-      # promtail requires access to /run/promtail for its buffering and persistent state.
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          - promtail-promtail*
       {{- end }}
       {{- if .Values.alloy.enabled }}
       # Alloy requires access to journalctl as well as /var/log.  This would require modifications
@@ -747,7 +714,7 @@ policies:
     {{- end }}
   restrict-host-path-mount:
     validationFailureAction: Enforce
-    {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled .Values.alloy.enabled $deployNodeAgent }}
+    {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled .Values.neuvector.enabled .Values.alloy.enabled $deployNodeAgent }}
     exclude:
       any:
       {{- if .Values.fluentbit.enabled }}
@@ -763,19 +730,6 @@ policies:
           # Since logs can have sensitive information, it is better to exclude
           # FluentBit from the policy than add the paths as allowable mounts
           - fluentbit-fluent-bit*
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-          # Promtail mounts the following hostPaths:
-          # - `/var/log/pods`: to tail pod logs
-          # - `/var/lib/docker/containers`: to tail container logs
-          # - `/run/promtail`: for Promtail's buffering and persistent state
-          # Since logs can have sensitive information, it is better to exclude
-          # Promtail from the policy than add the paths as allowable mounts
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          - promtail-promtail*
       {{- end }}
       {{- if .Values.monitoring.enabled }}
       # Prometheus Node Exporter mounts the following hostPaths:
@@ -881,21 +835,15 @@ policies:
           - neuvector-enforcer-pod*
       {{- end }}
     {{- end }}
-    {{- if or .Values.fluentbit.enabled .Values.promtail.enabled }}
+    {{- if .Values.fluentbit.enabled }}
     parameters:
       allow:
-      {{- if .Values.fluentbit.enabled }}
       # FluentBit - `/var/log/flb-storage`: fluent bit buffering and persistent state
       - /var/log/flb-storage/
       # FluentBit - `/var/log`
       # NO JUSTIFICATION - Issue opened at https://repo1.dso.mil/big-bang/product/packages/fluentbit/-/issues/31
       # Temporarily added so policy could be enforced
       - /var/log
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-      # Promtail - `/run/promtail`: promtail buffering and persistent state
-      - /run/promtail
-      {{- end }}
     {{- end }}
 
   restrict-image-registries:
@@ -919,7 +867,7 @@ policies:
           - '*-egressgateway'
       {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.alloy.enabled }}
+  {{- if or .Values.fluentbit.enabled .Values.twistlock.enabled .Values.alloy.enabled }}
   restrict-selinux-type:
     exclude:
       any:
@@ -931,15 +879,6 @@ policies:
           # NEEDS FURTHER JUSTIFICATION
           # FluentBit needs selinux option type spc_t
           - fluentbit-fluent-bit*
-      {{- end }}
-      {{- if .Values.promtail.enabled }}
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          # NEEDS FURTHER JUSTIFICATION
-          # Promtail needs selinux option type spc_t
-          - promtail-promtail*
       {{- end }}
       {{- if .Values.twistlock.enabled }}
       # NEEDS FURTHER JUSTIFICATION
@@ -978,7 +917,7 @@ policies:
       {{- end }}
   {{- end }}
 
-  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.promtail.enabled .Values.twistlock.enabled .Values.neuvector.enabled .Values.alloy.enabled $deployNodeAgent }}
+  {{- if or .Values.fluentbit.enabled .Values.monitoring.enabled .Values.twistlock.enabled .Values.neuvector.enabled .Values.alloy.enabled $deployNodeAgent }}
   restrict-volume-types:
     exclude:
       any:
@@ -991,16 +930,6 @@ policies:
           # https://docs.fluentbit.io/manual/pipeline/filters/kubernetes#workflow-of-tail-+-kubernetes-filter
           - fluentbit-fluent-bit*
           {{- end }}
-      {{- if .Values.promtail.enabled }}
-      - resources:
-          namespaces:
-          - promtail
-          names:
-          # NEEDS FURTHER JUSTIFICATION
-          # Promtail requires HostPath volume types
-          # https://github.com/grafana/helm-charts/blob/main/charts/promtail/templates/daemonset.yaml#L120
-          - promtail-promtail*
-      {{- end }}
       {{- if .Values.monitoring.enabled }}
       # Prometheus node exporter requires a HostPath volume to monitor host metrics in /proc and /sys
       - resources:
@@ -1074,7 +1003,6 @@ policies:
       - anchore
       - fortify
       - vault
-      - promtail
       - fluentbit
       - eck-operator
       - nexus-repository-manager
@@ -1245,10 +1173,6 @@ policies:
           - vault-vault-*
           - vault-vault-agent-injector-*
           - vault-vault-job-init-*
-      - namespace: promtail
-        pods:
-          allow:
-          - promtail-promtail-*
       - namespace: fluentbit
         pods:
           allow:
