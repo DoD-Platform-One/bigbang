@@ -79,16 +79,6 @@ upstream:
 
   serviceMonitor:
     enabled: {{ $monioringEnabled }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.keycloak.values) "STRICT") }}
-    scheme: https
-    tlsConfig:
-      caFile: /etc/prom-certs/root-cert.pem
-      certFile: /etc/prom-certs/cert-chain.pem
-      keyFile: /etc/prom-certs/key.pem
-      # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-      insecureSkipVerify: true
-    {{- end }}
 
   {{- if or .Values.addons.keycloak.database.host (and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key) }}
   secrets:

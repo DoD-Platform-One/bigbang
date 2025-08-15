@@ -1,6 +1,7 @@
 {{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
 {{- if .Values.addons.keycloak.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
 {{ $name := "keycloak" }}
 {{ $component := "security-tools" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -48,7 +49,7 @@ spec:
   {{- if $istioEnabled }}
   {{ include "keycloak.istioHAPostRenderers" . | nindent 2 }}
   {{- end }}
-  {{- if $serviceMonitorsMtlsEnabled }}
+  {{- if $tlsEnabled }}
   {{ include "keycloak.mtlsServiceMonitorPostrenderers" . | nindent 2 }}
   {{- end }}
   {{- if .Values.addons.keycloak.postRenderers }}
