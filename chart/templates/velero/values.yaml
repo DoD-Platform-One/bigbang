@@ -55,31 +55,11 @@ networkPolicies:
 
 openshift: {{ .Values.openshift }}
 
-fullnameOverride: "velero"
+upstream:
+  imagePullSecrets:
+  - name: private-registry
 
-imagePullSecrets:
-- name: private-registry
-
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-
-{{- if eq (len .Values.addons.velero.plugins) 0 }}{{- fail "At least one plugin in '.Values.addons.velero.plugins' required. Supported values: aws, azure, csi" }}{{- end }}
-plugins:
-{{- range .Values.addons.velero.plugins }}
-{{- if eq . "aws" }}
-  aws:
-    enabled: true
-{{- end }}
-{{- if eq . "azure" }}
-  azure:
-    enabled: true
-{{- end }}
-{{- if eq . "csi" }}
-  csi:
-    enabled: true
-configuration:
-  features: EnableCSI
-{{- end }}
-{{- end }}
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
 
 {{- end -}}
