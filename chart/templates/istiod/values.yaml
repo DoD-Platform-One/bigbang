@@ -10,6 +10,22 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCIDRs:
     - {{ .Values.networkPolicies.controlPlaneCidr }}
+  egress:
+    definitions:
+      sso:
+        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
+    from:
+      istiod:
+        to:
+          definition:
+            sso: {{ .Values.addons.authservice.enabled }}
+  ingress:
+    to:
+      istiod:15014:
+        from:
+          k8s:
+            kiali/kiali: {{ .Values.kiali.enabled }}
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

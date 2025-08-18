@@ -125,9 +125,7 @@ networkPolicies:
           - ipBlock:
               cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
       sso:
-        to:
-          - ipBlock:
-              cidr: "0.0.0.0/0"
+        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
     from:
       kiali:
         to:
