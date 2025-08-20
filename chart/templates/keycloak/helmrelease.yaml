@@ -53,7 +53,7 @@ spec:
   {{ include "keycloak.mtlsServiceMonitorPostrenderers" . | nindent 2 }}
   {{- end }}
   {{- if .Values.addons.keycloak.postRenderers }}
-  {{ toYaml .Values.addons.keycloak.postRenderers | nindent 4 }}
+  {{ toYaml .Values.addons.keycloak.postRenderers | nindent 2 }}
   {{- end }}
   {{- end }}
 
