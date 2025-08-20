@@ -117,8 +117,14 @@ upstream:
           {{- end }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-
+  ingress:
+    defaults:
+      allowPrometheusToIstioSidecar:
+        enabled: {{ and .Values.monitoring.enabled .Values.istiod.enabled }}
   egress:
+    defaults:
+      allowIstiod:
+        enabled: {{ .Values.istiod.enabled }}
     definitions:
       kubeAPI:
         to:
