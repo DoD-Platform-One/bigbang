@@ -190,11 +190,11 @@ istioCRDs:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-crds.git
     path: "./chart"
-    tag: 1.26.3-bb.0
+    tag: 1.27.0-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-crds"
-    tag: 1.26.3-bb.0
+    tag: 1.27.0-bb.0
   # -- Values to passthrough to the Istio CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CRDs Package
@@ -223,11 +223,11 @@ istiod:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istiod.git
     path: "./chart"
-    tag: 1.26.3-bb.1
+    tag: 1.27.0-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istiod"
-    tag: 1.26.3-bb.1
+    tag: 1.27.0-bb.0
   # -- Values to passthrough to the istiod chart
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
@@ -261,11 +261,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.26.3-bb.0
+    tag: 1.27.0-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "gateway"
-    tag: 1.26.3-bb.0
+    tag: 1.27.0-bb.0
   # -- Values to passthrough to the gateway chart(s)
   values: {}
   # EXAMPLE: Set the tls key/cert for the existing public gateway
