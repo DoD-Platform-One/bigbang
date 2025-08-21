@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 3.4.0](https://img.shields.io/badge/Version-3.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.5.0](https://img.shields.io/badge/Version-3.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -62,7 +62,7 @@ Kubernetes: `>=1.31.0-0`
 | sso.oidc.claims.username | string | `"preferred_username"` | IdP's claim name used for the username |
 | sso.oidc.claims.groups | string | `"groups"` | IdP's claim name used for the user's groups or roles |
 | flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}],"mode":"enabled"},"install":{"remediation":{"retries":-1}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
-| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","enabled":true,"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
+| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","egress":{"definitions":{"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}},"enabled":true,"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled` |
 | networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` | Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints) Used by package NetworkPolicies to allow Kube API access |
 | networkPolicies.nodeCidr | string | `""` | Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks. use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range. Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs) |
@@ -84,10 +84,10 @@ Kubernetes: `>=1.31.0-0`
 | istiod.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | istiod.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/istiod.git"` |  |
 | istiod.git.path | string | `"./chart"` |  |
-| istiod.git.tag | string | `"1.26.3-bb.0"` |  |
+| istiod.git.tag | string | `"1.26.3-bb.1"` |  |
 | istiod.helmRepo.repoName | string | `"registry1"` |  |
 | istiod.helmRepo.chartName | string | `"istiod"` |  |
-| istiod.helmRepo.tag | string | `"1.26.3-bb.0"` |  |
+| istiod.helmRepo.tag | string | `"1.26.3-bb.1"` |  |
 | istiod.values | object | `{}` | Values to passthrough to the istiod chart |
 | istiod.flux | object | `{"driftDetection":{"ignore":[{"paths":["/webhooks/0/failurePolicy"],"target":{"kind":"ValidatingWebhookConfiguration","name":"istio-validator-istio-system"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}],"mode":"warn"}}` | Flux reconciliation overrides specifically for the Istio Core Package |
 | istiod.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -106,10 +106,10 @@ Kubernetes: `>=1.31.0-0`
 | kiali.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kiali.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"2.12.0-bb.1"` |  |
+| kiali.git.tag | string | `"2.13.0-bb.1"` |  |
 | kiali.helmRepo.repoName | string | `"registry1"` |  |
 | kiali.helmRepo.chartName | string | `"kiali"` |  |
-| kiali.helmRepo.tag | string | `"2.12.0-bb.1"` |  |
+| kiali.helmRepo.tag | string | `"2.13.0-bb.1"` |  |
 | kiali.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Kiali"}}]}}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
@@ -166,10 +166,10 @@ Kubernetes: `>=1.31.0-0`
 | elasticsearchKibana.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | elasticsearchKibana.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git"` |  |
 | elasticsearchKibana.git.path | string | `"./chart"` |  |
-| elasticsearchKibana.git.tag | string | `"1.30.0-bb.3"` |  |
+| elasticsearchKibana.git.tag | string | `"1.30.0-bb.5"` |  |
 | elasticsearchKibana.helmRepo.repoName | string | `"registry1"` |  |
 | elasticsearchKibana.helmRepo.chartName | string | `"elasticsearch-kibana"` |  |
-| elasticsearchKibana.helmRepo.tag | string | `"1.30.0-bb.3"` |  |
+| elasticsearchKibana.helmRepo.tag | string | `"1.30.0-bb.5"` |  |
 | elasticsearchKibana.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Kibana"}},{"paths":[""],"target":{"kind":"Elasticsearch"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]},"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | elasticsearchKibana.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | elasticsearchKibana.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -202,17 +202,30 @@ Kubernetes: `>=1.31.0-0`
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
 | fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
+| alloy.enabled | bool | `true` | Toggle deployment of grafana alloy |
+| alloy.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
+| alloy.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/alloy.git"` |  |
+| alloy.git.tag | string | `"3.2.1-bb.1"` |  |
+| alloy.git.path | string | `"./chart"` |  |
+| alloy.helmRepo.repoName | string | `"registry1"` |  |
+| alloy.helmRepo.chartName | string | `"k8s-monitoring"` |  |
+| alloy.helmRepo.tag | string | `"3.2.1-bb.1"` |  |
+| alloy.alloyLogs | object | `{"enabled":true}` | Toggle Alloy to collect logs |
+| alloy.additionalDestinations | list | `[]` | Additional Alloy destinations not included in Big Bang |
+| alloy.values | object | `{}` |  |
+| alloy.postRenderers | list | `[]` |  |
+| alloy.flux | object | `{}` | Flux reconciliation overrides specifically for the alloy package |
 | loki.enabled | bool | `true` | Toggle deployment of Loki. |
 | loki.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | loki.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/loki.git"` |  |
 | loki.git.path | string | `"./chart"` |  |
-| loki.git.tag | string | `"6.30.1-bb.3"` |  |
+| loki.git.tag | string | `"6.30.1-bb.4"` |  |
 | loki.helmRepo.repoName | string | `"registry1"` |  |
 | loki.helmRepo.chartName | string | `"loki"` |  |
-| loki.helmRepo.tag | string | `"6.30.1-bb.3"` |  |
+| loki.helmRepo.tag | string | `"6.30.1-bb.4"` |  |
 | loki.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Tenant"}},{"paths":[""],"target":{"kind":"Sidecar"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
-| loki.clusterName | string | `""` | Loki clusterName |
+| loki.clusterName | string | `""` | Loki clusterName identifier |
 | loki.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
 | loki.objectStorage.region | string | `""` | S3 compatible region to use for connection information. |
 | loki.objectStorage.accessKey | string | `""` | Access key for connecting to object storage endpoint. |
@@ -224,10 +237,10 @@ Kubernetes: `>=1.31.0-0`
 | neuvector.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | neuvector.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/neuvector.git"` |  |
 | neuvector.git.path | string | `"./chart"` |  |
-| neuvector.git.tag | string | `"2.8.6-bb.1"` |  |
+| neuvector.git.tag | string | `"2.8.6-bb.2"` |  |
 | neuvector.helmRepo.repoName | string | `"registry1"` |  |
 | neuvector.helmRepo.chartName | string | `"neuvector"` |  |
-| neuvector.helmRepo.tag | string | `"2.8.6-bb.1"` |  |
+| neuvector.helmRepo.tag | string | `"2.8.6-bb.2"` |  |
 | neuvector.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | neuvector.sso.enabled | bool | `false` | Toggle SSO for Neuvector on and off |
 | neuvector.sso.client_id | string | `""` | OIDC Client ID to use for Neuvector |
@@ -275,10 +288,10 @@ Kubernetes: `>=1.31.0-0`
 | monitoring.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"75.6.1-bb.2"` |  |
+| monitoring.git.tag | string | `"75.6.1-bb.3"` |  |
 | monitoring.helmRepo.repoName | string | `"registry1"` |  |
 | monitoring.helmRepo.chartName | string | `"monitoring"` |  |
-| monitoring.helmRepo.tag | string | `"75.6.1-bb.2"` |  |
+| monitoring.helmRepo.tag | string | `"75.6.1-bb.3"` |  |
 | monitoring.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Alertmanager"}},{"paths":[""],"target":{"kind":"Prometheus"}},{"paths":[""],"target":{"kind":"PrometheusRule"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]},"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
@@ -292,10 +305,10 @@ Kubernetes: `>=1.31.0-0`
 | grafana.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | grafana.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/grafana.git"` |  |
 | grafana.git.path | string | `"./chart"` |  |
-| grafana.git.tag | string | `"9.2.10-bb.0"` |  |
+| grafana.git.tag | string | `"9.3.1-bb.1"` |  |
 | grafana.helmRepo.repoName | string | `"registry1"` |  |
 | grafana.helmRepo.chartName | string | `"grafana"` |  |
-| grafana.helmRepo.tag | string | `"9.2.10-bb.0"` |  |
+| grafana.helmRepo.tag | string | `"9.3.1-bb.1"` |  |
 | grafana.flux | object | `{}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | grafana.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | grafana.sso.enabled | bool | `false` | Toggle SSO for grafana components on and off |
@@ -336,19 +349,6 @@ Kubernetes: `>=1.31.0-0`
 | bbctl.flux | object | `{}` | Override flux settings for this package |
 | bbctl.values | object | `{}` |  |
 | bbctl.postRenderers | list | `[]` |  |
-| alloy.enabled | bool | `true` | Toggle deployment of grafana alloy |
-| alloy.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| alloy.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/alloy.git"` |  |
-| alloy.git.tag | string | `"3.2.1-bb.1"` |  |
-| alloy.git.path | string | `"./chart"` |  |
-| alloy.helmRepo.repoName | string | `"registry1"` |  |
-| alloy.helmRepo.chartName | string | `"k8s-monitoring"` |  |
-| alloy.helmRepo.tag | string | `"3.2.1-bb.1"` |  |
-| alloy.alloyLogs | object | `{"enabled":true}` | Toggle Alloy to collect logs |
-| alloy.additionalDestinations | list | `[]` | Additional Alloy destinations not included in Big Bang |
-| alloy.values | object | `{}` |  |
-| alloy.postRenderers | list | `[]` |  |
-| alloy.flux | object | `{}` | Flux reconciliation overrides specifically for the alloy package |
 | addons.argocd.enabled | bool | `false` | Toggle deployment of ArgoCD. |
 | addons.argocd.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.argocd.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/argocd.git"` |  |
@@ -410,10 +410,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.minio.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.minio.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/minio.git"` |  |
 | addons.minio.git.path | string | `"./chart"` |  |
-| addons.minio.git.tag | string | `"7.1.1-bb.6"` |  |
+| addons.minio.git.tag | string | `"7.1.1-bb.8"` |  |
 | addons.minio.helmRepo.repoName | string | `"registry1"` |  |
 | addons.minio.helmRepo.chartName | string | `"minio-instance"` |  |
-| addons.minio.helmRepo.tag | string | `"7.1.1-bb.6"` |  |
+| addons.minio.helmRepo.tag | string | `"7.1.1-bb.8"` |  |
 | addons.minio.flux | object | `{}` | Flux reconciliation overrides specifically for the Minio Package |
 | addons.minio.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.minio.accesskey | string | `""` | Default access key to use for minio. |
@@ -426,10 +426,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"9.2.1-bb.1"` |  |
+| addons.gitlab.git.tag | string | `"9.2.2-bb.0"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"9.2.1-bb.1"` |  |
+| addons.gitlab.helmRepo.tag | string | `"9.2.2-bb.0"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
@@ -514,10 +514,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.fortify.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.fortify.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/fortify.git"` |  |
 | addons.fortify.git.path | string | `"./chart"` |  |
-| addons.fortify.git.tag | string | `"1.1.2320154-bb.32"` |  |
+| addons.fortify.git.tag | string | `"1.1.2320154-bb.33"` |  |
 | addons.fortify.helmRepo.repoName | string | `"registry1"` |  |
 | addons.fortify.helmRepo.chartName | string | `"fortify-ssc"` |  |
-| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.32"` |  |
+| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.33"` |  |
 | addons.fortify.flux | object | `{}` | Flux reconciliation overrides specifically for the Fortify Package |
 | addons.fortify.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.fortify.sso.enabled | bool | `false` | Toggle SSO for Fortify on and off |
@@ -540,10 +540,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.anchoreEnterprise.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.anchoreEnterprise.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git"` |  |
 | addons.anchoreEnterprise.git.path | string | `"./chart"` |  |
-| addons.anchoreEnterprise.git.tag | string | `"3.10.0-bb.1"` |  |
+| addons.anchoreEnterprise.git.tag | string | `"3.13.0-bb.0"` |  |
 | addons.anchoreEnterprise.helmRepo.repoName | string | `"registry1"` |  |
 | addons.anchoreEnterprise.helmRepo.chartName | string | `"anchore-enterprise"` |  |
-| addons.anchoreEnterprise.helmRepo.tag | string | `"3.10.0-bb.1"` |  |
+| addons.anchoreEnterprise.helmRepo.tag | string | `"3.13.0-bb.0"` |  |
 | addons.anchoreEnterprise.flux | object | `{"upgrade":{"disableWait":true}}` | Flux reconciliation overrides specifically for the Anchore Package |
 | addons.anchoreEnterprise.adminPassword | string | `""` | Initial admin password used to authenticate to Anchore. |
 | addons.anchoreEnterprise.enterprise | object | `{"licenseYaml":"FULL LICENSE\n"}` | Anchore Enterprise functionality. |
@@ -568,10 +568,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.mattermostOperator.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.mattermostOperator.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git"` |  |
 | addons.mattermostOperator.git.path | string | `"./chart"` |  |
-| addons.mattermostOperator.git.tag | string | `"1.24.0-bb.0"` |  |
+| addons.mattermostOperator.git.tag | string | `"1.25.0-bb.0"` |  |
 | addons.mattermostOperator.helmRepo.repoName | string | `"registry1"` |  |
 | addons.mattermostOperator.helmRepo.chartName | string | `"mattermost-operator"` |  |
-| addons.mattermostOperator.helmRepo.tag | string | `"1.24.0-bb.0"` |  |
+| addons.mattermostOperator.helmRepo.tag | string | `"1.25.0-bb.0"` |  |
 | addons.mattermostOperator.flux | object | `{}` | Flux reconciliation overrides specifically for the Mattermost Operator Package |
 | addons.mattermostOperator.values | object | `{}` | Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml |
 | addons.mattermostOperator.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -579,10 +579,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.mattermost.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.mattermost.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/mattermost.git"` |  |
 | addons.mattermost.git.path | string | `"./chart"` |  |
-| addons.mattermost.git.tag | string | `"10.10.1-bb.1"` |  |
+| addons.mattermost.git.tag | string | `"10.11.1-bb.0"` |  |
 | addons.mattermost.helmRepo.repoName | string | `"registry1"` |  |
 | addons.mattermost.helmRepo.chartName | string | `"mattermost"` |  |
-| addons.mattermost.helmRepo.tag | string | `"10.10.1-bb.1"` |  |
+| addons.mattermost.helmRepo.tag | string | `"10.11.1-bb.0"` |  |
 | addons.mattermost.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Mattermost"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Mattermost Package |
 | addons.mattermost.enterprise | object | `{"enabled":false,"license":""}` | Mattermost Enterprise functionality. |
 | addons.mattermost.enterprise.enabled | bool | `false` | Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install. |
@@ -609,10 +609,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.velero.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.velero.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/velero.git"` |  |
 | addons.velero.git.path | string | `"./chart"` |  |
-| addons.velero.git.tag | string | `"10.0.7-bb.0"` |  |
+| addons.velero.git.tag | string | `"10.0.7-bb.1"` |  |
 | addons.velero.helmRepo.repoName | string | `"registry1"` |  |
 | addons.velero.helmRepo.chartName | string | `"velero"` |  |
-| addons.velero.helmRepo.tag | string | `"10.0.7-bb.0"` |  |
+| addons.velero.helmRepo.tag | string | `"10.0.7-bb.1"` |  |
 | addons.velero.flux | object | `{}` | Flux reconciliation overrides specifically for the Velero Package |
 | addons.velero.plugins | list | `[]` | Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi |
 | addons.velero.values | object | `{}` | Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml |
@@ -621,10 +621,10 @@ Kubernetes: `>=1.31.0-0`
 | addons.keycloak.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.keycloak.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/keycloak.git"` |  |
 | addons.keycloak.git.path | string | `"./chart"` |  |
-| addons.keycloak.git.tag | string | `"7.0.1-bb.5"` |  |
+| addons.keycloak.git.tag | string | `"7.0.1-bb.6"` |  |
 | addons.keycloak.helmRepo.repoName | string | `"registry1"` |  |
 | addons.keycloak.helmRepo.chartName | string | `"keycloak"` |  |
-| addons.keycloak.helmRepo.tag | string | `"7.0.1-bb.5"` |  |
+| addons.keycloak.helmRepo.tag | string | `"7.0.1-bb.6"` |  |
 | addons.keycloak.database.host | string | `""` | Hostname of a pre-existing database to use for Keycloak. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
 | addons.keycloak.database.type | string | `"postgres"` | Pre-existing database type (e.g. postgres) to use for Keycloak. |
 | addons.keycloak.database.port | int | `5432` | Port of a pre-existing database to use for Keycloak. |
@@ -664,11 +664,11 @@ Kubernetes: `>=1.31.0-0`
 | addons.harbor.enabled | bool | `false` | Toggle deployment of harbor |
 | addons.harbor.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.harbor.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/harbor.git"` |  |
-| addons.harbor.git.tag | string | `"1.17.1-bb.3"` |  |
+| addons.harbor.git.tag | string | `"1.17.2-bb.1"` |  |
 | addons.harbor.git.path | string | `"./chart"` |  |
 | addons.harbor.helmRepo.repoName | string | `"registry1"` |  |
 | addons.harbor.helmRepo.chartName | string | `"harbor"` |  |
-| addons.harbor.helmRepo.tag | string | `"1.17.1-bb.3"` |  |
+| addons.harbor.helmRepo.tag | string | `"1.17.2-bb.1"` |  |
 | addons.harbor.flux | object | `{}` | Flux reconciliation overrides specifically for the Harbor Package |
 | addons.harbor.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.harbor.values | object | `{}` | Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git |
@@ -697,11 +697,11 @@ Kubernetes: `>=1.31.0-0`
 | addons.externalSecrets.enabled | bool | `false` | Toggle deployment of external secrets |
 | addons.externalSecrets.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.externalSecrets.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/external-secrets.git"` |  |
-| addons.externalSecrets.git.tag | string | `"0.18.2-bb.1"` |  |
+| addons.externalSecrets.git.tag | string | `"0.19.0-bb.0"` |  |
 | addons.externalSecrets.git.path | string | `"./chart"` |  |
 | addons.externalSecrets.helmRepo.repoName | string | `"registry1"` |  |
 | addons.externalSecrets.helmRepo.chartName | string | `"external-secrets"` |  |
-| addons.externalSecrets.helmRepo.tag | string | `"0.18.2-bb.1"` |  |
+| addons.externalSecrets.helmRepo.tag | string | `"0.19.0-bb.0"` |  |
 | addons.externalSecrets.flux | object | `{}` | Override flux settings for this package |
 | addons.externalSecrets.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.externalSecrets.values | object | `{}` |  |
@@ -730,11 +730,11 @@ Kubernetes: `>=1.31.0-0`
 | addons.headlamp.enabled | bool | `false` | Toggle deployment of headlamp |
 | addons.headlamp.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.headlamp.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/headlamp.git"` |  |
-| addons.headlamp.git.tag | string | `"0.33.0-bb.0"` |  |
+| addons.headlamp.git.tag | string | `"0.34.0-bb.0"` |  |
 | addons.headlamp.git.path | string | `"./chart"` |  |
 | addons.headlamp.helmRepo.repoName | string | `"registry1"` |  |
 | addons.headlamp.helmRepo.chartName | string | `"headlamp"` |  |
-| addons.headlamp.helmRepo.tag | string | `"0.33.0-bb.0"` |  |
+| addons.headlamp.helmRepo.tag | string | `"0.34.0-bb.0"` |  |
 | addons.headlamp.flux | object | `{}` | Override flux settings for this package |
 | addons.headlamp.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.headlamp.sso.enabled | bool | `false` | Toggle OIDC SSO for Headlamp on and off. Enabling this option will auto-create any required secrets. |
