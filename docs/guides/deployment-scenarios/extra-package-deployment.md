@@ -63,6 +63,100 @@ packages:
 
 In this example, Istio will only be configured for podinfo if Istio is enabled for Big Bang.
 
+#### Additional Scenarios
+
+In some cases, you may want to deploy an additional package to a namespace that already exists which can be done by setting the `<package>.namespace.create` value to false as shown below:
+
+```yaml
+packages:
+  istio-cni:
+    namespace:
+      create: false
+      name: kube-system
+    helmRelease:
+      namespace: bigbang
+    dependsOn:
+      - name: istiod
+        namespace: bigbang
+    enabled: true
+    sourceType: "git"
+    git:
+      repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-cni.git
+      path: "./chart"
+      tag: 1.27.0-bb.0
+```
+
+This deploys the istio-cni package with tag of `1.27.0-bb.0` to the kube-system namespace which already exists within the cluster.
+
+It is also possible to disable the creation of the `imagePullSecret` by setting the `<package>.namespace.createRegistrySecret` to false:
+
+```yaml
+packages:
+  istio-cni:
+    namespace:
+      create: false
+      name: kube-system
+    helmRelease:
+      namespace: bigbang
+    dependsOn:
+      - name: istiod
+        namespace: bigbang
+    enabled: true
+    sourceType: "git"
+    git:
+      repo: https://repo1.dso.mil/big-bang/apps/sandbox/istio-cni.git
+      path: "./chart"
+      tag: 1.27.0-bb.0
+    values:
+      upstream:
+        # Enable ambient mode
+        ambient:
+          enabled: true
+        global:
+          platform: k3s
+  ztunnel:
+    namespace:
+      create: false
+      name: istio-system
+      createRegistrySecret: false
+    helmRelease:
+      namespace: bigbang
+    dependsOn:
+      - name: istio-cni
+        namespace: bigbang
+    enabled: true
+    sourceType: "git"
+    git:
+      repo: https://repo1.dso.mil/big-bang/apps/sandbox/ztunnel.git
+      path: "./chart"
+      branch: "main"
+```
+
+In this example, we are deploying the istio-cni package to the kube-system namepace where it will need to create the secret required to pull the image.  We are also deploying the ztunnel package which is reliant on the istio-cni package.  It deploys to another existing namespace (istio-system in this case) where that secret already exists so we have set the `createRegistrySecret` value to false to prevent duplication and errors.
+
+Another available feature is to have the package automatically deploy a secret containing the SSO certificate authority based on the global key for `sso` in the umbrella template by setting the `<package>.sso.enabled` to true.
+
+```yaml
+packages:
+  podinfo:
+    sso:
+      enabled: true
+    git:
+      repo: https://github.com/stefanprodan/podinfo.git
+      tag: 6.3.4
+      path: charts/podinfo
+    flux:
+      timeout: 5m
+    postRenderers: []
+    dependsOn:
+      - name: monitoring
+        namespace: bigbang
+```
+
+> **Note**: The above example is just to illustrate what it would look like to enable the sso behavior and is not a functional example.
+
+> **Note**: The default behavior when leaving off these keys are to create the namepace, create the image pull secret in that namespace, and not to create the secret for sso in that namespace.
+
 ## Wrapper Deployment
 
 The [Wrapper](https://repo1.dso.mil/big-bang/product/packages/wrapper) is a helm chart that provides additional integrations with key Big Bang components and standards, as well as extensibility features for common use cases. All of these can be tailored to a given package's needs with a simple interface. Currently included are those listed in the following:
