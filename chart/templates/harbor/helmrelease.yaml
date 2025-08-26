@@ -45,7 +45,7 @@ spec:
   postRenderers:
   {{ include "harbor.fixRegistryPostRender" . | nindent 2 }}
   {{- if (get .Values.addons $pkg).postRenderers }}
-  {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 4 }}
+  {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 2 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-{{ $pkg }}-values
