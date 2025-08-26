@@ -48,11 +48,18 @@ istio:
 openshift: {{ .Values.openshift }}
 
 {{- if .Values.addons.headlamp.sso.enabled }}
-config:
-  oidc:
-    clientID: {{ .Values.addons.headlamp.sso.client_id }}
-    clientSecret: {{ .Values.addons.headlamp.sso.client_secret }}
-    issuerURL: {{ .Values.sso.url }}
-    scopes: "email,profile"
+upstream:
+  config:
+    oidc:
+      clientID: {{ .Values.addons.headlamp.sso.client_id }}
+      clientSecret: {{ .Values.addons.headlamp.sso.client_secret }}
+      issuerURL: {{ .Values.sso.url }}
+      scopes: "email,profile"
+{{- else }}
+upstream:
+  config:
+    oidc:
+      secret:
+       create: false
 {{- end }}
 {{- end -}}
