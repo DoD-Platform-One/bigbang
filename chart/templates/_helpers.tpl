@@ -174,6 +174,8 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{ $defaults = $origDefaults | toYaml }}
 {{- end -}}
 {{/* This is the end of the workaround */}}
+{{- $packageValues := default dict .package.values -}}
+{{- $commonValues := mustMergeOverwrite (deepCopy $packageValues) (deepCopy ($defaults | fromYaml)) -}}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -181,7 +183,8 @@ metadata:
   namespace: {{ .root.Release.Namespace }}
 type: generic
 stringData:
-  common: ""
+  common: |
+    {{- toYaml (pick $commonValues "bbtests" "istio" "networkPolicies" "sso" "waitJob") | nindent 4 }}
   defaults: {{- toYaml $defaults | nindent 4 }}
   overlays: |
     {{- toYaml .package.values | nindent 4 }}
