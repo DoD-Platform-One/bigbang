@@ -1422,15 +1422,16 @@ addons:
       redis:
         enabled: true
       redis-bb:
-        master:
-          persistence:
-            size: 256Mi
-        replica:
-          replicaCount: 0
-          autoscaling:
-            enabled: false
-          persistence:
-            size: 256Mi
+        upstream: 
+          master:
+            persistence:
+              size: 256Mi
+          replica:
+            replicaCount: 0
+            autoscaling:
+              enabled: false
+            persistence:
+              size: 256Mi
 
   fortify:
     enabled: false
