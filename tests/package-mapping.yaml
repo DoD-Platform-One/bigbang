@@ -10,6 +10,10 @@ istiod:
   repoName: "istiod"
   hrName: "istiod"
   filePath: "istiod"
+istioCNI:
+  repoName: "istio-cni"
+  hrName: "istio-cni"
+  filePath: "istio-cni"
 istioCRDs:
   repoName: "istio-crds"
   hrName: "istio-crds"

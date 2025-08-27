@@ -101,6 +101,12 @@ istiod:
   values:
     hardened:
       enabled: true
+istioCNI:
+  enabled: false
+  values:
+    upstream:
+      global:
+        platform: k3s
 istioCRDs:
   enabled: true
 istioGateway:
