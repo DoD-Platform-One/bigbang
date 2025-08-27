@@ -22,13 +22,59 @@ flux:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  ingressLabels:
-    {{- if $istioEnabled }}
-    {{- include "getGatewaySelector" (dict "pkg" .Values.monitoring "root" .) | nindent 4 }}
-    {{- end }}
+  egress:
+    definitions:
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    from:
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+      # TODO: Remove this once gluon is updated to at least 0.8.4 in the monitoring package
+      helm-test:
+        podSelector:
+          matchLabels:
+            helm-test: enabled
+        to:
+          cidr:
+            0.0.0.0/0: true
+  ingress:
+    to:
+      prometheus:10901:
+        from:
+          k8s:
+            thanos/thanos: {{ .Values.addons.thanos.enabled }}
+      alertmanager:9093:
+        from:
+          k8s:
+            authservice/haproxy: {{ .Values.addons.haproxy.enabled }}
+            alloy/alloy-logs: {{ .Values.alloy.enabled }}
+            logging/logging-loki: {{ .Values.loki.enabled }}
+          definition:
+            gateway: {{ .Values.istioGateway.enabled }}
+      alertmanager:10003:
+        from:
+          k8s:
+            authservice/authservice: {{ .Values.addons.authservice.enabled }}
+      grafana:3000:
+        from:
+          k8s:
+            kiali/kiali: {{ .Values.kiali.enabled }}
+          definition:
+            gateway: {{ .Values.istioGateway.enabled }}
+      prometheus:9090:
+        from:
+          definition:
+            gateway: {{ .Values.istioGateway.enabled }}
+          k8s:
+            tempo/tempo: {{ .Values.tempo.enabled }}
+            authservice/haproxy: {{ .Values.addons.haproxy.enabled }}
+            kiali/kiali: {{ .Values.kiali.enabled }}
+            alloy/alloy-logs: {{ .Values.alloy.enabled }}
+            logging/logging-loki: {{ .Values.loki.enabled }}
 
 openshift: {{ .Values.openshift }}
 
