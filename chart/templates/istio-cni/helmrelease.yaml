@@ -1,0 +1,73 @@
+{{- $fluxSettingsIstioCNI := merge .Values.istioCNI.flux .Values.flux -}}
+{{- if .Values.istioCNI.enabled }}
+{{- if not .Values.istiod.enabled }}
+{{- fail "istioCNI requires istiod to be enabled" }}
+{{- end }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-cni
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-cni
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-cni/values.yaml") . | sha256sum }}
+spec:
+  releaseName: istio-cni
+  targetNamespace: kube-system
+  chart:
+    spec:
+      {{- if eq .Values.istioCNI.sourceType "git" }}
+      chart: {{ .Values.istioCNI.git.path }}
+      sourceRef:
+        kind: GitRepository
+        name: istio-cni
+        namespace: {{ .Release.Namespace }}
+      {{- else }}
+      chart: {{ .Values.istioCNI.helmRepo.chartName }}
+      version: {{ .Values.istioCNI.helmRepo.tag }}
+      sourceRef:
+        kind: HelmRepository
+        name: {{ .Values.istioCNI.helmRepo.repoName }}
+        namespace: {{ .Release.Namespace }}
+      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istioCNI.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
+      {{- if (and .Values.istioCNI.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+      verify:
+        provider: cosign
+        secretRef:
+          name: {{ printf "%s-cosign-pub" .Values.istioCNI.helmRepo.repoName }}
+      {{- end }}
+      {{- end }}
+      interval: 5m
+
+  {{- toYaml $fluxSettingsIstioCNI | nindent 2 }}
+
+  {{- if .Values.istioCNI.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.istioCNI.postRenderers | nindent 4 }}
+  {{- end }}
+  valuesFrom:
+    - name: {{ .Release.Name }}-istio-cni-values
+      kind: Secret
+      valuesKey: "common"
+    - name: {{ .Release.Name }}-istio-cni-values
+      kind: Secret
+      valuesKey: "defaults"
+    - name: {{ .Release.Name }}-istio-cni-values
+      kind: Secret
+      valuesKey: "overlays"
+
+  dependsOn:
+    - name: istiod
+      namespace: {{ .Release.Namespace }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+{{- end }}

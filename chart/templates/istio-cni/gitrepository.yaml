@@ -1,0 +1,24 @@
+{{- if and (eq .Values.istioCNI.sourceType "git") (not .Values.offline) .Values.istioCNI.enabled }}
+{{- $gitCredsDict := dict
+  "name" "istioCNI"
+  "packageGitScope" .Values.istioCNI.git
+  "rootScope" .
+  "releaseName" .Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: istio-cni
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-cni
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+spec:
+  interval: {{ .Values.flux.interval }}
+  url: {{ .Values.istioCNI.git.repo }}
+  ref:
+    {{- include "validRef" .Values.istioCNI.git | nindent 4 }}
+  {{ include "gitIgnore" . }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end }}

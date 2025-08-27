@@ -34,6 +34,8 @@ authservice:
   enabled: {{ .Values.addons.authservice.enabled }}
 
 upstream:
+  cni:
+    enabled: {{ .Values.istioCNI.enabled }}
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     imagePullSecrets:
