@@ -2,8 +2,15 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled") -}}
 
-# Includes suffix of "A1a" to ensure password always meets default minimum password requirements
-{{- $neuvectorMetricsPass := join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2))}}
+# Check for existing NeuVector exporter secret, otherwise generate new random password
+{{- $existingSecret := lookup "v1" "Secret" "neuvector" "neuvector-prometheus-exporter-pod-secret" }}
+{{- $neuvectorMetricsPass := "" }}
+{{- if $existingSecret }}
+  {{- $neuvectorMetricsPass = (get $existingSecret.data "CTRL_PASSWORD" | b64dec) }}
+{{- else }}
+  # Includes suffix of "A1a" to ensure password always meets default minimum password requirements
+  {{- $neuvectorMetricsPass = join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2)) }}
+{{- end }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
