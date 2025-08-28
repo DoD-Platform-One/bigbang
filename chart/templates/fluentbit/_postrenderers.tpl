@@ -9,6 +9,4 @@
           kind: DaemonSet
           name: fluentbit-fluent-bit
           namespace: fluentbit
-        options:
-          allowNameChange: true
 {{- end }}
