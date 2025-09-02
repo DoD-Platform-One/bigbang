@@ -81,6 +81,8 @@ tempo:
   enabled: true
 kiali:
   enabled: true
+monitoring:
+  enabled: true
 ```
 
 ### Logging
@@ -90,6 +92,8 @@ Within Big Bang, logs are captured by fluentbit and shipped to elastic by defaul
 ### Monitoring
 
 Monitoring can be enabled to automatically capture metrics for Istio when `monitoring.enabled` is set to `true` in the Big Bang values.yaml. Since Istio 1.5, standard metrics are directly exported by the Envoy proxy. For a list of metrics, see [Istio Standard Metrics](https://istio.io/latest/docs/reference/config/metrics/#metrics) and [Istio Observability](https://istio.io/latest/docs/ops/best-practices/observability/).
+
+> **Note**: When using Kiali as a UI component of Istio, monitoring must be enabled as Kiali will not function properly without Prometheus.
 
 Grafana (part of the monitoring packages) is a standalone component of Big Bang that can provide dashboards to show monitoring data. For more information, see Big Bang's [Grafana docs](https://repo1.dso.mil/big-bang/product/packages/monitoring/-/tree/main/docs#grafana) and [Visualizing Metrics with Grafana](https://istio.io/latest/docs/tasks/observability/metrics/using-istio-dashboard/).
 
@@ -101,4 +105,5 @@ There are standard readiness probes built into the envoy sidecars and istio cont
 
 - istio-crds
 - istiod
+- istio-cni (Optional for sidecar mode; Required for ambient mode)
 - istio-gateway
