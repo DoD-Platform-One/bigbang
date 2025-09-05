@@ -1070,7 +1070,8 @@ policies:
           # tenant pods require get/list/watch on secrets/tenants (CRD), and create/delete/get on services
           # More details in role named minio-minio-minio-instance-role
           - minio-minio-minio-instance-*
-          - minio-instance-wait-job-*
+          - minio-minio-wait-job-*
+          - minio-minio-script-test
       - namespace: kyverno
         pods:
           allow:
