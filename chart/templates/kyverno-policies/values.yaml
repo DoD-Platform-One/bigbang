@@ -1029,6 +1029,8 @@ policies:
       - namespace: twistlock
         pods:
           allow:
+          # For twistlock the gluon wait-job needs to query namespaces and check defenders are up
+          - twistlock-twistlock-wait-job-*
           # twistlock-init pods require get/list/patch/etc to several resources.
           # More details in twistlock/chart/templates/init/clusterrole.yaml
           - twistlock-init-*
