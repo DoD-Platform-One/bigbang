@@ -307,7 +307,7 @@ packages:
     # -- Values to pass through to package Helm chart
     values: 
       istio:
-        enabled: "{{ .Values.istio.enabled }}"
+        enabled: "{{ .Values.istiod.enabled }}"
       ui:
         color: "#fcba03" #yellow
 

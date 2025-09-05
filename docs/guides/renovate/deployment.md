@@ -14,7 +14,7 @@ packages:
       networkPolicies:
         enabled: "{{ $.Values.networkPolicies.enabled }}"
       istio:
-        enabled: "{{ $.Values.istio.enabled }}"
+        enabled: "{{ $.Values.istiod.enabled }}"
       cronjob:
         schedule: '0 1 * * *'
       renovate:
