@@ -58,7 +58,7 @@ packages:
   podinfo:
     values:
       istio:
-        enabled: "{{ .Values.istio.enabled }}"
+        enabled: "{{ .Values.istiod.enabled }}"
 ```
 
 In this example, Istio will only be configured for podinfo if Istio is enabled for Big Bang.

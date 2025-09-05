@@ -52,10 +52,10 @@ If we plan to scrape metrics from the application with the monitoring stack, we 
 
 ```yaml
 spec:
-  {{- if or .Values.istio.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.istiod.enabled .Values.monitoring.enabled }}
   dependsOn:
-    {{- if .Values.istio.enabled }}
-    - name: istio
+    {{- if .Values.istiod.enabled }}
+    - name: istiod
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}

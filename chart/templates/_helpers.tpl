@@ -507,24 +507,6 @@ data:
   {{- end -}}
 {{- end -}}
 
-{{- /* Returns name of istio public gateway */ -}}
-{{- define "istioPublicGateway" -}}
-{{- if .Values.istioGateway.enabled -}}
-  {{- print "public" -}}
-{{- else -}}
-  {{- print "public-ingressgateway" -}}
-{{- end -}}
-{{- end -}}
-
-{{- /* Returns name of istio passthrough gateway */ -}}
-{{- define "istioPassthroughGateway" -}}
-{{- if .Values.istio.enabled -}}
-  {{- print "passthrough" -}}
-{{- else -}}
-  {{- print "passthrough-ingressgateway" -}}
-{{- end -}}
-{{- end -}}
-
 {{- /* Returns true if istiod is enabled */ -}}
 {{- define "istioEnabled" -}}
 {{ .Values.istiod.enabled }}
@@ -551,12 +533,10 @@ Args:
 {{- define "getGatewaySelector" -}}
 {{- $default := default "public" .default }}
 {{- $gateway := default $default .pkg.ingress.gateway }}
-{{- if .root.Values.istioGateway.enabled }}
-  {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
-  {{- $gw := get $gateways $gateway }}
-  {{- if $gw }}
-    {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
-  {{- end }}
+{{- $gateways := (include "enabledGateways" .root) | fromYaml }}
+{{- $gw := get $gateways $gateway }}
+{{- if $gw }}
+  {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
 {{- end }}
 {{- end -}}
 
@@ -570,12 +550,8 @@ Args:
 {{- define "getGatewayName" -}}
 {{- $default := default "public" .default }}
 {{- $gateway := default $default .gateway }}
-{{- if .root.Values.istioGateway.enabled }}
-  {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
-  {{- $gwlookup := get $gateways $gateway }}
-  {{- $gw := default (dict "serviceName" $default) $gwlookup }}
-  {{- printf "istio-gateway/%s" $gw.serviceName }}
-{{- else }}
-  {{- printf "istio-system/%s" $gateway }}
-{{- end }}
+{{- $gateways := (include "enabledGateways" .root) | fromYaml }}
+{{- $gwlookup := get $gateways $gateway }}
+{{- $gw := default (dict "serviceName" $default) $gwlookup }}
+{{- printf "istio-gateway/%s" $gw.serviceName }}
 {{- end -}}
