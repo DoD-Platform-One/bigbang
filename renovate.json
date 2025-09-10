@@ -1,37 +1,60 @@
 {
-    "baseBranches": ["master"],
+    "baseBranches": [
+        "master"
+    ],
     "configWarningReuseIssue": false,
     "dependencyDashboard": true,
     "dependencyDashboardHeader": "- [ ] If there are Flux updates: Update your Flux CLI to the latest version possible based on available IB images. Note, if installing with homebrew on mac, use command `brew upgrade fluxcd/tap/flux`. This specific tap is needed to grab the latest version. Then from the root of the bigbang repository, run `flux install --components source-controller,kustomize-controller,helm-controller,notification-controller --export > base/flux/gotk-components.yaml` to generate the latest manifests",
     "dependencyDashboardTitle": "Renovate: Update Dependencies",
     "draftPR": true,
-    "enabledManagers": ["helm-values","regex"],
-    "labels": ["renovate","kind::maintenance","kind::Tools & Automation"],
+    "enabledManagers": [
+        "helm-values",
+        "custom.regex"
+    ],
+    "labels": [
+        "renovate",
+        "kind::maintenance",
+        "kind::Tools & Automation"
+    ],
     "packageRules": [
         {
-            "matchDatasources": ["docker"],
+            "matchDatasources": [
+                "docker"
+            ],
             "groupName": "Ironbank",
-            "registryUrls": ["https://registry1.dso.mil"]
+            "registryUrls": [
+                "https://registry1.dso.mil"
+            ]
         },
         {
-            "matchPackagePatterns": ["flux"],
             "additionalBranchPrefix": "flux-",
-            "addLabels": ["flux"],
-            "groupName": "Flux"
+            "addLabels": [
+                "flux"
+            ],
+            "groupName": "Flux",
+            "matchPackageNames": [
+                "/flux/"
+            ]
         }
     ],
-    "regexManagers": [
+    "customManagers": [
         {
-            "fileMatch": ["^base/flux/kustomization\\.yaml"],
+            "customType": "regex",
+            "fileMatch": [
+                "^base/flux/kustomization\\.yaml"
+            ],
             "matchStrings": [
                 "newName\\S*:\\s*(?<depName>\\S+).*\n\\s+newTag:\\s*(?<currentValue>.+)"
-              ],
+            ],
             "datasourceTemplate": "docker"
         },
         {
-            "fileMatch": ["^tests/images\\.txt$"],
+            "customType": "regex",
+            "fileMatch": [
+                "^tests/images\\.txt$"
+            ],
             "matchStrings": [
-              "s*(?<depName>.+):(?<currentValue>.+)"
+                "s*(?<depName>.+):(?<currentValue>.+)"
             ],
             "datasourceTemplate": "docker"
         }
