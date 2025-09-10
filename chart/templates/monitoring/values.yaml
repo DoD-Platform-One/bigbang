@@ -29,6 +29,18 @@ networkPolicies:
           - ipBlock:
               cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
     from:
+      # TODO: Remove this once bb-common creates default policies in `pre-install` and `post-delete` hook phases
+      admission-create-job:
+        to:
+          k8s:
+            udp://kube-system/coredns:53:
+              enabled: true
+              metadata:
+                annotations:
+                  helm.sh/hook: pre-install,pre-upgrade
+              podSelector:
+                matchLabels:
+                  k8s-app: kube-dns
       "*":
         to:
           k8s:
