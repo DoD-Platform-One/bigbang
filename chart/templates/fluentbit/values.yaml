@@ -8,6 +8,14 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.fluentbit) "enabled")) }}
 
+{{- $lokiServiceMap := dict
+    "monolith" "logging-loki"
+    "scalable" "logging-loki-write"
+    "distributed" "logging-loki-distributor"
+}}
+{{- $lokiServiceName := index $lokiServiceMap .Values.loki.strategy }}
+{{- $lokiWriteDestUrl := printf "%s.logging" $lokiServiceName }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
@@ -329,11 +337,7 @@ upstream:
           name                   loki
           match                  kube.*
           labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
-          {{- if eq .Values.loki.strategy "monolith" }}
-          host                   logging-loki.logging
-          {{- else }}
-          host                   logging-loki-write.logging
-          {{- end }}
+          host                   {{ $lokiWriteDestUrl }}
           port                   3100
           auto_kubernetes_labels on
           Retry_Limit            False
@@ -343,11 +347,7 @@ upstream:
           name                   loki
           match                  host.*
           labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
-          {{- if eq .Values.loki.strategy "monolith" }}
-          host                   logging-loki.logging
-          {{- else }}
-          host                   logging-loki-write.logging
-          {{- end }}
+          host                   {{ $lokiWriteDestUrl }}
           port                   3100
           auto_kubernetes_labels on
           Retry_Limit            False

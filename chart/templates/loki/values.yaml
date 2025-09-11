@@ -15,7 +15,7 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  {{- if or 
+  {{- if or
       (dig "hardened" "enabled" false .Values.istiod.values)
       (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
       (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
@@ -173,6 +173,98 @@ gateway:
 # Allows users to deploy distributed mode but calls out that we do not support it
 {{- if (eq .Values.loki.strategy "distributed") }}
 deploymentMode: Distributed
+singleBinary:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+gateway:
+  enabled: true
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+
+ingester:
+  replicas: 3
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+querier:
+  replicas: 3
+  maxUnavailable: 2
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+queryFrontend:
+  replicas: 2
+  maxUnavailable: 1
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+queryScheduler:
+  replicas: 2
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+distributor:
+  replicas: 3
+  maxUnavailable: 2
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+compactor:
+  replicas: 1
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+indexGateway:
+  replicas: 2
+  maxUnavailable: 1
+  extraArgs:
+    - -config.expand-env=true
+  extraEnv:
+    - name: MY_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
+bloomPlanner:
+  replicas: 0
+bloomBuilder:
+  replicas: 0
+bloomGateway:
+  replicas: 0
 {{- end -}}
 
 {{- end -}}

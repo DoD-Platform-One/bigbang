@@ -7,11 +7,13 @@
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 
-{{- $lokiWriteDestUrl := ternary
-    "http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push"
-    "http://logging-loki-write.logging.svc.cluster.local:3100/loki/api/v1/push"
-    (eq .Values.loki.strategy "monolith")
+{{- $lokiServiceMap := dict
+    "monolith" "logging-loki"
+    "scalable" "logging-loki-write"
+    "distributed" "logging-loki-distributor"
 }}
+{{- $lokiServiceName := index $lokiServiceMap .Values.loki.strategy }}
+{{- $lokiWriteDestUrl := printf "http://%s.logging.svc.cluster.local:3100/loki/api/v1/push" $lokiServiceName }}
 
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
 
