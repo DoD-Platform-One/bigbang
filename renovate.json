@@ -11,6 +11,7 @@
         "helm-values",
         "custom.regex"
     ],
+    "ignorePaths": ["**/templates/**/values.yaml"],
     "labels": [
         "renovate",
         "kind::maintenance",
