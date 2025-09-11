@@ -49,7 +49,7 @@ istio:
     {{- end }}
 
 {{- if $minioEnabled }}
-minio-tenant: 
+minio-tenant:
   enabled: true
   tenant:
     configSecret:

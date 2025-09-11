@@ -415,7 +415,7 @@ DEPRECATION NOTICE:
 
 {{- if and $.Values.addons.thanos.enabled (not (dig "values" "prometheus" "prometheusSpec" "replicas" "" $.Values.monitoring)) }}
 PLATFORM ONE THANOS WARNING:
-  You have enabled Thanos with the default Prometheus replicas set to 1.  For production deployments, 
+  You have enabled Thanos with the default Prometheus replicas set to 1.  For production deployments,
   you can increase the number of replicas by adding:
   monitoring:
     values:
@@ -426,15 +426,16 @@ PLATFORM ONE THANOS WARNING:
 
 {{- if (eq .Values.loki.strategy "distributed") }}
 PLATFORM ONE LOKI WARNING:
-  BigBang does not support the Loki Distributed deployment mode. For production deployments,
-  please set your strategy to "scalable" or "monolithic"
+  The Loki "distributed" deployment strategy is experimental and has limited support from Big Bang.
+  For production deployments, please set your strategy to "scalable" or "monolithic"
+  To proceed with distributed mode, set .Values.loki.values.experimentalMode.enabled=true
 {{- end }}
 
 {{- if and .Values.addons.keycloak.enabled (not (or .Values.addons.keycloak.database.host (dig "upstream" "database" "hostname" false .Values.addons.keycloak.values))) }}
 PLATFORM ONE KEYCLOAK WARNING
-  You have enabled Keycloak with an internal database. Platform One does not 
-  support this option for production deployments. This option should only be 
-  used for development or CI pipelines. Please configure your Keycloak deployment 
-  to use an external database at either the `addons.keycloak.database` or 
+  You have enabled Keycloak with an internal database. Platform One does not
+  support this option for production deployments. This option should only be
+  used for development or CI pipelines. Please configure your Keycloak deployment
+  to use an external database at either the `addons.keycloak.database` or
   `addons.keycloak.values.upstream.database` keys.
 {{- end }}

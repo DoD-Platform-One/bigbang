@@ -42,9 +42,14 @@ spec:
 
   {{- toYaml $fluxSettingsLoki | nindent 2 }}
 
-  {{- if .Values.loki.postRenderers }}
+  {{- if or .Values.loki.postRenderers $istioEnabled }}
   postRenderers:
-  {{ toYaml .Values.loki.postRenderers | nindent 4 }}
+  {{- if $istioEnabled }}
+  {{- include "loki.istioPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- if .Values.loki.postRenderers }}
+  {{ toYaml .Values.loki.postRenderers | nindent 2 }}
+  {{- end }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-loki-values
