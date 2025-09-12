@@ -2395,6 +2395,10 @@ packages:
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
 
+    # -- Pass bigbang values to the package
+    # @default -- true
+    passBigBangValues: true
+
     # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     helmRepo:
       # -- Name of the HelmRepo specified in `helmRepositories`
