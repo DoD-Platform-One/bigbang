@@ -5,10 +5,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ---
 ## [3.6.1]
 	
-- [!3.6.1](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=3.6.1); List of merge requests in this release.
-
-## [3.6.1]
-	
 - [!3.6.1](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests?scope=all&utf8=%E2%9C%93&state=merged&milestone_title=3.6.0); List of merge requests in this release.
 
 ## [3.6.0]
