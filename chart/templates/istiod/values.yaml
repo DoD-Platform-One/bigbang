@@ -14,6 +14,10 @@ networkPolicies:
     definitions:
       sso:
         {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
     from:
       istiod:
         to:
