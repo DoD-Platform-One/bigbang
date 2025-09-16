@@ -12,6 +12,8 @@ domain: {{ $domainName }}
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled") }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
+
+{{- $authserviceEnabled := and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
 {{- $lokiEnabled := (.Values.loki.enabled) }}
@@ -53,6 +55,14 @@ networkPolicies:
         to:
           cidr:
             0.0.0.0/0: true
+      prometheus:
+        to:
+          k8s:
+            authservice/authservice:10003: {{ $authserviceEnabled }}
+      alertmanager:
+        to:
+          k8s:
+            authservice/authservice:10003: {{ $authserviceEnabled }}
   ingress:
     to:
       prometheus:10901:
@@ -67,10 +77,6 @@ networkPolicies:
             logging/logging-loki: {{ .Values.loki.enabled }}
           definition:
             gateway: {{ .Values.istioGateway.enabled }}
-      alertmanager:10003:
-        from:
-          k8s:
-            authservice/authservice: {{ .Values.addons.authservice.enabled }}
       grafana:3000:
         from:
           k8s:
