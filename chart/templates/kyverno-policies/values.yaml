@@ -1047,6 +1047,7 @@ policies:
         pods:
           allow:
           - logging-loki-minio-*
+          - logging-ek-wait-job-*
           deny:
           - logging-ek-es-data*
           - logging-ek-es-master*
