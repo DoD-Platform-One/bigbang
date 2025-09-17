@@ -44,7 +44,7 @@ spec:
 
   {{- if or .Values.loki.postRenderers $istioEnabled }}
   postRenderers:
-  {{- if $istioEnabled }}
+  {{- if and $istioEnabled (eq .Values.loki.strategy "distributed") }}
   {{- include "loki.istioPostRenderers" . | nindent 2 }}
   {{- end }}
   {{- if .Values.loki.postRenderers }}
