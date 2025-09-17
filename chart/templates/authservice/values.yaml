@@ -39,10 +39,54 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled | default false }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.haproxy "root" .) | nindent 4 }}
+  ingress:
+    definitions:
+      keycloak-protected-pods:
+        from:
+          - namespaceSelector: {}
+            podSelector:
+              matchLabels:
+                {{- $Key := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+                {{- $Value := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+                {{ $Key }}: {{ $Value }}
+    to:
+      # gRPC connections for pods with protect=keycloak label
+      authservice:10003:
+        from:
+          definition:
+            keycloak-protected-pods: true
+      # Grafana redis client connection
+      redis-bb:6379:
+        from:
+          k8s:
+            monitoring/grafana: {{ .Values.monitoring.enabled }}
+      haproxy:8080:
+        from:
+          k8s:
+            "istio-gateway/*": {{ .Values.addons.haproxy.enabled }}
+      # Redis exporter metrics
+      redis-bb:9121:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  egress:
+    definitions:
+      sso:
+        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
+
+    from:
+      authservice:
+        to:
+          definition:
+            sso: true
+          k8s:
+            # Tempo trace data
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+      haproxy:
+        to:
+          k8s:
+            monitoring/alertmanager:9093: {{ .Values.addons.haproxy.enabled }}
+            monitoring/prometheus:9090: {{ .Values.addons.haproxy.enabled }}
 
 {{- if or (dig "redis" "enabled" false .Values.addons.authservice.values) (dig "global" "redis_server_uri" "" .Values.addons.authservice.values) }}
 autoscaling:
