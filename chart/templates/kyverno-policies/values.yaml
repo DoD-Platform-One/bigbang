@@ -1137,6 +1137,8 @@ policies:
           # notifications bot pods interact with secrets, configmaps, and CRDs
           # More details in argocd/chart/templates/argocd-notifications/bots/slack/role.yaml
           - argocd-argocd-notifications-controller-*
+          # needed to allow gluon 0.9.0 to execute test.sh script
+          - argocd-argocd-script-test
       - namespace: harbor
         # Omitting the serviceAccount and Pods section forces the policy to apply to
         # all of the serviceAccount and Pods in the namespace
