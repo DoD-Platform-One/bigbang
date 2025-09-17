@@ -1162,6 +1162,7 @@ policies:
           allow:
           - mimir-mimir-rollout-operator-*
           - mimir-mimir-minio*
+          - mimir-mimir-script-test*
       - namespace: anchore
         pods:
           allow:
