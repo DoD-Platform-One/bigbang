@@ -6737,6 +6737,8 @@ addons:
         global:
           tlsDisable: false
         injector:
+          enabled: true
+          tlsDisable: false
           affinity: |
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:

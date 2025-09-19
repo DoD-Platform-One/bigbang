@@ -335,6 +335,7 @@ prometheus:
         vault.hashicorp.com/role: "prometheus"
         vault.hashicorp.com/agent-run-as-user : "1000"
         vault.hashicorp.com/agent-run-as-group : "2000"
+        vault.hashicorp.com/tls-server-name: {{ .Values.domain }} 
         {{- end }}
       {{- end }}
     {{- if .Values.addons.vault.enabled }}
