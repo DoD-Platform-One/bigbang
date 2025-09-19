@@ -11,7 +11,9 @@
         "helm-values",
         "custom.regex"
     ],
-    "ignorePaths": ["**/templates/**/values.yaml"],
+    "ignorePaths": [
+        "**/templates/**/values.yaml"
+    ],
     "labels": [
         "renovate",
         "kind::maintenance",
@@ -41,8 +43,8 @@
     "customManagers": [
         {
             "customType": "regex",
-            "fileMatch": [
-                "^base/flux/kustomization\\.yaml"
+            "managerFilePatterns": [
+                "/^base/flux/kustomization\\.yaml/"
             ],
             "matchStrings": [
                 "newName\\S*:\\s*(?<depName>\\S+).*\n\\s+newTag:\\s*(?<currentValue>.+)"
@@ -51,8 +53,8 @@
         },
         {
             "customType": "regex",
-            "fileMatch": [
-                "^tests/images\\.txt$"
+            "managerFilePatterns": [
+                "/^tests/images\\.txt$/"
             ],
             "matchStrings": [
                 "s*(?<depName>.+):(?<currentValue>.+)"
