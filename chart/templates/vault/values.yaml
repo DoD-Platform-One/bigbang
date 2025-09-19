@@ -26,6 +26,7 @@ upstream:
     {{- if $istioEnabled }}
     annotations:
       {{ include "istioAnnotation" . }}
+      traffic.sidecar.istio.io/excludeInboundPorts: "8080"
     {{- end }}
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
