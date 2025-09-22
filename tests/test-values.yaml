@@ -1973,7 +1973,7 @@ addons:
         scripts:
           envs:
             MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
-      mimir-distributed:
+      upstream:
         mimir:
           structuredConfig:
             limits:
