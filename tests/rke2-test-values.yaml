@@ -48,7 +48,7 @@ elasticsearchKibana:
 loki:
   values:
     global:
-      dnsService: rke2-coredns-rke2-coredns  
+      dnsService: rke2-coredns-rke2-coredns
     bbtests:
       cypress:
         artifacts: false
@@ -158,7 +158,7 @@ addons:
       bbtests:
         cypress:
           artifacts: false
-      mimir-distributed:
+      upstream:
         global:
           dnsService: rke2-coredns-rke2-coredns
   argocd:
@@ -423,7 +423,7 @@ addons:
             cpu: 200m
             memory: 512Mi
           limits: null
-    
+
   sonarqube:
     values:
       bbtests:
@@ -492,7 +492,7 @@ addons:
             cpu: 100m
             memory: 1500Mi
           limits: null
-  
+
   keycloak:
     values:
       bbtests:

@@ -1428,7 +1428,7 @@ addons:
       redis:
         enabled: true
       redis-bb:
-        upstream: 
+        upstream:
           master:
             persistence:
               size: 256Mi
@@ -2012,7 +2012,7 @@ addons:
         scripts:
           envs:
             MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
-      mimir-distributed:
+      upstream:
         mimir:
           structuredConfig:
             limits:
@@ -6793,7 +6793,7 @@ addons:
                   kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
                   endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
                 }
-  
+
                 telemetry {
                   prometheus_retention_time = "24h"
                   disable_hostname = true
