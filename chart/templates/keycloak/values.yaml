@@ -48,7 +48,7 @@ upstream:
     port: {{ coalesce .port 5432 }}
     database: {{ coalesce .database "keycloak" }}
     username: {{ coalesce .username "keycloak" }}
-    password: {{ coalesce .password "keycloak" }}
+    password: {{ coalesce .password "keycloak" | quote }}
   {{- end }}
 
   {{- if $istioInjection }}
