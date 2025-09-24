@@ -1150,17 +1150,26 @@ bbctl:
 
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/bbctl.git
-    tag: "2.1.0-bb.1"
+    tag: "3.0.0-bb.0"
     path: "./chart"
   helmRepo:
     repoName: "registry1"
     chartName: "bbctl"
-    tag: "2.1.0-bb.1"
+    tag: "3.0.0-bb.0"
 
   repoCredentials:
     repo: "repo1.dso.mil"
     username: ""
     password: ""
+    email: ""
+
+  # List of docker image registry hostnames to use in commands that deploy images
+  # Defaults to ["registry1.dso.mil"] if empty
+  registryOverrides: []
+  # Image name including tag to use for the preflight check pod
+  # Defaults to "registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.6" if empty
+  preflightCheck:
+    image: ""
 
   # -- Override flux settings for this package
   flux: {}

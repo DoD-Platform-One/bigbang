@@ -8,17 +8,6 @@
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-registryCredentials:
-{{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
-{{ with index .Values.registryCredentials 0 }}
-  registry: "{{ .registry }}"
-  username: "{{ .username }}"
-  password: "{{ .password }}"
-{{- end }}
-{{ else }}
-{{ toYaml .Values.registryCredentials }}
-{{- end }}
-
 credentialsFile:
   credentials:
   {{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
@@ -26,30 +15,24 @@ credentialsFile:
   - uri: {{ $item.registry }}
     username: {{ $item.username }}
     password: {{ $item.password }}
+    email: {{ $item.email }}
   {{- end }}
   {{ else }}
   - uri: {{ .Values.registryCredentials.registry }}
     username: {{ .Values.registryCredentials.username }}
     password: {{ .Values.registryCredentials.password }}
+    email: {{ .Values.registryCredentials.email }}
   {{- end }}
   - uri: "{{ .Values.bbctl.repoCredentials.repo }}"
     username: "{{ .Values.bbctl.repoCredentials.username }}"
     password: "{{ .Values.bbctl.repoCredentials.password }}"
+    email: {{ .Values.bbctl.repoCredentials.email }}
 
 baseConfig:
   skip-update-check: true
+  registry-override: {{ .Values.bbctl.registryOverrides }}
   preflight-check:
-    {{- if and .Values.registryCredentials (kindIs "slice" .Values.registryCredentials) }}
-    {{ with index .Values.registryCredentials 0 }}
-    registryserver: "https://{{ .registry }}"
-    registryusername: {{ .username }}
-    registrypassword: {{ .password }}
-    {{- end }}
-    {{ else }}
-    registryserver: "https://{{ .Values.registryCredentials.registry }}"
-    registryusername: {{ .Values.registryCredentials.username }}
-    registrypassword: {{ .Values.registryCredentials.password }}
-    {{- end }}
+    image: {{ .Values.bbctl.preflightCheck.image }}
 
 istio:
   enabled: {{ $istioEnabled }}
