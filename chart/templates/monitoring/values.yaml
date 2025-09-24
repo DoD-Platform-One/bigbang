@@ -240,8 +240,20 @@ prometheus:
       {{- if $istioEnabled }}
       # I promise it's not a typo; the port is 80 even though it's TLS
       - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+        writeRelabelConfigs:
+          - sourceLabels: [__name__]
+            regex: '.*\..*'
+            action: drop
+          - action: labeldrop
+            regex: '.*\..*'
       {{- else }}
       - url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
+        writeRelabelConfigs:
+          - sourceLabels: [__name__]
+            regex: '.*\..*'
+            action: drop
+          - action: labeldrop
+            regex: '.*\..*'
       {{- end }}
         {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
         tlsConfig:
