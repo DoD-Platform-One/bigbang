@@ -843,6 +843,23 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
+        "registryOverrides": {
+          "description": "List of docker image registry hostnames to use in commands that deploy images.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preflightCheck": {
+          "description": "Configuration values specific to the preflight-check command.",
+          "type": "object",
+          "properties": {
+            "image": {
+              "description": "Image name including tag to deploy as the preflight check pod.",
+              "type": "string"
+            }
+          }
+        },
         "repoCredentials": {
           "type": "object",
           "items": {
@@ -856,6 +873,10 @@
             },
             "password": {
               "description": "Password or API token used to acess the repository. Only required when using a private repository.",
+              "type": "string"
+            },
+            "email": {
+              "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
               "type": "string"
             }
           }
