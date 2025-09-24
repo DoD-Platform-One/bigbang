@@ -174,9 +174,9 @@ imagePullPolicy: IfNotPresent
 
 # -- Flag for temporary workaround for passthrough chart migrations
 # This is the global flag to disable automatic passthrough values for all packages.
-# Alternatively, you can set this flag to `true` in the individual package values to disable passthrough for that package.
-# This will be removed in a future release.
-disableAutomaticPassthroughValues: false
+# Alternatively, you can set this flag to `false` (enabling automatic passthrough globally), and then per package set `disableAutomaticPassthroughValues` to `true` to disable automatic passthrough for that package.
+# This will be removed in a future release (as will all references to `disableAutomaticPassthroughValues`).
+disableAutomaticPassthroughValues: true
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Istio
