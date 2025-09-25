@@ -12,7 +12,6 @@ domain: {{ $domainName }}
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled")) }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
-{{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
 {{- $enterpriseEnabled := (dig "enterprise" "enabled" false .Values.grafana) }}
 
 flux:
@@ -27,12 +26,6 @@ networkPolicies:
     {{- include "getGatewaySelector" (dict "pkg" .Values.grafana "root" .) | nindent 4 }}
 
 openshift: {{ .Values.openshift }}
-
-minioOperator:
-  enabled: {{ .Values.addons.minioOperator.enabled }}
-
-gitlabRunner:
-  enabled: {{ .Values.addons.gitlabRunner.enabled }}
 
 istio:
   {{- $grafanaInjection := dig "istio" "injection" "enabled" .Values.grafana }}
@@ -53,289 +46,269 @@ istio:
       - {{ include "getGatewayName" (dict "gateway" .Values.grafana.ingress.gateway "root" .)}}
   injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
 
-anchoreEnterprise:
-  enabled: {{ .Values.addons.anchoreEnterprise.enabled }}
-
-kiali:
-  enabled: {{ .Values.kiali.enabled }}
-
-loki:
-  enabled: {{ .Values.loki.enabled }}
-
-tempo:
-  enabled: {{ .Values.tempo.enabled }}
-
-{{- if or $gitlabRedis $authserviceRedisEnabled $redisDatasource }}
-redis:
-  enabled: true
-{{- end }}
-
-vault:
-  enabled: {{ .Values.addons.vault.enabled }}
-  tlsDisable: {{ dig "global" "tlsDisable" true .Values.addons.vault.values }}
-
-sso:
-  enabled: {{ or .Values.grafana.sso.enabled .Values.grafana.sso.enabled }}
-
-{{- if $gitlabRedis }}
-envFromSecret: grafana-env-secret
-{{- end }}
-
-{{- if .Values.tempo.enabled }}
-env:
-  GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor tempoSearch tempoServiceGraph"
-{{- end }}
-
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-  pullSecrets:
-  - private-registry
-  {{- if $enterpriseEnabled }}
-  repository: ironbank/grafana/grafana-enterprise
-  {{- end }}
-
-sidecar:
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-
-{{- if $istioInjection }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-  {{- if $gitlabRedis }}
-  checksum/gitlabRedisPassword: {{ sha256sum .Values.addons.gitlab.redis.password }}
-  {{- end }}
-{{- end }}
-
-{{- if or .Values.monitoring.enabled .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
-datasources:
-  datasourcesbb.yaml:
-    apiVersion: 1
-    datasources:
-    {{- if .Values.addons.mimir.enabled }}
-    - name: Mimir
-      type: prometheus
-      uid: mimir
-      access: proxy
-      url: http://mimir-mimir-gateway.mimir.svc.cluster.local/prometheus
-      editable: true
-    {{- end }}
-    {{- if .Values.monitoring.enabled }}
-    {{- if .Values.addons.thanos.enabled }}
-    - name: Thanos
-      type: prometheus
-      uid: prometheus
-      access: proxy
-      url: http://thanos-query.thanos.svc:9090
-      editable: true
-    {{- else }}
-    - name: Prometheus
-      type: prometheus
-      uid: prometheus
-      access: proxy
-      url: http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090
-      editable: true
-    {{- end }}
-    {{- end }}
-    {{- if .Values.addons.argocd.enabled }}
-    - name: Argo Master
-      type: redis-datasource
-      access: proxy
-      url: argocd-argocd-redis-bb-master.argocd.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    - name: Argo Headless
-      type: redis-datasource
-      access: proxy
-      url: argocd-argocd-redis-bb-headless.argocd.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    - name: Argo Replicas
-      type: redis-datasource
-      access: proxy
-      url: argocd-argocd-redis-bb-replicas.argocd.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    {{- end }}
-    {{- if $authserviceRedisEnabled }}
-    - name: AuthService Master
-      type: redis-datasource
-      access: proxy
-      url: authservice-authservice-redis-bb-master.authservice.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    - name: AuthService Headless
-      type: redis-datasource
-      access: proxy
-      url: authservice-authservice-redis-bb-headless.authservice.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    - name: AuthService Replicas
-      type: redis-datasource
-      access: proxy
-      url: authservice-authservice-redis-bb-replicas.authservice.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-    {{- end }}
-    {{- if $gitlabRedis }}
-    - name: GitLab
-      type: redis-datasource
-      access: proxy
-      url: gitlab-redis-master.gitlab.svc.cluster.local:6379
-      jsonData:
-        client: standalone
-      secureJsonData:
-        password: $GITLAB_REDIS_PASSWORD
-    {{- end }}
-    {{- if .Values.loki.enabled }}
-    - name: Loki
-      type: loki
-      {{- if eq .Values.loki.strategy "monolith" }}
-      url: http://logging-loki.logging.svc.cluster.local:3100
-      {{- else }}
-      url: http://logging-loki-gateway.logging.svc.cluster.local
-      {{- end }}
-      access: proxy
-      editable: true
-    {{- end }}
-    {{- if and .Values.loki.enabled .Values.tempo.enabled }}
-      jsonData:
-        derivedFields:
-          - datasourceName: Tempo
-            matcherRegex: "traceID=(\\w+)"
-            name: TraceID
-            url: "$${__value.raw}"
-            datasourceUid: tempo
-    {{- end }}
-    {{- if .Values.tempo.enabled }}
-    - name: Tempo
-      type: tempo
-      access: proxy
-      orgId: 1
-      uid: tempo
-      url: http://tempo-tempo.tempo.svc:3100
-      isDefault: false
-      editable: true
-      jsonData:
-        httpMethod: GET
-        serviceMap:
-          datasourceUid: 'prometheus'
-    {{- end }}
-    {{- if and .Values.loki.enabled .Values.tempo.enabled }}
-      jsonData:
-        httpMethod: GET
-        tracesToLogs:
-          datasourceUid: 'Loki'
-          tags: ['job', 'instance', 'pod', 'namespace']
-          mappedTags: [{ key: 'service.name', value: 'service' }]
-          mapTagNamesEnabled: false
-          spanStartTimeShift: '1h'
-          spanEndTimeShift: '1h'
-          filterByTraceID: false
-          filterBySpanID: false
-        serviceMap:
-          datasourceUid: 'prometheus'
-        search:
-          hide: false
-        nodeGraph:
-          enabled: true
-        lokiSearch:
-          datasourceUid: 'Loki'
-    {{- end }}
-{{- end }}
-
-grafana.ini:
-  {{- if $istioEnabled }}
-  server:
-    root_url: https://grafana.{{ $domainName }}/
-  {{- end }}
-
-  auth.generic_oauth:
-    enabled: {{ or .Values.grafana.sso.enabled (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
-    {{- if .Values.sso.name }}
-    name: {{ .Values.sso.name }}
-    {{- end }}
-    {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
-    client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
-    {{- end }}
-    {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_secret) (and (dig "grafana" "client_secret" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
-    client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
-    {{- end }}
-    {{- if (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
-    scopes: {{ ( dig "grafana" "scopes" false .Values.monitoring.sso) | default "openid profile email" }}
-    auth_url: {{ default (include "sso.oidc.auth" .) (dig "grafana" "auth_url" false .Values.monitoring.sso) }}
-    token_url: {{ default (include "sso.oidc.token" .) (dig "grafana" "token_url" false .Values.monitoring.sso) }}
-    api_url: {{ default (include "sso.oidc.userinfo" .) (dig "grafana" "api_url" false .Values.monitoring.sso) }}
-    allow_sign_up: {{ (dig "grafana" "allow_sign_up" false .Values.monitoring.sso) | default "True" }}
-    role_attribute_path: {{ (dig "grafana" "role_attribute_path" false .Values.monitoring.sso) | default "Viewer" }}
-    {{- else if .Values.grafana.sso.enabled }}
-    scopes: {{ .Values.grafana.sso.grafana.scopes | default "openid profile email" }}
-    auth_url: {{ default (include "sso.oidc.auth" .) .Values.grafana.sso.grafana.auth_url }}
-    token_url: {{ default (include "sso.oidc.token" .) .Values.grafana.sso.grafana.token_url }}
-    api_url: {{ default (include "sso.oidc.userinfo" .) .Values.grafana.sso.grafana.api_url }}
-    allow_sign_up: {{ .Values.grafana.sso.grafana.allow_sign_up | default "True" }}
-    role_attribute_path: {{ .Values.grafana.sso.grafana.role_attribute_path | default "Viewer" }}
-    {{- end }}
-  {{- with .Values.grafana.sso.grafana }}
-    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
-  {{- end }}
-  {{- with .Values.monitoring.sso.grafana }}
-    {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
-    {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
-  {{- end }}
-
-  {{- if $enterpriseEnabled }}
-  enterprise:
-    license_path: /etc/grafana/license/license.jwt
-  {{- end }}
-
-{{- if or (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) $enterpriseEnabled }}
-extraSecretMounts:
-  {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
-  - name: auth-generic-oauth-secret
-    mountPath: /etc/secrets/auth_generic_oauth
-    secretName: grafana-sso
-    defaultMode: 0440
-    readOnly: true
-  {{- end }}
-  {{- if and (or .Values.grafana.sso.enabled .Values.monitoring.sso.enabled) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
-  - name: "oidc-ca-certificate"
-    mountPath: "/etc/oidc/ca.pem"
-    secretName: "tls-ca-sso-grafana"
-    readOnly: true
-    subPath: "ca.pem"
-  {{- end }}
-  {{- if $enterpriseEnabled }}
-  - name: enterprise-license
-    mountPath: /etc/grafana/license
-    secretName: grafana-enterprise-license
-    readOnly: true
-  {{- end }}
-{{- end }}
-
-{{- if .Values.monitoring.enabled }}
-serviceMonitor:
-  enabled: true
-{{- if $istioInjection }}
-  scheme: https
-  tlsConfig:
-    caFile: /etc/prom-certs/root-cert.pem
-    certFile: /etc/prom-certs/cert-chain.pem
-    keyFile: /etc/prom-certs/key.pem
-    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-{{- end }}
-{{- end }}
-
 {{- if $enterpriseEnabled }}
 enterprise:
   createSecret: {{ .Values.grafana.enterprise.createSecret | default true }}
   license: {{ .Values.grafana.enterprise.license | quote }}
 {{- end }}
+
+sso:
+  enabled: {{ or .Values.grafana.sso.enabled .Values.grafana.sso.enabled }}
+
+upstream:
+  {{- if .Values.monitoring.enabled }}
+  serviceMonitor:
+    enabled: true
+  {{- if $istioInjection }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+  {{- end }}
+  {{- end }}
+
+  {{- if $gitlabRedis }}
+  envFromSecret: grafana-env-secret
+  {{- end }}
+
+  {{- if .Values.tempo.enabled }}
+  env:
+    GF_FEATURE_TOGGLES_ENABLE: "traceqlEditor tempoSearch tempoServiceGraph"
+  {{- end }}
+
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    pullSecrets:
+    - private-registry
+    {{- if $enterpriseEnabled }}
+    repository: ironbank/grafana/grafana-enterprise
+    {{- end }}
+
+  sidecar:
+    imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+  {{- if $istioInjection }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+    {{- if $gitlabRedis }}
+    checksum/gitlabRedisPassword: {{ sha256sum .Values.addons.gitlab.redis.password }}
+    {{- end }}
+  {{- end }}
+
+  {{- if or .Values.monitoring.enabled .Values.loki.enabled .Values.tempo.enabled $gitlabRedis $authserviceRedisEnabled .Values.addons.argocd.enabled }}
+  datasources:
+    datasourcesbb.yaml:
+      apiVersion: 1
+      datasources:
+      {{- if .Values.addons.mimir.enabled }}
+      - name: Mimir
+        type: prometheus
+        uid: mimir
+        access: proxy
+        url: http://mimir-mimir-gateway.mimir.svc.cluster.local/prometheus
+        editable: true
+      {{- end }}
+      {{- if .Values.monitoring.enabled }}
+      {{- if .Values.addons.thanos.enabled }}
+      - name: Thanos
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://thanos-query.thanos.svc:9090
+        editable: true
+      {{- else }}
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090
+        editable: true
+      {{- end }}
+      {{- end }}
+      {{- if .Values.addons.argocd.enabled }}
+      - name: Argo Master
+        type: redis-datasource
+        access: proxy
+        url: argocd-argocd-redis-bb-master.argocd.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      - name: Argo Headless
+        type: redis-datasource
+        access: proxy
+        url: argocd-argocd-redis-bb-headless.argocd.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      - name: Argo Replicas
+        type: redis-datasource
+        access: proxy
+        url: argocd-argocd-redis-bb-replicas.argocd.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      {{- end }}
+      {{- if $authserviceRedisEnabled }}
+      - name: AuthService Master
+        type: redis-datasource
+        access: proxy
+        url: authservice-authservice-redis-bb-master.authservice.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      - name: AuthService Headless
+        type: redis-datasource
+        access: proxy
+        url: authservice-authservice-redis-bb-headless.authservice.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      - name: AuthService Replicas
+        type: redis-datasource
+        access: proxy
+        url: authservice-authservice-redis-bb-replicas.authservice.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+      {{- end }}
+      {{- if $gitlabRedis }}
+      - name: GitLab
+        type: redis-datasource
+        access: proxy
+        url: gitlab-redis-master.gitlab.svc.cluster.local:6379
+        jsonData:
+          client: standalone
+        secureJsonData:
+          password: $GITLAB_REDIS_PASSWORD
+      {{- end }}
+      {{- if .Values.loki.enabled }}
+      - name: Loki
+        type: loki
+        {{- if eq .Values.loki.strategy "monolith" }}
+        url: http://logging-loki.logging.svc.cluster.local:3100
+        {{- else }}
+        url: http://logging-loki-gateway.logging.svc.cluster.local
+        {{- end }}
+        access: proxy
+        editable: true
+      {{- end }}
+      {{- if and .Values.loki.enabled .Values.tempo.enabled }}
+        jsonData:
+          derivedFields:
+            - datasourceName: Tempo
+              matcherRegex: "traceID=(\\w+)"
+              name: TraceID
+              url: "$${__value.raw}"
+              datasourceUid: tempo
+      {{- end }}
+      {{- if .Values.tempo.enabled }}
+      - name: Tempo
+        type: tempo
+        access: proxy
+        orgId: 1
+        uid: tempo
+        url: http://tempo-tempo.tempo.svc:3100
+        isDefault: false
+        editable: true
+        jsonData:
+          httpMethod: GET
+          serviceMap:
+            datasourceUid: 'prometheus'
+      {{- end }}
+      {{- if and .Values.loki.enabled .Values.tempo.enabled }}
+        jsonData:
+          httpMethod: GET
+          tracesToLogs:
+            datasourceUid: 'Loki'
+            tags: ['job', 'instance', 'pod', 'namespace']
+            mappedTags: [{ key: 'service.name', value: 'service' }]
+            mapTagNamesEnabled: false
+            spanStartTimeShift: '1h'
+            spanEndTimeShift: '1h'
+            filterByTraceID: false
+            filterBySpanID: false
+          serviceMap:
+            datasourceUid: 'prometheus'
+          search:
+            hide: false
+          nodeGraph:
+            enabled: true
+          lokiSearch:
+            datasourceUid: 'Loki'
+      {{- end }}
+  {{- end }}
+
+  grafana.ini:
+    {{- if $istioEnabled }}
+    server:
+      root_url: https://grafana.{{ $domainName }}/
+    {{- end }}
+
+    auth.generic_oauth:
+      enabled: {{ or .Values.grafana.sso.enabled (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
+      {{- if .Values.sso.name }}
+      name: {{ .Values.sso.name }}
+      {{- end }}
+      {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
+      client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
+      {{- end }}
+      {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_secret) (and (dig "grafana" "client_secret" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
+      client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+      {{- end }}
+      {{- if (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
+      scopes: {{ ( dig "grafana" "scopes" false .Values.monitoring.sso) | default "openid profile email" }}
+      auth_url: {{ default (include "sso.oidc.auth" .) (dig "grafana" "auth_url" false .Values.monitoring.sso) }}
+      token_url: {{ default (include "sso.oidc.token" .) (dig "grafana" "token_url" false .Values.monitoring.sso) }}
+      api_url: {{ default (include "sso.oidc.userinfo" .) (dig "grafana" "api_url" false .Values.monitoring.sso) }}
+      allow_sign_up: {{ (dig "grafana" "allow_sign_up" false .Values.monitoring.sso) | default "True" }}
+      role_attribute_path: {{ (dig "grafana" "role_attribute_path" false .Values.monitoring.sso) | default "Viewer" }}
+      {{- else if .Values.grafana.sso.enabled }}
+      scopes: {{ .Values.grafana.sso.grafana.scopes | default "openid profile email" }}
+      auth_url: {{ default (include "sso.oidc.auth" .) .Values.grafana.sso.grafana.auth_url }}
+      token_url: {{ default (include "sso.oidc.token" .) .Values.grafana.sso.grafana.token_url }}
+      api_url: {{ default (include "sso.oidc.userinfo" .) .Values.grafana.sso.grafana.api_url }}
+      allow_sign_up: {{ .Values.grafana.sso.grafana.allow_sign_up | default "True" }}
+      role_attribute_path: {{ .Values.grafana.sso.grafana.role_attribute_path | default "Viewer" }}
+      {{- end }}
+    {{- with .Values.grafana.sso.grafana }}
+      {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- end }}
+    {{- with .Values.monitoring.sso.grafana }}
+      {{- list "allowed_domains" .allowed_domains | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_ca" .tls_client_ca | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_skip_verify_insecure" .tls_skip_verify_insecure | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_cert" .tls_client_cert | include "bigbang.addValueIfSet" | indent 4 }}
+      {{- list "tls_client_key" .tls_client_key | include "bigbang.addValueIfSet" | indent 4 }}
+    {{- end }}
+
+    {{- if $enterpriseEnabled }}
+    enterprise:
+      license_path: /etc/grafana/license/license.jwt
+    {{- end }}
+
+  {{- if or (or .Values.grafana.sso.grafana.client_id (dig "grafana" "client_id" false .Values.monitoring.sso)) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) $enterpriseEnabled }}
+  extraSecretMounts:
+    {{- if or (and .Values.grafana.sso.enabled .Values.grafana.sso.grafana.client_id) (and (dig "grafana" "client_id" false .Values.monitoring.sso) .Values.monitoring.sso.enabled) }}
+    - name: auth-generic-oauth-secret
+      mountPath: /etc/secrets/auth_generic_oauth
+      secretName: grafana-sso
+      defaultMode: 0440
+      readOnly: true
+    {{- end }}
+    {{- if and (or .Values.grafana.sso.enabled .Values.monitoring.sso.enabled) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+    - name: "oidc-ca-certificate"
+      mountPath: "/etc/oidc/ca.pem"
+      secretName: "tls-ca-sso-grafana"
+      readOnly: true
+      subPath: "ca.pem"
+    {{- end }}
+    {{- if $enterpriseEnabled }}
+    - name: enterprise-license
+      mountPath: /etc/grafana/license
+      secretName: grafana-enterprise-license
+      readOnly: true
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 {{- /* This function merges defaults in lists from above into overlays */ -}}
