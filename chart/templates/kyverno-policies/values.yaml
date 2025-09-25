@@ -1140,6 +1140,9 @@ policies:
           # needed to allow gluon 0.9.0 to execute test.sh script
           - argocd-argocd-script-test
       - namespace: harbor
+        pods:
+          allow:
+          - harbor-script-test
         # Omitting the serviceAccount and Pods section forces the policy to apply to
         # all of the serviceAccount and Pods in the namespace
       - namespace: authservice
