@@ -1896,34 +1896,34 @@ addons:
                     protocol: TLS
                     name: https
                 resolution: DNS
-      tenant:
-        pools:
-        - name: pool-0
-          labels:
-            app: minio
-            app.kubernetes.io/name: minio
-          servers: 3
-          volumesPerServer: 4
-          size: 256Mi
-          resources:
-            requests:
-              cpu: 250m
-              memory: 2Gi
-            limits:
-              cpu: 250m
-              memory: 2Gi
-          securityContext:
-            runAsUser: 1001
-            runAsGroup: 1001
-            fsGroup: 1001
-            runAsNonRoot: true
-          containerSecurityContext:
-            runAsUser: 1001
-            runAsGroup: 1001
-            runAsNonRoot: true
-            capabilities:
-              drop:
-              - ALL
+      upstream:
+        tenant:
+          pools:
+          - name: pool-0
+            labels:
+              app.kubernetes.io/name: minio-instance
+            servers: 3
+            volumesPerServer: 4
+            size: 256Mi
+            resources:
+              requests:
+                cpu: 250m
+                memory: 2Gi
+              limits:
+                cpu: 250m
+                memory: 2Gi
+            securityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              fsGroup: 1001
+              runAsNonRoot: true
+            containerSecurityContext:
+              runAsUser: 1001
+              runAsGroup: 1001
+              runAsNonRoot: true
+              capabilities:
+                drop:
+                - ALL
       bbtests:
         # There have been intermittent failures of the tests in the past.   The issue is tracked in the below issue.
         # https://repo1.dso.mil/big-bang/product/packages/minio/-/issues/7
