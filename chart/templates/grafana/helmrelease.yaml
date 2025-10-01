@@ -41,10 +41,16 @@ spec:
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 
-  {{- if .Values.grafana.postRenderers }}
+  {{- if or .Values.grafana.postRenderers .Values.monitoring.enabled }}
   postRenderers:
-  {{ toYaml .Values.grafana.postRenderers | nindent 4 }}
+  {{- if .Values.monitoring.enabled }}
+  {{ include "grafana.serviceMonitorPostRenderers" . | nindent 2 }}
   {{- end }}
+  {{- with .Values.grafana.postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+
   valuesFrom:
     - name: {{ .Release.Name }}-grafana-values
       kind: Secret
