@@ -2033,7 +2033,15 @@ addons:
       key: ""
       cert: ""
 
-    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/big-bang/product/packages/keycloak.git
+    # -- Values to passthrough to the keycloak chart: https://repo1.dso.mil/big-bang/product/packages/keycloak.git;
+    # WARNING: The upstream keycloak chart has some limitations on certain keys
+    # due to its templating architecture. Some of the offending keys are
+    # `extraEnv`, `extraEnvFrom`, `extraVolumeMounts`, and `extraVolumes`.
+    # These keys are set as strings when installing the chart, so subsequent
+    # overrides aren't merged with existing values: they simply replace them.
+    # This means that if you set any of these keys in your overrides, you must
+    # include all the existing values you wish to keep from [Big Bang's overrides](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/keycloak/values.yaml?ref_type=heads)
+    # in addition to your own.
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
