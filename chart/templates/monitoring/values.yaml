@@ -347,7 +347,12 @@ prometheus:
         vault.hashicorp.com/role: "prometheus"
         vault.hashicorp.com/agent-run-as-user : "1000"
         vault.hashicorp.com/agent-run-as-group : "2000"
-        vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }} 
+        {{- $vaultHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
+        {{- if $vaultHosts }}
+        vault.hashicorp.com/tls-server-name: {{ tpl ($vaultHosts | first) $ }}
+        {{- else }}
+        vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }}
+        {{- end }}
         {{- end }}
       {{- end }}
     {{- if .Values.addons.vault.enabled }}
