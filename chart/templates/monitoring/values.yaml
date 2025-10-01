@@ -18,6 +18,7 @@ domain: {{ $domainName }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
 {{- $lokiEnabled := (.Values.loki.enabled) }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
+{{- $vaultIstioHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
 
 flux:
   enabled: true
@@ -347,7 +348,11 @@ prometheus:
         vault.hashicorp.com/role: "prometheus"
         vault.hashicorp.com/agent-run-as-user : "1000"
         vault.hashicorp.com/agent-run-as-group : "2000"
-        vault.hashicorp.com/tls-server-name: {{ .Values.domain }} 
+        {{- if and $istioEnabled $vaultIstioHosts }} # the 1st istio vault host will be used for the tls server name
+        vault.hashicorp.com/tls-server-name: {{ tpl ($vaultIstioHosts | first) $ }}
+        {{- else }} # the vault certificate is expected to contain the CN or X509v3 Subject Alternative Name of vault.domain
+        vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }}
+        {{- end }}
         {{- end }}
       {{- end }}
     {{- if .Values.addons.vault.enabled }}
