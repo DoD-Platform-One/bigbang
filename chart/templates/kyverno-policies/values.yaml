@@ -1043,6 +1043,8 @@ policies:
           # bb-twistlock-upgrade-job requires patch/get/list/update/etc to deployments daemonsets pv's and pvc
           # More details in twistlock/chart/templates/bigbang/upgrade-job.yaml
           - bb-twistlock-twistlock-upgrade-job-*
+          # For the gluon script test job to access the K8s API
+          - twistlock-twistlock-script-test
       - namespace: logging
         pods:
           allow:
