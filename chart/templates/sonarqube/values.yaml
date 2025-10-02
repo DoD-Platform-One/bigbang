@@ -45,8 +45,8 @@ annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
 
-{{- if .Values.addons.sonarqube.sso.enabled }}
 upstream:
+{{- if .Values.addons.sonarqube.sso.enabled }}
   sonarProperties:
     # enabling saml authentication 
     sonar.auth.saml.enabled: {{ .Values.addons.sonarqube.sso.enabled }}   #false
@@ -72,34 +72,34 @@ upstream:
 {{- with .Values.addons.sonarqube.database }}
   {{- if and .host .username .password .database .port }}
 # External Postgres config
-jdbcOverwrite:
-  enable: true
-  jdbcUrl: "jdbc:postgresql://{{ .host }}:{{ .port }}/{{ .database }}?socketTimeout=1500"
-  jdbcUsername: {{ .username }}
-  jdbcSecretName: sonarqube-db-secret
-  jdbcSecretPasswordKey: postgresql-password
-postgresql:
-  # Use external database
-  enabled: false
+  jdbcOverwrite:
+    enabled: true
+    jdbcUrl: "jdbc:postgresql://{{ .host }}:{{ .port }}/{{ .database }}?socketTimeout=1500"
+    jdbcUsername: {{ .username }}
+    jdbcSecretName: sonarqube-db-secret
+    jdbcSecretPasswordKey: postgresql-password
+  postgresql:
+    # Use external database
+    enabled: false
   {{- else }}
-postgresql:
-  {{- if or $istioInjection $.Values.kiali.enabled}}
-  master:
-    {{- if $istioInjection }}
-    podAnnotations:
-      {{ include "istioAnnotation" $ }}
+  postgresql:
+    {{- if or $istioInjection $.Values.kiali.enabled}}
+    master:
+      {{- if $istioInjection }}
+      podAnnotations:
+        {{ include "istioAnnotation" $ }}
+      {{- end }}
+    slave:
+      {{- if $istioInjection }}
+      podAnnotations:
+        {{ include "istioAnnotation" $ }}
+      {{- end }}
     {{- end }}
-  slave:
-    {{- if $istioInjection }}
-    podAnnotations:
-      {{ include "istioAnnotation" $ }}
+    # Use internal database, defaults are fine
+    enabled: true
+    service:
+      port: {{ .port }}
     {{- end }}
   {{- end }}
-  # Use internal database, defaults are fine
-  enabled: true
-  service:
-    port: {{ .port }}
-  {{- end }}
-{{- end }}
-{{- end -}}
+{{ end -}}
 
