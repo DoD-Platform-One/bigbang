@@ -96,10 +96,10 @@ upstream:
   extraVolumes: |
     - name: tlscert
       secret:
-        secretName: keycloak-upstream-tlscert
+        secretName: '{{ `{{ include "keycloak.fullname" . }}` }}-tlscert'
     - name: tlskey
       secret:
-        secretName: keycloak-upstream-tlskey
+        secretName: '{{ `{{ include "keycloak.fullname" . }}` }}-tlskey'
 
   extraVolumeMounts: |
     # keep /etc/x509/https/ for legacy backwards compatibility
