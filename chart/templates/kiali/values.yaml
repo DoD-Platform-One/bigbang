@@ -23,9 +23,12 @@ istio:
   enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-  kiali:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
+
+routes:
+  inbound:
+    kiali:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
 
 {{- if and .Values.kiali.enabled .Values.kiali.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso))  }}
 oidcCaCert: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | quote }}
