@@ -972,7 +972,7 @@ loki:
           cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
       scripts:
         envs:
-          LOKI_URL: 'http://logging-loki-write.logging.svc:3100'
+          LOKI_URL: 'http://logging-loki.logging.svc:3100'
 
 tempo:
   sso:
@@ -2366,18 +2366,18 @@ addons:
               # the p1 auth plugin.
               curl -fsSL \
                 https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/51cd6066cc4585fede3383ce4905425fc0a83d99/docs/test-data/custom-registration-config.yaml \
-                -o /opt/keycloak/conf/custom-registration-config.yaml 
+                -o /opt/keycloak/conf/custom-registration-config.yaml
 
               # Download a quarkus.properties file to handle particular
               # routing requirements for the p1 auth plugin.
               curl -fsSL \
                 https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/51cd6066cc4585fede3383ce4905425fc0a83d99/docs/test-data/quarkus.properties \
-                -o /opt/keycloak/conf/quarkus.properties 
+                -o /opt/keycloak/conf/quarkus.properties
 
               # Download the test realm config
               curl -fsSL \
                 https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/51cd6066cc4585fede3383ce4905425fc0a83d99/docs/test-data/realm.json \
-                -o /opt/keycloak/data/import/realm.json 
+                -o /opt/keycloak/data/import/realm.json
 
               ls -l /opt/keycloak/{conf,data/import}
 
