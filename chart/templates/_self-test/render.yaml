@@ -1,0 +1,76 @@
+{{- /*
+  This template renders self-test results based on the configuration provided in the `_selfTest` section
+  of the Helm values. Each entry in `_selfTest` corresponds to a template to be
+  executed with specified arguments, and the results are captured in a `TestResult` custom resource.
+*/}}
+{{- define "bigbang.self-test.render" }}
+  {{- $ctx := . }}
+  {{- range $templateName, $config := .Values._selfTest | default dict }}
+    {{- $manifest := dict }}
+    {{- $_ := set $manifest "apiVersion" "testing.bigbang.dev/v1" }}
+    {{- $_ := set $manifest "kind" "TestResult" }}
+    {{- $_ := set $manifest "metadata" (dict "name" $templateName)}}
+
+    {{- $args := $config }}
+    {{- if and (kindIs "string" $config) (eq $config "helm:context") }}
+      {{- $args = $ctx }}
+    {{- end }}
+
+    {{- $resultIsYaml := false }}
+
+    {{- if kindIs "map" $config }}
+      {{- if hasKey $config "args" }}
+        {{- if kindIs "slice" $config.args }}
+          {{- $args = tpl ($config.args | toYaml) $ | fromYamlArray }}
+
+          {{- $newArgs := list }}
+          {{- range $arg := $args }}
+            {{- if and (kindIs "string" $arg) (eq $arg "helm:context") }}
+              {{- $newArgs = append $newArgs $ctx }}
+              {{- continue }}
+            {{- end }}
+            {{- $newArgs = append $newArgs $arg }}
+          {{- end }}
+
+          {{- $args = $newArgs }}
+        {{- else if kindIs "map" $config.args }}
+          {{- $args = tpl ($config.args | toYaml) $ | fromYaml }}
+
+          {{- range $key, $arg := $args }}
+            {{- if and (kindIs "string" $arg) (eq $arg "helm:context") }}
+              {{- $_ := set $args $key $ctx }}
+            {{- end }}
+          {{- end }}
+        {{- else if kindIs "string" $config.args }}
+          {{- if eq $config.args "helm:context" }}
+            {{- $args = $ctx }}
+          {{- else }}
+            {{- $args = tpl $config.args $ctx }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if hasKey $config "resultIsYaml" }}
+        {{- $resultIsYaml = $config.resultIsYaml }}
+      {{- end }}
+    {{- end }}
+
+    {{- $_ := set $manifest "args" $args }}
+
+    {{- $result := include $templateName $args }}
+    {{- if $resultIsYaml }}
+      {{- $isArray := (regexMatch "^\\s*-" $result) }}
+
+      {{- if $isArray }}
+        {{- $_ := set $manifest "result" ($result | fromYamlArray) }}
+      {{- else }}
+        {{- $_ := set $manifest "result" ($result | fromYaml) }}
+      {{- end }}
+    {{- else }}
+      {{- $_ := set $manifest "result" $result }}
+    {{- end }}
+    
+    {{- print "---\n" (toYaml $manifest) }}
+  {{- end }}
+{{- end }}
+
+{{- include "bigbang.self-test.render" $ }}
