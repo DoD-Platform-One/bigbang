@@ -160,13 +160,33 @@ networkPolicies:
   # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
   # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
   vpcCidr: 0.0.0.0/0
-  # Egress definitions reused throughout various packages
+  # bb-common-related values below; See [the documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md?ref_type=heads#definition-rules-definition) 
+  # for more details.
   egress:
+    # -- Egress definitions; create definitions here that you want to re-use globally across
+    # all packages
     definitions:
+      # -- Egress definition for SSO; Set this to the CIDRs your SSO implementation is
+      # being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm) 
+      # for this purpose
       sso:
         to:
           - ipBlock:
               cidr: "0.0.0.0/0"
+  ingress:
+    # -- Ingress definitions; create definitions here that you want to re-use globally across
+    # all packages
+    definitions:
+      # -- Ingress definition for load balancer subnets; change these CIDRs to
+      # match the subnet CIDRs where your load balancers are deployed
+      load-balancer-subnets:
+        from:
+          - ipBlock:
+              cidr: 192.168.0.0/16
+          - ipBlock:
+              cidr: 172.16.0.0/12
+          - ipBlock:
+              cidr: 10.0.0.0/8
 
 # -- Global ImagePullPolicy value for all packages
 # Permitted values are: None, Always, IfNotPresent
@@ -281,11 +301,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.27.1-bb.0
+    tag: 1.27.1-bb.1
   helmRepo:
     repoName: "registry1"
     chartName: "gateway"
-    tag: 1.27.1-bb.0
+    tag: 1.27.1-bb.1
   # -- Values to passthrough to the gateway chart(s)
   values: {}
   # EXAMPLE: Set the tls key/cert for the existing public gateway

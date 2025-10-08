@@ -1,6 +1,8 @@
 {{- define "bigbang.istio-gateway-secrets" -}}
 {{- $root := . -}}
-{{- range $name, $gw := include "enabledGateways" $ | fromYaml }}
+{{- $enabledGateways := include "enabledGateways" $ | fromYaml }}
+{{- $enabledGateways = include "bigbang.istio-gateway.generate-ingress-netpols" (list $ $enabledGateways) | fromYaml }}
+{{- range $name, $gw := $enabledGateways }}
 ---
 {{- if and (typeIs "map[string]interface {}" $gw) (hasKey $gw "overlays") }}
   {{ $_ := unset $gw.overlays "gatewayCerts" }}
@@ -14,14 +16,10 @@
 {{- end }}
 {{- end }}
 
+
 {{- define "bigbang.defaults.istio-gateway" -}}
 gateways:
   public:
-    networkPolicies:
-      enabled: {{ .Values.networkPolicies.enabled }}
-      istioNamespaceSelector:
-      {{ include "istioNamespaceSelector" . | nindent 8 }}   
-
     gateway:
       servers:
       - hosts:
@@ -56,11 +54,6 @@ gateways:
         istio: ingressgateway
 
   passthrough:
-    networkPolicies:
-      enabled: {{ .Values.networkPolicies.enabled }}
-      istioNamespaceSelector:
-      {{ include "istioNamespaceSelector" . | nindent 8 }} 
-
     gateway:
       servers:
       - hosts:

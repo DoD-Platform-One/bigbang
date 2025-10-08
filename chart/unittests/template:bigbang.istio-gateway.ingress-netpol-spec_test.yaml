@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Template - bigbang.istio-gateway.ingress-netpol-spec
+templates:
+- templates/_self-test/render.yaml
+tests:
+- it: must create the correct netpol config for a gateway
+  set:
+    _selfTest:
+      bigbang.istio-gateway.ingress-netpol-spec:
+        resultIsYaml: true
+        args:
+        - Values:
+            networkPolicies:
+              enabled: true
+              ingress:
+                definitions:
+                  load-balancer-subnets:
+                    from:
+                      - ipBlock:
+                          cidr: 10.0.0.0/8
+        - test
+        - - 80
+          - 443
+  asserts:
+  - hasDocuments:
+      count: 1
+  - equal:
+      path: result
+      value:
+        networkPolicies:
+          enabled: true
+          ingress:
+            to:
+              test-ingressgateway:[80,443]:
+                from:
+                  definition:
+                    load-balancer-subnets: true
+            definitions:
+              load-balancer-subnets:
+                from:
+                  - ipBlock:
+                      cidr: 10.0.0.0/8
+          egress:
+            from:
+              test-ingressgateway:
+                to:
+                  k8s:
+                    '*': true
+
+- it: must handle the case when global definitions are not defined
+  set:
+    _selfTest:
+      bigbang.istio-gateway.ingress-netpol-spec:
+        resultIsYaml: true
+        args:
+        - Values:
+            networkPolicies:
+              enabled: true
+        - test
+        - - 80
+          - 443
+  asserts:
+  - hasDocuments:
+      count: 1
+  - equal:
+      path: result
+      value:
+        networkPolicies:
+          enabled: true
+          ingress:
+            to:
+              test-ingressgateway:[80,443]:
+                from:
+                  definition:
+                    load-balancer-subnets: true
+          egress:
+            from:
+              test-ingressgateway:
+                to:
+                  k8s:
+                    '*': true

@@ -39,6 +39,11 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "_selfTest": {
+      "type": "object",
+      "description": "(for internal use only) Configuration for self-testing individual Big Bang templates.",
+      "additionalProperties": true
+    },
     "comments": {
       "type": "string"
     },

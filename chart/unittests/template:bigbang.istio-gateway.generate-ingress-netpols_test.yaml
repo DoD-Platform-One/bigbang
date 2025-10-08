@@ -1,0 +1,215 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Template - bigbang.istio-gateway.generate-ingress-netpols
+templates:
+- templates/_self-test/render.yaml
+tests:
+- it: must create the correct netpol spec with the default definitions
+  set:
+    _selfTest:
+      bigbang.istio-gateway.generate-ingress-netpols:
+        resultIsYaml: true
+        args:
+        - helm:context
+        - custom:
+            defaults: {}
+            overlays:
+              gateway:
+                servers:
+                  - port:
+                      number: 8080
+  asserts:
+  - equal:
+      path: result.custom.defaults.networkPolicies
+      value:
+        enabled: true
+        egress:
+          definitions:
+            sso:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+          from:
+            custom-ingressgateway:
+              to:
+                k8s:
+                  '*': true
+        ingress:
+          definitions:
+            load-balancer-subnets:
+              from:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+          to:
+            custom-ingressgateway:[8080]:
+              from:
+                definition:
+                  load-balancer-subnets: true
+
+- it: must create the correct netpol spec when the global definitions are overridden
+  set:
+    networkPolicies:
+      ingress:
+        definitions:
+          load-balancer-subnets:
+            from:
+            - ipBlock:
+                cidr: 10.100.0.0/16
+    _selfTest:
+      bigbang.istio-gateway.generate-ingress-netpols:
+        resultIsYaml: true
+        args:
+        - helm:context
+        - custom:
+            defaults: {}
+            overlays:
+              gateway:
+                servers:
+                  - port:
+                      number: 8080
+  asserts:
+  - equal:
+      path: result.custom.defaults.networkPolicies
+      value:
+        enabled: true
+        egress:
+          definitions:
+            sso:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+          from:
+            custom-ingressgateway:
+              to:
+                k8s:
+                  '*': true
+        ingress:
+          definitions:
+            load-balancer-subnets:
+              from:
+                - ipBlock:
+                    cidr: 10.100.0.0/16
+          to:
+            custom-ingressgateway:[8080]:
+              from:
+                definition:
+                  load-balancer-subnets: true
+
+- it: must correctly overlay on top of existing default values
+  set:
+    _selfTest:
+      bigbang.istio-gateway.generate-ingress-netpols:
+        resultIsYaml: true
+        args:
+        - helm:context
+        - custom:
+            defaults: 
+              networkPolicies:
+                egress:
+                  from:
+                    custom-ingressgateway:
+                      to:
+                        cidr:
+                          10.200.0.0/16: true
+            overlays:
+              gateway:
+                servers:
+                  - port:
+                      number: 8080
+  asserts:
+  - equal:
+      path: result.custom.defaults.networkPolicies
+      value:
+        enabled: true
+        egress:
+          definitions:
+            sso:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+          from:
+            custom-ingressgateway:
+              to:
+                k8s:
+                  '*': true
+                cidr:
+                  10.200.0.0/16: true
+        ingress:
+          definitions:
+            load-balancer-subnets:
+              from:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+          to:
+            custom-ingressgateway:[8080]:
+              from:
+                definition:
+                  load-balancer-subnets: true
+
+- it: must use the correct ports when the customer has overlayed their own server config
+  set:
+    _selfTest:
+      bigbang.istio-gateway.generate-ingress-netpols:
+        resultIsYaml: true
+        args:
+        - helm:context
+        - custom:
+            defaults: 
+              networkPolicies:
+                egress:
+                  from:
+                    custom-ingressgateway:
+                      to:
+                        cidr:
+                          10.200.0.0/16: true
+              gateway:
+                servers:
+                  - port:
+                      number: 8080
+            overlays:
+              gateway:
+                servers:
+                  - port:
+                      number: 80
+                  - port:
+                      number: 443
+  asserts:
+  - equal:
+      path: result.custom.defaults.networkPolicies
+      value:
+        enabled: true
+        egress:
+          definitions:
+            sso:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+          from:
+            custom-ingressgateway:
+              to:
+                k8s:
+                  '*': true
+                cidr:
+                  10.200.0.0/16: true
+        ingress:
+          definitions:
+            load-balancer-subnets:
+              from:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+          to:
+            custom-ingressgateway:[80,443]:
+              from:
+                definition:
+                  load-balancer-subnets: true

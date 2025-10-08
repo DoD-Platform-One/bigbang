@@ -555,3 +555,58 @@ Args:
 {{- $gw := default (dict "serviceName" $default) $gwlookup }}
 {{- printf "istio-gateway/%s" $gw.serviceName }}
 {{- end -}}
+
+{{- define "bigbang.istio-gateway.ingress-netpol-spec" }}
+  {{- $ctx := index . 0 }}
+  {{- $name := index . 1 }}
+  {{- $ports := index . 2 }}
+networkPolicies:
+  enabled: {{ $ctx.Values.networkPolicies.enabled }}
+  ingress:
+    {{- if dig "ingress" "definitions" dict $ctx.Values.networkPolicies }}
+    definitions:
+      {{- $ctx.Values.networkPolicies.ingress.definitions | toYaml | nindent 8 }}
+    {{- end }}
+    to:
+      "{{ $name }}-ingressgateway:{{ $ports | toJson }}":
+        from:
+          definition:
+            load-balancer-subnets: true
+  egress:
+    {{- if dig "egress" "definitions" dict $ctx.Values.networkPolicies }}
+    definitions:
+      {{- $ctx.Values.networkPolicies.egress.definitions | toYaml | nindent 8 }}
+    {{- end }}
+    from:
+      "{{ $name }}-ingressgateway":
+        to:
+          k8s:
+            '*': true
+{{- end }}
+
+{{- /*
+  This helper generates a bb-common compatible netpol spec from the configured
+  gateway servers of the individual gateways, then ensures that spec is applied 
+  to the default values for each of the gateway releases.
+*/}}
+{{- define "bigbang.istio-gateway.generate-ingress-netpols" }}
+  {{- $ctx := index . 0 }}
+  {{- $gateways := index . 1 }}
+
+  {{- $newGateways := dict }}
+
+  {{- range $name, $gateway := $gateways }}
+    {{- $newGateway := deepCopy $gateway }}
+    {{- $mergedGateway := merge ($newGateway.overlays | default dict) ($newGateway.defaults | default dict) }}
+    {{- $ports := list }}
+    {{- range $server := $mergedGateway.gateway.servers }}
+      {{- $ports = append $ports $server.port.number }}
+    {{- end }}
+
+    {{- $newGateway = merge (dict "defaults" (include "bigbang.istio-gateway.ingress-netpol-spec" (list $ctx $name $ports) | fromYaml)) $newGateway }}
+
+    {{- $_ := set $newGateways $name $newGateway }}
+  {{- end }}
+
+  {{- $newGateways | toYaml }}
+{{- end }}
