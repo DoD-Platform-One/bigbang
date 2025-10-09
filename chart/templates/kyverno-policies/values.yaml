@@ -1050,6 +1050,7 @@ policies:
           allow:
           - logging-loki-minio-*
           - logging-ek-wait-job-*
+          - logging-loki-script-test
           deny:
           - logging-ek-es-data*
           - logging-ek-es-master*
