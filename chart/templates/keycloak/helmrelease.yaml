@@ -46,12 +46,6 @@ spec:
   {{- $serviceMonitorsMtlsEnabled := and $istioEnabled (dig "mtls" "enabled" false .Values.addons.keycloak.values) }}
   {{- if or $istioEnabled $serviceMonitorsMtlsEnabled .Values.addons.keycloak.postRenderers }}
   postRenderers:
-  {{- if $istioEnabled }}
-  {{ include "keycloak.istioHAPostRenderers" . | nindent 2 }}
-  {{- end }}
-  {{- if $tlsEnabled }}
-  {{ include "keycloak.mtlsServiceMonitorPostrenderers" . | nindent 2 }}
-  {{- end }}
   {{- if .Values.addons.keycloak.postRenderers }}
   {{ toYaml .Values.addons.keycloak.postRenderers | nindent 2 }}
   {{- end }}
