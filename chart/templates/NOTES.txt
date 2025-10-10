@@ -128,7 +128,7 @@ PLATFORM ONE LOGGING WARNING:
 
 
 {{- $fluentbitEnabled := .Values.fluentbit.enabled }}
-{{- $alloyLogsEnabled := (and .Values.alloy.enabled (or (dig "k8s-monitoring" "alloy-logs" "enabled" false .Values.alloy.values) (dig "alloyLogs" "enabled" false .Values.alloy))) }}
+{{- $alloyLogsEnabled := (and .Values.alloy.enabled (or (dig "upstream" "alloy-logs" "enabled" false .Values.alloy.values) (dig "alloyLogs" "enabled" false .Values.alloy))) }}
 {{- $loggerCount := add $fluentbitEnabled $alloyLogsEnabled }}
 {{- if ge $loggerCount 2 }}
 PLATFORM ONE LOGGING WARNING:
