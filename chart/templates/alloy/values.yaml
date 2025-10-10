@@ -41,7 +41,7 @@ istio:
       (dig "istio" "hardened" "enabled" false .Values.alloy.values)
     }}
 
-k8s-monitoring:
+upstream:
   destinations:
     {{- if and $alloyLogsEnabled .Values.loki.enabled }}
     - name: loki
