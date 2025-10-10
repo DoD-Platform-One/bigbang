@@ -2158,12 +2158,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/harbor.git
-      tag: "1.18.0-bb.1"
+      tag: "1.18.0-bb.2"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "harbor"
-      tag: "1.18.0-bb.1"
+      tag: "1.18.0-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Harbor Package
     flux: {}
