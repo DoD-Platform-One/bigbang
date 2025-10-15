@@ -1,4 +1,5 @@
 nav:
+  - Streamlining Integration with bb-common: streamlining-integration-with-bb-common.md
   - Big Bang 3.0 - Overview of changes in Big Bang 3.0 Release: big-bang-3-0.md
   - Big Bang 3.0 - Operatorless Istio Migration: bb-3-0-operatorless-istio-migration.md
   - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
