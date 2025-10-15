@@ -610,3 +610,51 @@ networkPolicies:
 
   {{- $newGateways | toYaml }}
 {{- end }}
+
+#######################################################################################################################################
+# convert the bool to string if found
+#######################################################################################################################################
+
+{{- define "bb._isTrue" -}}
+  {{- $v := . -}}
+  {{- if kindIs "bool" $v -}}
+    {{- if $v }}true{{- end -}}
+  {{- else if kindIs "string" $v -}}
+    {{- if eq (lower $v) "true" }}true{{- end -}}
+  {{- end -}}
+{{- end -}}
+
+#######################################################################################################################################
+# Verify if there is a value enabled for redis or redis-bb set to true or false and if there is it will return true
+#######################################################################################################################################
+
+{{- define "bb.anyRedisEnabled" -}}
+  {{- $n := . -}}
+  {{- if kindIs "map" $n -}}
+    {{- $m := default dict $n -}}              {{/* ensure non-nil map */}}
+    {{- $r := default dict (get $m "redis") -}}
+    {{- $rb := default dict (get $m "redis-bb") -}}
+    {{- if or
+          (eq (include "bb._isTrue" (get $r  "enabled")) "true")
+          (eq (include "bb._isTrue" (get $rb "enabled")) "true")
+        -}}
+      true
+    {{- else -}}
+      {{- $found := "" -}}
+      {{- range $k, $v := $m -}}
+        {{- if eq (include "bb.anyRedisEnabled" $v) "true" -}}
+          {{- $found = "true" -}}
+        {{- end -}}
+      {{- end -}}
+      {{- if eq $found "true" -}}true{{- end -}}
+    {{- end -}}
+  {{- else if kindIs "slice" $n -}}
+    {{- $found := "" -}}
+    {{- range $i, $v := $n -}}
+      {{- if eq (include "bb.anyRedisEnabled" $v) "true" -}}
+        {{- $found = "true" -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if eq $found "true" -}}true{{- end -}}
+  {{- end -}}
+{{- end -}}
