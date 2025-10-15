@@ -81,6 +81,13 @@ PLATFORM ONE GITLAB WARNING:
 {{- end }}
 {{- end }}
 
+{{- if eq (include "bb.anyRedisEnabled" .Values) "true" }}
+PLATFORM ONE REDIS WARNING:
+  You have enabled an internal redis instance in the BigBang configuration.
+  Platform One does not support this option for production deployments because your persistent data can be permanently lost.
+  This option should only be used for development or CI pipelines.
+{{- end }}
+
 {{- if $.Values.addons.anchoreEnterprise.enabled }}
 Anchore Enterprise is enabled.
 {{- if not (and $.Values.addons.anchoreEnterprise.database.host $.Values.addons.anchoreEnterprise.database.port $.Values.addons.anchoreEnterprise.database.username $.Values.addons.anchoreEnterprise.database.password $.Values.addons.anchoreEnterprise.database.database) }}
