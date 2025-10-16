@@ -61,12 +61,11 @@ tests:
       value: sample-values
     asserts:
       - equal:
-          path: stringData
-          value:
-            values.yaml: |-
-              customKey: customValue
-              nested:
-                nestedKey: nestedValue
+          path: stringData["values.yaml"]
+          value: |-
+            customKey: customValue
+            nested:
+              nestedKey: nestedValue
   - it: must create values.yaml with both BigBang values and custom values when both are set
     set:
       packages:
