@@ -42,7 +42,7 @@ spec:
 
   {{- toYaml $fluxSettingsLoki | nindent 2 }}
 
-  {{- if or .Values.loki.postRenderers $istioEnabled }}
+  {{- if or .Values.loki.postRenderers (and $istioEnabled (eq .Values.loki.strategy "distributed")) }}
   postRenderers:
   {{- if and $istioEnabled (eq .Values.loki.strategy "distributed") }}
   {{- include "loki.istioPostRenderers" . | nindent 2 }}

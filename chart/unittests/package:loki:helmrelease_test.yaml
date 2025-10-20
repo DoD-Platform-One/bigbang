@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Loki - HelmRelease
+tests:
+- it: must create a postRenderers key when loki's mode is distributed and istio is enabled
+  set:
+    istiod:
+      enabled: true
+    loki:
+      enabled: true
+      strategy: distributed
+  template: loki/helmrelease.yaml
+  asserts:
+  - exists:
+      path: spec.postRenderers
+
+- it: must not create a postRenderers key when loki's mode is not distributed and istio is enabled
+  set:
+    istiod:
+      enabled: true
+    loki:
+      enabled: true
+      strategy: monolith
+  template: loki/helmrelease.yaml
+  asserts:
+  - notExists:
+      path: spec.postRenderers
+
+- it: must not create a postRenderers key when loki's mode is distributed and istio is not enabled
+  set:
+    istiod:
+      enabled: false
+    loki:
+      enabled: true
+      strategy: distributed
+  template: loki/helmrelease.yaml
+  asserts:
+  - notExists:
+      path: spec.postRenderers
