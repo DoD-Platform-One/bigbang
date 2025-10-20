@@ -1511,61 +1511,62 @@ addons:
         rails:
           bootstrap:
             enabled: false
-      gitlab-runner:
-        resources:
-          requests:
-            cpu: 10m
-      gitlab:
-        webservice:
-          minReplicas: 1
-          maxReplicas: 1
-        sidekiq:
-          minReplicas: 1
-          maxReplicas: 1
-        gitlab-shell:
-          minReplicas: 1
-          maxReplicas: 1
-        gitaly:
-          persistence:
-            size: 256Mi
-        shared-secrets:
+      upstream:
+        gitlab-runner:
           resources:
             requests:
               cpu: 10m
-        migrations:
-          resources:
-            requests:
-              cpu: 10m
-        toolbox:
+        gitlab:
+          webservice:
+            minReplicas: 1
+            maxReplicas: 1
+          sidekiq:
+            minReplicas: 1
+            maxReplicas: 1
+          gitlab-shell:
+            minReplicas: 1
+            maxReplicas: 1
+          gitaly:
+            persistence:
+              size: 256Mi
+          shared-secrets:
+            resources:
+              requests:
+                cpu: 10m
+          migrations:
+            resources:
+              requests:
+                cpu: 10m
+          toolbox:
+            persistence:
+              size: 256Mi
+            resources:
+              requests:
+                cpu: 10m
+        registry:
+          hpa:
+            minReplicas: 1
+            maxReplicas: 1
+        postgresql:
+          persistence:
+            size: 256Mi
+          metrics:
+            resources:
+              requests:
+                cpu: 10m
+        minio:
           persistence:
             size: 256Mi
           resources:
             requests:
-              cpu: 10m
-      registry:
-        hpa:
-          minReplicas: 1
-          maxReplicas: 1
-      postgresql:
-        persistence:
-          size: 256Mi
-        metrics:
-          resources:
-            requests:
-              cpu: 10m
-      minio:
-        persistence:
-          size: 256Mi
-        resources:
-          requests:
-            cpu: 50m
-      redis:
-        master:
-          persistence:
-            size: 256Mi
-        slave:
-          persistence:
-            size: 256Mi
+              cpu: 50m
+        redis:
+          master:
+            persistence:
+              size: 256Mi
+          replica:
+            persistence:
+              size: 256Mi
       bbtests:
         enabled: true
         cypress:

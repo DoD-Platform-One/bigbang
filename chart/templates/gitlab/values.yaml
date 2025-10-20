@@ -47,95 +47,55 @@ networkPolicies:
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   istioNamespaceSelector:
     {{ include "istioNamespaceSelector" . | nindent 4 }}
-
-{{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
-redis:
-  {{- if .Values.monitoring.enabled }}
-  metrics:
-    serviceMonitor:
-      enabled: true
-      namespace: gitlab
-  {{- end }}
-  {{- if $istioInjection }}
-  master:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  slave:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  {{- end }}
-{{- end }}
-
-{{- if or .Values.addons.gitlab.database.host $istioInjection }}
-postgresql:
-  {{- if .Values.addons.gitlab.database.host }}
-  install: false
-  {{- end }}
-  {{- if $istioInjection }}
-  master:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  slave:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  {{- end }}
-{{- end }}
-
-{{- if or $extObjStorageIsConfigured $istioInjection }}
-registry:
-  {{- if $extObjStorageIsConfigured }}
-  storage:
-    secret: gitlab-object-storage
-    key: registry
-  {{- end }}
-  {{- if or $iamProfile $istioInjection }}
-  annotations: 
-    {{- if $iamProfile }}
-    iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+upstream:
+  {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
+  redis:
+    {{- if .Values.monitoring.enabled }}
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: gitlab
     {{- end }}
     {{- if $istioInjection }}
-    {{ include "istioAnnotation" . }}
+    master:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    replica:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
     {{- end }}
   {{- end }}
-  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
-  metrics:
-    serviceMonitor:
-      endpointConfig:
-        scheme: https
-        tlsConfig:
-          caFile: /etc/prom-certs/root-cert.pem
-          certFile: /etc/prom-certs/cert-chain.pem
-          keyFile: /etc/prom-certs/key.pem
-          insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  {{- end }}
-{{- end }}
 
-gitlab:
+  {{- if or .Values.addons.gitlab.database.host $istioInjection }}
+  postgresql:
+    {{- if .Values.addons.gitlab.database.host }}
+    install: false
+    {{- end }}
+    {{- if $istioInjection }}
+    primary:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    readReplicas:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    {{- end }}
+  {{- end }}
+
   {{- if or $extObjStorageIsConfigured $istioInjection }}
-  toolbox:
+  registry:
     {{- if $extObjStorageIsConfigured }}
-    backups:
-      objectStorage:
-        config:
-          secret: gitlab-object-storage
-          key: backups
+    storage:
+      secret: gitlab-object-storage
+      key: registry
     {{- end }}
     {{- if or $iamProfile $istioInjection }}
-    annotations:
+    annotations: 
       {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
       {{- end }}
       {{- if $istioInjection }}
       {{ include "istioAnnotation" . }}
       {{- end }}
-    {{- end }}
-  {{- end }}
-  gitlab-exporter:
-    enabled: {{ .Values.monitoring.enabled }}
-    {{- if $istioInjection }}
-    metrics:
-      annotations:
-        {{ include "istioAnnotation" . }}
     {{- end }}
     {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
     metrics:
@@ -148,20 +108,36 @@ gitlab:
             keyFile: /etc/prom-certs/key.pem
             insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
+  {{- end }}
 
-  {{- if or $iamProfile $istioInjection }}
-  webservice:
-  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
-    metrics:
-      serviceMonitor:
-        endpointConfig:
-          scheme: https
-          tlsConfig:
-            caFile: /etc/prom-certs/root-cert.pem
-            certFile: /etc/prom-certs/cert-chain.pem
-            keyFile: /etc/prom-certs/key.pem
-            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    workhorse:
+  gitlab:
+    {{- if or $extObjStorageIsConfigured $istioInjection }}
+    toolbox:
+      {{- if $extObjStorageIsConfigured }}
+      backups:
+        objectStorage:
+          config:
+            secret: gitlab-object-storage
+            key: backups
+      {{- end }}
+      {{- if or $iamProfile $istioInjection }}
+      annotations:
+        {{- if $iamProfile }}
+        iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+        {{- end }}
+        {{- if $istioInjection }}
+        {{ include "istioAnnotation" . }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    gitlab-exporter:
+      enabled: {{ .Values.monitoring.enabled }}
+      {{- if $istioInjection }}
+      metrics:
+        annotations:
+          {{ include "istioAnnotation" . }}
+      {{- end }}
+      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -171,71 +147,95 @@ gitlab:
               certFile: /etc/prom-certs/cert-chain.pem
               keyFile: /etc/prom-certs/key.pem
               insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  {{- end }}
-  {{- if or $iamProfile $istioInjection }}
-    annotations: 
-      {{- if $iamProfile }}
-      iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
       {{- end }}
-      {{- if $istioInjection }}
-      {{ include "istioAnnotation" . }}
-      {{- end }}
-  sidekiq:
-    annotations: 
-      {{- if $iamProfile }}
-      iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
-      {{- end }}
-      {{- if $istioInjection }}
-      {{ include "istioAnnotation" . }}
-      {{- end }}
-  {{- end }}
-  {{- end }}
-{{- if $istioInjection }}
-  migrations:
-    annotations:
-      {{ include "istioAnnotation" . }}
-  gitaly:
-    annotations:
-      {{ include "istioAnnotation" . }}
-    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
-    metrics:
-      serviceMonitor:
-        endpointConfig:
-          scheme: https
-          tlsConfig:
-            caFile: /etc/prom-certs/root-cert.pem
-            certFile: /etc/prom-certs/cert-chain.pem
-            keyFile: /etc/prom-certs/key.pem
-            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    {{- end }}
-  gitlab-shell:
-    annotations:
-      {{ include "istioAnnotation" . }}
-    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
-    metrics:
-      serviceMonitor:
-        endpointConfig:
-          scheme: https
-          tlsConfig:
-            caFile: /etc/prom-certs/root-cert.pem
-            certFile: /etc/prom-certs/cert-chain.pem
-            keyFile: /etc/prom-certs/key.pem
-            insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    {{- end }}
 
-  praefect:
+    {{- if or $iamProfile $istioInjection }}
+    webservice:
+    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      metrics:
+        serviceMonitor:
+          endpointConfig:
+            scheme: https
+            tlsConfig:
+              caFile: /etc/prom-certs/root-cert.pem
+              certFile: /etc/prom-certs/cert-chain.pem
+              keyFile: /etc/prom-certs/key.pem
+              insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      workhorse:
+        metrics:
+          serviceMonitor:
+            endpointConfig:
+              scheme: https
+              tlsConfig:
+                caFile: /etc/prom-certs/root-cert.pem
+                certFile: /etc/prom-certs/cert-chain.pem
+                keyFile: /etc/prom-certs/key.pem
+                insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    {{- end }}
+    {{- if or $iamProfile $istioInjection }}
+      annotations: 
+        {{- if $iamProfile }}
+        iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+        {{- end }}
+        {{- if $istioInjection }}
+        {{ include "istioAnnotation" . }}
+        {{- end }}
+    sidekiq:
+      annotations: 
+        {{- if $iamProfile }}
+        iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
+        {{- end }}
+        {{- if $istioInjection }}
+        {{ include "istioAnnotation" . }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- if $istioInjection }}
+    migrations:
+      annotations:
+        {{ include "istioAnnotation" . }}
+    gitaly:
+      annotations:
+        {{ include "istioAnnotation" . }}
+      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      metrics:
+        serviceMonitor:
+          endpointConfig:
+            scheme: https
+            tlsConfig:
+              caFile: /etc/prom-certs/root-cert.pem
+              certFile: /etc/prom-certs/cert-chain.pem
+              keyFile: /etc/prom-certs/key.pem
+              insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+    gitlab-shell:
+      annotations:
+        {{ include "istioAnnotation" . }}
+      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      metrics:
+        serviceMonitor:
+          endpointConfig:
+            scheme: https
+            tlsConfig:
+              caFile: /etc/prom-certs/root-cert.pem
+              certFile: /etc/prom-certs/cert-chain.pem
+              keyFile: /etc/prom-certs/key.pem
+              insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+
+    praefect:
+      annotations:
+        {{ include "istioAnnotation" . }}
+    gitlab-grafana:
+      annotations:
+        {{ include "istioAnnotation" . }}
+  shared-secrets:
     annotations:
       {{ include "istioAnnotation" . }}
-  gitlab-grafana:
-    annotations:
+  minio:
+    podAnnotations:
       {{ include "istioAnnotation" . }}
-shared-secrets:
-  annotations:
-    {{ include "istioAnnotation" . }}
-minio:
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-{{- end }}
+  {{- end }}
 
 global:
   {{- if and .Values.addons.gitlab.sso.enabled (or (dig "certificateAuthority" "secretName" false .Values.sso) .Values.sso.secretName) }}
