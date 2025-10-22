@@ -19,11 +19,34 @@ flux:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.grafana "root" .) | nindent 4 }}
+  prependReleaseName: true
+  egress:
+    definitions:
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    from:
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+            thanos:9090: {{ .Values.addons.thanos.enabled }}
+
+      grafana:
+        to:
+          k8s:
+            authservice/authservice:10003: {{ $authserviceRedisEnabled }}
+
+  ingress:
+    to:
+      grafana:3000:
+        from:
+          k8s:
+            kiali/kiali: {{ .Values.kiali.enabled }}
+            backstage/backstage: {{ .Values.addons.backstage.enabled }}
+          definition:
+            gateway: {{ .Values.istioGateway.enabled }}
 
 openshift: {{ .Values.openshift }}
 
@@ -337,4 +360,3 @@ upstream:
   {{- end }}
 {{ toYaml $overlays }}
 {{- end }}
-
