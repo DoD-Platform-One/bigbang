@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Base Package
+tests:
+  - it: should pass validation with valid base package (kiali)
+    set:
+      kiali:
+        enabled: true
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+        flux: {}
+        ingress:
+          gateway: ""
+        sso:
+          enabled: false
+          client_id: ""
+          client_secret: ""
+        values: {}
+        postRenderers: []
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with neuvector istio injection enabled
+    set:
+      neuvector:
+        enabled: true
+        istio:
+          injection: "enabled"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with extra key in base package
+    set:
+      kiali:
+        extra: field
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with invalid neuvector istio injection value
+    set:
+      neuvector:
+        enabled: true
+        istio:
+          injection: foo
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

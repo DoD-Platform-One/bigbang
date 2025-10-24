@@ -1,6 +1,0 @@
-twistlock:
-  sso: 
-    enabled: true
-    client_id: "id"
-    provider_type: "string"
-    extra: "key"

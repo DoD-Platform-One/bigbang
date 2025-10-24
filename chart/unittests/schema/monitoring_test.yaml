@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Monitoring
+tests:
+  - it: should pass validation with valid monitoring SSO grafana configuration
+    set:
+      monitoring:
+        sso:
+          grafana:
+            client_id: grafana
+            client_secret: secret
+            scopes: Grafana
+            allow_sign_up: true
+            role_attribute_path: Viewer
+            auth_url: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/auth
+            token_url: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/token
+            api_url: https://login.dso.mil/auth/realms/baby-yoda/protocol/openid-connect/userinfo
+            allowed_domains: foo.com bar.com
+            tls_client_ca: ""
+            tls_skip_verify_insecure: false
+            tls_client_cert: ""
+            tls_client_key: ""
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with invalid monitoring SSO grafana configuration
+    set:
+      monitoring:
+        sso:
+          grafana:
+            foo: bar
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

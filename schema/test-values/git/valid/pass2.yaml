@@ -1,5 +1,0 @@
-git:
-  credentials:
-    privateKey: "key"
-    publicKey: "key"
-    knownHosts: "host"

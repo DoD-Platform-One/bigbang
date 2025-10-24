@@ -1,9 +1,0 @@
-kiali:
-  enabled: true
-
-  sourceType: "helmRepo"
-
-  helmRepo:
-    repoName: "repo"
-    chartName: "kiali"
-    tag: "1.65.0-bb.0"

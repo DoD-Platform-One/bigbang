@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Base Package Source Type
+tests:
+  - it: should pass validation with sourceType git
+    set:
+      kiali:
+        enabled: true
+        sourceType: "git"
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+        helmRepo: null
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with sourceType helmRepo
+    set:
+      kiali:
+        enabled: true
+        sourceType: "helmRepo"
+        git: null
+        helmRepo:
+          repoName: "registry1"
+          chartName: "kiali"
+          tag: "1.65.0-bb.0"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with invalid sourceType
+    set:
+      kiali:
+        sourceType: "foo"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with sourceType git but using helmRepo config
+    set:
+      kiali:
+        enabled: true
+        sourceType: "git"
+        git: null
+        helmRepo:
+          repoName: "registry1"
+          chartName: "kiali"
+          tag: "1.65.0-bb.0"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with sourceType helmRepo but using git config
+    set:
+      kiali:
+        enabled: true
+        sourceType: "helmRepo"
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+        helmRepo: null
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
