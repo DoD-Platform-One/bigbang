@@ -1752,10 +1752,11 @@ addons:
             cpu: 100m
             memory: 200Mi
       ui-redis:
-        replica:
-          replicaCount: 0
-          autoscaling:
-            enabled: false
+        upstream:
+          replica:
+            replicaCount: 0
+            autoscaling:
+              enabled: false
       bbtests:
         enabled: true
         scripts:
