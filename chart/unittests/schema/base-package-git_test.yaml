@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Base Package Git
+tests:
+  - it: should pass validation with git tag (default)
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git branch
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: null
+          branch: branch
+      neuvector:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
+          path: "./chart"
+          tag: ""
+          branch: branch
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git branch without tag
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          branch: "foo"
+          tag: null
+      neuvector:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
+          path: "./chart"
+          branch: "foo"
+          tag: ""
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git commit and branch
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          commit: "1234"
+          branch: "foo"
+          tag: null
+      neuvector:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
+          path: "./chart"
+          commit: "1234"
+          branch: "foo"
+          tag: ""
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git semver
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          semver: "1.65.^"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with git commit without branch
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          commit: "1234"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with git extra key
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+          extra: "failure"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with git semver and extra fields
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          semver: "1.65.^"
+          branch: "foobar"
+          commit: "foo"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with git tag and branch together
+    set:
+      kiali:
+        git:
+          repo: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+          path: "./chart"
+          tag: "1.65.0-bb.0"
+          branch: "extra"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

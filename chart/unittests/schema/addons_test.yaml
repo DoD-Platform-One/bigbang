@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Addons
+tests:
+  - it: should fail validation with invalid addon configuration (git tag null)
+    set:
+      addons:
+        gitlab:
+          sourceType: "git"
+          git:
+            tag: null
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with unknown addon (foo)
+    set:
+      addons:
+        foo:
+          extra: key
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

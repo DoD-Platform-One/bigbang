@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Flux
+tests:
+  - it: should pass validation with valid global flux values
+    set:
+      flux:
+        interval: 1m
+        rollback:
+          cleanupOnFail: false
+        driftDetection:
+          mode: warn
+          ignore:
+            - paths: ["/webhooks/0/failurePolicy"]
+              target:
+                kind: ValidatingWebhookConfiguration
+                name: istiod-default-validator
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with valid package flux values
+    set:
+      loki:
+        flux:
+          timeout: 5m
+          driftDetection:
+            mode: warn
+            ignore:
+              - paths: ["/webhooks/0/failurePolicy"]
+                target:
+                  kind: ValidatingWebhookConfiguration
+                  name: istiod-default-validator
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with invalid global flux driftDetection mode (boolean instead of string)
+    set:
+      flux:
+        driftDetection:
+          mode: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with invalid package flux driftDetection (missing name field)
+    set:
+      loki:
+        flux:
+          driftDetection:
+            ignore:
+              - paths: ["/spec/size"]
+                target:
+                kind: Mattermost
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with invalid flux configuration (install field)
+    set:
+      loki:
+        flux:
+          install: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

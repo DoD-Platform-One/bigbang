@@ -1,7 +1,0 @@
-loki:
-  flux:
-    driftDetection:
-      ignore:
-        - paths: ["/spec/size"]
-          target:
-          kind: Mattermost

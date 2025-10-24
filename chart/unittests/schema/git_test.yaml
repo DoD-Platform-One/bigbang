@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema Validation - Git
+tests:
+  - it: should pass validation with git credentials (full config)
+    set:
+      git:
+        existingSecret: ""
+        credentials:
+          username: ""
+          password: ""
+          caFile: ""
+          privateKey: ""
+          publicKey: ""
+          knownHosts: ""
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git existingSecret
+    set:
+      git:
+        existingSecret: "foo"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git SSH credentials
+    set:
+      git:
+        credentials:
+          privateKey: "key"
+          publicKey: "key"
+          knownHosts: "host"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with git HTTPS credentials
+    set:
+      git:
+        credentials:
+          username: "p1"
+          password: "pass"
+          caFile: ""
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with git credentials username without password
+    set:
+      git:
+        credentials:
+          username: "p1"
+          password: null
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*password.*"

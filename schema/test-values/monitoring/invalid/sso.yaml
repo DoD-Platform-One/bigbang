@@ -1,4 +1,0 @@
-monitoring:
-  sso:
-    grafana:
-      foo: bar
