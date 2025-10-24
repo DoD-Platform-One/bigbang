@@ -109,47 +109,50 @@ ui:
 
 ui-redis:
   {{- if and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password }}
-  enabled: false
+  # We are using an external redis url
   externalEndpoint: "redis://{{ .Values.addons.anchoreEnterprise.redis.username | default "nouser" }}:{{ .Values.addons.anchoreEnterprise.redis.password }}@{{ .Values.addons.anchoreEnterprise.redis.host }}:{{ .Values.addons.anchoreEnterprise.redis.port }}"
-  auth:
-    password: {{ .Values.addons.anchoreEnterprise.redis.password }}
-  {{- end }}
-  {{- if $istioEnabled }}
-  master:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  replica:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  {{- end }}
-  image:
-    pullSecrets:
-      - private-registry
-  {{- if and .Values.monitoring.enabled (not (and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password)) }}
-  metrics:
-    enabled: true
+  upstream:
+    enabled: false
+  {{- else }}
+  # We are using an internal,dev redis url
+  upstream:
+    {{- if $istioEnabled }}
+    master:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    replica:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    {{- end }}
     image:
       pullSecrets:
         - private-registry
-    serviceMonitor:
+    {{- if .Values.monitoring.enabled }}
+    metrics:
       enabled: true
-      namespace: anchore
-      selector:
-        app.kubernetes.io/name: anchore-ui-redis
-        app.kubernetes.io/instance: anchore
-      {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
-      {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
-      scheme: "https"
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-      {{- end }}
-      {{- end }}
-    prometheusRule:
-      enabled: true
-      namespace: monitoring
+      image:
+        pullSecrets:
+          - private-registry
+      serviceMonitor:
+        enabled: true
+        namespace: anchore
+        selector:
+          app.kubernetes.io/name: ui-redis
+          app.kubernetes.io/instance: anchore-enterprise
+        {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
+        {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+        scheme: "https"
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true
+        {{- end }}
+        {{- end }}
+      prometheusRule:
+        enabled: true
+        namespace: monitoring
+    {{- end }}
   {{- end }}
 
 {{- end }}
