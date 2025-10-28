@@ -2396,7 +2396,7 @@ addons:
           # Modify the image key below to deploy a custom image
           # i.e image: registry.dso.mil/big-bang/apps/product-tools/keycloak-p1-auth-plugin/init-container:test-X.X.X
           - name: plugin
-            image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.6.7
+            image: registry1.dso.mil/ironbank/big-bang/p1-keycloak-plugin:3.6.10
             imagePullPolicy: Always
             command:
             - sh
