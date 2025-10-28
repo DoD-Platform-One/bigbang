@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
-suite: Package - Loki - HelmRelease
+suite: Packages - Loki - HelmRelease
 tests:
 - it: must create a postRenderers key when loki's mode is distributed and istio is enabled
   set:
