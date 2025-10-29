@@ -1,11 +1,11 @@
-{{- if and .Values.monitoring.enabled (dig "grafana" "enabled" true .Values.monitoring.values) }}
+{{- if .Values.grafana.enabled }}
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Provider
 metadata:
   name: grafana
   namespace: monitoring
   labels:
-    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/name: grafana
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
 spec:
