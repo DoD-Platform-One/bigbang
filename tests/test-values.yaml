@@ -364,7 +364,7 @@ kyverno:
               cpu: 1
               memory: 768Mi
       features:
-        policyexceptions:
+        policyExceptions:
           enabled: true
           # -- Restrict policy exceptions to a single namespace
           namespace: 'kyverno'
