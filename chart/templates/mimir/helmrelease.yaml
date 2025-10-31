@@ -1,5 +1,8 @@
 {{- $fluxSettingsMimir := merge .Values.addons.mimir.flux .Values.flux -}}
 {{- if .Values.addons.mimir.enabled }}
+{{- if and (dig "minio-tenant" "enabled" false .Values.addons.mimir.values) (not .Values.addons.minioOperator.enabled) }}
+{{- fail "mimir with minio-tenant.enabled=true requires addons.minioOperator.enabled to be true" }}
+{{- end }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
