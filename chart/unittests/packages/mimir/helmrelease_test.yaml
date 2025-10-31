@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Mimir - HelmRelease
+tests:
+- it: should fail when minio-tenant is enabled but minioOperator is disabled
+  set:
+    addons:
+      mimir:
+        enabled: true
+        values:
+          minio-tenant:
+            enabled: true
+      minioOperator:
+        enabled: false
+  template: mimir/helmrelease.yaml
+  asserts:
+  - failedTemplate:
+      errorMessage: "mimir with minio-tenant.enabled=true requires addons.minioOperator.enabled to be true"
+
+- it: should succeed when minio-tenant is enabled and minioOperator is enabled
+  set:
+    addons:
+      mimir:
+        enabled: true
+        values:
+          minio-tenant:
+            enabled: true
+      minioOperator:
+        enabled: true
+  template: mimir/helmrelease.yaml
+  asserts:
+  - isKind:
+      of: HelmRelease
+
+- it: should succeed when minio-tenant is disabled
+  set:
+    addons:
+      mimir:
+        enabled: true
+        values:
+          minio-tenant:
+            enabled: false
+      minioOperator:
+        enabled: false
+  template: mimir/helmrelease.yaml
+  asserts:
+  - isKind:
+      of: HelmRelease
+
+- it: should succeed when mimir values does not contain minio-tenant config
+  set:
+    addons:
+      mimir:
+        enabled: true
+        values: {}
+      minioOperator:
+        enabled: false
+  template: mimir/helmrelease.yaml
+  asserts:
+  - isKind:
+      of: HelmRelease

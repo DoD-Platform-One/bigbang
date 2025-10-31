@@ -16,10 +16,61 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  prependReleaseName: false
+  egress:
+    definitions:
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    from:
+      mimir:
+        to:
+          k8s:
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }} 
+      rollout-operator:
+        to:
+          k8s:
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }} 
+      minio:
+        to:
+          definition:
+            kubeAPI: true
 
+  ingress:
+    to:
+      mimir:[15020]:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}  
+            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      mimir:[8080,9095]:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            monitoring/grafana: {{ .Values.grafana.enabled }}
+            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      rollout-operator:[8080,9095]:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            monitoring/grafana: {{ .Values.grafana.enabled }}
+            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      rollout-operator:[15020]:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      minio:[9000]:
+        from:
+          k8s: 
+            minio-operator/minio-operator: {{ .Values.addons.minioOperator.enabled }}
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      minio:[15020]:
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
 istio:
   enabled: {{ $istioEnabled }}
   hardened:

@@ -746,6 +746,10 @@ alloy:
   alloyLogs:
     enabled: true
 
+    # -- Toggle Alloy to collect logs
+  alloyMetrics:
+    enabled: true
+
   # -- Additional Alloy destinations not included in Big Bang
   additionalDestinations: []
 
@@ -2289,12 +2293,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mimir.git
-      tag: "5.8.0-bb.2"
+      tag: "5.8.0-bb.3"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "mimir"
-      tag: "5.8.0-bb.2"
+      tag: "5.8.0-bb.3"
 
     # -- Enable Mimir Enterprise
     enterprise:
