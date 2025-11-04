@@ -133,7 +133,7 @@ istio:
               protocol: TLS
               name: https
           resolution: DNS
-     {{- end }}
+    {{- end }}
   clusterWideHardenedEnabled: {{ (dig "hardened" "enabled" false .Values.istiod.values) }}
   prometheus:
     enabled: true
@@ -154,328 +154,6 @@ istio:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
   injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
-
-alertmanager:
-  alertmanagerSpec:
-    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
-    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
-    containers:
-      - name: "alertmanager"
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-      - name: "config-reloader"
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or .Values.monitoring.sso.enabled $istioInjection .Values.kiali.enabled }}
-    podMetadata:
-      {{- if or .Values.monitoring.sso.enabled .Values.kiali.enabled }}
-      {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-      {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-      labels:
-        {{- if .Values.monitoring.sso.enabled }}
-        {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
-        {{- end }}
-      {{- end }}
-      {{- if $istioInjection }}
-      annotations:
-        {{ include "istioAnnotation" . }}
-      {{- end }}
-    {{- end }}
-  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
-  serviceMonitor:
-    scheme: https
-    tlsConfig:
-      caFile: /etc/prom-certs/root-cert.pem
-      certFile: /etc/prom-certs/cert-chain.pem
-      keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  {{- end }}
-
-prometheus:
-  {{- if $lokiEnabled }}
-  monitor:
-    relabelings:
-      - action: replace
-        replacement: {{ $clusterName }}
-        targetLabel: cluster
-  {{- end }}
-
-  {{- if $thanosEnabled }}
-  thanosService:
-    enabled: true
-
-    # Note: We need to change the portName in order for istio to correctly detect TCP is being used
-    #       for the headless service
-    {{- if $istioInjection }}
-    portName: "tcp-grpc"
-    {{- end }}
-
-  thanosServiceMonitor:
-    enabled: true
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
-    serviceMonitor:
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    {{- end }}
-  {{- end }}
-  prometheusSpec:
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
-    alertingEndpoints:
-    - name: monitoring-monitoring-kube-alertmanager
-      namespace: monitoring
-      apiVersion: v2
-      port: http-web
-      pathPrefix: /
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-    {{- end }}
-
-    {{- if .Values.addons.mimir.enabled }}
-    remoteWrite:
-      {{- if $istioEnabled }}
-      # I promise it's not a typo; the port is 80 even though it's TLS
-      - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
-        writeRelabelConfigs:
-          - sourceLabels: [__name__]
-            regex: '.*\..*'
-            action: drop
-          - action: labeldrop
-            regex: '.*\..*'
-      {{- else }}
-      - url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
-        writeRelabelConfigs:
-          - sourceLabels: [__name__]
-            regex: '.*\..*'
-            action: drop
-          - action: labeldrop
-            regex: '.*\..*'
-      {{- end }}
-        {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
-        tlsConfig:
-          caFile: /etc/prom-certs/root-cert.pem
-          certFile: /etc/prom-certs/cert-chain.pem
-          keyFile: /etc/prom-certs/key.pem
-          insecureSkipVerify: true
-        {{- end }}
-    {{- end }}
-
-    {{- if $thanosEnabled }}
-    thanos:
-      {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
-      objectStorageConfig:
-        secret:
-          type: s3
-          config:
-            bucket: "thanos"
-            endpoint: minio.thanos.svc.cluster.local:80
-            access_key: "minio"
-            secret_key: "minio123"
-            insecure: false
-            trace:
-              enable: true
-            http_config:
-              tls_config:
-                key_file: /etc/prom-certs/key.pem
-                ca_file: /etc/prom-certs/root-cert.pem
-                cert_file: /etc/prom-certs/cert-chain.pem
-              insecure_skip_verify: true
-
-      # by default, the object stores only sync every 2 hours
-      # increase the frequency so the tests will pass
-      blockSize: 1m
-
-      {{- else if not ( .Values.addons.thanos.objectStorage.endpoint | empty) }}
-      objectStorageConfig:
-        existingSecret:
-          key: objstore.yml
-          name: monitoring-objstore-secret
-
-      {{- end }}
-
-      {{- if $istioInjection }}
-      # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
-      volumes:
-        - emptyDir:
-            medium: Memory
-          name: istio-certs
-      volumeMounts:
-        - mountPath: /etc/prom-certs/
-          name: istio-certs
-      {{- end }}
-    {{- end }}
-
-    # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
-    # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
-    containers:
-      - name: "prometheus"
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-      - name: "config-reloader"
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if .Values.tempo.enabled }}
-    enableRemoteWriteReceiver: true
-    {{- end }}
-    podMetadata:
-      labels:
-        app: prometheus
-        {{- if .Values.monitoring.sso.enabled }}
-        {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-        {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-        {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
-        {{- end }}
-        {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
-        vault-ingress: "true"
-        {{- end }}
-      {{- if or $istioInjection .Values.addons.vault.enabled }}
-      annotations:
-        {{- if $istioInjection }}
-        {{ include "istioAnnotation" . }}
-        traffic.sidecar.istio.io/includeOutboundIPRanges: ""
-        proxy.istio.io/config: |
-          proxyMetadata:
-            OUTPUT_CERTS: /etc/istio-output-certs
-        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
-        {{- end }}
-        {{- if .Values.addons.vault.enabled }}
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-init-first: "true"
-        vault.hashicorp.com/agent-inject-token: "true"
-        vault.hashicorp.com/role: "prometheus"
-        vault.hashicorp.com/agent-run-as-user : "1000"
-        vault.hashicorp.com/agent-run-as-group : "2000"
-        {{- if and $istioEnabled $vaultIstioHosts }} # the 1st istio vault host will be used for the tls server name
-        vault.hashicorp.com/tls-server-name: {{ tpl ($vaultIstioHosts | first) $ }}
-        {{- else }} # the vault certificate is expected to contain the CN or X509v3 Subject Alternative Name of vault.domain
-        vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }}
-        {{- end }}
-        {{- end }}
-      {{- end }}
-    {{- if .Values.addons.vault.enabled }}
-    additionalScrapeConfigs:
-    - job_name: vault
-      metrics_path: /v1/sys/metrics
-      params:
-        format: ['prometheus']
-      scheme: https
-      authorization:
-        credentials_file: /vault/secrets/token
-      {{- $vaultHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
-      {{- if $vaultHosts }}
-      static_configs:
-      - targets: [{{ tpl ($vaultHosts | first) $ }}]
-      {{- else }}
-      static_configs:
-      - targets: [vault.{{ .Values.domain }}]
-      {{- end }}
-    {{- end }}
-    # Scrape config for service endpoints.
-    #
-    # The relabeling allows the actual service scrape endpoint to be configured
-    # via the following annotations:
-    #
-    # * `prometheus.io/scrape`: Only scrape services that have a value of `true`
-    # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need
-    # to set this to `https` & most likely set the `tls_config` of the scrape config.
-    # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
-    # * `prometheus.io/port`: If the metrics are exposed on a different port to the
-    # service then set this appropriately.
-    {{- if (dig "globalServiceEndpointMetrics" "enabled" false .Values.monitoring) }}
-    - job_name: 'kubernetes-service-endpoints'
-      kubernetes_sd_configs:
-        - role: endpoints
-      scheme: https
-      tls_config:
-        insecure_skip_verify: true
-      follow_redirects: true
-      enable_http2: true
-      relabel_configs:
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
-          action: keep
-          regex: true
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
-          action: replace
-          target_label: __scheme__
-          regex: (https?)
-        - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
-          action: replace
-          target_label: __metrics_path__
-          regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
-          action: replace
-          target_label: __address__
-          regex: ([^:]+)(?::\d+)?;(\d+)
-          replacement: $1:$2
-        - action: labelmap
-          regex: __meta_kubernetes_service_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_service_name]
-          action: replace
-          target_label: kubernetes_name
-        - source_labels: [__meta_kubernetes_service_name]
-          action: drop
-          regex: '(.+)node-exporter'
-        - source_labels: [__meta_kubernetes_service_name]
-          action: drop
-          regex: '(.+)dns'
-        - source_labels: [__meta_kubernetes_service_name]
-          action: drop
-          regex: '(.+)kube-state-metrics'
-    {{- end }}
-    # Example scrape config for pods
-    #
-    # The relabeling allows the actual pod scrape endpoint to be configured via the
-    # following annotations:
-    #
-    # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
-    # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
-    # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
-    {{- if (dig "globalPodEndpointMetrics" "enabled" false .Values.monitoring) }}
-    - job_name: 'kubernetes-pods'
-
-
-      kubernetes_sd_configs:
-        - role: pod
-
-      relabel_configs:
-        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-          action: keep
-          regex: true
-        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-          action: replace
-          target_label: __metrics_path__
-          regex: (.+)
-        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-          action: replace
-          regex: ([^:]+)(?::\d+)?;(\d+)
-          replacement: $1:$2
-          target_label: __address__
-        - action: labelmap
-          regex: __meta_kubernetes_pod_label_(.+)
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-        - source_labels: [__meta_kubernetes_pod_name]
-          action: replace
-          target_label: kubernetes_pod_name
-    {{- end }}
-    {{- if $istioInjection }}
-    # Add volume/mount for Istio certs for mTLS scraping
-    volumes:
-      - emptyDir:
-          medium: Memory
-        name: istio-certs
-    volumeMounts:
-      - mountPath: /etc/prom-certs/
-        name: istio-certs
-    {{- end }}
-
 
 anchoreEnterprise:
   enabled: {{ .Values.addons.anchoreEnterprise.enabled }}
@@ -505,24 +183,33 @@ global:
 sso:
   enabled: {{ .Values.monitoring.sso.enabled }}
 
-prometheus-node-exporter:
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
-
-
-  {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
-  prometheus:
-    monitor:
-    {{- if $lokiEnabled }}
-      relabelings:
-        - action: replace
-          replacement: {{ $clusterName }}
-          targetLabel: cluster
-        - targetLabel: "instance"
-          sourceLabels:
-            - "__meta_kubernetes_pod_node_name"
-    {{- end }}
-    {{- if $istioInjection }}
+upstream:
+  alertmanager:
+    alertmanagerSpec:
+      # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+      # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+      containers:
+        - name: "alertmanager"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+        - name: "config-reloader"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+      {{- if or .Values.monitoring.sso.enabled $istioInjection .Values.kiali.enabled }}
+      podMetadata:
+        {{- if or .Values.monitoring.sso.enabled .Values.kiali.enabled }}
+        {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+        {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+        labels:
+          {{- if .Values.monitoring.sso.enabled }}
+          {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
+          {{- end }}
+        {{- end }}
+        {{- if $istioInjection }}
+        annotations:
+          {{ include "istioAnnotation" . }}
+        {{- end }}
+      {{- end }}
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+    serviceMonitor:
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -530,50 +217,316 @@ prometheus-node-exporter:
         keyFile: /etc/prom-certs/key.pem
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end }}
-  {{- end }}
 
-  {{- if .Values.openshift }}
-  service:
-    targetPort: 9102
-    port: 9102
-  {{- end }}
-
-{{- if $lokiEnabled }}
-kubelet:
-  serviceMonitor:
-    cAdvisorRelabelings:
-      - action: replace
-        replacement: {{ $clusterName }}
-        targetLabel: cluster
-      - targetLabel: metrics_path
-        sourceLabels:
-          - "__metrics_path__"
-      - targetLabel: "instance"
-        sourceLabels:
-          - "node"
-{{- end }}
-
-{{- if $lokiEnabled }}
-defaultRules:
-  additionalRuleLabels:
-    cluster: {{ $clusterName }}
-{{- end }}
-
-kube-state-metrics:
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
-  {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
   prometheus:
-    monitor:
+    {{- if $thanosEnabled }}
+    thanosService:
+      enabled: true
+      # Note: We need to change the portName in order for istio to correctly detect TCP is being used
+      #       for the headless service
+      {{- if $istioInjection }}
+      portName: "tcp-grpc"
+      {{- end }}
+    thanosServiceMonitor:
+      enabled: true
+      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+    {{- end }}
+    prometheusSpec:
+      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+      alertingEndpoints:
+      - name: monitoring-monitoring-kube-alertmanager
+        namespace: monitoring
+        apiVersion: v2
+        port: http-web
+        pathPrefix: /
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+      {{- if .Values.addons.mimir.enabled }}
+      remoteWrite:
+        {{- if $istioEnabled }}
+        # I promise it's not a typo; the port is 80 even though it's TLS
+        - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+          writeRelabelConfigs:
+            - sourceLabels: [__name__]
+              regex: '.*\..*'
+              action: drop
+            - action: labeldrop
+              regex: '.*\..*'
+        {{- else }}
+        - url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
+          writeRelabelConfigs:
+            - sourceLabels: [__name__]
+              regex: '.*\..*'
+              action: drop
+            - action: labeldrop
+              regex: '.*\..*'
+        {{- end }}
+          {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
+          tlsConfig:
+            caFile: /etc/prom-certs/root-cert.pem
+            certFile: /etc/prom-certs/cert-chain.pem
+            keyFile: /etc/prom-certs/key.pem
+            insecureSkipVerify: true
+          {{- end }}
+      {{- end }}
+      {{- if $thanosEnabled }}
+      thanos:
+        {{- if (dig "values" "bbtests" "enabled" false .Values.addons.thanos) }}
+        objectStorageConfig:
+          secret:
+            type: s3
+            config:
+              bucket: "thanos"
+              endpoint: minio.thanos.svc.cluster.local:80
+              access_key: "minio"
+              secret_key: "minio123"
+              insecure: false
+              trace:
+                enable: true
+              http_config:
+                tls_config:
+                  key_file: /etc/prom-certs/key.pem
+                  ca_file: /etc/prom-certs/root-cert.pem
+                  cert_file: /etc/prom-certs/cert-chain.pem
+                insecure_skip_verify: true
+        # by default, the object stores only sync every 2 hours
+        # increase the frequency so the tests will pass 
+        blockSize: 1m
+        {{- else if not ( .Values.addons.thanos.objectStorage.endpoint | empty) }}
+        objectStorageConfig:
+          existingSecret:
+            key: objstore.yml
+            name: monitoring-objstore-secret
+        {{- end }}
+        {{- if $istioInjection }}    
+        # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
+        volumes:
+          - emptyDir:
+              medium: Memory
+            name: istio-certs
+        volumeMounts:
+          - mountPath: /etc/prom-certs/
+            name: istio-certs
+        {{- end }}
+      {{- end }}
+      # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
+      # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
+      containers:
+        - name: "prometheus"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+        - name: "config-reloader"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+      {{- if .Values.tempo.enabled }}
+      enableRemoteWriteReceiver: true
+      {{- end }}
+      podMetadata:
+        labels:
+          app: prometheus
+          {{- if .Values.monitoring.sso.enabled }}
+          {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+          {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+          {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
+          {{- end }}
+          {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
+          vault-ingress: "true"
+          {{- end }}
+        {{- if or $istioInjection .Values.addons.vault.enabled }}
+        annotations:
+          {{- if $istioInjection }}
+          {{ include "istioAnnotation" . }}
+          traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+          proxy.istio.io/config: |
+            proxyMetadata:
+              OUTPUT_CERTS: /etc/istio-output-certs
+          sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+          {{- end }}
+          {{- if .Values.addons.vault.enabled }}
+          vault.hashicorp.com/agent-inject: "true"
+          vault.hashicorp.com/agent-init-first: "true"
+          vault.hashicorp.com/agent-inject-token: "true"
+          vault.hashicorp.com/role: "prometheus"
+          vault.hashicorp.com/agent-run-as-user : "1000"
+          vault.hashicorp.com/agent-run-as-group : "2000"
+          {{- if and $istioEnabled $vaultIstioHosts }} # the 1st istio vault host will be used for the tls server name
+          vault.hashicorp.com/tls-server-name: {{ tpl ($vaultIstioHosts | first) $ }}
+          {{- else }} # the vault certificate is expected to contain the CN or X509v3 Subject Alternative Name of vault.domain
+          vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- if .Values.addons.vault.enabled }}
+      additionalScrapeConfigs:
+      - job_name: vault
+        metrics_path: /v1/sys/metrics
+        params:
+          format: ['prometheus']
+        scheme: https
+        authorization:
+          credentials_file: /vault/secrets/token
+        {{- $vaultHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
+        {{- if $vaultHosts }}
+        static_configs:
+        - targets: [{{ tpl ($vaultHosts | first) $ }}]
+        {{- else }}
+        static_configs:
+        - targets: [vault.{{ .Values.domain }}]
+        {{- end }}
+      {{- end }}           
+      # Scrape config for service endpoints.
+      #
+      # The relabeling allows the actual service scrape endpoint to be configured
+      # via the following annotations:
+      #
+      # * `prometheus.io/scrape`: Only scrape services that have a value of `true`
+      # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need
+      # to set this to `https` & most likely set the `tls_config` of the scrape config.
+      # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+      # * `prometheus.io/port`: If the metrics are exposed on a different port to the
+      # service then set this appropriately.
+      {{- if (dig "globalServiceEndpointMetrics" "enabled" false .Values.monitoring) }}
+      - job_name: 'kubernetes-service-endpoints'
+        kubernetes_sd_configs:
+          - role: endpoints
+        scheme: https
+        tls_config:
+          insecure_skip_verify: true
+        follow_redirects: true
+        enable_http2: true 
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+            action: replace
+            target_label: __scheme__
+            regex: (https?)
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+            action: replace
+            target_label: __address__
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_service_name]
+            action: replace
+            target_label: kubernetes_name
+          - source_labels: [__meta_kubernetes_service_name]
+            action: drop
+            regex: '(.+)node-exporter'
+          - source_labels: [__meta_kubernetes_service_name]
+            action: drop
+            regex: '(.+)dns'
+          - source_labels: [__meta_kubernetes_service_name]
+            action: drop
+            regex: '(.+)kube-state-metrics'
+      {{- end }}
+      # Example scrape config for pods
+      #
+      # The relabeling allows the actual pod scrape endpoint to be configured via the
+      # following annotations:
+      #
+      # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
+      # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+      # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
+      {{- if (dig "globalPodEndpointMetrics" "enabled" false .Values.monitoring) }}
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod     
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+      {{- end }}
+      {{- if $istioInjection }}    
+      # Add volume/mount for Istio certs for mTLS scraping
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: istio-certs
+      volumeMounts:
+        - mountPath: /etc/prom-certs/
+          name: istio-certs
+      {{- end }}
+
+  prometheus-node-exporter:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
+    prometheus:
+      monitor:
       {{- if $lokiEnabled }}
-      relabelings:
+        relabelings:
+          - action: replace
+            replacement: {{ $clusterName }}
+            targetLabel: cluster
+          - targetLabel: "instance"
+            sourceLabels:
+              - "__meta_kubernetes_pod_node_name"
+      {{- end }}
+      {{- if $istioInjection }}
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
+    {{- if $istioInjection }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+    {{- if .Values.openshift }}
+    service:
+      targetPort: 9102
+      port: 9102
+    {{- end }}
+
+  {{- if $lokiEnabled }}
+  kubelet:
+    serviceMonitor:
+      cAdvisorRelabelings:
         - action: replace
           replacement: {{ $clusterName }}
           targetLabel: cluster
+        - targetLabel: metrics_path
+          sourceLabels:
+            - "__metrics_path__"
         - targetLabel: "instance"
           sourceLabels:
             - "__meta_kubernetes_pod_node_name"
@@ -586,327 +539,346 @@ kube-state-metrics:
         keyFile: /etc/prom-certs/key.pem
         insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
   {{- end }}
+  
+  {{- if $lokiEnabled }}
+  defaultRules:
+    additionalRuleLabels:
+      cluster: {{ $clusterName }}
   {{- end }}
 
-  # Add in the custom resource states, so the grafana flux charts work
-  # See Documentation for flux -- https://fluxcd.io/flux/monitoring/metrics/
-  # These overrides are found in https://github.com/fluxcd/flux2-monitoring-example/blob/main/monitoring/controllers/kube-prometheus-stack/kube-state-metrics-config.yaml
-  #
-  # For kube-prometheus-stacks that are already installed and configured with
-  # custom collectors, commenting out the collectors and extraArgs below will
-  # retain any existing kube-state-metrics configuration.
-  #collectors: [ ]
-  #extraArgs:
-  #  - --custom-resource-state-only=true
-  rbac:
-    extraRules:
-      - apiGroups:
-          - source.toolkit.fluxcd.io
-          - kustomize.toolkit.fluxcd.io
-          - helm.toolkit.fluxcd.io
-          - notification.toolkit.fluxcd.io
-          - image.toolkit.fluxcd.io
-        resources:
-          - gitrepositories
-          - buckets
-          - helmrepositories
-          - helmcharts
-          - ocirepositories
-          - kustomizations
-          - helmreleases
-          - alerts
-          - providers
-          - receivers
-          - imagerepositories
-          - imagepolicies
-          - imageupdateautomations
-        verbs: [ "list", "watch" ]
-  customResourceState:
-    enabled: true
-    config:
-      spec:
-        resources:
-          - groupVersionKind:
-              group: kustomize.toolkit.fluxcd.io
-              version: v1
-              kind: Kustomization
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Kustomization resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, lastAppliedRevision ]
-                  source_name: [ spec, sourceRef, name ]
-          - groupVersionKind:
-              group: helm.toolkit.fluxcd.io
-              version: v2
-              kind: HelmRelease
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmRelease resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, history, "0", chartVersion ]
-                  chart_name: [ status, history, "0", chartName ]
-                  chart_app_version: [ status, history, "0", appVersion ]
-                  chart_ref_name: [ spec, chartRef, name ]
-                  chart_source_name: [ spec, chart, spec, sourceRef, name ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1
-              kind: GitRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux GitRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1
-              kind: Bucket
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Bucket resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  endpoint: [ spec, endpoint ]
-                  bucket_name: [ spec, bucketName ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1
-              kind: HelmRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1
-              kind: HelmChart
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux HelmChart resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  chart_name: [ spec, chart ]
-                  chart_version: [ spec, version ]
-          - groupVersionKind:
-              group: source.toolkit.fluxcd.io
-              version: v1beta2
-              kind: OCIRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux OCIRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  revision: [ status, artifact, revision ]
-                  url: [ spec, url ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1beta3
-              kind: Alert
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Alert resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  suspended: [ spec, suspend ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1beta3
-              kind: Provider
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Provider resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  suspended: [ spec, suspend ]
-          - groupVersionKind:
-              group: notification.toolkit.fluxcd.io
-              version: v1
-              kind: Receiver
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux Receiver resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  webhook_path: [ status, webhookPath ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta2
-              kind: ImageRepository
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImageRepository resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  image: [ spec, image ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta2
-              kind: ImagePolicy
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImagePolicy resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  source_name: [ spec, imageRepositoryRef, name ]
-          - groupVersionKind:
-              group: image.toolkit.fluxcd.io
-              version: v1beta2
-              kind: ImageUpdateAutomation
-            metricNamePrefix: gotk
-            metrics:
-              - name: "resource_info"
-                help: "The current state of a Flux ImageUpdateAutomation resource."
-                each:
-                  type: Info
-                  info:
-                    labelsFromPath:
-                      name: [ metadata, name ]
-                labelsFromPath:
-                  exported_namespace: [ metadata, namespace ]
-                  ready: [ status, conditions, "[type=Ready]", status ]
-                  suspended: [ spec, suspend ]
-                  source_name: [ spec, sourceRef, name ]
+  kube-state-metrics:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
+    prometheus:
+      monitor:
+        {{- if $lokiEnabled }}
+        relabelings:
+          - action: replace
+            replacement: {{ $clusterName }}
+            targetLabel: cluster
+          - targetLabel: "instance"
+            sourceLabels:
+              - "__meta_kubernetes_pod_node_name"
+        {{- end }}
+        {{- if $istioInjection }}
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+        {{- end }}
+    {{- end }}
+    # Add in the custom resource states, so the grafana flux charts work
+    # See Documentation for flux -- https://fluxcd.io/flux/monitoring/metrics/
+    # These overrides are found in https://github.com/fluxcd/flux2-monitoring-example/blob/main/monitoring/controllers/kube-prometheus-stack/kube-state-metrics-config.yaml
+    #
+    # For kube-prometheus-stacks that are already installed and configured with
+    # custom collectors, commenting out the collectors and extraArgs below will
+    # retain any existing kube-state-metrics configuration.
+    #collectors: [ ]
+    #extraArgs:  
+    #  - --custom-resource-state-only=true
+    rbac:
+      extraRules:
+        - apiGroups:
+            - source.toolkit.fluxcd.io
+            - kustomize.toolkit.fluxcd.io
+            - helm.toolkit.fluxcd.io
+            - notification.toolkit.fluxcd.io
+            - image.toolkit.fluxcd.io
+          resources:
+            - gitrepositories
+            - buckets
+            - helmrepositories
+            - helmcharts
+            - ocirepositories
+            - kustomizations
+            - helmreleases
+            - alerts
+            - providers
+            - receivers
+            - imagerepositories
+            - imagepolicies
+            - imageupdateautomations
+          verbs: [ "list", "watch" ]
+    customResourceState:
+      enabled: true
+      config:
+        spec:
+          resources:
+            - groupVersionKind:
+                group: kustomize.toolkit.fluxcd.io
+                version: v1
+                kind: Kustomization
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux Kustomization resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, lastAppliedRevision ]
+                    source_name: [ spec, sourceRef, name ]
+            - groupVersionKind:
+                group: helm.toolkit.fluxcd.io
+                version: v2
+                kind: HelmRelease
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux HelmRelease resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, history, "0", chartVersion ]
+                    chart_name: [ status, history, "0", chartName ]
+                    chart_app_version: [ status, history, "0", appVersion ]
+                    chart_ref_name: [ spec, chartRef, name ]
+                    chart_source_name: [ spec, chart, spec, sourceRef, name ]
+            - groupVersionKind:
+                group: source.toolkit.fluxcd.io
+                version: v1
+                kind: GitRepository
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux GitRepository resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, artifact, revision ]
+                    url: [ spec, url ]
+            - groupVersionKind:
+                group: source.toolkit.fluxcd.io
+                version: v1
+                kind: Bucket
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux Bucket resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, artifact, revision ]
+                    endpoint: [ spec, endpoint ]
+                    bucket_name: [ spec, bucketName ]
+            - groupVersionKind:
+                group: source.toolkit.fluxcd.io
+                version: v1
+                kind: HelmRepository
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux HelmRepository resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, artifact, revision ]
+                    url: [ spec, url ]
+            - groupVersionKind:
+                group: source.toolkit.fluxcd.io
+                version: v1
+                kind: HelmChart
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux HelmChart resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, artifact, revision ]
+                    chart_name: [ spec, chart ]
+                    chart_version: [ spec, version ]
+            - groupVersionKind:
+                group: source.toolkit.fluxcd.io
+                version: v1beta2
+                kind: OCIRepository
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux OCIRepository resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    revision: [ status, artifact, revision ]
+                    url: [ spec, url ]
+            - groupVersionKind:
+                group: notification.toolkit.fluxcd.io
+                version: v1beta3
+                kind: Alert
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux Alert resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    suspended: [ spec, suspend ]
+            - groupVersionKind:
+                group: notification.toolkit.fluxcd.io
+                version: v1beta3
+                kind: Provider
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux Provider resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    suspended: [ spec, suspend ]
+            - groupVersionKind:
+                group: notification.toolkit.fluxcd.io
+                version: v1
+                kind: Receiver
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux Receiver resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    webhook_path: [ status, webhookPath ]
+            - groupVersionKind:
+                group: image.toolkit.fluxcd.io
+                version: v1beta2
+                kind: ImageRepository
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux ImageRepository resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    image: [ spec, image ]
+            - groupVersionKind:
+                group: image.toolkit.fluxcd.io
+                version: v1beta2
+                kind: ImagePolicy
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux ImagePolicy resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    source_name: [ spec, imageRepositoryRef, name ]
+            - groupVersionKind:
+                group: image.toolkit.fluxcd.io
+                version: v1beta2
+                kind: ImageUpdateAutomation
+              metricNamePrefix: gotk
+              metrics:
+                - name: "resource_info"
+                  help: "The current state of a Flux ImageUpdateAutomation resource."
+                  each:
+                    type: Info
+                    info:
+                      labelsFromPath:
+                        name: [ metadata, name ]
+                  labelsFromPath:
+                    exported_namespace: [ metadata, namespace ]
+                    ready: [ status, conditions, "[type=Ready]", status ]
+                    suspended: [ spec, suspend ]
+                    source_name: [ spec, sourceRef, name ]
 
-prometheusOperator:
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
-  admissionWebhooks:
-    cleanupProxy:
-      image:
-        pullPolicy: {{ .Values.imagePullPolicy }}
-    patch:
-      image:
-        pullPolicy: {{ .Values.imagePullPolicy }}
-  {{- if $istioInjection }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
+  prometheusOperator:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+    admissionWebhooks:
+      patch:
+        image:
+          pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if $istioInjection }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
   {{- end }}
-{{- end }}
 
 {{- /* This function merges defaults in lists from above into overlays */ -}}
 {{- /* The end user will not have to replicate `prometheus.prometheusSpec.additionalScrapeConfigs` or `grafana.extraSecretMounts` from above when providing an overlay */ -}}
 {{- /* There is a hidden flag `skipOverlayMerge` that can be added to `prometheus.prometheusSpec` or `grafana` overlays to ignore the defaults */ -}}
 {{- define "bigbang.overlays.monitoring" }}
-
   {{- $defaults := fromYaml (include "bigbang.defaults.monitoring" .) }}
-
   {{- $overlays := dig "values" dict .Values.monitoring }}
   {{- range $prometheusConfig, $default := $defaults.prometheus }}
     {{- $overlay := (dig "prometheus" $prometheusConfig dict $overlays) }}
     # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set
     {{- if and $overlay (kindIs "map" $overlay) (not $overlay.skipOverlayMerge) }}
-
       # Add any default additionalScrapeConfigs to overlay
       {{- if and (dig "additionalScrapeConfigs"  list $default) (dig "additionalScrapeConfigs"  list $overlay) }}
          {{ $_ := set $overlay "additionalScrapeConfigs" (concat $default.additionalScrapeConfigs $overlay.additionalScrapeConfigs) }}
       {{- end }}
-
     {{- end }}
   {{- end }}
 {{ toYaml $overlays }}

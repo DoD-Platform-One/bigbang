@@ -128,6 +128,7 @@ kiali:
         envs:
           cypress_url: 'https://kiali.dev.bigbang.mil'
           cypress_check_data: 'true'
+          cypress_pod_monitor_name: 'monitoring-monitoring-istio-envoy'
           # uncomment these next 3 lines if enabling the keycloak SSO integration test
           #cypress_keycloak_test_enable: "true"
           #cypress_keycloak_username: "cypress"
@@ -1052,8 +1053,33 @@ monitoring:
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_alertmanager
   values:
     # Monitoring CRDs are handled in prometheus-operator-crds chart
-    crds:
-      enabled: false
+    upstream:
+      kube-state-metrics:
+        resources:
+          requests:
+            cpu: 40m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
+      prometheus-node-exporter:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 30Mi
+          limits: {}
+    bbtests:
+      enabled: true
+      cypress:
+        envs:
+          cypress_bigbang_integration: 'true'
+          cypress_prometheus_url: 'https://prometheus.dev.bigbang.mil'
+          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
+          cypress_alertmanager_url: 'https://alertmanager.dev.bigbang.mil'
+          cypress_check_istio_dashboards: 'true'
+          cypress_keycloak_test_enable: 'false'
+          cypress_tnr_username: "cypress"
+          cypress_tnr_password: "tnr_w!G33ZyAt@C8"
     istio:
       hardened:
         customServiceEntries:
@@ -1074,33 +1100,6 @@ monitoring:
                   protocol: TLS
                   name: https
               resolution: DNS
-
-    kube-state-metrics:
-      resources:
-        requests:
-          cpu: 40m
-          memory: 128Mi
-        limits:
-          cpu: 200m
-          memory: 512Mi
-    prometheus-node-exporter:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 30Mi
-        limits: {}
-    bbtests:
-      enabled: true
-      cypress:
-        envs:
-          cypress_bigbang_integration: 'true'
-          cypress_prometheus_url: 'https://prometheus.dev.bigbang.mil'
-          cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
-          cypress_alertmanager_url: 'https://alertmanager.dev.bigbang.mil'
-          cypress_check_istio_dashboards: 'true'
-          cypress_keycloak_test_enable: 'false'
-          cypress_tnr_username: "cypress"
-          cypress_tnr_password: "tnr_w!G33ZyAt@C8"
 
 grafana:
   sso:

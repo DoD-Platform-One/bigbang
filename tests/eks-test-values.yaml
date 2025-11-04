@@ -102,46 +102,47 @@ tempo:
 
 monitoring:
   values:
+    upstream:
+      prometheus:
+        prometheusSpec:
+          additionalScrapeConfigs: []
+          podMetadata:
+            annotations:
+              vault.hashicorp.com/agent-inject: "false"
+              vault.hashicorp.com/agent-init-first: "true"
+              vault.hashicorp.com/agent-inject-token: "true"
+              vault.hashicorp.com/role: "prometheus"
+              vault.hashicorp.com/agent-pre-populate: "false"
+  ### COMMENTED OUT DUE TO ISSUES WITH THANOS-SIDECAR CONTAINER AND PROMETHEUS ###
+  #            proxy.istio.io/config: |
+  #              holdApplicationUntilProxyStarts: true
+          resources:
+            requests:
+              cpu: 300m
+              memory: 5Gi
+            limits: null
+      kube-state-metrics:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits: null
+      prometheus-node-exporter:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 50Mi
+          limits: null
+      grafana:
+        downloadDashboards:
+          resources:
+            limits: null
+            requests:
+              cpu: 20m
+              memory: 20Mi
     bbtests:
       cypress:
         artifacts: false
-    prometheus:
-      prometheusSpec:
-        additionalScrapeConfigs: []
-        podMetadata:
-          annotations:
-            vault.hashicorp.com/agent-inject: "false"
-            vault.hashicorp.com/agent-init-first: "true"
-            vault.hashicorp.com/agent-inject-token: "true"
-            vault.hashicorp.com/role: "prometheus"
-            vault.hashicorp.com/agent-pre-populate: "false"
-### COMMENTED OUT DUE TO ISSUES WITH THANOS-SIDECAR CONTAINER AND PROMETHEUS ###
-#            proxy.istio.io/config: |
-#              holdApplicationUntilProxyStarts: true
-        resources:
-          requests:
-            cpu: 300m
-            memory: 5Gi
-          limits: null
-    kube-state-metrics:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits: null
-    prometheus-node-exporter:
-      resources:
-        requests:
-          cpu: 200m
-          memory: 50Mi
-        limits: null
-    grafana:
-      downloadDashboards:
-        resources:
-          limits: null
-          requests:
-            cpu: 20m
-            memory: 20Mi
 
 twistlock:
   values:
