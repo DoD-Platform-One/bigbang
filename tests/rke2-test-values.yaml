@@ -91,38 +91,39 @@ monitoring:
     bbtests:
       cypress:
         artifacts: false
-    prometheus:
-      prometheusSpec:
-        additionalScrapeConfigs: []
-        podMetadata:
-          annotations:
-            vault.hashicorp.com/agent-inject: "false"
-            vault.hashicorp.com/agent-init-first: "false"
-            vault.hashicorp.com/agent-inject-token: "false"
+    upstream:
+      prometheus:
+        prometheusSpec:
+          additionalScrapeConfigs: []
+          podMetadata:
+            annotations:
+              vault.hashicorp.com/agent-inject: "false"
+              vault.hashicorp.com/agent-init-first: "false"
+              vault.hashicorp.com/agent-inject-token: "false"
+          resources:
+            requests:
+              cpu: 300m
+              memory: 5Gi
+            limits: null
+      kube-state-metrics:
         resources:
           requests:
-            cpu: 300m
-            memory: 5Gi
+            cpu: 100m
+            memory: 128Mi
           limits: null
-    kube-state-metrics:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits: null
-    prometheus-node-exporter:
-      resources:
-        requests:
-          cpu: 200m
-          memory: 50Mi
-        limits: null
-    grafana:
-      downloadDashboards:
+      prometheus-node-exporter:
         resources:
-          limits: null
           requests:
-            cpu: 20m
-            memory: 20Mi
+            cpu: 200m
+            memory: 50Mi
+          limits: null
+      grafana:
+        downloadDashboards:
+          resources:
+            limits: null
+            requests:
+              cpu: 20m
+              memory: 20Mi
 
 twistlock:
   values:
