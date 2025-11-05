@@ -516,6 +516,7 @@ upstream:
       targetPort: 9102
       port: 9102
     {{- end }}
+    {{- end }}
 
   {{- if $lokiEnabled }}
   kubelet:
@@ -530,7 +531,6 @@ upstream:
         - targetLabel: "instance"
           sourceLabels:
             - "__meta_kubernetes_pod_node_name"
-      {{- end }}
       {{- if $istioInjection }}
       scheme: https
       tlsConfig:
@@ -863,7 +863,7 @@ upstream:
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
-  {{- end }}
+{{- end }}
 
 {{- /* This function merges defaults in lists from above into overlays */ -}}
 {{- /* The end user will not have to replicate `prometheus.prometheusSpec.additionalScrapeConfigs` or `grafana.extraSecretMounts` from above when providing an overlay */ -}}
