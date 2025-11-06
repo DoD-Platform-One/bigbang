@@ -45,6 +45,20 @@ helm unittest chart -f "unittests/schema/umbrella_test.yaml"
 helm unittest chart -f "unittests/template:*_test.yaml"
 ```
 
+### Debugging Tests
+
+To enable verbose output and view the rendered YAML templates during test execution, use the `-d` flag:
+
+```bash
+helm unittest chart -f "unittests/**/*_test.yaml" -d
+```
+
+When the `-d` (or `--debugPlugin`) flag is enabled, helm unittest creates a `.debug/` directory containing the rendered YAML output for each template processed during the tests. This is useful for:
+
+- Inspecting the actual rendered templates to understand test failures
+- Verifying that your Helm values produce the expected template output
+- Debugging complex template logic and conditionals
+
 ## Test Organization
 
 Big Bang organizes helm unit tests into several categories:
@@ -92,7 +106,7 @@ Template helper tests ensure that custom template functions produce correct outp
 
 ### Package-Specific Tests
 
-Tests for individual packages validate that package-specific templates render correctly:
+Located in [chart/unittests/packages/](../../chart/unittests/packages/), these tests validate that package-specific templates render correctly for individual packages.
 
 ## Additional Resources
 
