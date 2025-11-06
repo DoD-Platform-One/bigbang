@@ -5,66 +5,81 @@
 {{- define "bigbang.defaults.tempo" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 
-{{- if $istioEnabled }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
+upstream:
+  # --- Add writable runtime volume ---
+  extraVolumes:
+    - name: tempo-runtime
+      emptyDir: {}  # ephemeral, backed by node disk or memor
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
 
-objectStorage: 
-  access_key_id: {{ .Values.tempo.objectStorage.accessKey }}
-  secret_access_key: {{ .Values.tempo.objectStorage.accessSecret }}
+  {{- if or .Values.kiali.enabled .Values.tempo.sso.enabled }}
+  {{- $tempoAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+  {{- $tempoAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+  podLabels:
+    {{- if .Values.tempo.sso.enabled }}
+    {{ $tempoAuthserviceKey }}: {{ $tempoAuthserviceValue }}
+    {{- end }}
+  {{- end }}
 
-tempo:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-  global_overrides:
-    ingestion_rate_limit_bytes: 30000000
-{{- with .Values.tempo.objectStorage }}
-{{- if and .endpoint .region .bucket }}
-  storage: 
-    trace:
-      backend: s3
-      s3:
-        endpoint: {{ .endpoint }}
-        bucket: {{ .bucket }}
-        region: {{ .region }}
-        insecure: {{ .insecure }}
-        forcepathstyle: true
-{{- end }}
-{{- end }}
-{{- if and .Values.tempo.metricsGenerator.enabled .Values.monitoring.enabled }}
-  metricsGenerator:
-    enabled: true
-    remoteWriteUrl: "http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090/api/v1/write"
-  per_tenant_overrides:
-    'single-tenant':
-      ingestion_rate_strategy: local
-      ingestion_rate_limit_bytes: 10485760         # 10MB/sec
-      ingestion_burst_size_bytes: 20971520         # 20MB burst
-      metrics_generator_processors:
-        - local-blocks
-        - service-graphs
-        - span-metrics
-      metrics_generator_processor_span_metrics_histogram_buckets: [0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 2.048, 4.096, 8.192, 16.384]
-      # Example spnametrics filter, filters out non-server traces
-      # metrics_generator_processor_span_metrics_filter_policies:
-      #   - include:
-      #       match_type: strict
-      #       attributes:
-      #         - key: kind
-      #           value: SPAN_KIND_SERVER
-{{- end }}
+  tempo:
+    extraVolumeMounts:
+      - name: tempo-runtime
+        mountPath: /var/tempo
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    global_overrides:
+      ingestion_rate_limit_bytes: 30000000
+  {{- with .Values.tempo.objectStorage }}
+  {{- if and .endpoint .region .bucket }}
+    storage: 
+      trace:
+        backend: s3
+        s3:
+          endpoint: {{ .endpoint }}
+          bucket: {{ .bucket }}
+          region: {{ .region }}
+          insecure: {{ .insecure }}
+          forcepathstyle: true
+  {{- end }}
+  {{- end }}
+  {{- if and .Values.tempo.metricsGenerator.enabled .Values.monitoring.enabled }}
+    metricsGenerator:
+      enabled: true
+      remoteWriteUrl: "http://monitoring-monitoring-kube-prometheus.monitoring.svc:9090/api/v1/write"
+    per_tenant_overrides:
+      'single-tenant':
+        ingestion_rate_strategy: local
+        ingestion_rate_limit_bytes: 10485760         # 10MB/sec
+        ingestion_burst_size_bytes: 20971520         # 20MB burst
+        metrics_generator_processors:
+          - local-blocks
+          - service-graphs
+          - span-metrics
+        metrics_generator_processor_span_metrics_histogram_buckets: [0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 2.048, 4.096, 8.192, 16.384]
+        # Example spnametrics filter, filters out non-server traces
+        # metrics_generator_processor_span_metrics_filter_policies:
+        #   - include:
+        #       match_type: strict
+        #       attributes:
+        #         - key: kind
+        #           value: SPAN_KIND_SERVER
+  {{- end }}
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+
+  tempoQuery:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+  serviceAccount:
+    imagePullSecrets:
+      - name: private-registry
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
-
-tempoQuery:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-
-serviceAccount:
-  imagePullSecrets:
-    - name: private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -87,30 +102,6 @@ istio:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-serviceMonitor:
-  enabled: {{ .Values.monitoring.enabled }}
-  # conditional passes only if all conditionals are true:
-  # - istio: enabled
-  # - mTLS: SCRICT
-  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
-  scheme: https
-  tlsConfig:
-    caFile: /etc/prom-certs/root-cert.pem
-    certFile: /etc/prom-certs/cert-chain.pem
-    keyFile: /etc/prom-certs/key.pem
-    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-  {{- end }}
-
 sso:
   enabled: {{ .Values.tempo.sso.enabled }}
-
-{{- if or .Values.kiali.enabled .Values.tempo.sso.enabled }}
-{{- $tempoAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-{{- $tempoAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-podLabels:
-  {{- if .Values.tempo.sso.enabled }}
-  {{ $tempoAuthserviceKey }}: {{ $tempoAuthserviceValue }}
-  {{- end }}
-{{- end }}
-
 {{- end -}}

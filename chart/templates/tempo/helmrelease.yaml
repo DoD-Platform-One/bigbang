@@ -41,9 +41,18 @@ spec:
 
   {{- toYaml $fluxSettingsTempo | nindent 2 }}
 
-  {{- if .Values.tempo.postRenderers }}
   postRenderers:
-  {{ toYaml .Values.tempo.postRenderers | nindent 4 }}
+  {{ include "tempo.promPortsPostRenderers" . | nindent 2 }}
+  {{- if .Values.tempo.postRenderers }}
+  {{- with .Values.tempo.postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+  {{- if and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
+  {{ include "tempo.serviceMonitorPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- if and .Values.tempo.objectStorage.accessKey .Values.tempo.objectStorage.accessSecret }}
+  {{ include "tempo.objectStoragePostRenderers" . | nindent 2 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-tempo-values
