@@ -2,9 +2,6 @@
 - kustomize:
     patches:
       - patch: |
-          - op: replace
-            path: /spec/ports/2/port
-            value: 3100
           - op: add
             path: /spec/ports/2/appProtocol
             value: http

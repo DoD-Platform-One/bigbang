@@ -226,7 +226,7 @@ upstream:
         access: proxy
         orgId: 1
         uid: tempo
-        url: http://tempo-tempo.tempo.svc:3100
+        url: http://tempo-tempo.tempo.svc:3200
         isDefault: false
         editable: true
         jsonData:
