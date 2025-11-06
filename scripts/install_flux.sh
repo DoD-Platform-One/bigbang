@@ -12,6 +12,8 @@ REGISTRY_URL=registry1.dso.mil
 FLUX_SECRET=private-registry
 WAIT_TIMEOUT=300
 NAMESPACE=flux-system
+REGISTRY_USERNAME=${REGISTRY1_USERNAME:-}
+REGISTRY_PASSWORD=${REGISTRY1_TOKEN:-}
 
 #
 # helper functions
