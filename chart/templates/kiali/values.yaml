@@ -94,7 +94,7 @@ upstream:
         tracing:
           enabled: true
           {{- if .Values.tempo.enabled }}
-          internal_url: http://tempo-tempo.tempo.svc.cluster.local:3100
+          internal_url: http://tempo-tempo.tempo.svc.cluster.local:3200
           provider: tempo
           {{- end}}
         {{- end }}
@@ -138,7 +138,7 @@ networkPolicies:
           k8s:
             monitoring/prometheus:9090: {{ .Values.monitoring.enabled }}
             monitoring/grafana:3000: {{ .Values.grafana.enabled }}
-            tempo/tempo:3100: {{ .Values.tempo.enabled }}
+            tempo/tempo:3200: {{ .Values.tempo.enabled }}
             istio-system/istiod:15014: {{ .Values.istiod.enabled }}
           definition:
             sso: {{ .Values.kiali.sso.enabled }}
