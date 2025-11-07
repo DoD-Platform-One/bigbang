@@ -39,10 +39,10 @@ if [[ $# -eq 0 ]]; then
   running_as_postrenderer=true
 fi
 
-b=$(tput setaf 4) # Blue
-r=$(tput setaf 1) # Red
-y=$(tput setaf 3) # Yellow
-n=$(tput sgr0)    # Normal
+b=$(tput setaf 4) || true # Blue
+r=$(tput setaf 1) || true # Red
+y=$(tput setaf 3) || true # Yellow
+n=$(tput sgr0) || true    # Normal
 
 function info() {
   echo -e "[${b}INFO${n}] $1" >&2

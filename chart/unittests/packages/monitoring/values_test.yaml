@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Monitoring - Values
+tests:
+- it: should create an ingress netpol allowing the control plane to hit the webhook port
+  postRenderer:
+    cmd: sh
+    args:
+      - -c
+      - |
+        set -o pipefail && \
+        yq 'select(.metadata.name == "*monitoring*")' \
+          | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
+          | yq 'select(.kind == "NetworkPolicy" and .metadata.name == "*10250*")'
+  asserts:
+  - equal:
+      path: spec
+      value:
+        ingress:
+        - from:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+          ports:
+          - port: 10250
+            protocol: TCP
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+        policyTypes:
+          - Ingress
+- it: should update the selector based on the monitoring upstream name override
+  set:
+    monitoring.values.upstream.nameOverride: testing
+  postRenderer:
+    cmd: sh
+    args:
+      - -c
+      - |
+        set -o pipefail && \
+        yq 'select(.metadata.name == "*monitoring*")' \
+          | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
+          | yq 'select(.kind == "NetworkPolicy" and .metadata.name == "*10250*")'
+  asserts:
+  - equal:
+      path: spec
+      value:
+        ingress:
+        - from:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+          ports:
+          - port: 10250
+            protocol: TCP
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: testing-prometheus-operator
+        policyTypes:
+          - Ingress
