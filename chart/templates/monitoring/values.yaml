@@ -20,6 +20,12 @@ domain: {{ $domainName }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $vaultIstioHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
 
+# Reproducing the naming convention based on the upstream chart: 
+# https://github.com/prometheus-community/helm-charts/blob/1a04bc9e7e988a210d0f1d1882243ff1e3bd1c03/charts/kube-prometheus-stack/templates/prometheus-operator/_prometheus-operator.tpl#L5
+{{- $kpsNameOverride := dig "upstream" "nameOverride" "kube-prometheus-stack" .Values.monitoring.values | trunc 50 | trimSuffix "-" }}
+{{- $kpsName := printf "%s-%s" $kpsNameOverride "prometheus-operator" }}
+{{- $isDefaultKpsName := eq $kpsName "kube-prometheus-stack-prometheus-operator" }}
+
 flux:
   enabled: true
 
@@ -32,8 +38,24 @@ networkPolicies:
           - ipBlock:
               cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
     from:
+      {{ if not $isDefaultKpsName }}
+      # Need to make a couple changes to the default package netpols when the name is overridden
+      {{ $kpsName }}:
+        to:
+          definition:
+            kubeAPI: true
+      kube-prometheus-stack-prometheus-operator:
+        to:
+          definition:
+            kubeAPI: false
+      {{ end }}
       # TODO: Remove this once bb-common creates default policies in `pre-install` and `post-delete` hook phases
       admission-create-job:
+      {{ if not $isDefaultKpsName }}
+        podSelector:
+          matchLabels:
+            app: {{ printf "%s-%s" $kpsNameOverride "admission-create" }}
+      {{ end }}
         to:
           k8s:
             udp://kube-system/coredns:53:
@@ -66,6 +88,11 @@ networkPolicies:
             authservice/authservice:10003: {{ $authserviceEnabled }}
   ingress:
     to:
+      {{ $kpsName }}:10250:
+        from:
+          cidr:
+            # Needed for kube-api to call the prometheus operator webhook endpoint
+            {{ .Values.networkPolicies.controlPlaneCidr }}: true
       prometheus:10901:
         from:
           k8s:
