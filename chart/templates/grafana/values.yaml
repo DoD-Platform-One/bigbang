@@ -132,6 +132,9 @@ upstream:
         access: proxy
         url: http://mimir-mimir-gateway.mimir.svc.cluster.local/prometheus
         editable: true
+        jsonData:
+          # Should match mimir metamonitoring scrape_interval (default 60s)
+          timeInterval: "60s"
       {{- end }}
       {{- if .Values.monitoring.enabled }}
       {{- if .Values.addons.thanos.enabled }}
