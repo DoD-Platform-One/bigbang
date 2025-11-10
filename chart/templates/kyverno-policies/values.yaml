@@ -1097,7 +1097,6 @@ policies:
           - velero-velero-*
           - node-agent-*
           - velero-label-namespace-*
-          - velero-script-test
           - velero-backup-restore-test
       - namespace: neuvector
         pods:
