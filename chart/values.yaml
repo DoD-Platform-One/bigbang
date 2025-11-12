@@ -1005,11 +1005,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "75.6.1-bb.10"
+    tag: "75.6.1-bb.11"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "75.6.1-bb.10"
+    tag: "75.6.1-bb.11"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -2363,12 +2363,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/headlamp.git
-      tag: "0.36.0-bb.5"
+      tag: "0.37.0-bb.1"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "headlamp"
-      tag: "0.36.0-bb.5"
+      tag: "0.37.0-bb.1"
 
     # -- Override flux settings for this package
     flux: {}
