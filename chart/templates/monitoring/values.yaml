@@ -15,6 +15,7 @@ domain: {{ $domainName }}
 
 {{- $authserviceEnabled := and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
+{{- $headlampEnabled := (.Values.addons.headlamp.enabled) }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
 {{- $lokiEnabled := (.Values.loki.enabled) }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
@@ -82,6 +83,10 @@ networkPolicies:
         to:
           k8s:
             authservice/authservice:10003: {{ $authserviceEnabled }}
+      prometheus-blackbox-exporter:
+        to:
+          k8s:
+            headlamp/headlamp:4466: {{ $headlampEnabled }}
       alertmanager:
         to:
           k8s:
@@ -123,6 +128,27 @@ networkPolicies:
             logging/logging-loki: {{ .Values.loki.enabled }}
 
 openshift: {{ .Values.openshift }}
+
+{{- if .Values.addons.headlamp.enabled }}
+blackboxExporter:
+  enabled: true
+  serviceMonitor:
+    enabled: {{ .Values.monitoring.enabled }}
+    {{- if $istioInjection }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+    {{- end }}
+    defaults:         
+      labels: { release: monitoring }
+    targets:
+      - name: headlamp
+        url: "http://headlamp-headlamp.headlamp.svc.cluster.local:4466"
+        scheme: https
+{{- end }}  
 
 minioOperator:
   enabled: {{ .Values.addons.minioOperator.enabled }}
