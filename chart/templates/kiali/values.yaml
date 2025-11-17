@@ -1,9 +1,16 @@
 {{- if .Values.kiali.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.kiali "name" "kiali" "defaults" (include "bigbang.defaults.kiali" .)) }}
+{{- /* Create a cleaned copy of kiali config and merge deprecated paths into current paths */ -}}
+{{- $kialiPackage := deepCopy .Values.kiali -}}
+{{- if .Values.kiali.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.kiali.values) | fromYaml -}}
+{{- $kialiPackage = set $kialiPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $kialiPackage "name" "kiali" "defaults" (include "bigbang.defaults.kiali" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.kiali" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.kiali.values) }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -21,8 +28,13 @@ openshift: {{ .Values.openshift}}
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 routes:
   inbound:
