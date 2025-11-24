@@ -1291,6 +1291,64 @@ istio:
       {{- if and (dig "parameters" "require" list $default) (dig "parameters" "require" list $overlay) -}}
         {{ $_ := set $overlay.parameters "require" (concat $default.parameters.require $overlay.parameters.require) -}}
       {{- end -}}
+
+      {{- /* Merge 'namespaces' list by namespace name with deduplication of pods.allow and pods.deny */ -}}
+      {{- if and (hasKey $default "namespaces") (hasKey $overlay "namespaces") -}}
+
+        {{- /* Step 1: Create a map to hold merged namespaces keyed by namespace name */ -}}
+        {{- $mergedNamespaces := dict -}}
+
+        {{- /* Step 2: Index default namespaces by name */ -}}
+        {{- range $ns := $default.namespaces -}}
+          {{- $_ := set $mergedNamespaces $ns.namespace (deepCopy $ns) -}}
+        {{- end -}}
+
+        {{- /* Step 3: Merge overlay namespaces into the indexed map */ -}}
+        {{- range $ons := $overlay.namespaces -}}
+
+          {{- $existing := index $mergedNamespaces $ons.namespace | default dict -}}
+
+          {{- if $existing.namespace -}}
+            {{- /* Merge and deduplicate 'pods.allow' */ -}}
+            {{- $allowCombined := concat (dig "pods" "allow" list $existing) (dig "pods" "allow" list $ons) -}}
+            {{- $allowUnique := dict -}}
+            {{- range $item := $allowCombined -}}
+              {{- $_ := set $allowUnique $item true -}}
+            {{- end -}}
+            {{- $allow := keys $allowUnique | sortAlpha -}}
+
+            {{- /* Merge and deduplicate 'pods.deny' */ -}}
+            {{- $denyCombined := concat (dig "pods" "deny" list $existing) (dig "pods" "deny" list $ons) -}}
+            {{- $denyUnique := dict -}}
+            {{- range $item := $denyCombined -}}
+              {{- $_ := set $denyUnique $item true -}}
+            {{- end -}}
+            {{- $deny := keys $denyUnique | sortAlpha -}}
+
+            {{- /* Set merged pods back into the existing namespace entry */ -}}
+            {{- $_ := set $existing "pods" (dict "allow" $allow "deny" $deny) -}}
+
+            {{- /* Update the mergedNamespaces map */ -}}
+            {{- $_ := set $mergedNamespaces $ons.namespace $existing -}}
+
+          {{- else -}}
+            {{- /* If namespace only exists in overlay, add it directly */ -}}
+            {{- $_ := set $mergedNamespaces $ons.namespace $ons -}}
+          {{- end -}}
+
+        {{- end -}}
+
+        {{- /* Step 4: Convert the merged map back into a list */ -}}
+        {{- $mergedList := list -}}
+        {{- range $k, $v := $mergedNamespaces -}}
+          {{- $mergedList = append $mergedList $v -}}
+        {{- end -}}
+
+        {{- /* Step 5: Set the final merged list back into the overlay */ -}}
+        {{- $_ := set $overlay "namespaces" $mergedList -}}
+
+      {{- end -}}            
+
     {{- end -}}
   {{- end -}}
 {{ toYaml $overlays }}

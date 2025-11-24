@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Template - overlays.kyverno-policies
+tests:
+- it: must correctly overlay on top of existing default values
+  set:
+    _selfTest:
+      bigbang.overlays.kyverno-policies:
+        resultIsYaml: true
+        args:
+          Values:
+            addons:
+              vault:
+                enabled: false
+              gitlabRunner:
+                enabled: false
+              gitlab:
+                enabled: false
+              velero:
+                enabled: false
+              mimir:
+                enabled: false
+              thanos:
+                enabled: false
+              mattermost:
+                enabled: false
+              headlamp:
+                enabled: false
+              externalSecrets:
+                enabled: false
+              backstage:
+                enabled: false
+            twistlock:
+              enabled: false
+            istiod:
+              enabled: true
+            istioGateway:
+              enabled: true
+              values:
+                gateways:
+                  public: {}
+            neuvector:
+              enabled: false
+            fluentbit:
+              enabled: false
+            gatekeeper:
+              enabled: false
+            alloy:
+              enabled: false
+            kyvernoReporter:
+              enabled: false
+            kiali:
+              enabled: false
+            monitoring:
+              enabled: false
+            kyvernoPolicies:
+              enabled: true
+              values:
+                policies:
+                  update-automountserviceaccounttokens:
+                    namespaces:
+                      - namespace: monitoring
+                        pods:
+                          allow:
+                            - test-monitoring
+                            - grafana
+                          deny:
+                            - deny-monitoring
+                      - namespace: custom
+                        pods:
+                          allow:
+                            - custom-pod
+                          deny:
+                            - custom-deny
+  template: templates/_self-test/render.yaml
+  asserts:
+    - equal:
+        path: kind
+        value: TestResult
+
+    # Merged and deduplicated 'allow' list for monitoring
+    - equal:
+        path: 'result.policies.update-automountserviceaccounttokens.namespaces[?(@.namespace=="monitoring")].pods.allow'
+        value: [ "grafana", "monitoring-grafana*", "monitoring-monitoring-kube-admission-create*", "monitoring-monitoring-kube-admission-patch*", "monitoring-monitoring-kube-state-metrics*", "monitoring-operator*", "prometheus-monitoring-prometheus*", "test-monitoring" ]
+
+
+    # Deduplicated 'deny' list for monitoring
+    - equal:
+        path: 'result.policies.update-automountserviceaccounttokens.namespaces[?(@.namespace=="monitoring")].pods.deny'
+        value: [ "deny-monitoring" ]
+
+    # Custom namespace from overlay
+    - equal:
+        path: 'result.policies.update-automountserviceaccounttokens.namespaces[?(@.namespace=="custom")].pods.allow'
+        value: [ "custom-pod" ]
+
+    - equal:
+        path: 'result.policies.update-automountserviceaccounttokens.namespaces[?(@.namespace=="custom")].pods.deny' 
+        value: [ "custom-deny" ]
