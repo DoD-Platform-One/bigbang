@@ -51,6 +51,50 @@ upstream:
       readOnly: true
     {{- end }}
     {{- end }}
+    # bbtests specific config for allowing auto-unseal and kms access
+    {{- if (dig "values" "bbtests" "enabled" false .Values.addons.vault) }}
+    ha:
+      raft:
+        config: |
+          ui = true
+
+          listener "tcp" {
+            tls_disable = false
+            address = "[::]:8200"
+            cluster_address = "[::]:8201"
+            tls_cert_file = "/vault/tls/tls.crt"
+            tls_key_file  = "/vault/tls/tls.key"
+            telemetry {
+              unauthenticated_metrics_access = true
+            }
+          }
+
+          storage "raft" {
+            path = "/vault/data"
+
+            retry_join {
+              leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
+              leader_client_cert_file = "/vault/tls/tls.crt"
+              leader_client_key_file = "/vault/tls/tls.key"
+              leader_tls_servername = "vault.dev.bigbang.mil"
+            }
+          }
+
+          seal "awskms" {
+            region     = "us-gov-west-1"
+            access_key = "{{ .Values.addons.vault.kms_access_key }}"
+            secret_key = "{{ .Values.addons.vault.kms_secret_key }}"
+            kms_key_id = "{{ .Values.addons.vault.kms_key_id }}"
+            endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
+          }
+
+          telemetry {
+            prometheus_retention_time = "24h"
+            disable_hostname = true
+          }
+          service_registration "kubernetes" {}
+    {{- end }}
+
 
   csi:
     image:

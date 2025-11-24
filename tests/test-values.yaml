@@ -2453,6 +2453,9 @@ addons:
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
+    kms_key_id: mrk-ff723da024254ea2b7f490c68fbc9b9b
+    kms_access_key: "" # gets added via CI VAULT_KMS_ACCESS_KEY and 01_deploy_bigbang.sh
+    kms_secret_key: "" # gets added via CI VAULT_KMS_SECRET_KEY and 01_deploy_bigbang.sh
     values:
       upstream:
         global:
@@ -2485,42 +2488,6 @@ addons:
             raft:
               enabled: true
               setNodeId: true
-              config: |
-                ui = true
-
-                listener "tcp" {
-                  tls_disable = false
-                  address = "[::]:8200"
-                  cluster_address = "[::]:8201"
-                  tls_cert_file = "/vault/tls/tls.crt"
-                  tls_key_file  = "/vault/tls/tls.key"
-                  telemetry {
-                    unauthenticated_metrics_access = true
-                  }
-                }
-
-                storage "raft" {
-                  path = "/vault/data"
-
-                  retry_join {
-                    leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
-                    leader_client_cert_file = "/vault/tls/tls.crt"
-                    leader_client_key_file = "/vault/tls/tls.key"
-                    leader_tls_servername = "vault.dev.bigbang.mil"
-                  }
-                }
-
-                seal "awskms" {
-                  region     = "us-gov-west-1"
-                  kms_key_id = "mrk-ff723da024254ea2b7f490c68fbc9b9b"
-                  endpoint   = "https://kms.us-gov-west-1.amazonaws.com"
-                }
-
-                telemetry {
-                  prometheus_retention_time = "24h"
-                  disable_hostname = true
-                }
-                service_registration "kubernetes" {}
 
       istio:
         hardened:
