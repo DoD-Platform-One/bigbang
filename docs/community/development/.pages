@@ -1,0 +1,20 @@
+nav:
+  - Package Integration: package-integration
+  - Overview: index.md
+  - AWS K3d Script: aws-k3d-script.md
+  - CI Workflow: ci-workflow.md
+  - Dev OCI Workflow: dev-oci-workflow.md
+  - Develop Package: develop-package.md
+  - Development Environment: development-environment.md
+  - K3d Keys for Testing: k3d-keys-for-testing.md
+  - Kubernetes Storage: k8s-storage.md
+  - MDO Partybus Pipelines: mdo-partybus-pipelines.md
+  - OSCAL Contributing: oscal-contributing.md
+  - Postrenderers: postrenderers.md
+  - Release Process: release-process.md
+  - Renovate Maintenance: renovate-maintenance.md
+  - Testing a Package Against Big Bang: test-package-against-bb.md
+  - Testing Repo1 CI: testing-repo1-ci.md
+  - Testing: testing.md
+  - Helm Unit Tests: helm-unittests.md
+  - Vendor Distribution Integration: vendor-distro-integration.md

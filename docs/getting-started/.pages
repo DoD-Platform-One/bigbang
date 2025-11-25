@@ -1,0 +1,6 @@
+nav:
+  - Overview: overview.md
+  - FAQ: faq.md
+  - First Deployment: first-deployment.md
+  - Prerequisites: prerequisites.md
+  - Quickstart: quick-start.md

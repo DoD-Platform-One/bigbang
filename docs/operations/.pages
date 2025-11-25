@@ -1,0 +1,7 @@
+nav:
+  - Maintenance: maintenance
+  - Troubleshooting: troubleshooting
+  - Overview: index.md
+  - Backup and Restore: backup-restore.md
+  - Monitoring: monitoring.md
+  - Upgrades: upgrades.md

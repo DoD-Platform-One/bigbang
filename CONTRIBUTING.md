@@ -61,7 +61,7 @@ helm upgrade -i bigbang chart -n bigbang --create-namespace -f myvalues.yaml
 ./scripts/sync.sh
 ```
 
-For more extensive development, use the [Development Guide](./docs/developer).
+For more extensive development, use the [Development Guide](./docs/community/development/).
 
 ## Testing Big Bang Development Changes
 
@@ -79,13 +79,13 @@ All routable endpoints BigBang deploys will use the TLD of `bigbang.dev` by defa
 
 ## Secrets & Certificates
 
-Follow instructions in the [Big Bang encryption guide](./docs/understanding-bigbang/concepts/encryption.md) for how to encrypt and decrypt secrets.
+Follow instructions in the [Big Bang encryption guide](./docs/concepts/encryption.md) for how to encrypt and decrypt secrets.
 
 ## Merge Requests Process
 
 The merge request process is provided as an overview of the pipeline stages required to get a commit merged.
 
-Follow instruction in [CI-Workflow](./docs/developer/ci-workflow.md) for specific details on the pipeline stages.
+Follow instruction in [CI-Workflow](./docs/community/development/ci-workflow.md) for specific details on the pipeline stages.
 
 ## Security Considerations
 

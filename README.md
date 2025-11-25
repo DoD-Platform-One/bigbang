@@ -4,25 +4,25 @@ Big Bang is a declarative, continuous delivery tool for deploying Department of 
 
 > If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
-[Click here to view the Big Bang Quick Start Guide](docs/guides/deployment-scenarios/quickstart.md)
+[Click here to view the Big Bang Quick Start Guide](docs/installation/environments/quick-start.md)
 
 ## Usage & Scope
 
 Big Bang's scope is to provide publicly available installation manifests for packages required to adhere to the DoD DevSecOps Reference Architecture and additional useful utilities. Big Bang packages are broken into three categories:
 
-- **Core:** [Core packages](./docs/understanding-bigbang/package-architecture/README.md#core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
+- **Core:** [Core packages](./docs/packages/index.md#core) are a group of capabilities required by the DoD DevSecOps Reference Architecture, that are supported directly by the Big Bang development team. The specific capabilities that are considered core currently are Service Mesh, Policy Enforcement, Logging, Monitoring, and Runtime Security.
 
-- **Add-ons:** [Addon packages](./docs/understanding-bigbang/package-architecture/README.md#addons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
+- **Add-ons:** [Addon packages](./docs/packages/index.md#supported-add-ons) are any packages/capabilities that the Big Bang development team directly supports that do not fall under the above core definition. These serve to extend the functionality/features of Big Bang.
 
 - **Community:** [Community packages](https://repo1.dso.mil/big-bang/product/community) are any packages that are maintained by the broader Big Bang community (e.g., users and/or vendors). These packages could be alternatives to core or add-on packages, or even entirely new packages to help extend usage/functionality of Big Bang.
 
-In order for an installation of Big Bang to be a valid installation/configuration, you must install/deploy a core package of each category. For additional details on categories and options, see [here](./docs/understanding-bigbang/package-architecture/README.md##Core).
+In order for an installation of Big Bang to be a valid installation/configuration, you must install/deploy a core package of each category. For additional details on categories and options, see [here](./docs/packages/index.md#core).
 
 Big Bang also builds tooling around the testing and validation of Big Bang packages. These tools are provided as-is, without support.
 
 Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, and/or monitoring are handled via Big Bang.  Additional packages (e.g., ArgoCD and GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
 
-Additional information can be found in the [Big Bang Docs](./docs/README.md).
+Additional information can be found in the [Big Bang Docs](./docs/index.md).
 
 ## Getting Started
 
@@ -36,7 +36,7 @@ There are three primary ways to contribute to Big Bang. They are listed in the f
 - [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/big-bang/bigbang/-/issues).
 - [Contribute to open-source projects under the Big Bang Technical Oversight Committee (BBTOC)](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/master/CONTRIBUTING.md).
 - [Submit new package proposals](https://repo1.dso.mil/big-bang/product/bbtoc/-/issues/new?issue%5Bmilestone_id%5D=).
-  - Please review the [package integration guide](./docs/developer/package-integration/README.md) if you are interested in submitting a new package.
+  - Please review the [package integration guide](./docs/community/development/package-integration/index.md) if you are interested in submitting a new package.
   - A shepherd will be assigned to the project to create a repo in the [Big Bang Community Packages](https://repo1.dso.mil/big-bang/product/community).
 
 Additional information can be found in the [contributing guide](./CONTRIBUTING.md).
@@ -85,8 +85,8 @@ Your feedback is important to us. Please complete the [Big Bang Feedback Form](h
 
 Several useful starting points in the Big Bang documentation are listed in the following:
 
-- [Developer Contribution Documentation](./docs/developer/README.md)
-- [Key Big Bang Concept Overviews](./docs/understanding-bigbang/README.md)
-- [User Guides for Big Bang](./docs/guides/README.md)
-- [Big Bang Prerequisites](./docs/prerequisites/README.md)
-- [Big Bang Example Configurations](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/assets/configs/example)
+- [Developer Contribution Documentation](./docs/community/development/index.md)
+- [Key Big Bang Concept Overviews](./docs/concepts/index.md)
+- [Tutorials for Big Bang](./docs/tutorials/)
+- [Big Bang Prerequisites](./docs/getting-started/prerequisites.md)
+- [Big Bang Example Configurations](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/reference/configs/example)

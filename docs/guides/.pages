@@ -1,6 +1,0 @@
-nav:
-  - Overview: README.md
-  - Using Big Bang: using-bigbang
-  - Deployment Scenarios: deployment-scenarios
-  - Backup and Restore: backup-and-restore
-  - Airgap: airgap-zarf
