@@ -1056,6 +1056,10 @@ policies:
           - logging-ek-es-master*
           - logging-ek-kb*
           - logging-ek-metrics*
+      - namespace: fluentbit
+        pods:
+          allow:
+          - fluentbit-script-test
       - namespace: minio-operator
         pods:
           allow:
