@@ -1,5 +1,0 @@
-nav:
-  - Base Config: base-config.md
-  - Sample Production Config: sample-prod-config.md
-  - Overall Configuration: configuration.md
-  - Post Renderers: postrenderers.md

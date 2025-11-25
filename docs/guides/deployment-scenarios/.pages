@@ -1,6 +1,0 @@
-nav:
-  - Quickstart: quickstart.md
-  - SSO Quickstart: sso-quickstart.md
-  - Extra Package Deployment: extra-package-deployment.md
-  - Multiple Ingress: multiple-ingress.md
-  - Appliance Mode: appliance-mode.md

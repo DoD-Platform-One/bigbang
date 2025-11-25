@@ -39,7 +39,7 @@ Once again - these will be *small* breaking changes to user values and potential
 
 With 2.0 we will be providing a way to deploy community/arbitrary packages as part of Big Bang and as a "first-class" experience. This will provide a way for users to effectively extend Big Bang, and still have the lifecycle of additional packages tied to the Big Bang deployment directly. Beyond this, there will also be a new `wrapper` provided that offers some features for integration of an application inside of Big Bang, strictly via Big Bang values. This includes things like configuring `VirtualService`, `ServiceMonitor`, and `NetworkPolicy` resources.
 
-For additional details on what this looks like from a user/values perspective, read the [extra package deployment guide](../docs/guides/deployment-scenarios/extra-package-deployment.md). This will be provided as a new feature, and not change any existing architecture/functionality.
+For additional details on what this looks like from a user/values perspective, read the [extra package deployment guide](../docs/installation/environments/extra-package-deployment.md). This will be provided as a new feature, and not change any existing architecture/functionality.
 
 ### Upgrade Process Improvements
 

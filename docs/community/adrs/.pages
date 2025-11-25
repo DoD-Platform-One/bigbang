@@ -1,0 +1,8 @@
+nav:
+  - 0001 Public ADRs: 0001-public-adrs.md
+  - 0002 Package Standardization: 0002-package-standardization.md
+  - 0003 Single Package Mapping: 0003-single-package-mapping.md
+  - 0004 Alloy Replacing Promtail: 0004-alloy-replacing-promtail.md
+  - 0005 Passthrough Chart: 0005-passthrough-chart.md
+  - 0006 Drift Detection: 0006-drift-detection.md
+  - 0007 Dev Defaults: 0007-dev-defaults.md

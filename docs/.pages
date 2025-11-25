@@ -1,8 +1,11 @@
 nav:
-  - Overview: README.md
-  - Packages: packages.md
-  - Developer: developer
-  - Guides: guides
-  - Prerequisites: prerequisites
-  - Understanding Big Bang: understanding-bigbang
-  - FAQ: FAQ.md
+  - Community: community
+  - Concepts: concepts
+  - Configuration: configuration
+  - Getting Started: getting-started
+  - Installation: installation
+  - Migration: migration
+  - Operations: operations
+  - Packages: packages
+  - Tutorials: tutorials
+  - Overview: index.md
