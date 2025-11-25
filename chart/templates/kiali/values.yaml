@@ -89,7 +89,7 @@ upstream:
         grafana:
           enabled: {{ .Values.grafana.enabled }}
           {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.grafana.values) }}
-          url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
+          external_url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
           {{- if .Values.grafana.enabled }}
           auth:
             {{- if (dig "admin" "existingSecret" "" .Values.grafana.values) }}
