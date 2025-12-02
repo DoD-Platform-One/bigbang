@@ -86,6 +86,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   ingressLabels:
     {{- if $istioEnabled }}
     {{- include "getGatewaySelector" (dict "pkg" .Values.tempo "root" .) | nindent 4 }}

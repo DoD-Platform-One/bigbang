@@ -101,6 +101,7 @@ networkPolicies:
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
 
 
 {{- end -}}

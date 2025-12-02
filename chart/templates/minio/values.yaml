@@ -35,6 +35,7 @@ monitoring:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   ingressLabels:
     {{- include "getGatewaySelector" (dict "pkg" .Values.addons.minio "root" .) | nindent 4 }}
   istioNamespaceSelector:
