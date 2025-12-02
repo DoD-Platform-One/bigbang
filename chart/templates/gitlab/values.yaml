@@ -45,6 +45,7 @@ networkPolicies:
   ingressLabels:
     {{- include "getGatewaySelector" (dict "pkg" .Values.addons.gitlab "root" .) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   istioNamespaceSelector:
     {{ include "istioNamespaceSelector" . | nindent 4 }}
 upstream:

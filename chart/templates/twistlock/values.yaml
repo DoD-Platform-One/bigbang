@@ -35,6 +35,7 @@ networkPolicies:
     {{- include "getGatewaySelector" (dict "pkg" .Values.twistlock "root" .) | nindent 4 }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
 
 istio:
   enabled: {{ $istioEnabled }}

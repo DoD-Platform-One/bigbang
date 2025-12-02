@@ -36,6 +36,7 @@ preUninstall:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
 violations:  # Try to keep this in alpha order to make it easier to find keys
 
   allowedDockerRegistries:
