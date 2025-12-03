@@ -1,0 +1,19 @@
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues (index .Values.addons "nxrm-ha") -}}
+{{- if $nexusValues.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nxrm-ha
+  labels:
+    istio-injection: {{ ternary "enabled" "disabled"
+      (and
+        $istioEnabled
+        (eq (dig "istio" "injection" "enabled" $nexusValues) "enabled")
+      )
+    }}
+    app.kubernetes.io/name: "nxrm-ha"
+    app.kubernetes.io/component: "developer-tools"
+    {{- include "commonLabels" . | nindent 4}}
+{{- end }}
