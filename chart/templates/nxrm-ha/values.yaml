@@ -1,0 +1,118 @@
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues (index .Values.addons "nxrm-ha") -}}
+{{- if $nexusValues.enabled  }}
+{{- include "values-secret" (dict "root" $ "package" $nexusValues "name" "nxrm-ha" "defaults" (include "bigbang.defaults.nxrm-ha" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.nxrm-ha" -}}
+{{- $nexusOldValues := default dict .Values.addons.nexus -}}
+{{- $nexusValues := mergeOverwrite $nexusOldValues (index .Values.addons "nxrm-ha") -}}
+{{- $domainName := default .Values.domain .Values.hostname }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+domain: {{ $domainName }}
+hostname: nexus
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ or
+      (dig "istio" "hardened" "enabled" false $nexusValues.values)
+      (dig "hardened" "enabled" false .Values.istiod.values)
+    }}
+  injection: {{ dig "istio" "injection" "enabled" $nexusValues }}
+  nexus:
+    gateways:
+      - {{ include "getGatewayName" (dict "gateway" $nexusValues.ingress.gateway "root" .)}}
+
+openshift: {{ .Values.openshift }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+job_image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+  
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+  serviceMonitor:
+    createMetricsUser: {{ .Values.monitoring.enabled }}
+  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target
+  {{- end }}
+
+networkPolicies:
+  istioNamespaceSelector:
+  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  enabled: {{ .Values.networkPolicies.enabled }}
+  ingressLabels:
+    {{- include "getGatewaySelector" (dict "pkg" $nexusValues "root" .) | nindent 4 }}
+
+realms:
+  - "NexusAuthenticatingRealm"
+
+# Upstream chart values
+upstream:
+  nameOverride: nxrm-ha
+  fullnameOverride: nxrm-ha
+  nexus:
+    imagePullSecrets:
+      - name: private-registry
+    {{- if $istioEnabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+    {{- if $nexusValues.license_key }}
+    properties:
+      override: true
+      data:
+        nexus.licenseFile: /nexus-data/sonatype-license.lic
+    {{- end }}
+  {{- if $nexusValues.license_key }}
+  secret:
+    license:
+      licenseSecret:
+        enabled: true
+        fileContentsBase64: {{ $nexusValues.license_key }}
+  {{- end }}
+
+{{- if $nexusValues.sso.enabled }}
+sso:
+  enabled: {{ $nexusValues.sso.enabled }}
+  idp_data:
+    {{- if $nexusValues.sso.idp_data.entityId }}
+    entityId: {{ $nexusValues.sso.idp_data.entityId }}
+    {{- else }}
+    entityId: "https://nexus.{{ $domainName }}/service/rest/v1/security/saml/metadata"
+    {{- end }}
+    usernameAttribute: "{{ default "username" $nexusValues.sso.idp_data.username }}"
+    firstNameAttribute: "{{ default "firstName" $nexusValues.sso.idp_data.firstName }}"
+    lastNameAttribute: "{{ default "lastName" $nexusValues.sso.idp_data.lastName }}"
+    emailAttribute: "{{ default "email" $nexusValues.sso.idp_data.email }}"
+    groupsAttribute: "{{ default "groups" $nexusValues.sso.idp_data.groups }}"
+    validateResponseSignature: "true"
+    validateAssertionSignature: "true"
+    idpMetadata: '{{ default (dig "saml" "metadata" "" .Values.sso) (dig "sso" "idp_data" "idpMetadata" "" $nexusValues) }}'
+
+  role:
+    {{- range $nexusValues.sso.role }}
+    - id: {{ .id | quote }}
+      name: {{ .name | quote }}
+      description: {{ .description | quote }}
+      privileges: 
+        {{- range .privileges }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+      roles: 
+        {{- range .roles }}
+        - {{ . | quote }}
+        {{- else }} []
+        {{- end }}
+    {{- end }}
+
+{{- end }}
+{{- end -}}

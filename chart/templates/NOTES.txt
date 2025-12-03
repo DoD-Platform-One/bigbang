@@ -215,6 +215,15 @@ DEPRECATION NOTICE:
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
 
+{{- if .Values.addons.nexusRepositoryManager.enabled }}
+DEPRECATION NOTICE:
+  .Values.addons.nexusRepositoryManager has been deprecated and will be removed in a future Big Bang release.
+  Please reconfigure your values overrides to use .Values.addons.nxrm-ha
+  For migration guidance, see:
+    - OSS Migration: https://repo1.dso.mil/big-bang/product/packages/nxrm-ha/-/blob/main/docs/migration-oss.md
+    - Pro Migration: https://repo1.dso.mil/big-bang/product/packages/nxrm-ha/-/blob/main/docs/migration-pro.md
+{{- end }}
+
 {{- with .Values }}
 {{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .grafana.sso.grafana.auth_url .grafana.sso.grafana.token_url .grafana.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
 DEPRECATION NOTICE:
