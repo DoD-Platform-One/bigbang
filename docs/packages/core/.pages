@@ -1,0 +1,13 @@
+nav:
+  - Alloy: alloy.md
+  - ElasticSearch Kibana: elasticsearch-kibana.md
+  - Fluent Bit: fluent-bit.md
+  - Istio: istio.md
+  - Kiali: kiali.md
+  - Kyverno: kyverno.md
+  - Loki: loki.md
+  - Monitoring: monitoring.md
+  - Neuvector: neuvector.md
+  - OPA Gatekeeper: opa-gatekeeper.md
+  - Tempo: tempo.md
+  - Twistlock: twistlock.md

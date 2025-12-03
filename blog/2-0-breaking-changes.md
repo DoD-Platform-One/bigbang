@@ -49,7 +49,7 @@ As mentioned in the previous post - Big Bang will deploy by default with a new o
 - Gatekeeper: Set `gatekeeper.enabled` and `clusterAuditor.enabled` to true; set `kyverno.enabled`, `kyvernoReporter.enabled`, and `kyvernoPolicies.enabled` to false
 - Jaeger: Set `jaeger.enabled` to true; set `tempo.enabled` to false
 
-Provided you make the above adjustments you will be able to deploy with the same set of packages you were using in 1.x. Example values for each of the above are provided in a reference file [here](../docs/assets/configs/example/core-packages-1-x.yaml).
+Provided you make the above adjustments you will be able to deploy with the same set of packages you were using in 1.x. Example values for each of the above are provided in a reference file [here](../docs/reference/configs/example/core-packages-1-x.yaml).
 
 ## HelmRelease / GitRepository Name Changes
 

@@ -1,0 +1,8 @@
+nav:
+  - Addons: addons
+  - Community: community
+  - Core: core
+  - Package Development: package-development
+  - Overview: index.md
+  - Categorization: categorization.md
+  - Reference Package: ref-package.md

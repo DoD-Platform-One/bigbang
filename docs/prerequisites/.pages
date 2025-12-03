@@ -1,7 +1,0 @@
-nav:
-  - Overview: README.md
-  - Install Flux: install-flux.md
-  - OS Preconfiguration: os-preconfiguration.md
-  - Kubernetes Preconfiguration: kubernetes-preconfiguration.md
-  - Default Storageclass: default-storageclass.md
-  - Minimum Hardware Requirements: minimum-hardware-requirements.md

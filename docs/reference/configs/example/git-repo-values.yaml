@@ -1,0 +1,10 @@
+packages:
+  podinfo:
+    enabled: true
+    sourceType: "git"
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
+      path: chart
+      tag: null
+      # tag: 1.2.3
+      branch: dev

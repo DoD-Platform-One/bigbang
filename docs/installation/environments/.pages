@@ -1,0 +1,8 @@
+nav:
+  - Airgap Zarf: airgap-zarf.md
+  - Airgap: airgap.md
+  - Appliance Mode: appliance-mode.md
+  - Extra Package Deployment: extra-package-deployment.md
+  - Multiple Ingress: multiple-ingress.md
+  - Quickstart: quick-start.md
+  - SSO Quickstart: sso-quickstart.md
