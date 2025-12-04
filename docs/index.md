@@ -56,7 +56,7 @@ Big Bang is an umbrella Helm chart that packages together a collection of open-s
 
 ### Getting Started
 Start here if you're new to Big Bang:
-- **[Overview](getting-started/overview.md)**: Introduction to Big Bang concepts
+- **[Overview](getting-started/index.md)**: Introduction to Big Bang concepts
 - **[Prerequisites](getting-started/prerequisites.md)**: Cluster and environment requirements
 - **[Quick Start](getting-started/quick-start.md)**: Deploy Big Bang in minutes
 - **[First Deployment](getting-started/first-deployment.md)**: Detailed deployment walkthrough
@@ -123,7 +123,7 @@ Big Bang is an open-source project welcoming contributions:
 ## What's Next?
 
 ### New Users
-1. Start with [Getting Started Overview](getting-started/overview.md)
+1. Start with [Getting Started Overview](getting-started/index.md)
 2. Review [Prerequisites](getting-started/prerequisites.md)
 3. Follow the [Quick Start Guide](getting-started/quick-start.md)
 4. Explore [Core Concepts](concepts/)
@@ -148,4 +148,4 @@ Big Bang is an open-source project welcoming contributions:
 
 ---
 
-**Ready to get started?** Begin with the [Getting Started Overview](getting-started/overview.md) or jump straight to the [Quick Start Guide](getting-started/quick-start.md) to deploy Big Bang in your environment.
+**Ready to get started?** Begin with the [Getting Started Overview](getting-started/index.md) or jump straight to the [Quick Start Guide](getting-started/quick-start.md) to deploy Big Bang in your environment.

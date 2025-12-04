@@ -1,2 +1,3 @@
 nav:
+  - Overview: index.md
   - Migrating Istio For BB 3.0: migrating-istio-for-bb3.0.md

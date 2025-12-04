@@ -64,7 +64,7 @@ The diagram provided in this section shows a typical deployment of Big Bang into
 ### Configuration
 
 1. The user must [setup an encryption key pair](./encryption.md) for SOPS and store the private key securely (e.g., KMS). This should **NOT** be stored in Git.
-1. The user should then [configure Big Bang](../configuration/configuration.md) values and secrets for the targeted Kubernetes cluster.
+1. The user should then [configure Big Bang](../configuration/index.md) values and secrets for the targeted Kubernetes cluster.
 1. All secrets should be encrypted with SOPS to protect them.
 1. Once all of the configuration has been completed, it must be pushed to a Git repository.
 

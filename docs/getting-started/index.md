@@ -1,4 +1,4 @@
-# Big Bang Documentation README
+# Getting Started with Big Bang
 
 ## What is Big Bang?
 
