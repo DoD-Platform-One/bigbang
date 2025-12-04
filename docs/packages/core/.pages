@@ -1,4 +1,5 @@
 nav:
+  - Overview: index.md
   - Alloy: alloy.md
   - ElasticSearch Kibana: elasticsearch-kibana.md
   - Fluent Bit: fluent-bit.md

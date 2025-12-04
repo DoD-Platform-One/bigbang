@@ -1,3 +1,4 @@
 nav:
+  - Overview: index.md
   - ADRs: adrs
   - Development: development

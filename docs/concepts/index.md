@@ -1,11 +1,10 @@
 # Useful Background Contextual Information
 
-Start with the [Getting Started Overview](../getting-started/overview.md), which includes the following sections:
+Start with the [Getting Started Overview](../getting-started/index.md), which includes the following sections:
 
-* [What is Big Bang?](../getting-started/overview.md#what-is-big-bang)
-* [What *isn't* Big Bang?](../getting-started/overview.md#what-isnt-big-bang)
-* [Benefits of Big Bang](../getting-started/overview.md#what-are-the-benefits-of-using-big-bang)
-
+* [What is Big Bang?](../getting-started/index.md#what-is-big-bang)
+* [What *isn't* Big Bang?](../getting-started/index.md#what-isnt-big-bang)
+* [Benefits of Big Bang](../getting-started/index.md#what-are-the-benefits-of-using-big-bang)
 ## Acronyms
 
 * **CSP**: Cloud Service Provider

@@ -1,4 +1,5 @@
 nav:
+  - Overview: index.md
   - Community: community
   - Concepts: concepts
   - Configuration: configuration
@@ -8,4 +9,3 @@ nav:
   - Operations: operations
   - Packages: packages
   - Tutorials: tutorials
-  - Overview: index.md
