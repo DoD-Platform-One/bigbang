@@ -1,4 +1,5 @@
 nav:
+  - Overview: index.md
   - 0001 Public ADRs: 0001-public-adrs.md
   - 0002 Package Standardization: 0002-package-standardization.md
   - 0003 Single Package Mapping: 0003-single-package-mapping.md
@@ -6,3 +7,4 @@ nav:
   - 0005 Passthrough Chart: 0005-passthrough-chart.md
   - 0006 Drift Detection: 0006-drift-detection.md
   - 0007 Dev Defaults: 0007-dev-defaults.md
+  - 0008 Generate Images Metadata from Explicit Container Image References: 0008-generate-images-metadata-from-explicit-container-image-references.md

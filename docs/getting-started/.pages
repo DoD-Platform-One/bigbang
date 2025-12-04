@@ -1,5 +1,5 @@
 nav:
-  - Overview: overview.md
+  - Overview: index.md
   - FAQ: faq.md
   - First Deployment: first-deployment.md
   - Prerequisites: prerequisites.md

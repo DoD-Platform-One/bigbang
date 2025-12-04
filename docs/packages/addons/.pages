@@ -1,4 +1,5 @@
 nav:
+  - Overview: index.md
   - Anchore: anchore.md
   - Argo CD: argocd.md
   - AuthService: authservice.md

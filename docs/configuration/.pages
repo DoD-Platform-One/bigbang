@@ -1,5 +1,5 @@
 nav:
-  - Overview: configuration.md
+  - Overview: index.md
   - Base Configuration: base-config.md
   - Default Credentials: default-credentials.md
   - Network Policies: network-policies.md

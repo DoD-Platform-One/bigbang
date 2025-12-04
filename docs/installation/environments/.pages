@@ -1,4 +1,5 @@
 nav:
+  - Overview: index.md
   - Airgap Zarf: airgap-zarf.md
   - Airgap: airgap.md
   - Appliance Mode: appliance-mode.md
