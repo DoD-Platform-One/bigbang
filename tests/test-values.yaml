@@ -2487,10 +2487,20 @@ addons:
                 https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/51cd6066cc4585fede3383ce4905425fc0a83d99/docs/test-data/quarkus.properties \
                 -o /opt/keycloak/conf/quarkus.properties
 
-              # Download the test realm config
+              # Download the test realm config and remove the Conditional OTP execution
               curl -fsSL \
                 https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/51cd6066cc4585fede3383ce4905425fc0a83d99/docs/test-data/realm.json \
-                -o /opt/keycloak/data/import/realm.json
+                | jq '
+                .authenticationFlows |= map(
+                  if .id == "cdf1be21-4140-4652-9d68-3b60742cc8ad" then
+                    .authenticationExecutions |= map(
+                      select(.flowAlias != "Conditional OTP")
+                    )
+                  else
+                    .
+                  end
+                )
+              ' > /opt/keycloak/data/import/realm.json
 
               ls -l /opt/keycloak/{conf,data/import}
 
