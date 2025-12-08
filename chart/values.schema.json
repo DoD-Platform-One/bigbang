@@ -1157,18 +1157,6 @@
             }
           }
         },
-        "nxrm-ha": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ],
-          "properties": {
-            "istio": {
-              "$ref": "#/$defs/istio"
-            }
-          }
-        },
         "sonarqube": {
           "allOf": [
             {
