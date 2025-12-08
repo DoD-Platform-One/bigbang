@@ -1,6 +1,4 @@
-# Nexus Repository Manager
-
-> **DEPRECATION NOTICE**: The `nexus-repository-manager` package is deprecated and will be removed in a future Big Bang release. Please migrate to the new [`nxrm-ha`](./nxrm-ha.md) package. See the [Migration Guides](#migration-to-nxrm-ha) section below for details.
+# Nexus
 
 ## Overview
 
@@ -99,34 +97,3 @@ Nexus Repository Manager uses Repository Health Check (RHC) for health checking.
 
 - A summary of components with security vulnerabilities categorized by severity.
 - A count of license warnings per component categorized by severity.
-
-## Migration to NXRM-HA
-
-The legacy `nexus-repository-manager` chart is being replaced by the new `nxrm-ha` chart, which provides:
-
-- **High Availability Support**: Deploy Nexus Repository Manager Pro in a highly available, multi-node configuration
-- **Production-Ready Architecture**: Built-in support for external databases (PostgreSQL, AWS RDS) and object storage (S3, Azure Blob)
-- **Active Maintenance**: Official Sonatype-supported Helm chart with direct updates
-- **Improved Configuration**: Upstream passthrough pattern for cleaner values structure
-
-### Migration Guides
-
-Choose the appropriate migration guide based on your deployment:
-
-| Guide | Use Case | Estimated Downtime |
-|-------|----------|-------------------|
-| [OSS Migration Guide](https://repo1.dso.mil/big-bang/product/packages/nxrm-ha/-/blob/main/docs/migration-oss.md) | OSS/Development with embedded H2 database | 30-60 minutes |
-| [Pro Migration Guide](https://repo1.dso.mil/big-bang/product/packages/nxrm-ha/-/blob/main/docs/migration-pro.md) | Pro/Production with external PostgreSQL | 30-45 minutes |
-
-### Key Differences
-
-| Feature | Legacy Chart | NXRM-HA |
-|---------|-------------|---------|
-| Values Key | `addons.nexusRepositoryManager` | `addons.nxrm-ha` |
-| Workload Type | Deployment | StatefulSet |
-| Database | H2 (embedded) or external | PostgreSQL required |
-| Values Pattern | Direct values | Upstream passthrough (`upstream:` key) |
-| High Availability | Not supported | Supported (Pro license required) |
-| Namespace | nexus-repository-manager | nxrm-ha |
-
-For detailed migration instructions and values mapping, see the [NXRM-HA General Documentation](https://repo1.dso.mil/big-bang/product/packages/nxrm-ha/-/blob/main/docs/general.md).
