@@ -105,7 +105,7 @@ networkPolicies:
       alertmanager:9093:
         from:
           k8s:
-            authservice/haproxy: {{ dig "haproxy" "enabled" false .Values.packages }}
+            authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             logging/logging-loki: {{ .Values.loki.enabled }}
           definition:
@@ -122,7 +122,7 @@ networkPolicies:
             gateway: {{ .Values.istioGateway.enabled }}
           k8s:
             tempo/tempo: {{ .Values.tempo.enabled }}
-            authservice/haproxy: {{ dig "haproxy" "enabled" false .Values.packages }}
+            authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
             kiali/kiali: {{ .Values.kiali.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             logging/logging-loki: {{ .Values.loki.enabled }}
