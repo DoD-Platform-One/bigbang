@@ -1721,35 +1721,6 @@ addons:
     # -- Post Renderers.  See docs/postrenders.md
     postRenderers: []
 
-  # ----------------------------------------------------------------------------------------------------------------------
-  # Deployment of HAProxy is automatically toggled depending on Monitoring SSO and Monitoring Istio Injection
-  #
-  haproxy:
-    # -- Choose source type of "git" or "helmRepo"
-    sourceType: "git"
-
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
-      path: "./chart"
-      tag: "1.19.3-bb.10"
-    helmRepo:
-      repoName: "registry1"
-      chartName: "haproxy"
-      tag: "1.19.3-bb.10"
-
-    # -- Flux reconciliation overrides specifically for the HAProxy Package
-    flux: {}
-
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
-    ingress:
-      gateway: ""
-
-    # -- Values to passthrough to the haproxy chart: https://repo1.dso.mil/big-bang/product/packages/haproxy.git
-    values: {}
-
-    # -- Post Renderers.  See docs/postrenders.md
-    postRenderers: []
-
   anchoreEnterprise:
     # -- Toggle deployment of Anchore.
     enabled: false

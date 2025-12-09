@@ -158,11 +158,6 @@ addons:
     helmRepo:
       cosignVerify: false
 
-  haproxy:
-    sourceType: "helmRepo"
-    helmRepo:
-      cosignVerify: false
-
   anchoreEnterprise:
     sourceType: "helmRepo"
     helmRepo:

@@ -1181,28 +1181,6 @@
             }
           }
         },
-        "haproxy": {
-          "type": "object",
-          "required": [
-            "git",
-            "flux",
-            "values"
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/git"
-            },
-            "flux": {
-              "ref": "#/$defs/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/values"
-            },
-            "istio": {
-              "$ref": "#/$defs/istio"
-            }
-          }
-        },
         "anchoreEnterprise": {
           "allOf": [
             {

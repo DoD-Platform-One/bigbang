@@ -73,8 +73,6 @@ nexusRepositoryManager:
   repoName: "nexus"
   hrName: "nexus-repository-manager"
   filePath: "nexus-repository-manager"
-haproxy:
-  hrName: "haproxy-sso"
 anchoreEnterprise:
   repoName: "anchore-enterprise"
   hrName: "anchore-enterprise"

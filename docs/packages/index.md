@@ -94,7 +94,6 @@
 | [Thanos](https://repo1.dso.mil/big-bang/product/packages/thanos) |  ![Thanos Build](https://repo1.dso.mil/big-bang/product/packages/thanos/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) |
 | [Mimir](https://repo1.dso.mil/big-bang/product/packages/mimir) |  ![Mimir Build](https://repo1.dso.mil/big-bang/product/packages/mimir/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/5378) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/mimir/-/blob/main/chart/values.yaml?ref_type=heads#L213) |
 | [bbctl](https://repo1.dso.mil/big-bang/product/packages/bbctl) |  ![bbctl Build](https://repo1.dso.mil/big-bang/product/packages/bbctl/badges/main/pipeline.svg) | No | No | No | N/A |
-| [haproxy](https://repo1.dso.mil/big-bang/product/packages/haproxy) |  ![haproxy Build](https://repo1.dso.mil/big-bang/product/packages/haproxy/badges/main/pipeline.svg) | No | No | No | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/haproxy/-/blob/main/chart/values.yaml?ref_type=heads#L569) |
 
 ## Community
 
