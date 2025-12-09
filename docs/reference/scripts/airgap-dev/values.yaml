@@ -98,10 +98,6 @@ addons:
     enabled: false
     git:
       repo: ssh://git@host.k3d.internal/home/git/repos/minio
-  haproxy:
-    enabled: false
-    git:
-      repo: ssh://git@host.k3d.internal/home/git/repos/haproxy
   mattermostOperator:
     enabled: false
     git:
