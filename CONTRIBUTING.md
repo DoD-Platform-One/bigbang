@@ -24,15 +24,15 @@ Big Bang is designed in such a way as to be as easily deployed locally as it is 
 
 ## Iron Bank Images
 
-Per the [charter](https://repo1.dso.mil/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/).  In order to pull these images, ImagePullSecrets must be provided to Big Bang. To obtain access to these images, follow the guides provided in this document. These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
+Per the [charter](https://repo1.dso.mil/big-bang/charter), all Big Bang packages will leverage container images from [IronBank](https://ironbank.dso.mil/). In order to pull these images, ImagePullSecrets must be provided to Big Bang. To obtain access to these images, follow the guides provided in this document. These steps should NOT be used for production since the API keys for a user are only valid when the user is logged into [Registry1](https://registry1.dso.mil)
 
-1) Register for a free Iron Bank account [Here](https://sso-info.il2.dso.mil/new_account.html).
-1) Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your *Username* and then *User Profile* to get access to your *CLI secret*/API keys.
-1) When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token.
+1. Register for a free Iron Bank account [Here](https://login.dso.mil).
+1. Log into the [Iron Bank Registry](https://registry1.dso.mil), in the top right click your _Username_ and then _User Profile_ to get access to your _CLI secret_/API keys.
+1. When installing BigBang, set the Helm Values `registryCredentials.username` and `registryCredentials.password` to match your Registry1 username and API token.
 
 ## Local Kubernetes cluster
 
-Follow the steps below to get a local Kubernetes cluster for Big Bang  using [k3d](https://k3d.io/).
+Follow the steps below to get a local Kubernetes cluster for Big Bang using [k3d](https://k3d.io/).
 
 ```bash
 # Create a local k3d cluster with the appropriate port forwards (tested on version 5.4.1).
@@ -94,7 +94,7 @@ Follow instruction in [CI-Workflow](./docs/community/development/ci-workflow.md)
 
 - Big Bang does not recommend using internal databases for production deployments. Please look into having external databases, each application will have guides to deploy production system.
 
-- For questions on CVEs and remediation, email Andrew Vu Big Bang Cyber Lead (andrew.vu.9@us.af.mil) or message on MatterMost IL4 (andrew.vu.9) for more information.
+- For questions on CVEs and remediation, email Andrew Vu Big Bang Cyber Lead (<andrew.vu.9@us.af.mil>) or message on MatterMost IL4 (andrew.vu.9) for more information.
 
 # Community Contributions to DoD-Platform-One via Github
 
@@ -106,10 +106,10 @@ Follow instruction in [CI-Workflow](./docs/community/development/ci-workflow.md)
 
 ### Technical Requirements
 
-* Pipelines which must pass will run on runners from `repo1.dso.mil` and a bot will comment the status and information from the pipeline.
-* Any change to a Big Bang package chart requires a version bump following [semver](https://semver.org/) principles. See [Documentation Changes](#documentation-changes) and [Versioning](#versioning) below
-* Big Bang Package Issues which need to be included in the Big Bang Umbrella chart are not complete when the package PR is merged so please do not close issues. A new tag will automatically get created on `repo1.dso.mil` along with an MR into the Big Bang Umbrella as part of the CI process. This repo1 MR is reviewed the Big Bang Product team to merge on the Gitlab side, upon which the issue will be closed.
-* Changes to the Big Bang Umbrella get released separately according to our Release Schedule outlined in the [README](./README.md#release-schedule).
+- Pipelines which must pass will run on runners from `repo1.dso.mil` and a bot will comment the status and information from the pipeline.
+- Any change to a Big Bang package chart requires a version bump following [semver](https://semver.org/) principles. See [Documentation Changes](#documentation-changes) and [Versioning](#versioning) below
+- Big Bang Package Issues which need to be included in the Big Bang Umbrella chart are not complete when the package PR is merged so please do not close issues. A new tag will automatically get created on `repo1.dso.mil` along with an MR into the Big Bang Umbrella as part of the CI process. This repo1 MR is reviewed the Big Bang Product team to merge on the Gitlab side, upon which the issue will be closed.
+- Changes to the Big Bang Umbrella get released separately according to our Release Schedule outlined in the [README](./README.md#release-schedule).
 
 Once changes have been merged, all subsequent automation will run on `repo1.dso.mil` with changes getting published back to Github.
 

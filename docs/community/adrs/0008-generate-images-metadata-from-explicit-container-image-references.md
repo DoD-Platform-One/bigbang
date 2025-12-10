@@ -19,7 +19,7 @@ package being deployed.
 For example, when deploying ArgoCD, the `images.txt` file would also contain image references for Istio, Kyverno, and
 Flux CD.
 
-See [the blog post](../../blog/images-v2-metadata-files.md) about these changes.
+See [the blog post](../../../blog/images-v2-metadata-files.md) about these changes.
 
 ## Decision
 
@@ -27,12 +27,11 @@ Switch from an implicit approach (using cluster scraping) to an explicit approac
 locations that can be easily parsed to come up with an authoritative and accurate list of only the images needed.
 
 | Source / Location                                                          | Key Path                       | Scope                 | Example                                                                                                                |
-|----------------------------------------------------------------------------|--------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------|
+| -------------------------------------------------------------------------- | ------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Package's `chart/Chart.yaml`                                               | `annotations."helm.sh/images"` | `package`, `umbrella` | [Example](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/8.3.4-bb.0/chart/Chart.yaml?ref_type=tags#L42) |
 | Subcharts listed in `chart/Chart.yaml` that contain their own `Chart.yaml` | `annotations."helm.sh/images"` | `package`, `umbrella` |                                                                                                                        |
 | Flux kustomization in `base/flux/kustomization.yaml`                       | `images`                       | `umbrella`            | [Example](https://repo1.dso.mil/big-bang/bigbang/-/blob/3.6.0/base/flux/kustomization.yaml?ref_type=tags#L6)           |
 | Test images in `tests/images.txt`                                          | N/A                            | `umbrella`            | [Example](https://repo1.dso.mil/big-bang/bigbang/-/blob/3.6.0/tests/images.txt?ref_type=tags)                          |
-
 
 ## Consequences
 
@@ -51,14 +50,14 @@ locations that can be easily parsed to come up with an authoritative and accurat
 And, because the `clean install all-packages` job failed regularly, this pipeline would typically need to be run 3–5
 times for every release, bringing the total pipeline time (not including fixing) to approximately 4:39:56 on average.
 
-#### [New Release Pipeline Run for `3.6.0`](https://repo1.dso.mil/big-bang/bigbang/-/pipelines/4495018) (0:19:11):
+#### [New Release Pipeline Run for `3.6.0`](https://repo1.dso.mil/big-bang/bigbang/-/pipelines/4495018) (0:19:11)
 
 ![New Pipeline](https://repo1.dso.mil/big-bang/product/bb-static/-/raw/main/blog/assets/imgs/images-v2-metadata-files/new-pipeline.png)
 
 #### Time Saved
 
 | Pipeline                  | Time            |            |
-|---------------------------|-----------------|------------|
+| ------------------------- | --------------- | ---------- |
 | Old (avg across 3-5 runs) | `4:39:56`       | ██████████ |
 | New                       | `0:19:11`       | █          |
 | **Savings**               | `4:20:45` (93%) |            |
@@ -72,7 +71,7 @@ The structure is self-explanatory, but notice that the top level item is a
 and has the following fields:
 
 | Variable            | Type                |
-|---------------------|---------------------|
+| ------------------- | ------------------- |
 | `name`              | `str`               |
 | `version`           | `str`               |
 | `images`            | `list[str]`         |

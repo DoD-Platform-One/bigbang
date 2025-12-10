@@ -1,0 +1,43 @@
+# Refer to https://github.com/tcort/markdown-link-check?tab=readme-ov-file#config-file-format for details
+# projectBaseUrl: ${workspaceFolder}
+ignorePatterns:
+  # ignore specific links in the change log
+  - pattern: "https://docs.anchore.com/current/docs/overview/requirements/"
+  # ignore pdf links that are known to be slow or unreliable
+  - pattern: "https://dodcio.defense.gov/Portals/0/Documents/Library/DoD%20Enterprise%20DevSecOps%20Reference%20Design%20-%20CNCF%20Kubernetes%20w-DD1910_cleared_20211022.pdf"
+  # ignore medium links that are known to be unreliable
+  - pattern: "https://medium.com/@bramblexu/install-gnu-sed-on-mac-os-and-set-it-as-default-7c17ef1b8f64"
+  - pattern: "https://medium.com/the-telegraph-engineering/binding-gcp-accounts-to-gke-service-accounts-with-terraform-dfca4e81d2a0"
+  # ignore sdelements links that are known to be unreliable
+  - pattern: "https://www.securitycompass.com/sdelements/"
+  # ignore well-known big-bang issue links
+  - pattern: "https://repo1.dso.mil/big-bang/bigbang/-/issues/1204"
+  # ignore well-known anchor references
+  - pattern: "#package-configuration"
+  - pattern: "#Troubleshooting"
+  - pattern: "#extending-cypress-tests"
+# replacementPatterns:
+#   - pattern: ^.attachments
+#     replacement: file://some/conventional/folder/.attachments
+#   - pattern: ^/
+#     replacement: '{{BASEURL}}/'
+#   - pattern: '%20'
+#     replacement: '-'
+#     global: true
+#   - pattern: images/(?<filename>.*)
+#     replacement: assets/$<filename>
+# httpHeaders:
+#   - urls:
+#       - https://example.com
+#     headers:
+#       Authorization: Basic Zm9vOmJhcg==
+#       Foo: Bar
+# timeout: 20s
+# retryOn429: true
+# retryCount: 2
+# fallbackRetryDelay: 60s
+# aliveStatusCodes:
+#   - 200
+#   - 206
+#   - 429
+

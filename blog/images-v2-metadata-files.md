@@ -6,7 +6,7 @@
 2. New `images-v2-*` artifacts show the dependency graph so you can pre-pull or allowlist exactly what you need—no Istio/Kyverno/Flux noise unless they are actual dependencies.
 3. `images.txt` is now a copy of `images-v2-with-dependencies.txt` (which uses the explicit declarations)
 4. The `smoke tests` stage and its jobs (`clean install all-packages` and `clean install oci all-packages`) have been eliminated from the Big Bang release pipeline since each package is tested individually as part of the individual package pipeline.
-5. The Big Bang release pipeline now [completes in around 20 minutes rather than multiple hours](../docs/adrs/0008-generate-images-metadata-from-explicit-container-image-references.md#comparing-old-and-new-pipelines), saving the release engineers considerable time on every release.
+5. The Big Bang release pipeline now [completes in around 20 minutes rather than multiple hours](../docs/community/adrs/0008-generate-images-metadata-from-explicit-container-image-references.md#comparing-old-and-new-pipelines), saving the release engineers considerable time on every release.
 
 ## Terms / Glossary
 
@@ -42,7 +42,7 @@ This was an implicit approach and led to an imprecise list of images.
 The new methodology uses an explicit approach where all images are defined purposefully in the following locations:
 
 | Source / Location                                                          | Key Path                       | Scope                 | Example                                                                                                                |
-|----------------------------------------------------------------------------|--------------------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------|
+| -------------------------------------------------------------------------- | ------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Package's `chart/Chart.yaml`                                               | `annotations."helm.sh/images"` | `package`, `umbrella` | [Example](https://repo1.dso.mil/big-bang/product/packages/argocd/-/blob/8.3.4-bb.0/chart/Chart.yaml?ref_type=tags#L42) |
 | Subcharts listed in `chart/Chart.yaml` that contain their own `Chart.yaml` | `annotations."helm.sh/images"` | `package`, `umbrella` |                                                                                                                        |
 | Flux kustomization in `base/flux/kustomization.yaml`                       | `images`                       | `umbrella`            | [Example](https://repo1.dso.mil/big-bang/bigbang/-/blob/3.6.0/base/flux/kustomization.yaml?ref_type=tags#L6)           |
@@ -66,7 +66,7 @@ They are available in both the package repos and the umbrella release level.
 
 See [an example of the `images-v2-dependencies.yaml` from the Big Bang 3.6.0 release](https://umbrella-bigbang-releases.s3-us-gov-west-1.amazonaws.com/umbrella/3.6.0/images-v2-dependencies.yaml).
 
-For more technical details, please review [ADR 8: Generate Images Metadata from Explicit References](../docs/adrs/0008-generate-images-metadata-from-explicit-container-image-references.md)
+For more technical details, please review [ADR 8: Generate Images Metadata from Explicit References](../docs/community/adrs/0008-generate-images-metadata-from-explicit-container-image-references.md)
 
 ## Where does `images.txt` come from now?
 

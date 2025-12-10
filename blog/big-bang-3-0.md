@@ -18,7 +18,7 @@ Keeping with the theme of deprecated packages, we’re also replacing our primar
 
 Much of this transition is already complete. Alloy-logging features were introduced in Big Bang 2.51, and the Alloy chart was moved to Core in 2.53. Starting in 3.0, Alloy will be enabled by default and Promtail disabled. Promtail will be fully removed in release 3.5.0, after which it will become a Community-supported package.
 
-Users with custom Promtail configurations will need to convert and test their setups with Alloy before release 3.5.0. To assist with this transition, please refer to [Grafana's migration guide](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/) for detailed instructions, and the [Big Bang ADR](https://docs-bigbang.dso.mil/latest/docs/adrs/0004-alloy-replacing-promtail/?h=4/) for general information about this change.  
+Users with custom Promtail configurations will need to convert and test their setups with Alloy before release 3.5.0. To assist with this transition, please refer to [Grafana's migration guide](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/) for detailed instructions, and the [Big Bang ADR](https://docs-bigbang.dso.mil/latest/docs/adrs/0004-alloy-replacing-promtail/?h=4/) for general information about this change.
 
 ### 🛡️ Flux Drift Detection By Default
 
@@ -30,7 +30,7 @@ While drift detection will be enabled by default for most existing HelmReleases,
 
 ### 💡 The Universe Expands: Headlamp, Backstage, and Compliance Dashboard
 
-To further enhance Big Bang’s value as a comprehensive platform for building, deploying, and managing secure and compliant Kubernetes applications, our 3.0 release broadens its capabilities with the addition of three new packages to the umbrella chart:  
+To further enhance Big Bang’s value as a comprehensive platform for building, deploying, and managing secure and compliant Kubernetes applications, our 3.0 release broadens its capabilities with the addition of three new packages to the umbrella chart:
 
 - **[Headlamp](https://repo1.dso.mil/big-bang/product/packages/headlamp)** – A user-friendly Kubernetes UI, specifically recommended by the Flux maintainers for monitoring Flux Custom Resource state without requiring `kubectl` or similar tools.
   - [Big Bang Docs: Headlamp](https://docs-bigbang.dso.mil/latest/packages/headlamp/)
@@ -64,9 +64,9 @@ Big Bang 3.0 accelerates onboarding with revamped customer templates and a strea
 
 We're excited to bring you Big Bang 3.0 and hope you find these improvements valuable. If you have any questions or need assistance, our team is here to help!
 
-- [Register to attend our next briefing](https://www.zoomgov.com/meeting/register/Q-2KHrmZStaCSsdafKsr2w#/registration), scheduled for Thursday 5 June 2025 at 1300 CT
+- [Register to attend our next briefing](https://repo1.dso.mil/big-bang/product/bbtoc#meetups), scheduled for Thursday 5 June 2025 at 1300 CT
 - Join the Big Bang Distro List for the latest Big Bang BBTOC, Immersion Series, and e-mail updates
-  - *send a request to `aflcmc.hncx.platformonebigbang@us.af.mil` to be added to the distro*
+  - _send a request to `aflcmc.hncx.platformonebigbang@us.af.mil` to be added to the distro_
 - [Join the Big Bang Slack Channel](https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/zt-38q4ytzv4-P1uxIpm9pzooo_m06OOmzg)
 
-We also extend a sincere thank you to everyone who participated in the Istio beta program, and to all our community members submitting contributions, bug reports, and feature requests. Your feedback is invaluable to the work that we do. So, as always, *thank you for helping us build a better Big Bang!* 🚀
+We also extend a sincere thank you to everyone who participated in the Istio beta program, and to all our community members submitting contributions, bug reports, and feature requests. Your feedback is invaluable to the work that we do. So, as always, _thank you for helping us build a better Big Bang!_ 🚀
