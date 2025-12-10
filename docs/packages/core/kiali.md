@@ -54,7 +54,7 @@ kiali:
         - kiali.{{ .Values.hostname }}
 ```
 
-Kiali is also pre-configured with knowledge of the BB Istio stack for monitoring purposes. Kiali will monitor the status of all ingressGateways and istiod and display a status "bubble" when a component is unreachable or down.
+Kiali is also pre-configured with knowledge of the BB Istio stack for monitoring purposes. Kiali will monitor the status of all gateways and istiod and display a status "bubble" when a component is unreachable or down.
 
 ### External Service Configuration
 

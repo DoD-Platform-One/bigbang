@@ -61,16 +61,6 @@ spec:
         protect: keycloak
 ```
 
-If you need to guarantee that authservice protects everything behind istio-ingressgateway, you can label ingressgateway instead of individual applications.
-
-```yaml
-istio:
-  ingressGateways:
-    public-ingressgateway:
-      extraLabels:
-        protect: keycloak
-```
-
 This label can be adjusted via following values in the Big Bang chart:
 
 ```yaml
