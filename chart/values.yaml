@@ -1976,8 +1976,6 @@ addons:
   #
   keycloak:
     # -- Toggle deployment of Keycloak.
-    # if you enable Keycloak you should uncomment the istio passthrough configurations above
-    # istio.ingressGateways.passthrough-ingressgateway and istio.gateways.passthrough
     enabled: false
 
     # -- Choose source type of "git" or "helmRepo"
