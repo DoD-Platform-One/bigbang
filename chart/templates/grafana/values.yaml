@@ -292,15 +292,9 @@ upstream:
       allow_sign_up: {{ .Values.grafana.sso.grafana.allow_sign_up | default "True" }}
       role_attribute_path: {{ .Values.grafana.sso.grafana.role_attribute_path | default "Viewer" }}
       {{- end }}
-      {{- $ssoList := list .Values.grafana.sso.grafana .Values.monitoring.sso.grafana }}
-      {{- range $i, $sso := $ssoList }}
-        {{- if $sso }}
-          {{- range $field := list "allowed_domains" "tls_client_ca" "tls_skip_verify_insecure" "tls_client_cert" "tls_client_key" }}
-            {{- $val := index $sso $field }}
-            {{- if $val }}
-              {{- list $field $val | include "bigbang.addValueIfSet" | indent 2 }}
-            {{- end }}
-          {{- end }}
+      {{- range $key := list "allowed_domains" "tls_client_ca" "tls_skip_verify_insecure" "tls_client_cert" "tls_client_key" }}
+        {{- with (index $ $key) }}
+      {{ $key }} = {{ . }}
         {{- end }}
       {{- end }}
 
