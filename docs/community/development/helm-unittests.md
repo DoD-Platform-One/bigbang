@@ -65,7 +65,7 @@ Big Bang organizes helm unit tests into several categories:
 
 ### Schema Validation Tests
 
-Located in [chart/unittests/schema/](../../chart/unittests/schema/), these tests validate that the Helm chart's values conform to the expected schema.
+Located in [chart/unittests/schema/](../../../chart/unittests/schema/), these tests validate that the Helm chart's values conform to the expected schema.
 
 #### Example: Valid Configuration
 
@@ -100,13 +100,13 @@ tests:
 
 ### Template Helper Tests
 
-Located in [chart/unittests/](../../chart/unittests/), these tests validate custom Helm template functions defined in `_helpers.tpl`.
+Located in [chart/unittests/](../../../chart/unittests/), these tests validate custom Helm template functions defined in `_helpers.tpl`.
 
 Template helper tests ensure that custom template functions produce correct output across various input scenarios. For detailed information on Big Bang's template self-testing framework and how to write tests for custom template helpers, see the [Template Self-testing Guide](self-testing.md).
 
 ### Package-Specific Tests
 
-Located in [chart/unittests/packages/](../../chart/unittests/packages/), these tests validate that package-specific templates render correctly for individual packages.
+Located in [chart/unittests/packages/](../../../chart/unittests/packages/), these tests validate that package-specific templates render correctly for individual packages.
 
 ## Additional Resources
 

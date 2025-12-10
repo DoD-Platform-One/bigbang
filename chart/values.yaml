@@ -160,14 +160,14 @@ networkPolicies:
   # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
   # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
   vpcCidr: 0.0.0.0/0
-  # bb-common-related values below; See [the documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md?ref_type=heads#definition-rules-definition) 
+  # bb-common-related values below; See [the documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md?ref_type=heads#definition-rules-definition)
   # for more details.
   egress:
     # -- Egress definitions; create definitions here that you want to re-use globally across
     # all packages
     definitions:
       # -- Egress definition for SSO; Set this to the CIDRs your SSO implementation is
-      # being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm) 
+      # being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm)
       # for this purpose
       sso:
         to:
@@ -242,16 +242,16 @@ istioCRDs:
     driftDetection:
       mode: warn
       ignore:
-      - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
-        target:
-          kind: ValidatingWebhookConfiguration
-          name: istiod-default-validator
-      - paths: [""]
-        target:
-          kind: Job
-      - paths: [""]
-        target:
-          kind: StatefulSet
+        - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
+          target:
+            kind: ValidatingWebhookConfiguration
+            name: istiod-default-validator
+        - paths: [""]
+          target:
+            kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -280,16 +280,16 @@ istiod:
     driftDetection:
       mode: warn
       ignore:
-      - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
-        target:
-          kind: ValidatingWebhookConfiguration
-          name: istio-validator-istio-system
-      - paths: [""]
-        target:
-          kind: Job
-      - paths: [""]
-        target:
-          kind: StatefulSet
+        - paths: ["/webhooks/0/failurePolicy"] # this field is managed by istiod directly
+          target:
+            kind: ValidatingWebhookConfiguration
+            name: istio-validator-istio-system
+        - paths: [""]
+          target:
+            kind: Job
+        - paths: [""]
+          target:
+            kind: StatefulSet
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
@@ -1299,10 +1299,7 @@ addons:
     # -- Toggle deployment of Authservice.
     # if enabling authservice, a filter needs to be provided by either enabling
     # sso for monitoring or istio, or manually adding a filter chain in the values here:
-    # values:
-    #   chain:
-    #     minimal:
-    #       callback_uri: "https://somecallback"
+    # `.Values.addons.authservice.values.chain.minimal.callback_uri="htts://somecallback"`
     enabled: false
 
     # -- Choose source type of "git" or "helmRepo"
@@ -1478,7 +1475,7 @@ addons:
       # Setting this allows the registry to use a different endpoint than the global `objectStorage.endpoint` documented above.
       # `objectStorage.endpoint` must be set in order for `objectStorage.regionendpoint` endpoint to be used.  See: https://docs.gitlab.com/administration/object_storage/
       # Also note rails.s3.yaml and registry.s3.yaml here for implementation parallel: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage
-      # examples:  "https://s3.us-gov-west-1.amazonaws.com" "https://minio.example.com:9000"
+      # examples:  `"https://s3.us-gov-west-1.amazonaws.com"` `"https://minio.example.com:9000"`
       regionendpoint: ""
 
       # -- S3 compatible region to use for connection information.
@@ -1575,7 +1572,7 @@ addons:
       # -- Toggle SAML SSO for NXRM.
       # -- handles SAML SSO, a Client must be configured in Keycloak or IdP
       # -- to complete setup.
-      # -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599
+      # -- `https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599`
       enabled: false
 
       # -- NXRM SAML SSO Integration data

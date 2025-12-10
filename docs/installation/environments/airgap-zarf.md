@@ -1,15 +1,16 @@
 # Airgap w/Zarf
 
 > ⚠️ This is a work in-progress.
+
 <!-- TODO most of this was removed from zarf. It should either be recreated here or removed entirely. See
 - https://github.com/defenseunicorns-partnerships/generate-big-bang-zarf-package
 - https://docs.zarf.dev/ref/components/#extensions-removed
 - Likely to recreate this based on this work https://repo1.dso.mil/big-bang/customers/airgap/-/issues/5
  -->
 
-### Requires Big Bang 1.54.0 and greater.
+### Requires Big Bang 1.54.0 and greater
 
-This section is currently purely devoted to building and testing packages on a development cluster.  The result could be a set of archives that can be used for moving across an airgap.  Essentially, this automates a few of the steps indicated in this [documentation](https://docs.zarf.dev/docs/zarf-tutorials/big-bang).
+This section is currently purely devoted to building and testing packages on a development cluster. The result could be a set of archives that can be used for moving across an airgap. Essentially, this automates a few of the steps indicated in this documentation (`https://docs.zarf.dev/docs/zarf-tutorials/big-bang`).
 
 The first step would be to stand up a Big Bang dev cluster. This is most easily represented by following the steps outlined here, but would ultimately result in running the below command, which stands up a larger development cluster. Take note of the KeyName and Public IP address which will be used in a later step.
 
@@ -24,16 +25,16 @@ export REGISTRY1_USERNAME=<username>
 export REGISTRY1_PASSWORD=<password>
 ```
 
-Now you can execute the following, which will automatically detect your SSH key location, name and Public IP, based off the current `AWS_PROFILE` declared locally: 
+Now you can execute the following, which will automatically detect your SSH key location, name and Public IP, based off the current `AWS_PROFILE` declared locally:
 
 ```shell
 docs/assets/scripts/airgap-zarf/zarf-dev.sh
 ```
 
-The above will clone the latest `main` branch of the [zarf-dev/zarf](https://github.com/zarf-dev/zarf) repository and execute the stock `examples/big-bang/zarf.yaml`.  If you want to use a different `zarf.yaml`, you can override this by setting any of these variables ahead of time, either by exporting them or setting them as part of the command.
+The above will clone the latest `main` branch of the [zarf-dev/zarf](https://github.com/zarf-dev/zarf) repository and execute the stock `examples/big-bang/zarf.yaml`. If you want to use a different `zarf.yaml`, you can override this by setting any of these variables ahead of time, either by exporting them or setting them as part of the command.
 
-* `ZARF_TEST_REPO`: sets the repository to clone from.
-* `ZARF_TEST_REPO_BRANCH`: sets the branch to switch to from the cloned repo.
-* `ZARF_TEST_REPO_DIRECTORY`: sets the directory where the desired `zarf.yaml` is.
+- `ZARF_TEST_REPO`: sets the repository to clone from.
+- `ZARF_TEST_REPO_BRANCH`: sets the branch to switch to from the cloned repo.
+- `ZARF_TEST_REPO_DIRECTORY`: sets the directory where the desired `zarf.yaml` is.
 
 Also since this all uses the same dev script, you should be able to use whatever k8s tooling (such as `kubectl` or `k9s`) you already might use on a dev cluster as `KUBECONFIG` is still transferred locally and available.

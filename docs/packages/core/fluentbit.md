@@ -7,13 +7,13 @@
 ## Big Bang Touch Points
 
 ```mermaid
-graph TB 
+graph TB
   subgraph "Fluent-Bit"
-    fluentbit 
-  end 
+    fluentbit
+  end
 
   subgraph "Elasticsearch"
-    fluentbit --> elasticsearch 
+    fluentbit --> elasticsearch
   end
 ```
 
@@ -50,7 +50,7 @@ fluentbit:
 
 ## Logging
 
-Since Fluentbit is the method for shipping cluster logs to the ECK stack, to reduce the amount of logs fluentbit and ECK has to process, fluentbit container logs are excluded from being processed and shipped to ECK. However, if you would like to enable fluentbit container logs being sent to ECK  you just have to remove the "Excluded_Path" portion of this INPUT block (requires presence of entire block even when changing a single line):
+Since Fluentbit is the method for shipping cluster logs to the ECK stack, to reduce the amount of logs fluentbit and ECK has to process, fluentbit container logs are excluded from being processed and shipped to ECK. However, if you would like to enable fluentbit container logs being sent to ECK you just have to remove the "Excluded_Path" portion of this INPUT block (requires presence of entire block even when changing a single line):
 
 ```yaml
 fluentbit:
@@ -70,7 +70,7 @@ fluentbit:
 
 ## High Availability
 
-Fluent-bit by default runs as a [Kubernetes DaemonSet with a single pod on each node in the cluster](https://docs.fluentbit.io/manual/installation/downloads/kubernetes#concepts). There is no need to run multiple pods per node as only one is required to maintain the state of logs that appear on that node. The Big Bang fluent-bit package also comes with default values to enable and configure [a storage buffer](https://docs.fluentbit.io/manual/installation/kubernetes#concepts) to better index and process records on your Kubernetes nodes in the event of pod restarts or pods becoming unhealthy.
+Fluent-bit by default runs as a [Kubernetes DaemonSet with a single pod on each node in the cluster](https://docs.fluentbit.io/manual/installation/downloads/kubernetes#concepts). There is no need to run multiple pods per node as only one is required to maintain the state of logs that appear on that node. The Big Bang fluent-bit package also comes with default values to enable and configure [a storage buffer](https://docs.fluentbit.io/manual/administration/buffering-and-storage) to better index and process records on your Kubernetes nodes in the event of pod restarts or pods becoming unhealthy.
 
 ## Health Checks
 

@@ -15,29 +15,30 @@ This work was quickly developed to entertain certain paths for image packaging a
 
 `package_images.sh` - Proof of concept script for image packaging
 
-* Dependencies:
-  * `docker` - The docker CLI tool
-  * `images.txt` - A list of all requires airgap images
-  * `jq` - The jq CLI tool
-* Deliverables:
-  * `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
-    * NOTE - `registry:2` vs `harbor` vs anything else is trivial, we can use whatever we want
-    * Packaged images are loaded and retrievable immediately upon container start
-    * `/var/lib/registry-package` is created and populated with images
-    * `/etc/docker/registry/config.yml` is templated to use new registry folder
-    * This is due to the fact that `/var/lib/registry` is a docker volume
+- Dependencies:
+  - `docker` - The docker CLI tool
+  - `images.txt` - A list of all requires airgap images
+  - `jq` - The jq CLI tool
+- Deliverables:
+  - `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
+    - NOTE - `registry:2` vs `harbor` vs anything else is trivial, we can use whatever we want
+    - Packaged images are loaded and retrievable immediately upon container start
+    - `/var/lib/registry-package` is created and populated with images
+    - `/etc/docker/registry/config.yml` is templated to use new registry folder
+    - This is due to the fact that `/var/lib/registry` is a docker volume
 
 `deploy_images.sh` - Proof of concept script for image deployment
 
-* Dependencies:
-  * `docker` - The docker CLI tool
-  * `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
-* Deliverables:
-  * Running `registry` container with airgap images deployed and retrievable
+- Dependencies:
+  - `docker` - The docker CLI tool
+  - `registry:package.tar.gz` - Modified `registry:2` container loaded with airgap images
+- Deliverables:
+  - Running `registry` container with airgap images deployed and retrievable
 
 Hack commands:
-* `curl -sX GET http://localhost:5000/v2/_catalog | jq -r .`
-  * Verify the catalog of a local running registry container
+
+- `curl -sX GET http://localhost:5000/v2/_catalog | jq -r .`
+  - Verify the catalog of a local running registry container
 
 ### Repository Packaging/Deployment
 
@@ -47,9 +48,9 @@ Airgap Deployment is a form of deployment which does not have any direct connect
 
 #### General Prerequisites
 
-* A kubernetes cluster with container mirroring support. There is a section below that covers mirroring in more detail with examples for supported clusters.
-* Big Bang [release artifacts](https://repo1.dso.mil/big-bang/bigbang/-/releases).
-* Utility Server.
+- A kubernetes cluster with container mirroring support. There is a section below that covers mirroring in more detail with examples for supported clusters.
+- Big Bang [release artifacts](https://repo1.dso.mil/big-bang/bigbang/-/releases).
+- Utility Server.
 
 #### Package Specific Prerequisites
 
@@ -60,12 +61,12 @@ Elastic requires a larger number of memory map areas than some OSes support by d
 ```shell
 MIME-Version: 1.0
     Content-Type: multipart/mixed; boundary="==MYBOUNDARY=="
-    
+
     --==MYBOUNDARY==
     Content-Type: text/x-shellscript; charset="us-ascii"
 
     #!/bin/bash
-    # Set the vm.max_map_count to 262144. 
+    # Set the vm.max_map_count to 262144.
     # Required for Elastic to run correctly without OOM errors.
     sysctl -w vm.max_map_count=262144
 ```
@@ -74,11 +75,11 @@ MIME-Version: 1.0
 
 Utility Server is an internet-disconnected server that will host the private registry and git server that are required to deploy Big Bang. It should include these command-line tools listed in the following:
 
-* `docker`: for running docker registry.
-  * `registry:2` image
-  * `openssl` for self-signed certificate.
-* `curl`: For troubleshooting registry.
-* `git`: for setup git server.
+- `docker`: for running docker registry.
+  - `registry:2` image
+  - `openssl` for self-signed certificate.
+- `curl`: For troubleshooting registry.
+- `git`: for setup git server.
 
 ### Git Server
 
@@ -88,14 +89,14 @@ As part of Big Bang release, we provide `repositories.tar.gz` which contains all
 
 You can follow the process below to setup git with `repositories.tar.gz` on the Utility Server.
 
-* Create Git user and SSH key.
+- Create Git user and SSH key.
 
 ```shell
 sudo useradd --create-home --shell /bin/bash git
 ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
 ```
 
-* Create .SSH folder for `git` user.
+- Create .SSH folder for `git` user.
 
   ```shell
   sudo su - git
@@ -103,8 +104,8 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
   exit
   ```
-  
-* Add client ssh key to `git` user `authorized_keys`.
+
+- Add client ssh key to `git` user `authorized_keys`.
 
   ```shell
   sudo su
@@ -112,48 +113,48 @@ ssh-keygen  -b 4096 -t rsa -f ~/.ssh/identity -q -N ""
   exit
   ```
 
-* Extract `repositories.tar.gz` to git user home directory.
+- Extract `repositories.tar.gz` to git user home directory.
 
   ```shell
   sudo tar -xvf repositories.tar.gz --directory /home/git/
   ```
 
-* Add Hostname alias.
+- Add Hostname alias.
 
   ```shell
   PRIVATEIP=$( curl http://169.254.169.254/latest/meta-data/local-ipv4 )
   sudo sed -i -e '1i'$PRIVATEIP'   'myhostname.com'\' /etc/hosts
   sudo sed -i -e '1i'$PRIVATEIP'   'host.k3d.internal'\' /etc/hosts #only for k3d
   ```
-  
-* To test the client key, complete the following:
+
+- To test the client key, complete the following:
 
   ```shell
   GIT_SSH_COMMAND='ssh -i /[client-private-key-path] -o IdentitiesOnly=yes' git clone git@[hostname/IP]:/home/git/repos/[sample-repo]
-  
+
   #For example;
-  GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:/home/git/repos/bigbang 
+  GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:/home/git/repos/bigbang
   #checkout release branch
   git checkout 1.3.0
   ```
-  
+
 #### Option Two
 
 There are some cases where you do not have access to or cannot create an ssh user on the utility server. It is possible to run an ssh git server on a non-standard port using Docker.
 
-* Create an SSH key.
+- Create an SSH key.
 
 ```shell
 ssh-keygen  -b 4096 -t rsa -f ./identity -q -N ""
 ```
 
-* Extract `repositories.tar.gz` to your working directory.
+- Extract `repositories.tar.gz` to your working directory.
 
 ```shell
 sudo tar -xvf repositories.tar.gz
 ```
 
-* Start the provided Docker image (TODO: move this to an IB image when ready).
+- Start the provided Docker image (TODO: move this to an IB image when ready).
 
 ```shell
 docker run -d -p 4001:22 -v ${PWD}/identity.pub:/home/git/.ssh/authorized_keys -v ${PWD}/repos:/home/git servicesengineering/gitshim:0.0.1
@@ -165,7 +166,7 @@ You will now be able to test by checking out some of the code.
 GIT_SSH_COMMAND='ssh -i /[client-private-key-path] -o IdentitiesOnly=yes' git clone git@[hostname/IP]:[PORT]/home/git/repos/[sample-repo]
 
 # For example;
-GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:[PORT]/home/git/repos/bigbang 
+GIT_SSH_COMMAND='ssh -i ~/.ssh/identity -o IdentitiesOnly=yes' git clone git@host.k3d.internal:[PORT]/home/git/repos/bigbang
 # Check out release branch
 git checkout 1.3.0
 ```
@@ -176,15 +177,15 @@ Images needed to run BB in your cluster is packaged as part of the release in `i
 
 #### Set Up
 
-To set up the registry, we will be using `registry:2` to run a  private registry with self-signed certificate.
+To set up the registry, we will be using `registry:2` to run a private registry with self-signed certificate.
 
-* First, untar `images.tar.gz`;
+- First, untar `images.tar.gz`;
 
 ```shell
 tar -xvf images.tar.gz -C .
 ```
 
-* SCP `registry:2` tar file
+- SCP `registry:2` tar file
 
 ```shell
 docker save -o registry2.tar registry:2
@@ -194,7 +195,7 @@ docker load -i registry2.tar #on your registry server
 docker load -i k3s.tar
 ```
 
-* Use the script [registry.sh](../../reference/scripts/airgap-dev/registry.sh) to create registry.
+- Use the script [registry.sh](../../reference/scripts/airgap-dev/registry.sh) to create registry.
 
 ```shell
 $ chmod +x registry.sh && sudo ./registry.sh
@@ -229,7 +230,7 @@ def21e7025c7d4ea7bbb30603955e0b7da14d077592851b327e59d78a849cb7d
 
 Installation finished ...
 
-**Notes:** 
+**Notes:**
 =====
 
 To see images in the registry;
@@ -244,13 +245,13 @@ A folder is created with TLS certs that we are going to supply to our k8s cluste
 You can ensure the images are now loaded in the registry;
 
 ```shell
- curl -k https://myhostname.com:5443/v2/_catalog 
+ curl -k https://myhostname.com:5443/v2/_catalog
 {"repositories":["ironbank/anchore/engine/engine","ironbank/anchore/enterprise/enterprise","ironbank/anchore/enterpriseui/enterpriseui","ironbank/big-bang/argocd","ironbank/bitnami/analytics/redis-exporter","ironbank/elastic/eck-operator/eck-operator","ironbank/elastic/elasticsearch/elasticsearch","ironbank/elastic/kibana/kibana","ironbank/fluxcd/helm-controller","ironbank/fluxcd/kustomize-controller","ironbank/fluxcd/notification-controller","ironbank/fluxcd/source-controller","ironbank/gitlab/gitlab/alpine-certificates","ironbank/gitlab/gitlab/cfssl-self-sign","ironbank/gitlab/gitlab/gitaly",...]
 ```
 
 #### Mirroring
 
-The images specified as part of the helm charts in Big Bang are expected to be sourced from `registry1.dso.mil` hence this registry needs to be mirrored to the one set up above. To reduce the amount of work needed on the developer part, we will be taking advantage of container mirroring which is supported by `containerd` as well as `cri-o`. Check if your container runtime supports this as it is required for smooth developer experience when deploying BB.  You should also check documentation on how your cluster supports passing these configuration to the runtime. For example, TKG and RKE2 support such configuration for `containerd` below to enable `registry.dso.mil` and `registry1.dso.mil` .
+The images specified as part of the helm charts in Big Bang are expected to be sourced from `registry1.dso.mil` hence this registry needs to be mirrored to the one set up above. To reduce the amount of work needed on the developer part, we will be taking advantage of container mirroring which is supported by `containerd` as well as `cri-o`. Check if your container runtime supports this as it is required for smooth developer experience when deploying BB. You should also check documentation on how your cluster supports passing these configuration to the runtime. For example, TKG and RKE2 support such configuration for `containerd` below to enable `registry.dso.mil` and `registry1.dso.mil` .
 
 ​You need to also configure your cluster with appropriate registry TLS. Please consult your cluster documentation on how to configure this.
 
@@ -258,7 +259,7 @@ If you need to handle mirroring manually, there is an example Ansible script pro
 
 ##### Konvoy Cluster
 
-Modify the `cluster.yaml` file and apply. More details can be found on the [D2iQ Konvoy documentation](https://d2iq.com/air-gapped-environments).
+Modify the `cluster.yaml` file and apply. More details can be found on the D2iQ Konvoy documentation `https://d2iq.com/air-gapped-environments`.
 
 ```yaml
 kind: ClusterConfiguration
@@ -420,40 +421,40 @@ Take the values from each of these files and place in the correct fields in the 
 
 ```yaml
 git:
-    # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
-    privateKey: |
-      -----BEGIN RSA PRIVATE KEY-----
-      MIIEowIBAAKCAQEAwcG6YKsqDC6728XZ7/8oiqnQaw3OkQnvMBrzvZjxd//PsEog
-      xVc+F9YqW4FIeTH57wN6JXIC4iMbE0QGd6+1yOoYiXkhi66tuO5FN+n4PeMnvKcC
-      JXtFWme4W/9YnEk/3sbNOgAMPlhMhTsudzLiXtHd3g+xCmNs1pdEIInaNadrolWn
-      QTM0krUCcC6VLCri7ae/pDloglX4cBJ+EfqFC94T6wUICPd1P7zYsy8WwIQtPhLT
-      lbY8CHj9iMlxlUdwdiXTlifqHsPgTh3X5e9Vptd+wi0+vfjvrXd/8SuM1q8xdQvY
-      bZ27AlhgfQsVl9WQrk/47xd3g430G4cqSbyhLQIDAQABAoIBAFlSu153akIFhXtz
-      Ad7fbcxHLxs7WUCKKOevdTCyApgEqbWm5uazKqAIjqxytHuS65shqjz7C5M/Beti
-      z+x7Z73BFiDCZBgmLNZ1mhmF1niJcTdKcvXel4FvEZHv7OTX7AcC9XfIr9xKDrTZ
-      LLmtDqkR7UvDRiX44iMnxzOM+bkDsHVva00e3IoSiOsQ4DKQ1l/HFseVlPIaGzfZ
-      Z2q0myUrBzlOYE06VJluhexsrrVDi7KdIfR8UGpN4kC5R/vOnOi7ycd4tfsZe2Wb
-      CjbKMTNYRFnVTt6/SXAhhFu+kz0FftDXNTIOhikVB8ryZ5iyNXszYqiptUI9VUZB
-      mQLdPuECgYEA9odVxlPUgSMLhbE5vD57jbtB6Cswy5ztAuyCHMABM4U6pVvFDSNb
-      244y0ov0TzviaCZkb+0qrAM0ZSNItLQ1PmbeD0SnB4q/C8hDvVtpB+0SPBJMX8so
-      49n1Wr5dH0axGMLaZXGmQ4DPEW/t0dNbYpN1Sxgn6KZPprISXigBufkCgYEAyTNe
-      kY3vaJ6Nla1pBVUmiK7hu1G3Ddihy1w56upHbOnDvJySuVOM5HRPm2ISFwW38/b5
-      5+cGKWnmu7UhFi1d8Iz3Kmr6kpfRxEDtbrk5rkgKJmTtduxAzBH8CTZfxuYIC5xS
-      3fbcFpFYfrtE+3tjqlXJSOpLOuDqbA3uGwWFTdUCgYEAkSi9A8uGnAdDmJPzF/l+
-      jMTPGOKdl7auBAO41S7lRi3Ti1xO2d6RDuVa3YiU8TakqIi6qQDwGFrGtiqhe+2E
-      UFsHs9vLsfArb8eaw1uYq5c7HpHzsJASYp+LDcR7VpgsXRUWvZa+vI6S3oSWdu9J
-      pvCGpxHxJdcPnWrKz/AknBkCgYAnej/U+W9/LJUFSFgx5qo/6Wh7M6ZiPh5I45it
-      ojhPg3KXgHU9jco4TSYNi+mWwNV+NfiE6wyHdbMDI6ARVOd4uoAIv6M9NDLBeifc
-      MNXDf3kWXXlGe0afg+va9uNGCH6NoKeVy8kVWIFvpFj9qxE8K8bp2qbWL6lveDA+
-      9w9X3QKBgGtkQi9OI7TyrloZ5F6/0/LnOJMGd/+e2cJUN6Pa10ZAjQh12JZ5fK7i
-      Vwh5l0P5CGQsuC96n4xPELoBnbTdr+y17f0o+kAuSDAsXnDf/Jjr0y/+uzL6YYCg
-      VD1yNitgcQw6oHKdTbGn4jni3/VemzONOz0uTB+/K7WhW2J7faaJ
-      -----END RSA PRIVATE KEY-----
-    publicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBwbpgqyoMLrvbxdnv/yiKqdBrDc6RCe8wGvO9mPF3/+wSiDFVz4X1ipbgUh3MfnvA2olcgLiIxsTRAZ8r7XI6hiJeSGLrq2123kU36fg94ye8pwIle0VaZ7hb/1icST/exs06AAw+WEyFOy53MuJe0d3e$"
-    knownHosts: "10.0.52.144 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPFZzQ6BmaswdhT8UWD5a/VYmZYrGv1qD3T+euf/gFjkPkeySYRIyM+Kg/UdHCHVBzc4aaFdBDmugHimZ4lbWpE="
+  # -- SSH git credentials, privateKey, publicKey, and knownHosts must be provided
+  privateKey: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEAwcG6YKsqDC6728XZ7/8oiqnQaw3OkQnvMBrzvZjxd//PsEog
+    xVc+F9YqW4FIeTH57wN6JXIC4iMbE0QGd6+1yOoYiXkhi66tuO5FN+n4PeMnvKcC
+    JXtFWme4W/9YnEk/3sbNOgAMPlhMhTsudzLiXtHd3g+xCmNs1pdEIInaNadrolWn
+    QTM0krUCcC6VLCri7ae/pDloglX4cBJ+EfqFC94T6wUICPd1P7zYsy8WwIQtPhLT
+    lbY8CHj9iMlxlUdwdiXTlifqHsPgTh3X5e9Vptd+wi0+vfjvrXd/8SuM1q8xdQvY
+    bZ27AlhgfQsVl9WQrk/47xd3g430G4cqSbyhLQIDAQABAoIBAFlSu153akIFhXtz
+    Ad7fbcxHLxs7WUCKKOevdTCyApgEqbWm5uazKqAIjqxytHuS65shqjz7C5M/Beti
+    z+x7Z73BFiDCZBgmLNZ1mhmF1niJcTdKcvXel4FvEZHv7OTX7AcC9XfIr9xKDrTZ
+    LLmtDqkR7UvDRiX44iMnxzOM+bkDsHVva00e3IoSiOsQ4DKQ1l/HFseVlPIaGzfZ
+    Z2q0myUrBzlOYE06VJluhexsrrVDi7KdIfR8UGpN4kC5R/vOnOi7ycd4tfsZe2Wb
+    CjbKMTNYRFnVTt6/SXAhhFu+kz0FftDXNTIOhikVB8ryZ5iyNXszYqiptUI9VUZB
+    mQLdPuECgYEA9odVxlPUgSMLhbE5vD57jbtB6Cswy5ztAuyCHMABM4U6pVvFDSNb
+    244y0ov0TzviaCZkb+0qrAM0ZSNItLQ1PmbeD0SnB4q/C8hDvVtpB+0SPBJMX8so
+    49n1Wr5dH0axGMLaZXGmQ4DPEW/t0dNbYpN1Sxgn6KZPprISXigBufkCgYEAyTNe
+    kY3vaJ6Nla1pBVUmiK7hu1G3Ddihy1w56upHbOnDvJySuVOM5HRPm2ISFwW38/b5
+    5+cGKWnmu7UhFi1d8Iz3Kmr6kpfRxEDtbrk5rkgKJmTtduxAzBH8CTZfxuYIC5xS
+    3fbcFpFYfrtE+3tjqlXJSOpLOuDqbA3uGwWFTdUCgYEAkSi9A8uGnAdDmJPzF/l+
+    jMTPGOKdl7auBAO41S7lRi3Ti1xO2d6RDuVa3YiU8TakqIi6qQDwGFrGtiqhe+2E
+    UFsHs9vLsfArb8eaw1uYq5c7HpHzsJASYp+LDcR7VpgsXRUWvZa+vI6S3oSWdu9J
+    pvCGpxHxJdcPnWrKz/AknBkCgYAnej/U+W9/LJUFSFgx5qo/6Wh7M6ZiPh5I45it
+    ojhPg3KXgHU9jco4TSYNi+mWwNV+NfiE6wyHdbMDI6ARVOd4uoAIv6M9NDLBeifc
+    MNXDf3kWXXlGe0afg+va9uNGCH6NoKeVy8kVWIFvpFj9qxE8K8bp2qbWL6lveDA+
+    9w9X3QKBgGtkQi9OI7TyrloZ5F6/0/LnOJMGd/+e2cJUN6Pa10ZAjQh12JZ5fK7i
+    Vwh5l0P5CGQsuC96n4xPELoBnbTdr+y17f0o+kAuSDAsXnDf/Jjr0y/+uzL6YYCg
+    VD1yNitgcQw6oHKdTbGn4jni3/VemzONOz0uTB+/K7WhW2J7faaJ
+    -----END RSA PRIVATE KEY-----
+  publicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBwbpgqyoMLrvbxdnv/yiKqdBrDc6RCe8wGvO9mPF3/+wSiDFVz4X1ipbgUh3MfnvA2olcgLiIxsTRAZ8r7XI6hiJeSGLrq2123kU36fg94ye8pwIle0VaZ7hb/1icST/exs06AAw+WEyFOy53MuJe0d3e$"
+  knownHosts: "10.0.52.144 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPFZzQ6BmaswdhT8UWD5a/VYmZYrGv1qD3T+euf/gFjkPkeySYRIyM+Kg/UdHCHVBzc4aaFdBDmugHimZ4lbWpE="
 ```
 
-** Note the above values are all examples and are intentionally not operational keys.**
+**Note the above values are all examples and are intentionally not operational keys.**
 
 Then install Big Bang using Helm.
 
@@ -626,7 +627,7 @@ To test Airgap BigBang on k3d, complete the following steps:
 
 - Follow [Airgap Documentation](#airgap-deployment) to install Git server and Registry.
 
-- Once Git Server and Registry is up, setup k3d mirroring configuration  `registries.yaml`
+- Once Git Server and Registry is up, setup k3d mirroring configuration `registries.yaml`
 
   ```yaml
   mirrors:
@@ -652,7 +653,7 @@ To test Airgap BigBang on k3d, complete the following steps:
   $ k3d cluster create --image "rancher/k3s:v1.20.5-rc1-k3s1" --api-port "33989" -s 1 -a 2 -v "${HOME}/registries.yaml:/etc/rancher/k3s/registries.yaml" -v /etc/machine-id:/etc/machine-id -v "${HOME}/certs/host.k3d.internal.public.pem:/etc/ssl/certs/registry1.pem" --k3s-server-arg "--disable=traefik" --k3s-server-arg "--disable=metrics-server" --k3s-server-arg "--tls-san=$PRIVATEIP"  -p 80:80@loadbalancer -p 443:443@loadbalancer
   ```
 
-- Block all egress with `iptables` except those going to instance IP before deploying bigbang  by running [airgap.sh](../../reference/scripts/airgap-dev/airgap.sh).
+- Block all egress with `iptables` except those going to instance IP before deploying bigbang by running [airgap.sh](../../reference/scripts/airgap-dev/airgap.sh).
 
 ```shell
 sudo ./k3d_airgap.sh
@@ -686,80 +687,74 @@ kubectl delete po test
 ## Current Pipeline Outline and Notes
 
 1. .pre
+   1. **changelog**
 
-    1. **changelog**
+      Does a diff to lint what has changed for the logs.
 
-        Does a diff to lint what has changed for the logs.
-    1. **commits**
+   1. **commits**
 
-        Enforces the conventional commits stuff.
-    1. **pre vars**
+      Enforces the conventional commits stuff.
 
-        pre checks
-    1. **version**
+   1. **pre vars**
 
-        Gets various versions to build a complex version number for the build.
+      pre checks
+
+   1. **version**
+
+      Gets various versions to build a complex version number for the build.
 
 1. **smoke tests**
+   1. **clean install**
 
-    1. **clean install**
+      Doesn't really effect airgap, this sets up things like cluster names and such.
 
-        Doesn't really effect airgap, this sets up things like cluster names and such.
-    1. **upgrade**
+   1. **upgrade**
 
-        Splits out testing and determines if there are breaking changes for testing of upgrades.
+      Splits out testing and determines if there are breaking changes for testing of upgrades.
 
 1. **network up**
+   1. **airgap/network up**
 
-    1. **airgap/network up**
+      Creates a VPC and subnets for the cluster to be deployed in.
 
-        Creates a VPC and subnets for the cluster to be deployed in.
-    1. **aws/airgap/package**
+   1. **aws/airgap/package**
 
-        Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for Big Bang [https://repo1.dso.mil/big-bang/bigbang/-/releases](https://repo1.dso.mil/big-bang/bigbang/-/releases).
+      Packages everything needed for the airgap install into a tar file. This leaves the repositories and images bundled in the Releases section for Big Bang [https://repo1.dso.mil/big-bang/bigbang/-/releases](https://repo1.dso.mil/big-bang/bigbang/-/releases).
 
 1. **airgap up**
+   1. **aws/airgap/utility up**
 
-    1. **aws/airgap/utility up**
-
-        Sets up proxies using Route 53 to essentially fake out where Repo 1 and Registry 1 exist for the purposes of using an air gap registry and git repo.
+      Sets up proxies using Route 53 to essentially fake out where Repo 1 and Registry 1 exist for the purposes of using an air gap registry and git repo.
 
 1. **cluster up**
+   1. **airgap/rke2/cluster up**
 
-    1. **airgap/rke2/cluster up**
+      Stands up an RKE2 cluster for BB in an airgapped network. \*\* Uses terraform ./gitlab-ci/jobs/rke2/dependencies/terraform/.
 
-        Stands up an RKE2 cluster for BB in an airgapped network. \*\* Uses terraform ./gitlab-ci/jobs/rke2/dependencies/terraform/.
-
-        Both this and the non-airgapped use the same image registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1.
+      Both this and the non-airgapped use the same image registry.dso.mil/platform-one/big-bang/pipeline-templates/pipeline-templates/k3d-builder:0.0.1.
 
 1. **bigbang up**
+   1. **airgap/rke2/bigbang up**
 
-    1. **airgap/rke2/bigbang up**
-
-        Stands up the Big Bang instance.
+      Stands up the Big Bang instance.
 
 1. **test**
+   1. **airgap/rke2/bigbang test**
 
-    1. **airgap/rke2/bigbang test**
-
-        Runs some basic tests to make sure that Big Bang is up and working.
+      Runs some basic tests to make sure that Big Bang is up and working.
 
 1. **bigbang down**
+   1. **airgap/rke2/bigbang down**
 
-    1. **airgap/rke2/bigbang down**
-
-        Tears down the Big Bang instance.
+      Tears down the Big Bang instance.
 
 1. **cluster down**
-
-    1. **airgap/rke2/cluster down**
+   1. **airgap/rke2/cluster down**
 
 1. **airgap down**
+   1. **aws/airgap/package delete**
 
-    1. **aws/airgap/package delete**
-
-    1. **aws/airgap/utility down**
+   1. **aws/airgap/utility down**
 
 1. **network down**
-
-    1. **airgap/network down**
+   1. **airgap/network down**
