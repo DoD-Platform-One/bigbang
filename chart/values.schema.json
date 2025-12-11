@@ -307,7 +307,15 @@
         "git": true,
         "helmRepo": true,
         "flux": true,
-        "values": true,
+        "values": {
+          "type": "object",
+          "properties": {
+            "gateways": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        },
         "postRenderers": true
       },
       "allOf": [

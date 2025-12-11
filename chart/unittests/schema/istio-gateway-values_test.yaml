@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema - Istio Gateway Values
+tests:
+  - it: should pass validation with default values
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with acceptable values
+    set:
+      istioGateway:
+        values:
+          gateways:
+            custom:
+              upstream:
+                labels:
+                  istio: ingressgateway
+              gateway:
+                servers:
+                  - hosts:
+                      - "*.example.com"
+                    port:
+                      name: https
+                      number: 8443
+                      protocol: HTTPS
+                    tls:
+                      credentialName: cert
+                    mode: SIMPLE
+    asserts:
+      - notFailedTemplate: {}
+  - it: should fail validation with invalid istioGateway values
+    set:
+      istioGateway:
+        values:
+          waitJob:
+            image: foo
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
