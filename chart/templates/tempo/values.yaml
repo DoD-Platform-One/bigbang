@@ -1,9 +1,17 @@
 {{- if .Values.tempo.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.tempo "name" "tempo" "defaults" (include "bigbang.defaults.tempo" .)) }}
+{{- /* Create a cleaned copy of kiali config and merge deprecated paths into current paths */ -}}
+{{- $tempoPackage := deepCopy .Values.tempo -}}
+{{- if .Values.tempo.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.tempo.values) | fromYaml -}}
+{{- $tempoPackage = set $tempoPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $tempoPackage "name" "tempo" "defaults" (include "bigbang.defaults.tempo" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.tempo" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.tempo.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.tempo.values) }}
+{{- $storageMode := dig "upstream" "tempo" "storage" "trace" "backend" "local" .Values.tempo.values }}
 
 upstream:
   # --- Add writable runtime volume ---
@@ -13,15 +21,6 @@ upstream:
   {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
-  {{- end }}
-
-  {{- if or .Values.kiali.enabled .Values.tempo.sso.enabled }}
-  {{- $tempoAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-  {{- $tempoAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-  podLabels:
-    {{- if .Values.tempo.sso.enabled }}
-    {{ $tempoAuthserviceKey }}: {{ $tempoAuthserviceValue }}
-    {{- end }}
   {{- end }}
 
   tempo:
@@ -83,22 +82,45 @@ domain: {{ $domainName }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- if $istioEnabled }}
-    {{- include "getGatewaySelector" (dict "pkg" .Values.tempo "root" .) | nindent 4 }}
-    {{- end }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    to:
+      tempo:3200:
+        from:
+          k8s:
+            monitoring-grafana@monitoring/grafana: {{ .Values.grafana.enabled }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            kiali-service-account@kiali/kiali: {{ .Values.kiali.enabled }}
+      tempo:4317:
+        from:
+          k8s:
+            alloy-alloy-operator@alloy/alloy: {{ .Values.alloy.enabled }}
+            alloy-alloy-logs@alloy/alloy-logs: {{ .Values.alloy.enabled }}
+  egress:
+    definitions:
+      storage-subnets:
+        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
+    from:
+      tempo:
+        to:
+          k8s:
+            monitoring/prometheus:9090: {{ .Values.monitoring.enabled }}
+          definition:
+            storage-subnets: {{ ne $storageMode "local" }}
 
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.tempo.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-  tempoQuery:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.tempo.ingress.gateway "root" .)}}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
