@@ -28,6 +28,13 @@ tests:
               to:
                 - ipBlock:
                     cidr: 0.0.0.0/0
+            storage-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 443
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -81,6 +88,13 @@ tests:
               to:
                 - ipBlock:
                     cidr: 0.0.0.0/0
+            storage-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 443
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -130,6 +144,13 @@ tests:
               to:
                 - ipBlock:
                     cidr: 0.0.0.0/0
+            storage-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 443
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -191,6 +212,13 @@ tests:
               to:
                 - ipBlock:
                     cidr: 0.0.0.0/0
+            storage-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 443
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
