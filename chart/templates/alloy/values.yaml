@@ -1,11 +1,18 @@
 {{- /* Create secret */ -}}
 {{- if .Values.alloy.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.alloy "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
+{{- /* Create a cleaned copy of alloy config and merge deprecated paths into current paths */ -}}
+{{- $alloyPackage := deepCopy .Values.alloy -}}
+{{- if .Values.alloy.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.alloy.values) | fromYaml -}}
+{{- $alloyPackage = set $alloyPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $alloyPackage "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.alloy.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 {{- $lokiServiceMap := dict
     "monolith" "logging-loki"
@@ -22,25 +29,39 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    to:
+      alloy-logs:12345:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  egress:
+    definitions:
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    from:
+      alloy-logs:
+        to:
+          k8s:
+            # Loki egress: namespace with app.kubernetes.io/name=logging, pod with app.kubernetes.io/name=logging-loki, port 3100
+            logging/logging-loki:3100: {{ .Values.loki.enabled }}
+      alloy:
+        to:
+          tempo/tempo:4317: {{ .Values.tempo.enabled }}
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.mimir.values)
-      (dig "istio" "hardened" "enabled" false .Values.alloy.values)
-    }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 upstream:
   destinations:
