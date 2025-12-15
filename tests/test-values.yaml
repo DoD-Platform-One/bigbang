@@ -2139,9 +2139,6 @@ addons:
                   blobStoreName: "default"
                   strictContentTypeValidation: true
                   writePolicy: "allow_once"
-                cleanup:
-                  policyNames:
-                    - "string"
                 component:
                   proprietaryComponents: true
                 docker:
