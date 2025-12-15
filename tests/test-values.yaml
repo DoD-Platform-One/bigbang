@@ -960,12 +960,6 @@ loki:
 
     minio:
       enabled: false
-    write:
-      replicas: 0
-    backend:
-      replicas: 0
-    read:
-      replicas: 0
     bbtests:
       enabled: true
       cypress:
