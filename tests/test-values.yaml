@@ -1243,6 +1243,25 @@ alloy:
   alloyLogs:
     enabled: true
 
+  values:
+    bbtests:
+      enabled: true
+
+    istio:
+      hardened:
+        customServiceEntries:
+          - name: "cypress-service-entries-alloy"
+            enabled: true
+            spec:
+              hosts:
+                - 'loki.dev.bigbang.mil'
+              location: MESH_EXTERNAL
+              ports:
+                - number: 443
+                  protocol: TLS
+                  name: https
+              resolution: DNS
+
 # Addons are toggled based on labels in CI
 addons:
   argocd:
