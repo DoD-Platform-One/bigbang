@@ -2103,11 +2103,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git
       path: "./chart"
-      tag: "3.13.0-bb.3"
+      tag: "3.13.0-bb.4"
     helmRepo:
       repoName: "registry1"
       chartName: "metrics-server"
-      tag: "3.13.0-bb.3"
+      tag: "3.13.0-bb.4"
 
     # -- Enabled automount Service Account Token so that metrics-server fetches resource metrics from the kubelets
     automountServiceAccountToken: true
