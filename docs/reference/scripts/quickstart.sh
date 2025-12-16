@@ -89,14 +89,14 @@ function build_k3d_arguments {
 }
 
 function destroy_k3d_cluster {
-    ${BIG_BANG_REPO}/docs/assets/scripts/developer/k3d-dev.sh \
+    ${BIG_BANG_REPO}/docs/reference/scripts/developer/k3d-dev.sh \
         -t quickstart \
         $(build_k3d_arguments) \
         -d
 }
 
 function build_k3d_cluster {
-    ${BIG_BANG_REPO}/docs/assets/scripts/developer/k3d-dev.sh \
+    ${BIG_BANG_REPO}/docs/reference/scripts/developer/k3d-dev.sh \
         -t quickstart \
         -T \
         -q \
@@ -121,8 +121,8 @@ function deploy_bigbang {
             --set registryCredentials.password=${REGISTRY1_TOKEN} \
             $@ \
             -f ${BIG_BANG_REPO}/chart/ingress-certs.yaml \
-            -f ${BIG_BANG_REPO}/docs/assets/configs/example/dev-sso-values.yaml \
-            -f ${BIG_BANG_REPO}/docs/assets/configs/example/policy-overrides-k3d.yaml
+            -f ${BIG_BANG_REPO}/docs/reference/configs/example/dev-sso-values.yaml \
+            -f ${BIG_BANG_REPO}/docs/reference/configs/example/policy-overrides-k3d.yaml
 }
 
 function check_for_tools {
