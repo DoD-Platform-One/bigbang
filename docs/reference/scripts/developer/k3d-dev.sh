@@ -5,7 +5,7 @@
 ### Initialized globals
 
 K3D_VERSION="5.8.3"
-DEFAULT_K3S_TAG="v1.33.3-k3s1"
+DEFAULT_K3S_TAG="v1.34.1-k3s1"
 PROVISION_CLOUD_INSTANCE=true
 CLOUDPROVIDER="aws"
 SSHUSER=ubuntu
