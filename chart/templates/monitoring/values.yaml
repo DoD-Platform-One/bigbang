@@ -252,6 +252,9 @@ upstream:
         {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
         {{- $alertmanagerAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
         labels:
+          {{- if .Values.kiali.enabled }}
+          service.istio.io/canonical-name: alertmanager
+          {{- end }}
           {{- if .Values.monitoring.sso.enabled }}
           {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
           {{- end }}
@@ -379,6 +382,9 @@ upstream:
       podMetadata:
         labels:
           app: prometheus
+          {{- if .Values.kiali.enabled }}
+          service.istio.io/canonical-name: prometheus
+          {{- end }}
           {{- if .Values.monitoring.sso.enabled }}
           {{- $prometheusAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
           {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}

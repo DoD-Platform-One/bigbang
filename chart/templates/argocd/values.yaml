@@ -75,6 +75,10 @@ global:
   podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}
+{{- if .Values.kiali.enabled }}
+  podLabels:
+    service.istio.io/canonical-name: argocd-argocd
+{{- end }}
 
 istio:
   enabled: {{ $istioEnabled }}

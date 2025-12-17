@@ -30,6 +30,10 @@ upstream:
     {{- end }}
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if .Values.kiali.enabled }}
+    extraLabels:
+      service.istio.io/canonical-name: vault-vault-agent-injector
+    {{- end }}
 
   server:
     {{- if $istioEnabled }}
@@ -38,6 +42,10 @@ upstream:
     {{- end }}
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if .Values.kiali.enabled }}
+    extraLabels:
+      service.istio.io/canonical-name: vault-vault
+    {{- end }}
     {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
     # In this context, we do not use any istio helpers (.vault.ingress.gateway would be "passthrough" in both istio versions)
     {{- if eq .Values.addons.vault.ingress.gateway "passthrough" }}

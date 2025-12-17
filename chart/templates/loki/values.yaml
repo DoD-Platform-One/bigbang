@@ -115,6 +115,10 @@ loki:
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    service.istio.io/canonical-name: logging-loki
+  {{- end }}
 
 {{- if (eq .Values.loki.strategy "monolith") }}
 deploymentMode: SingleBinary

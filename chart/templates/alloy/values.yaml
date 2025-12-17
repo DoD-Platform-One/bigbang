@@ -64,6 +64,11 @@ istio:
     generateFromNetpol: true
 
 upstream:
+  {{- if .Values.kiali.enabled }}
+  alloy:
+    extraLabels:
+      service.istio.io/canonical-name: alloy-alloy-logs
+  {{- end }}
   destinations:
     {{- if and $alloyLogsEnabled .Values.loki.enabled }}
     - name: loki
