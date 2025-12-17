@@ -71,6 +71,11 @@ upstream:
     {{ include "istioAnnotation" . | nindent 2 }}
   {{- end }}
 
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    service.istio.io/canonical-name: fluentbit-fluent-bit
+  {{- end }}
+
   {{- if .Values.openshift }}
   podSecurityContext:
     seLinuxOptions:

@@ -64,6 +64,8 @@ upstream:
         pod_annotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
+        pod_labels:
+          service.istio.io/canonical-name: kiali
         hpa:
           spec:
             maxReplicas: 2

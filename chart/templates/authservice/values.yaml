@@ -32,6 +32,11 @@ imagePullSecrets:
 podAnnotations:
   {{ include "istioAnnotation" . }}
 
+{{- if .Values.kiali.enabled }}
+podLabels:
+  service.istio.io/canonical-name: authservice
+{{- end }}
+
 openshift: {{ .Values.openshift | default false }}
 
 monitoring:

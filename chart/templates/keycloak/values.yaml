@@ -78,6 +78,11 @@ upstream:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
+  {{- if .Values.kiali.enabled }}
+  podLabels:
+    service.istio.io/canonical-name: keycloak-keycloak
+  {{- end }}
+
   http:
     internalScheme: HTTP
 

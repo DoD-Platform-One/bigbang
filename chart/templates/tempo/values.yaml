@@ -23,6 +23,19 @@ upstream:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
+  {{- $tempoAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+  {{- $tempoAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+  {{- if or .Values.kiali.enabled .Values.tempo.sso.enabled }}
+  podLabels:
+    {{- if .Values.kiali.enabled }}
+    service.istio.io/canonical-name: tempo-tempo
+    {{- end }}
+    {{- if .Values.tempo.sso.enabled }}
+    {{ $tempoAuthserviceKey }}: {{ $tempoAuthserviceValue }}
+    {{- end }}
+  {{- end }}
+
+
   tempo:
     extraVolumeMounts:
       - name: tempo-runtime
