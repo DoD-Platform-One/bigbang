@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 3.13.0](https://img.shields.io/badge/Version-3.13.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.14.0](https://img.shields.io/badge/Version-3.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -61,13 +61,14 @@ Kubernetes: `>=1.32.0-0`
 | sso.oidc.claims.username | string | `"preferred_username"` | IdP's claim name used for the username |
 | sso.oidc.claims.groups | string | `"groups"` | IdP's claim name used for the user's groups or roles |
 | flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}],"mode":"enabled"},"install":{"remediation":{"retries":-1}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
-| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","egress":{"definitions":{"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}},"enabled":true,"ingress":{"definitions":{"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}},"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
+| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","egress":{"definitions":{"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]},"storage-subnets":{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}},"enabled":true,"ingress":{"definitions":{"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}},"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled` |
 | networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` | Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints) Used by package NetworkPolicies to allow Kube API access |
 | networkPolicies.nodeCidr | string | `""` | Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks. use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range. Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs) |
 | networkPolicies.vpcCidr | string | `"0.0.0.0/0"` | VPC CIDR, defaults to 0.0.0.0/0 In a production environment, it is recommended to setup a Private Endpoint for your AWS services like KMS or S3. Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network. Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint. |
-| networkPolicies.egress.definitions | object | `{"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}` | Egress definitions; create definitions here that you want to re-use globally across all packages |
-| networkPolicies.egress.definitions.sso | object | `{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}` | Egress definition for SSO; Set this to the CIDRs your SSO implementation is being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm)  for this purpose |
+| networkPolicies.egress.definitions | object | `{"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]},"storage-subnets":{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}` | Egress definitions; create definitions here that you want to re-use globally across all packages |
+| networkPolicies.egress.definitions.sso | object | `{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}` | Egress definition for SSO; Set this to the CIDRs your SSO implementation is being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm) for this purpose |
+| networkPolicies.egress.definitions.storage-subnets | object | `{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}` | Egress definition for Storage subnets (i.e. S3, Azure blob storage, etc.) |
 | networkPolicies.ingress.definitions | object | `{"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}` | Ingress definitions; create definitions here that you want to re-use globally across all packages |
 | networkPolicies.ingress.definitions.load-balancer-subnets | object | `{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}` | Ingress definition for load balancer subnets; change these CIDRs to match the subnet CIDRs where your load balancers are deployed |
 | imagePullPolicy | string | `"IfNotPresent"` | Global ImagePullPolicy value for all packages Permitted values are: None, Always, IfNotPresent |
@@ -120,10 +121,10 @@ Kubernetes: `>=1.32.0-0`
 | kiali.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kiali.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kiali.git"` |  |
 | kiali.git.path | string | `"./chart"` |  |
-| kiali.git.tag | string | `"2.19.0-bb.0"` |  |
+| kiali.git.tag | string | `"2.19.0-bb.2"` |  |
 | kiali.helmRepo.repoName | string | `"registry1"` |  |
 | kiali.helmRepo.chartName | string | `"kiali"` |  |
-| kiali.helmRepo.tag | string | `"2.19.0-bb.0"` |  |
+| kiali.helmRepo.tag | string | `"2.19.0-bb.2"` |  |
 | kiali.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Kiali"}}]}}` | Flux reconciliation overrides specifically for the Kiali Package |
 | kiali.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | kiali.sso.enabled | bool | `false` | Toggle SSO for Kiali on and off |
@@ -135,10 +136,10 @@ Kubernetes: `>=1.32.0-0`
 | gatekeeper.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | gatekeeper.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/policy.git"` |  |
 | gatekeeper.git.path | string | `"./chart"` |  |
-| gatekeeper.git.tag | string | `"3.20.1-bb.1"` |  |
+| gatekeeper.git.tag | string | `"3.21.0-bb.0"` |  |
 | gatekeeper.helmRepo.repoName | string | `"registry1"` |  |
 | gatekeeper.helmRepo.chartName | string | `"gatekeeper"` |  |
-| gatekeeper.helmRepo.tag | string | `"3.20.1-bb.1"` |  |
+| gatekeeper.helmRepo.tag | string | `"3.21.0-bb.0"` |  |
 | gatekeeper.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the OPA Gatekeeper Package |
 | gatekeeper.values | object | `{}` | Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/big-bang/product/packages/policy.git |
 | gatekeeper.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -146,10 +147,10 @@ Kubernetes: `>=1.32.0-0`
 | kyverno.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kyverno.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kyverno.git"` |  |
 | kyverno.git.path | string | `"./chart"` |  |
-| kyverno.git.tag | string | `"3.6.0-bb.1"` |  |
+| kyverno.git.tag | string | `"3.6.1-bb.0"` |  |
 | kyverno.helmRepo.repoName | string | `"registry1"` |  |
 | kyverno.helmRepo.chartName | string | `"kyverno"` |  |
-| kyverno.helmRepo.tag | string | `"3.6.0-bb.1"` |  |
+| kyverno.helmRepo.tag | string | `"3.6.1-bb.0"` |  |
 | kyverno.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"CustomResourceDefinition"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]},"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Kyverno Package |
 | kyverno.values | object | `{}` | Values to passthrough to the kyverno chart: https://repo1.dso.mil/big-bang/product/packages/kyverno.git |
 | kyverno.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -180,10 +181,10 @@ Kubernetes: `>=1.32.0-0`
 | elasticsearchKibana.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | elasticsearchKibana.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git"` |  |
 | elasticsearchKibana.git.path | string | `"./chart"` |  |
-| elasticsearchKibana.git.tag | string | `"1.34.0-bb.0"` |  |
+| elasticsearchKibana.git.tag | string | `"1.34.0-bb.1"` |  |
 | elasticsearchKibana.helmRepo.repoName | string | `"registry1"` |  |
 | elasticsearchKibana.helmRepo.chartName | string | `"elasticsearch-kibana"` |  |
-| elasticsearchKibana.helmRepo.tag | string | `"1.34.0-bb.0"` |  |
+| elasticsearchKibana.helmRepo.tag | string | `"1.34.0-bb.1"` |  |
 | elasticsearchKibana.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Kibana"}},{"paths":[""],"target":{"kind":"Elasticsearch"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]},"timeout":"20m"}` | Flux reconciliation overrides specifically for the Logging (EFK) Package |
 | elasticsearchKibana.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | elasticsearchKibana.sso.enabled | bool | `false` | Toggle OIDC SSO for Kibana/Elasticsearch on and off. Enabling this option will auto-create any required secrets. |
@@ -219,11 +220,11 @@ Kubernetes: `>=1.32.0-0`
 | alloy.enabled | bool | `true` | Toggle deployment of grafana alloy |
 | alloy.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | alloy.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/alloy.git"` |  |
-| alloy.git.tag | string | `"3.2.1-bb.5"` |  |
+| alloy.git.tag | string | `"3.2.1-bb.6"` |  |
 | alloy.git.path | string | `"./chart"` |  |
 | alloy.helmRepo.repoName | string | `"registry1"` |  |
 | alloy.helmRepo.chartName | string | `"k8s-monitoring"` |  |
-| alloy.helmRepo.tag | string | `"3.2.1-bb.5"` |  |
+| alloy.helmRepo.tag | string | `"3.2.1-bb.6"` |  |
 | alloy.alloyLogs | object | `{"enabled":true}` | Toggle Alloy to collect logs |
 | alloy.alloyMetrics.enabled | bool | `true` |  |
 | alloy.additionalDestinations | list | `[]` | Additional Alloy destinations not included in Big Bang |
@@ -234,10 +235,10 @@ Kubernetes: `>=1.32.0-0`
 | loki.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | loki.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/loki.git"` |  |
 | loki.git.path | string | `"./chart"` |  |
-| loki.git.tag | string | `"6.46.0-bb.0"` |  |
+| loki.git.tag | string | `"6.46.0-bb.1"` |  |
 | loki.helmRepo.repoName | string | `"registry1"` |  |
 | loki.helmRepo.chartName | string | `"loki"` |  |
-| loki.helmRepo.tag | string | `"6.46.0-bb.0"` |  |
+| loki.helmRepo.tag | string | `"6.46.0-bb.1"` |  |
 | loki.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Tenant"}},{"paths":[""],"target":{"kind":"Sidecar"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Loki Package |
 | loki.strategy | string | `"monolith"` | Loki architecture.  Options are monolith and scalable |
 | loki.clusterName | string | `""` | Loki clusterName identifier |
@@ -270,11 +271,10 @@ Kubernetes: `>=1.32.0-0`
 | tempo.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | tempo.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/tempo.git"` |  |
 | tempo.git.path | string | `"./chart"` |  |
-| tempo.git.tag | string | `"1.23.3-bb.0"` |  |
+| tempo.git.tag | string | `"1.23.3-bb.2"` |  |
 | tempo.helmRepo.repoName | string | `"registry1"` |  |
 | tempo.helmRepo.chartName | string | `"tempo"` |  |
-| tempo.helmRepo.tag | string | `"1.23.3-bb.0"` |  |
-| tempo.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
+| tempo.helmRepo.tag | string | `"1.23.3-bb.2"` |  |
 | tempo.flux | object | `{}` | Flux reconciliation overrides specifically for the Tempo Package |
 | tempo.sso.enabled | bool | `false` | Toggle SSO for Tempo on and off |
 | tempo.sso.client_id | string | `""` | OIDC Client ID to use for Tempo |
@@ -292,10 +292,10 @@ Kubernetes: `>=1.32.0-0`
 | prometheusOperatorCRDs.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | prometheusOperatorCRDs.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/prometheus-operator-crds.git"` |  |
 | prometheusOperatorCRDs.git.path | string | `"./chart"` |  |
-| prometheusOperatorCRDs.git.tag | string | `"24.0.0-bb.0"` |  |
+| prometheusOperatorCRDs.git.tag | string | `"25.0.0-bb.0"` |  |
 | prometheusOperatorCRDs.helmRepo.repoName | string | `"registry1"` |  |
 | prometheusOperatorCRDs.helmRepo.chartName | string | `"prometheus-operator-crds"` |  |
-| prometheusOperatorCRDs.helmRepo.tag | string | `"24.0.0-bb.0"` |  |
+| prometheusOperatorCRDs.helmRepo.tag | string | `"25.0.0-bb.0"` |  |
 | prometheusOperatorCRDs.values | object | `{}` | Values to passthrough to the Prometheus Operator CRDs chart |
 | prometheusOperatorCRDs.flux | object | `{"driftDetection":{"mode":"warn"}}` | Flux reconciliation overrides specifically for the Prometheus Operator CRDs Package |
 | prometheusOperatorCRDs.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -303,10 +303,10 @@ Kubernetes: `>=1.32.0-0`
 | monitoring.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | monitoring.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/monitoring.git"` |  |
 | monitoring.git.path | string | `"./chart"` |  |
-| monitoring.git.tag | string | `"79.11.0-bb.0"` |  |
+| monitoring.git.tag | string | `"80.4.1-bb.0"` |  |
 | monitoring.helmRepo.repoName | string | `"registry1"` |  |
 | monitoring.helmRepo.chartName | string | `"monitoring"` |  |
-| monitoring.helmRepo.tag | string | `"79.11.0-bb.0"` |  |
+| monitoring.helmRepo.tag | string | `"80.4.1-bb.0"` |  |
 | monitoring.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Alertmanager"}},{"paths":[""],"target":{"kind":"Prometheus"}},{"paths":[""],"target":{"kind":"PrometheusRule"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]},"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the Monitoring Package |
 | monitoring.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | monitoring.sso.enabled | bool | `false` | Toggle SSO for monitoring components on and off |
@@ -338,10 +338,10 @@ Kubernetes: `>=1.32.0-0`
 | twistlock.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | twistlock.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/twistlock.git"` |  |
 | twistlock.git.path | string | `"./chart"` |  |
-| twistlock.git.tag | string | `"0.23.0-bb.4"` |  |
+| twistlock.git.tag | string | `"0.24.0-bb.0"` |  |
 | twistlock.helmRepo.repoName | string | `"registry1"` |  |
 | twistlock.helmRepo.chartName | string | `"twistlock"` |  |
-| twistlock.helmRepo.tag | string | `"0.23.0-bb.4"` |  |
+| twistlock.helmRepo.tag | string | `"0.24.0-bb.0"` |  |
 | twistlock.flux | object | `{}` | Flux reconciliation overrides specifically for the Twistlock Package |
 | twistlock.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | twistlock.sso.enabled | bool | `false` | Toggle SAML SSO, requires a license and enabling the init job - see https://repo1.dso.mil/big-bang/product/packages/initialization.md |
@@ -400,7 +400,7 @@ Kubernetes: `>=1.32.0-0`
 | addons.backstage.sso.client_secret | string | `""` | Backstage OIDC client secret |
 | addons.backstage.values | object | `{}` | Values to passthrough to the Backstage chart: https://repo1.dso.mil/big-bang/product/packages/backstage.git |
 | addons.backstage.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| addons.authservice.enabled | bool | `false` | Toggle deployment of Authservice. if enabling authservice, a filter needs to be provided by either enabling sso for monitoring or istio, or manually adding a filter chain in the values here: values:   chain:     minimal:       callback_uri: "https://somecallback" |
+| addons.authservice.enabled | bool | `false` | Toggle deployment of Authservice. if enabling authservice, a filter needs to be provided by either enabling sso for monitoring or istio, or manually adding a filter chain in the values here: `.Values.addons.authservice.values.chain.minimal.callback_uri="htts://somecallback"` |
 | addons.authservice.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.authservice.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/authservice.git"` |  |
 | addons.authservice.git.path | string | `"./chart"` |  |
@@ -444,10 +444,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"9.6.1-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"9.6.2-bb.0"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"9.6.1-bb.0"` |  |
+| addons.gitlab.helmRepo.tag | string | `"9.6.2-bb.0"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.gitlab.sso.enabled | bool | `false` | Toggle OIDC SSO for Gitlab on and off. Enabling this option will auto-create any required secrets. |
@@ -462,7 +462,7 @@ Kubernetes: `>=1.32.0-0`
 | addons.gitlab.database.password | string | `""` | Database password for the username used to connect to the existing database. |
 | addons.gitlab.objectStorage.type | string | `""` | Type of object storage to use for Gitlab, setting to s3 will assume an external, pre-existing object storage is to be used. Entering connection info will enable this option and will auto-create any required secrets |
 | addons.gitlab.objectStorage.endpoint | string | `""` | S3 compatible endpoint to use for connection information. examples: "https://s3.amazonaws.com" "https://s3.us-gov-west-1.amazonaws.com" "http://minio.minio.svc.cluster.local:9000" |
-| addons.gitlab.objectStorage.regionendpoint | string | `""` | S3 compatible service endpoint for use with Minio or aws S3.  See: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage Setting this allows the registry to use a different endpoint than the global `objectStorage.endpoint` documented above. `objectStorage.endpoint` must be set in order for `objectStorage.regionendpoint` endpoint to be used.  See: https://docs.gitlab.com/administration/object_storage/ Also note rails.s3.yaml and registry.s3.yaml here for implementation parallel: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage examples:  "https://s3.us-gov-west-1.amazonaws.com" "https://minio.example.com:9000" |
+| addons.gitlab.objectStorage.regionendpoint | string | `""` | S3 compatible service endpoint for use with Minio or aws S3.  See: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage Setting this allows the registry to use a different endpoint than the global `objectStorage.endpoint` documented above. `objectStorage.endpoint` must be set in order for `objectStorage.regionendpoint` endpoint to be used.  See: https://docs.gitlab.com/administration/object_storage/ Also note rails.s3.yaml and registry.s3.yaml here for implementation parallel: https://gitlab.com/gitlab-org/charts/gitlab/-/tree/master/examples/objectstorage examples:  `"https://s3.us-gov-west-1.amazonaws.com"` `"https://minio.example.com:9000"` |
 | addons.gitlab.objectStorage.region | string | `""` | S3 compatible region to use for connection information. |
 | addons.gitlab.objectStorage.accessKey | string | `""` | Access key for connecting to object storage endpoint. -- If using accessKey and accessSecret, the iamProfile must be left as an empty string: "" |
 | addons.gitlab.objectStorage.accessSecret | string | `""` | Secret key for connecting to object storage endpoint. Unencoded string data. This should be placed in the secret values and then encrypted |
@@ -477,10 +477,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.gitlabRunner.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlabRunner.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git"` |  |
 | addons.gitlabRunner.git.path | string | `"./chart"` |  |
-| addons.gitlabRunner.git.tag | string | `"0.82.0-bb.4"` |  |
+| addons.gitlabRunner.git.tag | string | `"0.83.2-bb.0"` |  |
 | addons.gitlabRunner.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlabRunner.helmRepo.chartName | string | `"gitlab-runner"` |  |
-| addons.gitlabRunner.helmRepo.tag | string | `"0.82.0-bb.4"` |  |
+| addons.gitlabRunner.helmRepo.tag | string | `"0.83.2-bb.0"` |  |
 | addons.gitlabRunner.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Runner Package |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git |
 | addons.gitlabRunner.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -488,13 +488,13 @@ Kubernetes: `>=1.32.0-0`
 | addons.nexusRepositoryManager.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.nexusRepositoryManager.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/nexus.git"` |  |
 | addons.nexusRepositoryManager.git.path | string | `"./chart"` |  |
-| addons.nexusRepositoryManager.git.tag | string | `"84.0.0-bb.1"` |  |
+| addons.nexusRepositoryManager.git.tag | string | `"86.0.0-bb.0"` |  |
 | addons.nexusRepositoryManager.helmRepo.repoName | string | `"registry1"` |  |
 | addons.nexusRepositoryManager.helmRepo.chartName | string | `"nexus-repository-manager"` |  |
-| addons.nexusRepositoryManager.helmRepo.tag | string | `"84.0.0-bb.1"` |  |
+| addons.nexusRepositoryManager.helmRepo.tag | string | `"86.0.0-bb.0"` |  |
 | addons.nexusRepositoryManager.license_key | string | `""` | Base64 encoded license file. |
 | addons.nexusRepositoryManager.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
-| addons.nexusRepositoryManager.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599 |
+| addons.nexusRepositoryManager.sso.enabled | bool | `false` | Toggle SAML SSO for NXRM. -- handles SAML SSO, a Client must be configured in Keycloak or IdP -- to complete setup. -- `https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599` |
 | addons.nexusRepositoryManager.sso.idp_data | object | `{"email":"","entityId":"","firstName":"","groups":"","lastName":"","username":""}` | NXRM SAML SSO Integration data |
 | addons.nexusRepositoryManager.sso.idp_data.username | string | `""` | IdP Field Mappings -- NXRM username attribute |
 | addons.nexusRepositoryManager.sso.idp_data.firstName | string | `""` | NXRM firstname attribute (optional) |
@@ -509,10 +509,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.sonarqube.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.sonarqube.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/sonarqube.git"` |  |
 | addons.sonarqube.git.path | string | `"./chart"` |  |
-| addons.sonarqube.git.tag | string | `"2025.5.0-bb.1"` |  |
+| addons.sonarqube.git.tag | string | `"2025.5.0-bb.2"` |  |
 | addons.sonarqube.helmRepo.repoName | string | `"registry1"` |  |
 | addons.sonarqube.helmRepo.chartName | string | `"sonarqube"` |  |
-| addons.sonarqube.helmRepo.tag | string | `"2025.5.0-bb.1"` |  |
+| addons.sonarqube.helmRepo.tag | string | `"2025.5.0-bb.2"` |  |
 | addons.sonarqube.flux | object | `{}` | Flux reconciliation overrides specifically for the Sonarqube Package |
 | addons.sonarqube.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.sonarqube.sso.enabled | bool | `false` | Toggle SAML SSO for SonarQube. Enabling this option will auto-create any required secrets. |
@@ -532,10 +532,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.fortify.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.fortify.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/fortify.git"` |  |
 | addons.fortify.git.path | string | `"./chart"` |  |
-| addons.fortify.git.tag | string | `"1.1.2320154-bb.38"` |  |
+| addons.fortify.git.tag | string | `"1.1.2320154-bb.39"` |  |
 | addons.fortify.helmRepo.repoName | string | `"registry1"` |  |
 | addons.fortify.helmRepo.chartName | string | `"fortify-ssc"` |  |
-| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.38"` |  |
+| addons.fortify.helmRepo.tag | string | `"1.1.2320154-bb.39"` |  |
 | addons.fortify.flux | object | `{}` | Flux reconciliation overrides specifically for the Fortify Package |
 | addons.fortify.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.fortify.sso.enabled | bool | `false` | Toggle SSO for Fortify on and off |
@@ -586,10 +586,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.mattermost.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.mattermost.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/mattermost.git"` |  |
 | addons.mattermost.git.path | string | `"./chart"` |  |
-| addons.mattermost.git.tag | string | `"11.1.1-bb.1"` |  |
+| addons.mattermost.git.tag | string | `"11.1.1-bb.2"` |  |
 | addons.mattermost.helmRepo.repoName | string | `"registry1"` |  |
 | addons.mattermost.helmRepo.chartName | string | `"mattermost"` |  |
-| addons.mattermost.helmRepo.tag | string | `"11.1.1-bb.1"` |  |
+| addons.mattermost.helmRepo.tag | string | `"11.1.1-bb.2"` |  |
 | addons.mattermost.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Mattermost"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Mattermost Package |
 | addons.mattermost.enterprise | object | `{"enabled":false,"license":""}` | Mattermost Enterprise functionality. |
 | addons.mattermost.enterprise.enabled | bool | `false` | Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install. |
@@ -628,10 +628,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.keycloak.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.keycloak.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/keycloak.git"` |  |
 | addons.keycloak.git.path | string | `"./chart"` |  |
-| addons.keycloak.git.tag | string | `"7.1.4-bb.4"` |  |
+| addons.keycloak.git.tag | string | `"7.1.4-bb.5"` |  |
 | addons.keycloak.helmRepo.repoName | string | `"registry1"` |  |
 | addons.keycloak.helmRepo.chartName | string | `"keycloak"` |  |
-| addons.keycloak.helmRepo.tag | string | `"7.1.4-bb.4"` |  |
+| addons.keycloak.helmRepo.tag | string | `"7.1.4-bb.5"` |  |
 | addons.keycloak.database.host | string | `""` | Hostname of a pre-existing database to use for Keycloak. Entering connection info will disable the deployment of an internal database and will auto-create any required secrets. |
 | addons.keycloak.database.type | string | `"postgres"` | Pre-existing database type (e.g. postgres) to use for Keycloak. |
 | addons.keycloak.database.port | int | `5432` | Port of a pre-existing database to use for Keycloak. |
@@ -660,10 +660,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.metricsServer.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.metricsServer.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/metrics-server.git"` |  |
 | addons.metricsServer.git.path | string | `"./chart"` |  |
-| addons.metricsServer.git.tag | string | `"3.13.0-bb.3"` |  |
+| addons.metricsServer.git.tag | string | `"3.13.0-bb.4"` |  |
 | addons.metricsServer.helmRepo.repoName | string | `"registry1"` |  |
 | addons.metricsServer.helmRepo.chartName | string | `"metrics-server"` |  |
-| addons.metricsServer.helmRepo.tag | string | `"3.13.0-bb.3"` |  |
+| addons.metricsServer.helmRepo.tag | string | `"3.13.0-bb.4"` |  |
 | addons.metricsServer.automountServiceAccountToken | bool | `true` | Enabled automount Service Account Token so that metrics-server fetches resource metrics from the kubelets |
 | addons.metricsServer.flux | object | `{}` | Flux reconciliation overrides specifically for the metrics server Package |
 | addons.metricsServer.values | object | `{}` | Values to passthrough to the metrics server chart: https://repo1.dso.mil/big-bang/product/packages/metrics-server.git |
@@ -692,11 +692,11 @@ Kubernetes: `>=1.32.0-0`
 | addons.thanos.objectStorage.insecure | bool | `false` | Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object |
 | addons.thanos.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.thanos.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/thanos.git"` |  |
-| addons.thanos.git.tag | string | `"17.3.3-bb.0"` |  |
+| addons.thanos.git.tag | string | `"17.3.3-bb.1"` |  |
 | addons.thanos.git.path | string | `"./chart"` |  |
 | addons.thanos.helmRepo.repoName | string | `"registry1"` |  |
 | addons.thanos.helmRepo.chartName | string | `"thanos"` |  |
-| addons.thanos.helmRepo.tag | string | `"17.3.3-bb.0"` |  |
+| addons.thanos.helmRepo.tag | string | `"17.3.3-bb.1"` |  |
 | addons.thanos.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Tenant"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Thanos Package |
 | addons.thanos.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.thanos.values | object | `{}` |  |
