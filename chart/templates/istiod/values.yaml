@@ -6,6 +6,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.istiod" -}}
+{{- $authserviceEnabled := (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   controlPlaneCIDRs:
@@ -22,7 +23,7 @@ networkPolicies:
       istiod:
         to:
           definition:
-            sso: {{ .Values.addons.authservice.enabled }}
+            sso: {{ $authserviceEnabled }}
   ingress:
     to:
       istiod:15014:
@@ -35,7 +36,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 authservice:
-  enabled: {{ .Values.addons.authservice.enabled }}
+  enabled: {{ $authserviceEnabled }}
 
 upstream:
   cni:
@@ -45,7 +46,7 @@ upstream:
     imagePullSecrets:
       - private-registry
  
-  {{- if or .Values.addons.authservice.enabled .Values.tempo.enabled }}
+  {{- if or $authserviceEnabled .Values.tempo.enabled }}
   meshConfig:
     {{- if .Values.tempo.enabled }}
     accessLogFormat: |
@@ -57,7 +58,7 @@ upstream:
         zipkin:
           address: tempo-tempo.tempo.svc:9411
     {{- end }}
-    {{- if .Values.addons.authservice.enabled }}
+    {{- if $authserviceEnabled }}
     extensionProviders:
       - name: "authservice"
         envoyExtAuthzGrpc:
@@ -65,7 +66,7 @@ upstream:
           port: "10003"
     {{- end }}
   {{- end }}
-{{ if and .Values.addons.authservice.enabled .Values.sso.certificateAuthority.cert }}
+{{ if and $authserviceEnabled .Values.sso.certificateAuthority.cert }}
   jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert  | quote }}
 {{- end }}
 {{- end }}
