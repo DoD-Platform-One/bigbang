@@ -1,5 +1,7 @@
 # Using Network Policies in Big Bang
 
+> **ℹ️ NOTE:** For package developers integrating network policies, see the [Big Bang Common Library](../community/development/package-integration/bb-common.md) guide which consolidates service mesh, network policies, and Istio hardening documentation.
+
 ## What are Network Policies
 
 Kubernetes allows Big Bang operators to utilize [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) to control the network traffic into or out of the various pods of a Kubernetes cluster. These network policies allow you to restrict incoming and outgoing traffic to or from a given set of pods using selectors. [Selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) allow you to select which pods a given networkPolicy will apply to. 
