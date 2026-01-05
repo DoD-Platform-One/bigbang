@@ -102,13 +102,15 @@ istio:
 {{- if $minioEnabled }}
 minio-tenant:
   enabled: true
-  tenant:
-    configSecret:
-      accessKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
-      secretKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
-    defaultUserCredentials:
-        username: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.username }}
-        password: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.password }}
+  upstream:
+    tenant:
+      name: mimir-mimir-minio-tenant
+      configSecret:
+        accessKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
+        secretKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
+      defaultUserCredentials:
+          username: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.username }}
+          password: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.password }}
 {{- end }}
 
 upstream:
@@ -145,10 +147,10 @@ upstream:
           backend: s3
           s3:
             {{- if $minioEnabled }}
-            access_key_id: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.username }}
+            access_key_id: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
             endpoint: minio.mimir.svc.cluster.local
             insecure: true
-            secret_access_key: {{ .Values.addons.mimir.minioObjectStorage.defaultUserCredentials.password }}
+            secret_access_key: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
             bucket_name: mimir
             {{- else }}
             {{- if $s3Enabled }}
