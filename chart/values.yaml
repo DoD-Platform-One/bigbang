@@ -927,6 +927,7 @@ tempo:
   # -- Flux reconciliation overrides specifically for the Tempo Package
   flux: {}
 
+  # -- This section is deprecated and will be removed in a future release
   sso:
     # -- Toggle SSO for Tempo on and off
     enabled: false
