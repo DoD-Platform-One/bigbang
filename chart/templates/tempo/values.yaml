@@ -1,5 +1,5 @@
 {{- if .Values.tempo.enabled }}
-{{- /* Create a cleaned copy of kiali config and merge deprecated paths into current paths */ -}}
+{{- /* Create a cleaned copy of tempo config and merge deprecated paths into current paths */ -}}
 {{- $tempoPackage := deepCopy .Values.tempo -}}
 {{- if .Values.tempo.values -}}
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.tempo.values) | fromYaml -}}

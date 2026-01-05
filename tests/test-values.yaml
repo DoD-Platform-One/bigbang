@@ -932,17 +932,12 @@ loki:
   strategy: monolith
   values:
     istio:
-      loki:
-        enabled: true
-      hardened:
-        customServiceEntries:
+      serviceEntries:
+        custom:
           - name: "cypress-service-entries-loki"
             enabled: true
             spec:
               hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
                 - 'repo1.dso.mil'
                 - 'grafana.dev.bigbang.mil'
                 - 'optimizationguide-pa.googleapis.com'
@@ -957,7 +952,6 @@ loki:
                   protocol: TLS
                   name: https
               resolution: DNS
-
     minio:
       enabled: false
     bbtests:
