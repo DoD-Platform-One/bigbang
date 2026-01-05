@@ -1,9 +1,17 @@
 {{- if .Values.loki.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.loki "name" "loki" "defaults" (include "bigbang.defaults.loki" .)) }}
+{{- /* Create a cleaned copy of loki config and merge deprecated paths into current paths */ -}}
+{{- $lokiPackage := deepCopy .Values.loki -}}
+{{- if .Values.loki.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.loki.values) | fromYaml -}}
+{{- $lokiPackage = set $lokiPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $lokiPackage "name" "loki" "defaults" (include "bigbang.defaults.loki" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.loki" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.loki.values) }}
+{{- $minioEnabled := dig "minio" "enabled" false .Values.loki.values }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -15,30 +23,36 @@ openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  {{- if or
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-  }}
   hardened:
-    enabled: true
-    monitoring:
-      enabled: {{ .Values.monitoring.enabled }}
-    fluentbit:
-      enabled: {{ .Values.fluentbit.enabled }}
-    minioOperator:
-      enabled: {{ .Values.addons.minioOperator.enabled }}
-    alloy:
-      enabled: {{ .Values.alloy.enabled }}
-  {{- end }}
-  loki:
-    enabled: true
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+routes:
+  inbound:
+    loki:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
+      hosts:
+        - loki.{{ .Values.domain }}
+      {{- if ne .Values.loki.strategy "monolith" }}
+      service: logging-loki-gateway.logging.svc.cluster.local
+      port: {{ dig "gateway" "service" "port" 80 .Values.loki.values }}
+      {{- else }}
+      service: logging-loki.logging.svc.cluster.local
+      port: {{ dig "loki" "server" "http_listen_port" 3100 .Values.loki.values }}
+      {{- end }}
+      selector:
+        app.kubernetes.io/name: logging-loki
+        # Be more specific when using a distributed so simple scalable deployment mode
+        {{- if ne .Values.loki.strategy "monolith" }}
+        app.kubernetes.io/component: gateway
+        {{- end }}
 
 imagePullSecrets:
   - name: private-registry
@@ -48,10 +62,62 @@ image:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    to:
+      logging-loki:3100:
+        from:
+          k8s:
+            alloy-alloy-operator@alloy/alloy: {{ .Values.alloy.enabled }}
+            alloy-alloy-logs@alloy/alloy-logs: {{ .Values.alloy.enabled }}
+            fluentbit-fluent-bit@fluentbit/fluent-bit: {{ .Values.fluentbit.enabled }}
+            monitoring-grafana@monitoring/grafana: {{ and .Values.grafana.enabled (eq .Values.loki.strategy "monolith") }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      loki:8080:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: logging-loki
+            app.kubernetes.io/component: gateway
+        from:
+          k8s:
+            monitoring-grafana@monitoring/grafana: {{ and .Values.grafana.enabled (ne .Values.loki.strategy "monolith") }}
+      minio:9000:
+        from:
+          k8s:
+            minio-operator@minio-operator/minio-operator: {{ $minioEnabled }}
+  egress:
+    definitions:
+      storage-subnets:
+        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
+      kubeAPI:
+        to:
+        {{- if or (eq .Values.networkPolicies.controlPlaneCidr "0.0.0.0/0") (eq .Values.networkPolicies.vpcCidr "0.0.0.0/0") }}
+          - ipBlock:
+              cidr: "0.0.0.0/0"
+              except:
+              - 169.254.169.254/32
+        {{- else }}
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.vpcCidr }}
+        {{- end }}
+    from:
+      logging-loki:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            storage-subnets: {{ not $minioEnabled }}
+      minio:
+        to:
+          k8s:
+            minio-operator/minio-operator:4222: {{ $minioEnabled }}
+          definition:
+            storage-subnets: {{ $minioEnabled }}
+            kubeAPI: {{ $minioEnabled }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
