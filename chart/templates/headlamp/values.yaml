@@ -1,8 +1,73 @@
 {{- if .Values.addons.headlamp.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.headlamp "name" "headlamp" "defaults" (include "bigbang.defaults.headlamp" .)) }}
+{{- $headlampPackage := deepCopy .Values.addons.headlamp -}}
+{{- if .Values.addons.headlamp.values }}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.headlamp.values) | fromYaml -}}
+{{- $_ := set $headlampPackage "values" $cleanedValues }}
+{{- end -}}
+{{- include "values-secret" (dict
+  "root" $
+  "package" $headlampPackage
+  "name" "headlamp"
+  "defaults" (merge (include "bigbang.headlamp.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.headlamp" . | fromYaml) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.headlamp" -}}
+istio:
+  enabled: {{ .Values.istiod.enabled }}
+  authorizationPolicies:
+    enabled: true
+    generateFromNetpol: true
+  sidecar:
+    enabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      headlamp:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+    to:
+      headlamp:4466:
+        from:
+          k8s:
+            monitoring-monitoring-prometheus-blackbox-exporter@monitoring/prometheus-blackbox-exporter: {{ .Values.monitoring.enabled }}
+
+{{- $baseURL := dig "upstream" "config" "baseURL" "" .Values.addons.headlamp.values }}
+{{- $port := dig "upstream" "service" "port" 4466 .Values.addons.headlamp.values }}
+{{- $serviceName := "headlamp-headlamp" }}
+routes:
+  inbound:
+    headlamp:
+      {{- if empty $baseURL }}
+      service: {{ $serviceName }}
+      port: {{ $port }}
+      {{- else }}
+      http:
+      - match:
+        - uri:
+            exact: {{ $baseURL }}
+        rewrite:
+          uri: {{ $baseURL }}/
+        route:
+        - destination:
+            host: {{ $serviceName }}
+            port:
+              number: {{ $port }}
+      - match:
+        - uri:
+            prefix: {{ $baseURL }}
+        route:
+        - destination:
+            host: {{ $serviceName }}
+            port:
+              number: {{ $port }}
+      {{- end }}
 
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -10,31 +75,10 @@ domain: {{ $domainName }}
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
-
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-
 {{- if (eq (include "istioEnabled" .) "true") }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
-
-istio:
-  enabled: {{ (eq (include "istioEnabled" .) "true") }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.headlamp.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  headlamp:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.headlamp.ingress.gateway "root" .)}}
 
 openshift: {{ .Values.openshift }}
 
