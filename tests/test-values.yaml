@@ -2583,6 +2583,23 @@ addons:
           replicas: 1
       istio:
         hardened:
+          customAuthorizationPolicies:
+            - name: "allow-monitoring"
+              enabled: true
+              spec:
+                action: ALLOW
+                rules:
+                - from:
+                  - source:
+                      principals:
+                      - cluster.local/ns/monitoring/sa/monitoring-monitoring-kube-prometheus
+                  to:
+                  - operation:
+                      ports:
+                      - "8001"
+                selector:
+                  matchLabels:
+                    app: harbor
           customServiceEntries:
             - name: "allow-npm-for-cypress-tests"
               enabled: true

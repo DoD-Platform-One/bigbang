@@ -44,6 +44,9 @@ spec:
 
   postRenderers:
   {{ include "harbor.fixRegistryPostRender" . | nindent 2 }}
+  {{- if $istioEnabled }}
+  {{ include "harbor.ServiceMonitorPostRenderer" . | nindent 2 }}
+  {{- end }}
   {{- if (get .Values.addons $pkg).postRenderers }}
   {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 2 }}
   {{- end }}
