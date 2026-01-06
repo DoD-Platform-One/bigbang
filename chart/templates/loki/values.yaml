@@ -37,7 +37,7 @@ routes:
   inbound:
     loki:
       gateways:
-        - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
+        - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
       hosts:
         - loki.{{ .Values.domain }}
       {{- if ne .Values.loki.strategy "monolith" }}
