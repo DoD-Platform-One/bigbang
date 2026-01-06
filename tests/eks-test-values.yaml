@@ -15,16 +15,17 @@ neuvector:
 
 gatekeeper:
   values:
-    replicas: 1
-    controllerManager:
-      resources:
-        limits: null
-        requests:
-          cpu: 175m
-          memory: 512Mi
     bbtests:
       cypress:
         artifacts: false
+    upstream:
+      replicas: 1
+      controllerManager:
+        resources:
+          limits: null
+          requests:
+            cpu: 175m
+            memory: 512Mi
 
 kyverno:
   values:

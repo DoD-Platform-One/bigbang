@@ -53,12 +53,13 @@ gatekeeper:
 
 ## High Availability
 
-High availability is accomplished by ensuring the replicas in the values file of this helm chart are > 1. By default, this chart is configured for high availability with `replicas: 3`.
+High availability is accomplished by ensuring the `gatekeeper.values.upstream.replicas` setting is > 1. By default, this chart is configured for high availability with `replicas: 3`.
 
 ```yaml
 gatekeeper:
   values:
-    replicas: 3
+    upstream:
+      replicas: 3
 ```
 
 ## Single Sign on (SSO)

@@ -8,13 +8,14 @@ gatekeeper:
     bbtests:
       cypress:
         artifacts: false
-    replicas: 1
-    controllerManager:
-      resources:
-        limits: null
-        requests:
-          cpu: 175m
-          memory: 512Mi
+    upstream:
+      replicas: 1
+      controllerManager:
+        resources:
+          limits: null
+          requests:
+            cpu: 175m
+            memory: 512Mi
 
 kyverno:
   values:
