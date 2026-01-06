@@ -217,7 +217,8 @@ twistlock:
 
 gatekeeper:
   values:
-    replicas: 1
+    upstream:
+      replicas: 1
 ```
 
 You will also need to merge this file with the existing configmaps in `kustomization.yaml`.

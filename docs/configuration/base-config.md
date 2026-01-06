@@ -141,7 +141,7 @@ Kubernetes: `>=1.32.0-0`
 | gatekeeper.helmRepo.chartName | string | `"gatekeeper"` |  |
 | gatekeeper.helmRepo.tag | string | `"3.21.0-bb.0"` |  |
 | gatekeeper.flux | object | `{"install":{"crds":"CreateReplace"},"upgrade":{"crds":"CreateReplace"}}` | Flux reconciliation overrides specifically for the OPA Gatekeeper Package |
-| gatekeeper.values | object | `{}` | Values to passthrough to the gatekeeper chart: https://repo1.dso.mil/big-bang/product/packages/policy.git |
+| gatekeeper.values | object | `{}` | Values to pass through to the Gatekeeper package. Upstream chart values belong under `gatekeeper.values.upstream`. |
 | gatekeeper.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | kyverno.enabled | bool | `true` | Toggle deployment of Kyverno. |
 | kyverno.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |

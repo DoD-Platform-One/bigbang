@@ -4,34 +4,35 @@
 
 {{- define "bigbang.defaults.gatekeeper" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-  pullSecrets:
-  - name: private-registry
-postInstall:
-  labelNamespace:
-    enabled: false
-    image:
-      pullPolicy: {{ .Values.imagePullPolicy }}
-      pullSecrets:
-      - name: private-registry
-  probeWebhook:
-    image:
-      pullPolicy: {{ .Values.imagePullPolicy }}
-      pullSecrets:
-      - name: private-registry
-postUpgrade:
-  cleanupCRD:
-    image:
-      pullPolicy: {{ .Values.imagePullPolicy }}
-      pullSecrets:
-      - name: private-registry
-preUninstall:
-  deleteWebhookConfigurations:
-    image:
-      pullPolicy: {{ .Values.imagePullPolicy }}
-      pullSecrets:
-      - name: private-registry
+upstream:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    pullSecrets:
+    - name: private-registry
+  postInstall:
+    labelNamespace:
+      enabled: false
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+        pullSecrets:
+        - name: private-registry
+    probeWebhook:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+        pullSecrets:
+        - name: private-registry
+  postUpgrade:
+    cleanupCRD:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+        pullSecrets:
+        - name: private-registry
+  preUninstall:
+    deleteWebhookConfigurations:
+      image:
+        pullPolicy: {{ .Values.imagePullPolicy }}
+        pullSecrets:
+        - name: private-registry
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
