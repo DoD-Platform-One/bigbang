@@ -13,13 +13,14 @@
 {{- end }}
 
 {{- define "bigbang.defaults.headlamp" -}}
+{{- $istioHardenedEnabled := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
   enabled: {{ .Values.istiod.enabled }}
   authorizationPolicies:
-    enabled: true
-    generateFromNetpol: true
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
   sidecar:
-    enabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
+    enabled: {{ $istioHardenedEnabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}

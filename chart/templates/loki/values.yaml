@@ -31,7 +31,7 @@ istio:
 
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    generateFromNetpol: {{ $istioHardenedEnabled }}
 
 routes:
   inbound:

@@ -61,7 +61,7 @@ istio:
 
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    generateFromNetpol: {{ $istioHardenedEnabled }}
 
 upstream:
   {{- if .Values.kiali.enabled }}
