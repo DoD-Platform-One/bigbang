@@ -43,9 +43,11 @@ routes:
       {{- if ne .Values.loki.strategy "monolith" }}
       service: logging-loki-gateway.logging.svc.cluster.local
       port: {{ dig "gateway" "service" "port" 80 .Values.loki.values }}
+      containerPort: {{ dig "gateway" "containerPort" 8080 .Values.loki.values }}
       {{- else }}
       service: logging-loki.logging.svc.cluster.local
       port: {{ dig "loki" "server" "http_listen_port" 3100 .Values.loki.values }}
+      containerPort: {{ dig "loki" "server" "http_listen_port" 3100 .Values.loki.values }}
       {{- end }}
       selector:
         app.kubernetes.io/name: logging-loki
