@@ -1,5 +1,15 @@
 {{- if .Values.addons.gitlab.enabled }}
-{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.gitlab" .))) "name" "gitlab" "defaults" (include "bigbang.defaults.gitlab" .)) }}
+{{- $gitlabPackage := deepCopy .Values.addons.gitlab -}}
+{{- if .Values.addons.gitlab.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.gitlab.values) | fromYaml -}}
+{{- $gitlabPackage = set $gitlabPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $gitlabPackage 
+  "name" "gitlab" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.gitlab" . | fromYaml) (include "bigbang.gitlab.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 {{- if and (ne .Values.addons.gitlab.objectStorage.iamProfile "") (ne .Values.addons.gitlab.objectStorage.accessKey "") }}{{- fail "Must choose to use an IAM profile OR an AWS accessKey/accessSecret at .Values.addons.gitlab.objectStorage" }}{{- end }}
 {{- define "bigbang.defaults.gitlab" -}}
@@ -16,38 +26,155 @@ domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
+routes:
+  inbound:
+    gitlab:
+      enabled: true
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - gitlab.{{ .Values.domain }}
+      http:
+      - fault:
+          abort:
+            httpStatus: 403
+            percentage:
+              value: 100
+        match:
+        - uri:
+            prefix: /-/metrics
+        route:
+        - destination:
+            host: gitlab-webservice-default
+            port:
+              number: 8181
+      - match:
+        - uri:
+            prefix: /
+        route:
+        - destination:
+            host: gitlab-webservice-default
+            port:
+              number: 8181
+      - match:
+        - uri:
+            prefix: /admin/sidekiq
+        route:
+        - destination:
+            host: gitlab-webservice-default
+            port:
+              number: 8080
+      selector:
+        app: webservice
+
+    registry:
+      enabled: false
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - registry.{{ .Values.domain }}
+      service: gitlab-registry
+      port: 5000
+      selector:
+        app: registry
+
+    pages:
+      enabled: false
+      service: gitlab-pages
+      port: 8090
+      selector:
+        app: gitlab-pages
+
+{{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
   enabled: {{ $istioInjection }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.gitlab.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
-  gitlab:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.gitlab.ingress.gateway "root" .)}}
-  registry:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.gitlab.ingress.gateway "root" .)}}
-
-# Used for istio SSO serviceEntry
-sso:
-  enabled: {{ .Values.addons.gitlab.sso.enabled }}
-  host: {{ include "sso.host" . }}
-
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  sidecar:
+  authorizationPolicies:
+    enabled: {{ $istioHardened }}
+    generateFromNetpol: {{ $istioHardened }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.gitlab "root" .) | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  istioNamespaceSelector:
-    {{ include "istioNamespaceSelector" . | nindent 4 }}
+  ingress:
+    definitions: {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    to:
+      redis:9121: 
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
+      gitlab-exporter:9168:
+        podSelector:
+          matchLabels:
+            app: gitlab-exporter
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+      gitaly:9236:
+        podSelector:
+          matchLabels:
+            app: gitaly
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+      webservice:8181:
+        podSelector:
+          matchLabels:
+            app: webservice
+        from:
+          k8s:
+            # Allow any service account from the gitlab-runner namespace; the runner 
+            # coordinator has a different service account to the jobs it runs
+            gitlab-runner/gitlab-runner: 
+              enabled: {{ .Values.addons.gitlabRunner.enabled }}
+              podSelector:
+                matchLabels:
+                  app: gitlab-runner
+      webservice:[8083,8084,9229]:
+        podSelector:
+          matchLabels:
+            app: webservice
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+            
+      registry:5001:
+        podSelector:
+          matchLabels:
+            app: registry
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+
+      gitlab-runner:9252:
+        podSelector:
+          matchLabels:
+            app: gitlab-runner
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+  egress:
+    definitions: {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+    from:
+      "*":
+        to:
+          definition:
+            kubeAPI: true
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+      sidekiq:
+        to:
+          definition:
+            storage-subnets: true
+      webservice:
+        to:
+          definition:
+            sso: true
+            database-subnets: true
+      migrations:
+        to:
+          definition:
+            database-subnets: true
+
 upstream:
   {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
   redis:
@@ -281,19 +408,6 @@ global:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
     
-  istio:
-    enabled: {{ $istioInjection }}
-    injection: {{ dig "istio" "injection" "enabled" .Values.addons.gitlab }}
-
-  hosts:
-    domain: {{ $domainName }}
-
-    gitlab:
-      name: {{ .Values.addons.gitlab.hostnames.gitlab }}.{{ $domainName }}
-
-    registry:
-      name: {{ .Values.addons.gitlab.hostnames.registry }}.{{ $domainName }}
-
   {{- if or (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured }}
   minio:
     enabled: false
