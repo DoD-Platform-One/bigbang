@@ -1,5 +1,17 @@
 {{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.minioOperator "name" "minio-operator" "defaults" (include "bigbang.defaults.minio-operator" .)) }}
+  {{- $minioOperatorPackage := deepCopy .Values.addons.minioOperator -}}
+
+  {{- if .Values.addons.minioOperator.values -}}
+    {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.minioOperator.values) | fromYaml -}}
+    {{- $minioOperatorPackage = set $minioOperatorPackage "values" $cleanedValues -}}
+  {{- end -}}
+
+  {{- include "values-secret" (dict 
+    "root" $ 
+    "package" $minioOperatorPackage 
+    "name" "minio-operator" 
+    "defaults" ((mergeOverwrite (include "bigbang.defaults.minio-operator" . | fromYaml) (include "bigbang.minio-operator.bb-common-migrations" . | fromYaml)) | toYaml)
+  )}}
 {{- end }}
 
 {{- define "bigbang.defaults.minio-operator" -}}
@@ -33,12 +45,12 @@ upstream:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.minio "root" .) | nindent 4 }}
+  egress:
+    from:
+      minio-operator:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
 
 istio:
   enabled: {{ $istioEnabled }}
