@@ -182,6 +182,17 @@ networkPolicies:
         ports:
           - port: 443
             protocol: TCP
+      database-subnets:
+        to:
+          - ipBlock:
+              cidr: 192.168.0.0/16
+          - ipBlock:
+              cidr: 172.16.0.0/12
+          - ipBlock:
+              cidr: 10.0.0.0/8
+        ports:
+        - port: 5432
+          protocol: TCP
   ingress:
     # -- Ingress definitions; create definitions here that you want to re-use globally across
     # all packages
@@ -1414,11 +1425,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
-      tag: "9.7.0-bb.0"
+      tag: "9.7.0-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab"
-      tag: "9.7.0-bb.0"
+      tag: "9.7.0-bb.1"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
