@@ -294,9 +294,6 @@ gatekeeper:
 kyverno:
   values:
     upstream:
-      networkPolicies:
-        externalRegistries:
-          allowEgress: true
       admissionController:
         container:
           extraArgs:

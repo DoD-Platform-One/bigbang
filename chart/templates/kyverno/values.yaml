@@ -1,5 +1,10 @@
 {{- if or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.kyverno "name" "kyverno" "defaults" (include "bigbang.defaults.kyverno" .)) }}
+{{- include "values-secret" (dict 
+"root" $ 
+"package" .Values.kyverno 
+"name" "kyverno" 
+"defaults" ((mergeOverwrite (include "bigbang.defaults.kyverno" . | fromYaml) (include "bigbang.kyverno.bb-common-migrations" . | fromYaml)) | toYaml) 
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno" -}}
@@ -10,8 +15,54 @@ istio:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
+  # Setting to false as Kyverno is not in the mesh
+  hbonePortInjection:
+    enabled: false
+  ingress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    to:
+      kyverno:8000:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/instance: kyverno-kyverno
+        from:
+          k8s:
+            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  egress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+      private-registry:
+        to:
+          - ipBlock:
+              cidr: "15.205.173.153/32"
+        ports:
+          - port: 443
+            protocol: TCP
+    from:
+      kyverno-admission-controller:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: admission-controller
+        to:
+          definition:
+            private-registry: {{ dig "policies" "require-image-signature" "enabled" false .Values.kyvernoPolicies.values }}
+            kubeAPI: true
+      ## Kyverno background and cleanup controllers may be needed depending on the flavor of kubernetes in use
+      kyverno-background-controller:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: background-controller
+        to:
+          definition:
+            kubeAPI: true
+      kyverno-cleanup-controller:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: cleanup-controller
+        to:
+          definition:
+            kubeAPI: true
 
 openshift: {{ .Values.openshift }}
 
