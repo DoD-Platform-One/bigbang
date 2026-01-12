@@ -16,6 +16,8 @@ ignorePatterns:
   - pattern: "#package-configuration"
   - pattern: "#Troubleshooting"
   - pattern: "#extending-cypress-tests"
+  # ignore cluster.local domains
+  - pattern: "(.*\\.)?cluster\\.local.*"
 # replacementPatterns:
 #   - pattern: ^.attachments
 #     replacement: file://some/conventional/folder/.attachments
