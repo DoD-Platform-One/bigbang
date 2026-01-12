@@ -1753,8 +1753,6 @@ addons:
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core
     values:
-      bbtests:
-        enabled: true
       istio:
         console:
           enabled: false
