@@ -30,6 +30,9 @@ Package is the term we use for an application that has been prepared to be deplo
             version: 6.9.0
             repository: https://upstream-helm-repo.example.com
             alias: upstream
+          - name: gluon          # This is our testing harness and will be used later on in this process
+            version: "<version>" # Update with latest version available - https://repo1.dso.mil/big-bang/product/packages/gluon/-/tags
+            repository: oci://registry1.dso.mil/bigbang
         kubeVersion: ">=1.23.0-0"
         annotations:
           bigbang.dev/maintenanceTrack: bb_integrated
@@ -37,7 +40,10 @@ Package is the term we use for an application that has been prepared to be deplo
             - name: your-app
               image: registry1.dso.mil/ironbank/path/to/your-app:6.9.0
         ```
-4. Run a helm dependency update that will download the upstream chart as a dependency as well as any external sub-chart dependencies. Commit any *.tgz files that are downloaded into the "charts" directory. The reason for doing this is that BigBang Packages must be able to be installed in an air-gap without any internet connectivity.
+
+3. Add bb-common as a helm dependency and create the required include files as referenced [here](https://repo1.dso.mil/big-bang/product/packages/bb-common#as-a-library-chart).
+
+4. Run a helm dependency update that will download the upstream chart as a dependency as well as any external sub-chart and library chart dependencies. Commit any *.tgz files that are downloaded into the "charts" directory. The reason for doing this is that BigBang Packages must be able to be installed in an air-gap without any internet connectivity.
     ```shell
     helm dependency update ./chart
     ```
@@ -54,11 +60,32 @@ Package is the term we use for an application that has been prepared to be deplo
     # list images from the upstream chart
     helm template <releasename> ./chart -n <namespace> -f chart/values.yaml | grep image:
     ```
-    Add the image overrides, **do not** copy the upstream defaults, in your package's `values.yaml` using the `upstream` key to pass values to the upstream chart. Also add the "imagePullSecrets" tag if not already there. Here is an example:
+    Add the image overrides, **do not** copy the upstream defaults, in your package's `values.yaml` using the `upstream` key to pass values to the upstream chart. Also add the "imagePullSecrets" tag if not already there along with the "Big Bang specific values" that get used by the bb-common library chart. Here is an example:
     ```yaml
     # Big Bang specific values
     networkPolicies:
       enabled: true
+
+    istio:
+      enabled: false
+    
+      sidecar:
+        enabled: false
+        outboundTrafficPolicyMode: "REGISTRY_ONLY"
+    
+      serviceEntries:
+        custom: []
+    
+      authorizationPolicies:
+        enabled: false
+        generateFromNetpol: true
+        custom: []
+    
+      # Default peer authentication
+      mtls:
+        # STRICT = Allow only mutual TLS traffic
+        # PERMISSIVE = Allow both plain text and mutual TLS traffic
+        mode: STRICT
     
     # Values passed to upstream chart
     upstream:
@@ -71,8 +98,11 @@ Package is the term we use for an application that has been prepared to be deplo
             pullSecrets:
             - private-registry
     ```
-7. Add a VirtualService if your application has a back-end API or a front-end GUI. Create the VirtualService in the sub-directory  "chart/templates/bigbang/VirtualService.yaml". You will need to manually create the "bigbang" directory. It is convenient to copy VirtualService code from one of the other Packages and then modify it. You should be able to load the application in your browser if all the configuration is correct.
-8. Add NetworkPolices templates in the sub-directory "chart/templates/bigbang/networkpolicies/*.yaml." The intent is to lock down all ingress and egress traffic except for what is required for the application to function properly. Start with a deny-all policy and then add additional policies to open traffic as needed. Refer to the other Packages code for examples. The [Gitlab package](https://repo1.dso.mil/big-bang/product/packages/gitlab/-/tree/main/chart/templates/bigbang/networkpolicies) is a good/complete example.
+
+7. Add any specific network policies that will be needed to allow the package to function as normal. The bb-common library will automatically generate a [default set](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/network-policies?ref_type=heads#default-policies) of network policies if `networkPolicies.enabled` is set to `true` which provides a great starting point. The [bb-common network policy documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md) can be referenced for guidance on this portion. It is recommended to include the service accounts for any ingress network policies as shown [here](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/network-policies?ref_type=heads#authorization-policy-generation) as this will allow authorization policies to get automatically generated if the `istio.authorizationPolicies.enabled` value gets set to `true`.
+
+8. If your application has a back-end API or a front-end GUI please refer to the [bb-common docs](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/routes?ref_type=heads#inbound-routes) for instructions on how to create the virtual service.
+
 9. Add a Continuous Integration (CI) pipeline to the Package and configure Renovate for automated dependency updates. A Package should be able to be deployed by itself, independently from the Big Bang chart. The Package pipeline takes advantage of this to run a Package pipeline test. The package testing is done with a helm test library. Reference the [pipeline documentation](https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates#setting-up-your-project-with-pipelines) for how to create a pipeline and also [detailed instructions](https://repo1.dso.mil/big-bang/apps/library-charts/gluon/-/blob/master/docs/bb-tests.md) in the gluon library.
     Configure Renovate to automatically update the upstream chart dependency by adding a `renovate.json` file:
     ```json
@@ -154,10 +184,9 @@ Package is the term we use for an application that has been prepared to be deplo
     │   │ └── upstream-chart-*.tgz
     │   ├── templates/
     │   │ └── bigbang/
-    │   │     ├── networkpolicies/
-    │   │     │ ├── egress-*.yaml
-    │   │     │ └── ingress-*.yaml
-    │   │     └── virtualservice.yaml
+    │   │     ├── network-policies.yaml
+    │   │     ├── istio.yaml
+    │   │     └── routes.yaml
     │   ├── tests/
     │   │ ├── cypress/
     │   │ └── scripts/
