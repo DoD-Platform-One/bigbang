@@ -1,50 +1,68 @@
 {{- if .Values.addons.minio.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.minio "name" "minio" "defaults" (include "bigbang.defaults.minio" .)) }}
+  {{- $minioPackage := deepCopy .Values.addons.minio -}}
+  {{- if .Values.addons.minio.values -}}
+    {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.minio.values) | fromYaml -}}
+    {{- $minioPackage = set $minioPackage "values" $cleanedValues -}}
+  {{- end -}}
+  {{- include "values-secret" (dict 
+    "root" $ 
+    "package" $minioPackage 
+    "name" "minio" 
+    "defaults" ((mergeOverwrite (include "bigbang.defaults.minio" . | fromYaml) (include "bigbang.minio.bb-common-migrations" . | fromYaml)) | toYaml)
+  )}}
 {{- end }}
 
 {{- define "bigbang.defaults.minio" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-hostname: {{ $domainName }}
-domain: {{ $domainName }}
-
 istio:
   enabled: {{ $istioEnabled }}
-  console:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
-  api:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.minio.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
+  authorizationPolicies:
+    enabled: {{ $istioHardened }}
+    generateFromNetpol: {{ $istioHardened }}
 
-{{- if $istioEnabled }}
-annotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      minio:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+
+routes:
+  inbound:
+    api:
+      enabled: true
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - minio-api.{{ .Values.domain }}
+      service: minio
+      port: 80
+      containerPort: 9000
+      selector:
+        app.kubernetes.io/name: minio-instance
+
+    console:
+      enabled: true
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - minio.{{ .Values.domain }}
+      service: minio-minio-minio-instance-console
+      port: 9090
+      selector:
+        app.kubernetes.io/name: minio-instance
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.minio "root" .) | nindent 4 }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-
-podAnnotations:
-  sidecar.istio.io/inject: "true"
-  traffic.sidecar.istio.io/includeInboundPorts: "*"
-  traffic.sidecar.istio.io/excludeInboundPorts: "9443"
 upstream:
   tenant:
     name: minio-minio-minio-instance
@@ -62,6 +80,7 @@ upstream:
       - name: MINIO_PROMETHEUS_AUTH_TYPE
         value: "public"
     {{- end }}
-  {{- end -}}
+
+{{- end -}}
 
 
