@@ -44,6 +44,10 @@ networkPolicies:
         to:
           - ipBlock:
               cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+          {{- if ne .Values.networkPolicies.vpcCidr "0.0.0.0/0" }}
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.vpcCidr }}
+          {{- end }}
     from:
       alloy-logs:
         to:
