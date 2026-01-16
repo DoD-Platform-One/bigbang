@@ -1696,41 +1696,12 @@ addons:
           persistence:
             size: 256Mi
         curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
-      istio:
-        hardened:
-          customAuthorizationPolicies:
-            - name: "allow-intranamespace-sonarqube"
-              enabled: true
-              spec:
-                action: ALLOW
-                rules:
-                - from:
-                  - source:
-                      namespaces:
-                      - sonarqube
-          customServiceEntries:
-            - name: "sonarqube-allow-cypress-tests"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'repo1.dso.mil'
-                  - 'sonarqube.dev.bigbang.mil'
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
       bbtests:
         enabled: true
         cypress:
           envs:
             cypress_url: "https://sonarqube.dev.bigbang.mil"
             cypress_url_setup: "https://sonarqube.dev.bigbang.mil/setup"
-
 
   minioOperator:
     enabled: true # Minio Operator is required for Loki in default core
