@@ -1,9 +1,24 @@
 {{- if .Values.addons.sonarqube.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.sonarqube "name" "sonarqube" "defaults" (include "bigbang.defaults.sonarqube" .)) }}
+{{- /* Create a cleaned copy of sonarqube config and merge deprecated paths into current paths */ -}}
+{{- $sonarqubePackage := deepCopy .Values.addons.sonarqube -}}
+{{- if .Values.addons.sonarqube.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.sonarqube.values) | fromYaml -}}
+{{- $sonarqubePackage = set $sonarqubePackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict 
+"root" $ 
+"package" $sonarqubePackage 
+"name" "sonarqube" 
+"defaults" ((mergeOverwrite (include "bigbang.defaults.sonarqube" . | fromYaml) (include "bigbang.sonarqube.bb-common-migrations" . | fromYaml)) | toYaml) 
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.sonarqube" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.sonarqube.values) }}
+{{- $postgresEnabled := dig "upstream" "postgresql" "enabled" true .Values.addons.sonarqube.values }}
+{{- $plugins := dig "upstream" "plugins" "install" (list) .Values.addons.sonarqube.values }}
+{{- $pluginsExist := not (empty $plugins) }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -17,24 +32,68 @@ OpenShift:
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  sonarqube:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.sonarqube.ingress.gateway "root" .)}}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.sonarqube }}
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+routes:
+  inbound:
+    sonarqube:
+      enabled: true
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.sonarqube.ingress.gateway "root" .)}}
+      hosts:
+        - sonarqube.{{ .Values.domain }}
+      service: sonarqube-sonarqube.sonarqube.svc.cluster.local
+      port: 9000
+      selector:
+        app: sonarqube
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.sonarqube.values }}
+      hosts:
+      - repo1.dso.mil
+    sonarqube-marketplace:
+      enabled: {{ $pluginsExist }}
+      hosts:
+      - github.com
+      - release-assets.githubusercontent.com
+      - downloads.sonarsource.com
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.sonarqube "root" .) | nindent 4 }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    definitions: {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    to:
+      sonarqube:[8000,8001,9000]:
+        podSelector:
+          matchLabels:
+            app: sonarqube
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  egress:
+    definitions: {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+    from:
+      sonarqube:
+        podSelector:
+          matchLabels:
+            app: sonarqube
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            sonarsource-marketplace: {{ $pluginsExist }}
+            code-repository: true
+            database-subnets: {{ not $postgresEnabled }}
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
@@ -59,7 +118,7 @@ upstream:
     # You will find this in Keycloak in Realm Settings > General > Endpoints. Click on SAML 2.0 Identify Provider Metadata to obtain the XML configuration file. Search for the value 'EntityDescriptor > entityID'
     sonar.auth.saml.providerId: {{ include "sso.url" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda"
     sonar.auth.saml.loginUrl: {{ include "sso.saml.service" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda/protocol/saml"
-     # This is the RS256 key copied from Keycloak The value you get from ***Realm Settings > Keys > RS256.*** Click on Certificate
+    # This is the RS256 key copied from Keycloak The value you get from ***Realm Settings > Keys > RS256.*** Click on Certificate
     sonar.auth.saml.certificate.secured: {{ default (include "sso.saml.cert" .) .Values.addons.sonarqube.sso.certificate }}   #"-----BEGIN CERTIFICATE-----"
     sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}   #"login" (user attribute)
     sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}      #"username" (user attribute)
@@ -67,7 +126,10 @@ upstream:
     {{- if .Values.addons.sonarqube.sso.group }}
     sonar.auth.saml.group.name: {{ .Values.addons.sonarqube.sso.group }}  #"groups" (user attribute)
     {{- end }}
-  {{- end }}
+{{- end }}
+
+  prometheusExporter:
+    enabled: {{ .Values.monitoring.enabled }}
 
 {{- with .Values.addons.sonarqube.database }}
   {{- if and .host .username .password .database .port }}
@@ -102,4 +164,3 @@ upstream:
     {{- end }}
   {{- end }}
 {{ end -}}
-
