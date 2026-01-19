@@ -78,10 +78,8 @@ upstream:
     {{ include "istioAnnotation" . }}
   {{- end }}
 
-  {{- if $tlsEnabled }}
   http:
-    internalScheme: HTTPS
-  {{- end }}
+    internalScheme: HTTP
 
   extraEnv: |
     - name: KC_HTTPS_CLIENT_AUTH
@@ -97,6 +95,10 @@ upstream:
       value: /opt/keycloak/conf/tls.crt
     - name: KC_HTTPS_CERTIFICATE_KEY_FILE
       value: /opt/keycloak/conf/tls.key
+    {{- if eq (dig "http" "internalScheme" "HTTP" .Values.addons.keycloak.values) "HTTP" }}
+    - name: KC_HTTP_MANAGEMENT_SCHEME
+      value: http
+    {{- end }}
     {{- end }}
 
   {{- if $istioEnabled }}
@@ -114,8 +116,12 @@ upstream:
 
   serviceMonitor:
     enabled: {{ $monitoringEnabled }}
-    {{- if $monitoringEnabled }}
+    scheme: https
+    {{- if and $monitoringEnabled $tlsEnabled $istioEnabled }}
     tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true
     {{- end }}
 

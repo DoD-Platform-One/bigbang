@@ -2319,6 +2319,8 @@ addons:
               -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
           - name: KC_HTTPS_CERTIFICATE_FILE
             value: /opt/keycloak/conf/tls.crt
+          - name: KC_HTTP_MANAGEMENT_SCHEME
+            value: http
           - name: KC_HTTPS_CERTIFICATE_KEY_FILE
             value: /opt/keycloak/conf/tls.key
           - name: KC_HTTPS_CLIENT_AUTH
@@ -2459,8 +2461,6 @@ addons:
           - name: plugin
             mountPath: /opt/keycloak/providers/p1-keycloak-plugin.jar
             subPath: p1-keycloak-plugin.jar
-        http:
-          internalScheme: HTTPS
 
   vault:
     enabled: false
