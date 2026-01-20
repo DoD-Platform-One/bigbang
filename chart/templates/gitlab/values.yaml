@@ -78,6 +78,24 @@ routes:
       selector:
         app: registry
 
+    kas:
+      enabled: {{ dig "global" "kas" "enabled" true .Values.addons.gitlab.values }}
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - kas.{{ .Values.domain }}
+      http:
+      - match:
+        - uri:
+            prefix: /-/kubernetes-agent
+        route:
+        - destination:
+            host: gitlab-kas
+            port:
+              number: 8150
+      selector:
+        app: kas
+
     pages:
       enabled: false
       service: gitlab-pages
@@ -141,6 +159,14 @@ networkPolicies:
         podSelector:
           matchLabels:
             app: registry
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+
+      kas:[8150,8153]:
+        podSelector:
+          matchLabels:
+            app: kas
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
@@ -350,7 +376,20 @@ upstream:
               keyFile: /etc/prom-certs/key.pem
               insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
-
+    kas:
+      annotations:
+        {{ include "istioAnnotation" . }}
+      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      metrics:
+        serviceMonitor:
+          endpointConfig:
+            scheme: https
+            tlsConfig:
+              caFile: /etc/prom-certs/root-cert.pem
+              certFile: /etc/prom-certs/cert-chain.pem
+              keyFile: /etc/prom-certs/key.pem
+              insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      {{- end }}
     praefect:
       annotations:
         {{ include "istioAnnotation" . }}
