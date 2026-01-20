@@ -1,33 +1,79 @@
 {{- $pkg := "kyvernoReporter" }}
-
 {{- if (get .Values $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" ($pkg | kebabcase) "defaults" (include (printf "bigbang.defaults.%s" $pkg | kebabcase) .)) }}
+{{- /* Create a cleaned copy of kyvernoReporter config and merge deprecated paths into current paths */ -}}
+{{- $kyvernoReporterPackage := deepCopy .Values.kyvernoReporter -}}
+{{- if .Values.kyvernoReporter.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.kyvernoReporter.values) | fromYaml -}}
+{{- $kyvernoReporterPackage = set $kyvernoReporterPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict 
+"root" $ 
+"package" (get .Values $pkg) 
+"name" ($pkg | kebabcase) 
+"defaults" ((mergeOverwrite (include "bigbang.defaults.kyverno-reporter" . | fromYaml) (include "bigbang.kyverno-reporter.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno-reporter" -}}
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.kyvernoReporter.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.kyvernoReporter.values) }}
 domain: {{ $domainName }}
 
 global:
   fullnameOverride: kyverno-reporter
 
-{{- if $istioEnabled }}
 istio:
-  enabled: true
-  kyvernoReporter:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.kyvernoReporter.ingress.gateway "root" .)}}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.kyvernoReporter.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+routes:
+  inbound:
+    policy-reporter-ui:
+      enabled: {{ dig "upstream" "ui" "enabled" true .Values.kyvernoReporter.values }}
+      gateways:
+        - istio-gateway/public-ingressgateway
+      hosts:
+        - policyreporter.{{ $domainName }}
+      service: policy-reporter-ui.kyverno-reporter.svc.cluster.local
+      port: 8080
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.kyvernoReporter.values }}
+      hosts:
+      - repo1.dso.mil
+      - prometheus.{{ $domainName }}
+      - grafana.{{ $domainName }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  egress:
+    from:
+      kyverno-reporter:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/instance: kyverno-reporter-kyverno-reporter
+        to:
+          definition:
+            kubeAPI: true
+  ingress:
+    to:
+      policy-reporter:8080:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  additionalPolicies: []
 
 openshift: {{ .Values.openshift }}
 
