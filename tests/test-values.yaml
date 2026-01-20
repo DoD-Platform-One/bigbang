@@ -322,35 +322,7 @@ kyvernoReporter:
           cypress_grafana_url: https://grafana.dev.bigbang.mil
           cypress_prometheus_url: https://prometheus.dev.bigbang.mil
           cypress_check_datasource: 'true'
-        resources:
-          requests:
-            cpu: 2
-            memory: 3Gi
-          limits:
-            cpu: 2
-            memory: 3Gi
-    istio:
-      hardened:
-        customServiceEntries:
-          - name: "cypress-service-entries-kyvernoreporter"
-            enabled: true
-            spec:
-              hosts:
-                - 'registry.npmjs.org'
-                - 'download.cypress.io'
-                - 'cdn.cypress.io'
-                - 'repo1.dso.mil'
-                - 'prometheus.dev.bigbang.mil'
-              location: MESH_EXTERNAL
-              exportTo:
-                - "."
-              ports:
-                - number: 443
-                  protocol: TLS
-                  name: https
-              resolution: DNS
-
-
+          
 kyvernoPolicies:
   values:
     bbtests:
