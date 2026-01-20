@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Elasticsearch-Kibana - Values Defaults Tests
+templates:
+  - templates/elasticsearch-kibana/values.yaml
+set:
+  elasticsearchKibana.enabled: true
+postRenderer:
+  cmd: "sh"
+  args:
+    - "-c"
+    - "yq eval '.stringData.defaults' - | yq eval '.'"
+tests:
+  - it: make assertions on the default values for Elasticsearch Kibana
+    set:
+      istiod.values.hardened.enabled: true
+    asserts:
+      - equal:
+          path: domain
+          value: "dev.bigbang.mil"
+      - equal:
+          path: istio.enabled
+          value: true
+  - it: should enable istio sidecar when elasticsearch-kibana hardened is enabled
+    set:
+      elasticsearchKibana.values.hardened.enabled: true
+    asserts:
+      - equal:
+          path: istio.sidecar.enabled
+          value: true
+  - it: should map istio.kibana.hosts to routes.inbound.kibana.hosts
+    set:
+      elasticsearchKibana.values.istio.kibana.hosts:
+        - "custom-kibana.example.com"
+        - "kibana.internal.example.com"
+    asserts:
+      - equal:
+          path: routes.inbound.kibana.hosts[0]
+          value: "custom-kibana.example.com"
+      - equal:
+          path: routes.inbound.kibana.hosts[1]
+          value: "kibana.internal.example.com"
+  - it: should map istio.elasticsearch.hosts to routes.inbound.elasticsearch.hosts
+    set:
+      elasticsearchKibana.values.istio.elasticsearch.hosts:
+        - "custom-elasticsearch.example.com"
+        - "es.internal.example.com"
+    asserts:
+      - equal:
+          path: routes.inbound.elasticsearch.hosts[0]
+          value: "custom-elasticsearch.example.com"
+      - equal:
+          path: routes.inbound.elasticsearch.hosts[1]
+          value: "es.internal.example.com"
+  - it: should default kibana route hosts to kibana.domain when not set
+    asserts:
+      - equal:
+          path: routes.inbound.kibana.hosts[0]
+          value: "kibana.dev.bigbang.mil"
+  - it: should default elasticsearch route hosts to elasticsearch.domain when not set
+    asserts:
+      - equal:
+          path: routes.inbound.elasticsearch.hosts[0]
+          value: "elasticsearch.dev.bigbang.mil"
+  - it: should map istio.kibana.enabled to routes.inbound.kibana.enabled
+    set:
+      elasticsearchKibana.values.istio.kibana.enabled: false
+    asserts:
+      - equal:
+          path: routes.inbound.kibana.enabled
+          value: false
+  - it: should map istio.elasticsearch.enabled to routes.inbound.elasticsearch.enabled
+    set:
+      elasticsearchKibana.values.istio.elasticsearch.enabled: true
+    asserts:
+      - equal:
+          path: routes.inbound.elasticsearch.enabled
+          value: true
+  - it: should default kibana route enabled to true
+    asserts:
+      - equal:
+          path: routes.inbound.kibana.enabled
+          value: true
+  - it: should default elasticsearch route enabled to false
+    asserts:
+      - equal:
+          path: routes.inbound.elasticsearch.enabled
+          value: false

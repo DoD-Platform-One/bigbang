@@ -1,5 +1,11 @@
 {{- if .Values.elasticsearchKibana.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.elasticsearchKibana "name" "ek" "defaults" (include "bigbang.defaults.logging" .)) }}
+{{- /* Create a cleaned copy of elasticsearchKibana config and merge deprecated paths into current paths */ -}}
+{{- $elasticsearchKibanaPackage := deepCopy .Values.elasticsearchKibana -}}
+{{- if .Values.elasticsearchKibana.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.elasticsearchKibana.values) | fromYaml -}}
+{{- $elasticsearchKibanaPackage = set $elasticsearchKibanaPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $elasticsearchKibanaPackage "name" "ek" "defaults" (merge (include "bigbang.elasticsearchKibana.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.logging" . | fromYaml) | toYaml)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.logging" -}}
@@ -7,6 +13,8 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana) "enabled") }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.elasticsearchKibana.values) }}
+{{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
@@ -16,40 +24,55 @@ imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-    }}
-  kibana:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.elasticsearchKibana.ingress.gateway "root" .)}}
-  elasticsearch:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.elasticsearchKibana.ingress.gateway "root" .)}}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.elasticsearchKibana "root" .) | nindent 4 }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
 
-{{- if and .Values.addons.mattermost.elasticsearch.enabled .Values.addons.mattermost.enabled }}
-mattermost:
-  enabled: true
-{{- end }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
 
-{{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
-{{- if and .Values.fluentbit.enabled (not $disableDefaultFLB) }}
-fluentbit:
-  enabled: true
-{{- end }}
+  egress:
+    definitions:
+      sso:
+        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
+    from:
+      elasticsearch:
+        podSelector:
+          matchLabels:
+            common.k8s.elastic.co/type: elasticsearch
+        to:
+          definition:
+            sso: {{ .Values.elasticsearchKibana.sso.enabled }}
+  ingress:
+    to:
+      # Elasticsearch ingress policies
+      elasticsearch:9200:
+        podSelector:
+          matchLabels:
+            common.k8s.elastic.co/type: elasticsearch
+        from:
+          k8s:
+            # Allow Fluentbit to write logs to Elasticsearch
+            fluentbit-fluent-bit@fluentbit/fluent-bit: {{ and .Values.fluentbit.enabled (not $disableDefaultFLB)  }}
+
+            # Allow Mattermost to write to Elasticsearch 
+            mattermost@mattermost/mattermost: {{ and .Values.addons.mattermost.elasticsearch.enabled .Values.addons.mattermost.enabled  }}
+
+
+      # Metrics exporter ingress
+      metrics:9108:
+        from:
+          k8s:
+            # Allow Prometheus to scrape metrics
+            monitoring/prometheus: {{ .Values.monitoring.enabled  }}
 
 {{- with .Values.elasticsearchKibana.sso }}
 {{- if .enabled }}
