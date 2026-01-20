@@ -63,6 +63,13 @@ networkPolicies:
         to:
           definition:
             kubeAPI: true
+      kyverno-reports-controller:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: reports-controller
+        to:
+          definition:
+            kubeAPI: true
 
 openshift: {{ .Values.openshift }}
 
