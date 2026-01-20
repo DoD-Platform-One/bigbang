@@ -17,4 +17,5 @@ The following documents should be followed, in order, to move a package to maint
 - [ ] 13. Cyber Review: Complete Cyber security review and address any findings
 - [ ] 14. [Supported Package](supported.md): Migrate package into the Big Bang repo as an integrated or maintained package
 - [ ] 15. [Final Documentation](documentation.md): Add additional Big Bang documentation for final release
-- [ ] 16. [\*Big Bang Merge Request](bigbang-merge-request.md): Create Big Bang Merge Request and run all packages pipeline
+- [ ] 16. Development: Add any subdomains exposed by the package to [the k3d-dev script](https://repo1.dso.mil/big-bang/bigbang/-/blob/a5d179011744e5b0de700a23cd51cd89d89bccd1/docs/reference/scripts/developer/k3d-dev.sh#L24).
+- [ ] 17. [\*Big Bang Merge Request](bigbang-merge-request.md): Create Big Bang Merge Request and run all packages pipeline
