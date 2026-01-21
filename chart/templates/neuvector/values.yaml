@@ -42,18 +42,11 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
 
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+
   egress:
-    definitions:
-      sso:
-        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-          {{- if ne .Values.networkPolicies.vpcCidr "0.0.0.0/0" }}
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.vpcCidr }}
-          {{- end }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       controller:
         podSelector:
@@ -167,5 +160,10 @@ monitor:
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.neuvector.values) | fromYaml -}}
 {{- $neuvectorPackage = set $neuvectorPackage "values" $cleanedValues -}}
 
-{{- include "values-secret" (dict "root" $ "package" $neuvectorPackage "name" "neuvector" "defaults" (include "bigbang.defaults.neuvector" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $neuvectorPackage 
+  "name" "neuvector" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.neuvector" . | fromYaml) (include "bigbang.neuvector.bb-common-migrations" . | fromYaml)) | toYaml)
+) }}
 {{- end }}
