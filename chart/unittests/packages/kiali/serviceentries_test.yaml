@@ -89,6 +89,7 @@ tests:
     istiod.enabled: true
     kiali.enabled: true
     kiali.values.istio.enabled: true
+    kiali.values.routes.inbound.kiali.enabled: false # The route creates a service entry too if it's enabled; disable it for this test
     kiali.values.istio.hardened.customServiceEntries:
       - name: "hardened-entry-1"
         spec:
