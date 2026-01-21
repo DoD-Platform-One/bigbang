@@ -20,6 +20,39 @@ USE_WEAVE=false
 TERMINATE_INSTANCE=true
 QUIET=false
 TMPDIR=$(mktemp -d)
+BASE_DOMAIN="dev.bigbang.mil"
+PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
+  "alertmanager"
+  "anchore-api"
+  "anchore"
+  "argocd"
+  "backstage"
+  "chat"
+  "fortify"
+  "gitlab"
+  "grafana"
+  "harbor"
+  "headlamp"
+  "kiali"
+  "kibana"
+  "loki"
+  "minio-api"
+  "minio"
+  "neuvector"
+  "nexus"
+  "policyreporter"
+  "prometheus"
+  "registry"
+  "sonarqube"
+  "tempo"
+  "thanos"
+  "tracing"
+  "twistlock"
+)
+PASSTHROUGH_SUBDOMAINS=( # Subdomains that use the passthrough gateway by default
+  "keycloak"
+  "vault"
+)
 
 ### Uninitialized globals
 
@@ -38,6 +71,8 @@ KUBECTL_VERSION=""
 PrivateIP=""
 PublicIP=""
 SSHKEY=""
+PUBLIC_DOMAINS=()
+PASSTHROUGH_DOMAINS=()
 
 ### AWS Cloud provider globals
 AMI_ID=${AMI_ID:-""}
@@ -178,6 +213,8 @@ function process_arguments {
       echo " -q|--quiet                       suppress the final completion message"
       echo " -I|--print-instructions          Print the instructional message for the"
       echo "                                  instance described or discovered and exit"
+      echo " -D|--domain DOMAIN               Base domain to use for cluster; defaults to"
+      echo "                                  dev.bigbang.mil"
       echo
       echo "========= These options override -c and use your own infrastructure ======="
       echo
@@ -195,6 +232,10 @@ function process_arguments {
       ;;
     -I|--print-instructions)
       action=print_instructions
+      ;;
+    -D|--domain)
+      shift
+      BASE_DOMAIN=$1
       ;;
     -K|--recreate-k3d)
       RESET_K3D=true
@@ -230,6 +271,17 @@ function process_arguments {
     PrivateIP=$PublicIP
   fi
 
+}
+
+function set_domains {
+  PUBLIC_DOMAINS=()
+  PASSTHROUGH_DOMAINS=()
+  for subdomain in "${PUBLIC_SUBDOMAINS[@]}"; do
+    PUBLIC_DOMAINS+=("${subdomain}.${BASE_DOMAIN}")
+  done
+  for subdomain in "${PASSTHROUGH_SUBDOMAINS[@]}"; do
+    PASSTHROUGH_DOMAINS+=("${subdomain}.${BASE_DOMAIN}")
+  done
 }
 
 function check_missing_tools {
@@ -892,8 +944,8 @@ function print_instructions {
       echo "Edit your workstation /etc/hosts to add the LOADBALANCER EXTERNAL-IPs from the istio-system services with application hostnames."
       echo "Here is an example. You might have to change this depending on the number of gateways you configure for k8s cluster."
       echo "  # METALLB ISTIO INGRESS IPs"
-      echo "  172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil"
-      echo "  172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil"
+      echo "  172.20.1.240 ${PASSTHROUGH_DOMAINS[*]}"
+      echo "  172.20.1.241 ${PUBLIC_DOMAINS[*]}"
     fi
   elif [[ "$PRIVATE_IP" == true ]]; then # not using MetalLB
     # Not using MetalLB and using private IP
@@ -901,17 +953,17 @@ function print_instructions {
     echo "  sshuttle --dns -vr ${SSHUSER}@${PublicIP} 172.31.0.0/16 --ssh-cmd 'ssh -i ${SSHKEY}'"
     echo
     echo "To access apps from a browser edit your /etc/hosts to add the private IP of your EC2 instance with application hostnames. Example:"
-    echo "  ${PrivateIP}  gitlab.dev.bigbang.mil prometheus.dev.bigbang.mil kibana.dev.bigbang.mil"
+    echo "  ${PrivateIP} ${PUBLIC_DOMAINS[*]}"
     echo
   else # Not using MetalLB and using public IP. This is the default
     echo "To access apps from a browser edit your /etc/hosts to add the public IP of your EC2 instance with application hostnames."
     echo "Example:"
-    echo "  ${PublicIP} gitlab.dev.bigbang.mil prometheus.dev.bigbang.mil kibana.dev.bigbang.mil"
+    echo "  ${PublicIP} ${PUBLIC_DOMAINS[*]}"
     echo
 
     if [[ $SecondaryIP ]]; then
       echo "A secondary IP is available for use if you wish to have a passthrough ingress for Istio along with a public Ingress Gateway, this maybe useful for Keycloak x509 mTLS authentication."
-      echo "  $SecondaryIP  keycloak.dev.bigbang.mil"
+      echo "  $SecondaryIP  ${PASSTHROUGH_DOMAINS[*]}"
     fi
   fi
 }
@@ -1266,33 +1318,46 @@ function cloud_aws_create_instances {
 }
 
 function fix_etc_hosts {
-    if [[ "$METAL_LB" == "true" ]]; then
-      run <<ENDSSH
-    # run this command on remote
-    # fix /etc/hosts for new cluster
-    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-    sudo bash -c "echo '## begin dev.bigbang.mil section (METAL_LB)' >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.240  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo 172.20.1.241 anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil policyreporter.dev.bigbang.mil prometheus.dev.bigbang.mil neuvector.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    172.20.0.1 host.k3d.internal$/a\ \ \ \ 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-    kubectl delete pod -n kube-system -l k8s-app=kube-dns
-ENDSSH
-    elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
-      run <<ENDSSH
-    # run this command on remote
-    # fix /etc/hosts for new cluster
-    sudo sed -i '/dev.bigbang.mil/d' /etc/hosts
-    sudo bash -c "echo '## begin dev.bigbang.mil section (ATTACH_SECONDARY_IP)' >> /etc/hosts"
-    sudo bash -c "echo $(getPrivateIP2)  keycloak.dev.bigbang.mil vault.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo $PrivateIP anchore-api.dev.bigbang.mil anchore.dev.bigbang.mil argocd.dev.bigbang.mil gitlab.dev.bigbang.mil registry.dev.bigbang.mil tracing.dev.bigbang.mil kiali.dev.bigbang.mil kibana.dev.bigbang.mil chat.dev.bigbang.mil minio.dev.bigbang.mil minio-api.dev.bigbang.mil alertmanager.dev.bigbang.mil grafana.dev.bigbang.mil policyreporter.dev.bigbang.mil prometheus.dev.bigbang.mil neuvector.dev.bigbang.mil nexus.dev.bigbang.mil sonarqube.dev.bigbang.mil tempo.dev.bigbang.mil twistlock.dev.bigbang.mil >> /etc/hosts"
-    sudo bash -c "echo '## end dev.bigbang.mil section' >> /etc/hosts"
-    # run kubectl to add keycloak and vault's hostname/IP to the configmap for coredns, restart coredns
-    kubectl get configmap -n kube-system coredns -o yaml | sed '/^    .* host.k3d.internal$/a\ \ \ \ $(getPrivateIP2) keycloak.dev.bigbang.mil vault.dev.bigbang.mil' | kubectl apply -f -
-    kubectl delete pod -n kube-system -l k8s-app=kube-dns
-ENDSSH
+  local primary_ip # for the public gateway
+  local secondary_ip # for the passthrough gateway
+
+  if [[ "$METAL_LB" == "true" ]]; then
+    primary_ip="172.20.1.241"
+    secondary_ip="172.20.1.240"
+  elif [[ "$ATTACH_SECONDARY_IP" == true ]]; then
+    primary_ip=${PrivateIP}
+    secondary_ip=$(getPrivateIP2)
+  else
+    # No need to fix /etc/hosts if we are not using MetalLB or a secondary IP
+    return
   fi
+
+  run <<ENDSSH
+# fix /etc/hosts for new cluster
+sudo sed -i '/${BASE_DOMAIN}/d' /etc/hosts
+sudo bash -c "echo '## begin ${BASE_DOMAIN} section (METAL_LB)' >> /etc/hosts"
+sudo bash -c "echo ${primary_ip} ${PUBLIC_DOMAINS[*]} >> /etc/hosts"
+sudo bash -c "echo ${secondary_ip} ${PASSTHROUGH_DOMAINS[*]} >> /etc/hosts"
+sudo bash -c "echo '## end ${BASE_DOMAIN} section' >> /etc/hosts"
+
+# run kubectl to add a configmap for coredns to resolve bigbang hostnames, restart coredns
+kubectl create configmap coredns-custom \
+  --namespace=kube-system \
+  --from-literal=bigbang.server='${BASE_DOMAIN} {
+  template IN A ${PASSTHROUGH_DOMAINS[*]} {
+    answer "{{ .Name }} 60 IN A ${secondary_ip}"
+  }
+
+  template IN A {
+    answer "{{ .Name }} 60 IN A ${primary_ip}"
+  }
+
+  errors
+  log
+}'
+
+kubectl -n kube-system rollout restart deployment coredns
+ENDSSH
 }
 
 function check_for_existing_instances {
@@ -1326,6 +1391,7 @@ function create_instances {
 
 function main {
   process_arguments "$@"
+  set_domains
 
   extratools=""
   if [[ "${CLOUDPROVIDER}" != "" ]]; then
