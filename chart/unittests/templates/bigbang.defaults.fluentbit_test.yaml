@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Template - bigbang.defaults.fluentbit
+templates:
+- templates/_self-test/render.yaml
+- templates/fluentbit/values.yaml
+tests:
+- it: must source storage-subnets from global definitions and enable when S3 output is configured
+  set:
+    networkPolicies:
+      egress:
+        definitions:
+          storage-subnets:
+            to:
+              - ipBlock:
+                  cidr: 10.99.0.0/16
+            ports:
+              - port: 443
+                protocol: TCP
+    fluentbit:
+      values:
+        additionalOutputs:
+          s3:
+            bucket: test-bucket
+            region: us-gov-west-1
+            aws_access_key_id: test
+            aws_secret_access_key: test
+    _selfTest:
+      bigbang.defaults.fluentbit:
+        resultIsYaml: true
+        args: helm:context
+  template: templates/_self-test/render.yaml
+  asserts:
+  - equal:
+      path: result.networkPolicies.egress.definitions["storage-subnets"]
+      value:
+        to:
+          - ipBlock:
+              cidr: 10.99.0.0/16
+        ports:
+          - port: 443
+            protocol: TCP
+  - equal:
+      path: result.networkPolicies.egress.from["fluent-bit"].to.definition["storage-subnets"].enabled
+      value: true

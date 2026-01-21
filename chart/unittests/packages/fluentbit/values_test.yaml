@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Fluentbit - Values Tests
+templates:
+  - templates/fluentbit/values.yaml
+tests:
+  - it: should merge external elastic definition and enable egress rule
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      fluentbit.enabled: true
+      fluentbit.values.networkPolicies.egress.definitions.external-elastic:
+        to:
+          - ipBlock:
+              cidr: 203.0.113.10/32
+        ports:
+          - port: 9200
+            protocol: TCP
+      fluentbit.values.networkPolicies.egress.from.fluent-bit.to.definition.external-elastic:
+        enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.external-elastic.to[0].ipBlock.cidr
+          value: 203.0.113.10/32
+      - equal:
+          path: networkPolicies.egress.definitions.external-elastic.ports[0].port
+          value: 9200
+      - equal:
+          path: networkPolicies.egress.from.fluent-bit.to.definition.external-elastic.enabled
+          value: true
+
+  - it: should merge external fluentd definition and enable egress rule
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      fluentbit.enabled: true
+      fluentbit.values.networkPolicies.egress.definitions.external-fluentd:
+        to:
+          - ipBlock:
+              cidr: 198.51.100.0/24
+        ports:
+          - port: 24224
+            protocol: TCP
+      fluentbit.values.networkPolicies.egress.from.fluent-bit.to.definition.external-fluentd:
+        enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.external-fluentd.to[0].ipBlock.cidr
+          value: 198.51.100.0/24
+      - equal:
+          path: networkPolicies.egress.definitions.external-fluentd.ports[0].port
+          value: 24224
+      - equal:
+          path: networkPolicies.egress.from.fluent-bit.to.definition.external-fluentd.enabled
+          value: true
