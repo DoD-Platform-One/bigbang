@@ -16,7 +16,7 @@ The mechanisms described in this document are natively available for:
 - all bigbang supported addon packages (such as minio, etc)
 - select community supported addons (jira, confluence)
 
-For the purposes of this document, "customer defined package" and "community supported package" may be used interchangably and the techniques for one will apply equally to the other. However, customer defined packages will need to implement support for the networkpolicy control mechanism themselves if they want to make use of this functionality. See the [developer guide](../community/development/package-integration/network-policies.md) for how to implement this functionality in a customer defined package. 
+For the purposes of this document, "customer defined package" and "community supported package" may be used interchangably and the techniques for one will apply equally to the other. However, customer defined packages will need to implement support for the networkpolicy control mechanism themselves if they want to make use of this functionality. See the [Big Bang Common Library](../community/development/package-integration/bb-common.md) guide for how to implement this functionality in a customer defined package. 
 
 ## Enabling or Disabling Network Policies
 
@@ -113,6 +113,6 @@ additionalPolicies:
 * [Kubernetes Network Policies Documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 * [Kubernetes Labels and Selectors Documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
 * [Big Bang Developer Guide for Package Implementation](../community/development/develop-package.md)
-* [Big Bang Developer Guide for Package Integration regarding Network Policies](../community/development/package-integration/network-policies.md)
+* [Big Bang Common Library](../community/development/package-integration/bb-common.md)
 
 For more information regarding the behavior of a specific core, supported addon or community supported package, you should always reference the documentation for the specific package in question. Information specific to any given package is outside the scope of this documentation.

@@ -1,5 +1,10 @@
 {{- if .Values.fluentbit.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.fluentbit "name" "fluentbit" "defaults" (include "bigbang.defaults.fluentbit" .)) }}
+{{- $fluentbitPackage := deepCopy .Values.fluentbit -}}
+{{- if .Values.fluentbit.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.fluentbit.values) | fromYaml -}}
+{{- $fluentbitPackage = set $fluentbitPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $fluentbitPackage "name" "fluentbit" "defaults" (include "bigbang.defaults.fluentbit" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.fluentbit" -}}
@@ -7,6 +12,17 @@
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.fluentbit) "enabled")) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.fluentbit.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $additionalS3 := (and
+  (dig "additionalOutputs" "s3" "bucket" false .Values.fluentbit.values)
+  (dig "additionalOutputs" "s3" "region" false .Values.fluentbit.values)
+  (or
+    (and
+      (dig "additionalOutputs" "s3" "aws_secret_access_key" false .Values.fluentbit.values)
+      (dig "additionalOutputs" "s3" "aws_access_key_id" false .Values.fluentbit.values))
+      (dig "additionalOutputs" "s3" "existingSecret" false .Values.fluentbit.values))
+  true)
+}}
 
 {{- $lokiServiceMap := dict
     "monolith" "logging-loki"
@@ -22,14 +38,52 @@ networkPolicies:
   vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
-
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  egress:
+    definitions:
+      storage-subnets:
+        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
+    from:
+      fluent-bit:
+        to:
+          definition:
+            external-elastic:
+              enabled: false
+            external-loki:
+              enabled: false
+            external-fluentd:
+              enabled: false
+            storage-subnets:
+              enabled: {{ $additionalS3 }} # NOTE: S3 output requires storage subnet egress
+            kubeAPI:
+              enabled: true
+          k8s:
+            logging/elasticsearch:9200:
+              enabled: {{ .Values.elasticsearchKibana.enabled }}
+              podSelector:
+                matchLabels:
+                  common.k8s.elastic.co/type: elasticsearch
+            logging/logging-loki:3100:
+              enabled: {{ .Values.loki.enabled }}
+            tempo/tempo:9411:
+              enabled: {{ .Values.tempo.enabled }}
+  ingress:
+    to:
+      "fluent-bit:2020":
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.fluentbit.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
+    enabled: {{ $istioHardenedEnabled }}
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 openshift: {{ .Values.openshift }}
 
@@ -162,15 +216,6 @@ upstream:
   {{- $additionalLoki := (and
     (dig "additionalOutputs" "loki" "host" false .Values.fluentbit.values)
     (dig "additionalOutputs" "loki" "port" false .Values.fluentbit.values))
-  }}
-  {{- $additionalS3 := (and
-    (dig "additionalOutputs" "s3" "bucket" false .Values.fluentbit.values)
-    (dig "additionalOutputs" "s3" "region" false .Values.fluentbit.values)
-    (or
-      (and
-        (dig "additionalOutputs" "s3" "aws_secret_access_key" false .Values.fluentbit.values)
-        (dig "additionalOutputs" "s3" "aws_access_key_id" false .Values.fluentbit.values))
-        (dig "additionalOutputs" "s3" "existingSecret" false .Values.fluentbit.values)))
   }}
   {{- $envFrom := (dig "upstream" "envFrom" false .Values.fluentbit.values) }}
   {{- if or
