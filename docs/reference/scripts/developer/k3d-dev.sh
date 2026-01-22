@@ -65,7 +65,7 @@ CLOUD_RECREATE_INSTANCE=false
 INIT_SCRIPT=""
 RUN_BATCH_FILE=""
 CURRENT_EPOCH=0
-KUBECONFIG=""
+KUBECONFIG="${KUBECONFIG:-}"
 KUBECTL_CHECKSUM=""
 KUBECTL_VERSION=""
 PrivateIP=""
@@ -215,6 +215,7 @@ function process_arguments {
       echo "                                  instance described or discovered and exit"
       echo " -D|--domain DOMAIN               Base domain to use for cluster; defaults to"
       echo "                                  dev.bigbang.mil"
+      echo " -C|--kubeconfig FILENAME         Use the provided kubeconfig path"
       echo
       echo "========= These options override -c and use your own infrastructure ======="
       echo
@@ -229,6 +230,10 @@ function process_arguments {
       echo
       echo " -h|--help                        output this help"
       exit 0
+      ;;
+    -C|--kubeconfig)
+      shift
+      KUBECONFIG=$1
       ;;
     -I|--print-instructions)
       action=print_instructions
@@ -394,11 +399,13 @@ function cloud_aws_report_instances {
 }
 
 function set_kubeconfig {
-  if [[ "${PROVISION_CLOUD_INSTANCE}" == "false" ]]; then
-    KUBECONFIG=${PublicIP}-dev-${PROJECTTAG}-config
-  elif [[ "${AWSUSERNAME}" != "" ]]; then
-    KUBECONFIG=${AWSUSERNAME}-dev-${PROJECTTAG}-config
-  fi
+    if [[ "${KUBECONFIG}" == "" ]]; then
+	if [[ "${PROVISION_CLOUD_INSTANCE}" == "false" ]]; then
+	    KUBECONFIG=~/.kube/${PublicIP}-dev-${PROJECTTAG}-config
+	elif [[ "${AWSUSERNAME}" != "" ]]; then
+	    KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-${PROJECTTAG}-config
+	fi
+    fi
 }
 
 function run_batch_new() {
@@ -691,11 +698,11 @@ function install_kubectl {
 
   echo "copying kubeconfig to workstation..."
   mkdir -p ~/.kube
-  scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/.kube/config ~/.kube/${KUBECONFIG}
+  scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/.kube/config ${KUBECONFIG}
   if [[ "$PRIVATE_IP" == true ]]; then
-    $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ~/.kube/${KUBECONFIG}
+    $sed_gsed -i "s/0\.0\.0\.0/${PrivateIP}/g" ${KUBECONFIG}
   else # default is to use public ip
-    $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ~/.kube/${KUBECONFIG}
+    $sed_gsed -i "s/0\.0\.0\.0/${PublicIP}/g" ${KUBECONFIG}
   fi
 }
 
@@ -909,7 +916,7 @@ function print_instructions {
   echo "  ssh -i ${SSHKEY} -o IdentitiesOnly=yes ${SSHUSER}@${PublicIP}"
   echo
   echo "To use kubectl from your local workstation you must set the KUBECONFIG environment variable:"
-  echo "  export KUBECONFIG=~/.kube/${KUBECONFIG}"
+  echo "  export KUBECONFIG=${KUBECONFIG}"
   if [[ "$PRIVATE_IP" == true ]]; then
     echo "The cluster connection will not work until you start sshuttle as described below."
   fi

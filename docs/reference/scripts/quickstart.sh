@@ -321,7 +321,14 @@ function main {
     if [[ "${arg_host}" != "" ]]; then
         export KUBECONFIG=~/.kube/${arg_host}-dev-quickstart-config
     else
-        AWSUSERNAME=$(aws sts get-caller-identity --query Arn --output text | cut -f 2 -d '/')
+	ARN=$(aws sts get-caller-identity --query Arn --output text)
+	if echo "$ARN" | grep ".*assumed-role.*"; then
+	    RAW_USERNAME=$(echo "$ARN" | cut -f 3 -d '/')
+	    AWSUSERNAME=$(echo "$RAW_USERNAME" | cut -d '@' -f 1)
+	    AWSUSERNAME+=$(echo "$RAW_USERNAME" | cut -d '@' -f 2)
+	else
+	    AWSUSERNAME=$(echo "$ARN" | cut -f 2 -d '/')
+	fi
         export KUBECONFIG=~/.kube/${AWSUSERNAME}-dev-quickstart-config
         instanceid=$(aws ec2 describe-instances \
             --output text \
@@ -343,14 +350,14 @@ function main {
         export PIPELINE_REPO_DESTINATION=${REPO1_LOCATION}/big-bang/pipeline-templates/pipeline-templates
         export CI_VALUES_FILE=${BIG_BANG_REPO}/chart/values.yaml
         export VALUES_FILE=${BIG_BANG_REPO}/chart/values.yaml
-        ${REPO1_LOCATION}/big-bang/pipeline-templates/pipeline-templates/scripts/deploy/03_wait_for_helmreleases.sh
+        ${REPO1_LOCATION}/big-bang/pipeline-templates/pipeline-templates/scripts/deploy/03_wait_for_resources.sh
     fi
 
     services=$(kubectl get virtualservices -A -o json 2>/dev/null | jq -r .items[].spec.hosts[0] | tr "\n" "\t")
     echo "=================================================================================="
     echo "                          INSTALLATION   COMPLETE"
     echo ""
-    build_k3d_cluster --print-instructions
+    build_k3d_cluster --kubeconfig ${KUBECONFIG} --print-instructions
     echo
     echo "=================================================================================="
     set +e
