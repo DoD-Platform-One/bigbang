@@ -854,6 +854,14 @@ loki:
   # Test SingleBinary at Umbrella, and Scalable at package level
   strategy: monolith
   values:
+    singleBinary:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 1Gi
     istio:
       serviceEntries:
         custom:
