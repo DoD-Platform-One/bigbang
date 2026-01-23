@@ -24,6 +24,7 @@ domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") }}
+{{- $localSSOEnabled := and .Values.addons.keycloak.enabled .Values.addons.sonarqube.sso.enabled }}
 
 OpenShift:
   enabled: {{ .Values.openshift }}
@@ -63,6 +64,10 @@ routes:
       - github.com
       - release-assets.githubusercontent.com
       - downloads.sonarsource.com
+    sonarqube-configure-sso:
+      enabled: {{ $localSSOEnabled }}
+      hosts:
+      - {{ include "sso.host" . }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -93,6 +98,26 @@ networkPolicies:
             sonarsource-marketplace: {{ $pluginsExist }}
             code-repository: true
             database-subnets: {{ not (or (empty .Values.addons.sonarqube.database.host) (dig "upstream" "jdbcOverwrite" "enabled" false .Values.addons.sonarqube.values )) }}
+      sonarqube-configure-sso:
+        podSelector:
+          matchLabels:
+            batch.kubernetes.io/job-name: configure-sso-certificate-secret
+        to:
+          definition:
+            kubeAPI: 
+              enabled: {{ $localSSOEnabled }}
+              metadata:
+                annotations:
+                  helm.sh/hook: pre-install,pre-upgrade
+                  helm.sh/hook-weight: "-10"
+                  helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+            sso: 
+              enabled: {{ $localSSOEnabled }}
+              metadata:
+                annotations:
+                  helm.sh/hook: pre-install,pre-upgrade
+                  helm.sh/hook-weight: "-10"
+                  helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
 
 image:
   pullPolicy: {{ .Values.imagePullPolicy }}
@@ -101,6 +126,11 @@ image:
 {{- if $istioInjection }}
 annotations:
   {{ include "istioAnnotation" . }}
+{{- end }}
+
+{{- if $localSSOEnabled }}
+sso:
+  idpmetadataurl: {{ include "sso.saml.service" . }}/descriptor
 {{- end }}
 
 upstream:
@@ -118,7 +148,9 @@ upstream:
     sonar.auth.saml.providerId: {{ include "sso.url" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda"
     sonar.auth.saml.loginUrl: {{ include "sso.saml.service" . }}    #"https://your.keycloak.url/auth/realms/baby-yoda/protocol/saml"
     # This is the RS256 key copied from Keycloak The value you get from ***Realm Settings > Keys > RS256.*** Click on Certificate
+    {{- if not $localSSOEnabled }}
     sonar.auth.saml.certificate.secured: {{ default (include "sso.saml.cert" .) .Values.addons.sonarqube.sso.certificate }}   #"-----BEGIN CERTIFICATE-----"
+    {{- end }}
     sonar.auth.saml.user.login: {{ .Values.addons.sonarqube.sso.login | default "login" }}   #"login" (user attribute)
     sonar.auth.saml.user.name: {{ .Values.addons.sonarqube.sso.name | default "name" }}      #"username" (user attribute)
     sonar.auth.saml.user.email: {{ .Values.addons.sonarqube.sso.email | default "email" }}   #"email" (user attribute)
@@ -126,6 +158,10 @@ upstream:
     sonar.auth.saml.group.name: {{ .Values.addons.sonarqube.sso.group }}  #"groups" (user attribute)
     {{- end }}
 {{- end }}
+
+  {{- if $localSSOEnabled }}
+  sonarSecretProperties: sonarqube-sonarqube-secret
+  {{- end }}
 
   prometheusExporter:
     enabled: {{ .Values.monitoring.enabled }}

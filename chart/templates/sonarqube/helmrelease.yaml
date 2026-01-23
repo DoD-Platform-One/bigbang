@@ -64,7 +64,7 @@ spec:
 
   values:
 
-  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled $istioEnabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.keycloak.enabled $istioEnabled }}
   dependsOn:
   {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
@@ -80,6 +80,10 @@ spec:
   {{- end }}
   {{- if .Values.monitoring.enabled }}
     - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if and .Values.addons.keycloak.enabled .Values.addons.sonarqube.sso.enabled}}
+    - name: keycloak
       namespace: {{ .Release.Namespace }}
   {{- end }}
   {{- end }}
