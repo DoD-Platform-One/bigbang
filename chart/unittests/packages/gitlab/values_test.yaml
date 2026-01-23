@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Gitlab - Values Tests
+templates:
+  - templates/gitlab/values.yaml
+tests:
+  - it: sets the registry host from addons.gitlab.hostnames.registry
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.hostnames.gitlab: custom-gitlab
+      addons.gitlab.hostnames.registry: custom-registry
+      domain: example.com
+    asserts:
+      - equal:
+          path: routes.inbound.gitlab.hosts[0]
+          value: "custom-gitlab.example.com"
+      - equal:
+          path: routes.inbound.registry.hosts[0]
+          value: "custom-registry.example.com"
+      - equal:
+          path: global.hosts.domain
+          value: "example.com"
+      - equal:
+          path: global.hosts.gitlab.name
+          value: "custom-gitlab.example.com"
+      - equal:
+          path: global.hosts.registry.name
+          value: "custom-registry.example.com"
