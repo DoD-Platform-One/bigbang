@@ -14,7 +14,7 @@ routes:
       {{- end }}
       {{- else }}
       hosts:
-      - gitlab.{{ .Values.domain }}
+      - "{{ .Values.addons.gitlab.hostnames.gitlab }}.{{ .Values.domain }}"
       {{- end }}
     registry:
       enabled: {{ dig "istio" "registry" "enabled" true .Values.addons.gitlab.values }}
@@ -28,7 +28,7 @@ routes:
       {{- end }}
       {{- else }}
       hosts:
-      - registry.{{ .Values.domain }}
+      - "{{ .Values.addons.gitlab.hostnames.registry }}.{{ .Values.domain }}"
       {{- end }}
     kas:
       enabled: {{ dig "global" "kas" "enabled" true .Values.addons.gitlab.values }}
