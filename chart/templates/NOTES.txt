@@ -96,7 +96,7 @@ PLATFORM ONE ANCHORE WARNING:
   Platform One does not support this option for production deployments.
   This option should only be used for development or CI pipelines.
 {{- end }}
-{{- if $.Values.addons.anchoreEnterprise.enabled }}
+{{- if $.Values.addons.anchoreEnterprise.enterprise.enabled }}
 {{- if not (and $.Values.addons.anchoreEnterprise.redis.host $.Values.addons.anchoreEnterprise.redis.port $.Values.addons.anchoreEnterprise.redis.password) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an internal redis database in the values configuration.
@@ -110,13 +110,13 @@ PLATFORM ONE ANCHORE WARNING:
   This option should only be used for development or CI pipelines.
 {{- end }}
 {{- end }}
-{{- if and ($.Values.addons.anchoreEnterprise.enabled) (not $.Values.addons.anchoreEnterprise.enterprise.licenseYaml) }}
+{{- if and ($.Values.addons.anchoreEnterprise.enterprise.enabled) (not $.Values.addons.anchoreEnterprise.enterprise.licenseYaml) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled an enterprise Anchore in the values configuration, but not provided a license.
   Your deployment will fail without a license, please review your configuration and supply a license
   or disable the enterprise features.
 {{- end }}
-{{- if and ($.Values.addons.anchoreEnterprise.sso.enabled) (not $.Values.addons.anchoreEnterprise.enabled) }}
+{{- if and ($.Values.addons.anchoreEnterprise.sso.enabled) (not $.Values.addons.anchoreEnterprise.enterprise.enabled) }}
 PLATFORM ONE ANCHORE WARNING:
   You have enabled SSO in the values configuration, but not enabled enterprise Anchore.
   Your SSO configuration will be ignored, the Anchore UI is only available for enterprise deployments.
