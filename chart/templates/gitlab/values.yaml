@@ -446,7 +446,16 @@ global:
   # added to help with Gitlab sub-chart configuration
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-    
+
+  hosts:
+    domain: {{ $domainName }}
+
+    gitlab:
+      name: {{ .Values.addons.gitlab.hostnames.gitlab }}.{{ $domainName }}
+
+    registry:
+      name: {{ .Values.addons.gitlab.hostnames.registry }}.{{ $domainName }}
+
   {{- if or (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured }}
   minio:
     enabled: false
