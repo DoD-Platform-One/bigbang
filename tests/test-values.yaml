@@ -1788,6 +1788,8 @@ addons:
                 resolution: DNS
       upstream:
         tenant:
+          buckets:
+            - name: velero
           pools:
           - name: pool-0
             labels:
@@ -2090,25 +2092,18 @@ addons:
     plugins:
     - aws
     values:
-      istio:
-        hardened:
-          customServiceEntries:
-            - name: "cypress-service-entries-velero"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'repo1.dso.mil'
-                exportTo:
-                  - "."
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
+      # Minio is only enabled for velero in our test-values so including the netpol required for it here as well
+      networkPolicies:
+        egress:
+          from:
+            velero:
+              to:
+                k8s:
+                  minio/minio-instance:9000:
+                    enabled: true
+                    podSelector:
+                      matchLabels:
+                        v1.min.io/tenant: minio-minio-minio-instance
       upstream:
         upgradeCRDs: true
         serviceAccount:
@@ -2122,7 +2117,7 @@ addons:
               config:
                 region: velero
                 s3ForcePathStyle: "true"
-                s3Url: https://minio-api.dev.bigbang.mil
+                s3Url: http://minio.minio.svc.cluster.local
               annotations:
                 "helm.sh/hook": post-install,post-upgrade,post-rollback
                 "helm.sh/hook-delete-policy": before-hook-creation

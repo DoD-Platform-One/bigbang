@@ -1,14 +1,16 @@
 {{- if .Values.addons.velero.enabled }}
+{{- /* Create a cleaned copy of loki config and merge deprecated paths into current paths */ -}}
+{{- $veleroPackage := deepCopy .Values.addons.velero -}}
+{{- if .Values.addons.velero.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.velero.values) | fromYaml -}}
+{{- $veleroPackage = set $veleroPackage "values" $cleanedValues -}}
+{{- end -}}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.velero "name" "velero" "defaults" (include "bigbang.defaults.velero" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.velero" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-
-istio:
-  enabled: {{ $istioEnabled  }}
-  hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.velero.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.velero.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.velero.values) }}
 
 domain: {{ .Values.domain }}
 
@@ -20,39 +22,64 @@ podAnnotations:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-{{- if .Values.monitoring.enabled }}
-metrics:
-  enabled: true
-  scrapeInterval: 30s
-  scrapeTimeout: 10s
-  service:
-    annotations: {}
-    labels: {}
-  podAnnotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "8085"
-    prometheus.io/path: "/metrics"
-  serviceMonitor:
-    enabled: true
-    additionalLabels: {}
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
-    scheme: https
-    tlsConfig:
-      caFile: /etc/prom-certs/root-cert.pem
-      certFile: /etc/prom-certs/cert-chain.pem
-      keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target
-    {{- end }}
-  prometheusRule:
-    enabled: true
-{{- end }}
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    to:
+      velero:8085:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+  egress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+        {{- if eq .Values.networkPolicies.controlPlaneCidr "0.0.0.0/0" }}
+              # ONLY Block requests to cloud metadata IP
+              except:
+              - 169.254.169.254/32
+        {{- end }}
+    from:
+      velero:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            kubeAPI: true
+            storage-subnets: true
+      velero-upgrade-crds:
+        podSelector:
+          matchLabels:
+            batch.kubernetes.io/job-name: velero-upgrade-crds
+        to:
+          definition:
+            kubeAPI:
+              enabled: true
+              metadata:
+                annotations:
+                  helm.sh/hook: pre-upgrade
+                  helm.sh/hook-weight: "-10"
+                  helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
 
 openshift: {{ .Values.openshift }}
 
@@ -62,5 +89,32 @@ upstream:
 
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+
+  {{- if .Values.monitoring.enabled }}
+  metrics:
+    enabled: true
+    scrapeInterval: 30s
+    scrapeTimeout: 10s
+    service:
+      annotations: {}
+      labels: {}
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8085"
+      prometheus.io/path: "/metrics"
+    serviceMonitor:
+      enabled: true
+      additionalLabels: {}
+      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.velero.values) "STRICT") }}
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target
+      {{- end }}
+    prometheusRule:
+      enabled: true
+  {{- end }}
 
 {{- end -}}
