@@ -2,11 +2,18 @@
 
 {{- /* Create secret */ -}}
 {{- if (get .Values.addons $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values.addons $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- /* Create a cleaned copy of harbor config and merge deprecated paths into current paths */ -}}
+{{- $harborPackage := deepCopy .Values.addons.harbor -}}
+{{- if .Values.addons.harbor.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.harbor.values) | fromYaml -}}
+{{- $harborPackage = set $harborPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $harborPackage "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.harbor" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.harbor.values) }}
 
 imagePullSecrets:
 - name: private-registry
@@ -18,25 +25,46 @@ domain: {{ .Values.domain }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.harbor }}
-  harbor:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.harbor.ingress.gateway "root" .)}}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
+routes:
+  inbound:
+    harbor:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.harbor.ingress.gateway "root" .)}}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.harbor "root" .) | nindent 4 }}
-  istioNamespaceSelector:
-    {{ include "istioNamespaceSelector" . | nindent 4 }}
 
+  egress:
+    definitions:
+      sso:
+        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
+      kubeAPI:
+        to:
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+          {{- if ne .Values.networkPolicies.vpcCidr "0.0.0.0/0" }}
+          - ipBlock:
+              cidr: {{ .Values.networkPolicies.vpcCidr }}
+          {{- end }}
+    from:
+      harbor:
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+  ingress:
+    to:
+      harbor:8001:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
