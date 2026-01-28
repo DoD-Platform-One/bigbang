@@ -15,8 +15,9 @@
 #   helm template ./chart --post-renderer ./scripts/template-all.sh
 #
 # Options:
-#   --debug    Enable debug logging (will also be passed on to Helm template
-#              command if templating directly)
+#   --debug                                 Enable debug logging (will also be passed on to Helm template
+#                                           command if templating directly)
+#   --api-versions <version>, -a <version>  Add additional API versions to Helm template command (both Big Bang and packages)
 #
 # Requirements:
 #   - helm
@@ -25,6 +26,27 @@
 #   - kubectl
 
 set -euo pipefail
+
+# These are all the non-standard K8s APIs installed by Big Bang in its default configuration.
+api_versions=(
+  "monitoring.coreos.com/v1"
+  "monitoring.coreos.com/v1alpha1"
+  "kyverno.io/v1"
+  "kyverno.io/v2"
+  "kyverno.io/v2alpha1"
+  "kyverno.io/v2beta1"
+  "policies.kyverno.io/v1alpha1"
+  "policies.kyverno.io/v1beta1"
+  "reports.kyverno.io/v1"
+  "extensions.istio.io/v1alpha1"
+  "networking.istio.io/v1"
+  "networking.istio.io/v1alpha3"
+  "networking.istio.io/v1beta1"
+  "security.istio.io/v1"
+  "security.istio.io/v1beta1"
+  "telemetry.istio.io/v1"
+  "telemetry.istio.io/v1alpha1"
+)
 
 debug_mode=false
 for arg in "$@"; do
@@ -79,6 +101,25 @@ function die() {
   cat "$error_log" >&2
   exit 1
 }
+
+function add_api_versions_from_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -a | --api-versions)
+      shift
+      api_versions+=("$1")
+      ;;
+    esac
+    shift
+  done
+}
+
+add_api_versions_from_args "$@"
+
+api_version_args=()
+for api_version in "${api_versions[@]}"; do
+  api_version_args+=("--api-versions" "$api_version")
+done
 
 big_bang_templates=""
 
@@ -384,12 +425,12 @@ function template_helm_release() {
 
     if [[ $helm_repo_type == "oci" ]]; then
       debug "Using OCI Helm repository: $helm_repo_url"
-      if ! release_templates=$(try helm template "$release_name" "$helm_repo_url/$helm_chart" --version "$helm_chart_version" "${values_args[@]}"); then
+      if ! release_templates=$(try helm template "$release_name" "$helm_repo_url/$helm_chart" --version "$helm_chart_version" "${api_version_args[@]}" "${values_args[@]}"); then
         die "Failed to template HelmRelease: $release_name"
       fi
     else
       debug "Using classic Helm repository: $helm_repo_url"
-      if ! release_templates=$(try helm template "$release_name" "$helm_source_name/$helm_chart" --version "$helm_chart_version" "${values_args[@]}"); then
+      if ! release_templates=$(try helm template "$release_name" "$helm_source_name/$helm_chart" --version "$helm_chart_version" "${api_version_args[@]}" "${values_args[@]}"); then
         die "Failed to template HelmRelease: $release_name"
       fi
     fi
@@ -402,7 +443,7 @@ function template_helm_release() {
 
     debug "Using chart directory: $repo_dir"
     pushd "$repo_dir" >/dev/null || die "Failed to access repository directory: $repo_dir"
-    if ! release_templates=$(try helm template . "${values_args[@]}"); then
+    if ! release_templates=$(try helm template . "${api_version_args[@]}" "${values_args[@]}"); then
       die "Failed to template HelmRelease: $release_name"
     fi
     popd >/dev/null
@@ -414,7 +455,7 @@ function template_helm_release() {
     fi
 
     debug "Using OCI chart archive: $chart_file"
-    if ! release_templates=$(try helm template "$release_name" "$chart_file" "${values_args[@]}"); then
+    if ! release_templates=$(try helm template "$release_name" "$chart_file" "${api_version_args[@]}" "${values_args[@]}"); then
       die "Failed to template HelmRelease: $release_name"
     fi
   else
