@@ -31,6 +31,9 @@ networkPolicies:
         to:
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            kubeAPI: true
+            sso: {{ .Values.addons.headlamp.sso.enabled }}
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
@@ -42,6 +45,10 @@ networkPolicies:
 {{- $baseURL := dig "upstream" "config" "baseURL" "" .Values.addons.headlamp.values }}
 {{- $port := dig "upstream" "service" "port" 4466 .Values.addons.headlamp.values }}
 {{- $serviceName := "headlamp-headlamp" }}
+{{- $ssoHost := "" }}
+{{- if .Values.addons.headlamp.sso.enabled }}
+{{- $ssoHost = include "sso.url" . | trimPrefix "https://" | regexFind "^[^/]+" }}
+{{- end }}
 routes:
   inbound:
     headlamp:
@@ -69,6 +76,13 @@ routes:
             port:
               number: {{ $port }}
       {{- end }}
+  outbound:
+    sso:
+      enabled: {{ .Values.addons.headlamp.sso.enabled }}
+      {{- if $ssoHost }}
+      hosts:
+        - {{ $ssoHost }}
+      {{- end }}
 
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -88,9 +102,9 @@ upstream:
   config:
     oidc:
       clientID: {{ .Values.addons.headlamp.sso.client_id }}
-      clientSecret: {{ .Values.addons.headlamp.sso.client_secret }}
       issuerURL: {{ .Values.sso.url }}
       scopes: "email,profile"
+      usePKCE: true
 {{- else }}
 upstream:
   config:
