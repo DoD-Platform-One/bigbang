@@ -34,7 +34,24 @@ networkPolicies:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
     to:
+      # Allow alloy-metrics and Prometheus to scrape alloy-receiver
+      alloy-receiver:12345:
+        from:
+          k8s:
+            # Use full sa@namespace/pod format for same-namespace AuthorizationPolicy
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+
+      # Allow alloy-metrics and Prometheus to scrape alloy-logs
       alloy-logs:12345:
+        from:
+          k8s:
+            # Use full sa@namespace/pod format for same-namespace AuthorizationPolicy
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+
+      # Allow Prometheus to scrape alloy-metrics
+      alloy-metrics:12345:
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
