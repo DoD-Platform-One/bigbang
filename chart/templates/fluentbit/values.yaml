@@ -513,7 +513,6 @@ upstream:
       {{- end }}
 
     filters: |
-      {{- if .Values.loki.enabled }}
       [FILTER]
           Name kubernetes
           Match kube.*
@@ -525,16 +524,17 @@ upstream:
           K8S-Logging.Exclude Off
           Buffer_Size 1M
       [FILTER]
-          Name          lua
-          Match         kube.*
-          script        /fluent-bit/scripts/remove_labels.lua
-          call          remove_labels
-      [FILTER]
           Alias         lua.add
           Name          lua
           Match         kube.*
           script        /fluent-bit/scripts/add_labels.lua
           call          add_labels
+      {{- if .Values.loki.enabled }}
+      [FILTER]
+          Name          lua
+          Match         kube.*
+          script        /fluent-bit/scripts/remove_labels.lua
+          call          remove_labels
       {{- end }}
   {{- end }}
 
