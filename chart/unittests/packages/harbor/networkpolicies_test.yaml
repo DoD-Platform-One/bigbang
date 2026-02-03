@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Harbor - NetworkPolicies
+postRenderer:
+  cmd: sh
+  args:
+    - -c
+    - |
+      set -o pipefail && \
+      yq 'select(.metadata.name == "*harbor*")' \
+        | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
+        | yq 'select(.kind == "NetworkPolicy")'
+tests:
+  - it: should create database-subnets egress NetworkPolicy when postgresql is disabled
+    set:
+      addons.harbor.enabled: true
+      addons.harbor.values.postgresql.enabled: false
+      networkPolicies.enabled: true
+    documentSelector:
+      path: metadata.name
+      value: allow-egress-from-harbor-to-database-subnets
+    asserts:
+      - equal:
+          path: kind
+          value: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: allow-egress-from-harbor-to-database-subnets
