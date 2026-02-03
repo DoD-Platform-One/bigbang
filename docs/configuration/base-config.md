@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 3.16.0](https://img.shields.io/badge/Version-3.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.17.0](https://img.shields.io/badge/Version-3.17.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -671,11 +671,11 @@ Kubernetes: `>=1.32.0-0`
 | addons.harbor.enabled | bool | `false` | Toggle deployment of harbor |
 | addons.harbor.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.harbor.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/harbor.git"` |  |
-| addons.harbor.git.tag | string | `"1.18.1-bb.4"` |  |
+| addons.harbor.git.tag | string | `"1.18.2-bb.0"` |  |
 | addons.harbor.git.path | string | `"./chart"` |  |
 | addons.harbor.helmRepo.repoName | string | `"registry1"` |  |
 | addons.harbor.helmRepo.chartName | string | `"harbor"` |  |
-| addons.harbor.helmRepo.tag | string | `"1.18.1-bb.4"` |  |
+| addons.harbor.helmRepo.tag | string | `"1.18.2-bb.0"` |  |
 | addons.harbor.flux | object | `{}` | Flux reconciliation overrides specifically for the Harbor Package |
 | addons.harbor.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public". |
 | addons.harbor.values | object | `{}` | Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git |
