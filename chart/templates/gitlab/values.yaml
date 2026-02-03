@@ -23,6 +23,7 @@ domain: {{ $domainName }}
 {{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
+{{- $kasEnabled := dig "global" "kas" "enabled" false .Values.addons.gitlab.values }}
 
 openshift: {{ .Values.openshift }}
 
@@ -77,7 +78,7 @@ routes:
       port: 5000
       selector:
         app: registry
-
+    {{- if $kasEnabled }}
     kas:
       enabled: {{ dig "global" "kas" "enabled" true .Values.addons.gitlab.values }}
       gateways:
@@ -95,6 +96,7 @@ routes:
               number: 8150
       selector:
         app: kas
+    {{- end }}
 
     pages:
       enabled: false
@@ -162,7 +164,7 @@ networkPolicies:
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
-
+      {{- if $kasEnabled }}
       kas:[8150,8153]:
         podSelector:
           matchLabels:
@@ -170,6 +172,7 @@ networkPolicies:
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
+      {{- end }}
 
       gitlab-runner:9252:
         podSelector:
@@ -376,6 +379,7 @@ upstream:
               keyFile: /etc/prom-certs/key.pem
               insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
+    {{- if $kasEnabled }}
     kas:
       annotations:
         {{ include "istioAnnotation" . }}
@@ -390,6 +394,7 @@ upstream:
               keyFile: /etc/prom-certs/key.pem
               insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
+    {{- end }}
     praefect:
       annotations:
         {{ include "istioAnnotation" . }}

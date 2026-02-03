@@ -30,6 +30,7 @@ routes:
       hosts:
       - "{{ .Values.addons.gitlab.hostnames.registry }}.{{ .Values.domain }}"
       {{- end }}
+    {{- if (dig "global" "kas" "enabled" false .Values.addons.gitlab.values) }}
     kas:
       enabled: {{ dig "global" "kas" "enabled" true .Values.addons.gitlab.values }}
       gateways:
@@ -44,6 +45,7 @@ routes:
       hosts:
       - kas.{{ .Values.domain }}
       {{- end }}
+    {{- end }}
     pages:
       enabled: {{ dig "istio" "pages" "enabled" false .Values.addons.gitlab.values }}
       {{- $pagesGateways := dig "istio" "pages" "gateways" list .Values.addons.gitlab.values }}
