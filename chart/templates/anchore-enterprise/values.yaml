@@ -101,12 +101,11 @@ upstream:
       password: {{ .Values.addons.anchoreEnterprise.database.password }}
       database: {{ .Values.addons.anchoreEnterprise.database.database }}
     externalEndpoint: "{{ .Values.addons.anchoreEnterprise.database.host }}"
-    {{- end }}
     primary:
       service:
         ports:
           postgresql: {{ .Values.addons.anchoreEnterprise.database.port }}
-
+    {{- end }}
 
   ui:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
