@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Harbor - Values Tests
+templates:
+  - templates/harbor/values.yaml
+tests:
+  - it: should enable database-subnets egress when postgresql is disabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.harbor.enabled: true
+      addons.harbor.values.postgresql.enabled: false
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.harbor.to.definition.database-subnets
+          value: true
+  - it: should disable database-subnets egress when postgresql is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.harbor.enabled: true
+      addons.harbor.values.postgresql.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.harbor.to.definition.database-subnets
+          value: false
+  - it: should disable database-subnets egress by default
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.harbor.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.harbor.to.definition.database-subnets
+          value: false

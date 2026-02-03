@@ -14,6 +14,7 @@
 {{- define "bigbang.defaults.harbor" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.harbor.values) }}
+{{- $postgresEnabled := dig "postgresql" "enabled" true .Values.addons.harbor.values }}
 
 imagePullSecrets:
 - name: private-registry
@@ -44,6 +45,8 @@ networkPolicies:
 
   egress:
     definitions:
+      database-subnets:
+        {{ toYaml ( index .Values.networkPolicies.egress.definitions "database-subnets") | nindent 8 }}
       sso:
         {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
       kubeAPI:
@@ -57,6 +60,8 @@ networkPolicies:
     from:
       harbor:
         to:
+          definition:
+            database-subnets: {{ not $postgresEnabled }}
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
   ingress:
