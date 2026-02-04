@@ -2,12 +2,41 @@
 
 {{- /* Create secret */ -}}
 {{- if (get .Values.addons $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values.addons $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+  {{- $package := deepCopy (get .Values.addons $pkg) -}}
+  {{- if $package.values -}}
+    {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" $package.values) | fromYaml -}}
+    {{- $package = set $package "values" $cleanedValues -}}
+  {{- end -}}
+  {{- include "values-secret" (dict 
+    "root" $ 
+    "package" $package 
+    "name" "thanos" 
+    "defaults" ((merge (include "bigbang.defaults.thanos" . | fromYaml) (include "bigbang.thanos.bb-common-migrations" . | fromYaml)) | toYaml)
+  )}}
 {{- end }}
 
+
+{{- /* Default values for Thanos */ -}}
 {{- define "bigbang.defaults.thanos" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $thanosS3Endpoint := (printf "%s.s3.dualstack.%s.amazonaws.com" .Values.addons.thanos.objectStorage.bucket .Values.addons.thanos.objectStorage.region) }}
+{{- $istioHardened := or
+  (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
+  (dig "hardened" "enabled" false .Values.istiod.values)
+}}
+
+{{- $s3Bucket := .Values.addons.thanos.objectStorage.bucket }}
+{{- $s3Region := .Values.addons.thanos.objectStorage.region }}
+{{- $s3Endpoint := .Values.addons.thanos.objectStorage.endpoint }}
+{{- if and (empty $s3Endpoint) (not (empty $s3Bucket)) (not (empty $s3Region)) }}
+  {{- $s3Endpoint = printf "%s.s3.%s.amazonaws.com" $s3Bucket $s3Region }}
+{{- end }}
+
+{{- $minioEnabled := false }}
+{{- with .Values.addons.thanos.objectStorage }}
+  {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
+    {{- $minioEnabled = true  }}
+  {{- end }}
+{{- end }}
 
 imagePullSecrets:
 - name: private-registry
@@ -17,46 +46,69 @@ externalURL: https://thanos.{{ .Values.domain }}
 
 domain: {{ .Values.domain }}
 
+routes:
+  outbound:
+    s3:
+      enabled: {{ and $istioHardened (not (empty $s3Endpoint)) }}
+      hosts:
+      - {{ $s3Endpoint }}
+  inbound:
+    query-frontend:
+      enabled: {{ $istioEnabled }}
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - thanos.{{ .Values.domain }}
+    minio:
+      enabled: {{ and $istioEnabled $minioEnabled }} 
+      gateways:
+      - istio-gateway/public-ingressgateway
+      hosts:
+      - thanos-minio.{{ .Values.domain }}
+
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-    {{- if and (or (dig "values" "istio" "hardened" "enabled" false .Values.addons.thanos) (dig "hardened" "enabled" false .Values.istiod.values)) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
-    customServiceEntries:
-      - name: egress-object-store
-        enabled: true
-        spec:
-          hosts:
-          - {{ $thanosS3Endpoint }}
-          location: MESH_EXTERNAL
-          ports:
-            - number: 443
-              protocol: TLS
-              name: https
-          resolution: DNS
-  {{- end }}
-  thanos:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.thanos.ingress.gateway "root" .)}}
+  sidecar:
+    enabled: {{ $istioHardened }}
+  authorizationPolicies:
+    enabled: {{ $istioHardened }}
+    generateFromNetpol: true
 
-{{- with .Values.addons.thanos.objectStorage }}
-{{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
 minio:
-  enabled: true
-{{- end }}
-{{- end }}
+  enabled: {{ $minioEnabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.thanos "root" .) | nindent 4 }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      thanos-query:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/component: query
+        to:
+          k8s:
+            monitoring/prometheus:10901: {{ .Values.monitoring.enabled }}
+            authservice/authservice:10003: {{ .Values.addons.authservice.enabled }}
+
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+    to:
+      minio:9000:
+        from:
+          k8s:
+            minio-operator@minio-operator/minio-operator: {{ or $minioEnabled (dig "minio" "enabled" false .Values.addons.thanos.values) }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      thanos-query:10902:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/component: query
+        from:
+          k8s:
+            grafana@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            haproxy@authservice/haproxy: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
