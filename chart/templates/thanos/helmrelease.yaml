@@ -42,9 +42,12 @@ spec:
 
   {{- toYaml $fluxSettingsThanos | nindent 2 }}
 
-  {{- if (get .Values.addons $pkg).postRenderers }}
   postRenderers:
+  {{- if (get .Values.addons $pkg).postRenderers }}
   {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 4 }}
+  {{- end }}
+  {{- if and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.thanos.values) "STRICT") }}
+  {{ include "thanos.serviceMonitorPostRenderers" . | nindent 2 }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-{{ $pkg }}-values
