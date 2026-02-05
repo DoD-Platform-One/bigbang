@@ -15,7 +15,6 @@
   )}}
 {{- end }}
 
-
 {{- /* Default values for Thanos */ -}}
 {{- define "bigbang.defaults.thanos" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
@@ -31,12 +30,7 @@
   {{- $s3Endpoint = printf "%s.s3.%s.amazonaws.com" $s3Bucket $s3Region }}
 {{- end }}
 
-{{- $minioEnabled := false }}
-{{- with .Values.addons.thanos.objectStorage }}
-  {{- if and (eq $.Values.addons.thanos.strategy "scalable") (not (and .endpoint .region)) }}
-    {{- $minioEnabled = true  }}
-  {{- end }}
-{{- end }}
+{{- $shouldEnableMinio := or (and (eq .Values.addons.thanos.strategy "scalable") (not (and .Values.addons.thanos.objectStorage.endpoint .Values.addons.thanos.objectStorage.region))) (dig "minio" "enabled" false .Values.addons.thanos.values) -}}
 
 imagePullSecrets:
 - name: private-registry
@@ -60,7 +54,7 @@ routes:
       hosts:
       - thanos.{{ .Values.domain }}
     minio:
-      enabled: {{ and $istioEnabled $minioEnabled }} 
+      enabled: {{ and $istioEnabled $shouldEnableMinio }} 
       gateways:
       - istio-gateway/public-ingressgateway
       hosts:
@@ -75,7 +69,14 @@ istio:
     generateFromNetpol: true
 
 minio:
-  enabled: {{ $minioEnabled }}
+  enabled: {{ $shouldEnableMinio }}
+  enabled: {{ $shouldEnableMinio }}
+  {{- if $shouldEnableMinio }}
+  upstream:
+    tenant:
+      metrics:
+        enabled: {{ .Values.monitoring.enabled }}
+  {{- end }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -98,7 +99,7 @@ networkPolicies:
       minio:9000:
         from:
           k8s:
-            minio-operator@minio-operator/minio-operator: {{ or $minioEnabled (dig "minio" "enabled" false .Values.addons.thanos.values) }}
+            minio-operator@minio-operator/minio-operator: {{ $shouldEnableMinio }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       thanos-query:10902:
         podSelector:
@@ -109,6 +110,16 @@ networkPolicies:
           k8s:
             grafana@monitoring/prometheus: {{ .Values.monitoring.enabled }}
             haproxy@authservice/haproxy: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
+
+{{- if .Values.monitoring.enabled }}
+metrics:
+  enabled: true
+  image:
+    pullSecrets:
+      - private-registry
+  serviceMonitor:
+    enabled: true
+{{- end }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
