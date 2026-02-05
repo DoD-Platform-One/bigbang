@@ -1,0 +1,165 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Twistlock - Values Tests
+templates:
+  - templates/twistlock/values.yaml
+tests:
+  - it: uses the top-level definitions if they're set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.egress.definitions:
+        kubeAPI:
+          to:
+            - ipBlock:
+                cidr: 10.10.10.10/10
+      networkPolicies.ingress.definitions:
+        nodeCidrs:
+          from:
+            - ipBlock:
+                cidr: 10.10.10.30/30
+        load-balancer-subnets:
+          from:
+            - ipBlock:
+                cidr: 10.10.10.10/10
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI
+          value:
+            to:
+              - ipBlock:
+                  cidr: 10.10.10.10/10
+      - equal:
+          path: networkPolicies.ingress.definitions.nodeCidrs
+          value:
+            from:
+              - ipBlock:
+                  cidr: 10.10.10.30/30
+      - equal:
+          path: networkPolicies.ingress.definitions.load-balancer-subnets
+          value:
+            from:
+              - ipBlock:
+                  cidr: 10.10.10.10/10
+
+  - it: uses the control plane cidr for the kubeAPI definition by default if no top-level kubeAPI egress definition is set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.controlPlaneCidr: 10.10.10.10/10
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI
+          value:
+            to:
+              - ipBlock:
+                  cidr: 10.10.10.10/10
+
+  - it: uses the control plane cidr and the VPC cidr if both are set and no top-level kubeAPI egress definition is set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.controlPlaneCidr: 10.10.10.10/10
+      networkPolicies.vpcCidr: 10.10.10.20/20
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI
+          value:
+            to:
+              - ipBlock:
+                  cidr: 10.10.10.10/10
+              - ipBlock:
+                  cidr: 10.10.10.20/20
+
+  - it: prefers the top-level kubeAPI egress definition over the control plane and VPC cidrs when all are set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.controlPlaneCidr: 10.10.10.10/10
+      networkPolicies.vpcCidr: 10.10.10.20/20
+      networkPolicies.egress.definitions.kubeAPI:
+        to:
+          - ipBlock:
+              cidr: 100.100.100.100/16
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI
+          value:
+            to:
+              - ipBlock:
+                  cidr: 100.100.100.100/16
+
+  - it: uses default private CIDRs for the nodeCidrs ingress definition when nodeCidr is not specified
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.ingress.definitions.nodeCidrs
+          value:
+            from:
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+              - ipBlock:
+                  cidr: 172.16.0.0/12
+              - ipBlock:
+                  cidr: 192.168.0.0/16
+              - ipBlock:
+                  cidr: 100.64.0.0/10
+
+  - it: uses the node cidr for the nodeCidrs ingress definition when nodeCidr is specified
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.nodeCidr: 10.10.10.30/30
+    asserts:
+      - equal:
+          path: networkPolicies.ingress.definitions.nodeCidrs
+          value:
+            from:
+              - ipBlock:
+                  cidr: 10.10.10.30/30
+
+  - it: prefers the top-level nodeCidrs ingress definition over the node cidr when both are set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      twistlock.enabled: true
+      networkPolicies.nodeCidr: 10.10.10.30/30
+      networkPolicies.ingress.definitions.nodeCidrs:
+        from:
+          - ipBlock:
+              cidr: 100.100.100.100/16
+    asserts:
+      - equal:
+          path: networkPolicies.ingress.definitions.nodeCidrs
+          value:
+            from:
+              - ipBlock:
+                  cidr: 100.100.100.100/16
