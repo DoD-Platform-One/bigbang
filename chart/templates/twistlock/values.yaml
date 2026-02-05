@@ -1,9 +1,18 @@
 {{- if .Values.twistlock.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.twistlock "name" "twistlock" "defaults" (include "bigbang.defaults.twistlock" .)) }}
+{{- /* Create a cleaned copy of twistlock config and merge deprecated paths into current paths */ -}}
+{{- $twistlockPackage := deepCopy .Values.twistlock -}}
+{{- if .Values.twistlock.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.twistlock.values) | fromYaml -}}
+{{- $twistlockPackage = set $twistlockPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $twistlockPackage "name" "twistlock" "defaults" ((mergeOverwrite (include "bigbang.defaults.twistlock" . | fromYaml) (include "bigbang.twistlock.bb-common-migrations" . | fromYaml)) | toYaml)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.twistlock" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.twistlock.values) }}
+
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -29,24 +38,45 @@ imagePullSecrets:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.twistlock "root" .) | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
+
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+
+    to:
+      twistlock-console:8081:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+
+    from:
+      twistlock-console:
+        to:
+          definition:
+            sso: {{ .Values.twistlock.sso.enabled }}
+      "*":
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.twistlock.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  console:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.twistlock.ingress.gateway "root" .)}}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  injection: {{ ternary "enabled" "disabled" $istioInjection }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
+routes:
+  inbound:
+    console:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.twistlock.ingress.gateway "root" .)}}
 
 {{- if $istioEnabled }}
 annotations:
