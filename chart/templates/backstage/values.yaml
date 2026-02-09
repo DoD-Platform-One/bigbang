@@ -1,11 +1,22 @@
 {{- if .Values.addons.backstage.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.backstage "name" "backstage" "defaults" (include "bigbang.defaults.backstage" .)) }}
+{{- $backstagePackage := deepCopy .Values.addons.backstage -}}
+{{- if .Values.addons.backstage.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.backstage.values) | fromYaml -}}
+{{- $backstagePackage = set $backstagePackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict
+  "root" $
+  "package" $backstagePackage
+  "name" "backstage"
+  "defaults" (merge (include "bigbang.backstage.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.backstage" . | fromYaml) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.backstage" -}}
 
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.backstage) "enabled") $istioEnabled }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.backstage.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.backstage.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -14,14 +25,18 @@ domain: {{ $domainName }}
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.backstage.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.backstage }}
-  backstage:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.backstage.ingress.gateway "root" .)}}
+    enabled: {{ $istioHardenedEnabled }}
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
+routes:
+  inbound:
+    backstage:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.backstage.ingress.gateway "root" .) }}
 
 {{- if .Values.grafana.enabled }}
 # protect from undeclared values error by nesting the child within parent helm templating check. 
@@ -98,11 +113,18 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-
-
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      backstage:
+        to:
+          k8s:
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }}
+            monitoring/prometheus:9090: {{ .Values.monitoring.enabled }}
+            logging/loki:3100: {{ .Values.loki.enabled }}
+            tempo/tempo:4317: {{ .Values.tempo.enabled }}
+            keycloak/keycloak:8443: {{ .Values.addons.keycloak.enabled }}
 {{- end -}}
 
