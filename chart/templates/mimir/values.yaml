@@ -99,6 +99,19 @@ istio:
           resolution: DNS
     {{- end }}
 
+routes:
+  inbound:
+    mimir-gateway:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
+      hosts:
+        - mimir.{{ .Values.domain }}
+      service: mimir-mimir-gateway.mimir.svc.cluster.local
+      port: 8080
+      selector:
+        app.kubernetes.io/component: gateway
+        app.kubernetes.io/name: mimir
+
 {{- if $minioEnabled }}
 minio-tenant:
   enabled: true
