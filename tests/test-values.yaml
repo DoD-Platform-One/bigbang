@@ -1273,6 +1273,24 @@ addons:
         cypress:
           envs:
             cypress_url: "https://backstage.dev.bigbang.mil"
+      istio:
+        hardened:
+          customServiceEntries:
+            - name: "cypress-service-entries-backstage"
+              enabled: true
+              spec:
+                hosts:
+                  - 'registry.npmjs.org'
+                  - 'download.cypress.io'
+                  - 'cdn.cypress.io'
+                  - 'fortify.dev.bigbang.mil'
+                  - 'repo1.dso.mil'
+                location: MESH_EXTERNAL
+                ports:
+                  - number: 443
+                    protocol: TLS
+                    name: https
+                resolution: DNS
       backstage:
         backstage:
           appConfig:

@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Backstage - Values Overlays Tests
+templates:
+  - templates/backstage/values.yaml
+set:
+  addons.backstage.enabled: true
+postRenderer:
+  cmd: "sh"
+  args:
+    - "-c"
+    - "yq eval '.stringData.overlays' - | yq eval '.'"
+tests:
+  - it: should map customServiceEntries to istio.serviceEntries.custom
+    set:
+      addons.backstage.values.istio.hardened.customServiceEntries:
+        - name: "test-service-entry"
+          hosts:
+            - "example.com"
+    asserts:
+      - equal:
+          path: istio.serviceEntries.custom[0].name
+          value: "test-service-entry"
+      - equal:
+          path: istio.serviceEntries.custom[0].hosts[0]
+          value: "example.com"
+
+  - it: should map customAuthorizationPolicies to istio.authorizationPolicies.custom
+    set:
+      addons.backstage.values.istio.hardened.customAuthorizationPolicies:
+        - name: "test-authz-policy"
+          labels:
+            app: "backstage"
+    asserts:
+      - equal:
+          path: istio.authorizationPolicies.custom[0].name
+          value: "test-authz-policy"
+      - equal:
+          path: istio.authorizationPolicies.custom[0].labels.app
+          value: "backstage"
+
+  - it: should merge both istio.serviceEntries.custom and istio.hardened.customServiceEntries
+    set:
+      addons.backstage.values.istio.hardened.customServiceEntries:
+        - name: "hardened-entry"
+          spec:
+            hosts:
+              - "hardened.example.com"
+      addons.backstage.values.istio.serviceEntries.custom:
+        - name: "custom-entry"
+          spec:
+            hosts:
+              - "custom.example.com"
+    asserts:
+      - equal:
+          path: istio.serviceEntries.custom[0].name
+          value: "hardened-entry"
+      - equal:
+          path: istio.serviceEntries.custom[0].spec.hosts[0]
+          value: "hardened.example.com"
+      - equal:
+          path: istio.serviceEntries.custom[1].name
+          value: "custom-entry"
+      - equal:
+          path: istio.serviceEntries.custom[1].spec.hosts[0]
+          value: "custom.example.com"
