@@ -1,0 +1,3 @@
+# Tell GitLab/GitHub to render .bats files with Bash syntax highlighting
+# in MR diffs and the web file browser.
+*.bats linguist-language=Bash

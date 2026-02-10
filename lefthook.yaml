@@ -1,0 +1,28 @@
+# lefthook.yaml — Git hooks managed by Lefthook (https://github.com/evilmartians/lefthook)
+#
+# Lefthook runs commands automatically at git lifecycle points (pre-commit,
+# pre-push, etc). Install hooks into your local repo with:
+#
+#   lefthook install
+#
+# After that, the hooks below fire automatically. To run them manually:
+#
+#   lefthook run pre-commit
+#   lefthook run pre-push
+
+# Runs when you `git commit` — only if the staged files match the glob.
+pre-commit:
+  parallel: true
+  commands:
+    bats-k3d-dev:
+      # Only fire when the script or its tests are staged
+      glob: "{docs/reference/scripts/developer/k3d-dev.sh,tests/bats/**/*.bats}"
+      run: bats --jobs 4 --recursive tests/bats/
+
+# Runs when you `git push` — only if any .sh or .bats files changed.
+pre-push:
+  parallel: true
+  commands:
+    bats-k3d-dev:
+      glob: "**/*.{sh,bats}"
+      run: bats --jobs 4 --recursive tests/bats/
