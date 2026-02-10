@@ -17,7 +17,7 @@ The UI testing is performed via a container running Cypress and can be enabled o
 Upon running the command, a new pod will be created in the same namespace as the package.  This pod will install Cypress, download a Cypress configuration file, download a file that contains custom Cypress commands, and run any available tests.  In order for the Cypress pod to run successfully, it needs to have external access to the internet and any resources it is attempting to reach out to for testing.  This communication should be allowed by default. You may also need to add exceptions if using Kyverno or Gatekeeper within Big Bang.  Links to these exceptions required can be found below in the Resources section.  
  
 ### Default Configuration Options
-All Cypress tests use the same shared configuration file which can be found [here](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/common/cypress.config.js?ref_type=heads).  These values can be overridden by using additional environment variables under the bbtests.cypress.envs section for any given package.  This [same process](https://docs.cypress.io/guides/guides/environment-variables#Option-4---env) can be used to specify and custom variables that may be need for custom Cypress tests you would like to deploy.
+All Cypress tests use the same shared configuration file which can be found [here](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/common/cypress.config.js?ref_type=heads).  These values can be overridden by using additional environment variables under the bbtests.cypress.envs section for any given package.  This [same process](https://docs.cypress.io/app/guides/environment-variables#3-CYPRESS_-environment-variables) can be used to specify and custom variables that may be need for custom Cypress tests you would like to deploy.
 
 Additionally, test isolation has been disabled by default within Big Bang's implementation of Cypress as each test is already isolated to a specific package.  Disabling test isolation means that session and cookie information will persist within that Cypress pod from test to test instead of being wiped clean after each test.  However, this behavior can be mitigated by leveraging a custom command that is available as part of the deployment:
 
@@ -133,4 +133,4 @@ kubectl kustomize ../bigbang
 [In Depth BB Test Documentation](https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-tests.md?ref_type=heads)
 [Kyverno Exceptions for Cypress](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/kyverno-policies/values.yaml)
 [Gatekeeper Exceptions for Cypress](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/chart/templates/gatekeeper/values.yaml)
-[Cypress Environment Variables](https://docs.cypress.io/guides/guides/environment-variables#Option-4---env)
+[Cypress Environment Variables](https://docs.cypress.io/app/guides/environment-variables#3-CYPRESS_-environment-variables)
