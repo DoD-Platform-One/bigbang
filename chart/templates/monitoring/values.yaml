@@ -19,7 +19,7 @@ domain: {{ $domainName }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
 {{- $lokiEnabled := (.Values.loki.enabled) }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
-{{- $vaultIstioHosts := (dig "istio" "vault" "hosts" dict .Values.addons.vault.values) }}
+{{- $vaultIstioHosts := (dig "routes" "inbound" "vault" "hosts" dict .Values.addons.vault.values) }}
 
 # Reproducing the naming convention based on the upstream chart: 
 # https://github.com/prometheus-community/helm-charts/blob/1a04bc9e7e988a210d0f1d1882243ff1e3bd1c03/charts/kube-prometheus-stack/templates/prometheus-operator/_prometheus-operator.tpl#L5
@@ -410,10 +410,11 @@ upstream:
           vault.hashicorp.com/role: "prometheus"
           vault.hashicorp.com/agent-run-as-user : "1000"
           vault.hashicorp.com/agent-run-as-group : "2000"
+          vault.hashicorp.com/service: "https://vault.{{ $domainName }}" # Without this it will try and use https://vault-vault.vault.svc:8200 which isn't covered by a cert
           {{- if and $istioEnabled $vaultIstioHosts }} # the 1st istio vault host will be used for the tls server name
           vault.hashicorp.com/tls-server-name: {{ tpl ($vaultIstioHosts | first) $ }}
           {{- else }} # the vault certificate is expected to contain the CN or X509v3 Subject Alternative Name of vault.domain
-          vault.hashicorp.com/tls-server-name: vault.{{ .Values.domain }}
+          vault.hashicorp.com/tls-server-name: vault.{{ $domainName }}
           {{- end }}
           {{- end }}
         {{- end }}
@@ -432,7 +433,7 @@ upstream:
         - targets: [{{ tpl ($vaultHosts | first) $ }}]
         {{- else }}
         static_configs:
-        - targets: [vault.{{ .Values.domain }}]
+        - targets: [vault.{{ $domainName }}]
         {{- end }}
       {{- end }}           
       # Scrape config for service endpoints.

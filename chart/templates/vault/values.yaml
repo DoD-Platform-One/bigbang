@@ -1,21 +1,128 @@
 {{- if .Values.addons.vault.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.vault "name" "vault" "defaults" (include "bigbang.defaults.vault" .)) }}
+{{- /* Create a cleaned copy of vault config and merge deprecated paths into current paths */ -}}
+{{- $vaultPackage := deepCopy .Values.addons.vault -}}
+{{- if .Values.addons.vault.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.vault.values) | fromYaml -}}
+{{- $vaultPackage = set $vaultPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict 
+"root" $ 
+"package" $vaultPackage 
+"name" "vault" 
+"defaults" ((mergeOverwrite (include "bigbang.defaults.vault" . | fromYaml) (include "bigbang.vault.bb-common-migrations" . | fromYaml)) | toYaml) 
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.vault" -}}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.vault.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.vault.values) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
-openshift: {{ .Values.openshift }}
+{{ $gateway := include "getGatewayName" (dict "gateway" .Values.addons.vault.ingress.gateway "root" .)}}
+{{ $gatewayPort := dig "routes" "inbound" "vault" "passthrough" "gatewayPort" "8443" .Values.addons.vault.values | int }}
+{{ $ingressKey := dig "customAppIngressSelector" "key" "vault-ingress" .Values.addons.vault.values }}
+{{ $ingressValue := dig "customAppIngressSelector" "value" "true" .Values.addons.vault.values | quote }}
 
-prometheus:
-  servicemonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+openshift: {{ .Values.openshift }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
+
+routes:
+  inbound:
+    vault:
+      enabled: true
+      gateways:
+        - {{ $gateway }}
+      hosts:
+        - vault.{{ .Values.domain }}
+      service: vault-vault.vault.svc.cluster.local
+      port: 8200
+      passthrough:
+        enabled: true
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.vault.values }}
+      hosts:
+      - repo1.dso.mil
+
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+tls:
+  cert: {{ .Values.addons.vault.ingress.cert | quote }}
+  key: {{ .Values.addons.vault.ingress.key | quote }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+      custom-app-ingress:
+        from:
+          - namespaceSelector: {}
+            podSelector:
+              matchLabels:
+                {{ $ingressKey }}: {{ $ingressValue }}
+    to:
+      vault:8200:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+          definition:
+            custom-app-ingress: true
+      vault-agent-injector:8080:
+        from:
+          cidr:
+            0.0.0.0/0: true
+  egress:
+    definitions:
+      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+      kms:
+        to:
+          - ipBlock:
+              cidr: "0.0.0.0/0"
+        ports:
+          - port: 443
+            protocol: TCP
+    from:
+      vault:
+        to:
+          cidr:
+            169.254.169.254/32: true
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definitions:
+            kubeAPI: true
+            kms: true
+            sso: {{ .Values.addons.vault.sso.enabled }}
+      vault-agent-injector:
+        to:
+          definition:
+            kubeAPI: true
+      vault-autoinit:
+        podSelector:
+          matchLabels:
+            batch.kubernetes.io/job-name: vault-vault-job-init
+        to:
+          k8s:
+            {{ $gateway }}:{{ $gatewayPort }}: true
+          definition:
+            kubeAPI: true
 
 upstream:
   global:
@@ -23,13 +130,13 @@ upstream:
     - name: private-registry
 
   injector:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
     {{- if $istioEnabled }}
     annotations:
       {{ include "istioAnnotation" . }}
       traffic.sidecar.istio.io/excludeInboundPorts: "8080"
     {{- end }}
-    image:
-      pullPolicy: {{ .Values.imagePullPolicy }}
     {{- if .Values.kiali.enabled }}
     extraLabels:
       service.istio.io/canonical-name: vault-vault-agent-injector
@@ -107,29 +214,6 @@ upstream:
   csi:
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
-
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}  
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.vault "root" .) | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  nodeCidr: {{ .Values.networkPolicies.nodeCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}  
-
-istio:
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.vault.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-  vault:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.vault.ingress.gateway "root" .)}}
-    {{- if and .Values.addons.vault.ingress.cert .Values.addons.vault.ingress.key }}
-    tls:
-      cert: {{ .Values.addons.vault.ingress.cert | quote }}
-      key:  {{ .Values.addons.vault.ingress.key | quote }}
-    {{- end }}
 
 {{- if $istioEnabled }}
 minio:

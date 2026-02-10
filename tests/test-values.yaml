@@ -2359,6 +2359,12 @@ addons:
     kms_access_key: "" # gets added via CI VAULT_KMS_ACCESS_KEY and 01_deploy_bigbang.sh
     kms_secret_key: "" # gets added via CI VAULT_KMS_SECRET_KEY and 01_deploy_bigbang.sh
     values:
+      routes:
+        outbound:
+          aws-kms:
+            enabled: true
+            hosts:
+            - kms.us-gov-west-1.amazonaws.com
       upstream:
         global:
           tlsDisable: false
@@ -2390,19 +2396,6 @@ addons:
             raft:
               enabled: true
               setNodeId: true
-
-      istio:
-        hardened:
-          customAuthorizationPolicies:
-            - name: allow-egress-instance-metadata
-              enabled: true
-              spec:
-                action: ALLOW
-                rules:
-                - from:
-                  - source:
-                      ipBlocks:
-                        - 169.254.169.254/32
       bbtests:
         enabled: true
         cypress:
