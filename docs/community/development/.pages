@@ -16,5 +16,6 @@ nav:
   - Testing a Package Against Big Bang: test-package-against-bb.md
   - Testing Repo1 CI: testing-repo1-ci.md
   - Testing: testing.md
+  - Testing Shell Scripts: testing-shell-scripts.md
   - Helm Unit Tests: helm-unittests.md
   - Vendor Distribution Integration: vendor-distro-integration.md
