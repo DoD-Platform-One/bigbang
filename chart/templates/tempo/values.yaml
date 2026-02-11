@@ -85,6 +85,16 @@ upstream:
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
+routes:
+  inbound:
+    tempo-query:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
+      hosts:
+        - tempo.{{ .Values.domain }}
+      service: tempo-tempo.tempo.svc.cluster.local
+      port: 3200
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   # note: ztunnel does not exist yet, defaulting to false until ambient package is added
