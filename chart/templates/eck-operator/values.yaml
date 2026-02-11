@@ -59,13 +59,14 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       elastic-operator:8080:
         from:
           k8s:
             monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
       kubeAPI:
         to:
           - ipBlock:

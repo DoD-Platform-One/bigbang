@@ -5,7 +5,12 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.kiali.values) | fromYaml -}}
 {{- $kialiPackage = set $kialiPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- include "values-secret" (dict "root" $ "package" $kialiPackage "name" "kiali" "defaults" (include "bigbang.defaults.kiali" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $kialiPackage 
+  "name" "kiali" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.kiali" . | fromYaml) (include "bigbang.kiali.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.kiali" -}}
@@ -132,20 +137,15 @@ upstream:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6}}
     defaults:
       allowPrometheusToIstioSidecar:
         enabled: {{ and .Values.monitoring.enabled .Values.istiod.enabled }}
   egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6}}
     defaults:
       allowIstiod:
         enabled: {{ .Values.istiod.enabled }}
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-      sso:
-        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
     from:
       kiali:
         to:

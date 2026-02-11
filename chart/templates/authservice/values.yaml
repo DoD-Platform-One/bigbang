@@ -44,22 +44,19 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled | default false }}
-  ingress:
-    definitions:
-      keycloak-protected-pods:
-        from:
-          - namespaceSelector: {}
-            podSelector:
-              matchLabels:
-                {{- $Key := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
-                {{- $Value := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
-                {{ $Key }}: {{ $Value }}
+  ingress: 
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       # gRPC connections for pods with protect=keycloak label
       authservice:10003:
         from:
-          definition:
-            keycloak-protected-pods: true
+          k8s:
+            '*/keycloak-protected':
+              podSelector:
+                matchLabels:
+                  {{- $key := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
+                  {{- $value := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
+                  {{ $key }}: {{ $value }}
       # Grafana redis client connection
       redis-bb:6379:
         from:
@@ -75,10 +72,7 @@ networkPolicies:
           k8s:
             monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions:
-      sso:
-        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
-
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       authservice:
         to:

@@ -75,7 +75,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
-    definitions: {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       sonarqube:[8000,8001,9000]:
         podSelector:
@@ -85,7 +85,7 @@ networkPolicies:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions: {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       sonarqube:
         podSelector:

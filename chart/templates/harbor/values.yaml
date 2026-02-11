@@ -8,7 +8,12 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.harbor.values) | fromYaml -}}
 {{- $harborPackage = set $harborPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- include "values-secret" (dict "root" $ "package" $harborPackage "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $harborPackage 
+  "name" $pkg 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.harbor" . | fromYaml) (include "bigbang.harbor.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.harbor" -}}
@@ -44,19 +49,7 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
 
   egress:
-    definitions:
-      database-subnets:
-        {{ toYaml ( index .Values.networkPolicies.egress.definitions "database-subnets") | nindent 8 }}
-      sso:
-        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-          {{- if ne .Values.networkPolicies.vpcCidr "0.0.0.0/0" }}
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.vpcCidr }}
-          {{- end }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       harbor:
         to:
@@ -65,6 +58,7 @@ networkPolicies:
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       harbor:8001:
         from:

@@ -1,5 +1,10 @@
 {{- if .Values.addons.keycloak.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.keycloak "name" "keycloak" "defaults" (include "bigbang.defaults.keycloak" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" .Values.addons.keycloak 
+  "name" "keycloak" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.keycloak" . | fromYaml) (include "bigbang.keycloak.bb-common-migrations" . | fromYaml)) | toYaml)
+) }}
 {{- end }}
 
 {{- define "bigbang.defaults.keycloak" -}}
@@ -23,17 +28,14 @@ networkPolicies:
     defaults:
       allowIstiod:
         enabled: {{ .Values.istiod.enabled }}
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}    
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       keycloak:
         to:
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     defaults:
       allowPrometheusToIstioSidecar:
         enabled: {{ and .Values.monitoring.enabled .Values.istiod.enabled }}

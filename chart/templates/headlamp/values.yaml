@@ -8,7 +8,7 @@
   "root" $
   "package" $headlampPackage
   "name" "headlamp"
-  "defaults" (merge (include "bigbang.headlamp.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.headlamp" . | fromYaml) | toYaml)
+  "defaults" (mergeOverwrite (include "bigbang.headlamp.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.headlamp" . | fromYaml) | toYaml)
 )}}
 {{- end }}
 

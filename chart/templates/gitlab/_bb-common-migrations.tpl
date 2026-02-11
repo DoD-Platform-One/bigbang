@@ -71,14 +71,25 @@ routes:
 {{- $minioEnabled := dig "global" "minio" "enabled" true .Values.addons.gitlab.values }}
 {{- $postgresEnabled := dig "upstream" "postgresql" "install" true .Values.addons.gitlab.values }}
 {{- $iamProfileUsed := dig "use_iam_profile" false .Values.addons.gitlab.values }}
+{{- $iamProfileUsed = not (empty .Values.addons.gitlab.objectStorage.iamProfile) | or $iamProfileUsed }}
 networkPolicies:
   egress:
-    {{- if empty (dig "egress" "definitions" "kubeAPI" nil .Values.networkPolicies) }}
+    {{- if empty .Values.networkPolicies.egress.definitions.kubeAPI }}
     definitions:
       kubeAPI:
         to:
         - ipBlock:
             cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+            {{- if eq .Values.networkPolicies.controlPlaneCidr "0.0.0.0/0" }}
+            except:
+            - 169.254.169.254/32
+            {{- end }}
+        {{- if not (eq .Values.networkPolicies.controlPlaneCidr .Values.networkPolicies.vpcCidr) }}
+        {{- if not (eq .Values.networkPolicies.vpcCidr "0.0.0.0/0") }}
+        - ipBlock:
+            cidr: {{ .Values.networkPolicies.vpcCidr }}
+        {{- end }}
+        {{- end }}
     {{- end }}
     from:
       gitaly:

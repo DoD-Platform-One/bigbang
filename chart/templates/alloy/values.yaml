@@ -6,7 +6,12 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.alloy.values) | fromYaml -}}
 {{- $alloyPackage = set $alloyPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- include "values-secret" (dict "root" $ "package" $alloyPackage "name" "alloy" "defaults" (include "bigbang.defaults.alloy" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $alloyPackage 
+  "name" "alloy" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.alloy" . | fromYaml) (include "bigbang.alloy.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.alloy" -}}
@@ -33,6 +38,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       # Allow alloy-metrics and Prometheus to scrape alloy-receiver
       alloy-receiver:12345:
@@ -56,15 +62,7 @@ networkPolicies:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-          {{- if ne .Values.networkPolicies.vpcCidr "0.0.0.0/0" }}
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.vpcCidr }}
-          {{- end }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       alloy-logs:
         to:

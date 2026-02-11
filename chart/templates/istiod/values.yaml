@@ -2,29 +2,27 @@
 
 {{- /* Create secret */ -}}
 {{- if (get .Values $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" ($pkg | kebabcase) "defaults" (include (printf "bigbang.defaults.%s" $pkg | kebabcase) .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" (get .Values $pkg) 
+  "name" ($pkg | kebabcase) 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.istiod" . | fromYaml) (include "bigbang.istiod.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.istiod" -}}
 {{- $authserviceEnabled := (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCIDRs:
-    - {{ .Values.networkPolicies.controlPlaneCidr }}
   egress:
-    definitions:
-      sso:
-        {{ toYaml .Values.networkPolicies.egress.definitions.sso | nindent 8 }}
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    definitions: {{.Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       istiod:
         to:
           definition:
             sso: {{ $authserviceEnabled }}
   ingress:
+    definitions: {{.Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       istiod:15014:
         from:

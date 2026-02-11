@@ -1,5 +1,10 @@
 {{- if .Values.monitoring.enabled }}
-{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.monitoring" .))) "name" "monitoring" "defaults" (include "bigbang.defaults.monitoring" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" (dict "values" (fromYaml (include "bigbang.overlays.monitoring" .))) 
+  "name" "monitoring" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.monitoring" . | fromYaml) (include "bigbang.monitoring.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.monitoring" -}}
@@ -33,11 +38,7 @@ flux:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   egress:
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       {{ if not $isDefaultKpsName }}
       # Need to make a couple changes to the default package netpols when the name is overridden
@@ -92,6 +93,7 @@ networkPolicies:
           k8s:
             authservice/authservice:10003: {{ $authserviceEnabled }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       {{ $kpsName }}:10250:
         from:

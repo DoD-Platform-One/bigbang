@@ -42,9 +42,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   egress:
-    definitions:
-      storage-subnets:
-        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       fluent-bit:
         to:
@@ -70,6 +68,7 @@ networkPolicies:
             tempo/tempo:9411:
               enabled: {{ .Values.tempo.enabled }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       "fluent-bit:2020":
         from:
