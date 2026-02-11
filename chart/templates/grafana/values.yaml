@@ -1,5 +1,10 @@
 {{- if .Values.grafana.enabled }}
-{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.grafana" .))) "name" "grafana" "defaults" (include "bigbang.defaults.grafana" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" (dict "values" (fromYaml (include "bigbang.overlays.grafana" .))) 
+  "name" "grafana" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.grafana" . | fromYaml) (include "bigbang.grafana.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.grafana" -}}
@@ -21,11 +26,7 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   prependReleaseName: true
   egress:
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       "*":
         to:
@@ -39,6 +40,7 @@ networkPolicies:
             authservice/authservice:10003: {{ $authserviceRedisEnabled }}
 
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       grafana:3000:
         from:

@@ -5,7 +5,12 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.velero.values) | fromYaml -}}
 {{- $veleroPackage = set $veleroPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.velero "name" "velero" "defaults" (include "bigbang.defaults.velero" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" .Values.addons.velero 
+  "name" "velero" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.velero" . | fromYaml) (include "bigbang.harbor.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.velero" -}}
@@ -40,25 +45,14 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
-    definitions: 
-      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       velero:8085:
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions: 
-      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-        {{- if eq .Values.networkPolicies.controlPlaneCidr "0.0.0.0/0" }}
-              # ONLY Block requests to cloud metadata IP
-              except:
-              - 169.254.169.254/32
-        {{- end }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       velero:
         to:

@@ -5,7 +5,12 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.loki.values) | fromYaml -}}
 {{- $lokiPackage = set $lokiPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- include "values-secret" (dict "root" $ "package" $lokiPackage "name" "loki" "defaults" (include "bigbang.defaults.loki" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" $lokiPackage 
+  "name" "loki" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.loki" . | fromYaml) (include "bigbang.loki.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.loki" -}}
@@ -68,6 +73,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       logging-loki:3100:
         from:
@@ -90,22 +96,7 @@ networkPolicies:
           k8s:
             minio-operator@minio-operator/minio-operator: {{ $minioEnabled }}
   egress:
-    definitions:
-      storage-subnets:
-        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
-      kubeAPI:
-        to:
-        {{- if or (eq .Values.networkPolicies.controlPlaneCidr "0.0.0.0/0") (eq .Values.networkPolicies.vpcCidr "0.0.0.0/0") }}
-          - ipBlock:
-              cidr: "0.0.0.0/0"
-              except:
-              - 169.254.169.254/32
-        {{- else }}
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.vpcCidr }}
-        {{- end }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       logging-loki:
         to:

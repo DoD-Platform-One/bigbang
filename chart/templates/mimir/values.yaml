@@ -1,6 +1,11 @@
 {{- /* Create secret */ -}}
 {{- if .Values.addons.mimir.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.mimir "name" "mimir" "defaults" (include "bigbang.defaults.mimir" .)) }}
+{{- include "values-secret" (dict 
+  "root" $ 
+  "package" .Values.addons.mimir 
+  "name" "mimir" 
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.mimir" . | fromYaml) (include "bigbang.mimir.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.mimir" -}}
@@ -18,11 +23,7 @@ networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   prependReleaseName: false
   egress:
-    definitions:
-      kubeAPI:
-        to:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       mimir:
         to:
@@ -38,6 +39,7 @@ networkPolicies:
             kubeAPI: true
 
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       mimir:[15020]:
         from:

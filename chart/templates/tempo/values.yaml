@@ -91,6 +91,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       tempo:3200:
         from:
@@ -104,9 +105,7 @@ networkPolicies:
             alloy-alloy-operator@alloy/alloy: {{ .Values.alloy.enabled }}
             alloy-alloy-logs@alloy/alloy-logs: {{ .Values.alloy.enabled }}
   egress:
-    definitions:
-      storage-subnets:
-        {{ toYaml ( index .Values.networkPolicies.egress.definitions "storage-subnets") | nindent 8 }}
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       tempo:
         to:

@@ -1,4 +1,4 @@
-{{- define "bigbang.minio-operator.bb-common-migrations" }}
+{{- define "bigbang.harbor.bb-common-migrations" }}
 {{/* TODO: Remove this migration template for bb 4.0 */}}
 {{- if empty .Values.networkPolicies.egress.definitions.kubeAPI }}
 networkPolicies:
@@ -20,3 +20,4 @@ networkPolicies:
         {{- end }}
 {{- end }}
 {{- end }}
+
