@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Gitlab Runner - ServiceMonitor TLS
+postRenderer:
+  cmd: sh
+  args:
+    - -c
+    - |
+      set -o pipefail && \
+      export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/tmp}" && \
+      yq 'select((.metadata.name // "") | contains("gitlab-runner"))' \
+        | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
+        | yq 'select(.kind == "ServiceMonitor" and .metadata.name == "gitlab-runner")'
+tests:
+- it: should render ServiceMonitor tlsConfig when istio mTLS is strict
+  set:
+    istiod.enabled: true
+    monitoring.enabled: true
+    addons.gitlabRunner.enabled: true
+    addons.gitlabRunner.istio.injection: enabled
+    addons.gitlabRunner.values.istio.mtls.mode: STRICT
+  asserts:
+  - equal:
+      path: kind
+      value: ServiceMonitor
+  - equal:
+      path: metadata.name
+      value: gitlab-runner
+  - equal:
+      path: metadata.namespace
+      value: gitlab-runner
+  - equal:
+      path: spec.endpoints[0].scheme
+      value: https
+  - isNotNull:
+      path: spec.endpoints[0].tlsConfig
+  - equal:
+      path: spec.endpoints[0].tlsConfig.insecureSkipVerify
+      value: true
