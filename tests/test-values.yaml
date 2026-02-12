@@ -1351,8 +1351,6 @@ addons:
                   - 'registry.npmjs.org'
                   - 'download.cypress.io'
                   - 'cdn.cypress.io'
-                  - 'fortify.dev.bigbang.mil'
-                  - 'repo1.dso.mil'
                 location: MESH_EXTERNAL
                 ports:
                   - number: 443
