@@ -1,47 +1,76 @@
-{{- $pkg := "fortify" }}
-
-{{- /* Create secret */ -}}
-{{- if (get .Values.addons $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values.addons $pkg) "name" $pkg "defaults" (include (printf "bigbang.defaults.%s" $pkg) .)) }}
+{{- if .Values.addons.fortify.enabled }}
+{{- $fortifyPackage := deepCopy .Values.addons.fortify -}}
+{{- if .Values.addons.fortify.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.fortify.values) | fromYaml -}}
+{{- $fortifyPackage = set $fortifyPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict
+  "root" $
+  "package" $fortifyPackage
+  "name" "fortify"
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.fortify" . | fromYaml) (include "bigbang.fortify.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.fortify" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-
-imagePullSecrets:
-- name: private-registry
-imagePullPolicy: {{ .Values.imagePullPolicy }}
-
-externalURL: https://fortify.{{ .Values.domain }}
+{{- $istioHardened := or (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 domain: {{ .Values.domain }}
+
+openshift: {{ .Values.openshift }}
 
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  fortify:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.fortify.ingress.gateway "root" .)}}
+    enabled: {{ $istioHardened }}
+  sidecar:
+    enabled: {{ $istioHardened }}
+  authorizationPolicies:
+    enabled: {{ $istioHardened }}
+
+routes:
+  inbound:
+    fortify:
+      enabled: true
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.fortify.ingress.gateway "root" .) }}
+      hosts:
+        - fortify.{{ .Values.domain }}
+      service: fortify-ssc-service
+      port: 80
+      selector:
+        app.kubernetes.io/name: fortify-ssc
+        app.kubernetes.io/component: webapp
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
+      hosts:
+        - repo1.dso.mil
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.fortify "root" .) | nindent 4 }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-
-openshift: {{ .Values.openshift }}
-
-monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
-
-sso:
-  enabled: {{ default "false" .Values.addons.fortify.sso.enabled }}
+  egress:
+    from:
+      keystore-job:
+        podSelector:
+          matchLabels:
+            job: keystore-generator
+        to:
+          definition:
+            kubeAPI: true
+      bb-tests:
+        podSelector:
+          matchLabels:
+            helm-test: enabled
+        to:
+          cidr:
+            0.0.0.0/0:443: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
+          k8s:
+            # kube-proxy DNAT translates service port 443 to targetPort 8443.
+            # k3s NetworkPolicy evaluates post-DNAT, so the CIDR port 443 rule
+            # does not match. This explicit k8s rule allows bb-tests pods to
+            # reach the ingressgateway on the actual targetPort.
+            {{ include "getGatewayName" (dict "gateway" .Values.addons.fortify.ingress.gateway "root" .) | replace "ingressgateway" "ingressgateway:8443" }}: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
 
 {{- end }}

@@ -42,9 +42,14 @@ spec:
 
   {{- toYaml $fluxSettingsFortify | nindent 2 }}
 
-  {{- if (get .Values.addons $pkg).postRenderers }}
+  {{- if or (get .Values.addons $pkg).postRenderers (dig "mysql" "enabled" true (get .Values.addons $pkg).values) }}
   postRenderers:
-  {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 4 }}
+  {{- if dig "mysql" "enabled" true (get .Values.addons $pkg).values }}
+  {{ include "fortify.postRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- with (get .Values.addons $pkg).postRenderers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
   {{- end }}
   valuesFrom:
     - name: {{ .Release.Name }}-{{ $pkg }}-values
