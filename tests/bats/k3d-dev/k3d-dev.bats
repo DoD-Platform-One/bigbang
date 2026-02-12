@@ -53,6 +53,8 @@ _reset_globals() {
     export ENABLE_OIDC=false
     export PUBLIC_DOMAINS=()
     export PASSTHROUGH_DOMAINS=()
+    export K3D_TIMEOUT=300
+    export SecondaryIP=""
 }
 
 # =============================================================================
@@ -232,4 +234,95 @@ _reset_globals() {
     exit_code=0
     ( run_batch_add "echo test" ) 2>/dev/null || exit_code=$?
     [ "$exit_code" -eq 1 ]
+}
+
+@test "run_batch_new creates batch file with correct header" {
+    _source_k3d_dev
+    _reset_globals
+    run_batch_new
+    [ -f "$RUN_BATCH_FILE" ]
+    head -1 "$RUN_BATCH_FILE" | grep -q '#!/bin/bash'
+    grep -q 'set -xue' "$RUN_BATCH_FILE"
+}
+
+@test "run_batch_add appends commands to batch file" {
+    _source_k3d_dev
+    _reset_globals
+    run_batch_new
+    run_batch_add "echo hello"
+    run_batch_add "echo world"
+    grep -q 'echo hello' "$RUN_BATCH_FILE"
+    grep -q 'echo world' "$RUN_BATCH_FILE"
+}
+
+# =============================================================================
+# K3D_TIMEOUT Tests
+# =============================================================================
+
+@test "K3D_TIMEOUT defaults to 300" {
+    _source_k3d_dev
+    [ "$K3D_TIMEOUT" = "300" ]
+}
+
+@test "process_arguments --k3d-timeout sets K3D_TIMEOUT" {
+    _source_k3d_dev
+    _reset_globals
+    process_arguments --k3d-timeout 600
+    [ "$K3D_TIMEOUT" = "600" ]
+}
+
+@test "process_arguments --k3d-timeout combines with other flags" {
+    _source_k3d_dev
+    _reset_globals
+    process_arguments --k3d-timeout 120 -b -M
+    [ "$K3D_TIMEOUT" = "120" ]
+    [ "$BIG_INSTANCE" = "true" ]
+    [ "$METAL_LB" = "false" ]
+}
+
+# =============================================================================
+# Print Instructions Tests
+# =============================================================================
+
+@test "print_instructions shows dual-gateway /etc/hosts with SecondaryIP" {
+    _source_k3d_dev
+    _reset_globals
+    PROVISION_CLOUD_INSTANCE=false
+    METAL_LB=false
+    PRIVATE_IP=false
+    ATTACH_SECONDARY_IP=true
+    PublicIP="1.2.3.4"
+    SecondaryIP="5.6.7.8"
+    SSHKEY="/tmp/test.pem"
+    KUBECONFIG="/tmp/test-config"
+    PUBLIC_DOMAINS=("grafana.dev.bigbang.mil" "kibana.dev.bigbang.mil")
+    PASSTHROUGH_DOMAINS=("keycloak.dev.bigbang.mil")
+
+    output=$(print_instructions)
+
+    [[ "$output" == *"Public gateway"* ]]
+    [[ "$output" == *"Passthrough gateway"* ]]
+    [[ "$output" == *"1.2.3.4"* ]]
+    [[ "$output" == *"5.6.7.8"* ]]
+    [[ "$output" == *"BOTH"* ]]
+}
+
+@test "print_instructions shows single-IP /etc/hosts without SecondaryIP" {
+    _source_k3d_dev
+    _reset_globals
+    PROVISION_CLOUD_INSTANCE=false
+    METAL_LB=false
+    PRIVATE_IP=false
+    PublicIP="1.2.3.4"
+    SecondaryIP=""
+    SSHKEY="/tmp/test.pem"
+    KUBECONFIG="/tmp/test-config"
+    PUBLIC_DOMAINS=("grafana.dev.bigbang.mil")
+    PASSTHROUGH_DOMAINS=("keycloak.dev.bigbang.mil")
+
+    output=$(print_instructions)
+
+    [[ "$output" == *"Example:"* ]]
+    [[ "$output" == *"1.2.3.4"* ]]
+    [[ "$output" != *"Passthrough gateway"* ]]
 }

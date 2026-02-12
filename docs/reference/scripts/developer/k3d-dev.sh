@@ -19,6 +19,7 @@ RESET_K3D=false
 USE_WEAVE=false
 TERMINATE_INSTANCE=true
 QUIET=false
+K3D_TIMEOUT=300
 TMPDIR=$(mktemp -d)
 BASE_DOMAIN="dev.bigbang.mil"
 PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
@@ -202,6 +203,9 @@ function process_arguments {
       echo "========= These options apply regardless of cloud provider ================"
       echo
       echo " -K|--recreate-k3d                recreate the k3d cluster on host"
+      echo " --k3d-timeout SECONDS            timeout for k3d cluster create"
+      echo "                                  (default: 300). Works around k3d"
+      echo "                                  agent readiness hang (k3d#1420)"
       echo " -m|--use-metallb                 create k3d cluster with metalLB"
       echo "                                  load balancer (default)"
       echo " -M|--disable-metallb             Don't use a metalLB load balancer"
@@ -308,6 +312,11 @@ function process_arguments {
     --oidc-preset)
       shift
       OIDC_PRESET=$1
+      ;;
+
+    --k3d-timeout)
+      shift
+      K3D_TIMEOUT=$1
       ;;
 
     *) echo "Option $1 not recognized" ;; # In case a non-existent option is submitted
@@ -502,7 +511,7 @@ function run_batch_execute() {
   fi
   batch_basename=$(basename ${RUN_BATCH_FILE})
   cat ${RUN_BATCH_FILE} | run "sudo cat > /tmp/${batch_basename}"
-  $(k3dsshcmd) -t "bash /tmp/${batch_basename}"
+  $(k3dsshcmd) "bash /tmp/${batch_basename}"
   if [[ $? -ne 0 ]]; then
     echo "Batch file /tmp/${batch_basename} failed on target system." >&2
     echo "You can debug it by logging into the system:" >&2
@@ -675,7 +684,7 @@ function install_k3d {
   echo "Installing k3d on instance"
   # Shared k3d settings across all options
   # 1 server, 3 agents
-  k3d_command="export K3D_FIX_MOUNTS=1; k3d cluster create --trace --servers 1 --agents 3 -v /cypress:/cypress@server:* -v /cypress:/cypress@agent:* --verbose"
+  k3d_command="k3d cluster create --trace --servers 1 --agents 3 -v /cypress:/cypress@server:* -v /cypress:/cypress@agent:* --verbose"
   # Volumes to support Twistlock defenders
   k3d_command+=" -v /etc:/etc@server:*\;agent:* -v /dev/log:/dev/log@server:*\;agent:* -v /run/systemd/private:/run/systemd/private@server:*\;agent:*"
   # Disable traefik and metrics-server
@@ -753,7 +762,12 @@ function install_k3d {
   run_batch_add "k3d version"
   run_batch_add "sudo mkdir -p /cypress && sudo chown 1000:1000 /cypress"
   run_batch_add "docker network create k3d-network --driver=bridge --subnet=172.20.0.0/16 --gateway 172.20.0.1"
-  run_batch_add "${k3d_command}"
+  run_batch_add "export K3D_FIX_MOUNTS=1"
+  # Wrap in timeout to work around k3d entrypoint hang (k3d-io/k3d#1420).
+  # Exit code 124 = timeout killed it; the cluster is healthy, k3d just hung
+  # on agent readiness. Any other non-zero exit is a real failure.
+  run_batch_add "timeout ${K3D_TIMEOUT} ${k3d_command}; rc=\$?; if [ \$rc -eq 124 ]; then echo 'WARNING: k3d cluster create timed out after ${K3D_TIMEOUT}s (likely k3d-io/k3d#1420 agent readiness hang). Cluster is probably healthy — verifying...'; elif [ \$rc -ne 0 ]; then echo 'ERROR: k3d cluster create failed with exit code '\$rc; exit \$rc; fi"
+  run_batch_add "k3d cluster list | grep -q '1/1'"
   run_batch_execute
 }
 
@@ -815,7 +829,9 @@ function install_metallb {
     run_batch_add 'echo "Waiting for MetalLB controller..."'
     run_batch_add "kubectl wait --for=condition=available --timeout 300s -n metallb-system deployment controller"
     run_batch_add 'echo "MetalLB is installed"'
-
+    run_batch_add 'echo "Waiting for MetalLB CRDs to be established..."'
+    run_batch_add "kubectl wait --for=condition=established --timeout 60s crd/ipaddresspools.metallb.io"
+    run_batch_add "kubectl wait --for=condition=established --timeout 60s crd/l2advertisements.metallb.io"
 
     if [[ "$METAL_LB" == true ]]; then
       echo "Building MetalLB configuration for -m mode."
@@ -971,12 +987,26 @@ EOF
 
       scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/primaryProxy.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
       scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/secondaryProxy.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
-      run_batch_add "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/${SSHUSER}/primaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
-      run_batch_add "docker run -d --name=secondaryProxy --network=k3d-network -p $(getPrivateIP2):443:443 -v /home/${SSHUSER}/secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
     fi
 
+    # Apply MetalLB config in the main batch (after CRD waits above)
     scp -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${TMPDIR}/metallb-config.yaml ${SSHUSER}@${PublicIP}:/home/${SSHUSER}/
-    run_batch_add "kubectl create -f /home/${SSHUSER}/metallb-config.yaml"
+    run_batch_add "kubectl apply -f /home/${SSHUSER}/metallb-config.yaml"
+    run_batch_execute
+
+    # Proxy containers in a separate batch so a MetalLB config failure doesn't skip them
+    if [[ "$ATTACH_SECONDARY_IP" == true ]]; then
+      echo "Starting proxy containers..."
+      run_batch_new
+      run_batch_add "docker run -d --name=primaryProxy --network=k3d-network -p $PrivateIP:443:443  -v /home/${SSHUSER}/primaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+      run_batch_add "docker run -d --name=secondaryProxy --network=k3d-network -p $(getPrivateIP2):443:443 -v /home/${SSHUSER}/secondaryProxy.yaml:/etc/confd/values.yaml ghcr.io/k3d-io/k3d-proxy:$K3D_VERSION"
+      run_batch_execute
+    fi
+
+    # Post-setup health check
+    echo "Verifying MetalLB setup..."
+    run_batch_new
+    run_batch_add "kubectl get ipaddresspool -n metallb-system -o name | grep -q . || { echo 'ERROR: No IPAddressPool resources found'; exit 1; }"
     run_batch_execute
   fi
 }
@@ -1046,14 +1076,21 @@ function print_instructions {
     echo
   else # Not using MetalLB and using public IP. This is the default
     echo "To access apps from a browser edit your /etc/hosts to add the public IP of your EC2 instance with application hostnames."
-    echo "Example:"
-    echo "  ${PublicIP} ${PUBLIC_DOMAINS[*]}"
-    echo
-
     if [[ $SecondaryIP ]]; then
-      echo "A secondary IP is available for use if you wish to have a passthrough ingress for Istio along with a public Ingress Gateway, this maybe useful for Keycloak x509 mTLS authentication."
-      echo "  $SecondaryIP  ${PASSTHROUGH_DOMAINS[*]}"
+      echo
+      echo "This cluster uses two public IPs routed to different Istio gateways."
+      echo "Add BOTH lines to your /etc/hosts:"
+      echo
+      echo "  # Public gateway (${PublicIP})"
+      echo "  ${PublicIP} ${PUBLIC_DOMAINS[*]}"
+      echo
+      echo "  # Passthrough gateway (${SecondaryIP})"
+      echo "  ${SecondaryIP} ${PASSTHROUGH_DOMAINS[*]}"
+    else
+      echo "Example:"
+      echo "  ${PublicIP} ${PUBLIC_DOMAINS[*]}"
     fi
+    echo
   fi
 
   if [[ "$ENABLE_OIDC" == true ]]; then
@@ -1464,7 +1501,7 @@ kubectl create configmap coredns-custom \
 
   errors
   log
-}'
+}' --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl -n kube-system rollout restart deployment coredns
 ENDSSH
