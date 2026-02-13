@@ -2,7 +2,7 @@
 {{- $thanos := .Values.addons.thanos }}
 {{/* TODO: Remove this migration template for bb 4.0 */}}
 {{- $storeGatewayEnabled := dig "storegateway" "enabled" false $thanos }}
-{{- $storeGatewayEnabled = or $storeGatewayEnabled (not (empty $thanos.objectStorage.endpoint)) }}
+{{- $storeGatewayEnabled = or $storeGatewayEnabled (not (empty .Values.addons.thanos.objectStorage.endpoint)) }}
 {{- $storeGatewayEgressCidr := dig "storegateway" "egress" "cidr" "" $thanos }}
 {{- $minioEnabled := dig "minio" "enabled" false $thanos }}
 
@@ -47,6 +47,11 @@ networkPolicies:
     {{- end }}
     {{- end }}
     from:
+    from:
+      '*':
+        to:
+          definition:
+            kubeAPI: true
       {{- if and $storeGatewayEnabled (not $minioEnabled) }}
       thanos-storegateway:
         to:

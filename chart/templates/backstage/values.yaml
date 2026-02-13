@@ -8,7 +8,7 @@
   "root" $
   "package" $backstagePackage
   "name" "backstage"
-  "defaults" (merge (include "bigbang.backstage.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.backstage" . | fromYaml) | toYaml)
+  "defaults" (mergeOverwrite (include "bigbang.backstage.bb-common-migrations" . | fromYaml) (include "bigbang.defaults.backstage" . | fromYaml) | toYaml)
 )}}
 {{- end }}
 
