@@ -1,9 +1,16 @@
 {{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.bbctl "name" "bbctl" "defaults" (include "bigbang.defaults.bbctl" .)) }}
+{{- /* Create a cleaned copy of bbctl config and merge deprecated paths into current paths */ -}}
+{{- $bbctlPackage := deepCopy .Values.bbctl -}}
+{{- if .Values.bbctl.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.bbctl.values) | fromYaml -}}
+{{- $bbctlPackage = set $bbctlPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $bbctlPackage "name" "bbctl" "defaults" (include "bigbang.defaults.bbctl" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.bbctl" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.bbctl.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -34,9 +41,85 @@ baseConfig:
   preflight-check:
     image: {{ .Values.bbctl.preflightCheck.image }}
 
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  egress:
+    definitions:
+      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+      private-registry:
+        to:
+          - ipBlock:
+              cidr: "15.205.173.153/32"
+        ports:
+          - port: 443
+            protocol: TCP
+      bigbang-releases:
+        to:
+          - ipBlock:
+              cidr: "15.200.176.128/28"
+          - ipBlock:
+              cidr: "15.200.28.240/28"
+          - ipBlock:
+              cidr: "108.175.48.0/22"
+          - ipBlock:
+              cidr: "108.175.56.0/22"
+          - ipBlock:
+              cidr: "136.18.0.0/23"
+        ports:
+          - port: 443
+            protocol: TCP
+    from:
+      bbctl-bigbang-policy:
+        to:
+          definition:
+            kubeAPI: true
+      bbctl-bigbang-preflight:
+        to:
+          definition:
+            kubeAPI: true
+      bbctl-bigbang-status:
+        to:
+          definition:
+            kubeAPI: true
+      bbctl-bigbang-updater:
+        to:
+          definition:
+            kubeAPI: true
+            private-registry: true
+            bigbang-releases: true
+      bbctl-bigbang-violations:
+        to:
+          definition:
+            kubeAPI: true
+  ingress:
+    definitions:
+      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+
 istio:
   enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.bbctl.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+    enabled: {{ $istioHardenedEnabled }}
 
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+routes:
+  outbound:
+    bbctl:
+      enabled: true
+      hosts:
+      - repo1.dso.mil
+      - registry1.dso.mil
+      - umbrella-bigbang-releases.s3-us-gov-west-1.amazonaws.com
+    bbctl-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.bbctl.values }}
+      hosts:
+      - grafana.{{ .Values.domain }}
 {{- end -}}
