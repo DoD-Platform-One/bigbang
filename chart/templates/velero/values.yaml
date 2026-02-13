@@ -9,7 +9,7 @@
   "root" $ 
   "package" .Values.addons.velero 
   "name" "velero" 
-  "defaults" ((mergeOverwrite (include "bigbang.defaults.velero" . | fromYaml) (include "bigbang.harbor.bb-common-migrations" . | fromYaml)) | toYaml)
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.velero" . | fromYaml) (include "bigbang.velero.bb-common-migrations" . | fromYaml)) | toYaml)
 )}}
 {{- end }}
 

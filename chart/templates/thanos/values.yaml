@@ -11,7 +11,7 @@
     "root" $ 
     "package" $package 
     "name" "thanos" 
-    "defaults" ((merge (include "bigbang.defaults.thanos" . | fromYaml) (include "bigbang.thanos.bb-common-migrations" . | fromYaml)) | toYaml)
+    "defaults" ((mergeOverwrite (include "bigbang.defaults.thanos" . | fromYaml) (include "bigbang.thanos.bb-common-migrations" . | fromYaml)) | toYaml)
   )}}
 {{- end }}
 
@@ -31,6 +31,8 @@
 {{- end }}
 
 {{- $shouldEnableMinio := or (and (eq .Values.addons.thanos.strategy "scalable") (not (and .Values.addons.thanos.objectStorage.endpoint .Values.addons.thanos.objectStorage.region))) (dig "minio" "enabled" false .Values.addons.thanos.values) -}}
+{{- $storeGatewayEnabled := dig "storegateway" "enabled" false .Values.addons.thanos.values }}
+{{- $storeGatewayEnabled = or $storeGatewayEnabled (not (empty .Values.addons.thanos.objectStorage.endpoint)) }}
 
 imagePullSecrets:
 - name: private-registry
@@ -83,6 +85,10 @@ networkPolicies:
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
+      '*':
+        to:
+          definition:
+            kubeAPI: true
       thanos-query:
         podSelector:
           matchLabels:
@@ -92,7 +98,10 @@ networkPolicies:
           k8s:
             monitoring/prometheus:10901: {{ .Values.monitoring.enabled }}
             authservice/authservice:10003: {{ .Values.addons.authservice.enabled }}
-
+      thanos-storegateway:
+        to:
+          definition:
+            storage-subnets: {{ $storeGatewayEnabled }}
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
