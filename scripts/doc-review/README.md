@@ -1,13 +1,17 @@
-# Documentation Review Tool
+# Documentation Review Tools
 
-A tool to identify and manage potentially outdated markdown documentation across BigBang GitLab projects.
+Tools to identify and manage potentially outdated markdown documentation across BigBang GitLab projects.
 
 ## Prerequisites
 
 - **glab** - GitLab CLI (authenticated)
 - **jq** - JSON processor
 
-## Usage
+## Tools
+
+### 1. doc-review.sh - Create Documentation Review Issues
+
+Scans for outdated markdown files and creates tracking issues.
 
 ```bash
 ./doc-review.sh [OPTIONS]
@@ -155,3 +159,82 @@ Created issues include:
 | `failed_issues_*.json` | Failed issues (for retry) | Real runs only (not dry run) |
 
 **Note:** Output files are only created if they contain data. Empty files are never created.
+
+---
+
+### 2. remove-stale.sh - Remove Stale Labels from Documentation Issues
+
+Finds documentation review issues (labeled `kind::docs`) that have been marked as stale and removes the stale label.
+
+```bash
+./remove-stale.sh [OPTIONS]
+```
+
+#### Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-d, --dry-run` | Preview mode - shows what would happen | false |
+| `-l, --label LABEL` | Stale label to remove | stale |
+| `-a, --all` | Process ALL documentation issues (not just script-created) | false |
+| `-h, --help` | Show help | - |
+
+**Default Behavior:** By default, only processes issues created by `doc-review.sh` (identified by title prefix "Documentation Review Needed for"). Use `-a/--all` to process all `kind::docs` issues.
+
+#### Project Selection
+
+Specify which projects/groups to scan. If none specified, all are scanned.
+
+| Flag | Description |
+|------|-------------|
+| `--packages` | Scan `big-bang/product/packages` |
+| `--maintained` | Scan `big-bang/product/maintained` |
+| `--sandbox` | Scan `big-bang/apps/sandbox` |
+| `--umbrella` | Scan `big-bang/bigbang` (umbrella project) |
+
+#### Examples
+
+```bash
+# Dry run - preview what would be removed (script-created issues only)
+./remove-stale.sh -d
+
+# Remove stale labels from script-created documentation issues (default)
+./remove-stale.sh
+
+# Remove stale labels from ALL documentation issues
+./remove-stale.sh -a
+
+# Dry run for all docs issues
+./remove-stale.sh -a -d
+
+# Scan only umbrella project (script-created issues)
+./remove-stale.sh --umbrella
+
+# Scan packages and maintained, all docs issues
+./remove-stale.sh --packages --maintained -a
+
+# Use custom stale label
+./remove-stale.sh -l "Status::Stale" -d
+```
+
+#### How It Works
+
+The script:
+1. Searches for open issues with both `kind::docs` and the stale label (default: `stale`)
+2. **By default**, filters to only issues created by `doc-review.sh` (title starts with "Documentation Review Needed for")
+3. With `-a/--all` flag, processes ALL documentation issues regardless of how they were created
+4. Removes the stale label from matching issues
+5. Is idempotent - safe to run multiple times
+
+#### Use Cases
+
+**Script-created issues only (default, no `-a` flag):**
+- Only processes issues created by the `doc-review.sh` script
+- Identifies them by title prefix: "Documentation Review Needed for"
+- **Recommended default** - keeps the automated doc review process active without affecting manually created documentation issues
+- Safe to run regularly without impacting other documentation work
+
+**All documentation issues (`-a` flag used):**
+- Removes stale labels from ANY documentation issue that has been marked stale
+- Useful for broader documentation issue management
+- Use when you want to mass-remove stale labels from all docs-related issues
