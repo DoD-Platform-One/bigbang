@@ -1,36 +1,46 @@
+{{- /* Create a cleaned copy of package config and merge deprecated paths into current paths */ -}}
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
 {{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
-{{- if or $mmOpValues.enabled .Values.addons.mattermost.enabled }}
-{{- include "values-secret" (dict "root" $ "package" $mmOpValues "name" "mattermost-operator" "defaults" (include "bigbang.defaults.mattermostOperator" .)) }}
+{{- $mattermostOperatorPackage := deepCopy $mmOpValues -}}
+{{- if $mmOpValues.values -}}
+  {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" $mmOpValues.values) | fromYaml -}}
+  {{- $mattermostOperatorPackage = set $mattermostOperatorPackage "values" $cleanedValues -}}
+{{- end -}}
+{{- if $mattermostOperatorPackage.enabled }}
+{{- include "values-secret" (dict "root" $ "package" $mattermostOperatorPackage "name" "mattermost-operator" "defaults" ((mergeOverwrite (include "bigbang.defaults.mattermostOperator" . | fromYaml) (include "bigbang.mattermostOperator.bb-common-migrations" . | fromYaml)) | toYaml)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.mattermostOperator" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.mattermostOperator.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 imagePullSecrets:
   - name: private-registry
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-{{- if $istioEnabled  }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
-{{- end}}
+{{- end }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }} 
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.mattermostOperator.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
