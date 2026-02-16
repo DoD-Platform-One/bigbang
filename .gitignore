@@ -32,3 +32,9 @@ ignore/*
 
 # Local History for Visual Studio Code
 .history/
+
+# Doc review script outputs
+old_markdown_*.json
+created_issues_*.json
+failed_issues_*.json
+filtered_input_*.json
