@@ -854,6 +854,10 @@ loki:
   # Test SingleBinary at Umbrella, and Scalable at package level
   strategy: monolith
   values:
+    routes:
+      inbound:
+        loki:
+          enabled: true
     singleBinary:
       resources:
         limits:
