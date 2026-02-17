@@ -1,9 +1,23 @@
 {{- if .Values.addons.argocd.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.argocd "name" "argocd" "defaults" (include "bigbang.defaults.argocd" .)) }}
+# handle legacy istio hardened keys in argocd values
+{{- $argocdPackage := deepCopy .Values.addons.argocd -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.argocd.values) | fromYaml -}}
+{{- $argocdPackage = set $argocdPackage "values" $cleanedValues -}}
+
+{{- include "values-secret" (dict
+  "root" $
+  "package" $argocdPackage
+  "name" "argocd"
+  "defaults" ((mergeOverwrite (include "bigbang.defaults.argocd" . | fromYaml) (include "bigbang.argocd.bb-common-migrations" . | fromYaml)) | toYaml)
+)}}
 {{- end }}
 
 {{- define "bigbang.defaults.argocd" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardened := or
+  (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)
+  (dig "hardened" "enabled" false .Values.istiod.values)
+}}
 {{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -82,28 +96,18 @@ global:
 
 istio:
   enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
+  sidecar:
+    enabled: {{ $istioHardened }}
   injection: {{ dig "istio" "injection" "enabled" .Values.addons.argocd }}
-  argocd:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.argocd.ingress.gateway "root" .)}}
+  authorizationPolicies:
+    enabled: {{ $istioHardened }}
+    generateFromNetpol: {{ $istioHardened }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.argocd "root" .) | nindent 4 }}
-
 
 upstream:
   {{- if .Values.addons.argocd.redis.host }}
