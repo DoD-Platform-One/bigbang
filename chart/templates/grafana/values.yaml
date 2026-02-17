@@ -164,19 +164,19 @@ upstream:
       - name: Argo Master
         type: redis-datasource
         access: proxy
-        url: argocd-argocd-redis-bb-master.argocd.svc.cluster.local:6379
+        url: redis-bb-master.argocd.svc.cluster.local:6379
         jsonData:
           client: standalone
       - name: Argo Headless
         type: redis-datasource
         access: proxy
-        url: argocd-argocd-redis-bb-headless.argocd.svc.cluster.local:6379
+        url: redis-bb-headless.argocd.svc.cluster.local:6379
         jsonData:
           client: standalone
       - name: Argo Replicas
         type: redis-datasource
         access: proxy
-        url: argocd-argocd-redis-bb-replicas.argocd.svc.cluster.local:6379
+        url: redis-bb-replicas.argocd.svc.cluster.local:6379
         jsonData:
           client: standalone
       {{- end }}
