@@ -136,6 +136,9 @@ upstream:
           {{- end }}
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6}}
     defaults:
