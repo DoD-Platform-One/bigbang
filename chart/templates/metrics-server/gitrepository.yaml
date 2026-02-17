@@ -1,29 +1,8 @@
-{{- if (eq .Values.addons.metricsServer.sourceType "git") }}
+{{- if and (eq .Values.addons.metricsServer.sourceType "git") (not .Values.offline) }}
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}
 {{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
-{{- $gitCredsDict := dict
-  "name" "metricsServer"
-  "packageGitScope" .Values.addons.metricsServer.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: metrics-server
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: metrics-server
-    app.kubernetes.io/component: "cluster-utilities"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.metricsServer.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.metricsServer.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "metrics-server" "gitCredsName" "metricsServer" "git" .Values.addons.metricsServer.git "component" "cluster-utilities" "root" .) }}
 {{- end }}
 {{- end }}

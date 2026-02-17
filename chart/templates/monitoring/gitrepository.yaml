@@ -1,24 +1,3 @@
 {{- if and (eq .Values.monitoring.sourceType "git") (not .Values.offline) .Values.monitoring.enabled }}
-{{- $gitCredsDict := dict
-  "name" "monitoring"
-  "packageGitScope" .Values.monitoring.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: monitoring
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: monitoring
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.monitoring.git.repo }}
-  ref:
-    {{- include "validRef" .Values.monitoring.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "monitoring" "gitCredsName" "monitoring" "git" .Values.monitoring.git "component" "core" "root" .) }}
 {{- end }}

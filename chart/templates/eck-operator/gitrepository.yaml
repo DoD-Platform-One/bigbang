@@ -1,24 +1,3 @@
 {{- if and (eq .Values.eckOperator.sourceType "git") (not .Values.offline) (or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled) }}
-{{- $gitCredsDict := dict
-  "name" "eckOperator"
-  "packageGitScope" .Values.eckOperator.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: eck-operator
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: eck-operator
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.eckOperator.git.repo }}
-  ref:
-    {{- include "validRef" .Values.eckOperator.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "eck-operator" "gitCredsName" "eckOperator" "git" .Values.eckOperator.git "component" "core" "root" .) }}
 {{- end }}

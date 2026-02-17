@@ -1,24 +1,3 @@
-{{- if and (eq .Values.addons.backstage.sourceType "git") .Values.addons.backstage.enabled  }}
-{{- $gitCredsDict := dict
-  "name" "backstage"
-  "packageGitScope" .Values.addons.backstage.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: backstage
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: backstage
-    app.kubernetes.io/component: "developer-tools"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.backstage.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.backstage.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.addons.backstage.sourceType "git") (not .Values.offline) .Values.addons.backstage.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "backstage" "gitCredsName" "backstage" "git" .Values.addons.backstage.git "component" "developer-tools" "root" .) }}
 {{- end }}

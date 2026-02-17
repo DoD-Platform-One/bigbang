@@ -1,24 +1,3 @@
 {{- if and (not .Values.offline) (eq .Values.neuvector.sourceType "git") .Values.neuvector.enabled }}
-{{- $gitCredsDict := dict
-  "name" "neuvector"
-  "packageGitScope" .Values.neuvector.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: neuvector
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: neuvector
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.neuvector.git.repo }}
-  ref:
-    {{- include "validRef" .Values.neuvector.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "neuvector" "gitCredsName" "neuvector" "git" .Values.neuvector.git "component" "core" "root" .) }}
 {{- end }}

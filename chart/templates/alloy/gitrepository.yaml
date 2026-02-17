@@ -1,23 +1,3 @@
 {{- if and (eq .Values.alloy.sourceType "git") (not .Values.offline) .Values.alloy.enabled }}
-{{- $gitCredsDict := dict
-  "name" "alloy"
-  "packageGitScope" .Values.alloy.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: alloy
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: alloy
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.alloy.git.repo }}
-  ref:
-    {{- include "validRef" .Values.alloy.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "alloy" "gitCredsName" "alloy" "git" .Values.alloy.git "component" "core" "root" .) }}
 {{- end }}

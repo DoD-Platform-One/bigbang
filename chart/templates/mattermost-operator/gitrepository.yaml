@@ -1,26 +1,5 @@
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
 {{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
 {{- if and (eq $mmOpValues.sourceType "git") (not .Values.offline) (or $mmOpValues.enabled .Values.addons.mattermost.enabled) }}
-{{- $gitCredsDict := dict
-  "name" "mattermostOperator"
-  "packageGitScope" $mmOpValues.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: mattermost-operator
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: mattermost-operator
-    app.kubernetes.io/component: "collaboration-tools"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ $mmOpValues.git.repo }}
-  ref:
-    {{- include "validRef" $mmOpValues.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "mattermost-operator" "gitCredsName" "mattermostOperator" "git" $mmOpValues.git "component" "collaboration-tools" "root" .) }}
 {{- end }}

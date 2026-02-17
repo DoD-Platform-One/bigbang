@@ -1,24 +1,3 @@
 {{- if and (eq .Values.loki.sourceType "git") (not .Values.offline) .Values.loki.enabled }}
-{{- $gitCredsDict := dict
-  "name" "loki"
-  "packageGitScope" .Values.loki.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: loki
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: loki
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.loki.git.repo }}
-  ref:
-    {{- include "validRef" .Values.loki.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "loki" "gitCredsName" "loki" "git" .Values.loki.git "component" "core" "root" .) }}
 {{- end }}

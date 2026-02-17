@@ -1,24 +1,3 @@
 {{- if and (eq .Values.kyverno.sourceType "git") (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled) }}
-{{- $gitCredsDict := dict
-  "name" "kyverno"
-  "packageGitScope" .Values.kyverno.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: kyverno
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: kyverno
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.kyverno.git.repo }}
-  ref:
-    {{- include "validRef" .Values.kyverno.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "kyverno" "gitCredsName" "kyverno" "git" .Values.kyverno.git "component" "core" "root" .) }}
 {{- end }}

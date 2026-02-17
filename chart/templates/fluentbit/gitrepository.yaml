@@ -1,24 +1,3 @@
-{{- if and (eq .Values.fluentbit.sourceType "git") (not .Values.offline) (.Values.fluentbit.enabled) }}
-{{- $gitCredsDict := dict
-  "name" "fluentbit"
-  "packageGitScope" .Values.fluentbit.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: fluentbit
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: fluentbit
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.fluentbit.git.repo }}
-  ref:
-    {{- include "validRef" .Values.fluentbit.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.fluentbit.sourceType "git") (not .Values.offline) .Values.fluentbit.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "fluentbit" "gitCredsName" "fluentbit" "git" .Values.fluentbit.git "component" "core" "root" .) }}
 {{- end }}

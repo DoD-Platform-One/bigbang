@@ -1,25 +1,4 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- if and $istioEnabled (eq .Values.addons.authservice.sourceType "git") (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
-{{- $gitCredsDict := dict
-  "name" "authservice"
-  "packageGitScope" .Values.addons.authservice.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: authservice
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: authservice
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.authservice.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.authservice.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and $istioEnabled (eq .Values.addons.authservice.sourceType "git") (not .Values.offline) (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{- include "bigbang.gitRepository" (dict "name" "authservice" "gitCredsName" "authservice" "git" .Values.addons.authservice.git "component" "core" "root" .) }}
 {{- end }}

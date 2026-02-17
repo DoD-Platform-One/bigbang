@@ -1,24 +1,3 @@
-{{- if and (eq .Values.addons.argocd.sourceType "git") .Values.addons.argocd.enabled  }}
-{{- $gitCredsDict := dict
-  "name" "argocd"
-  "packageGitScope" .Values.addons.argocd.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: argocd
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: argocd
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.argocd.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.argocd.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.addons.argocd.sourceType "git") (not .Values.offline) .Values.addons.argocd.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "argocd" "gitCredsName" "argocd" "git" .Values.addons.argocd.git "component" "core" "root" .) }}
 {{- end }}

@@ -1,26 +1,5 @@
 {{- $nexusOldValues := default dict .Values.addons.nexus -}}
 {{- $nexusValues := mergeOverwrite $nexusOldValues .Values.addons.nexusRepositoryManager -}}
-{{- if and (eq $nexusValues.sourceType "git") $nexusValues.enabled  }}
-{{- $gitCredsDict := dict
-  "name" "nexusRepositoryManager"
-  "packageGitScope" $nexusValues.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: nexus-repository-manager
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: nexus-repository-manager
-    app.kubernetes.io/component: "developer-tools"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ $nexusValues.git.repo }}
-  ref:
-    {{- include "validRef" $nexusValues.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq $nexusValues.sourceType "git") (not .Values.offline) $nexusValues.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "nexus-repository-manager" "gitCredsName" "nexusRepositoryManager" "git" $nexusValues.git "component" "developer-tools" "root" .) }}
 {{- end }}
