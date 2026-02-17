@@ -1,24 +1,3 @@
-{{- if and (eq .Values.addons.mattermost.sourceType "git") .Values.addons.mattermost.enabled  }}
-{{- $gitCredsDict := dict
-  "name" "mattermost"
-  "packageGitScope" .Values.addons.mattermost.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: mattermost
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: mattermost
-    app.kubernetes.io/component: "collaboration-tools"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.mattermost.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.mattermost.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.addons.mattermost.sourceType "git") (not .Values.offline) .Values.addons.mattermost.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "mattermost" "gitCredsName" "mattermost" "git" .Values.addons.mattermost.git "component" "collaboration-tools" "root" .) }}
 {{- end }}

@@ -174,6 +174,46 @@ Returns cleaned values with hardened key removed.
 {{- end -}}
 
 {{/*
+Shared GitRepository resource template.
+Args (dict):
+  - name: resource name (kebab-case, e.g. "kyverno-policies")
+  - gitCredsName: name for gitCredsExtended (e.g. "kyvernoPolicies")
+  - git: the .git values object (repo, branch, tag, semver, commit, credentials)
+  - component: app.kubernetes.io/component label value (optional)
+  - root: root context ($ or .)
+  - extraIgnore: additional gitignore lines appended after standard gitIgnore (optional)
+*/}}
+{{- define "bigbang.gitRepository" -}}
+{{- $gitCredsDict := dict
+  "name" .gitCredsName
+  "packageGitScope" .git
+  "rootScope" .root
+  "releaseName" .root.Release.Name
+}}
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: {{ .name }}
+  namespace: {{ .root.Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .name }}
+    {{- if .component }}
+    app.kubernetes.io/component: {{ .component | quote }}
+    {{- end }}
+    {{- include "commonLabels" .root | nindent 4 }}
+spec:
+  interval: {{ .root.Values.flux.interval }}
+  url: {{ .git.repo }}
+  ref:
+    {{- include "validRef" .git | nindent 4 }}
+  {{ include "gitIgnore" .root }}
+  {{- if .extraIgnore }}
+    {{ .extraIgnore }}
+  {{- end }}
+  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- end -}}
+
+{{/*
 Build common set of file extensions to include/exclude
 */}}
 {{- define "gitIgnore" -}}

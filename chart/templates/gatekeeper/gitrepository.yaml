@@ -1,24 +1,3 @@
-{{- if and (eq .Values.gatekeeper.sourceType "git") (not .Values.offline) (.Values.gatekeeper.enabled) }}
-{{- $gitCredsDict := dict
-  "name" "gatekeeper"
-  "packageGitScope" .Values.gatekeeper.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: gatekeeper
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: gatekeeper
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.gatekeeper.git.repo }}
-  ref:
-    {{- include "validRef" .Values.gatekeeper.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.gatekeeper.sourceType "git") (not .Values.offline) .Values.gatekeeper.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "gatekeeper" "gitCredsName" "gatekeeper" "git" .Values.gatekeeper.git "component" "core" "root" .) }}
 {{- end }}

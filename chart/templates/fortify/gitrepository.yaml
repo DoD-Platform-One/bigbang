@@ -1,21 +1,3 @@
-{{- $pkg := "fortify" }}
-{{- if and (eq (get .Values.addons $pkg).sourceType "git") (not .Values.offline) (get .Values.addons $pkg).enabled }}
-{{- $gitCredsDict := dict
-  "name" $pkg
-  "packageGitScope" (get .Values.addons $pkg).git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: {{ $pkg }}
-  namespace: {{ .Release.Namespace }}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ (get .Values.addons $pkg).git.repo }}
-  ref:
-    {{- include "validRef" (get .Values.addons $pkg).git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.addons.fortify.sourceType "git") (not .Values.offline) .Values.addons.fortify.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "fortify" "gitCredsName" "fortify" "git" .Values.addons.fortify.git "root" .) }}
 {{- end }}

@@ -1,24 +1,3 @@
 {{- if and (eq .Values.kiali.sourceType "git") (not .Values.offline) .Values.kiali.enabled }}
-{{- $gitCredsDict := dict
-  "name" "kiali"
-  "packageGitScope" .Values.kiali.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: kiali
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: kiali
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.kiali.git.repo }}
-  ref:
-    {{- include "validRef" .Values.kiali.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- include "bigbang.gitRepository" (dict "name" "kiali" "gitCredsName" "kiali" "git" .Values.kiali.git "component" "core" "root" .) }}
 {{- end }}

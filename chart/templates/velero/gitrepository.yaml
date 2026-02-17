@@ -1,24 +1,3 @@
-{{- if and (eq .Values.addons.velero.sourceType "git") .Values.addons.velero.enabled  }}
-{{- $gitCredsDict := dict
-  "name" "velero"
-  "packageGitScope" .Values.addons.velero.git
-  "rootScope" .
-  "releaseName" .Release.Name
-}}
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
-metadata:
-  name: velero
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: velero
-    app.kubernetes.io/component: "cluster-utilities"
-    {{- include "commonLabels" . | nindent 4}}
-spec:
-  interval: {{ .Values.flux.interval }}
-  url: {{ .Values.addons.velero.git.repo }}
-  ref:
-    {{- include "validRef" .Values.addons.velero.git | nindent 4 }}
-  {{ include "gitIgnore" . }}
-  {{- include "gitCredsExtended" $gitCredsDict | nindent 2 }}
+{{- if and (eq .Values.addons.velero.sourceType "git") (not .Values.offline) .Values.addons.velero.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "velero" "gitCredsName" "velero" "git" .Values.addons.velero.git "component" "cluster-utilities" "root" .) }}
 {{- end }}
