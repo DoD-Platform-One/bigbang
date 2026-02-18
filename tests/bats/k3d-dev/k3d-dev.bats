@@ -73,6 +73,14 @@ _reset_globals() {
     [[ "$result" == *"testuser@10.0.0.1"* ]]
 }
 
+@test "runwithreturn uses k3dsshcmd command builder" {
+    _source_k3d_dev
+    fn="$(declare -f runwithreturn)"
+
+    [[ "$fn" == *'$(k3dsshcmd) "$@"'* ]]
+    [[ "$fn" != *'$(k3sshcmd) "$@"'* ]]
+}
+
 @test "set_kubeconfig uses PublicIP when not provisioning" {
     _source_k3d_dev
     _reset_globals
