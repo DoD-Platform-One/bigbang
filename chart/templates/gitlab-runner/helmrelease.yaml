@@ -10,30 +10,7 @@ metadata:
 spec:
   targetNamespace: gitlab-runner
   releaseName: gitlab-runner
-  chart:
-    spec:
-      {{- if eq .Values.addons.gitlabRunner.sourceType "git" }}
-      chart: {{ .Values.addons.gitlabRunner.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: gitlab-runner
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.gitlabRunner.helmRepo.chartName }}
-      version: {{ .Values.addons.gitlabRunner.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.gitlabRunner.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.gitlabRunner.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.gitlabRunner.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.gitlabRunner.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "gitlab-runner" "package" .Values.addons.gitlabRunner "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsGitlabRunner | nindent 2 }}
 
@@ -41,18 +18,9 @@ spec:
   postRenderers:
   {{ toYaml .Values.addons.gitlabRunner.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-gitlab-runner-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-gitlab-runner-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-gitlab-runner-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "gitlab-runner" "root" .) | nindent 2 }}
 
-  {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
+  {{- if or .Values.gatekeeper.enabled .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper

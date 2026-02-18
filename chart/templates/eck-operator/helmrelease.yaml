@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/eck-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: eck-operator
-  chart:
-    spec:
-      {{- if eq .Values.eckOperator.sourceType "git" }}
-      chart: {{ .Values.eckOperator.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: eck-operator
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.eckOperator.helmRepo.chartName }}
-      version: {{ .Values.eckOperator.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.eckOperator.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.eckOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.eckOperator.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.eckOperator.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "eck-operator" "package" .Values.eckOperator "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsEckOperator | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.eckOperator.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-eck-operator-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-eck-operator-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-eck-operator-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "eck-operator" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

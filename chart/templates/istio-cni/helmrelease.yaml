@@ -17,30 +17,7 @@ metadata:
 spec:
   releaseName: istio-cni
   targetNamespace: kube-system
-  chart:
-    spec:
-      {{- if eq .Values.istioCNI.sourceType "git" }}
-      chart: {{ .Values.istioCNI.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: istio-cni
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.istioCNI.helmRepo.chartName }}
-      version: {{ .Values.istioCNI.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.istioCNI.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istioCNI.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.istioCNI.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.istioCNI.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "istio-cni" "package" .Values.istioCNI "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsIstioCNI | nindent 2 }}
 
@@ -48,16 +25,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.istioCNI.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-istio-cni-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-istio-cni-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-istio-cni-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "istio-cni" "root" .) | nindent 2 }}
 
   dependsOn:
     - name: istiod

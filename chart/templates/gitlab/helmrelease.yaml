@@ -15,30 +15,7 @@ metadata:
 spec:
   releaseName: gitlab
   targetNamespace: gitlab
-  chart:
-    spec:
-      {{- if eq .Values.addons.gitlab.sourceType "git" }}
-      chart: {{ .Values.addons.gitlab.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: gitlab
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.gitlab.helmRepo.chartName }}
-      version: {{ .Values.addons.gitlab.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.gitlab.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.gitlab.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.gitlab.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.gitlab.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "gitlab" "package" .Values.addons.gitlab "root" .) | nindent 2 }}
 
 
   {{- toYaml $fluxSettingsGitlab | nindent 2 }}
@@ -51,16 +28,7 @@ spec:
   {{ toYaml . | nindent 4 }}
   {{- end }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-gitlab-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-gitlab-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-gitlab-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "gitlab" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

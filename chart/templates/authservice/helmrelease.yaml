@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/authservice/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: authservice
-  chart:
-    spec:
-      {{- if eq .Values.addons.authservice.sourceType "git" }}
-      chart: {{ .Values.addons.authservice.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: authservice
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.authservice.helmRepo.chartName }}
-      version: {{ .Values.addons.authservice.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.authservice.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.authservice.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.authservice.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.authservice.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "authservice" "package" .Values.addons.authservice "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsAuthservice | nindent 2 }}
 
@@ -46,16 +23,7 @@ spec:
   {{ toYaml .Values.addons.authservice.postRenderers | nindent 4 }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-authservice-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-authservice-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-authservice-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "authservice" "root" .) | nindent 2 }}
 
   dependsOn:
   {{- if $istioEnabled }}

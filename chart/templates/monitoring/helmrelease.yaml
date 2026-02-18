@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/monitoring/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: monitoring
-  chart:
-    spec:
-      {{- if eq .Values.monitoring.sourceType "git" }}
-      chart: {{ .Values.monitoring.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: monitoring
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.monitoring.helmRepo.chartName }}
-      version: {{ .Values.monitoring.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.monitoring.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.monitoring.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.monitoring.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.monitoring.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "monitoring" "package" .Values.monitoring "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.monitoring.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-monitoring-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-monitoring-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-monitoring-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "monitoring" "root" .) | nindent 2 }}
 
   dependsOn:
     - name: prometheus-operator-crds

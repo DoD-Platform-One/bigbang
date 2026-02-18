@@ -15,30 +15,7 @@ metadata:
 spec:
   targetNamespace: alloy
   releaseName: alloy
-  chart:
-    spec:
-      {{- if eq .Values.alloy.sourceType "git" }}
-      chart: {{ .Values.alloy.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: alloy
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.alloy.helmRepo.chartName }}
-      version: {{ .Values.alloy.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.alloy.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.alloy.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.alloy.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.alloy.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "alloy" "package" .Values.alloy "root" .) | nindent 2 }}
   {{- toYaml $fluxSettingsAlloy | nindent 2 }}
   {{- if .Values.alloy.postRenderers }}
   postRenderers:
@@ -46,16 +23,7 @@ spec:
   {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-alloy-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-alloy-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-alloy-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "alloy" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.loki.enabled }}
   dependsOn:

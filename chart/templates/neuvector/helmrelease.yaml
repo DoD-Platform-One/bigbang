@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/neuvector/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: neuvector
-  chart:
-    spec:
-      {{- if eq .Values.neuvector.sourceType "git" }}
-      chart: {{ .Values.neuvector.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: neuvector
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.neuvector.helmRepo.chartName }}
-      version: {{ .Values.neuvector.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.neuvector.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.neuvector.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.neuvector.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.neuvector.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "neuvector" "package" .Values.neuvector "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsNeuvector | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.neuvector.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-neuvector-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-neuvector-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-neuvector-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "neuvector" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

@@ -15,30 +15,7 @@ metadata:
 spec:
   releaseName: sonarqube
   targetNamespace: sonarqube
-  chart:
-    spec:
-      {{- if eq .Values.addons.sonarqube.sourceType "git" }}
-      chart: {{ .Values.addons.sonarqube.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: sonarqube
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.sonarqube.helmRepo.chartName }}
-      version: {{ .Values.addons.sonarqube.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.sonarqube.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.sonarqube.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.sonarqube.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.sonarqube.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "sonarqube" "package" .Values.addons.sonarqube "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsSonarqube | nindent 2 }}
   
@@ -51,18 +28,7 @@ spec:
   {{ toYaml . | nindent 2 }}
   {{- end }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-sonarqube-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-sonarqube-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-sonarqube-values
-      kind: Secret
-      valuesKey: "overlays"
-
-  values:
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "sonarqube" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.keycloak.enabled $istioEnabled }}
   dependsOn:

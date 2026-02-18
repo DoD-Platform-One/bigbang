@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/external-secrets/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: external-secrets
-  chart:
-    spec:
-      {{- if eq .Values.addons.externalSecrets.sourceType "git" }}
-      chart: {{ .Values.addons.externalSecrets.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: external-secrets
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.externalSecrets.helmRepo.chartName }}
-      version: {{ .Values.addons.externalSecrets.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.externalSecrets.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.externalSecrets.helmRepo.repoName "allRepos" .Values.helmRepositories) -}}
-      {{- if (and .Values.addons.externalSecrets.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.externalSecrets.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "external-secrets" "package" .Values.addons.externalSecrets "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettings | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{- toYaml .Values.addons.externalSecrets.postRenderers | nindent 2 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-external-secrets-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-external-secrets-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-external-secrets-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "external-secrets" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

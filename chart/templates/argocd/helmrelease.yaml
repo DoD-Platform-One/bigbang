@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/argocd/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: argocd
-  chart:
-    spec:
-      {{- if eq .Values.addons.argocd.sourceType "git" }}
-      chart: {{ .Values.addons.argocd.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: argocd
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.argocd.helmRepo.chartName }}
-      version: {{ .Values.addons.argocd.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.argocd.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.argocd.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.argocd.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.argocd.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "argocd" "package" .Values.addons.argocd "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsArgo | nindent 2 }}
 
@@ -46,16 +23,7 @@ spec:
   {{ toYaml .Values.addons.argocd.postRenderers | nindent 4 }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-argocd-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-argocd-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-argocd-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "argocd" "root" .) | nindent 2 }}
 
   {{- if or .Values.monitoring.enabled $istioEnabled }}
   dependsOn:

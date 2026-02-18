@@ -18,30 +18,7 @@ metadata:
 spec:
   releaseName: {{ $name }}
   targetNamespace: {{ $name }}
-  chart:
-    spec:
-      {{- if eq .Values.addons.keycloak.sourceType "git" }}
-      chart: {{ .Values.addons.keycloak.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: {{ $name }}
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.keycloak.helmRepo.chartName }}
-      version: {{ .Values.addons.keycloak.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.keycloak.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.keycloak.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.keycloak.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.keycloak.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "keycloak" "package" .Values.addons.keycloak "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.addons.keycloak.postRenderers }}
   postRenderers:
@@ -55,16 +32,7 @@ spec:
 
   {{- toYaml $fluxSettingsKeycloak | nindent 2 }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-{{ $name }}-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-{{ $name }}-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-{{ $name }}-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "keycloak" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

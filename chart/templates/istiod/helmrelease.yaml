@@ -17,30 +17,7 @@ metadata:
 spec:
   releaseName: istiod
   targetNamespace: istio-system
-  chart:
-    spec:
-      {{- if eq .Values.istiod.sourceType "git" }}
-      chart: {{ .Values.istiod.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: istiod
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.istiod.helmRepo.chartName }}
-      version: {{ .Values.istiod.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.istiod.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istiod.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.istiod.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.istiod.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "istiod" "package" .Values.istiod "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsIstioCore | nindent 2 }}
 
@@ -48,16 +25,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.istiod.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-istiod-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-istiod-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-istiod-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "istiod" "root" .) | nindent 2 }}
 
   dependsOn:
     - name: istio-crds

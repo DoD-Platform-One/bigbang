@@ -18,30 +18,7 @@ metadata:
 spec:
   releaseName: metrics-server
   targetNamespace: metrics-server
-  chart:
-    spec:
-      {{- if eq .Values.addons.metricsServer.sourceType "git" }}
-      chart: {{ .Values.addons.metricsServer.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: metrics-server
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.metricsServer.helmRepo.chartName }}
-      version: {{ .Values.addons.metricsServer.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.metricsServer.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.metricsServer.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.metricsServer.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.metricsServer.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "metrics-server" "package" .Values.addons.metricsServer "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMetrics | nindent 2 }}
 
@@ -55,16 +32,7 @@ spec:
   {{- end }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-metrics-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-metrics-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-metrics-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "metrics" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.monitoring.enabled }}
   dependsOn:

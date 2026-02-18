@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/backstage/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: backstage
-  chart:
-    spec:
-      {{- if eq .Values.addons.backstage.sourceType "git" }}
-      chart: {{ .Values.addons.backstage.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: backstage
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.backstage.helmRepo.chartName }}
-      version: {{ .Values.addons.backstage.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.backstage.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.backstage.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.backstage.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.backstage.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "backstage" "package" .Values.addons.backstage "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsBackstage | nindent 2 }}
 
@@ -46,26 +23,19 @@ spec:
   {{ toYaml .Values.addons.backstage.postRenderers | nindent 4 }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-backstage-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-backstage-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-backstage-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "backstage" "root" .) | nindent 2 }}
 
-  {{- if or .Values.grafana.enabled $istioEnabled }}
+  {{- if or .Values.grafana.enabled $istioEnabled .Values.kyverno.enabled }}
   dependsOn:
   {{- if $istioEnabled }}
   - name: {{ include "istioHelmRelease" . }}
-    namespace: {{ .Release.Namespace}}
-  {{- end}}
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
   {{- if .Values.grafana.enabled }}
   - name: grafana
     namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyverno.enabled }}
   - name: kyverno
     namespace: {{ .Release.Namespace }}
   {{- end }}

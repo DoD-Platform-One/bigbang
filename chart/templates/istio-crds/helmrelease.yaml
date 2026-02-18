@@ -14,30 +14,7 @@ metadata:
 spec:
   releaseName: istio-crds
   targetNamespace: istio-system
-  chart:
-    spec:
-      {{- if eq .Values.istioCRDs.sourceType "git" }}
-      chart: {{ .Values.istioCRDs.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: istio-crds
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.istioCRDs.helmRepo.chartName }}
-      version: {{ .Values.istioCRDs.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.istioCRDs.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.istioCRDs.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.istioCRDs.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.istioCRDs.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "istio-crds" "package" .Values.istioCRDs "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsIstioCore | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.istioCRDs.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-istio-crds-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-istio-crds-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-istio-crds-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "istio-crds" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled .Values.kyvernoPolicies.enabled }}
   dependsOn:

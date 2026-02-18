@@ -13,30 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/elasticsearch-kibana/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: logging
-  chart:
-    spec:
-      {{- if eq .Values.elasticsearchKibana.sourceType "git" }}
-      chart: {{ .Values.elasticsearchKibana.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: elasticsearch-kibana
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.elasticsearchKibana.helmRepo.chartName }}
-      version: {{ .Values.elasticsearchKibana.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.elasticsearchKibana.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.elasticsearchKibana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.elasticsearchKibana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.elasticsearchKibana.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "elasticsearch-kibana" "package" .Values.elasticsearchKibana "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsEk | nindent 2 }}
 
@@ -44,16 +21,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.elasticsearchKibana.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-ek-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-ek-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-ek-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "ek" "root" .) | nindent 2 }}
 
   {{/* ECK and Logging _always_ depend on .Values.elasticsearchKibana being enabled, so can assume they exist here */}}
   dependsOn:

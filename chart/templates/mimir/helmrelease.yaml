@@ -16,30 +16,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/mimir/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: mimir
-  chart:
-    spec:
-      {{- if eq .Values.addons.mimir.sourceType "git" }}
-      chart: {{ .Values.addons.mimir.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: mimir
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.mimir.helmRepo.chartName }}
-      version: {{ .Values.addons.mimir.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.mimir.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.mimir.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.mimir.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.mimir.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mimir" "package" .Values.addons.mimir "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMimir | nindent 2 }}
   {{- if or .Values.addons.mimir.postRenderers $istioEnabled }}
@@ -51,16 +28,7 @@ spec:
   {{ toYaml . | nindent 2 }}
   {{- end }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-mimir-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-mimir-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-mimir-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "mimir" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
   dependsOn:
