@@ -16,30 +16,7 @@ metadata:
 spec:
   releaseName: {{ $gw.serviceName }}
   targetNamespace: istio-gateway
-  chart:
-    spec:
-      {{- if eq $.Values.istioGateway.sourceType "git" }}
-      chart: {{ $.Values.istioGateway.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: istio-gateway
-        namespace: {{ $.Release.Namespace }}
-      {{- else }}
-      chart: {{ $.Values.istioGateway.helmRepo.chartName }}
-      version: {{ $.Values.istioGateway.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ $.Values.istioGateway.helmRepo.repoName }}
-        namespace: {{ $.Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" $.Values.istioGateway.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and $.Values.istioGateway.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" $.Values.istioGateway.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "istio-gateway" "package" $.Values.istioGateway "root" $) | nindent 2 }}
 
   {{- toYaml $fluxSettingsIstioGateway | nindent 2 }}
 

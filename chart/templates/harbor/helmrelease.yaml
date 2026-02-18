@@ -15,30 +15,7 @@ metadata:
 spec:
   releaseName: {{ $pkg }}
   targetNamespace: {{ $pkg }}
-  chart:
-    spec:
-      {{- if eq (get .Values.addons $pkg).sourceType "git" }}
-      chart: {{ (get .Values.addons $pkg).git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: harbor
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ (get .Values.addons $pkg).helmRepo.chartName }}
-      version: {{ (get .Values.addons $pkg).helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ (get .Values.addons $pkg).helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" (get .Values.addons $pkg).helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and (get .Values.addons $pkg).helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" (get .Values.addons $pkg).helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "harbor" "package" (get .Values.addons $pkg) "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsHarbor | nindent 2 }}
 
@@ -50,16 +27,7 @@ spec:
   {{- if (get .Values.addons $pkg).postRenderers }}
   {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 2 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-{{ $pkg }}-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-{{ $pkg }}-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-{{ $pkg }}-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "harbor" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

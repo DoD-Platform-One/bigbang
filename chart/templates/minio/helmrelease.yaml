@@ -9,30 +9,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: minio
-  chart:
-    spec:
-      {{- if eq .Values.addons.minio.sourceType "git" }}
-      chart: {{ .Values.addons.minio.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: minio
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.minio.helmRepo.chartName }}
-      version: {{ .Values.addons.minio.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.minio.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.minio.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.minio.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.minio.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "minio" "package" .Values.addons.minio "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMinio | nindent 2 }}
   
@@ -40,16 +17,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.addons.minio.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-minio-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-minio-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-minio-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "minio" "root" .) | nindent 2 }}
 
   dependsOn:
     {{- if .Values.kyvernoPolicies.enabled }}

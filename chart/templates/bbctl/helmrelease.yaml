@@ -12,30 +12,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/bbctl/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: bbctl
-  chart:
-    spec:
-      {{- if eq .Values.bbctl.sourceType "git" }}
-      chart: {{ .Values.bbctl.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: bbctl
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.bbctl.helmRepo.chartName }}
-      version: {{ .Values.bbctl.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.bbctl.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.bbctl.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.bbctl.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.bbctl.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "bbctl" "package" .Values.bbctl "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsbbctl | nindent 2 }}
 
@@ -44,16 +21,7 @@ spec:
   {{ toYaml .Values.bbctl.postRenderers | nindent 4 }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-bbctl-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-bbctl-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-bbctl-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "bbctl" "root" .) | nindent 2 }}
 
   {{- if or .Values.loki.enabled (and .Values.alloy.enabled .Values.alloy.alloyLogs.enabled) .Values.monitoring.enabled .Values.grafana.enabled }}
   dependsOn:

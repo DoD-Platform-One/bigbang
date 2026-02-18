@@ -13,30 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/headlamp/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: headlamp
-  chart:
-    spec:
-      {{- if eq .Values.addons.headlamp.sourceType "git" }}
-      chart: {{ .Values.addons.headlamp.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: headlamp
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.headlamp.helmRepo.chartName }}
-      version: {{ .Values.addons.headlamp.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.headlamp.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.headlamp.helmRepo.repoName "allRepos" .Values.helmRepositories) -}}
-      {{- if (and .Values.addons.headlamp.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.headlamp.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "headlamp" "package" .Values.addons.headlamp "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettings | nindent 2 }}
 
@@ -44,16 +21,7 @@ spec:
   postRenderers:
   {{- toYaml .Values.addons.headlamp.postRenderers | nindent 2 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-headlamp-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-headlamp-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-headlamp-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "headlamp" "root" .) | nindent 2 }}
 
   {{- if or (eq (include "istioEnabled" . ) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

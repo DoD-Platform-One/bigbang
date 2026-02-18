@@ -15,30 +15,7 @@ metadata:
 spec:
   releaseName: {{ default "logging-loki" .Values.loki.releaseName }}
   targetNamespace: logging
-  chart:
-    spec:
-      {{- if eq .Values.loki.sourceType "git" }}
-      chart: {{ .Values.loki.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: loki
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.loki.helmRepo.chartName }}
-      version: {{ .Values.loki.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.loki.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.loki.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.loki.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.loki.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "loki" "package" .Values.loki "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsLoki | nindent 2 }}
 
@@ -51,16 +28,7 @@ spec:
   {{ toYaml .Values.loki.postRenderers | nindent 2 }}
   {{- end }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-loki-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-loki-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-loki-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "loki" "root" .) | nindent 2 }}
   {{- if or .Values.monitoring.enabled .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled }}
   dependsOn:
     {{- if  .Values.monitoring.enabled }}

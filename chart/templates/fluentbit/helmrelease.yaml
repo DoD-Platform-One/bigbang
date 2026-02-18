@@ -15,30 +15,7 @@ metadata:
 spec:
   targetNamespace: fluentbit
   releaseName: fluentbit
-  chart:
-    spec:
-      {{- if eq .Values.fluentbit.sourceType "git" }}
-      chart: {{ .Values.fluentbit.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: fluentbit
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.fluentbit.helmRepo.chartName }}
-      version: {{ .Values.fluentbit.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.fluentbit.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.fluentbit.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.fluentbit.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.fluentbit.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "fluentbit" "package" .Values.fluentbit "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsFluentbit | nindent 2 }}
 
@@ -47,19 +24,10 @@ spec:
   {{- if .Values.fluentbit.postRenderers }}
   {{ toYaml .Values.fluentbit.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-fluentbit-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-fluentbit-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-fluentbit-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "fluentbit" "root" .) | nindent 2 }}
 
   {{/* To support a "standalone" fluentbit for shipping to central location we conditionally depend on logging enabled */}}
-  {{- if or .Values.elasticsearchKibana.enabled .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.kyverno.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.elasticsearchKibana.enabled .Values.loki.enabled .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.kyverno.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if .Values.elasticsearchKibana.enabled }}
     - name: ek

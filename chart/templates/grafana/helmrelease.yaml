@@ -1,4 +1,4 @@
-{{- $fluxSettingsMonitoring := merge .Values.grafana.flux .Values.flux -}}
+{{- $fluxSettingsGrafana := merge .Values.grafana.flux .Values.flux -}}
 {{- if .Values.grafana.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -14,32 +14,9 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/grafana/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: monitoring
-  chart:
-    spec:
-      {{- if eq .Values.grafana.sourceType "git" }}
-      chart: {{ .Values.grafana.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: grafana
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.grafana.helmRepo.chartName }}
-      version: {{ .Values.grafana.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.grafana.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.grafana.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.grafana.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.grafana.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "grafana" "package" .Values.grafana "root" .) | nindent 2 }}
 
-  {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
+  {{- toYaml $fluxSettingsGrafana | nindent 2 }}
 
   {{- if or .Values.grafana.postRenderers .Values.monitoring.enabled }}
   postRenderers:
@@ -51,16 +28,7 @@ spec:
   {{- end }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-grafana-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-grafana-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-grafana-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "grafana" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

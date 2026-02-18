@@ -15,30 +15,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/vault/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: vault
-  chart:
-    spec:
-      {{- if eq .Values.addons.vault.sourceType "git" }}
-      chart: {{ .Values.addons.vault.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: vault
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.vault.helmRepo.chartName }}
-      version: {{ .Values.addons.vault.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.vault.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.vault.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.vault.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.vault.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "vault" "package" .Values.addons.vault "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsVault | nindent 2 }}
   
@@ -46,16 +23,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.addons.vault.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-vault-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-vault-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-vault-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "vault" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
   dependsOn:

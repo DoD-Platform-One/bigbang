@@ -13,30 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kyverno/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kyverno
-  chart:
-    spec:
-      {{- if eq .Values.kyverno.sourceType "git" }}
-      chart: {{ .Values.kyverno.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: kyverno
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.kyverno.helmRepo.chartName }}
-      version: {{ .Values.kyverno.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.kyverno.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.kyverno.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.kyverno.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.kyverno.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kyverno" "package" .Values.kyverno "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingskyverno | nindent 2 }}
 
@@ -44,16 +21,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.kyverno.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-kyverno-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-kyverno-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-kyverno-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "kyverno" "root" .) | nindent 2 }}
   {{- if or .Values.gatekeeper.enabled .Values.prometheusOperatorCRDs.enabled }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}

@@ -16,30 +16,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/mattermost-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: mattermost-operator
-  chart:
-    spec:
-      {{- if (eq $mmOpValues.sourceType "git") }}
-      chart: {{ $mmOpValues.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: mattermost-operator
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ $mmOpValues.helmRepo.chartName }}
-      version: {{ $mmOpValues.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ $mmOpValues.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" $mmOpValues.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and $mmOpValues.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" $mmOpValues.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mattermost-operator" "package" $mmOpValues "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMattermostOperator | nindent 2 }}
   
@@ -47,16 +24,7 @@ spec:
   postRenderers:
   {{- toYaml $mmOpValues.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-mattermost-operator-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-mattermost-operator-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-mattermost-operator-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "mattermost-operator" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

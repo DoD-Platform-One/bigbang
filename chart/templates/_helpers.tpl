@@ -577,6 +577,61 @@ data:
 {{- end }}
 {{- end }}
 
+{{/*
+Shared HelmRelease chart spec block.
+Generates the spec.chart.spec section handling git vs helmRepo sources with cosign verification.
+Args (dict):
+  - name: GitRepository/sourceRef name (kebab-case, e.g. "kyverno-policies")
+  - package: the package values object (contains sourceType, git, helmRepo)
+  - root: root context ($ or .)
+*/}}
+{{- define "bigbang.helmRelease.chartSpec" -}}
+chart:
+  spec:
+    {{- if eq .package.sourceType "git" }}
+    chart: {{ .package.git.path }}
+    sourceRef:
+      kind: GitRepository
+      name: {{ .name }}
+      namespace: {{ .root.Release.Namespace }}
+    {{- else }}
+    chart: {{ .package.helmRepo.chartName }}
+    version: {{ .package.helmRepo.tag }}
+    sourceRef:
+      kind: HelmRepository
+      name: {{ .package.helmRepo.repoName }}
+      namespace: {{ .root.Release.Namespace }}
+    {{- $repoType := include "getRepoType" (dict "repoName" .package.helmRepo.repoName "allRepos" .root.Values.helmRepositories) -}}
+    {{- if (and .package.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
+    verify:
+      provider: cosign
+      secretRef:
+        name: {{ printf "%s-cosign-pub" .package.helmRepo.repoName }}
+    {{- end }}
+    {{- end }}
+    interval: 5m
+{{- end -}}
+
+{{/*
+Shared HelmRelease valuesFrom block.
+Generates the standard 3-secret valuesFrom (common, defaults, overlays).
+Args (dict):
+  - name: secret name suffix (e.g. "loki", "ek", "metrics")
+  - root: root context ($ or .)
+*/}}
+{{- define "bigbang.helmRelease.valuesFrom" -}}
+valuesFrom:
+  - name: {{ .root.Release.Name }}-{{ .name }}-values
+    kind: Secret
+    valuesKey: "common"
+  - name: {{ .root.Release.Name }}-{{ .name }}-values
+    kind: Secret
+    valuesKey: "defaults"
+  - name: {{ .root.Release.Name }}-{{ .name }}-values
+    kind: Secret
+    valuesKey: "overlays"
+{{- end -}}
+
 {{- /* Returns type of Helm Repository */ -}}
 {{- define "getRepoType" -}}
   {{- $repoName := .repoName -}}

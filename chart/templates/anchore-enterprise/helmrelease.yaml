@@ -11,30 +11,7 @@ metadata:
 spec:
   releaseName: anchore-enterprise
   targetNamespace: anchore
-  chart:
-    spec:
-      {{- if eq .Values.addons.anchoreEnterprise.sourceType "git" }}
-      chart: {{ .Values.addons.anchoreEnterprise.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: anchore-enterprise
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.anchoreEnterprise.helmRepo.chartName }}
-      version: {{ .Values.addons.anchoreEnterprise.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.anchoreEnterprise.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.anchoreEnterprise.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.anchoreEnterprise.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.anchoreEnterprise.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "anchore-enterprise" "package" .Values.addons.anchoreEnterprise "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsAnchore | nindent 2 }}
 
@@ -44,16 +21,7 @@ spec:
   {{ toYaml .Values.addons.anchoreEnterprise.postRenderers | nindent 4 }}
   {{- end }}
 
-  valuesFrom:
-    - name: {{ .Release.Name }}-anchore-enterprise-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-anchore-enterprise-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-anchore-enterprise-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "anchore-enterprise" "root" .) | nindent 2 }}
 
   {{- if or $istioEnabled .Values.monitoring.enabled }}
   dependsOn:

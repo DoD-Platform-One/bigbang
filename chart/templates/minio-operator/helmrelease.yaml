@@ -10,30 +10,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: minio-operator
-  chart:
-    spec:
-      {{- if eq .Values.addons.minioOperator.sourceType "git" }}
-      chart: {{ .Values.addons.minioOperator.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: minio-operator
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.minioOperator.helmRepo.chartName }}
-      version: {{ .Values.addons.minioOperator.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.minioOperator.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.minioOperator.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.minioOperator.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.minioOperator.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "minio-operator" "package" .Values.addons.minioOperator "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMinioOperator | nindent 2 }}
 
@@ -41,16 +18,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.addons.minioOperator.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-minio-operator-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-minio-operator-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-minio-operator-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "minio-operator" "root" .) | nindent 2 }}
 
   values:
     podAnnotations:

@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/tempo/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: tempo
-  chart:
-    spec:
-      {{- if eq .Values.tempo.sourceType "git" }}
-      chart: {{ .Values.tempo.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: tempo
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.tempo.helmRepo.chartName }}
-      version: {{ .Values.tempo.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.tempo.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.tempo.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.tempo.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.tempo.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "tempo" "package" .Values.tempo "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsTempo | nindent 2 }}
 
@@ -54,16 +31,7 @@ spec:
   {{- if and .Values.tempo.objectStorage.accessKey .Values.tempo.objectStorage.accessSecret }}
   {{ include "tempo.objectStoragePostRenderers" . | nindent 2 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-tempo-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-tempo-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-tempo-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "tempo" "root" .) | nindent 2 }}
   {{- if or .Values.monitoring.enabled .Values.tempo.sso.enabled $istioEnabled }}
   dependsOn:
     {{- if  .Values.monitoring.enabled }}

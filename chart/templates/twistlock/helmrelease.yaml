@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/twistlock/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: twistlock
-  chart:
-    spec:
-      {{- if eq .Values.twistlock.sourceType "git" }}
-      chart: {{ .Values.twistlock.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: twistlock
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.twistlock.helmRepo.chartName }}
-      version: {{ .Values.twistlock.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.twistlock.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.twistlock.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.twistlock.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.twistlock.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "twistlock" "package" .Values.twistlock "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsTwistlock | nindent 2 }}
   
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.twistlock.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-twistlock-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "twistlock" "root" .) | nindent 2 }}
 
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:

@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/velero/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: velero
-  chart:
-    spec:
-      {{- if eq .Values.addons.velero.sourceType "git" }}
-      chart: {{ .Values.addons.velero.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: velero
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.addons.velero.helmRepo.chartName }}
-      version: {{ .Values.addons.velero.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.addons.velero.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.addons.velero.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.addons.velero.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.addons.velero.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "velero" "package" .Values.addons.velero "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsVelero | nindent 2 }}
   
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.addons.velero.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-velero-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-velero-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-velero-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "velero" "root" .) | nindent 2 }}
   {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
     {{- if $istioEnabled }}

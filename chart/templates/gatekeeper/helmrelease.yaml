@@ -15,30 +15,7 @@ spec:
   # Use a non-persistent client to allow for Gatekeeper CRD *magic*
   persistentClient: false
   targetNamespace: gatekeeper-system
-  chart:
-    spec:
-      {{- if eq .Values.gatekeeper.sourceType "git" }}
-      chart: {{ .Values.gatekeeper.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: gatekeeper
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.gatekeeper.helmRepo.chartName }}
-      version: {{ .Values.gatekeeper.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.gatekeeper.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.gatekeeper.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.gatekeeper.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.gatekeeper.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "gatekeeper" "package" .Values.gatekeeper "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsGatekeeper | nindent 2 }}
 
@@ -46,14 +23,5 @@ spec:
   postRenderers:
   {{ toYaml .Values.gatekeeper.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-gatekeeper-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-gatekeeper-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-gatekeeper-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "gatekeeper" "root" .) | nindent 2 }}
 {{- end }}

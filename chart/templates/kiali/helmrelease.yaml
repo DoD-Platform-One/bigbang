@@ -14,30 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kiali/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kiali
-  chart:
-    spec:
-      {{- if eq .Values.kiali.sourceType "git" }}
-      chart: {{ .Values.kiali.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: kiali
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.kiali.helmRepo.chartName }}
-      version: {{ .Values.kiali.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.kiali.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.kiali.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.kiali.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.kiali.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kiali" "package" .Values.kiali "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsKiali | nindent 2 }}
 
@@ -45,16 +22,7 @@ spec:
   postRenderers:
   {{ toYaml .Values.kiali.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-kiali-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-kiali-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-kiali-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "kiali" "root" .) | nindent 2 }}
 
   {{ if or $istioEnabled .Values.monitoring.enabled }}
   dependsOn:

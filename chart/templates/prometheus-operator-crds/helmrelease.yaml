@@ -14,30 +14,7 @@ metadata:
 spec:
   releaseName: prometheus-operator-crds
   targetNamespace: monitoring
-  chart:
-    spec:
-      {{- if eq .Values.prometheusOperatorCRDs.sourceType "git" }}
-      chart: {{ .Values.prometheusOperatorCRDs.git.path }}
-      sourceRef:
-        kind: GitRepository
-        name: prometheus-operator-crds
-        namespace: {{ .Release.Namespace }}
-      {{- else }}
-      chart: {{ .Values.prometheusOperatorCRDs.helmRepo.chartName }}
-      version: {{ .Values.prometheusOperatorCRDs.helmRepo.tag }}
-      sourceRef:
-        kind: HelmRepository
-        name: {{ .Values.prometheusOperatorCRDs.helmRepo.repoName }}
-        namespace: {{ .Release.Namespace }}
-      {{- $repoType := include "getRepoType" (dict "repoName" .Values.prometheusOperatorCRDs.helmRepo.repoName "allRepos" $.Values.helmRepositories) -}}
-      {{- if (and .Values.prometheusOperatorCRDs.helmRepo.cosignVerify (eq $repoType "oci")) }} # Needs to be an OCI repo
-      verify:
-        provider: cosign
-        secretRef:
-          name: {{ printf "%s-cosign-pub" .Values.prometheusOperatorCRDs.helmRepo.repoName }}
-      {{- end }}
-      {{- end }}
-      interval: 5m
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "prometheus-operator-crds" "package" .Values.prometheusOperatorCRDs "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsPrometheusOperatorCRDs | nindent 2 }}
 
@@ -45,14 +22,5 @@ spec:
   postRenderers:
   {{ toYaml .Values.prometheusOperatorCRDs.postRenderers | nindent 4 }}
   {{- end }}
-  valuesFrom:
-    - name: {{ .Release.Name }}-prometheus-operator-crds-values
-      kind: Secret
-      valuesKey: "common"
-    - name: {{ .Release.Name }}-prometheus-operator-crds-values
-      kind: Secret
-      valuesKey: "defaults"
-    - name: {{ .Release.Name }}-prometheus-operator-crds-values
-      kind: Secret
-      valuesKey: "overlays"
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "prometheus-operator-crds" "root" .) | nindent 2 }}
 {{- end }}
