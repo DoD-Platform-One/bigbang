@@ -207,6 +207,16 @@ networkPolicies:
               cidr: 172.16.0.0/12
           - ipBlock:
               cidr: 10.0.0.0/8
+      # -- Ingress definition for Kube API subnets;
+      # Used to build Network Policy for packages that need to allow incoming traffic from the Kube API (i.e. Gatekeeper, Kyverno, etc.)
+      kubeAPI:
+        from:
+          - ipBlock:
+              cidr: 192.168.0.0/16
+          - ipBlock:
+              cidr: 172.16.0.0/12
+          - ipBlock:
+              cidr: 10.0.0.0/8
 
 # -- Global ImagePullPolicy value for all packages
 # Permitted values are: None, Always, IfNotPresent
