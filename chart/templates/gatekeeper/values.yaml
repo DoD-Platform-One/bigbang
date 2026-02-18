@@ -46,10 +46,6 @@ networkPolicies:
         enabled: false
     definitions:
       {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
-      kubeAPI:
-        from:
-          - ipBlock:
-              cidr: {{ .Values.networkPolicies.controlPlaneCidr }}
     to:
       gatekeeper:8443:
         from:
