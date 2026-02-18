@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Kyverno - Values Tests
+templates:
+  - templates/kyverno/values.yaml
+tests:
+  - it: should include default kubeAPI ingress definition
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      kyverno.enabled: true
+      networkPolicies.enabled: true
+    asserts:
+      - isNotNull:
+          path: networkPolicies.ingress.definitions.kubeAPI
+      - equal:
+          path: networkPolicies.ingress.definitions.kubeAPI.from[0].ipBlock.cidr
+          value: "192.168.0.0/16"
+      - equal:
+          path: networkPolicies.ingress.definitions.kubeAPI.from[1].ipBlock.cidr
+          value: "172.16.0.0/12"
+      - equal:
+          path: networkPolicies.ingress.definitions.kubeAPI.from[2].ipBlock.cidr
+          value: "10.0.0.0/8"
+
+  - it: should use custom kubeAPI ingress definition when overridden
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      kyverno.enabled: true
+      networkPolicies.enabled: true
+      networkPolicies.ingress.definitions.kubeAPI.from[0].ipBlock.cidr: "10.10.0.0/16"
+    asserts:
+      - isNotNull:
+          path: networkPolicies.ingress.definitions.kubeAPI
+      - equal:
+          path: networkPolicies.ingress.definitions.kubeAPI.from[0].ipBlock.cidr
+          value: "10.10.0.0/16"

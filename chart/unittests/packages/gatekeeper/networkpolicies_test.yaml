@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Gatekeeper - NetworkPolicies
+postRenderer:
+  cmd: sh
+  args:
+    - -c
+    - |
+      set -o pipefail && \
+      yq 'select(.metadata.name == "*gatekeeper*")' \
+        | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
+        | yq 'select(.kind == "NetworkPolicy")'
+tests:
+  - it: should create kubeAPI ingress NetworkPolicy for webhook with default CIDRs
+    set:
+      gatekeeper.enabled: true
+      networkPolicies.enabled: true
+    documentSelector:
+      path: metadata.name
+      value: allow-ingress-to-gatekeeper-port-8443-from-kubeapi
+    asserts:
+      - equal:
+          path: kind
+          value: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: allow-ingress-to-gatekeeper-port-8443-from-kubeapi
+      - equal:
+          path: spec.ingress[0].from[0].ipBlock.cidr
+          value: "192.168.0.0/16"
+      - equal:
+          path: spec.ingress[0].from[1].ipBlock.cidr
+          value: "172.16.0.0/12"
+      - equal:
+          path: spec.ingress[0].from[2].ipBlock.cidr
+          value: "10.0.0.0/8"
+      - equal:
+          path: spec.ingress[0].ports[0].port
+          value: 8443
+
+  - it: should create kubeAPI ingress NetworkPolicy with custom CIDRs when overridden
+    set:
+      gatekeeper.enabled: true
+      networkPolicies.enabled: true
+      networkPolicies.ingress.definitions.kubeAPI:
+        from:
+          - ipBlock:
+              cidr: "10.10.0.0/16"
+          - ipBlock:
+              cidr: "172.20.0.0/16"
+    documentSelector:
+      path: metadata.name
+      value: allow-ingress-to-gatekeeper-port-8443-from-kubeapi
+    asserts:
+      - equal:
+          path: kind
+          value: NetworkPolicy
+      - equal:
+          path: spec.ingress[0].from[0].ipBlock.cidr
+          value: "10.10.0.0/16"
+      - equal:
+          path: spec.ingress[0].from[1].ipBlock.cidr
+          value: "172.20.0.0/16"
