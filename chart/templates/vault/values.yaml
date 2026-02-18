@@ -106,10 +106,9 @@ networkPolicies:
             169.254.169.254/32: true
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
-          definitions:
+          definition:
             kubeAPI: true
             kms: true
-            sso: {{ .Values.addons.vault.sso.enabled }}
       vault-agent-injector:
         to:
           definition:
