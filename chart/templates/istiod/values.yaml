@@ -53,15 +53,22 @@ upstream:
     defaultConfig:
       tracing:
         sampling: 10
-        zipkin:
-          address: tempo-tempo.tempo.svc:9411
+    defaultProviders:
+      tracing:
+        - otel-tracing
     {{- end }}
-    {{- if $authserviceEnabled }}
     extensionProviders:
+    {{- if $authserviceEnabled }}
       - name: "authservice"
         envoyExtAuthzGrpc:
           service: "authservice.authservice.svc.cluster.local"
           port: "10003"
+    {{- end }}
+    {{- if .Values.tempo.enabled }}
+      - name: "otel-tracing"
+        opentelemetry:
+          service: "alloy-alloy-receiver.alloy.svc.cluster.local"
+          port: 4317
     {{- end }}
   {{- end }}
 {{ if and $authserviceEnabled .Values.sso.certificateAuthority.cert }}

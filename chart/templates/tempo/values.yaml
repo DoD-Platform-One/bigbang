@@ -114,6 +114,7 @@ networkPolicies:
           k8s:
             alloy-alloy-operator@alloy/alloy: {{ .Values.alloy.enabled }}
             alloy-alloy-logs@alloy/alloy-logs: {{ .Values.alloy.enabled }}
+            alloy-alloy-receiver@alloy/alloy-receiver: {{ .Values.alloy.enabled }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
