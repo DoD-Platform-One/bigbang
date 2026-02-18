@@ -16,6 +16,7 @@
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
+{{- $tempoEnabled := .Values.tempo.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.alloy.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
@@ -61,6 +62,23 @@ networkPolicies:
         from:
           k8s:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      {{- if $tempoEnabled }}
+      # Allow any namespace to send traces to alloy-receiver via OTLP gRPC
+      alloy-receiver:4317:
+        from:
+          k8s:
+            "*/*": true
+      # Allow any namespace to send traces to alloy-receiver via Zipkin
+      alloy-receiver:9411:
+        from:
+          k8s:
+            "*/*": true
+      # Allow Prometheus to scrape metrics from alloy-receiver
+      alloy-receiver:12345:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      {{- end }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
@@ -72,6 +90,13 @@ networkPolicies:
       alloy:
         to:
           tempo/tempo:4317: {{ .Values.tempo.enabled }}
+      {{- if $tempoEnabled }}
+      # Allow alloy-receiver to forward traces to Tempo backend
+      alloy-receiver:
+        to:
+          k8s:
+            tempo/tempo:4317: true
+      {{- end }}
 istio:
   enabled: {{ $istioEnabled }}
 
@@ -93,6 +118,13 @@ upstream:
     - name: loki
       type: loki
       url: {{ $lokiWriteDestUrl }}
+    {{- end }}
+    {{- if $tempoEnabled }}
+    - name: tempo
+      type: otlp
+      url: http://tempo-tempo.tempo.svc.cluster.local:4317
+      tls:
+        insecure: true
     {{- end }}
   {{- if .Values.alloy.additionalDestinations }}
   {{- toYaml .Values.alloy.additionalDestinations | nindent 4 }}
@@ -137,7 +169,33 @@ upstream:
     structuredMetadata:
       k8s.pod.name: null
       pod: null
-
+  {{- end }}
+  {{- if $tempoEnabled }}
+  # Enable alloy-receiver to collect traces and forward to Tempo
+  alloy-receiver:
+    enabled: true
+    alloy:
+      extraPorts:
+      - name: otlp-grpc
+        port: 4317
+        targetPort: 4317
+        protocol: TCP
+        appProtocol: grpc
+      - name: zipkin
+        port: 9411
+        targetPort: 9411
+        protocol: TCP
+  applicationObservability:
+    enabled: true
+    receivers:
+      otlp:
+        grpc:
+          enabled: true
+      zipkin:
+        enabled: true
+    destinations:
+      - tempo
+  {{- end }}
   {{- if $.Values.monitoring.enabled }}
 serviceMonitors:
   - name: alloy-alloy-logs
@@ -155,6 +213,5 @@ serviceMonitors:
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
-  {{- end }}
   {{- end }}
 {{- end }}
