@@ -413,7 +413,10 @@ function cloud_aws_configure {
 
   SGname="${AWSUSERNAME}-dev-${PROJECTTAG}"
   KeyName="${AWSUSERNAME}-dev-${PROJECTTAG}"
-  SSHKEY=~/.ssh/${KeyName}.pem
+  # Respect an explicitly provided --ssh-keyfile; otherwise use the default path.
+  if [[ -z "${SSHKEY}" ]]; then
+    SSHKEY=~/.ssh/${KeyName}.pem
+  fi
 
   # check for aws username environment variable. If not found then terminate script
   if [[ -z "${AWSUSERNAME}" ]]; then
@@ -538,7 +541,7 @@ function runwithexitcode() {
 }
 
 function runwithreturn() {
-  $(k3sshcmd) "$@"
+  $(k3dsshcmd) "$@"
 }
 
 function getPrivateIP2() {
@@ -766,7 +769,7 @@ function install_k3d {
   # Wrap in timeout to work around k3d entrypoint hang (k3d-io/k3d#1420).
   # Exit code 124 = timeout killed it; the cluster is healthy, k3d just hung
   # on agent readiness. Any other non-zero exit is a real failure.
-  run_batch_add "timeout ${K3D_TIMEOUT} ${k3d_command}; rc=\$?; if [ \$rc -eq 124 ]; then echo 'WARNING: k3d cluster create timed out after ${K3D_TIMEOUT}s (likely k3d-io/k3d#1420 agent readiness hang). Cluster is probably healthy — verifying...'; elif [ \$rc -ne 0 ]; then echo 'ERROR: k3d cluster create failed with exit code '\$rc; exit \$rc; fi"
+  run_batch_add "set +e; timeout ${K3D_TIMEOUT} ${k3d_command}; rc=\$?; set -e; if [ \$rc -eq 124 ]; then echo 'WARNING: k3d cluster create timed out after ${K3D_TIMEOUT}s (likely k3d-io/k3d#1420 agent readiness hang). Cluster is probably healthy — verifying...'; elif [ \$rc -ne 0 ]; then echo 'ERROR: k3d cluster create failed with exit code '\$rc; exit \$rc; fi"
   run_batch_add "k3d cluster list | grep -q '1/1'"
   run_batch_execute
 }
