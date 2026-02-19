@@ -1,6 +1,6 @@
 # bigbang
 
-![Version: 3.17.0](https://img.shields.io/badge/Version-3.17.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 3.18.0](https://img.shields.io/badge/Version-3.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved packages into a Kubernetes cluster.
 
@@ -61,7 +61,7 @@ Kubernetes: `>=1.32.0-0`
 | sso.oidc.claims.username | string | `"preferred_username"` | IdP's claim name used for the username |
 | sso.oidc.claims.groups | string | `"groups"` | IdP's claim name used for the user's groups or roles |
 | flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}],"mode":"enabled"},"install":{"remediation":{"retries":-1}},"interval":"2m","rollback":{"cleanupOnFail":true,"timeout":"10m"},"test":{"enable":false},"timeout":"10m","upgrade":{"cleanupOnFail":true,"remediation":{"remediateLastFailure":true,"retries":3}}}` | (Advanced) Flux reconciliation parameters. The default values provided will be sufficient for the majority of workloads. |
-| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","egress":{"definitions":{"database-subnets":{"ports":[{"port":5432,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]},"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]},"storage-subnets":{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}},"enabled":true,"ingress":{"definitions":{"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}},"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
+| networkPolicies | object | `{"controlPlaneCidr":"0.0.0.0/0","egress":{"definitions":{"database-subnets":{"ports":[{"port":5432,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]},"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]},"storage-subnets":{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}},"enabled":true,"ingress":{"definitions":{"kubeAPI":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]},"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}},"nodeCidr":"","vpcCidr":"0.0.0.0/0"}` | Global NetworkPolicies settings |
 | networkPolicies.enabled | bool | `true` | Toggle all package NetworkPolicies, can disable specific packages with `package.values.networkPolicies.enabled` |
 | networkPolicies.controlPlaneCidr | string | `"0.0.0.0/0"` | Control Plane CIDR, defaults to 0.0.0.0/0, use `kubectl get endpoints -n default kubernetes` to get the CIDR range needed for your cluster Must be an IP CIDR range (x.x.x.x/x - ideally with /32 for the specific IP of a single endpoint, broader range for multiple masters/endpoints) Used by package NetworkPolicies to allow Kube API access |
 | networkPolicies.nodeCidr | string | `""` | Node CIDR, defaults to allowing "10.0.0.0/8" "172.16.0.0/12" "192.168.0.0/16" "100.64.0.0/10" networks. use `kubectl get nodes -owide` and review the `INTERNAL-IP` column to derive CIDR range. Must be an IP CIDR range (x.x.x.x/x - ideally a /16 or /24 to include multiple IPs) |
@@ -69,8 +69,9 @@ Kubernetes: `>=1.32.0-0`
 | networkPolicies.egress.definitions | object | `{"database-subnets":{"ports":[{"port":5432,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]},"sso":{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]},"storage-subnets":{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}}` | Egress definitions; create definitions here that you want to re-use globally across all packages |
 | networkPolicies.egress.definitions.sso | object | `{"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}` | Egress definition for SSO; Set this to the CIDRs your SSO implementation is being served on; Example: Okta maintains [a list of their CIDRs](https://help.okta.com/en-us/content/topics/security/ip-address-allow-listing.htm) for this purpose |
 | networkPolicies.egress.definitions.storage-subnets | object | `{"ports":[{"port":443,"protocol":"TCP"}],"to":[{"ipBlock":{"cidr":"0.0.0.0/0"}}]}` | Egress definition for Storage subnets (i.e. S3, Azure blob storage, etc.) |
-| networkPolicies.ingress.definitions | object | `{"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}` | Ingress definitions; create definitions here that you want to re-use globally across all packages |
+| networkPolicies.ingress.definitions | object | `{"kubeAPI":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]},"load-balancer-subnets":{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}}` | Ingress definitions; create definitions here that you want to re-use globally across all packages |
 | networkPolicies.ingress.definitions.load-balancer-subnets | object | `{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}` | Ingress definition for load balancer subnets; change these CIDRs to match the subnet CIDRs where your load balancers are deployed |
+| networkPolicies.ingress.definitions.kubeAPI | object | `{"from":[{"ipBlock":{"cidr":"192.168.0.0/16"}},{"ipBlock":{"cidr":"172.16.0.0/12"}},{"ipBlock":{"cidr":"10.0.0.0/8"}}]}` | Ingress definition for Kube API subnets; Used to build Network Policy for packages that need to allow incoming traffic from the Kube API (i.e. Gatekeeper, Kyverno, etc.) |
 | imagePullPolicy | string | `"IfNotPresent"` | Global ImagePullPolicy value for all packages Permitted values are: None, Always, IfNotPresent |
 | disableAutomaticPassthroughValues | bool | `true` | Flag for temporary workaround for passthrough chart migrations This is the global flag to disable automatic passthrough values for all packages. Alternatively, you can set this flag to `false` (enabling automatic passthrough globally), and then per package set `disableAutomaticPassthroughValues` to `true` to disable automatic passthrough for that package. This will be removed in a future release (as will all references to `disableAutomaticPassthroughValues`). |
 | istioCNI.enabled | bool | `false` | Toggle deployment of Istio CNI |
@@ -210,10 +211,10 @@ Kubernetes: `>=1.32.0-0`
 | fluentbit.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | fluentbit.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/fluentbit.git"` |  |
 | fluentbit.git.path | string | `"./chart"` |  |
-| fluentbit.git.tag | string | `"0.55.0-bb.1"` |  |
+| fluentbit.git.tag | string | `"0.55.0-bb.0"` |  |
 | fluentbit.helmRepo.repoName | string | `"registry1"` |  |
 | fluentbit.helmRepo.chartName | string | `"fluentbit"` |  |
-| fluentbit.helmRepo.tag | string | `"0.55.0-bb.1"` |  |
+| fluentbit.helmRepo.tag | string | `"0.55.0-bb.0"` |  |
 | fluentbit.flux | object | `{}` | Flux reconciliation overrides specifically for the Fluent-Bit Package |
 | fluentbit.values | object | `{}` | Values to passthrough to the fluentbit chart: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git |
 | fluentbit.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
@@ -478,10 +479,10 @@ Kubernetes: `>=1.32.0-0`
 | addons.gitlabRunner.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlabRunner.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git"` |  |
 | addons.gitlabRunner.git.path | string | `"./chart"` |  |
-| addons.gitlabRunner.git.tag | string | `"0.85.0-bb.1"` |  |
+| addons.gitlabRunner.git.tag | string | `"0.85.0-bb.2"` |  |
 | addons.gitlabRunner.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlabRunner.helmRepo.chartName | string | `"gitlab-runner"` |  |
-| addons.gitlabRunner.helmRepo.tag | string | `"0.85.0-bb.1"` |  |
+| addons.gitlabRunner.helmRepo.tag | string | `"0.85.0-bb.2"` |  |
 | addons.gitlabRunner.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Runner Package |
 | addons.gitlabRunner.values | object | `{}` | Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git |
 | addons.gitlabRunner.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
