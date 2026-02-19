@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Gitlab Runner - Values Tests
+templates:
+  - templates/gitlab-runner/values.yaml
+tests:
+  - it: should set app selector for gitlab runner egress and ingress netpols
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlabRunner.enabled: true
+      networkPolicies.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.gitlab-runner.podSelector.matchLabels.app
+          value: gitlab-runner
+      - equal:
+          path: networkPolicies.ingress.to["gitlab-runner:9252"].podSelector.matchLabels.app
+          value: gitlab-runner
