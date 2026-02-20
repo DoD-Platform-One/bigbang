@@ -1,29 +1,65 @@
 {{- if .Values.addons.keycloak.enabled }}
+{{- /* Create a cleaned copy of keycloak config and merge deprecated paths into current paths */ -}}
+{{- $keycloakPackage := deepCopy .Values.addons.keycloak -}}
+{{- if .Values.addons.keycloak.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.keycloak.values) | fromYaml -}}
+{{- $keycloakPackage = set $keycloakPackage "values" $cleanedValues -}}
+{{- end -}}
 {{- include "values-secret" (dict 
   "root" $ 
-  "package" .Values.addons.keycloak 
+  "package" $keycloakPackage
   "name" "keycloak" 
-  "defaults" ((mergeOverwrite (include "bigbang.defaults.keycloak" . | fromYaml) (include "bigbang.keycloak.bb-common-migrations" . | fromYaml)) | toYaml)
+  "defaults" (include "bigbang.defaults.keycloak" . )
 ) }}
 {{- end }}
 
 {{- define "bigbang.defaults.keycloak" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
+{{- $monitoringEnabled := .Values.monitoring.enabled }}
 {{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
+{{- $externalPostgresEnabled := ternary true false (or .Values.addons.keycloak.database.host (dig "upstream" "database" "hostname" false .Values.addons.keycloak.values)) -}}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
-{{- $monitoringEnabled := .Values.monitoring.enabled }}
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
+routes:
+  inbound:
+    keycloak:
+      enabled: true
+      gateways:
+        - {{ include "getGatewayName" (dict "default" "passthrough" "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
+      hosts:
+        - keycloak.{{ $domainName }}
+      service: keycloak-keycloak-http.keycloak.svc.cluster.local
+      port: 8443
+      passthrough:
+        enabled: true
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.keycloak.values }}
+      hosts:
+      - repo1.dso.mil
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "default" "passthrough" "pkg" .Values.addons.keycloak "root" .) | nindent 4 }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   egress:
     defaults:
       allowIstiod:
@@ -34,6 +70,8 @@ networkPolicies:
         to:
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            database-subnets: {{ $externalPostgresEnabled }}
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     defaults:
@@ -43,19 +81,7 @@ networkPolicies:
       keycloak:9000:
         from:
           k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-istio:
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.keycloak }}
-  keycloak:
-    enabled: true
-    gateways:
-      - {{ include "getGatewayName" (dict "default" "passthrough" "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
 upstream:
   replicas: 1
@@ -176,7 +202,7 @@ upstream:
   {{- end }}
 
 postgresql:
-  {{- if or .Values.addons.keycloak.database.host (dig "upstream" "database" "hostname" false .Values.addons.keycloak.values)  }}
+  {{- if $externalPostgresEnabled }}
   enabled: false
   {{- else }}
   enabled: true
