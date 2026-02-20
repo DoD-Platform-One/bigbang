@@ -240,11 +240,11 @@ istioCNI:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-cni
     path: "./chart"
-    tag: 1.28.3-bb.0
+    tag: 1.29.0-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-cni"
-    tag: 1.28.3-bb.0
+    tag: 1.29.0-bb.0
   # -- Values to passthrough to the Istio CNI chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CRDs Package
