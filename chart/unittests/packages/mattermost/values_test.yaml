@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Mattermost - Values Tests
+templates:
+  - templates/mattermost/values.yaml
+tests:
+  - it: should allow user to override route hosts in overlays
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      addons.mattermost.values:
+        routes:
+          inbound:
+            chat:
+              hosts:
+                - "custom-chat.example.com"
+    asserts:
+      - equal:
+          path: routes.inbound.chat.hosts[0]
+          value: "custom-chat.example.com"
+
+  - it: should include kubeAPI egress definition from top level controlPlaneCidr
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      networkPolicies.controlPlaneCidr: "10.0.0.0/8"
+    asserts:
+      - exists:
+          path: networkPolicies.egress.definitions.kubeAPI
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI.to[0].ipBlock.cidr
+          value: "10.0.0.0/8"
+
+  - it: should include vpcCidr in kubeAPI egress definition when different from controlPlaneCidr
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      networkPolicies.controlPlaneCidr: "10.0.0.0/8"
+      networkPolicies.vpcCidr: "172.16.0.0/12"
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI.to[0].ipBlock.cidr
+          value: "10.0.0.0/8"
+      - equal:
+          path: networkPolicies.egress.definitions.kubeAPI.to[1].ipBlock.cidr
+          value: "172.16.0.0/12"
