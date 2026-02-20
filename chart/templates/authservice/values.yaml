@@ -1,13 +1,27 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- if and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.authservice "name" "authservice" "defaults" (include "bigbang.defaults.authservice" .)) }}
+
+{{- /* Create a cleaned copy of package config and merge deprecated paths into current paths */ -}}
+{{- $authservicePackage := deepCopy .Values.addons.authservice -}}
+{{- if .Values.addons.authservice.values -}}
+  {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.authservice.values) | fromYaml -}}
+  {{- $authservicePackage = set $authservicePackage "values" $cleanedValues -}}
+{{- end -}}
+
+{{- include "values-secret" (dict
+  "root" $
+  "package" $authservicePackage
+  "name" "authservice"
+  "defaults" (include "bigbang.defaults.authservice" .)
+)}}
+
 {{- end }}
 
 {{- define "bigbang.defaults.authservice" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
-{{- $authServiceHardened := or
+{{- $istioHardenedEnabled := or
     (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
     (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
     (dig "hardened" "enabled" false .Values.istiod.values)
@@ -19,8 +33,17 @@
 
 istio:
   enabled: {{ $istioEnabled }}
+
   hardened:
-    enabled: {{ $authServiceHardened }}
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
   clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
 
 image: 
@@ -44,6 +67,8 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled | default false }}
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress: 
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
