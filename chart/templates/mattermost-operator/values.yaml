@@ -6,7 +6,7 @@
   {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" $mmOpValues.values) | fromYaml -}}
   {{- $mattermostOperatorPackage = set $mattermostOperatorPackage "values" $cleanedValues -}}
 {{- end -}}
-{{- if $mattermostOperatorPackage.enabled }}
+{{- if or $mattermostOperatorPackage.enabled .Values.addons.mattermost.enabled }}
 {{- include "values-secret" (dict "root" $ "package" $mattermostOperatorPackage "name" "mattermost-operator" "defaults" ((mergeOverwrite (include "bigbang.defaults.mattermostOperator" . | fromYaml) (include "bigbang.mattermostOperator.bb-common-migrations" . | fromYaml)) | toYaml)) }}
 {{- end }}
 
