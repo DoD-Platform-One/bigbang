@@ -20,14 +20,8 @@ spec:
   targetNamespace: {{ $name }}
   {{- include "bigbang.helmRelease.chartSpec" (dict "name" "keycloak" "package" .Values.addons.keycloak "root" .) | nindent 2 }}
 
-  {{- if or $istioEnabled .Values.addons.keycloak.postRenderers }}
-  postRenderers:
-  {{- if $istioEnabled }}
-  {{- include "keycloak.postrenderers.istio-servicemonitor" . | nindent 2 }}
-  {{- end }}
   {{- if .Values.addons.keycloak.postRenderers }}
-  {{ toYaml .Values.addons.keycloak.postRenderers | nindent 2 }}
-  {{- end }}
+    {{ toYaml .Values.addons.keycloak.postRenderers | nindent 2 }}
   {{- end }}
 
   {{- toYaml $fluxSettingsKeycloak | nindent 2 }}
