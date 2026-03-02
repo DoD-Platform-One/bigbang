@@ -11,7 +11,17 @@
 {{- end }}
 
 {{- define "bigbang.defaults.istiod" -}}
+{{- $istioHardenedEnabled := dig "hardened" "enabled" false .Values.istiod.values }}
 {{- $authserviceEnabled := (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
+
+istio:
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   egress:
