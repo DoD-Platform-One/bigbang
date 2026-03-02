@@ -765,12 +765,12 @@ alloy:
 
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
-    tag: "3.7.2-bb.3"
+    tag: "3.7.2-bb.4"
     path: "./chart"
   helmRepo:
     repoName: "registry1"
     chartName: "k8s-monitoring"
-    tag: "3.7.2-bb.3"
+    tag: "3.7.2-bb.4"
 
   # -- Toggle Alloy to collect logs
   alloyLogs:
