@@ -23,11 +23,17 @@
               certFile: /etc/prom-certs/cert-chain.pem
               keyFile: /etc/prom-certs/key.pem
               insecureSkipVerify: true
+        target:
+          kind: ServiceMonitor
+          name: .*tempo.*
+{{- if (dig "upstream" "tempoQuery" "enabled" false .Values.tempo.values) }}
+      - patch: |
           - op: remove
             path: /spec/endpoints/1
         target:
           kind: ServiceMonitor
           name: .*tempo.*
+{{- end }}
 {{- end }}
 {{- define "tempo.objectStoragePostRenderers" }}
 - kustomize:

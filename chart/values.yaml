@@ -939,11 +939,11 @@ tempo:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/tempo.git
     path: "./chart"
-    tag: "1.24.4-bb.1"
+    tag: "1.26.5-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "tempo"
-    tag: "1.24.4-bb.1"
+    tag: "1.26.5-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Tempo Package
   flux: {}
