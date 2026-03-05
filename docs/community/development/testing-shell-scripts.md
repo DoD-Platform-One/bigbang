@@ -32,7 +32,7 @@ Lefthook is not required to run BATS tests directly, but it wires them into your
 brew install lefthook
 ```
 
-**Linux and other platforms:** See the [Lefthook installation docs](https://lefthook.dev/installation/) for options including `apt`, `rpm`, `npm`, standalone binaries, and building from source.
+**Linux and other platforms:** See the [Lefthook installation docs](https://lefthook.dev/install/) for options including `apt`, `rpm`, `npm`, standalone binaries, and building from source.
 
 ## Running Tests
 
@@ -96,10 +96,10 @@ This writes git hooks into `.git/hooks/` that delegate to `lefthook.yaml` in the
 
 ### What the hooks do
 
-| Hook         | Trigger              | Runs when                                            |
-|--------------|----------------------|------------------------------------------------------|
-| `pre-commit` | `git commit`         | `k3d-dev.sh` or a `tests/bats/**/*.bats` file is staged |
-| `pre-push`   | `git push`           | Any `*.sh` or `*.bats` file changed vs. the remote   |
+| Hook         | Trigger      | Runs when                                               |
+| ------------ | ------------ | ------------------------------------------------------- |
+| `pre-commit` | `git commit` | `k3d-dev.sh` or a `tests/bats/**/*.bats` file is staged |
+| `pre-push`   | `git push`   | Any `*.sh` or `*.bats` file changed vs. the remote      |
 
 Both hooks run `bats --jobs 4 --recursive tests/bats/`. The glob filters mean they only fire when shell or test files are involved -- a commit that only touches YAML or Markdown skips them entirely.
 

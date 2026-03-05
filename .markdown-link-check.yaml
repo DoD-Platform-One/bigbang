@@ -18,6 +18,9 @@ ignorePatterns:
   - pattern: "#extending-cypress-tests"
   # ignore cluster.local domains
   - pattern: "(.*\\.)?cluster\\.local.*"
+  # ignore private confluence links
+  - pattern: "https://confluence.il2.dso.mil/*"
+  - pattern: "https://confluence.il4.dso.mil/*"
 # replacementPatterns:
 #   - pattern: ^.attachments
 #     replacement: file://some/conventional/folder/.attachments
