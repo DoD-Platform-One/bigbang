@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Monitoring - Values Defaults Tests
+templates:
+  - templates/monitoring/values.yaml
+set:
+  monitoring.enabled: true
+postRenderer:
+  cmd: sh
+  args:
+    - -c
+    - "yq eval '.stringData.defaults' - | yq eval '.'"
+tests:
+  - it: should keep istio cert mounts when hardened sidecar is enabled
+    set:
+      istiod.enabled: true
+      istiod.values.hardened.enabled: true
+    asserts:
+      - equal:
+          path: istio.sidecar.enabled
+          value: true
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumeMounts[0].mountPath
+          value: /etc/prom-certs/
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumes[0].name
+          value: istio-certs
+      - equal:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+          value: /etc/prom-certs/root-cert.pem
+      - equal:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+          value: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+  - it: should inject istio cert mounts when istiod and namespace injection are enabled
+    set:
+      istiod.enabled: true
+      istiod.values.hardened.enabled: false
+    asserts:
+      - equal:
+          path: istio.sidecar.enabled
+          value: false
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumeMounts[0].mountPath
+          value: /etc/prom-certs/
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumes[0].name
+          value: istio-certs
+      - equal:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+          value: /etc/prom-certs/root-cert.pem
+      - equal:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+          value: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+  - it: should keep istio cert mounts when sidecar is explicitly enabled and hardened is disabled
+    set:
+      istiod.enabled: true
+      istiod.values.hardened.enabled: false
+      monitoring.values.istio.sidecar.enabled: true
+    asserts:
+      - equal:
+          path: istio.sidecar.enabled
+          value: false
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumeMounts[0].mountPath
+          value: /etc/prom-certs/
+      - equal:
+          path: upstream.prometheus.prometheusSpec.volumes[0].name
+          value: istio-certs
+      - equal:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+          value: /etc/prom-certs/root-cert.pem
+      - equal:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+          value: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+  - it: should not inject sidecar annotations from legacy monitoring.values.istio.injection when istio is disabled
+    set:
+      istiod.enabled: false
+      monitoring.values.istio.injection: enabled
+    asserts:
+      - equal:
+          path: istio.sidecar.enabled
+          value: false
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.volumeMounts[0].mountPath
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.volumes[0].name
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+  - it: should not inject istio cert mounts when istiod is disabled
+    set:
+      istiod.enabled: false
+    asserts:
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.volumeMounts[0].mountPath
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.volumes[0].name
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+  - it: should prioritize prometheusOperatorCRDs namespace injection over grafana when CRDs own monitoring namespace
+    set:
+      istiod.enabled: true
+      istiod.values.hardened.enabled: false
+      prometheusOperatorCRDs.enabled: true
+      grafana.enabled: true
+      grafana.istio.injection: disabled
+    asserts:
+      - equal:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+          value: /etc/prom-certs/root-cert.pem
+      - equal:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]
+          value: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+  - it: should use grafana namespace injection when prometheusOperatorCRDs is disabled
+    set:
+      istiod.enabled: true
+      istiod.values.hardened.enabled: false
+      prometheusOperatorCRDs.enabled: false
+      grafana.enabled: true
+      grafana.istio.injection: disabled
+    asserts:
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.alertingEndpoints[0].tlsConfig.caFile
+      - notExists:
+          path: upstream.prometheus.prometheusSpec.podMetadata.annotations["sidecar.istio.io/userVolumeMount"]

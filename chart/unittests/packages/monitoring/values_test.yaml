@@ -10,7 +10,7 @@ tests:
         set -o pipefail && \
         yq 'select(.metadata.name == "*monitoring*")' \
           | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
-          | yq 'select(.kind == "NetworkPolicy" and .metadata.name == "*10250*")'
+          | yq 'select(.kind == "NetworkPolicy" and .spec.podSelector.matchLabels."app.kubernetes.io/name" == "kube-prometheus-stack-prometheus-operator" and .spec.ingress[0].ports[0].port == 10250)'
   asserts:
   - equal:
       path: spec
@@ -38,7 +38,7 @@ tests:
         set -o pipefail && \
         yq 'select(.metadata.name == "*monitoring*")' \
           | BASH_ENV="" $(git rev-parse --show-toplevel)/scripts/template-all.sh \
-          | yq 'select(.kind == "NetworkPolicy" and .metadata.name == "*10250*")'
+          | yq 'select(.kind == "NetworkPolicy" and .spec.podSelector.matchLabels."app.kubernetes.io/name" == "testing-prometheus-operator" and .spec.ingress[0].ports[0].port == 10250)'
   asserts:
   - equal:
       path: spec
