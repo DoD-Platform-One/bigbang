@@ -13,8 +13,30 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
-
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.monitoring) "enabled") }}
+{{/*
+Derived hardened posture for Monitoring.
+This boolean drives bb-common Istio defaults rendered in this file, including
+sidecar defaults, generated authorization policies, and hardened service entries.
+It folds umbrella hardening and legacy package hardening key paths together.
+*/}}
+{{- $istioHardenedEnabled := or
+  (dig "hardened" "enabled" false .Values.istiod.values)
+  (dig "values" "istio" "hardened" "enabled" false .Values.monitoring)
+  (dig "values" "hardened" "enabled" false .Values.monitoring)
+}}
+{{/*
+Effective gate for monitoring workload injection/cert wiring.
+When true, render annotations and cert output wiring that depend on Istio sidecar
+injection in the monitoring namespace.
+*/}}
+{{- $monitoringNamespaceInjectionEnabled := ternary
+  (eq (dig "istio" "injection" "enabled" .Values.prometheusOperatorCRDs) "enabled")
+  (and .Values.grafana.enabled (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled"))
+  .Values.prometheusOperatorCRDs.enabled
+}}
+{{- $monitoringInjectionEnabled := and $istioEnabled $monitoringNamespaceInjectionEnabled }}
+{{- $mtlsStrict := and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+{{- $monitoringMtlsStrict := and $mtlsStrict $monitoringInjectionEnabled }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 
@@ -26,6 +48,7 @@ domain: {{ $domainName }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $vaultIstioHosts := (dig "routes" "inbound" "vault" "hosts" dict .Values.addons.vault.values) }}
 
+
 # Reproducing the naming convention based on the upstream chart: 
 # https://github.com/prometheus-community/helm-charts/blob/1a04bc9e7e988a210d0f1d1882243ff1e3bd1c03/charts/kube-prometheus-stack/templates/prometheus-operator/_prometheus-operator.tpl#L5
 {{- $kpsNameOverride := dig "upstream" "nameOverride" "kube-prometheus-stack" .Values.monitoring.values | trunc 50 | trimSuffix "-" }}
@@ -35,8 +58,50 @@ domain: {{ $domainName }}
 flux:
   enabled: true
 
+
+{{/* bb-common Istio defaults for monitoring follow hardened posture. */}}
+istio:
+  enabled: {{ $istioEnabled }}
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+    outboundTrafficPolicyMode: REGISTRY_ONLY
+  {{- if and $istioHardenedEnabled (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
+  serviceEntries:
+    custom:
+      - name: egress-object-store
+        enabled: true
+        spec:
+          hosts:
+          - "{{ .Values.addons.thanos.objectStorage.bucket }}.{{ .Values.addons.thanos.objectStorage.endpoint }}"
+          location: MESH_EXTERNAL
+          ports:
+            - number: 443
+              protocol: TLS
+              name: https
+          resolution: DNS
+  {{- else }}
+  serviceEntries:
+    custom: []
+  {{- end }}
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+routes:
+  inbound:
+    monitoring-prometheus:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
+    monitoring-alertmanager:
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  defaultsAsHooks:
+    enabled: true
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
@@ -51,35 +116,21 @@ networkPolicies:
           definition:
             kubeAPI: false
       {{ end }}
-      # TODO: Remove this once bb-common creates default policies in `pre-install` and `post-delete` hook phases
       admission-create-job:
-      {{ if not $isDefaultKpsName }}
         podSelector:
           matchLabels:
             app: {{ printf "%s-%s" $kpsNameOverride "admission-create" }}
-      {{ end }}
+        metadata:
+          annotations:
+            helm.sh/hook: pre-install,pre-upgrade
+            helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
         to:
-          k8s:
-            udp://kube-system/coredns:53:
-              enabled: true
-              metadata:
-                annotations:
-                  helm.sh/hook: pre-install,pre-upgrade
-              podSelector:
-                matchLabels:
-                  k8s-app: kube-dns
+          definition:
+            kubeAPI: true
       "*":
         to:
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
-      # TODO: Remove this once gluon is updated to at least 0.8.4 in the monitoring package
-      helm-test:
-        podSelector:
-          matchLabels:
-            helm-test: enabled
-        to:
-          cidr:
-            0.0.0.0/0: true
       prometheus:
         to:
           k8s:
@@ -136,7 +187,7 @@ blackboxExporter:
   enabled: true
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
-    {{- if $istioInjection }}
+    {{- if $monitoringMtlsStrict }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
@@ -158,57 +209,6 @@ minioOperator:
 gitlabRunner:
   enabled: {{ .Values.addons.gitlabRunner.enabled }}
 
-istio:
-  {{- $monitoringInjection := dig "istio" "injection" "enabled" .Values.monitoring }}
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-    }}
-    loki:
-      enabled: {{ and .Values.loki.enabled (or (dig "hardened" "enabled" false .Values.istiod.values) (dig "istio" "hardened" "enabled" false .Values.monitoring.values)) }}
-    alloy:
-      enabled: {{ and .Values.alloy.enabled (or (dig "hardened" "enabled" false .Values.istiod.values) (dig "istio" "hardened" "enabled" false .Values.monitoring.values)) }}
-    {{- if and (dig "values" "istio" "hardened" "enabled" false .Values.monitoring) (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
-    customServiceEntries:
-      - name: egress-object-store
-        enabled: true
-        spec:
-          hosts:
-           - "{{ .Values.addons.thanos.objectStorage.bucket }}.{{ .Values.addons.thanos.objectStorage.endpoint }}"
-          location: MESH_EXTERNAL
-          ports:
-            - number: 443
-              protocol: TLS
-              name: https
-          resolution: DNS
-    {{- end }}
-  clusterWideHardenedEnabled: {{ (dig "hardened" "enabled" false .Values.istiod.values) }}
-  prometheus:
-    enabled: true
-    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-    {{- end }}
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
-  alertmanager:
-    enabled: true
-    {{- if and .Values.monitoring.sso.enabled (eq $monitoringInjection "disabled") }}
-    service: authservice-haproxy-sso
-    port: 8080
-    namespace: authservice
-    {{- end }}
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
-  injection: {{ dig "istio" "injection" "enabled" .Values.monitoring }}
 
 anchoreEnterprise:
   enabled: {{ .Values.addons.anchoreEnterprise.enabled }}
@@ -248,7 +248,7 @@ upstream:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
         - name: "config-reloader"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
-      {{- if or .Values.monitoring.sso.enabled $istioInjection .Values.kiali.enabled }}
+      {{- if or .Values.monitoring.sso.enabled $monitoringInjectionEnabled .Values.kiali.enabled }}
       podMetadata:
         {{- if or .Values.monitoring.sso.enabled .Values.kiali.enabled }}
         {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
@@ -261,12 +261,12 @@ upstream:
           {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
           {{- end }}
         {{- end }}
-        {{- if $istioInjection }}
+        {{- if $monitoringInjectionEnabled }}
         annotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
       {{- end }}
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+    {{- if $monitoringMtlsStrict }}
     serviceMonitor:
       scheme: https
       tlsConfig:
@@ -278,18 +278,27 @@ upstream:
 
   prometheus:
     {{- if $thanosEnabled }}
+    # Must remain top-level under upstream.prometheus (cannot live inside prometheusSpec.thanos).
     thanosService:
       enabled: true
       # Note: We need to change the portName in order for istio to correctly detect TCP is being used
       #       for the headless service
-      {{- if $istioInjection }}
+      {{- if $monitoringInjectionEnabled }}
       portName: "tcp-grpc"
       {{- end }}
     thanosServiceMonitor:
       enabled: true
+      {{- if $monitoringMtlsStrict }}
+      scheme: https
+      tlsConfig:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- end }}
     {{- end }}
     prometheusSpec:
-      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
+      {{- if $monitoringMtlsStrict }}
       alertingEndpoints:
       - name: monitoring-monitoring-kube-alertmanager
         namespace: monitoring
@@ -323,13 +332,13 @@ upstream:
             - action: labeldrop
               regex: '.*\..*'
         {{- end }}
-          {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
+        {{- if and $monitoringMtlsStrict (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mimir.values) "STRICT") }}
           tlsConfig:
             caFile: /etc/prom-certs/root-cert.pem
             certFile: /etc/prom-certs/cert-chain.pem
             keyFile: /etc/prom-certs/key.pem
             insecureSkipVerify: true
-          {{- end }}
+        {{- end }}
       {{- end }}
       {{- if $thanosEnabled }}
       thanos:
@@ -360,7 +369,7 @@ upstream:
             key: objstore.yml
             name: monitoring-objstore-secret
         {{- end }}
-        {{- if $istioInjection }}    
+        {{- if $monitoringMtlsStrict }}    
         # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
         volumes:
           - emptyDir:
@@ -395,9 +404,9 @@ upstream:
           {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
           vault-ingress: "true"
           {{- end }}
-        {{- if or $istioInjection .Values.addons.vault.enabled }}
+        {{- if or $monitoringInjectionEnabled .Values.addons.vault.enabled }}
         annotations:
-          {{- if $istioInjection }}
+          {{- if $monitoringInjectionEnabled }}
           {{ include "istioAnnotation" . }}
           traffic.sidecar.istio.io/includeOutboundIPRanges: ""
           proxy.istio.io/config: |
@@ -527,7 +536,7 @@ upstream:
             action: replace
             target_label: kubernetes_pod_name
       {{- end }}
-      {{- if $istioInjection }}    
+      {{- if $monitoringMtlsStrict }}    
       # Add volume/mount for Istio certs for mTLS scraping
       volumes:
         - emptyDir:
@@ -541,10 +550,10 @@ upstream:
   prometheus-node-exporter:
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
+    {{- if or $lokiEnabled $monitoringMtlsStrict }}
     prometheus:
       monitor:
-      {{- if $lokiEnabled }}
+        {{- if $lokiEnabled }}
         relabelings:
           - action: replace
             replacement: {{ $clusterName }}
@@ -552,16 +561,17 @@ upstream:
           - targetLabel: "instance"
             sourceLabels:
               - "__meta_kubernetes_pod_node_name"
-      {{- end }}
-      {{- if $istioInjection }}
+        {{- end }}
+        {{- if $monitoringMtlsStrict }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem
           keyFile: /etc/prom-certs/key.pem
           insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-      {{- end }}
-    {{- if $istioInjection }}
+        {{- end }}
+    {{- end }}
+    {{- if $monitoringInjectionEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -569,7 +579,6 @@ upstream:
     service:
       targetPort: 9102
       port: 9102
-    {{- end }}
     {{- end }}
 
   {{- if $lokiEnabled }}
@@ -585,7 +594,7 @@ upstream:
         - targetLabel: "instance"
           sourceLabels:
             - "__meta_kubernetes_pod_node_name"
-      {{- if $istioInjection }}
+      {{- if $monitoringMtlsStrict }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -604,7 +613,7 @@ upstream:
   kube-state-metrics:
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if or (eq $lokiEnabled true) (eq $istioInjection true) }}
+    {{- if or $lokiEnabled $monitoringMtlsStrict }}
     prometheus:
       monitor:
         {{- if $lokiEnabled }}
@@ -616,7 +625,7 @@ upstream:
             sourceLabels:
               - "__meta_kubernetes_pod_node_name"
         {{- end }}
-        {{- if $istioInjection }}
+        {{- if $monitoringMtlsStrict }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
@@ -913,7 +922,7 @@ upstream:
       patch:
         image:
           pullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if $istioInjection }}
+    {{- if $monitoringInjectionEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -925,6 +934,9 @@ upstream:
 {{- define "bigbang.overlays.monitoring" }}
   {{- $defaults := fromYaml (include "bigbang.defaults.monitoring" .) }}
   {{- $overlays := dig "values" dict .Values.monitoring }}
+  {{- if $overlays }}
+    {{- $overlays = include "mergeLegacyIstioHardenedKeys" (dict "values" (deepCopy $overlays)) | fromYaml }}
+  {{- end }}
   {{- range $prometheusConfig, $default := $defaults.prometheus }}
     {{- $overlay := (dig "prometheus" $prometheusConfig dict $overlays) }}
     # Only continue if an overlay matches a default constriant and hidden "skipOverlayMerge" is not set

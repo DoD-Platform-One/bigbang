@@ -28,7 +28,6 @@
 {{- $lokiServiceName := index $lokiServiceMap .Values.loki.strategy }}
 {{- $lokiWriteDestUrl := printf "http://%s.logging.svc.cluster.local:3100/loki/api/v1/push" $lokiServiceName }}
 
-{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
