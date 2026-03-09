@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Mattermost - NetworkPolicies
+templates:
+  - templates/mattermost/values.yaml
+tests:
+  - it: should enable database-subnets egress when external database is configured
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      addons.mattermost.database:
+        username: "mattermost"
+        password: "password"
+        host: "postgres.example.com"
+        port: "5432"
+        database: "mattermost"
+      networkPolicies.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.mattermost.to.definition.database-subnets
+          value: true
+
+  - it: should disable database-subnets egress when using internal postgresql
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      networkPolicies.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.mattermost.to.definition.database-subnets
+          value: false
+
+  - it: should disable database-subnets egress when database config is incomplete (missing host)
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.mattermost.enabled: true
+      addons.mattermost.database:
+        username: "mattermost"
+        password: "password"
+        # host is missing
+        port: "5432"
+        database: "mattermost"
+      networkPolicies.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.mattermost.to.definition.database-subnets
+          value: false
