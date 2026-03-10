@@ -60,18 +60,23 @@ global:
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 postgresql:
-  {{- if $istioEnabled }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end}}
-  imagePullSecrets: private-registry
   {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
   enabled: false
-  postgresUser: {{ .Values.addons.anchoreEnterprise.database.username }}
-  postgresPassword: {{ .Values.addons.anchoreEnterprise.database.password }}
-  postgresDatabase: {{ .Values.addons.anchoreEnterprise.database.database }}
-  externalEndpoint: "{{ .Values.addons.anchoreEnterprise.database.host }}"
-  postgresPort: {{ .Values.addons.anchoreEnterprise.database.port }}
+  {{- else }}
+  enabled: true
+  auth:
+    enablePostgresUser: true
+  global:
+    imagePullSecrets:
+    - private-registry
+  {{- if $istioEnabled }}
+  primary:
+    annotations:
+      {{- include "istioAnnotation" . | nindent 6 }}
+  readReplicas:
+    annotations:
+      {{- include "istioAnnotation" . | nindent 6 }}
+  {{- end }}
   {{- end }}
 
 upstream:
@@ -89,13 +94,8 @@ upstream:
       enabled: {{ $istioEnabled }}
       injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
 
+  {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
   postgresql:
-    {{- if $istioEnabled }}
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-    {{- end}}
-    imagePullSecrets: private-registry
-    {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
     auth:
       username: {{ .Values.addons.anchoreEnterprise.database.username }}
       password: {{ .Values.addons.anchoreEnterprise.database.password }}
