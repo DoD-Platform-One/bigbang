@@ -46,8 +46,6 @@ routes:
       service: minio
       port: 80
       containerPort: 9000
-      selector:
-        app.kubernetes.io/name: minio-instance
 
     console:
       enabled: true
@@ -57,8 +55,6 @@ routes:
       - minio.{{ .Values.domain }}
       service: minio-minio-minio-instance-console
       port: 9090
-      selector:
-        app.kubernetes.io/name: minio-instance
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
