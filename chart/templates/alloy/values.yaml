@@ -29,6 +29,11 @@
 {{- $lokiWriteDestUrl := printf "http://%s.logging.svc.cluster.local:3100/loki/api/v1/push" $lokiServiceName }}
 
 
+global:
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  image:
+    {{- include "secretsPullSecretsWithName" . | nindent 4 }}
+
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 

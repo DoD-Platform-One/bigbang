@@ -1679,9 +1679,6 @@ addons:
             memory: 200Mi
         persistence:
           size: 5Gi
-        postgresql:
-          persistence:
-            size: 256Mi
         curlContainerImage: registry1.dso.mil/ironbank/big-bang/base:2.1.0
       bbtests:
         enabled: true

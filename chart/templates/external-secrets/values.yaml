@@ -5,8 +5,11 @@
 {{- define "bigbang.defaults.external-secrets" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 
-image:
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
+upstream:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

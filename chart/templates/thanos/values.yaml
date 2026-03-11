@@ -34,9 +34,14 @@
 {{- $storeGatewayEnabled := dig "storegateway" "enabled" false .Values.addons.thanos.values }}
 {{- $storeGatewayEnabled = or $storeGatewayEnabled (not (empty .Values.addons.thanos.objectStorage.endpoint)) }}
 
-imagePullSecrets:
-- name: private-registry
-imagePullPolicy: {{ .Values.imagePullPolicy }}
+image:
+  {{- include "secretsPullSecretsWithName" . | nindent 2 }}
+
+  pullPolicy: {{ .Values.imagePullPolicy }}
+  
+upgradeJob:
+  image:
+    {{- include "secretsPullSecretsSingle" . | nindent 4 }}
 
 externalURL: https://thanos.{{ .Values.domain }}
 
@@ -76,6 +81,7 @@ minio:
   {{- if $shouldEnableMinio }}
   upstream:
     tenant:
+      {{- include "secretsImagePullSecretWithName" . | nindent 6 }}
       metrics:
         enabled: {{ .Values.monitoring.enabled }}
   {{- end }}
@@ -124,8 +130,7 @@ networkPolicies:
 metrics:
   enabled: true
   image:
-    pullSecrets:
-      - private-registry
+    {{- include "secretsPullSecrets" . | nindent 4 }}
   serviceMonitor:
     enabled: true
 {{- end }}

@@ -451,6 +451,9 @@ global:
   # added to help with Gitlab sub-chart configuration
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- include "secretsPullSecretsWithName" . | nindent 4 }}
+
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
   hosts:
     domain: {{ $domainName }}

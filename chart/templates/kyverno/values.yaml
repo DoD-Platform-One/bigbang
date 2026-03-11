@@ -71,16 +71,17 @@ networkPolicies:
 
 openshift: {{ .Values.openshift }}
 
+global:
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+
 upstream:
 
   fullnameOverride: kyverno-kyverno
 
   replicaCount: 3
-
-  image:
-    pullSecrets:
-    - name: private-registry
-    pullPolicy: {{ .Values.imagePullPolicy }}
+  
+  # clear out the explicit set in the package, so it falls back to our global value
+  existingImagePullSecrets: []
 
   grafana:
     enabled: {{ .Values.monitoring.enabled }}
@@ -89,18 +90,34 @@ upstream:
   admissionController:
     serviceMonitor:
       enabled: {{ .Values.monitoring.enabled }}
+    # clear out the explicit set in the package, so it falls back to our global value
+    imagePullSecrets: []
 
   backgroundController:
     serviceMonitor:
       enabled: {{ .Values.monitoring.enabled }}
+    # clear out the explicit set in the package, so it falls back to our global value
+    imagePullSecrets: []
 
   cleanupController:
     serviceMonitor:
       enabled: {{ .Values.monitoring.enabled }}
+    # clear out the explicit set in the package, so it falls back to our global value
+    imagePullSecrets: []
 
   reportsController:
     serviceMonitor:
       enabled: {{ .Values.monitoring.enabled }}
+    # clear out the explicit set in the package, so it falls back to our global value
+    imagePullSecrets: []
+
+  crds:
+    groups:
+      # clear out the explicit set in the package, so it falls back to our global value
+      imagePullSecrets: []
+    migration:
+      # clear out the explicit set in the package, so it falls back to our global value
+      imagePullSecrets: []
 
 
 {{- end -}}

@@ -51,9 +51,9 @@ networkPolicies:
   ingressLabels:
     {{- include "getGatewaySelector" (dict "pkg" $nexusValues "root" .) | nindent 4 }}
 
+{{- include "secretsImagePullSecretsWithName" . }}
+    
 nexus:
-  imagePullSecrets:
-    - name: private-registry
   {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}

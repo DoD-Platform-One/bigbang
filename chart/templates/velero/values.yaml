@@ -78,11 +78,9 @@ networkPolicies:
 openshift: {{ .Values.openshift }}
 
 upstream:
-  imagePullSecrets:
-  - name: private-registry
-
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- include "secretsImagePullSecrets" . | nindent 4 }}
 
   {{- if .Values.monitoring.enabled }}
   metrics:

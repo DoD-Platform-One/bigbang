@@ -184,6 +184,9 @@ openshift: {{ .Values.openshift }}
 
 {{- if .Values.addons.headlamp.enabled }}
 blackboxExporter:
+  image:
+  {{- include "secretsPullSecrets" . | nindent 4 }}
+
   enabled: true
   serviceMonitor:
     enabled: {{ .Values.monitoring.enabled }}
@@ -232,8 +235,7 @@ vault:
   tlsDisable: {{ dig "global" "tlsDisable" true .Values.addons.vault.values }}
 
 global:
-  imagePullSecrets:
-  - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
 sso:
   enabled: {{ .Values.monitoring.sso.enabled }}

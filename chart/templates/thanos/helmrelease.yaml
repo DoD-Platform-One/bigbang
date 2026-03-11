@@ -2,6 +2,8 @@
 {{- $fluxSettingsThanos := merge .Values.addons.thanos.flux .Values.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $havePostRenderers := (get .Values.addons $pkg).postRenderers }}
+{{- $installServiceMonitorPostRenderers := and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.thanos.values) "STRICT") }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -19,12 +21,14 @@ spec:
 
   {{- toYaml $fluxSettingsThanos | nindent 2 }}
 
+  {{- if or $havePostRenderers $installServiceMonitorPostRenderers }}
   postRenderers:
-  {{- if (get .Values.addons $pkg).postRenderers }}
+  {{- if $havePostRenderers }}
   {{ toYaml (get .Values.addons $pkg).postRenderers | nindent 4 }}
   {{- end }}
-  {{- if and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.thanos.values) "STRICT") }}
+  {{- if $installServiceMonitorPostRenderers }}
   {{ include "thanos.serviceMonitorPostRenderers" . | nindent 2 }}
+  {{- end }}
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "thanos" "root" .) | nindent 2 }}
 

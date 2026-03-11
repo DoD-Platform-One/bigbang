@@ -102,8 +102,7 @@ sso:
 {{- end }}
 
 kibana:
-  imagePullSecrets:
-    - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
@@ -129,9 +128,11 @@ metrics:
       insecureSkipVerify: true
   {{- end }}
 
+  image:
+    {{- include "secretsPullSecret" . | nindent 4 }}
+
 elasticsearch:
-  imagePullSecrets:
-    - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
   master:
     initContainers:
       - name: elastic-internal-init-filesystem

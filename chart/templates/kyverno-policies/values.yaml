@@ -9,8 +9,7 @@
 {{- $deployNodeAgent := (and .Values.addons.velero.enabled (dig "deployNodeAgent" false .Values.addons.velero.values)) }}
 
 waitforready:
-  imagePullSecrets:
-  - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
 policies:
   add-default-capability-drop:

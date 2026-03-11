@@ -24,24 +24,29 @@ helmRepositories: []
   #       R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
   #       -----END PUBLIC KEY-----
 
-# -- Single set of registry credentials used to pull all images deployed by BigBang.
-registryCredentials:
-  registry: registry1.dso.mil
-  username: ""
-  password: ""
-  email: ""
+# -- Registry credentials used to pull all images deployed by BigBang.
+# Set to null (or omit) if your environment provides ambient image pull access,
+# e.g. AWS EKS nodes with an IAM role granting ECR access, or GKE Workload Identity for GCR.
+# When null, no private-registry Secret or imagePullSecrets stanzas are created.
+registryCredentials: null
 
-# -- Multiple sets of registry credentials used to pull all images deployed by BigBang.
-# Credentials will only be created when a valid combination exists, registry, username, and password (email is optional)
-# Or a list of registires:
-#  - registry: registry1.dso.mil
-#    username: ""
-#    password: ""
-#    email: ""
-#  - registry: registry.dso.mil
-#    username: ""
-#    password: ""
-#    email: ""
+# -- Single set of registry credentials:
+# registryCredentials:
+#   registry: registry1.dso.mil
+#   username: ""
+#   password: ""
+#   email: ""
+
+# -- Multiple sets of registry credentials:
+# registryCredentials:
+#   - registry: registry1.dso.mil
+#     username: ""
+#     password: ""
+#     email: ""
+#   - registry: registry.dso.mil
+#     username: ""
+#     password: ""
+#     email: ""
 
 # Openshift Container Platform Feature Toggle
 openshift: false
@@ -1435,11 +1440,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
       path: "./chart"
-      tag: "9.8.2-bb.2"
+      tag: "9.8.2-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "gitlab"
-      tag: "9.8.2-bb.2"
+      tag: "9.8.2-bb.3"
 
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}

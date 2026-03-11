@@ -87,8 +87,7 @@ istio:
 openshift: {{ .Values.openshift }}
 
 upstream:
-  imagePullSecrets:
-    - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}

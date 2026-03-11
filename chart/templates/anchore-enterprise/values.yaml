@@ -55,7 +55,7 @@ sso:
   roleAttribute: {{ .Values.addons.anchoreEnterprise.sso.role_attribute }}
 
 global:
-  imagePullSecretName: private-registry
+  {{- include "secretsImagePullSecrets" . | nindent 2 }}
 
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
@@ -66,9 +66,6 @@ postgresql:
   enabled: true
   auth:
     enablePostgresUser: true
-  global:
-    imagePullSecrets:
-    - private-registry
   {{- if $istioEnabled }}
   primary:
     annotations:
@@ -81,6 +78,12 @@ postgresql:
 
 upstream:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
+  # imagePullSecretName used for main enterprise charts and some bignbang templates
+  {{- if ( include "imagePullSecret" . ) }}
+  imagePullSecretName: private-registry
+  {{- else }}
+  imagePullSecretName: ""
+  {{- end }}
   {{- if .Values.addons.anchoreEnterprise.enterprise.licenseYaml }}
   license: 
     {{- .Values.addons.anchoreEnterprise.enterprise.licenseYaml | trim | nindent 4 }}
@@ -109,7 +112,11 @@ upstream:
 
   ui:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if ( include "imagePullSecret" . ) }}
     imagePullSecretName: private-registry
+    {{- else }}
+    imagePullSecretName: ""
+    {{- end }}
 
 ui-redis:
   {{- if and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password }}
@@ -129,14 +136,12 @@ ui-redis:
         {{ include "istioAnnotation" . }}
     {{- end }}
     image:
-      pullSecrets:
-        - private-registry
+      {{- include "secretsPullSecrets" . | nindent 6 }}
     {{- if .Values.monitoring.enabled }}
     metrics:
       enabled: true
       image:
-        pullSecrets:
-          - private-registry
+        {{- include "secretsPullSecrets" . | nindent 8 }}
       serviceMonitor:
         enabled: true
         namespace: anchore
@@ -158,8 +163,5 @@ ui-redis:
         namespace: monitoring
     {{- end }}
   {{- end }}
-
-
-
 
 {{- end }}

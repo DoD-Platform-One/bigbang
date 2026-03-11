@@ -16,6 +16,13 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardened := or (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
+upstream:
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  
+mysql:
+  global:
+    {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
+
 domain: {{ .Values.domain }}
 
 openshift: {{ .Values.openshift }}

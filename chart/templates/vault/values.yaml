@@ -125,8 +125,7 @@ networkPolicies:
 
 upstream:
   global:
-    imagePullSecrets:
-    - name: private-registry
+    {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
 
   injector:
     image:

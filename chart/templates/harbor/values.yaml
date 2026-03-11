@@ -21,10 +21,6 @@
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.harbor.values) }}
 {{- $postgresEnabled := dig "postgresql" "enabled" true .Values.addons.harbor.values }}
 
-imagePullSecrets:
-- name: private-registry
-imagePullPolicy: {{ .Values.imagePullPolicy }}
-
 externalURL: https://harbor.{{ .Values.domain }}
 
 domain: {{ .Values.domain }}
@@ -70,7 +66,20 @@ monitoring:
 
 openshift: {{ .Values.openshift }}
 
+global:
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
+redis-bb:
+  upstream:
+    image:
+      pullSecrets: [] # redis currently sets this value.  Clear it out here, so global values are used
+
 upstream:
+  # upstream doesn't support global, so we set it here.
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  imagePullPolicy: {{ .Values.imagePullPolicy }}
+
   metrics:
     enabled: {{ .Values.monitoring.enabled }}
     serviceMonitor:

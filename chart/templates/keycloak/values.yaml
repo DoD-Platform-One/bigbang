@@ -87,8 +87,7 @@ upstream:
   replicas: 1
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-  - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
   {{- with .Values.addons.keycloak.database }}
   database:
     existingSecret: ""
@@ -209,8 +208,7 @@ postgresql:
   auth:
     enablePostgresUser: true
   global:
-    imagePullSecrets:
-    - private-registry
+    {{- include "secretsImagePullSecrets" . | nindent 4 }}
     postgresql:
       auth:
         username: keycloak

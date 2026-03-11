@@ -61,8 +61,7 @@ monitoring:
 upstream:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
-  imagePullSecrets:
-  - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
   podLabels:
     app.kubernetes.io/name: gitlab-runner

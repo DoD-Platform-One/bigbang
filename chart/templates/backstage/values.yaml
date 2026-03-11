@@ -48,6 +48,11 @@ grafana:
 
 backstage:
   backstage:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+
+      {{- include "secretsPullSecrets" . | nindent 6 }}
+
     {{- if .Values.grafana.enabled }}
     extraEnvVars:
       - name: GRAFANA_HTTP
