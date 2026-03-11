@@ -1755,11 +1755,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "3.21.0-bb.2"
+      tag: "3.21.0-bb.3"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore-enterprise"
-      tag: "3.21.0-bb.2"
+      tag: "3.21.0-bb.3"
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
       upgrade:
