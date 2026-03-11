@@ -7,32 +7,27 @@
 upstream:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
-    pullSecrets:
-    - name: private-registry
+    {{- include "secretsPullSecretsWithName" . | nindent 4 }}
   postInstall:
     labelNamespace:
       enabled: false
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
-        pullSecrets:
-        - name: private-registry
+        {{- include "secretsPullSecretsWithName" . | nindent 8 }}
     probeWebhook:
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
-        pullSecrets:
-        - name: private-registry
+        {{- include "secretsPullSecretsWithName" . | nindent 8 }}
   postUpgrade:
     cleanupCRD:
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
-        pullSecrets:
-        - name: private-registry
+        {{- include "secretsPullSecretsWithName" . | nindent 8 }}
   preUninstall:
     deleteWebhookConfigurations:
       image:
         pullPolicy: {{ .Values.imagePullPolicy }}
-        pullSecrets:
-        - name: private-registry
+        {{- include "secretsPullSecretsWithName" . | nindent 8 }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}

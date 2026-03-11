@@ -14,6 +14,8 @@
 
 image:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
+  
+{{- include "secretsImagePullSecretsWithName" . }}
 
 credentialsFile:
   credentials:
@@ -24,7 +26,7 @@ credentialsFile:
     password: {{ $item.password }}
     email: {{ $item.email }}
   {{- end }}
-  {{ else }}
+  {{- else if .Values.registryCredentials }}
   - uri: {{ .Values.registryCredentials.registry }}
     username: {{ .Values.registryCredentials.username }}
     password: {{ .Values.registryCredentials.password }}

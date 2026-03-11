@@ -16,6 +16,11 @@
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
 
+
+upgradeJob:
+  image:
+    {{- include "secretsPullSecretsSingle" . | nindent 4 }}
+  
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
@@ -120,6 +125,7 @@ minio-tenant:
   upstream:
     tenant:
       name: mimir-mimir-minio-tenant
+      {{- include "secretsImagePullSecretWithName" . | nindent 6 }}
       configSecret:
         accessKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
         secretKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
@@ -129,6 +135,12 @@ minio-tenant:
 {{- end }}
 
 upstream:
+  image:
+    {{- include "secretsPullSecrets" . | nindent 4 }}
+    
+  rollout_operator:
+    {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
+
   query_scheduler:
     enabled: {{ not $istioEnabled }}
   {{- if or $minioEnabled $s3Enabled }}

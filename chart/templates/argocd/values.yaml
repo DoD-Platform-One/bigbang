@@ -32,17 +32,18 @@ redis-bb:
   {{- else }}
   enabled: true
   {{- end }}
-  image:
-    pullPolicy: {{ .Values.imagePullPolicy }}
+
   upstream:
+    image:
+      pullPolicy: {{ .Values.imagePullPolicy }}
+      # This clears out our forces value in the package.  We should use the global values set below
+      # This can be removed when we remove the overrides at the package level 
+      pullSecrets: []
     auth:
       enabled: false
-    {{- if .Values.monitoring.enabled }}
     metrics:
+    {{- if .Values.monitoring.enabled }}
       enabled: true
-      image:
-        pullSecrets:
-          - private-registry
       serviceMonitor:
         enabled: true
         namespace: argocd
@@ -62,6 +63,8 @@ redis-bb:
       prometheusRule:
         enabled: true
         namespace: monitoring
+    {{- else }}
+      enabled: false
     {{- end }}
   {{- if $istioInjection }}
     master:
@@ -83,8 +86,7 @@ global:
   {{- end }}
   image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
-  imagePullSecrets:
-    - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 {{- if $istioInjection }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
@@ -145,8 +147,6 @@ upstream:
   controller:
     image:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-    imagePullSecrets:
-      - name: private-registry
     # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
     {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
     metrics:
@@ -162,8 +162,6 @@ upstream:
   dex:
     image:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-    imagePullSecrets:
-      - name: private-registry
   
   server:
     image:

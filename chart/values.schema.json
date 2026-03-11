@@ -7,7 +7,6 @@
     "domain",
     "offline",
     "helmRepositories",
-    "registryCredentials",
     "openshift",
     "git",
     "sso",
@@ -64,6 +63,9 @@
             "$ref": "#/$defs/registryCredential"
           },
           "minItems": 1
+        },
+        {
+          "type": "null"
         }
       ]
     },
@@ -1401,11 +1403,6 @@
           "type": "string"
         }
       },
-      "required": [
-        "registry",
-        "username",
-        "password"
-      ],
       "additionalProperties": false
     },
     "helmRepositories": {

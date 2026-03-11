@@ -58,6 +58,8 @@ upstream:
   {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- include "secretsPullSecrets" . | nindent 4 }}
+
   cr:
     spec:
       {{- if $istioEnabled }}
@@ -65,6 +67,12 @@ upstream:
       {{- end}}
       deployment:
         image_pull_policy: {{ .Values.imagePullPolicy }}
+        {{- if ( include "imagePullSecret" . ) }}
+        image_pull_secrets:
+        - private-registry
+        {{- else }}
+        image_pull_secrets: []
+        {{- end }}
         {{- if include "istioEnabled" . }}
         pod_annotations:
           {{ include "istioAnnotation" . }}

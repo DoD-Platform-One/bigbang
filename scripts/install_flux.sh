@@ -37,10 +37,10 @@ EOF
 function check_secrets {
   if kubectl get secrets/"$FLUX_SECRET" -n $NAMESPACE >/dev/null 2>&1; then
     #the secret exists
-    FLUX_SECRET_EXISTS=0
+    FLUX_SECRET_EXISTS=1
   else
     #the secret does not exist
-    FLUX_SECRET_EXISTS=1
+    FLUX_SECRET_EXISTS=0
   fi
 }
 
@@ -150,8 +150,9 @@ while (("$#")); do
   esac
 done
 
+# only create the secret if one one of REGISTRY_USERNAME or REGISTRY_PASSWORD is set
 # if secret doesn't exist, create it
-if [ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 1 ]; then
+if ([ $REGISTRY_USERNAME ] || [ $REGISTRY_PASSWORD ]) && ([ -z "$FLUX_SECRET_EXISTS" ] || [ "$FLUX_SECRET_EXISTS" -eq 0 ]); then
 
   # check required arguments
   if [ -z "$REGISTRY_USERNAME" ]; then

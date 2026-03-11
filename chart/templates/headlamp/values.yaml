@@ -87,9 +87,6 @@ routes:
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
 
-image:
-  imagePullPolicy: {{ .Values.imagePullPolicy }}
-
 {{- if (eq (include "istioEnabled" .) "true") }}
 annotations:
   {{ include "istioAnnotation" . }}
@@ -97,19 +94,22 @@ annotations:
 
 openshift: {{ .Values.openshift }}
 
-{{- if .Values.addons.headlamp.sso.enabled }}
 upstream:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+
   config:
+    {{- if .Values.addons.headlamp.sso.enabled }}
     oidc:
       clientID: {{ .Values.addons.headlamp.sso.client_id }}
       issuerURL: {{ .Values.sso.url }}
       scopes: "email,profile"
       usePKCE: true
-{{- else }}
-upstream:
-  config:
+    {{- else }}
     oidc:
       secret:
        create: false
-{{- end }}
+    {{- end }}
 {{- end -}}

@@ -126,8 +126,7 @@ routes:
       {{- end }}
 
 global:
-  imagePullSecrets:
-    - name: private-registry
+  {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
 
 {{- with .Values.addons.mattermost.enterprise }}
 enterprise:
@@ -144,8 +143,7 @@ postgresql:
 {{- else }}
 postgresql:
   image:
-    pullSecrets:
-      - private-registry
+    {{- include "secretsPullSecrets" $ | nindent 4 }}
   {{- if $externalPostgresEnabled }}
   secret: "mattermost-database-secret"
   {{- else }}
@@ -193,9 +191,8 @@ fileStore:
 minio:
   install: true
   upstream:
-    imagePullSecrets:
-      - name: private-registry
     tenant:
+      {{- include "secretsImagePullSecretWithName" $ | nindent 6 }}
       metrics:
         enabled: {{ $.Values.monitoring.enabled }}
       configSecret:

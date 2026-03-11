@@ -119,10 +119,6 @@ networkPolicies:
                   helm.sh/hook-weight: "-10"
                   helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
 
-image:
-  pullPolicy: {{ .Values.imagePullPolicy }}
-  pullSecret: private-registry
-
 {{- if $istioInjection }}
 annotations:
   {{ include "istioAnnotation" . }}
@@ -133,7 +129,16 @@ sso:
   idpmetadataurl: {{ include "sso.saml.service" . }}/descriptor
 {{- end }}
 
+
+# big bang package references this in configure-sso.yaml
+image:
+  {{- include "secretsPullSecret" . | nindent 2 }}
+
 upstream:
+  image:
+    pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- include "secretsPullSecretsWithName" . | nindent 4 }}
+  
 {{- if .Values.addons.sonarqube.sso.enabled }}
   sonarProperties:
     # enabling saml authentication 
@@ -166,7 +171,7 @@ upstream:
   prometheusExporter:
     enabled: {{ .Values.monitoring.enabled }}
 
-{{- with .Values.addons.sonarqube.database }}
+  {{- with .Values.addons.sonarqube.database }}
   {{- if and .host .username .password .database .port }}
 # External Postgres config
   jdbcOverwrite:
@@ -175,27 +180,6 @@ upstream:
     jdbcUsername: {{ .username }}
     jdbcSecretName: sonarqube-db-secret
     jdbcSecretPasswordKey: postgresql-password
-  postgresql:
-    # Use external database
-    enabled: false
-  {{- else }}
-  postgresql:
-    {{- if or $istioInjection $.Values.kiali.enabled}}
-    master:
-      {{- if $istioInjection }}
-      podAnnotations:
-        {{ include "istioAnnotation" $ }}
-      {{- end }}
-    slave:
-      {{- if $istioInjection }}
-      podAnnotations:
-        {{ include "istioAnnotation" $ }}
-      {{- end }}
-    {{- end }}
-    # Use internal database, defaults are fine
-    enabled: true
-    service:
-      port: {{ .port }}
-    {{- end }}
+  {{- end }}
   {{- end }}
 {{ end -}}

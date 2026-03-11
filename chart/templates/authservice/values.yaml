@@ -49,8 +49,7 @@ istio:
 image: 
   pullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
   
-imagePullSecrets:
-  - name: private-registry
+{{- include "secretsImagePullSecretsWithName" . }}
 
 podAnnotations:
   {{ include "istioAnnotation" . }}
@@ -121,30 +120,33 @@ autoscaling:
 
 {{- if and (dig "redis" "enabled" false .Values.addons.authservice.values) (or .Values.monitoring.enabled .Values.kiali.enabled) }}
 redis-bb:
-  {{- if .Values.monitoring.enabled }}
-  metrics:
-    enabled: true 
-    image:
-      pullSecrets:
-        - private-registry
-    serviceMonitor:
-      enabled: true
-      namespace: authservice
-      selector: 
-        app.kubernetes.io/name: redis-bb
-        app.kubernetes.io/instance: authservice-authservice
-      {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  
-      {{- end }}
-    prometheusRule:
+  upstream:
+    global:
+      {{- include "secretsImagePullSecrets" . | nindent 6 }}
+
+    {{- if .Values.monitoring.enabled }}
+    metrics:
       enabled: true 
-      namespace: monitoring
-  {{- end }}
+      image:
+        {{- include "secretsPullSecrets" . | nindent 8 }}
+      serviceMonitor:
+        enabled: true
+        namespace: authservice
+        selector: 
+          app.kubernetes.io/name: redis-bb
+          app.kubernetes.io/instance: authservice-authservice
+        {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
+        scheme: https
+        tlsConfig:
+          caFile: /etc/prom-certs/root-cert.pem
+          certFile: /etc/prom-certs/cert-chain.pem
+          keyFile: /etc/prom-certs/key.pem
+          insecureSkipVerify: true  
+        {{- end }}
+      prometheusRule:
+        enabled: true 
+        namespace: monitoring
+    {{- end }}
 {{- end }}
 
 {{- $legacy := and .Values.sso.oidc.realm .Values.sso.oidc.host -}}
