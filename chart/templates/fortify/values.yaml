@@ -15,6 +15,11 @@
 {{- define "bigbang.defaults.fortify" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardened := or (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $externalMySQLHost := dig "externalDatabase" "host" "" .Values.addons.fortify }}
+{{- $externalMySQLPort := dig "externalDatabase" "port" 3306 .Values.addons.fortify }}
+{{- $externalMySQLCIDRs := dig "networkPolicies" "egress" "definitions" "external-mysql" "to" list .Values.addons.fortify.values }}
+{{- $externalMySQLEnabled := and (not (dig "mysql" "enabled" true .Values.addons.fortify.values)) (not (empty $externalMySQLCIDRs)) }}
+{{- $externalMySQLRouteEnabled := and $istioEnabled (not (dig "mysql" "enabled" true .Values.addons.fortify.values)) (ne $externalMySQLHost "") }}
 
 upstream:
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
@@ -54,30 +59,28 @@ routes:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
       hosts:
         - repo1.dso.mil
+    external-mysql:
+      enabled: {{ $externalMySQLRouteEnabled }}
+      {{- if ne $externalMySQLHost "" }}
+      hosts:
+        - {{ $externalMySQLHost | quote }}
+      {{- end }}
+      ports:
+        - number: {{ $externalMySQLPort }}
+          name: mysql
+          protocol: TCP
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   egress:
     from:
-      keystore-job:
+      fortify-webapp:
         podSelector:
           matchLabels:
-            job: keystore-generator
+            app.kubernetes.io/name: fortify-ssc
+            app.kubernetes.io/component: webapp
         to:
           definition:
-            kubeAPI: true
-      bb-tests:
-        podSelector:
-          matchLabels:
-            helm-test: enabled
-        to:
-          cidr:
-            0.0.0.0/0:443: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
-          k8s:
-            # kube-proxy DNAT translates service port 443 to targetPort 8443.
-            # k3s NetworkPolicy evaluates post-DNAT, so the CIDR port 443 rule
-            # does not match. This explicit k8s rule allows bb-tests pods to
-            # reach the ingressgateway on the actual targetPort.
-            {{ include "getGatewayName" (dict "gateway" .Values.addons.fortify.ingress.gateway "root" .) | replace "ingressgateway" "ingressgateway:8443" }}: {{ dig "bbtests" "enabled" false .Values.addons.fortify.values }}
+            external-mysql: {{ $externalMySQLEnabled }}
 
 {{- end }}

@@ -1186,6 +1186,24 @@
             }
           ],
           "properties": {
+            "externalDatabase": {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "default": "",
+                  "description": "External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                },
+                "port": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "default": 3306,
+                  "description": "External MySQL port used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                }
+              }
+            },
             "istio": {
               "$ref": "#/$defs/istio"
             }
