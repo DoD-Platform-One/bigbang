@@ -28,6 +28,10 @@ helmRepositories: []
 # Set to null (or omit) if your environment provides ambient image pull access,
 # e.g. AWS EKS nodes with an IAM role granting ECR access, or GKE Workload Identity for GCR.
 # When null, no private-registry Secret or imagePullSecrets stanzas are created.
+# registryCredentials.username is required to be non-null if registryCredentials is defined
+# registryCredentials.password is required to be non-null if registryCredentials is defined
+# registryCredentials.registry will default to registry1.dso.mil
+# registryCredentials.email will default to ""
 registryCredentials: null
 
 # -- Single set of registry credentials:
