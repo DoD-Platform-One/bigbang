@@ -50,7 +50,7 @@
       {{- /* If we have a map, treat those as key-value pairs. */ -}}
       {{- if and .Values.registryCredentials.username .Values.registryCredentials.password }}
       {{- with .Values.registryCredentials }}
-      {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
+      {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" (default "registry1.dso.mil" .registry) .username .password (default "" .email) (printf "%s:%s" .username .password | b64enc) | b64enc }}
       {{- end }}
       {{- end }}
     {{- end -}}
