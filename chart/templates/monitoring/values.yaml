@@ -290,14 +290,6 @@ upstream:
       {{- end }}
     thanosServiceMonitor:
       enabled: true
-      {{- if $monitoringMtlsStrict }}
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true
-      {{- end }}
     {{- end }}
     prometheusSpec:
       {{- if $monitoringMtlsStrict }}
