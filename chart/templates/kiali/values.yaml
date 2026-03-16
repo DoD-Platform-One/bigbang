@@ -139,7 +139,6 @@ upstream:
               {{- end -}}
               {{- end -}}
           {{- if .Values.istiod.enabled }}
-          ingress_gateway_namespace: istio-gateway
           egress_gateway_namespace: istio-gateway
           {{- end }}
 networkPolicies:
