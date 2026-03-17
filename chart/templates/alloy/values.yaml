@@ -16,6 +16,7 @@
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
+{{- $alloyClusterEventsEnabled := (dig "alloyClusterEvents" "enabled" false .Values.alloy) }}
 {{- $tempoEnabled := .Values.tempo.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.alloy.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
@@ -61,6 +62,13 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
+      # Allow alloy-metrics and Prometheus to scrape alloy-singleton
+      alloy-singleton:12345:
+        from:
+          k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+
       # Allow Prometheus to scrape alloy-metrics
       alloy-metrics:12345:
         from:
@@ -89,6 +97,12 @@ networkPolicies:
       alloy:
         to:
           tempo/tempo:4317: {{ .Values.tempo.enabled }}
+      {{- if $alloyClusterEventsEnabled }}
+      alloy-singleton:
+        to:
+          k8s:
+            logging/logging-loki:3100: {{ .Values.loki.enabled }}
+      {{- end }}
       {{- if $tempoEnabled }}
       # Allow alloy-receiver to forward traces to Tempo backend
       alloy-receiver:
@@ -113,7 +127,7 @@ upstream:
       service.istio.io/canonical-name: alloy-alloy-logs
   {{- end }}
   destinations:
-    {{- if and $alloyLogsEnabled .Values.loki.enabled }}
+    {{- if and (or $alloyLogsEnabled $alloyClusterEventsEnabled) .Values.loki.enabled }}
     - name: loki
       type: loki
       url: {{ $lokiWriteDestUrl }}
@@ -173,6 +187,23 @@ upstream:
       k8s.pod.name: null
       pod: null
   {{- end }}
+  {{- if $alloyClusterEventsEnabled }}
+  alloy-singleton:
+    enabled: true
+  clusterEvents:
+    enabled: true
+    destinations:
+      {{- if .Values.loki.enabled }}
+      - loki
+      {{- end }}
+      {{- if .Values.alloy.additionalDestinations }}
+      {{- range $dest := .Values.alloy.additionalDestinations }}
+      {{- if eq (lower $dest.type) "loki" }}
+      - {{ $dest.name }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+  {{- end }}
   {{- if $tempoEnabled }}
   # Enable alloy-receiver to collect traces and forward to Tempo
   alloy-receiver:
@@ -220,5 +251,22 @@ serviceMonitors:
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
+  {{- if and $alloyClusterEventsEnabled $.Values.monitoring.enabled }}
+  - name: alloy-alloy-singleton
+    additionalLabels:
+      app.kubernetes.io/instance: alloy
+      app.kubernetes.io/name: alloy-singleton
+    selectorLabels:
+      app.kubernetes.io/instance: alloy-alloy-singleton
+      app.kubernetes.io/name: alloy-singleton
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.alloy.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true
+    {{- end }}
+  {{- end }}
   {{- end }}
 {{- end }}

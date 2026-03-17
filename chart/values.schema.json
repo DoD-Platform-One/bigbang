@@ -1060,6 +1060,11 @@
             "type": "boolean"
           }
         },
+        "alloyClusterEvents": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
         "istio": {
           "$ref": "#/$defs/istio"
         },
