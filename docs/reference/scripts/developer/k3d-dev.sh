@@ -40,7 +40,6 @@ PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
   "minio-api"
   "minio"
   "neuvector"
-  "nexus"
   "policyreporter"
   "prometheus"
   "registry"

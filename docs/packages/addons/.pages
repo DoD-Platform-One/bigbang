@@ -13,7 +13,6 @@ nav:
   - Metrics Server: metricserver.md
   - Mimir: mimir.md
   - MinIO: minio.md
-  - Nexus Repository Manager: nexus-repository-manager.md
   - SonarQube: sonarqube.md
   - Vault: vault.md
   - Velero: velero.md

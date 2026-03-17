@@ -49,7 +49,6 @@ Big Bang is an umbrella Helm chart that packages together a collection of open-s
 ### Developer Tools
 - GitLab for source code management and CI/CD
 - ArgoCD for application deployment and management
-- Nexus for artifact and dependency management
 - SonarQube for code quality and security analysis
 
 ## Documentation Structure

@@ -206,17 +206,8 @@ DEPRECATION NOTICE:
   Please update your values override to use the "domain" key.
 {{- end }}
 
-{{- if .Values.addons.nexus }}
-DEPRECATION NOTICE:
-  .Values.addons.nexus has been deprecated and will be removed in a future Big Bang release.
-  Please reconfigure your values overrides to use .Values.addons.nexusRepositoryManager
-{{- end }}
-
-{{- $nexusOldValues := default dict .Values.addons.nexus -}}
-{{- $nexusValues := merge $nexusOldValues .Values.addons.nexusRepositoryManager -}}
-
 {{- with .Values }}
-{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .grafana.sso.grafana.auth_url .grafana.sso.grafana.token_url .grafana.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
+{{- if and .sso.url (coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName .elasticsearchKibana.sso.issuer .elasticsearchKibana.sso.auth_url .elasticsearchKibana.sso.token_url .elasticsearchKibana.sso.userinfo_url .elasticsearchKibana.sso.jwkset_url .elasticsearchKibana.sso.claims_principal .elasticsearchKibana.sso.endsession_url .elasticsearchKibana.sso.claims_group .elasticsearchKibana.sso.claims_mail .grafana.sso.grafana.auth_url .grafana.sso.grafana.token_url .grafana.sso.grafana.api_url .twistlock.sso.provider_name .twistlock.sso.issuer_uri .twistlock.sso.idp_url .twistlock.sso.console_url .twistlock.sso.cert .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate) }}
 DEPRECATION NOTICE:
   The following SSO keys have been deprecated.  Deprecated keys will continue to work, but will be removed in a future release.  Please update your overrides.
     {{- if coalesce .sso.oidc.host .sso.oidc.realm .sso.certificate_authority .sso.jwks .sso.jwks_uri .sso.client_id .sso.client_secret .sso.token_url .sso.auth_url .sso.secretName }}
@@ -346,7 +337,7 @@ DEPRECATION NOTICE:
         cert: {{ .twistlock.sso.cert | trunc 27 }}
         {{- end }}
     {{- end }}
-    {{- if coalesce .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint $nexusValues.sso.idp_data.idpMetadata .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate }}
+    {{- if coalesce .addons.argocd.sso.provider_name .addons.gitlab.sso.label .addons.gitlab.sso.issuer_uri .addons.gitlab.sso.end_session_uri .addons.gitlab.sso.uid_field .addons.mattermost.sso.auth_endpoint .addons.mattermost.sso.token_endpoint .addons.mattermost.sso.user_api_endpoint .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate }}
     addons:
       {{- if .addons.argocd.sso.provider_name }}
       argocd:
@@ -388,14 +379,6 @@ DEPRECATION NOTICE:
           {{- if .addons.mattermost.sso.user_api_endpoint }}
           # "user_api_endpoint" moved to "sso.oidc.userinfo"
           user_api_endpoint: {{ .addons.mattermost.sso.user_api_endpoint }}
-          {{- end }}
-      {{- end }}
-      {{- if coalesce $nexusValues.sso.idp_data.idpMetadata }}
-      nexus:
-        sso:
-          {{- if $nexusValues.sso.idp_data.idpMetadata }}
-          # idpMetadata moved to "sso.saml.metadata"
-          idpMetadata: {{ $nexusValues.sso.idp_data.idpMetadata | trunc 27 }}
           {{- end }}
       {{- end }}
       {{- if coalesce .addons.sonarqube.sso.provider_name .addons.sonarqube.sso.certificate }}

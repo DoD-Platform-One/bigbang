@@ -149,10 +149,9 @@ Note that this has a limited use case, since this requires at minimum Istio + Re
 Currently you could leverage any of the following as your OCI registry:
 
 * Gitlab Project Registries (in a Big Bang installed Gitlab, not Repo1)
-* Nexus Registry (refer to CI test values for auto-creation of OCI registry)
 * Harbor (currently in sandbox, but functioning well with the test values)
 
-1. Install a minimal Big Bang on your cluster, not including the package you want to test. You should at least install Istio and the registry (i.e., Gitlab, Nexus, and/or Harbor).
+1. Install a minimal Big Bang on your cluster, not including the package you want to test. You should at least install Istio and the registry (i.e., Gitlab and/or Harbor).
 
 1. Modify CoreDNS for your cluster to route traffic to `x.bigbang.dev` (e.g., `harbor.bigbang.dev`) to the IP of the public ingress gateway. 
 

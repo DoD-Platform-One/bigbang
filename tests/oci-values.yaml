@@ -148,11 +148,6 @@ addons:
     helmRepo:
       cosignVerify: false
 
-  nexusRepositoryManager:
-    sourceType: "helmRepo"
-    helmRepo:
-      cosignVerify: false
-
   sonarqube:
     sourceType: "helmRepo"
     helmRepo:

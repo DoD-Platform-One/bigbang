@@ -95,7 +95,7 @@ sso:
     entityDescriptor: "{{ .Values.sso.url }}/protocol/saml/descriptor"
     # -- SAML SSO Service path
     service: "{{ .Values.sso.url }}/protocol/saml"
-    # -- Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Nexus, Twistlock, or Sonarqube.
+    # -- Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Twistlock or Sonarqube.
     metadata: "" # See docs/assets/configs/example/dev-sso-values.yaml for an example
     # NOTE: SAML attribute names may vary by package.  Use the package values to setup attribute names
 
@@ -1580,75 +1580,6 @@ addons:
     flux: {}
 
     # -- Values to passthrough to the gitlab runner chart: https://repo1.dso.mil/big-bang/product/packages/gitlab-runner.git
-    values: {}
-
-    # -- Post Renderers.  See docs/postrenders.md
-    postRenderers: []
-
-  nexusRepositoryManager:
-    # -- Toggle deployment of Nexus Repository Manager.
-    enabled: false
-
-    # -- Choose source type of "git" or "helmRepo"
-    sourceType: "git"
-
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
-      path: "./chart"
-      tag: "88.0.0-bb.0"
-    helmRepo:
-      repoName: "registry1"
-      chartName: "nexus-repository-manager"
-      tag: "88.0.0-bb.0"
-
-    # -- Base64 encoded license file.
-    license_key: ""
-
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
-    ingress:
-      gateway: ""
-
-    sso:
-      # -- Toggle SAML SSO for NXRM.
-      # -- handles SAML SSO, a Client must be configured in Keycloak or IdP
-      # -- to complete setup.
-      # -- `https://support.sonatype.com/hc/en-us/articles/1500000976522-SAML-integration-for-Nexus-Repository-Manager-Pro-3-and-Nexus-IQ-Server-with-Keycloak#h_01EV7CWCYH3YKAPMAHG8XMQ599`
-      enabled: false
-
-      # -- NXRM SAML SSO Integration data
-      idp_data:
-        # Nexus saml URL. example: "https://nexus.bigbang.dev/service/rest/v1/security/saml/metadata"
-        entityId: ""
-
-        # -- IdP Field Mappings
-        # -- NXRM username attribute
-        username: ""
-
-        # -- NXRM firstname attribute (optional)
-        firstName: ""
-
-        # -- NXRM lastname attribute (optional)
-        lastName: ""
-
-        # -- NXRM email attribute (optional)
-        email: ""
-
-        # -- NXRM groups attribute (optional)
-        groups: ""
-
-      # -- NXRM Role
-      role:
-        # the id must match the Keycloak group name (case sensitive)
-        - id: ""
-          name: ""
-          description: ""
-          privileges: []
-          roles: []
-
-    # -- Flux reconciliation overrides specifically for the Nexus Repository Manager Package
-    flux: {}
-
-    # -- Values to passthrough to the nxrm chart: https://repo1.dso.mil/big-bang/product/packages/nexus.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md

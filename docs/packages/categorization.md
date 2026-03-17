@@ -142,7 +142,6 @@ flowchart BT
             subgraph Repo[Repositories]
             direction BT
               Harbor
-              Nexus[Nexus Repository]
             end
             subgraph UI[Dashboards and UIs]
               Backstage
@@ -349,7 +348,6 @@ DevSecOps tools include packages that programmers and security teams use to plan
 |Anchore|[Anchore](./addons/anchore.md)|Vulnerability Scanner|[anchore-enterprise](https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise)|
 |Fortify|[Fortify](./addons/fortify.md)|Security scanning tool|[fortify](https://repo1.dso.mil/big-bang/product/packages/fortify)|
 |Sonarqube|[Sonarqube](./addons/sonarqube.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube)|
-|Nexus|[Nexus Repository Manager](./addons/nexus-repository-manager.md)|Artifact repository|[nexus](https://repo1.dso.mil/big-bang/product/packages/nexus)|
 |Harbor|[Harbor](./addons/harbor.md)|Container registry|[harbor](https://repo1.dso.mil/big-bang/product/packages/harbor)|
 |Backstage|[Backstage](./addons/backstage.md)|Developer portal platform|[backstage](https://repo1.dso.mil/big-bang/product/packages/backstage)|
 
