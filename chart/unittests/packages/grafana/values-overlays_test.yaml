@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Grafana - Overlay Merge Tests
+templates:
+  - templates/grafana/values.yaml
+tests:
+  - it: should include user-provided extraSecretMounts in overlays
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      grafana.values.upstream.extraSecretMounts:
+        - name: "user-secret"
+          mountPath: "/etc/secrets/user"
+          secretName: "my-secret"
+          readOnly: true
+    asserts:
+      - equal:
+          path: upstream.extraSecretMounts[0].name
+          value: "user-secret"
+      - equal:
+          path: upstream.extraSecretMounts[0].mountPath
+          value: "/etc/secrets/user"
+      - equal:
+          path: upstream.extraSecretMounts[0].secretName
+          value: "my-secret"
+
+  - it: should merge default and user extraSecretMounts when SSO is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      # Enable SSO to generate default extraSecretMounts
+      grafana.sso.enabled: true
+      grafana.sso.grafana.client_id: "test-client"
+      grafana.sso.grafana.client_secret: "test-secret"
+      # User-provided extraSecretMounts
+      grafana.values.upstream.extraSecretMounts:
+        - name: "user-custom-secret"
+          mountPath: "/etc/secrets/custom"
+          secretName: "custom-secret"
+          readOnly: true
+    asserts:
+      # Default SSO secret mount should be first (from defaults)
+      - equal:
+          path: upstream.extraSecretMounts[0].name
+          value: "auth-generic-oauth-secret"
+      - equal:
+          path: upstream.extraSecretMounts[0].mountPath
+          value: "/etc/secrets/auth_generic_oauth"
+      # User secret mount should be appended
+      - equal:
+          path: upstream.extraSecretMounts[1].name
+          value: "user-custom-secret"
+      - equal:
+          path: upstream.extraSecretMounts[1].mountPath
+          value: "/etc/secrets/custom"
+
+  - it: should not merge extraSecretMounts when skipOverlayMerge is set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.overlays' - | yq eval '.'"
+    set:
+      # Enable SSO to generate default extraSecretMounts
+      grafana.sso.enabled: true
+      grafana.sso.grafana.client_id: "test-client"
+      grafana.sso.grafana.client_secret: "test-secret"
+      # User-provided extraSecretMounts with skipOverlayMerge
+      grafana.values.upstream:
+        skipOverlayMerge: true
+        extraSecretMounts:
+          - name: "only-this-secret"
+            mountPath: "/etc/secrets/only"
+            secretName: "only-secret"
+            readOnly: true
+    asserts:
+      # Only user secret should be present (no merge with defaults)
+      - equal:
+          path: upstream.extraSecretMounts[0].name
+          value: "only-this-secret"
+      - notExists:
+          path: upstream.extraSecretMounts[1]

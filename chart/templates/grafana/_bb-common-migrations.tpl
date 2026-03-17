@@ -1,5 +1,24 @@
 {{- define "bigbang.grafana.bb-common-migrations" }}
 {{/* TODO: Remove this migration template for bb 4.0 */}}
+
+{{- $domainName := default .Values.domain .Values.hostname }}
+
+routes:
+  inbound:
+    grafana:
+      gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.grafana.ingress.gateway "root" .) }}
+      {{- $grafanaHosts := dig "istio" "grafana" "hosts" list .Values.grafana.values }}
+      {{- if $grafanaHosts }}
+      hosts:
+      {{- range $grafanaHosts }}
+      - {{ tpl . $ | quote }}
+      {{- end }}
+      {{- else }}
+      hosts:
+      - grafana.{{ $domainName }}
+      {{- end }}
+
 {{- if empty .Values.networkPolicies.egress.definitions.kubeAPI }}
 networkPolicies:
   egress:
@@ -20,4 +39,3 @@ networkPolicies:
         {{- end }}
 {{- end }}
 {{- end }}
-

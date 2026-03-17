@@ -1,14 +1,21 @@
 {{- if .Values.grafana.enabled }}
-{{- include "values-secret" (dict 
-  "root" $ 
-  "package" (dict "values" (fromYaml (include "bigbang.overlays.grafana" .))) 
-  "name" "grafana" 
+{{- /* Create package with merged overlay values */ -}}
+{{- $grafanaPackage := deepCopy .Values.grafana -}}
+{{- $mergedOverlays := fromYaml (include "bigbang.overlays.grafana" .) -}}
+{{- /* Migrate deprecated istio.hardened keys to new structure */ -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" $mergedOverlays) | fromYaml -}}
+{{- $grafanaPackage = set $grafanaPackage "values" $cleanedValues -}}
+{{- include "values-secret" (dict
+  "root" $
+  "package" $grafanaPackage
+  "name" "grafana"
   "defaults" ((mergeOverwrite (include "bigbang.defaults.grafana" . | fromYaml) (include "bigbang.grafana.bb-common-migrations" . | fromYaml)) | toYaml)
 )}}
 {{- end }}
 
 {{- define "bigbang.defaults.grafana" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.grafana.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -22,23 +29,37 @@ domain: {{ $domainName }}
 flux:
   enabled: true
 
+openshift: {{ .Values.openshift }}
+
+monitoring:
+  enabled: {{ .Values.monitoring.enabled }}
+
+sso:
+  enabled: {{ or .Values.grafana.sso.enabled .Values.grafana.sso.enabled }}
+
+{{- if $enterpriseEnabled }}
+enterprise:
+  createSecret: {{ .Values.grafana.enterprise.createSecret | default true }}
+  license: {{ .Values.grafana.enterprise.license | quote }}
+{{- end }}
+
+istio:
+  enabled: {{ $istioEnabled }}
+  injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   prependReleaseName: true
-  egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
-    from:
-      "*":
-        to:
-          k8s:
-            tempo/tempo:9411: {{ .Values.tempo.enabled }}
-            thanos:9090: {{ .Values.addons.thanos.enabled }}
-
-      grafana:
-        to:
-          k8s:
-            authservice/authservice:10003: {{ $authserviceRedisEnabled }}
-
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
@@ -47,38 +68,18 @@ networkPolicies:
           k8s:
             kiali/kiali: {{ .Values.kiali.enabled }}
             backstage/backstage: {{ .Values.addons.backstage.enabled }}
-          definition:
-            gateway: {{ .Values.istioGateway.enabled }}
-
-openshift: {{ .Values.openshift }}
-
-istio:
-  {{- $grafanaInjection := dig "istio" "injection" "enabled" .Values.grafana }}
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-    }}
-  grafana:
-    enabled: true
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.grafana.ingress.gateway "root" .)}}
-  injection: {{ dig "istio" "injection" "enabled" .Values.grafana }}
-
-{{- if $enterpriseEnabled }}
-enterprise:
-  createSecret: {{ .Values.grafana.enterprise.createSecret | default true }}
-  license: {{ .Values.grafana.enterprise.license | quote }}
-{{- end }}
-
-sso:
-  enabled: {{ or .Values.grafana.sso.enabled .Values.grafana.sso.enabled }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+            thanos/thanos:9090: {{ .Values.addons.thanos.enabled }}
+      grafana:
+        to:
+          k8s:
+            authservice/authservice:10003: {{ $authserviceRedisEnabled }}
 
 upstream:
   {{- if .Values.monitoring.enabled }}
@@ -338,7 +339,6 @@ upstream:
 {{- /* The end user will not have to replicate `prometheus.prometheusSpec.additionalScrapeConfigs` or `grafana.extraSecretMounts` from above when providing an overlay */ -}}
 {{- /* There is a hidden flag `skipOverlayMerge` that can be added to `prometheus.prometheusSpec` or `grafana` overlays to ignore the defaults */ -}}
 {{- define "bigbang.overlays.grafana" }}
-
   {{- $defaults := fromYaml (include "bigbang.defaults.grafana" .) }}
 
   {{- $overlays := dig "values" dict .Values.grafana }}
