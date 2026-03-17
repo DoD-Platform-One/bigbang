@@ -28,8 +28,7 @@ spec:
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.loki.enabled }}
   dependsOn:
   {{- if $istioEnabled }}
-    - name: {{ include "istioHelmRelease" . }}
-      namespace: {{ .Release.Namespace }}
+    {{- include "istioHelmReleases" . | nindent 4 }}
   {{- end }}
   {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper

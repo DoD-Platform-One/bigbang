@@ -26,8 +26,7 @@ spec:
   {{- if or (eq (include "istioEnabled" . ) "true") .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
   dependsOn:
   {{- if (eq (include "istioEnabled" .) "true") }}
-    - name: {{ include "istioHelmRelease" . }}
-      namespace: {{ .Release.Namespace }}
+    {{- include "istioHelmReleases" . | nindent 4 }}
   {{- end }}
   {{- if .Values.kyvernoPolicies.enabled }}
     - name: kyverno-policies
