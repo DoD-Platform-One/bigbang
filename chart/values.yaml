@@ -785,7 +785,7 @@ alloy:
   alloyLogs:
     enabled: true
 
-    # -- Toggle Alloy to collect logs
+    # -- Toggle Alloy to collect metrics
   alloyMetrics:
     enabled: true
 
