@@ -110,7 +110,3 @@ addons:
     enabled: false
     git:
       repo: ssh://git@host.k3d.internal/home/git/repos/keycloak
-  nexusRepositoryManager:
-    enabled: false
-    git:
-      repo: ssh://git@host.k3d.internal/home/git/repos/nexus

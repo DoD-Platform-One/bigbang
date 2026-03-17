@@ -515,21 +515,6 @@ addons:
               runAsGroup: 1001
               runAsNonRoot: true
             
-  nexusRepositoryManager:
-    values:
-      bbtests:
-        cypress:
-          artifacts: false
-      persistence:
-        # Do NOT set this below 5Gi, nexus will fail to boot
-        storageSize: 5Gi
-      nexus:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 1500Mi
-          limits: null
-  
   keycloak:
     values:
       bbtests:

@@ -322,7 +322,6 @@ kyvernoPolicies:
               - kiali
               - cluster-auditor
               - mattermost
-              - nexus-repository-manager
               - keycloak
               - kyverno-reporter
               - monitoring
@@ -356,7 +355,6 @@ kyvernoPolicies:
               - kiali
               - cluster-auditor
               - mattermost
-              - nexus-repository-manager
               - keycloak
               - kyverno-reporter
               - monitoring
@@ -390,7 +388,6 @@ kyvernoPolicies:
               - kiali
               - cluster-auditor
               - mattermost
-              - nexus-repository-manager
               - keycloak
               - kyverno-reporter
               - monitoring

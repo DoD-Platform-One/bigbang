@@ -7,7 +7,7 @@ Big Bang uses a declarative approach to package management, allowing you to enab
 Big Bang organizes packages into three main categories:
 
 - **Core Packages**: Essential infrastructure components (Istio, Fluentd, Monitoring, etc.)
-- **Add-on Packages**: Optional but commonly used applications (ArgoCD, GitLab, Nexus, etc.)
+- **Add-on Packages**: Optional but commonly used applications (ArgoCD, GitLab, etc.)
 - **Custom Packages**: User-defined applications following Big Bang patterns
 
 ## Enabling and Disabling Packages

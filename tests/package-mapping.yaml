@@ -69,10 +69,6 @@ gitlabRunner:
   filePath: "gitlab-runner"
   dependencies:
     - "gitlab"
-nexusRepositoryManager:
-  repoName: "nexus"
-  hrName: "nexus-repository-manager"
-  filePath: "nexus-repository-manager"
 anchoreEnterprise:
   repoName: "anchore-enterprise"
   hrName: "anchore-enterprise"

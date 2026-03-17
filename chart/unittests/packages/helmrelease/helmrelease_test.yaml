@@ -607,31 +607,6 @@ tests:
       of: HelmRelease
 
 ###############################################################################
-# Nexus bug fix (now via shared helper - was referencing .Values.neuvector)
-###############################################################################
-
-- it: should render nexus HelmRelease with correct chart spec
-  set:
-    addons:
-      nexusRepositoryManager:
-        enabled: true
-        sourceType: "git"
-        git:
-          repo: https://repo1.dso.mil/big-bang/product/packages/nexus.git
-          path: chart
-          tag: 1.0.0
-  template: nexus-repository-manager/helmrelease.yaml
-  asserts:
-  - isKind:
-      of: HelmRelease
-  - equal:
-      path: spec.chart.spec.sourceRef.kind
-      value: GitRepository
-  - equal:
-      path: spec.chart.spec.sourceRef.name
-      value: nexus-repository-manager
-
-###############################################################################
 # Sonarqube orphaned values: removed
 ###############################################################################
 

@@ -116,7 +116,7 @@ Here is an example. You might have to change this depending on the number of gat
 r.
   # METALLB ISTIO INGRESS IPs
   172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil
-  172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil
+  172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil gitlab.dev.bigbang.mil
 
 ==================================================================================
 ```
@@ -156,7 +156,7 @@ Add the following lines at the end of the file:
 
 ```
 172.20.1.240 keycloak.dev.bigbang.mil vault.dev.bigbang.mil
-172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil nexus.dev.bigbang.mil gitlab.dev.bigbang.mil
+172.20.1.241 sonarqube.dev.bigbang.mil prometheus.dev.bigbang.mil gitlab.dev.bigbang.mil
 ```
 
 ### Start a lightweight VPN into your k3d cluster

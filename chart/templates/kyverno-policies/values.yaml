@@ -1004,7 +1004,6 @@ policies:
       - vault
       - fluentbit
       - eck-operator
-      - nexus-repository-manager
       - thanos
       - mattermost
       - mattermost-operator
@@ -1197,10 +1196,6 @@ policies:
         pods:
           allow:
           - elastic-operator-*
-      - namespace: nexus-repository-manager
-        pods:
-          allow:
-          - nexus-repository-manager-*
       - namespace: thanos
         pods:
           allow:
