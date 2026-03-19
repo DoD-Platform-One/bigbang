@@ -1556,26 +1556,6 @@ addons:
         cypress:
           envs:
             cypress_url: "https://anchore.dev.bigbang.mil"
-      istio:
-        hardened:
-          customServiceEntries:
-            - name: "anchore-allow-cypress-tests"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'repo1.dso.mil'
-                  - 'auth.docker.io'
-                  - 'registry-1.docker.io'
-                  - 'anchore.dev.bigbang.mil'
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
       sso:
         resources:
           requests:
