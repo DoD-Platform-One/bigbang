@@ -18,8 +18,9 @@ spec:
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 
-  {{- if .Values.monitoring.postRenderers }}
   postRenderers:
+  {{- include "monitoring.operatorServiceMonitorPostRenderer" . | nindent 4 }}
+  {{- if .Values.monitoring.postRenderers }}
   {{ toYaml .Values.monitoring.postRenderers | nindent 4 }}
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "monitoring" "root" .) | nindent 2 }}
