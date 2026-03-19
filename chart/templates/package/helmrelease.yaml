@@ -83,8 +83,7 @@ spec:
       namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
     {{- if $istioDep }}
-    - name: {{ include "istioHelmRelease" $ }}
-      namespace: {{ default "bigbang" $.Release.namespace }}
+    {{- include "istioHelmReleases" $ | nindent 4 }}
     {{- end }}
     {{- if $vals.dependsOn }}
     {{- toYaml $vals.dependsOn | nindent 4 }}

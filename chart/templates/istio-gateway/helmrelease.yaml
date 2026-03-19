@@ -46,8 +46,7 @@ spec:
       valuesKey: "overlays"
 
   dependsOn:
-    - name: istiod
-      namespace: {{ $.Release.Namespace }}
+    {{- include "istioHelmReleases" $ | nindent 4 }}
     {{- if $.Values.gatekeeper.enabled }}
     - name: gatekeeper
       namespace: {{ $.Release.Namespace }}

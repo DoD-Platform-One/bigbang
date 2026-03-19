@@ -43,8 +43,7 @@ spec:
       namespace: {{ .Release.Namespace }}
     {{- end }}
     {{- if $istioEnabled }}
-    - name: {{ include "istioHelmRelease" . }}
-      namespace: {{ .Release.Namespace }}
+    {{- include "istioHelmReleases" . | nindent 4 }}
     {{- end }}
   {{- end }}
 {{- end }}

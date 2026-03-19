@@ -27,8 +27,7 @@ spec:
 
   dependsOn:
   {{- if $istioEnabled }}
-  - name: {{ include "istioHelmRelease" . }}
-    namespace: {{ .Release.Namespace }}
+  {{- include "istioHelmReleases" . | nindent 2 }}
   {{- end }}
   {{- if .Values.monitoring.enabled }}
   - name: monitoring

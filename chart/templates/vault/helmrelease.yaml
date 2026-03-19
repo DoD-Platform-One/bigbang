@@ -28,8 +28,7 @@ spec:
   {{- if or $istioEnabled (dig "values" "minio" "enabled" false .Values.addons.vault ) }}
   dependsOn:
     {{- if $istioEnabled }}
-    - name: {{ include "istioHelmRelease" . }}
-      namespace: {{ .Release.Namespace }}
+    {{- include "istioHelmReleases" . | nindent 4 }}
     {{- end }}
 
     {{- if (dig "values" "minio" "enabled" false .Values.addons.vault) }}

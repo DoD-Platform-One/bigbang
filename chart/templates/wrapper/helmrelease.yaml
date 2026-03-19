@@ -79,8 +79,7 @@ spec:
       namespace: {{ $.Release.Namespace }}
     {{- end }}
     {{- if $istioOpDep }}
-    - name: {{ include "istioHelmRelease" $ }}
-      namespace: {{ $.Release.Namespace }}
+    {{- include "istioHelmReleases" $ | nindent 4 }}
     {{- end }}
     {{- if $monitoringDep }}
     - name: monitoring

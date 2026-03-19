@@ -28,8 +28,7 @@ spec:
   {{- if or .Values.grafana.enabled $istioEnabled .Values.kyverno.enabled }}
   dependsOn:
   {{- if $istioEnabled }}
-  - name: {{ include "istioHelmRelease" . }}
-    namespace: {{ .Release.Namespace }}
+  {{- include "istioHelmReleases" . | nindent 2 }}
   {{- end }}
   {{- if .Values.grafana.enabled }}
   - name: grafana
