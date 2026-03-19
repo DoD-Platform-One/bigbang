@@ -1,29 +1,23 @@
 {{- if .Values.addons.anchoreEnterprise.enabled }}
-{{- include "values-secret" (dict "root" $ "package" .Values.addons.anchoreEnterprise "name" "anchore-enterprise" "defaults" (include "bigbang.defaults.anchoreEnterprise" .)) }}
+{{- /* Create a cleaned copy of anchore config and merge deprecated paths into current paths */ -}}
+{{- $anchorePackage := deepCopy .Values.addons.anchoreEnterprise -}}
+{{- if .Values.addons.anchoreEnterprise.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.anchoreEnterprise.values) | fromYaml -}}
+{{- $anchorePackage = set $anchorePackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict "root" $ "package" $anchorePackage "name" "anchore-enterprise" "defaults" (include "bigbang.defaults.anchoreEnterprise" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.anchoreEnterprise" -}}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.anchoreEnterprise.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $externalRedisEnabled := and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password "true" }}
+{{- $externalPostgresEnabled := and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database "true" }}
 domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
-
-istio:
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.anchoreEnterprise.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
-  injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
-  ui:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
-  api:
-    gateways:
-      - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -39,12 +33,174 @@ monitoring:
   {{- end }}
   {{- end }}
 
+routes:
+  inbound:
+    anchore-api:
+      enabled: true
+      selector:
+        app.kubernetes.io/component: api
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
+      hosts:
+        - anchore-api.{{ $domainName }}
+      http:
+        # Disable ability to hit metrics on virtual service
+        - match:
+            - uri:
+                prefix: /metrics
+          route:
+            - destination:
+                host: anchore-enterprise-anchore-enterprise-api.anchore.svc.cluster.local
+                port:
+                  number: 8228
+          fault:
+            abort:
+              percentage:
+                value: 100
+              httpStatus: 403
+        # Default route for everything else
+        - match:
+            - uri:
+                prefix: /
+          route:
+            - destination:
+                host: anchore-enterprise-anchore-enterprise-api.anchore.svc.cluster.local
+                port:
+                  number: 8228
+    anchore-ui:
+      enabled: true
+      selector:
+        app.kubernetes.io/component: ui
+      gateways:
+        - {{ include "getGatewayName" (dict "gateway" .Values.addons.anchoreEnterprise.ingress.gateway "root" .)}}
+      hosts:
+        - anchore.{{ $domainName }}
+      service: anchore-enterprise-anchore-enterprise-ui.anchore.svc.cluster.local
+      port: 3000
+  outbound:
+    anchore-data-service:
+      enabled: true
+      hosts:
+      - data.anchore-enterprise.com
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.anchoreEnterprise.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - 'auth.docker.io'
+      - 'registry-1.docker.io'
+
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
+
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  ingressLabels:
-    {{- include "getGatewaySelector" (dict "pkg" .Values.addons.anchoreEnterprise "root" .) | nindent 4 }}
+  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
+  hbonePortInjection:
+    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+  ingress:
+    definitions: 
+      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
+    to:
+      catalog:8082:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: catalog
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      simplequeue:8083:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: simplequeue
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      analyzer:8084:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: analyzer
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      policy:8087:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: policyengine
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      api:8228:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: api
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      reports:8558:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: reports
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      notifications:8668:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: notifications
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      ui-redis:9121:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (not $externalRedisEnabled) }}
+  egress:
+    definitions:
+      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+    from:
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+          definition:
+            database-subnets: {{ $externalPostgresEnabled }}
+      api:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: api
+        to:
+          definition:
+            redis-subnets: {{ $externalRedisEnabled }}
+      configure-sso:
+        podSelector:
+          matchLabels:
+            batch.kubernetes.io/job-name: configure-sso
+        to:
+          definition:
+            sso: 
+              enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
+              metadata:
+                annotations:
+                  helm.sh/hook: post-install,post-upgrade
+                  helm.sh/hook-weight: "-10"
+                  helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+      ui:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/component: ui
+        to:
+          definition:
+            redis-subnets: {{ $externalRedisEnabled }}
+  additionalPolicies: []
 
 sso:
   enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
@@ -60,7 +216,7 @@ global:
 imagePullPolicy: {{ .Values.imagePullPolicy }}
 
 postgresql:
-  {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
+  {{- if $externalPostgresEnabled }}
   enabled: false
   {{- else }}
   enabled: true
@@ -97,7 +253,7 @@ upstream:
       enabled: {{ $istioEnabled }}
       injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
 
-  {{- if and .Values.addons.anchoreEnterprise.database.host .Values.addons.anchoreEnterprise.database.port .Values.addons.anchoreEnterprise.database.username .Values.addons.anchoreEnterprise.database.password .Values.addons.anchoreEnterprise.database.database }}
+  {{- if $externalPostgresEnabled }}
   postgresql:
     auth:
       username: {{ .Values.addons.anchoreEnterprise.database.username }}
@@ -119,7 +275,7 @@ upstream:
     {{- end }}
 
 ui-redis:
-  {{- if and .Values.addons.anchoreEnterprise.redis.host .Values.addons.anchoreEnterprise.redis.port .Values.addons.anchoreEnterprise.redis.password }}
+  {{- if $externalRedisEnabled }}
   # We are using an external redis url
   externalEndpoint: "redis://{{ .Values.addons.anchoreEnterprise.redis.username | default "nouser" }}:{{ .Values.addons.anchoreEnterprise.redis.password }}@{{ .Values.addons.anchoreEnterprise.redis.host }}:{{ .Values.addons.anchoreEnterprise.redis.port }}"
   upstream:
