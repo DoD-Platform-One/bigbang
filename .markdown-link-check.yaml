@@ -21,6 +21,8 @@ ignorePatterns:
   # ignore private confluence links
   - pattern: "https://confluence.il2.dso.mil/*"
   - pattern: "https://confluence.il4.dso.mil/*"
+  # ignore links that are known to be unreliable due to rate limiting (will be fixed by https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/issues/806)
+  - pattern: "https://www.opentext.com/products/cybersecurity-cloud"
 # replacementPatterns:
 #   - pattern: ^.attachments
 #     replacement: file://some/conventional/folder/.attachments
