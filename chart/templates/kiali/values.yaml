@@ -121,8 +121,11 @@ upstream:
         tracing:
           enabled: true
           {{- if .Values.tempo.enabled }}
+          external_url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
           internal_url: http://tempo-tempo.tempo.svc.cluster.local:3200
           provider: tempo
+          tempo_config:
+            datasource_uid: tempo
           {{- end}}
         {{- end }}
         istio:
