@@ -88,6 +88,8 @@ routes:
       - 'repo1.dso.mil'
       - 'auth.docker.io'
       - 'registry-1.docker.io'
+      - 'index.docker.io'
+      - 'docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com' # https://docs.docker.com/desktop/setup/allow-list/
 
 istio:
   enabled: {{ $istioEnabled }}
