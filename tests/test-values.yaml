@@ -1934,6 +1934,9 @@ addons:
                       matchLabels:
                         v1.min.io/tenant: minio-minio-minio-instance
       upstream:
+        serviceAccount:
+          server:
+            name: velero
         configuration:
           backupStorageLocation:
             - bucket: velero
