@@ -2431,6 +2431,9 @@ packages:
     # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
+    # -- Include default Big Bang package HelmRelease dependencies (gatekeeper, kyverno-policies, istio where applicable).
+    includeDefaultDependsOn: true
+
     # -- Package details for Istio.  See [wrapper values](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml) for settings.
     istio: {}
 

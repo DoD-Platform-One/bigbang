@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - Package - HelmRelease DependsOn Tests
+templates:
+  - templates/package/helmrelease.yaml
+release:
+  name: test
+set:
+  gatekeeper:
+    enabled: true
+  kyvernoPolicies:
+    enabled: false
+  istiod:
+    enabled: false
+  packages:
+    sample:
+      enabled: true
+      git:
+        repo: https://example.com/sample.git
+        path: chart
+        tag: 1.0.0
+tests:
+  - it: should include default dependsOn by default
+    asserts:
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: gatekeeper
+            namespace: bigbang
+
+  - it: should skip default dependsOn when includeDefaultDependsOn is false
+    set:
+      packages:
+        sample:
+          enabled: true
+          includeDefaultDependsOn: false
+          git:
+            repo: https://example.com/sample.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - notExists:
+          path: spec.dependsOn
+
+  - it: should keep custom dependsOn when includeDefaultDependsOn is false
+    set:
+      packages:
+        sample:
+          enabled: true
+          includeDefaultDependsOn: false
+          dependsOn:
+            - name: custom-dependency
+              namespace: custom-namespace
+          git:
+            repo: https://example.com/sample.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: custom-dependency
+            namespace: custom-namespace
+      - notContains:
+          path: spec.dependsOn
+          content:
+            name: gatekeeper
+            namespace: bigbang

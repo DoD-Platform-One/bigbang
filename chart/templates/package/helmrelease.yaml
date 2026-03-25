@@ -68,21 +68,23 @@ spec:
       kind: Secret
 
   {{- /* Always wait on policy enforcement */ -}}
+  {{- $includeDefaultDependsOn := dig "includeDefaultDependsOn" true $vals -}}
   {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
   {{- $kyvernoDep := $.Values.kyvernoPolicies.enabled -}}
   {{- /* Wait on istio if sidecar is enabled */ -}}
   {{- $istioDep := (and $istioEnabled (eq "enabled" (dig "istio" "injection" "enabled" $vals))) -}}
-  {{- if or $gatekeeperDep $kyvernoDep $istioDep $vals.dependsOn }}
+  {{- $defaultDependsOn := and $includeDefaultDependsOn (or $gatekeeperDep $kyvernoDep $istioDep) -}}
+  {{- if or $defaultDependsOn $vals.dependsOn }}
   dependsOn:
-    {{- if $gatekeeperDep }}
+    {{- if and $includeDefaultDependsOn $gatekeeperDep }}
     - name: gatekeeper
       namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
-    {{- if $kyvernoDep }}
+    {{- if and $includeDefaultDependsOn $kyvernoDep }}
     - name: kyverno-policies
       namespace: {{ default "bigbang" $.Release.namespace }}
     {{- end }}
-    {{- if $istioDep }}
+    {{- if and $includeDefaultDependsOn $istioDep }}
     {{- include "istioHelmReleases" $ | nindent 4 }}
     {{- end }}
     {{- if $vals.dependsOn }}
