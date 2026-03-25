@@ -1,5 +1,6 @@
 nav:
   - Overview: index.md
+  - Package Offboarding: package-offboarding
   - Package Integration: package-integration
   - AWS K3d Script: aws-k3d-script.md
   - CI Workflow: ci-workflow.md

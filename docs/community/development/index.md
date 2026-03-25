@@ -21,6 +21,10 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 
 [Big Bang Package Integration Guide](./package-integration/index.md) and [BBTOC Graduated Requirements](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process#graduated-project-requirements)
 
+## Package Offboarding
+
+[Package Offboarding Checklist](./package-offboarding/index.md).
+
 ## Package Development
 
 [Develop a Big Bang Package](./develop-package.md).
