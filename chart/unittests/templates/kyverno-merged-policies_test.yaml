@@ -46,6 +46,8 @@ tests:
               enabled: false
             alloy:
               enabled: false
+            ztunnel:
+              enabled: false
             kyvernoReporter:
               enabled: false
             kiali:
