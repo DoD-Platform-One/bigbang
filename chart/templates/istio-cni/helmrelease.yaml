@@ -1,5 +1,5 @@
 {{- $fluxSettingsIstioCNI := merge .Values.istioCNI.flux .Values.flux -}}
-{{- if .Values.istioCNI.enabled }}
+{{- if or .Values.istioCNI.enabled (.Values.ztunnel.enabled) }}
 {{- if not .Values.istiod.enabled }}
 {{- fail "istioCNI requires istiod to be enabled" }}
 {{- end }}

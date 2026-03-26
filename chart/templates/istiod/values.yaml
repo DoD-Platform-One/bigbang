@@ -25,6 +25,11 @@ istio:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   egress:
+    {{- if .Values.ztunnel.enabled }}
+    defaults:
+      allowInNamespace:
+        enabled: true
+    {{- end }}
     definitions: {{.Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       istiod:
@@ -32,6 +37,11 @@ networkPolicies:
           definition:
             sso: {{ $authserviceEnabled }}
   ingress:
+    {{- if .Values.ztunnel.enabled }}
+    defaults:
+      allowInNamespace:
+        enabled: true
+    {{- end }}
     definitions: {{.Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       istiod:15014:
@@ -52,7 +62,12 @@ upstream:
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}
- 
+  {{- if .Values.ztunnel.enabled }}
+  pilot:
+    env:
+      PILOT_ENABLE_AMBIENT: "true"
+  {{- end }}
+
   {{- if or $authserviceEnabled .Values.tempo.enabled }}
   meshConfig:
     {{- if .Values.tempo.enabled }}

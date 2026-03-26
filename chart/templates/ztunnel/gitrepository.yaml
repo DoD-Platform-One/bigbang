@@ -1,0 +1,3 @@
+{{- if and (eq .Values.ztunnel.sourceType "git") (not .Values.offline) (.Values.ztunnel.enabled) }}
+{{- include "bigbang.gitRepository" (dict "name" "ztunnel" "gitCredsName" "ztunnel" "git" .Values.ztunnel.git "component" "core" "root" .) }}
+{{- end }}
