@@ -64,6 +64,11 @@ spec:
   {{- toYaml $vals.postRenderers | nindent 4 }}
   {{- end }}
   valuesFrom:
+    {{- if dig "bbCommonValues" false $vals }}
+    - name: {{ $pkg }}-values
+      kind: Secret
+      valuesKey: common.yaml
+    {{- end }}
     - name: {{ $pkg }}-values
       kind: Secret
 

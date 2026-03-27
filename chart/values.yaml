@@ -2399,6 +2399,10 @@ packages:
     # @default -- true
     passBigBangValues: true
 
+    # -- Pass bb-common values to the package
+    # @default -- false
+    bbCommonValues: false
+
     # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
     helmRepo:
       # -- Name of the HelmRepo specified in `helmRepositories`
