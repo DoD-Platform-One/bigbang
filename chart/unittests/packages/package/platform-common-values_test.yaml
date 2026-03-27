@@ -1,0 +1,196 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Platform - Common Values Tests
+templates:
+  - templates/package/values.yaml
+release:
+  name: test
+set:
+  packages:
+    sample:
+      enabled: true
+      bbCommonValues: true
+      git:
+        repo: https://example.com/sample.git
+        path: chart
+        tag: 1.0.0
+postRenderer:
+  cmd: "sh"
+  args:
+    - "-c"
+    - "yq eval '.stringData.\"common.yaml\"' - | yq eval '.'"
+tests:
+  - it: should have global domain set correctly
+    asserts:
+      - equal:
+          path: global.domain
+          value: dev.bigbang.mil
+
+  - it: should have global domain set to custom value
+    set:
+      domain: custom.example.com
+    asserts:
+      - equal:
+          path: global.domain
+          value: custom.example.com
+
+  - it: should have monitoring enabled by default
+    asserts:
+      - equal:
+          path: global.monitoring.enabled
+          value: true
+
+  - it: should have monitoring disabled when set
+    set:
+      monitoring.enabled: false
+    asserts:
+      - equal:
+          path: global.monitoring.enabled
+          value: false
+
+  - it: should have istio enabled by default
+    asserts:
+      - equal:
+          path: bb-common.istio.enabled
+          value: true
+
+  - it: should have istio disabled when istiod is disabled
+    set:
+      istiod.enabled: false
+    asserts:
+      - equal:
+          path: bb-common.istio.enabled
+          value: false
+
+  - it: should have istio sidecar disabled by default
+    asserts:
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: false
+
+  - it: should have istio sidecar enabled when istiod hardened is enabled
+    set:
+      istiod.values.hardened.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: true
+
+  - it: should have authorizationPolicies disabled by default
+    asserts:
+      - equal:
+          path: bb-common.istio.authorizationPolicies.enabled
+          value: false
+      - equal:
+          path: bb-common.istio.authorizationPolicies.generateFromNetpol
+          value: false
+
+  - it: should have authorizationPolicies enabled when istiod hardened is enabled
+    set:
+      istiod.values.hardened.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.istio.authorizationPolicies.enabled
+          value: true
+      - equal:
+          path: bb-common.istio.authorizationPolicies.generateFromNetpol
+          value: true
+
+  - it: should have networkPolicies enabled by default
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.enabled
+          value: true
+
+  - it: should have networkPolicies disabled when set
+    set:
+      networkPolicies.enabled: false
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.enabled
+          value: false
+
+  - it: should pass through networkPolicies egress settings
+    set:
+      networkPolicies.egress.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.enabled
+          value: true
+
+  - it: should pass through networkPolicies ingress settings
+    set:
+      networkPolicies.ingress.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.ingress.enabled
+          value: true
+
+  - it: should have default sso egress definition
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.sso
+          value:
+            to:
+              - ipBlock:
+                  cidr: "0.0.0.0/0"
+
+  - it: should have default storage-subnets egress definition
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.storage-subnets
+          value:
+            to:
+              - ipBlock:
+                  cidr: "0.0.0.0/0"
+            ports:
+              - port: 443
+                protocol: TCP
+
+  - it: should have default database-subnets egress definition
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.database-subnets
+          value:
+            to:
+              - ipBlock:
+                  cidr: "192.168.0.0/16"
+              - ipBlock:
+                  cidr: "172.16.0.0/12"
+              - ipBlock:
+                  cidr: "10.0.0.0/8"
+            ports:
+              - port: 5432
+                protocol: TCP
+
+  - it: should allow custom sso egress CIDR
+    set:
+      networkPolicies.egress.definitions.sso.to:
+        - ipBlock:
+            cidr: "10.10.10.0/24"
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.sso
+          value:
+            to:
+              - ipBlock:
+                  cidr: "10.10.10.0/24"
+
+  - it: should allow custom egress definitions
+    set:
+      networkPolicies.egress.definitions.custom-service:
+        to:
+          - ipBlock:
+              cidr: "192.168.1.0/24"
+        ports:
+          - port: 8080
+            protocol: TCP
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.custom-service
+          value:
+            to:
+              - ipBlock:
+                  cidr: "192.168.1.0/24"
+            ports:
+              - port: 8080
+                protocol: TCP

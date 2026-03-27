@@ -19,7 +19,26 @@ metadata:
     {{- include "commonLabels" $ | nindent 4 }}
 type: Opaque
 stringData:
-  {{- if (not $vals.kustomize) }}
+{{- if (not $vals.kustomize) }}
+{{- if dig "bbCommonValues" false $vals }}
+{{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
+{{- $istioHardened := dig "hardened" "enabled" false $.Values.istiod.values }}
+  common.yaml: |
+    global:
+      domain: {{ $.Values.domain }}
+      monitoring:
+        enabled: {{ $.Values.monitoring.enabled }}
+    bb-common:
+      istio:
+        enabled: {{ $istioEnabled }}
+        sidecar:
+          enabled: {{ $istioHardened }}
+        authorizationPolicies:
+          enabled: {{ $istioHardened }}
+          generateFromNetpol: {{ $istioHardened }}
+      networkPolicies:
+{{- pick $.Values.networkPolicies "enabled" "hbonePortInjection" "prependReleaseName" "defaultsAsHooks" "egress" "ingress" "additionalPolicies" "additional" | toYaml | nindent 8 }}
+  {{- end }}
 
   {{- if or ($vals.values) (dig "passBigBangValues" true $vals) }}
   values.yaml: |-

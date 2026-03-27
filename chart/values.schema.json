@@ -1410,6 +1410,10 @@
             "type": "boolean",
             "default": true
           },
+          "bbCommonValues": {
+            "type": "boolean",
+            "default": false
+          },
           "includeDefaultDependsOn": {
             "type": "boolean",
             "default": true
