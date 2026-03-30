@@ -24,6 +24,21 @@ Big Bang leverages these Flux CD v2 controllers:
 - **Helm Controller**: Manages Helm releases with native Helm support
 - **Notification Controller**: Sends alerts and notifications
 
+### Flux Self-Management
+
+Big Bang supports a "Fluxing the Flux" pattern where Flux reconciles its own controller manifests from `base/flux` after initial bootstrap.
+
+- **Bootstrap once**: Install Flux initially (for example, with `install_flux.sh`) so controllers exist and can begin reconciliation.
+- **Steady state**: Manage Flux controller manifests declaratively through a `flux-components` `Kustomization`.
+- **Version alignment**: Keep Flux controller source revisions aligned with your Big Bang version pin.
+
+Reference implementations are available in the [Big Bang customer template](https://repo1.dso.mil/big-bang/customers/template/-/blob/main/README.md):
+
+- `gitRepo` strategy (`gitRepo/base/flux-components.yaml`)
+- `helmRepo` strategy (`helmRepo/base/flux-components.yaml`)
+
+For `helmRepo`, the template syncs `GitRepository/bigbang.spec.ref.tag` from `HelmRelease/bigbang.spec.chart.spec.version` in base. If an environment overlay overrides the chart version, also patch the GitRepository tag in that overlay to keep Flux components and Big Bang aligned.
+
 ### Repository Structure
 
 A typical Big Bang deployment follows this repository structure:

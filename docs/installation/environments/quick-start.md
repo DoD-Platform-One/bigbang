@@ -139,6 +139,8 @@ The quickstart.sh script performs several actions:
 1. Installs the Big Bang umbrella chart into your k3d cluster
 1. Waits for Big Bang to completely deploy, which may take a significant amount of time
 
+For customer-managed GitOps environments, see the customer template's Flux self-management implementation in the [Big Bang customer template README](https://repo1.dso.mil/big-bang/customers/template/-/blob/main/README.md#fluxing-the-flux) and conceptual guidance in [GitOps Workflow](../../concepts/git-ops-workflow.md#flux-self-management).
+
 ### Fix DNS to access the services in your browser
 
 You can now access your Big Bang kubernetes cluster from your workstation's command line using `kubectl`, but you will need to perform one extra step to easily access Big Bang services in your web browser (or from the command line using utilities like `curl`). You will need to manually override some DNS settings to send specific website requests to your kubernetes cluster. This was included in the final message of the Quick Start, but here are the instructions again.

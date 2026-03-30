@@ -64,6 +64,15 @@ resources:
       tag: "1.57.1"
 ```
 
+### Flux controller alignment in Customer Template
+
+The customer template includes a `flux-components` Kustomization in base for both `gitRepo` and `helmRepo` strategies so Flux can reconcile Flux controller manifests from Big Bang `base/flux`.
+
+- For `gitRepo`, update the base `ref` and Flux components follow that same source revision.
+- For `helmRepo`, update `base/helmrelease.yaml` `spec.chart.spec.version`; the template syncs the `GitRepository/bigbang` tag from that version.
+
+If you override the Big Bang version in an environment overlay, also override the `GitRepository/bigbang.spec.ref.tag` in that overlay to keep Flux controllers and Big Bang on matching revisions.
+
 ## Verifying the Upgrade
 After upgrading the cluster, there are some places to look to verify that the upgrade was completed successfully.
 
