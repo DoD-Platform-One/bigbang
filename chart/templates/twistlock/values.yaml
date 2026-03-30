@@ -20,9 +20,9 @@ domain: {{ $domainName }}
 openshift: {{ .Values.openshift }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT
     {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.twistlock.values) "STRICT") }}
     scheme: https
@@ -49,6 +49,7 @@ networkPolicies:
       twistlock-console:8081:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
   egress:

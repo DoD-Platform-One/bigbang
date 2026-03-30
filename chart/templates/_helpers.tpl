@@ -683,6 +683,16 @@ chart:
 {{- end -}}
 
 {{/*
+Returns "true" when at least one metric scraper is active:
+  - Prometheus scraping (monitoring.enabled + prometheusMetrics.enabled)
+  - Alloy metrics scraping (alloy.enabled + alloyMetrics.enabled)
+Used to gate ServiceMonitor/PodMonitor CRD creation across all packages.
+*/}}
+{{- define "metricScrapingEnabled" -}}
+{{- or (and .Values.monitoring.enabled (dig "prometheusMetrics" "enabled" true .Values.monitoring)) (and .Values.alloy.enabled (dig "alloyMetrics" "enabled" false .Values.alloy)) -}}
+{{- end -}}
+
+{{/*
 Shared HelmRelease valuesFrom block.
 Generates the standard 3-secret valuesFrom (common, defaults, overlays).
 Args (dict):

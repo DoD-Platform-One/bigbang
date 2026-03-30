@@ -72,6 +72,7 @@ networkPolicies:
       policy-reporter:8080:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   additionalPolicies: []
 
@@ -106,9 +107,9 @@ upstream:
   # monitoring contains configurations related to monitoring
   monitoring:
     # -- Enables the Prometheus Operator integration
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     grafana:
       dashboards:
-        enabled: {{ or .Values.monitoring.enabled .Values.grafana.enabled }}
+        enabled: {{ or (eq (include "metricScrapingEnabled" .) "true") .Values.grafana.enabled }}
         namespace: monitoring
 {{- end -}}

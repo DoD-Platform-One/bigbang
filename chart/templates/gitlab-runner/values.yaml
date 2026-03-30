@@ -48,6 +48,7 @@ networkPolicies:
             app: gitlab-runner
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   additionalPolicies: []
 
@@ -67,10 +68,10 @@ upstream:
     app.kubernetes.io/name: gitlab-runner
 
   metrics:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlabRunner.values) "STRICT") .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlabRunner.values) "STRICT") (eq (include "metricScrapingEnabled" .) "true") }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -82,7 +83,7 @@ upstream:
       enabled: false
 
   service:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
   # When istio injected, add an annotation with the istio version to the manager pods only
   {{- if $istioInjection }}

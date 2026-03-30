@@ -20,7 +20,7 @@ domain: {{ $domainName }}
 openshift: {{ .Values.openshift }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
   {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
   serviceMonitor:
@@ -118,6 +118,7 @@ networkPolicies:
             app.kubernetes.io/component: catalog
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       simplequeue:8083:
         podSelector:
@@ -125,6 +126,7 @@ networkPolicies:
             app.kubernetes.io/component: simplequeue
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       analyzer:8084:
         podSelector:
@@ -132,6 +134,7 @@ networkPolicies:
             app.kubernetes.io/component: analyzer
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       policy:8087:
         podSelector:
@@ -139,6 +142,7 @@ networkPolicies:
             app.kubernetes.io/component: policyengine
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       api:8228:
         podSelector:
@@ -146,6 +150,7 @@ networkPolicies:
             app.kubernetes.io/component: api
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       reports:8558:
         podSelector:
@@ -153,6 +158,7 @@ networkPolicies:
             app.kubernetes.io/component: reports
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       notifications:8668:
         podSelector:
@@ -160,10 +166,12 @@ networkPolicies:
             app.kubernetes.io/component: notifications
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       ui-redis:9121:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ and (dig "alloyMetrics" "enabled" false .Values.alloy) (not $externalRedisEnabled) }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (not $externalRedisEnabled) }}
   egress:
     definitions:
@@ -295,7 +303,7 @@ ui-redis:
     {{- end }}
     image:
       {{- include "secretsPullSecrets" . | nindent 6 }}
-    {{- if .Values.monitoring.enabled }}
+    {{- if eq (include "metricScrapingEnabled" .) "true" }}
     metrics:
       enabled: true
       image:

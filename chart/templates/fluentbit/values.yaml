@@ -73,6 +73,7 @@ networkPolicies:
       "fluent-bit:2020":
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 istio:
   enabled: {{ $istioEnabled }}
@@ -95,7 +96,7 @@ upstream:
   openShift:
     enabled: {{ .Values.openshift }}
 
-  {{- if .Values.monitoring.enabled }}
+  {{- if eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
     enabled: true
     namespace: monitoring

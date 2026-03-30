@@ -772,6 +772,15 @@
         "flux": true,
         "values": true,
         "postRenderers": true,
+        "prometheusMetrics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
         "istio": {
           "$ref": "#/$defs/istio"
         },

@@ -82,6 +82,7 @@ networkPolicies:
             alloy-alloy-singleton@alloy/alloy-singleton: {{ and .Values.alloy.enabled (dig "alloyClusterEvents" "enabled" false .Values.alloy) }}
             fluentbit-fluent-bit@fluentbit/fluent-bit: {{ .Values.fluentbit.enabled }}
             monitoring-grafana@monitoring/grafana: {{ and .Values.grafana.enabled (eq .Values.loki.strategy "monolith") }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       loki:8080:
         podSelector:
@@ -113,9 +114,9 @@ networkPolicies:
             kubeAPI: {{ $minioEnabled }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # conditional passes only for default istio: enabled, mTLS: SCRICT
     {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
     scheme: https

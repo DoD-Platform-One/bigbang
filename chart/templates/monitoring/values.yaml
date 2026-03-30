@@ -178,6 +178,7 @@ networkPolicies:
             authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
             kiali/kiali: {{ .Values.kiali.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
+            alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             logging/logging-loki: {{ .Values.loki.enabled }}
 
 openshift: {{ .Values.openshift }}
@@ -306,7 +307,7 @@ upstream:
           keyFile: /etc/prom-certs/key.pem
           insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
-      {{- if .Values.addons.mimir.enabled }}
+      {{- if and .Values.addons.mimir.enabled (not (dig "alloyMetrics" "enabled" false .Values.alloy)) }}
       remoteWrite:
         {{- if $istioEnabled }}
         # I promise it's not a typo; the port is 80 even though it's TLS
@@ -381,8 +382,16 @@ upstream:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
         - name: "config-reloader"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
-      {{- if .Values.tempo.enabled }}
+      {{- if or .Values.tempo.enabled (dig "alloyMetrics" "enabled" false .Values.alloy) }}
       enableRemoteWriteReceiver: true
+      {{- end }}
+      {{- if not (dig "prometheusMetrics" "enabled" true .Values.monitoring) }}
+      serviceMonitorNamespaceSelector:
+        matchLabels:
+          invalid-key: invalid-value
+      podMonitorNamespaceSelector:
+        matchLabels:
+          invalid-key: invalid-value
       {{- end }}
       podMetadata:
         labels:

@@ -108,15 +108,15 @@ upstream:
   {{- end }}
 
 monitor:
-  install: {{ .Values.monitoring.enabled }}
-  
+  install: {{ eq (include "metricScrapingEnabled" .) "true" }}
+
   {{- include "secretsImagePullSecretsSingle" . | nindent 2 }}
 
   exporter:
-    enabled: {{ .Values.monitoring.enabled }}
-    {{- if or .Values.monitoring.enabled $istioInjection }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+    {{- if or (eq (include "metricScrapingEnabled" .) "true") $istioInjection }}
     podAnnotations:
-      {{- if .Values.monitoring.enabled }}
+      {{- if eq (include "metricScrapingEnabled" .) "true" }}
       checksum/metrics-pass: {{ sha256sum $neuvectorMetricsPass }}
       {{- end }}
       {{- if $istioInjection }}
@@ -124,8 +124,8 @@ monitor:
       {{- end }}
     {{- end }}
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") (eq (include "metricScrapingEnabled" .) "true") }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -135,7 +135,7 @@ monitor:
       {{- end }}
 
     svc:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
       type: ClusterIP
     CTRL_USERNAME: metrics
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}

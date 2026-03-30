@@ -48,10 +48,10 @@ updateJob:
 {{- end }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
   serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # conditional passes only for default istio: enabled, mTLS: STRICT
     {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mattermost) "STRICT") }}
     scheme: https
@@ -194,7 +194,7 @@ minio:
     tenant:
       {{- include "secretsImagePullSecretWithName" $ | nindent 6 }}
       metrics:
-        enabled: {{ $.Values.monitoring.enabled }}
+        enabled: {{ eq (include "metricScrapingEnabled" $) "true" }}
       configSecret:
         accessKey: {{ .accessKey | default "minio" }}
         secretKey: {{ .secretKey | default "BigBangDEVONLY" }}

@@ -805,9 +805,9 @@ alloy:
   alloyLogs:
     enabled: true
 
-    # -- Toggle Alloy to collect metrics
+    # -- Toggle Alloy to scrape metrics
   alloyMetrics:
-    enabled: true
+    enabled: false
 
   # -- Toggle Alloy to collect cluster events
   alloyClusterEvents:
@@ -1058,6 +1058,10 @@ prometheusOperatorCRDs:
 monitoring:
   # -- Toggle deployment of Monitoring (Prometheus, Grafana, and Alertmanager).
   enabled: true
+
+  # -- Toggle Prometheus metrics scraping.  Set to false when using alloy-metrics as the scraper.
+  prometheusMetrics:
+    enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"

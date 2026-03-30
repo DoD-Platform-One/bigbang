@@ -66,7 +66,7 @@ upstream:
       pullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecretWithName" . | nindent 4 }}
     metrics:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     configSecret:
       accessKey: {{ .Values.addons.minio.accesskey | default "minio" }}
       secretKey: {{ .Values.addons.minio.secretkey | default "minio123" }}  

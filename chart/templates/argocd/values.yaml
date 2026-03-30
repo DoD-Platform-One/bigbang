@@ -42,7 +42,7 @@ redis-bb:
     auth:
       enabled: false
     metrics:
-    {{- if .Values.monitoring.enabled }}
+    {{- if eq (include "metricScrapingEnabled" .) "true" }}
       enabled: true
       serviceMonitor:
         enabled: true
@@ -106,7 +106,7 @@ istio:
     generateFromNetpol: {{ $istioHardened }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}

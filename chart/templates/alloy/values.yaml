@@ -16,8 +16,10 @@
 
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
+{{- $alloyMetricsEnabled := (dig "alloyMetrics" "enabled" false .Values.alloy) }}
 {{- $alloyClusterEventsEnabled := (dig "alloyClusterEvents" "enabled" false .Values.alloy) }}
 {{- $tempoEnabled := .Values.tempo.enabled }}
+{{- $mimirEnabled := .Values.addons.mimir.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.alloy.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
@@ -69,10 +71,11 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
-      # Allow Prometheus to scrape alloy-metrics
+      # Allow alloy-metrics and Prometheus to scrape alloy-metrics
       alloy-metrics:12345:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       {{- if $tempoEnabled }}
       # Allow any namespace to send traces to alloy-receiver via OTLP gRPC
@@ -110,6 +113,16 @@ networkPolicies:
           k8s:
             tempo/tempo:4317: true
       {{- end }}
+      {{- if $alloyMetricsEnabled }}
+      # Allow alloy-metrics to push metrics to Prometheus and Mimir
+      alloy-metrics:
+        to:
+          definition:
+            kubeAPI: true
+          k8s:
+            monitoring/monitoring-monitoring-kube-prometheus:9090: {{ .Values.monitoring.enabled }}
+            mimir/mimir-mimir-gateway:8080: {{ $mimirEnabled }}
+      {{- end }}
 istio:
   enabled: {{ $istioEnabled }}
 
@@ -142,6 +155,34 @@ upstream:
         enabled: false
       tls:
         insecure: true
+    {{- end }}
+    {{- if and $alloyMetricsEnabled .Values.monitoring.enabled }}
+    - name: prometheus
+      type: prometheus
+      {{- if $istioEnabled }}
+      url: https://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+      tls:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- else }}
+      url: http://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+      {{- end }}
+    {{- end }}
+    {{- if and $alloyMetricsEnabled $mimirEnabled }}
+    - name: mimir
+      type: prometheus
+      {{- if $istioEnabled }}
+      url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
+      tls:
+        caFile: /etc/prom-certs/root-cert.pem
+        certFile: /etc/prom-certs/cert-chain.pem
+        keyFile: /etc/prom-certs/key.pem
+        insecureSkipVerify: true
+      {{- else }}
+      url: http://mimir-mimir-gateway.mimir.svc.cluster.local/api/v1/push
+      {{- end }}
     {{- end }}
   {{- if .Values.alloy.additionalDestinations }}
   {{- toYaml .Values.alloy.additionalDestinations | nindent 4 }}
@@ -190,6 +231,26 @@ upstream:
   {{- if $alloyClusterEventsEnabled }}
   alloy-singleton:
     enabled: true
+    {{- if and $alloyMetricsEnabled $istioEnabled }}
+    alloy:
+      # Mount Istio certs so alloy-singleton can use prometheus destination with mTLS
+      mounts:
+        extra:
+          - name: istio-certs
+            mountPath: /etc/prom-certs/
+    controller:
+      podAnnotations:
+        proxy.istio.io/config: |
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-output-certs
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+      volumes:
+        extra:
+          - name: istio-certs
+            emptyDir:
+              medium: Memory
+    {{- end }}
   clusterEvents:
     enabled: true
     destinations:
@@ -234,8 +295,49 @@ upstream:
     destinations:
       - tempo
   {{- end }}
-  {{- if $.Values.monitoring.enabled }}
+  {{- if $alloyMetricsEnabled }}
+  # Enable alloy-metrics to scrape ServiceMonitors/PodMonitors and forward via remote write
+  alloy-metrics:
+    enabled: true
+    alloy:
+      {{- if and $istioEnabled $istioHardenedEnabled }}
+      extraAnnotations:
+        {{ include "istioAnnotation" . }}
+      {{- end }}
+      # Mount Istio certs so alloy-metrics can scrape ServiceMonitors with mTLS tlsConfig
+      mounts:
+        extra:
+          - name: istio-certs
+            mountPath: /etc/prom-certs/
+    controller:
+      {{- if $istioEnabled }}
+      # Istio sidecar annotations to output certs to the shared istio-certs volume
+      podAnnotations:
+        proxy.istio.io/config: |
+          proxyMetadata:
+            OUTPUT_CERTS: /etc/istio-output-certs
+        sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+        traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+      {{- end }}
+      volumes:
+        extra:
+          - name: istio-certs
+            emptyDir:
+              medium: Memory
+  prometheusOperatorObjects:
+    enabled: true
+    destinations:
+      {{- if .Values.monitoring.enabled }}
+      - prometheus
+      {{- end }}
+      {{- if $mimirEnabled }}
+      - mimir
+      {{- end }}
+    collector: alloy-metrics
+  {{- end }}
+  {{- if eq (include "metricScrapingEnabled" $) "true" }}
 serviceMonitors:
+  {{- if $alloyLogsEnabled }}
   - name: alloy-alloy-logs
     additionalLabels:
       app.kubernetes.io/instance: alloy
@@ -266,6 +368,24 @@ serviceMonitors:
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if $alloyMetricsEnabled }}
+  - name: alloy-alloy-metrics
+    additionalLabels:
+      app.kubernetes.io/instance: alloy
+      app.kubernetes.io/name: alloy-metrics
+    selectorLabels:
+      app.kubernetes.io/instance: alloy-alloy-metrics
+      app.kubernetes.io/name: alloy-metrics
+    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.alloy.values) "STRICT") }}
+    scheme: https
+    tlsConfig:
+      caFile: /etc/prom-certs/root-cert.pem
+      certFile: /etc/prom-certs/cert-chain.pem
+      keyFile: /etc/prom-certs/key.pem
+      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
   {{- end }}
   {{- end }}

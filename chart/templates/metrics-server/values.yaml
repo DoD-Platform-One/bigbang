@@ -22,12 +22,12 @@ upstream:
   fullnameOverride: "metrics-server"
 
   serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     dashboards:
       namespace: monitoring
 
   metrics:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 istio:
   enabled: {{ $istioEnabled }}
