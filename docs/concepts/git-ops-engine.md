@@ -10,6 +10,8 @@ Big Bang is composed of Open Source and licensed products.  [Helm](https://helm.
 
 The Flux 2 Engine has native Helm support, meaning the controller deployed as part of "Flux 2" leverages the same Helm code as the CLI.
 
+For operational workflow guidance, including Flux self-management ("Fluxing the Flux") patterns used in the customer template, see [GitOps Workflow](git-ops-workflow.md#flux-self-management).
+
 ### Limitations of Argo
 
 #### Helm Support
