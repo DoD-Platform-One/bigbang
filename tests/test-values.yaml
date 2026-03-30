@@ -701,8 +701,6 @@ kyvernoPolicies:
     additionalPolicyExceptions:
       testpolicyexception:
         enabled: true
-        kind: PolicyException
-        namespace: "kyverno"
         annotations:
           policies.kyverno.io/title: Test PolicyException
           policies.kyverno.io/category: Test
