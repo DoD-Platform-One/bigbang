@@ -71,7 +71,7 @@ upstream:
         #           value: SPAN_KIND_SERVER
   {{- end }}
   serviceMonitor:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
   tempoQuery:
     pullPolicy: {{ .Values.imagePullPolicy }}
@@ -106,6 +106,7 @@ networkPolicies:
         from:
           k8s:
             monitoring-grafana@monitoring/grafana: {{ .Values.grafana.enabled }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
             kiali-service-account@kiali/kiali: {{ .Values.kiali.enabled }}
       tempo:4317:

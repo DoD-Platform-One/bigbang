@@ -121,6 +121,7 @@ networkPolicies:
       redis:9121: 
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
       gitlab-exporter:9168:
         podSelector:
@@ -128,6 +129,7 @@ networkPolicies:
             app: gitlab-exporter
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
       gitaly:9236:
         podSelector:
@@ -135,6 +137,7 @@ networkPolicies:
             app: gitaly
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
       webservice:8181:
         podSelector:
@@ -155,14 +158,16 @@ networkPolicies:
             app: webservice
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
-            
+
       registry:5001:
         podSelector:
           matchLabels:
             app: registry
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
       {{- if $kasEnabled }}
       kas:[8150,8153]:
@@ -171,6 +176,7 @@ networkPolicies:
             app: kas
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
       {{- end }}
 
@@ -180,6 +186,7 @@ networkPolicies:
             app: gitlab-runner
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
   egress:
     definitions: {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
@@ -207,7 +214,7 @@ networkPolicies:
 upstream:
   {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
   redis:
-    {{- if .Values.monitoring.enabled }}
+    {{- if eq (include "metricScrapingEnabled" .) "true" }}
     metrics:
       serviceMonitor:
         enabled: true
@@ -288,7 +295,7 @@ upstream:
       {{- end }}
     {{- end }}
     gitlab-exporter:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
       {{- if $istioInjection }}
       metrics:
         annotations:

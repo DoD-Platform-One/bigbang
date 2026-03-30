@@ -40,7 +40,7 @@ networkPolicies:
       headlamp:4466:
         from:
           k8s:
-            monitoring-monitoring-prometheus-blackbox-exporter@monitoring/prometheus-blackbox-exporter: {{ .Values.monitoring.enabled }}
+            monitoring-monitoring-prometheus-blackbox-exporter@monitoring/prometheus-blackbox-exporter: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 {{- $baseURL := dig "upstream" "config" "baseURL" "" .Values.addons.headlamp.values }}
 {{- $port := dig "upstream" "service" "port" 4466 .Values.addons.headlamp.values }}

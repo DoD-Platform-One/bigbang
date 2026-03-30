@@ -84,30 +84,30 @@ upstream:
   existingImagePullSecrets: []
 
   grafana:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     namespace: monitoring
 
   admissionController:
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # clear out the explicit set in the package, so it falls back to our global value
     imagePullSecrets: []
 
   backgroundController:
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # clear out the explicit set in the package, so it falls back to our global value
     imagePullSecrets: []
 
   cleanupController:
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # clear out the explicit set in the package, so it falls back to our global value
     imagePullSecrets: []
 
   reportsController:
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     # clear out the explicit set in the package, so it falls back to our global value
     imagePullSecrets: []
 

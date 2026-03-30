@@ -82,7 +82,7 @@ networkPolicies:
             authservice/authservice:10003: {{ $authserviceRedisEnabled }}
 
 upstream:
-  {{- if .Values.monitoring.enabled }}
+  {{- if eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
     enabled: true
   {{- if $istioInjection }}

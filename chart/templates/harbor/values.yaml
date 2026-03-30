@@ -59,6 +59,7 @@ networkPolicies:
       harbor:8001:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
 monitoring:
@@ -81,8 +82,8 @@ upstream:
   imagePullPolicy: {{ .Values.imagePullPolicy }}
 
   metrics:
-    enabled: {{ .Values.monitoring.enabled }}
+    enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     serviceMonitor:
-      enabled: {{ .Values.monitoring.enabled }}
+      enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 {{- end }}

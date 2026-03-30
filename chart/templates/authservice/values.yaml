@@ -124,9 +124,9 @@ redis-bb:
     global:
       {{- include "secretsImagePullSecrets" . | nindent 6 }}
 
-    {{- if .Values.monitoring.enabled }}
+    {{- if eq (include "metricScrapingEnabled" .) "true" }}
     metrics:
-      enabled: true 
+      enabled: true
       image:
         {{- include "secretsPullSecrets" . | nindent 8 }}
       serviceMonitor:

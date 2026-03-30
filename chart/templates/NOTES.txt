@@ -151,12 +151,29 @@ PLATFORM ONE LOGGING WARNING:
 {{- end }}
 
 {{- if and (and .Values.alloy.enabled .Values.alloy.alloyLogs.enabled) (not .Values.loki.enabled) (not .Values.alloy.additionalDestinations) }}
-PLATFORM ONE LOGGING WARNING:
+PLATFORM ONE ALLOY WARNING:
   You have enabled Alloy with logging but a logging destination has not been configured.
   Resolution Options:
     1. Enable Loki: Set .Values.loki.enabled=true
     2. For external or custom destinations, add an additional destination of type "loki": Configure .Values.alloy.additionalDestinations see https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/docs/destinations
     3. Disable Alloy Logging: Set .Values.alloy.alloyLogs.enabled=false
+{{- end }}
+
+{{- if and (dig "alloyMetrics" "enabled" false .Values.alloy) (dig "prometheusMetrics" "enabled" true .Values.monitoring) .Values.monitoring.enabled }}
+PLATFORM ONE ALLOY WARNING:
+  You have enabled both Prometheus scraping (monitoring.prometheusMetrics.enabled=true) and Alloy metrics
+  scraping (alloy.alloyMetrics.enabled=true). This will result in duplicate metrics being collected.
+  Resolution: Set monitoring.prometheusMetrics.enabled=false to let Alloy handle all scraping.
+{{- end }}
+
+{{- if and (dig "alloyMetrics" "enabled" false .Values.alloy) (not .Values.monitoring.enabled) (not .Values.addons.mimir.enabled) }}
+PLATFORM ONE ALLOY WARNING:
+  You have enabled Alloy metrics scraping but no metrics backend (Prometheus or Mimir) is enabled.
+  Alloy will have no destination to push metrics to.
+  Resolution Options:
+    1. Enable Monitoring: Set .Values.monitoring.enabled=true
+    2. Enable Mimir: Set .Values.addons.mimir.enabled=true
+    3. Disable Alloy Metrics: Set .Values.alloy.alloyMetrics.enabled=false
 {{- end }}
 
 {{- if and $.Values.loki.enabled (dig "values" "global" "createGlobalConfig" false $.Values.loki) }}

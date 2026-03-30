@@ -115,6 +115,7 @@ networkPolicies:
         from:
           k8s:
             minio-operator@minio-operator/minio-operator: {{ $shouldEnableMinio }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       thanos-query:10902:
         podSelector:

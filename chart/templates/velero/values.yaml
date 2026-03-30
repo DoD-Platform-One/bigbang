@@ -25,7 +25,7 @@ podAnnotations:
 {{- end }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -50,6 +50,7 @@ networkPolicies:
       velero:8085:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
@@ -85,7 +86,7 @@ upstream:
     pullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}
 
-  {{- if .Values.monitoring.enabled }}
+  {{- if eq (include "metricScrapingEnabled" .) "true" }}
   metrics:
     enabled: true
     scrapeInterval: 30s

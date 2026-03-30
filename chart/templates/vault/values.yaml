@@ -28,7 +28,7 @@ domain: {{ $domainName }}
 openshift: {{ .Values.openshift }}
 
 monitoring:
-  enabled: {{ .Values.monitoring.enabled }}
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
 routes:
   inbound:
@@ -82,6 +82,7 @@ networkPolicies:
       vault:8200:
         from:
           k8s:
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
           definition:
             custom-app-ingress: true
