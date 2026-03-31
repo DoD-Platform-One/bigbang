@@ -71,6 +71,7 @@ spec:
     {{- end }}
     - name: {{ $pkg }}-values
       kind: Secret
+      valuesKey: values.yaml
 
   {{- /* Always wait on policy enforcement */ -}}
   {{- $includeDefaultDependsOn := dig "includeDefaultDependsOn" true $vals -}}
