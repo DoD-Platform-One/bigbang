@@ -1,7 +1,7 @@
 {{- /* Used for Helm chart deployment of Big Bang wrapper.  One per package. */ -}}
-{{- range $pkg, $vals := .Values.packages -}}
+{{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
-{{- $pkg = include "resourceName" $pkg -}}
+{{- $pkg := include "resourceName" $pkgKey -}}
 {{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
 
@@ -9,8 +9,8 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}-wrapper
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
               {{ else }}
                 {{ default (dig "namespace" "name" $pkg $vals) "" }}
               {{ end }}

@@ -1,7 +1,7 @@
 {{- /* Used for GitOps on a package's Helm chart */ -}}
-{{- range $pkg, $vals := .Values.packages -}}
+{{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) ($vals.git) -}}
-{{- $pkg = include "resourceName" $pkg -}}
+{{- $pkg := include "resourceName" $pkgKey -}}
 {{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
 {{- if $defaults -}}
 {{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
@@ -17,8 +17,8 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: {{ $pkg }}
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
               {{ else }}
                 {{ default (dig "namespace" "name" $pkg $vals) "" }}
               {{ end }}

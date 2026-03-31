@@ -1,13 +1,13 @@
 {{- /* Used for creating values to use for Helm wrapper and package Helm charts. */ -}}
-{{- range $pkg, $vals := .Values.packages -}}
+{{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
-{{- $pkg = include "resourceName" $pkg -}}
+{{- $pkg := include "resourceName" $pkgKey -}}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $pkg }}-wrapper-values
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkg) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkg) }}
+  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
               {{ else }}
                 {{ default (dig "namespace" "name" $pkg $vals) "" }}
               {{ end }}

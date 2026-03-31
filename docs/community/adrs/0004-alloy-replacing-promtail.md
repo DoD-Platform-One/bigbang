@@ -21,19 +21,20 @@ If customers have any custom Promtail configurations they want to make available
 Source: [Grafana Docs - Migrate from Promtail to Grafana Alloy](https://grafana.com/docs/alloy/latest/set-up/migrate/from-promtail/)
 
 For additional context on Grafana Labs' decision to migrate to Alloy we recommend the following posts:
- - [Grafana Labs Blog](https://grafana.com/blog/2025/02/13/grafana-loki-3.4-standardized-storage-config-sizing-guidance-and-promtail-merging-into-alloy/?camp=blog&cnt=Grafana+Loki+3.4+is+here%21&mdm=social&src=li)
- - [Promtail Documentation](https://grafana.com/docs/loki/latest/send-data/promtail/)
 
+- [Grafana Labs Blog](https://grafana.com/blog/2025/02/13/grafana-loki-3.4-standardized-storage-config-sizing-guidance-and-promtail-merging-into-alloy/?camp=blog&cnt=Grafana+Loki+3.4+is+here%21&mdm=social&src=li)
+- [Alloy Documentation](https://grafana.com/docs/loki/latest/send-data/alloy/)
+  - This was [Promtail Documentation](https://grafana.com/docs/loki/latest/send-data/promtail/), but that page is now gone
 
 ### Migration Timeline
 
-| Milestone | Date | Description |
-|-----------|------|-------------|
-| 2.50.00 | Q1 2025 | Promtail deprecation notice started being included in release notes, Alloy moved to individual namespace | 
-| 2.51.00 | Q1 2025 | Alloy-logging features added to Big Bang, Promtail deprecation warning added to NOTES.txt |
-| 2.53.00 | Q2 2025 | Alloy moved to Big Bang "core" values, removed from addons | 
-| 3.00.00 | Q2 2025 | Alloy with alloy-logs enabled by default, Promtail disabled by default |
-| 3.05.00 | Q2 2025 | Promtail removed from Big Bang charts, Promtail repository migrated to `community` | 
+| Milestone | Date    | Description                                                                                              |
+| --------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| 2.50.00   | Q1 2025 | Promtail deprecation notice started being included in release notes, Alloy moved to individual namespace |
+| 2.51.00   | Q1 2025 | Alloy-logging features added to Big Bang, Promtail deprecation warning added to NOTES.txt                |
+| 2.53.00   | Q2 2025 | Alloy moved to Big Bang "core" values, removed from addons                                               |
+| 3.00.00   | Q2 2025 | Alloy with alloy-logs enabled by default, Promtail disabled by default                                   |
+| 3.05.00   | Q2 2025 | Promtail removed from Big Bang charts, Promtail repository migrated to `community`                       |
 
 ## Decision
 
@@ -45,7 +46,7 @@ We will replace Grafana Promtail with Grafana Alloy as our primary log collectio
 
 ## Consequences
 
-### Positive 
+### Positive
 
 1. Future-proofing: Moving to Grafana's actively supported collector ensures continued updates and security patches beyond February 2026.
 2. Unified telemetry: Alloy provides a single agent for logs, metrics, and traces, simplifying observability architecture.
@@ -56,3 +57,4 @@ We will replace Grafana Promtail with Grafana Alloy as our primary log collectio
 1. Migration effort: Customers with custom Promtail configurations will need to convert and test their setups with Alloy.
 2. Learning curve: Technical staff will need to familiarize themselves with Alloy's configuration model and capabilities.
 3. Potential configuration gaps: The automated conversion tool may not handle all edge cases, requiring manual intervention.
+
