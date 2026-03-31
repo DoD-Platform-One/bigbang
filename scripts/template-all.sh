@@ -349,6 +349,11 @@ function generate_overlay_files() {
     secret_name="${names[i]}"
     secret_key="${keys[i]}"
 
+    # Flux defaults Secret valuesFrom entries without valuesKey to "values.yaml".
+    if [[ -z "$secret_key" || "$secret_key" == "null" ]]; then
+      secret_key="values.yaml"
+    fi
+
     values=$(yq "select(.kind == \"Secret\" and .metadata.name == \"$secret_name\") | .stringData.\"$secret_key\"" <<<"$big_bang_templates")
 
     values_filename="$values_overlays_dir/$release_name/$secret_name-$i.yaml"
