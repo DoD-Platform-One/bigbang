@@ -23,6 +23,8 @@ ignorePatterns:
   - pattern: "https://confluence.il4.dso.mil/*"
   # ignore links that are known to be unreliable due to rate limiting (will be fixed by https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/issues/806)
   - pattern: "https://www.opentext.com/products/cybersecurity-cloud"
+  # Ignore retired promtail links
+  - pattern: "https://grafana.com/docs/loki/latest/send-data/promtail/"
 # replacementPatterns:
 #   - pattern: ^.attachments
 #     replacement: file://some/conventional/folder/.attachments
