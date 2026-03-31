@@ -95,7 +95,7 @@ sso:
     entityDescriptor: "{{ .Values.sso.url }}/protocol/saml/descriptor"
     # -- SAML SSO Service path
     service: "{{ .Values.sso.url }}/protocol/saml"
-    # -- Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Twistlock or Sonarqube.
+    # -- Literal SAML XML metadata retrieved from `{{ .Values.sso.saml.entityDescriptor }}`.  Required for SSO in Twistlock or Sonarqube. Optional for Anchore Enterprise.
     metadata: "" # See docs/assets/configs/example/dev-sso-values.yaml for an example
     # NOTE: SAML attribute names may vary by package.  Use the package values to setup attribute names
 
@@ -1732,11 +1732,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise.git
       path: "./chart"
-      tag: "3.21.3-bb.0"
+      tag: "3.21.3-bb.1"
     helmRepo:
       repoName: "registry1"
       chartName: "anchore-enterprise"
-      tag: "3.21.3-bb.0"
+      tag: "3.21.3-bb.1"
     # -- Flux reconciliation overrides specifically for the Anchore Package
     flux:
       upgrade:
