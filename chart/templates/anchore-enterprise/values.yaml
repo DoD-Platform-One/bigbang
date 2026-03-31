@@ -218,6 +218,10 @@ sso:
   {{- $anchoreUrl := first (dig "istio" "ui" "hosts" list .Values.addons.anchoreEnterprise.values) }}
   acsUrl: https://{{ tpl ($anchoreUrl | default (printf "%s.%s" "anchore" $domainName)) . }}/service/sso/auth/keycloak
   idpMetadataUrl: "{{ include "sso.saml.descriptor" . }}"
+  {{- if .Values.sso.saml.metadata }}
+  idpMetadataXml: |
+    {{ .Values.sso.saml.metadata | nindent 4 }}
+  {{- end }}
   roleAttribute: {{ .Values.addons.anchoreEnterprise.sso.role_attribute }}
 
 global:
