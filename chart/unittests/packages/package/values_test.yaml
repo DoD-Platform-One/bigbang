@@ -109,9 +109,9 @@ tests:
       path: metadata.name
       value: sample-values
     asserts:
-      - equal:
-          path: stringData.bigbang.domain
-          value: dev.bigbang.mil
+      - matchRegex:
+          path: stringData.bigbang
+          pattern: '.*domain: dev.bigbang.mil.*'
       - notExists:
           path: stringData["values.yaml"]
   - it: must create kustomize values with custom values when kustomize is true and values are set and passBigBangValues is false
@@ -153,6 +153,6 @@ tests:
       - equal:
           path: stringData.nested.nestedKey
           value: nestedValue
-      - equal:
-          path: stringData.bigbang.domain
-          value: dev.bigbang.mil
+      - matchRegex:
+          path: stringData.bigbang
+          pattern: '.*domain: dev.bigbang.mil.*'

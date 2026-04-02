@@ -56,7 +56,7 @@ stringData:
   {{- else }}
   {{- if or ($vals.values) (dig "passBigBangValues" true $vals) }}
   {{- if (dig "passBigBangValues" true $vals) }}
-  bigbang:
+  bigbang: |-
     {{- include "values-bigbang" $.Values | nindent 6 }}
   {{- end }}
   {{- if $vals.values -}}
