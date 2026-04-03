@@ -13,11 +13,6 @@
 upstream:
   domain: {{ $domainName }}
 
-  {{- if (eq (include "istioEnabled" .) "true") }}
-  podAnnotations:
-    {{ include "istioAnnotation" . }}
-  {{- end }}
-
   nameOverride: "metrics-server"
   fullnameOverride: "metrics-server"
 
@@ -28,18 +23,5 @@ upstream:
 
   metrics:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-
-istio:
-  enabled: {{ $istioEnabled }}
-  hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.metricsServer.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-  injection: {{ ternary "enabled" "disabled" $istioEnabled }}
-
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  istioNamespaceSelector:
-  {{ include "istioNamespaceSelector" . | nindent 4 }}
-  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
 
 {{- end }}
