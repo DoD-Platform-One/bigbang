@@ -3,12 +3,11 @@
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}
 {{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: metrics-server
-  namespace: {{ .Release.Namespace }}
+  namespace:  {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: metrics-server
     app.kubernetes.io/component: "cluster-utilities"
@@ -17,7 +16,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/metrics-server/values.yaml") . | sha256sum }}
 spec:
   releaseName: metrics-server
-  targetNamespace: metrics-server
+  targetNamespace: kube-system
   {{- include "bigbang.helmRelease.chartSpec" (dict "name" "metrics-server" "package" .Values.addons.metricsServer "root" .) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMetrics | nindent 2 }}
@@ -34,14 +33,4 @@ spec:
 
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "metrics" "root" .) | nindent 2 }}
 
-  {{- if or $istioEnabled .Values.monitoring.enabled }}
-  dependsOn:
-    {{- if $istioEnabled }}
-    {{- include "istioHelmReleases" . | nindent 4 }}
-    {{- end }}
-    {{- if .Values.monitoring.enabled }}
-    - name: monitoring
-      namespace: {{ .Release.Namespace }}
-    {{- end }}
-  {{- end }}
 {{- end }}
