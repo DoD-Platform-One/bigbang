@@ -108,4 +108,4 @@ It would also be useful to review
 
 > How do I get a new package integrated into Big Bang?
 
-To integrate a new package into Big Bang, follow the steps outlined in the [package integration documents](../community/development/package-integration/index.md) and the [developing a package document](../community/development/develop-package.md).
+To integrate a new package into Big Bang, follow the steps outlined in the [package lifecycle onboarding](../community/development/package-lifecycle/onboarding.md), [package lifecycle integration](../community/development/package-lifecycle/integration.md), and the [developing a package document](../community/development/develop-package.md).

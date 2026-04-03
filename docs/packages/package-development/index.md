@@ -259,7 +259,7 @@ Package is the term we use for an application that has been prepared to be deplo
 17. Then, create a merge request to branch "main."
 18. After the merge create a git tag following the charter convention of {UpstreamChartVersion}-bb.{BigBangVersion}. The tag should exactly match the chart version in the Chart.yaml.
 example: `1.2.3-bb.0`
-19. Integrate the package using the [Package Integration Documents](../../community/development/package-integration/index.md).
+19. Integrate the package using the [Package Lifecycle Integration Documents](../../community/development/package-lifecycle/integration.md).
 
 ## Private registry secret creation
 

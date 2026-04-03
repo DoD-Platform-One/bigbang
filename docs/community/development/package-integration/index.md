@@ -1,11 +1,13 @@
 # Integration: Overview
 
-The following documents should be followed, in order, to move a package to maintained or (\*) fully integrate a new package into Big Bang:
+Package lifecycle guidance is organized under [Package Lifecycle](../package-lifecycle/index.md).
 
-For package deprecation and downward/high-impact track changes, use the [Package Offboarding Checklist](../package-offboarding/index.md).
+For process-oriented onboarding, start with [Onboarding](../package-lifecycle/onboarding.md).
+
+For package deprecation and downward/high-impact track changes, use [Package Lifecycle: Offboarding](../package-lifecycle/offboarding.md).
 
 - [ ] 1. [Complete Track Change Governance](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/master/process/Package%20Maintenance%20Tracks.md): Follow the Package Maintenance Tracks governance process (BBTOC issue, Big Bang value stream review, Jedi/Big Rocks review as needed, communications planning, and Cyber review approvals), set external status to `in process`, and document the final decision in ADR/BBTOC records.
-- [ ] 2. Confirm Sponsor (Integrated only): Packages entering or remaining Big Bang Integrated require an explicit stakeholder sponsor recorded in BBTOC and ADR updates.
+- [ ] 2. Confirm Sponsor (Maintained only): Packages entering or remaining Big Bang Maintained require an explicit stakeholder sponsor recorded in BBTOC and ADR updates. For Big Bang Integrated packages, Big Bang is the sponsor.
 - [ ] 3. [Upstream Helm Chart](upstream.md): Initialize package workspace using an upstream Helm chart
 - [ ] 4. [CICD Pipeline](pipeline.md): Establish a baseline package pipeline for testing changes
 - [ ] 5. [\*Flux Helm Chart](flux.md): Create Flux compatible GitOps Helm chart required by Big Bang

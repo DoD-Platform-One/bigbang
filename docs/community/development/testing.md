@@ -17,7 +17,7 @@ A detailed description of the pipelines and how to execute the testing process o
 
 ## Application Testing
 
-When a Big Bang application developer submits changes to a particular Big Bang application, the application needs to be tested to ensure functionality, as well as compliance with core [Package Requirements](./package-integration/index.md).  
+When a Big Bang application developer submits changes to a particular Big Bang application, the application needs to be tested to ensure functionality, as well as compliance with core [Package Requirements](./package-lifecycle/integration.md).  
 
 A core feature of all testing capabilities is its ability to be run locally by developers using their own environment, or by other teams looking to test proposed changes to the application (e.g., IronBank as part of container creation). The GitLab pipelines will be simple wrappers around these common testing and deployment tools.
 

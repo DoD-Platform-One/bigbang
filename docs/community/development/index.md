@@ -19,11 +19,7 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 
 ## Package Requirements
 
-[Big Bang Package Integration Guide](./package-integration/index.md) and [BBTOC Graduated Requirements](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process#graduated-project-requirements)
-
-## Package Offboarding
-
-[Package Offboarding Checklist](./package-offboarding/index.md).
+[Big Bang Package Lifecycle: Onboarding](./package-lifecycle/onboarding.md) and [BBTOC Graduated Requirements](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process#graduated-project-requirements)
 
 ## Package Development
 
@@ -31,11 +27,15 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 
 ## Add Package to Big Bang
 
-[Integrate Package with Big Bang](./package-integration/index.md).
+[Integrate Package with Big Bang](./package-lifecycle/integration.md).
 
 ## Package Owner Overview
 
 [Package Owner Requirements & Overview](./package-integration/ownership.md).
+
+## Package Offboarding
+
+[Offboard Package from Big Bang](./package-lifecycle/offboarding.md).
 
 ## Big Bang Code Through Party Bus Pipeline
 

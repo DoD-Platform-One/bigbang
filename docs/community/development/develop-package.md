@@ -216,4 +216,4 @@ In some instances you may wish to manually create a private-registry secret in t
     -f reg-creds.yaml
     ```
 
-21. Integrate the package using the [Package Integration Documents](package-integration/index.md).
+21. Integrate the package using the [Package Lifecycle Integration Documents](package-lifecycle/integration.md).
