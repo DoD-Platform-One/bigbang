@@ -286,6 +286,9 @@ get_team_label() {
 # Cache for default branches
 DEFAULT_BRANCH_CACHE=$(mktemp)
 
+# Cache for project label existence checks
+LABEL_CACHE=$(mktemp)
+
 # Function to get default branch for a project (cached)
 get_default_branch() {
     local project="$1"
@@ -317,6 +320,71 @@ check_existing_issue() {
         return 0
     fi
     return 1
+}
+
+# Function to get latest closed timestamp for matching issue title
+get_latest_closed_issue_at() {
+    local project="$1"
+    local issue_title="$2"
+
+    local encoded_path=$(echo "$project" | sed 's/\//%2F/g')
+    local closed_at
+    closed_at=$(glab api "projects/$encoded_path/issues?state=closed&per_page=100" 2>/dev/null | \
+        jq -r --arg title "$issue_title" '[.[] | select(.title == $title) | .closed_at] | sort | last // empty')
+
+    if [[ -n "$closed_at" ]]; then
+        echo "$closed_at"
+        return 0
+    fi
+    return 1
+}
+
+# Check if a project has a specific label (cached)
+project_has_label() {
+    local project="$1"
+    local label_name="$2"
+    local cache_key="${project}|${label_name}"
+
+    local cached=$(grep "^${cache_key}|" "$LABEL_CACHE" 2>/dev/null | tail -1 | cut -d'|' -f3)
+    if [[ -n "$cached" ]]; then
+        [[ "$cached" == "1" ]]
+        return
+    fi
+
+    local encoded_path=$(echo "$project" | sed 's/\//%2F/g')
+    local found
+    found=$(glab api "projects/$encoded_path/labels?search=$label_name&per_page=100" 2>/dev/null | jq -r --arg l "$label_name" 'map(select(.name == $l)) | length' 2>/dev/null || echo 0)
+    if ! [[ "$found" =~ ^[0-9]+$ ]]; then
+        found=0
+    fi
+
+    if [[ "$found" -gt 0 ]]; then
+        echo "${cache_key}|1" >> "$LABEL_CACHE"
+        return 0
+    fi
+
+    echo "${cache_key}|0" >> "$LABEL_CACHE"
+    return 1
+}
+
+# Ensure labels include a status:: label; default to status::grooming when label exists in project
+ensure_status_label() {
+    local labels="$1"
+    local project="$2"
+
+    if [[ "$labels" =~ (^|,)status::[^,]+($|,) ]]; then
+        echo "$labels"
+    elif project_has_label "$project" "status::grooming"; then
+        if [[ -n "$labels" ]]; then
+            echo "$labels,status::grooming"
+        else
+            echo "status::grooming"
+        fi
+    elif [[ -n "$labels" ]]; then
+        echo "$labels"
+    else
+        echo ""
+    fi
 }
 
 # Function to check if issue is already in epic
@@ -397,6 +465,7 @@ skipped_team=0
 added_to_epic=0
 would_add_to_epic=0
 already_in_epic=0
+skipped_closed_review=0
 
 # Phase 1: Scan or use input file
 if [[ -n "$INPUT_FILE" ]]; then
@@ -511,7 +580,7 @@ else
                 continue
             fi
 
-            ((checked_count++))
+            checked_count=$((checked_count + 1))
             echo "$checked_count" > "$counter_file"
 
             if [[ $((checked_count % 25)) -eq 0 ]]; then
@@ -621,7 +690,7 @@ else
                 if ! [[ "$current_found" =~ ^[0-9]+$ ]]; then
                     current_found=0
                 fi
-                ((current_found++))
+                current_found=$((current_found + 1))
                 echo "$current_found" > "$found_counter_file"
 
                 # Color code based on age
@@ -638,7 +707,7 @@ else
             fi
         done
 
-        ((page++))
+        page=$((page + 1))
 
         checked_count=$(cat "$counter_file" 2>/dev/null | tr -d ' \n\r')
         if ! [[ "$checked_count" =~ ^[0-9]+$ ]]; then
@@ -712,7 +781,7 @@ create_single_file_issue() {
 
     # Skip if team doesn't match filter
     if [[ "$TEAM_FILTER" != "all" ]] && [[ -z "$team_label" ]]; then
-        ((skipped_team++))
+        skipped_team=$((skipped_team + 1))
         return
     fi
 
@@ -730,7 +799,7 @@ create_single_file_issue() {
 
     if [[ -n "$existing_iid" ]]; then
         echo -e "   ${YELLOW}⏭️  Issue already exists: #$existing_iid${NC}"
-        ((duplicate_issues++))
+        duplicate_issues=$((duplicate_issues + 1))
 
         # If epic specified, check if we need to add it
         if [[ -n "$EPIC_IID" ]]; then
@@ -741,18 +810,30 @@ create_single_file_issue() {
             if [[ -n "$issue_id" ]]; then
                 if check_issue_in_epic "$issue_id"; then
                     echo -e "      ${DIM}Already in epic #$EPIC_IID${NC}"
-                    ((already_in_epic++))
+                    already_in_epic=$((already_in_epic + 1))
                 else
                     if [[ "$DRY_RUN" == true ]]; then
                         echo -e "      ${YELLOW}[DRY RUN]${NC} Would add existing issue to epic #$EPIC_IID"
-                        ((would_add_to_epic++))
+                        would_add_to_epic=$((would_add_to_epic + 1))
                     else
                         local issue_url="https://repo1.dso.mil/${project}/-/issues/${existing_iid}"
-                        add_to_epic "$issue_url" && ((added_to_epic++))
+                        if add_to_epic "$issue_url"; then
+                            added_to_epic=$((added_to_epic + 1))
+                        fi
                     fi
                 fi
             fi
         fi
+        echo ""
+        return
+    fi
+
+    # If a matching issue was previously closed after the file was last modified,
+    # treat that closure as the most recent review event and skip re-creating.
+    local latest_closed_at=$(get_latest_closed_issue_at "$project" "$issue_title" || echo "")
+    if [[ -n "$latest_closed_at" && ( "$latest_closed_at" > "$last_modified" || "$latest_closed_at" == "$last_modified" ) ]]; then
+        echo -e "   ${DIM}⏭️  Previously reviewed and closed on ${latest_closed_at%%T*}; no newer doc changes${NC}"
+        skipped_closed_review=$((skipped_closed_review + 1))
         echo ""
         return
     fi
@@ -782,6 +863,7 @@ Please review and ensure this document is up-to-date.
     if [[ -n "$team_label" ]]; then
         labels="$labels,$team_label"
     fi
+    labels=$(ensure_status_label "$labels" "$project")
 
     if [[ "$DRY_RUN" == true ]]; then
         echo -e "   ${YELLOW}[DRY RUN]${NC} Would create issue:"
@@ -790,9 +872,9 @@ Please review and ensure this document is up-to-date.
         echo -e "      • Weight: 1"
         if [[ -n "$EPIC_IID" ]]; then
             echo -e "      ${YELLOW}[DRY RUN]${NC} Would add to epic #$EPIC_IID"
-            ((would_add_to_epic++))
+            would_add_to_epic=$((would_add_to_epic + 1))
         fi
-        ((issues_would_create++))
+        issues_would_create=$((issues_would_create + 1))
     else
         echo -e "   ${DIM}Creating issue...${NC}"
 
@@ -809,7 +891,7 @@ Please review and ensure this document is up-to-date.
             [[ -z "$issue_url" ]] && issue_url="$issue_output"
 
             echo -e "   ${GREEN}✅ Created:${NC} $issue_url"
-            ((issues_created++))
+            issues_created=$((issues_created + 1))
 
             # Add to output JSON
             jq --arg proj "$project" \
@@ -822,13 +904,13 @@ Please review and ensure this document is up-to-date.
             # Add to epic if specified
             if [[ -n "$EPIC_IID" ]]; then
                 if add_to_epic "$issue_url"; then
-                    ((added_to_epic++))
+                    added_to_epic=$((added_to_epic + 1))
                 fi
             fi
         else
             echo -e "   ${RED}❌ Failed to create issue${NC}"
             echo -e "   ${DIM}$issue_output${NC}"
-            ((issues_failed++))
+            issues_failed=$((issues_failed + 1))
 
             jq --arg proj "$project" \
                --arg file "$file_path" \
@@ -859,18 +941,19 @@ create_directory_issue() {
 
     # Skip if team doesn't match filter
     if [[ "$TEAM_FILTER" != "all" ]] && [[ -z "$team_label" ]]; then
-        ((skipped_team++))
+        skipped_team=$((skipped_team + 1))
         return
     fi
 
     local issue_title="Documentation Review Needed for $directory/"
+    local latest_file_modified=$(echo "$files_json" | jq -r 'map(.last_modified) | sort | last // empty')
 
     # Check for existing issue (idempotency check)
     local existing_iid=$(check_existing_issue "$project" "$issue_title" || echo "")
 
     if [[ -n "$existing_iid" ]]; then
         echo -e "   ${YELLOW}⏭️  Issue already exists: #$existing_iid${NC}"
-        ((duplicate_issues++))
+        duplicate_issues=$((duplicate_issues + 1))
 
         # If epic specified, check if we need to add it
         if [[ -n "$EPIC_IID" ]]; then
@@ -881,18 +964,30 @@ create_directory_issue() {
             if [[ -n "$issue_id" ]]; then
                 if check_issue_in_epic "$issue_id"; then
                     echo -e "      ${DIM}Already in epic #$EPIC_IID${NC}"
-                    ((already_in_epic++))
+                    already_in_epic=$((already_in_epic + 1))
                 else
                     if [[ "$DRY_RUN" == true ]]; then
                         echo -e "      ${YELLOW}[DRY RUN]${NC} Would add existing issue to epic #$EPIC_IID"
-                        ((would_add_to_epic++))
+                        would_add_to_epic=$((would_add_to_epic + 1))
                     else
                         local issue_url="https://repo1.dso.mil/${project}/-/issues/${existing_iid}"
-                        add_to_epic "$issue_url" && ((added_to_epic++))
+                        if add_to_epic "$issue_url"; then
+                            added_to_epic=$((added_to_epic + 1))
+                        fi
                     fi
                 fi
             fi
         fi
+        echo ""
+        return
+    fi
+
+    # If a matching issue was previously closed after the newest file change in this directory,
+    # treat that closure as the most recent review event and skip re-creating.
+    local latest_closed_at=$(get_latest_closed_issue_at "$project" "$issue_title" || echo "")
+    if [[ -n "$latest_closed_at" && -n "$latest_file_modified" && ( "$latest_closed_at" > "$latest_file_modified" || "$latest_closed_at" == "$latest_file_modified" ) ]]; then
+        echo -e "   ${DIM}⏭️  Previously reviewed and closed on ${latest_closed_at%%T*}; no newer doc changes${NC}"
+        skipped_closed_review=$((skipped_closed_review + 1))
         echo ""
         return
     fi
@@ -936,6 +1031,7 @@ Please review and ensure these documents are up-to-date.
     if [[ -n "$team_label" ]]; then
         labels="$labels,$team_label"
     fi
+    labels=$(ensure_status_label "$labels" "$project")
 
     if [[ "$DRY_RUN" == true ]]; then
         echo -e "   ${YELLOW}[DRY RUN]${NC} Would create issue:"
@@ -944,9 +1040,9 @@ Please review and ensure these documents are up-to-date.
         echo -e "      • Weight: $file_count"
         if [[ -n "$EPIC_IID" ]]; then
             echo -e "      ${YELLOW}[DRY RUN]${NC} Would add to epic #$EPIC_IID"
-            ((would_add_to_epic++))
+            would_add_to_epic=$((would_add_to_epic + 1))
         fi
-        ((issues_would_create++))
+        issues_would_create=$((issues_would_create + 1))
     else
         echo -e "   ${DIM}Creating issue...${NC}"
 
@@ -963,7 +1059,7 @@ Please review and ensure these documents are up-to-date.
             [[ -z "$issue_url" ]] && issue_url="$issue_output"
 
             echo -e "   ${GREEN}✅ Created:${NC} $issue_url"
-            ((issues_created++))
+            issues_created=$((issues_created + 1))
 
             # Add to output JSON
             jq --arg proj "$project" \
@@ -977,13 +1073,13 @@ Please review and ensure these documents are up-to-date.
             # Add to epic if specified
             if [[ -n "$EPIC_IID" ]]; then
                 if add_to_epic "$issue_url"; then
-                    ((added_to_epic++))
+                    added_to_epic=$((added_to_epic + 1))
                 fi
             fi
         else
             echo -e "   ${RED}❌ Failed to create issue${NC}"
             echo -e "   ${DIM}$issue_output${NC}"
-            ((issues_failed++))
+            issues_failed=$((issues_failed + 1))
 
             jq --arg proj "$project" \
                --arg dir "$directory" \
@@ -1055,7 +1151,7 @@ if [[ "$umbrella_count" -gt 0 ]]; then
 fi
 
 # Cleanup temp files
-rm -f "$CHARTER_FILE" "$MAPPING_FILE" "$PROJECT_ID_CACHE" "$DEFAULT_BRANCH_CACHE"
+rm -f "$CHARTER_FILE" "$MAPPING_FILE" "$PROJECT_ID_CACHE" "$DEFAULT_BRANCH_CACHE" "$LABEL_CACHE"
 # Clean up filtered input file if we created one
 [[ "$results_file" == filtered_input_* ]] && rm -f "$results_file"
 
@@ -1079,6 +1175,9 @@ echo ""
 echo -e "${CYAN}📋 Issue Statistics:${NC}"
 if [[ $skipped_team -gt 0 ]]; then
     echo -e "   • Skipped (team filter): ${BOLD}${YELLOW}$skipped_team${NC}"
+fi
+if [[ $skipped_closed_review -gt 0 ]]; then
+    echo -e "   • Skipped (already reviewed/closed): ${BOLD}${YELLOW}$skipped_closed_review${NC}"
 fi
 echo -e "   • Already existing issues: ${BOLD}${YELLOW}$duplicate_issues${NC}"
 
