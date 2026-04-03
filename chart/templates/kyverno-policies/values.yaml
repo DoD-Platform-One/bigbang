@@ -158,9 +158,10 @@ policies:
   # Istio services (istio ingress) can create type: NodePort services
   disallow-nodeport-services:
     validationFailureAction: Enforce
-    {{- if or $nodePortIngressGateways .Values.istiod.enabled }}
+    {{- if or $nodePortIngressGateways (and .Values.istiod.enabled .Values.istioGateway.enabled) }}
     exclude:
       any:
+      {{- if $nodePortIngressGateways }}
       - resources:
           kinds:
           - Service
@@ -170,6 +171,7 @@ policies:
           {{- end }}
           namespaces:
           - istio-system
+      {{- end }}
       {{- if and .Values.istiod.enabled .Values.istioGateway.enabled }}
       - resources:
           kinds:
