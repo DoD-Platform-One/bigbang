@@ -294,6 +294,26 @@ istioCRDs:
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
 
+gatewayAPI:
+  # -- Toggle deployment of Gateway API CRDs
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/gateway-api.git
+    path: "./chart"
+    tag: 1.5.1-bb.0
+  helmRepo:
+    repoName: "registry1"
+    chartName: "gateway-api"
+    tag: 1.5.1-bb.0
+  # -- Values to passthrough to the Gateway API chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Gateway API Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
+
 istiod:
   # -- Toggle deployment of istiod
   enabled: true

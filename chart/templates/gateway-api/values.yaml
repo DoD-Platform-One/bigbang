@@ -1,0 +1,9 @@
+{{- $pkg := "gatewayAPI" }}
+
+{{- /* Create secret */ -}}
+{{- if .Values.gatewayAPI.enabled }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "gateway-api" "defaults" (include "bigbang.defaults.gateway-api" .)) }}
+{{- end }}
+
+{{- define "bigbang.defaults.gateway-api" -}}
+{{- end }}
