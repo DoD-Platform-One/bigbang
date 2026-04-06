@@ -1,0 +1,3 @@
+{{- if and (eq .Values.gatewayAPI.sourceType "git") (not .Values.offline) .Values.gatewayAPI.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "gateway-api" "gitCredsName" "gatewayAPI" "git" .Values.gatewayAPI.git "component" "core" "root" .) }}
+{{- end }}
