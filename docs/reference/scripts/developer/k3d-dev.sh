@@ -62,6 +62,7 @@ OIDC_ISSUER_URL="${OIDC_ISSUER_URL:-}"
 OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-}"
 OIDC_USERNAME_CLAIM="${OIDC_USERNAME_CLAIM:-preferred_username}"
 OIDC_GROUPS_CLAIM="${OIDC_GROUPS_CLAIM:-groups}"
+K3S_ARGS=()
 
 ### Uninitialized globals
 
@@ -226,6 +227,9 @@ function process_arguments {
       echo "                                  preferred_username)"
       echo " --oidc-groups-claim CLAIM        override OIDC groups claim (default:"
       echo "                                  groups)"
+      echo " --k3s-arg ARG                    pass a custom k3s argument to k3d"
+      echo "                                  (repeatable, e.g. --k3s-arg"
+      echo "                                  '--kube-apiserver-arg=foo=bar@server:0')"
       echo " -i|--init-script SCRIPTFILE      initialization script to pass to"
       echo "                                  instance before configuring it"
       echo " -U|--ssh-username USERNAME       username to use when connecting"
@@ -311,6 +315,15 @@ function process_arguments {
     --oidc-preset)
       shift
       OIDC_PRESET=$1
+      ;;
+
+    --k3s-arg)
+      shift
+      if [[ -z "$1" ]]; then
+        echo "Missing required value for --k3s-arg" >&2
+        exit 1
+      fi
+      K3S_ARGS+=("$1")
       ;;
 
     --k3d-timeout)
@@ -748,6 +761,14 @@ function install_k3d {
     k3d_command+=" --volume /tmp/machine-id-agent-1:/etc/machine-id@agent:1"
     k3d_command+=" --volume /tmp/machine-id-agent-2:/etc/machine-id@agent:2"
     k3d_command+=" --volume /opt/cni/bin:/opt/cni/bin@all:*"
+  fi
+
+  if [[ ${#K3S_ARGS[@]} -gt 0 ]]; then
+    echo "Adding custom k3s args from CLI..."
+    for arg in "${K3S_ARGS[@]}"; do
+      printf -v escaped_arg '%q' "$arg"
+      k3d_command+=" --k3s-arg ${escaped_arg}"
+    done
   fi
 
   run_batch_new
