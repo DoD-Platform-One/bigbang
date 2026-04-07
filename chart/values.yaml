@@ -1865,13 +1865,14 @@ addons:
 
     # -- Mattermost Enterprise functionality.
     enterprise:
-      # -- Toggle the Mattermost Enterprise.  This must be accompanied by a valid license unless you plan to start a trial post-install.
+      # -- Toggle the Mattermost Enterprise.  This must be accompanied by a valid license input via Helm values OR an existing secret name for Mattermost to reference.
       enabled: false
-
       # -- License for Mattermost.
       # This should be the entire contents of the license file from Mattermost (should be one line), example below
       # license: "eyJpZCI6InIxM205bjR3eTdkYjludG95Z3RiOD---REST---IS---HIDDEN
       license: ""
+      # -- Pre existing secret created outside of Helm values with license for Mattermost.
+      existingSecret: ""
 
     # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
     ingress:
