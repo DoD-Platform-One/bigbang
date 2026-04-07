@@ -1837,8 +1837,6 @@ addons:
     elasticsearch:
       enabled: true
     values:
-      enterprise:
-        enabled: true
       monitoring:
         enabled: true
       istio:
