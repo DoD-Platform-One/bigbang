@@ -35,7 +35,7 @@ Platform One does offer optional hosting and support contracts. These are listed
   instance of Big Bang, which an application can be hosted on. Party Bus removes the
   need for you to operate a cluster entirely.
 
-For more information on services, [contact us](https://p1.dso.mil/contact-us) or email platformone@dso.mil.
+For more information on services, [contact us](https://p1.dso.mil/contact-us)
 
 > Do we need a government PM to send a formal request to Platform One in order
 to get started?
