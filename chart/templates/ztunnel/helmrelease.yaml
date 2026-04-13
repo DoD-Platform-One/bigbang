@@ -1,5 +1,5 @@
 {{- $fluxSettingsZtunnel := merge .Values.ztunnel.flux .Values.flux -}}
-{{- if .Values.ztunnel.enabled }}
+{{- if eq (include "ambientEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

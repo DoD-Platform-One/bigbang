@@ -38,9 +38,8 @@ networkPolicies:
   vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
-  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
   hbonePortInjection:
-    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+    enabled: {{ include "ambientEnabled" . }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:

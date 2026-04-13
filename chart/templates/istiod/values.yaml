@@ -25,7 +25,7 @@ istio:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
   egress:
-    {{- if .Values.ztunnel.enabled }}
+    {{- if eq (include "ambientEnabled" .) "true" }}
     defaults:
       allowInNamespace:
         enabled: true
@@ -37,7 +37,7 @@ networkPolicies:
           definition:
             sso: {{ $authserviceEnabled }}
   ingress:
-    {{- if .Values.ztunnel.enabled }}
+    {{- if eq (include "ambientEnabled" .) "true" }}
     defaults:
       allowInNamespace:
         enabled: true
@@ -58,11 +58,11 @@ authservice:
 
 upstream:
   cni:
-    enabled: {{ .Values.istioCNI.enabled }}
+    enabled: {{ or .Values.istioCNI.enabled .Values.istio.ambient.enabled }}
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}
-  {{- if .Values.ztunnel.enabled }}
+  {{- if eq (include "ambientEnabled" .) "true" }}
   pilot:
     env:
       PILOT_ENABLE_AMBIENT: "true"

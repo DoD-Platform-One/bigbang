@@ -1,7 +1,7 @@
 {{- $pkg := "gatewayAPI" }}
 
 {{- /* Create secret */ -}}
-{{- if .Values.gatewayAPI.enabled }}
+{{- if or .Values.gatewayAPI.enabled .Values.istio.ambient.enabled }}
 {{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "gateway-api" "defaults" (include "bigbang.defaults.gateway-api" .)) }}
 {{- end }}
 

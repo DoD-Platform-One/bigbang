@@ -105,9 +105,8 @@ istio:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
-  # note: ztunnel does not exist yet, defaulting to false until ambient package is added
   hbonePortInjection:
-    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+    enabled: {{ include "ambientEnabled" . }}
   ingress:
     definitions: 
       {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}

@@ -67,7 +67,7 @@ monitoring:
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled | default false }}
   hbonePortInjection:
-    enabled: {{ dig "enabled" false (default dict .Values.ztunnel) }}
+    enabled: {{ include "ambientEnabled" . }}
   ingress: 
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:

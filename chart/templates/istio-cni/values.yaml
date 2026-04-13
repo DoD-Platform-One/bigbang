@@ -1,14 +1,14 @@
 {{- $pkg := "istioCNI" }}
 
 {{- /* Create secret */ -}}
-{{- if or .Values.istioCNI.enabled (.Values.ztunnel.enabled) }}
+{{- if or .Values.istioCNI.enabled (eq (include "ambientEnabled" .) "true") }}
 {{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "istio-cni" "defaults" (include "bigbang.defaults.istio-cni" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.istio-cni" -}}
 upstream:
   ambient:
-    enabled: {{ .Values.ztunnel.enabled }}
+    enabled: {{ include "ambientEnabled" . }}
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}

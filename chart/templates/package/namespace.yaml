@@ -12,7 +12,11 @@ metadata:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}
     {{- if $istioEnabled }}
+    {{- if eq (include "ambientEnabled" $) "true" }}
+    istio.io/dataplane-mode: ambient
+    {{- else }}
     istio-injection: {{ tpl ((dig "istio" "injection" "enabled" $vals)) $ }}
+    {{- end }}
     {{- end }}
     {{- if (dig "namespace" "labels" nil $vals) -}}
     {{- toYaml $vals.namespace.labels | nindent 4 -}}
