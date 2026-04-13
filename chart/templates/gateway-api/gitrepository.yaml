@@ -1,3 +1,3 @@
-{{- if and (eq .Values.gatewayAPI.sourceType "git") (not .Values.offline) .Values.gatewayAPI.enabled }}
+{{- if and (eq .Values.gatewayAPI.sourceType "git") (not .Values.offline) (or .Values.gatewayAPI.enabled .Values.istio.ambient.enabled) }}
 {{- include "bigbang.gitRepository" (dict "name" "gateway-api" "gitCredsName" "gatewayAPI" "git" .Values.gatewayAPI.git "component" "core" "root" .) }}
 {{- end }}

@@ -8,7 +8,7 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $deployNodeAgent := (and .Values.addons.velero.enabled (dig "deployNodeAgent" false .Values.addons.velero.values)) }}
 
-{{- if .Values.ztunnel.enabled }}
+{{- if eq (include "ambientEnabled" .) "true" }}
 additionalPolicyExceptions:
   ztunnel:
     enabled: true

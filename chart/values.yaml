@@ -1,6 +1,15 @@
 # -- Domain used for BigBang created exposed services, can be overridden by individual packages.
 domain: dev.bigbang.mil
 
+# -- Global Istio settings
+istio:
+  # -- Ambient mesh mode configuration
+  ambient:
+    # -- Enable Istio ambient mesh mode. When true, uses ztunnel for mTLS instead of sidecars.
+    # This automatically enables istioCNI, ztunnel, and gatewayAPI packages.
+    # NOTE: Ambient mode is currently in an alpha state.
+    enabled: false
+
 # -- (experimental) Toggle sourcing from external repos.
 # All this does right now is toggle GitRepositories, it is _not_ fully functional
 offline: false

@@ -727,11 +727,16 @@ valuesFrom:
 {{ .Values.istiod.enabled }}
 {{- end -}}
 
+{{- /* Returns true if ambient mode is enabled (via ztunnel or global ambient flag) */ -}}
+{{- define "ambientEnabled" -}}
+{{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
+{{- end -}}
+
 {{- /* Returns dependsOn entries for Istio HelmReleases. */ -}}
 {{- define "istioHelmReleases" -}}
 - name: istiod
   namespace: {{ .Release.Namespace }}
-{{- if .Values.istioCNI.enabled }}
+{{- if or .Values.istioCNI.enabled (eq (include "ambientEnabled" .) "true") }}
 - name: istio-cni
   namespace: {{ .Release.Namespace }}
 {{- end }}

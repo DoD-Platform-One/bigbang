@@ -49,6 +49,22 @@
     "domain": {
       "type": "string"
     },
+    "istio": {
+      "type": "object",
+      "description": "Global Istio settings",
+      "properties": {
+        "ambient": {
+          "type": "object",
+          "description": "Ambient mesh mode configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable Istio ambient mesh mode. When true, uses ztunnel for mTLS instead of sidecars."
+            }
+          }
+        }
+      }
+    },
     "offline": {
       "type": "boolean"
     },

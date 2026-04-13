@@ -1,13 +1,17 @@
 {{- $pkg := "ztunnel" }}
 
 {{- /* Create secret */ -}}
-{{- if .Values.ztunnel.enabled }}
+{{- if eq (include "ambientEnabled" .) "true" }}
 {{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "ztunnel" "defaults" (include "bigbang.defaults.ztunnel" .)) }}
 {{- end }}
 
 {{- define "bigbang.defaults.ztunnel" -}}
 upstream:
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
   global:
+    networkPolicy:
+      enabled: true
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}
 {{- end }}

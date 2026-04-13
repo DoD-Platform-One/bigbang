@@ -31,12 +31,16 @@ stringData:
     bb-common:
       istio:
         enabled: {{ $istioEnabled }}
+        ambient:
+          enabled: {{ include "ambientEnabled" $ }}
         sidecar:
           enabled: {{ $istioHardened }}
         authorizationPolicies:
           enabled: {{ $istioHardened }}
           generateFromNetpol: {{ $istioHardened }}
       networkPolicies:
+        hbonePortInjection:
+          enabled: {{ include "ambientEnabled" $ }}
 {{- pick $.Values.networkPolicies "enabled" "hbonePortInjection" "prependReleaseName" "defaultsAsHooks" "egress" "ingress" "additionalPolicies" "additional" | toYaml | nindent 8 }}
   {{- end }}
 

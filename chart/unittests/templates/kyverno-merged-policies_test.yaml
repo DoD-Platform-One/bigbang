@@ -46,6 +46,9 @@ tests:
               enabled: false
             alloy:
               enabled: false
+            istio:
+              ambient:
+                enabled: false
             ztunnel:
               enabled: false
             kyvernoReporter:
