@@ -25,6 +25,8 @@ ignorePatterns:
   - pattern: "https://www.opentext.com/products/cybersecurity-cloud"
   # Ignore retired promtail links
   - pattern: "https://grafana.com/docs/loki/latest/send-data/promtail/"
+  # Ignore mailto links
+  - pattern: "^mailto:"
 # replacementPatterns:
 #   - pattern: ^.attachments
 #     replacement: file://some/conventional/folder/.attachments
