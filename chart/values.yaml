@@ -311,11 +311,11 @@ gatewayAPI:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/gateway-api.git
     path: "./chart"
-    tag: 1.5.1-bb.0
+    tag: 1.5.1-bb.1
   helmRepo:
     repoName: "registry1"
     chartName: "gateway-api"
-    tag: 1.5.1-bb.0
+    tag: 1.5.1-bb.1
   # -- Values to passthrough to the Gateway API chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Gateway API Package
