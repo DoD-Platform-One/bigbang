@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Minio Operator - Values Tests
+templates:
+  - templates/minio-operator/values.yaml
+tests:
+  - it: should use imagePullSecrets (plural) with list format for operator image
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.minioOperator.enabled: true
+      registryCredentials.registry: registry1.dso.mil
+      registryCredentials.username: test
+      registryCredentials.password: test
+    asserts:
+      - isNotNull:
+          path: upstream.operator.imagePullSecrets
+      - equal:
+          path: upstream.operator.imagePullSecrets[0].name
+          value: private-registry
+      - isNull:
+          path: upstream.operator.imagePullSecret

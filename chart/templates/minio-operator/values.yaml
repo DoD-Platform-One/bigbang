@@ -30,7 +30,7 @@ upstream:
   operator:
     image:
       pullPolicy: {{ .Values.imagePullPolicy}}
-    {{- include "secretsImagePullSecretWithName" . | nindent 4 }}
+    {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
 
     {{- if .Values.monitoring.enabled }}
     env:
