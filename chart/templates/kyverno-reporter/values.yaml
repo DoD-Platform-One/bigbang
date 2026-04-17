@@ -58,6 +58,7 @@ networkPolicies:
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       kyverno-reporter:
         podSelector:
@@ -66,6 +67,9 @@ networkPolicies:
         to:
           definition:
             kubeAPI: true
+        to:
+          definition:
+            sso: {{ .Values.kyvernoReporter.sso.enabled }}
   ingress:
     to:
       policy-reporter:8080:
@@ -90,6 +94,12 @@ upstream:
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
+    openIDConnect:
+      enabled: {{ .Values.kyvernoReporter.sso.enabled }}
+      discoveryUrl: {{ printf "%s/.well-known/openid-configuration" .Values.sso.url | quote }}
+      callbackUrl: {{ printf "https://policyreporter.%s/callback" $domainName | quote }}
+      clientId: {{ .Values.kyvernoReporter.sso.client_id }}
+      clientSecret: {{ .Values.kyvernoReporter.sso.client_secret }}
 
   plugin:
     kyverno:
