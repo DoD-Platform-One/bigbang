@@ -467,6 +467,29 @@
         "enabled": true,
         "sourceType": true,
         "git": true,
+        "sso": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "client_id",
+            "client_secret"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "client_id": {
+              "type": "string"
+            },
+            "client_secret": {
+              "type": "string"
+            },
+            "default_role": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
         "helmRepo": true,
         "flux": true,
         "values": true,
