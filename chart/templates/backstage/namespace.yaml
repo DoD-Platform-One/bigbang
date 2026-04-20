@@ -7,6 +7,10 @@ metadata:
     app.kubernetes.io/name: backstage
     app.kubernetes.io/component: "developer-tools"
     {{- include "commonLabels" . | nindent 4}}
+    {{- if eq (include "ambientEnabled" .) "true" }}
+    istio.io/dataplane-mode: ambient
+    {{- else }}
     istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.backstage) "enabled")) }}
+    {{- end }}
   name: backstage
 {{- end }}

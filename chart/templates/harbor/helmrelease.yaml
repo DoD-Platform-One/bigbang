@@ -21,7 +21,7 @@ spec:
 
   postRenderers:
   {{ include "harbor.fixRegistryPostRender" . | nindent 2 }}
-  {{- if $istioEnabled }}
+  {{- if and $istioEnabled (ne (include "ambientEnabled" .) "true") }}
   {{ include "harbor.ServiceMonitorPostRenderer" . | nindent 2 }}
   {{- end }}
   {{- if (get .Values.addons $pkg).postRenderers }}

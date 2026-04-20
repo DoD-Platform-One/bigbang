@@ -18,13 +18,14 @@ spec:
 
   {{- toYaml $fluxSettings | nindent 2 }}
 
-  
+  {{- if or (get .Values $pkg).postRenderers (and .Values.monitoring.enabled $istioEnabled (ne (include "ambientEnabled" .) "true")) }}
   postRenderers:
-  {{- if $istioEnabled }}
+  {{- if and .Values.monitoring.enabled $istioEnabled (ne (include "ambientEnabled" .) "true") }}
   {{ include "KyvernoReporter.ServiceMonitorPostRenderer" . | nindent 2 }}
   {{- end }}
   {{- if (get .Values $pkg).postRenderers }}
   {{ toYaml (get .Values $pkg).postRenderers | nindent 4 }}
+  {{- end }}
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "kyverno-reporter" "root" .) | nindent 2 }}
   dependsOn:

@@ -19,9 +19,9 @@ spec:
 
 
   {{- toYaml $fluxSettingsGitlab | nindent 2 }}
-  {{- if or .Values.addons.gitlab.postRenderers .Values.monitoring.enabled }}
+  {{- if or .Values.addons.gitlab.postRenderers (and .Values.monitoring.enabled (ne (include "ambientEnabled" .) "true")) }}
   postRenderers:
-  {{- if .Values.monitoring.enabled }}
+  {{- if and .Values.monitoring.enabled (ne (include "ambientEnabled" .) "true") }}
   {{ include "gitlab.serviceMonitorPostRenderers" . | nindent 4 }}
   {{- end }}
   {{- with .Values.addons.gitlab.postRenderers }}

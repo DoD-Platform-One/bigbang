@@ -3,7 +3,7 @@
 {{- if (get .Values.addons $pkg).enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $havePostRenderers := (get .Values.addons $pkg).postRenderers }}
-{{- $installServiceMonitorPostRenderers := and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.thanos.values) "STRICT") }}
+{{- $installServiceMonitorPostRenderers := and .Values.monitoring.enabled $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.thanos.values) "STRICT") }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

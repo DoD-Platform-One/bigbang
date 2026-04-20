@@ -34,9 +34,18 @@ injection in the monitoring namespace.
   (and .Values.grafana.enabled (eq (dig "istio" "injection" "enabled" .Values.grafana) "enabled"))
   .Values.prometheusOperatorCRDs.enabled
 }}
+{{- $ambientEnabled := eq (include "ambientEnabled" .) "true" }}
 {{- $monitoringInjectionEnabled := and $istioEnabled $monitoringNamespaceInjectionEnabled }}
+{{/*
+When ambient mode is enabled, sidecar injection is disabled since sidecars are not used.
+Sidecar-specific annotations and cert mounting don't apply in ambient mode.
+*/}}
+{{- $sidecarInjectionEnabled := and $monitoringInjectionEnabled (not $ambientEnabled) }}
 {{- $mtlsStrict := and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.monitoring.values) "STRICT") }}
-{{- $monitoringMtlsStrict := and $mtlsStrict $monitoringInjectionEnabled }}
+{{/*
+mTLS strict mode with sidecar certs is only applicable when sidecars are used (not ambient mode).
+*/}}
+{{- $monitoringMtlsStrict := and $mtlsStrict $sidecarInjectionEnabled }}
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 
@@ -63,8 +72,10 @@ flux:
 istio:
   enabled: {{ $istioEnabled }}
   sidecar:
-    enabled: {{ $istioHardenedEnabled }}
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
     outboundTrafficPolicyMode: REGISTRY_ONLY
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
   {{- if and $istioHardenedEnabled (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
   serviceEntries:
     custom:
@@ -250,7 +261,7 @@ upstream:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
         - name: "config-reloader"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
-      {{- if or .Values.monitoring.sso.enabled $monitoringInjectionEnabled .Values.kiali.enabled }}
+      {{- if or .Values.monitoring.sso.enabled $sidecarInjectionEnabled .Values.kiali.enabled }}
       podMetadata:
         {{- if or .Values.monitoring.sso.enabled .Values.kiali.enabled }}
         {{- $alertmanagerAuthserviceKey := (dig "selector" "key" "protect" .Values.addons.authservice.values) }}
@@ -263,7 +274,7 @@ upstream:
           {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
           {{- end }}
         {{- end }}
-        {{- if $monitoringInjectionEnabled }}
+        {{- if $sidecarInjectionEnabled }}
         annotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
@@ -285,7 +296,7 @@ upstream:
       enabled: true
       # Note: We need to change the portName in order for istio to correctly detect TCP is being used
       #       for the headless service
-      {{- if $monitoringInjectionEnabled }}
+      {{- if $istioEnabled }}
       portName: "tcp-grpc"
       {{- end }}
     thanosServiceMonitor:
@@ -406,9 +417,9 @@ upstream:
           {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
           vault-ingress: "true"
           {{- end }}
-        {{- if or $monitoringInjectionEnabled .Values.addons.vault.enabled }}
+        {{- if or $sidecarInjectionEnabled .Values.addons.vault.enabled }}
         annotations:
-          {{- if $monitoringInjectionEnabled }}
+          {{- if $sidecarInjectionEnabled }}
           {{ include "istioAnnotation" . }}
           traffic.sidecar.istio.io/includeOutboundIPRanges: ""
           proxy.istio.io/config: |
@@ -573,7 +584,7 @@ upstream:
           insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
         {{- end }}
     {{- end }}
-    {{- if $monitoringInjectionEnabled }}
+    {{- if $sidecarInjectionEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -924,7 +935,7 @@ upstream:
       patch:
         image:
           pullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if $monitoringInjectionEnabled }}
+    {{- if $sidecarInjectionEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}

@@ -8,6 +8,10 @@ metadata:
     app.kubernetes.io/name: {{ $pkg | kebabcase }}
     app.kubernetes.io/component: "core"
     {{- include "commonLabels" . | nindent 4}}
+    {{- if eq (include "ambientEnabled" .) "true" }}
+    istio.io/dataplane-mode: ambient
+    {{- else }}
     istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" (get .Values $pkg)) "enabled")) }}
+    {{- end }}
   name: kyverno-reporter
 {{- end }}

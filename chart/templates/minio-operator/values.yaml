@@ -44,6 +44,8 @@ upstream:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
   egress:
     from:
       minio-operator:
@@ -53,6 +55,8 @@ networkPolicies:
 
 istio:
   enabled: {{ $istioEnabled }}
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
   hardened:
     enabled: {{ or
       (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)

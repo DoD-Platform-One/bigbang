@@ -41,6 +41,8 @@ imagePullSecretName: ""
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
 
   ingress:
     definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
@@ -68,7 +70,10 @@ istio:
   enabled: {{ $istioEnabled }}
 
   sidecar:
-    enabled: {{ $istioHardenedEnabled }}
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
+
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
 
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 

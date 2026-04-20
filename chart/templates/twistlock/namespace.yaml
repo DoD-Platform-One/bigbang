@@ -8,5 +8,9 @@ metadata:
     app.kubernetes.io/name: twistlock
     app.kubernetes.io/component: "security"
     {{- include "commonLabels" . | nindent 4}}
+    {{- if eq (include "ambientEnabled" .) "true" }}
+    istio.io/dataplane-mode: ambient
+    {{- else }}
     istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled")) }}
+    {{- end }}
 {{- end }}

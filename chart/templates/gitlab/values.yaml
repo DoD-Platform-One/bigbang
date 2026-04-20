@@ -109,12 +109,17 @@ routes:
 istio:
   enabled: {{ $istioInjection }}
   sidecar:
+    enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
     enabled: {{ $istioHardened }}
     generateFromNetpol: {{ $istioHardened }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
   ingress:
     definitions: {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
     to:

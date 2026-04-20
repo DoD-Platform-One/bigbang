@@ -2,7 +2,7 @@
 
 > **WARNING:** Ambient mode is currently in an **alpha state** within Big Bang. It is not fully integrated and is **not recommended for production use**. Expect potential breaking changes in future releases.
 >
-> **NOTE:** During the alpha phase, the global `istio.ambient.enabled` flag only deploys the required ambient infrastructure (ztunnel, istio-cni, gateway-api). Individual packages must be explicitly configured to participate in the ambient mesh until they have been validated. In future releases, the global ambient flag will automatically opt packages into ambient mode.
+> **NOTE:** When `istio.ambient.enabled` is set to `true`, Big Bang deploys the required ambient infrastructure (ztunnel, istio-cni, gateway-api) and automatically opts all packages into ambient mode by applying the `istio.io/dataplane-mode: ambient` label to their namespaces.
 
 [[_TOC_]]
 

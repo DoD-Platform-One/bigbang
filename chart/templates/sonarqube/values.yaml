@@ -35,7 +35,10 @@ istio:
     enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
   sidecar:
-    enabled: {{ $istioHardenedEnabled }}
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
+
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}

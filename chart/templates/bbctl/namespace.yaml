@@ -7,5 +7,9 @@ metadata:
   labels:
     app.kubernetes.io/name: bbctl
     {{- include "commonLabels" . | nindent 4}}
+    {{- if eq (include "ambientEnabled" .) "true" }}
+    istio.io/dataplane-mode: ambient
+    {{- else }}
     istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled")) }}
+    {{- end }}
 {{- end }}
