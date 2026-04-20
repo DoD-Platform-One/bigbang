@@ -16,7 +16,9 @@
 
 istio:
   sidecar:
-    enabled: {{ $istioHardenedEnabled }}
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
@@ -24,6 +26,8 @@ istio:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
   egress:
     {{- if eq (include "ambientEnabled" .) "true" }}
     defaults:

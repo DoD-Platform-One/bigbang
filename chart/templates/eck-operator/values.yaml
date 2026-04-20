@@ -34,7 +34,10 @@ istio:
   enabled: {{ $istioEnabled }}
 
   sidecar:
-    enabled: {{ $istioHardenedEnabled }}
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
+
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}

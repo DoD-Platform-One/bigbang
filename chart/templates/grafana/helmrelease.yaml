@@ -18,9 +18,9 @@ spec:
 
   {{- toYaml $fluxSettingsGrafana | nindent 2 }}
 
-  {{- if or .Values.grafana.postRenderers .Values.monitoring.enabled }}
+  {{- if or .Values.grafana.postRenderers (and .Values.monitoring.enabled (ne (include "ambientEnabled" .) "true")) }}
   postRenderers:
-  {{- if .Values.monitoring.enabled }}
+  {{- if and .Values.monitoring.enabled (ne (include "ambientEnabled" .) "true") }}
   {{ include "grafana.serviceMonitorPostRenderers" . | nindent 2 }}
   {{- end }}
   {{- with .Values.grafana.postRenderers }}

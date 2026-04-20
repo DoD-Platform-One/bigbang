@@ -25,7 +25,7 @@ spec:
   {{ toYaml . | nindent 2 }}
   {{- end }}
   {{- end }}
-  {{- if and .Values.monitoring.enabled $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
+  {{- if and .Values.monitoring.enabled $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "mtls" "mode" "STRICT" .Values.tempo.values) "STRICT") }}
   {{ include "tempo.serviceMonitorPostRenderers" . | nindent 2 }}
   {{- end }}
   {{- if and .Values.tempo.objectStorage.accessKey .Values.tempo.objectStorage.accessSecret }}

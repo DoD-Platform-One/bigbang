@@ -18,10 +18,14 @@ spec:
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 
+  {{- if or .Values.monitoring.postRenderers (ne (include "ambientEnabled" .) "true") }}
   postRenderers:
+  {{- if ne (include "ambientEnabled" .) "true" }}
   {{- include "monitoring.operatorServiceMonitorPostRenderer" . | nindent 4 }}
+  {{- end }}
   {{- if .Values.monitoring.postRenderers }}
   {{ toYaml .Values.monitoring.postRenderers | nindent 4 }}
+  {{- end }}
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "monitoring" "root" .) | nindent 2 }}
 

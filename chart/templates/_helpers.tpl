@@ -740,6 +740,10 @@ valuesFrom:
 - name: istio-cni
   namespace: {{ .Release.Namespace }}
 {{- end }}
+{{- if eq (include "ambientEnabled" .) "true" }}
+- name: ztunnel
+  namespace: {{ .Release.Namespace }}
+{{- end }}
 {{- end -}}
 
 {{- /* Returns name of istio Namespace Selector*/ -}}

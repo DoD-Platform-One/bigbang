@@ -12,6 +12,8 @@
 
 istio:
   enabled: {{ $istioEnabled }}
+  ambient:
+    enabled: {{ include "ambientEnabled" . }}
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
