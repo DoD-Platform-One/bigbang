@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kiali/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kiali
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kiali" "package" .Values.kiali "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kiali" "package" .Values.kiali "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsKiali | nindent 2 }}
 

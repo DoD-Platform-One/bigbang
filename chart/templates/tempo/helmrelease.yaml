@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/tempo/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: tempo
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "tempo" "package" .Values.tempo "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "tempo" "package" .Values.tempo "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsTempo | nindent 2 }}
 

@@ -16,7 +16,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/mattermost-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: mattermost-operator
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mattermost-operator" "package" $mmOpValues "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mattermost-operator" "package" $mmOpValues "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMattermostOperator | nindent 2 }}
   

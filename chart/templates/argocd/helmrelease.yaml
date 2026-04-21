@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/argocd/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: argocd
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "argocd" "package" .Values.addons.argocd "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "argocd" "package" .Values.addons.argocd "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsArgo | nindent 2 }}
 

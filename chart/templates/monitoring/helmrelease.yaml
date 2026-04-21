@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/monitoring/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: monitoring
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "monitoring" "package" .Values.monitoring "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "monitoring" "package" .Values.monitoring "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMonitoring | nindent 2 }}
 

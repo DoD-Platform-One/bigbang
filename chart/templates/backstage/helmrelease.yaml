@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/backstage/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: backstage
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "backstage" "package" .Values.addons.backstage "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "backstage" "package" .Values.addons.backstage "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsBackstage | nindent 2 }}
 

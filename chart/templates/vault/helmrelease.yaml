@@ -15,7 +15,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/vault/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: vault
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "vault" "package" .Values.addons.vault "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "vault" "package" .Values.addons.vault "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsVault | nindent 2 }}
   
