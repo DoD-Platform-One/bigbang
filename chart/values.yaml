@@ -1884,11 +1884,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
       path: "./chart"
-      tag: "11.5.1-bb.3"
+      tag: "11.5.1-bb.4"
     helmRepo:
       repoName: "registry1"
       chartName: "mattermost"
-      tag: "11.5.1-bb.3"
+      tag: "11.5.1-bb.4"
 
     # -- Flux reconciliation overrides specifically for the Mattermost Package
     flux:
