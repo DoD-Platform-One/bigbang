@@ -314,6 +314,9 @@ kyverno:
       enabled: true
 
 kyvernoReporter:
+  sso:
+    client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_kyvernoreporter
+    client_secret: anything-for-dev
   values:
     bbtests:
       enabled: true
@@ -2036,18 +2039,18 @@ addons:
               # Download the custom registration config needed for
               # the p1 auth plugin.
               curl -fsSL \
-                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0d0bbe88e3d527e9a33d2710428b9c1142154986/docs/test-data/custom-registration-config.yaml \
+                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0a1e5fc45abc7782a10afa2a9a927050fc0f15ca/docs/test-data/custom-registration-config.yaml \
                 -o /opt/keycloak/conf/custom-registration-config.yaml
 
               # Download a quarkus.properties file to handle particular
               # routing requirements for the p1 auth plugin.
               curl -fsSL \
-                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0d0bbe88e3d527e9a33d2710428b9c1142154986/docs/test-data/quarkus.properties \
+                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0a1e5fc45abc7782a10afa2a9a927050fc0f15ca/docs/test-data/quarkus.properties \
                 -o /opt/keycloak/conf/quarkus.properties
 
               # Download the test realm config and remove the Conditional OTP execution
               curl -fsSL \
-                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0d0bbe88e3d527e9a33d2710428b9c1142154986/docs/test-data/realm.json \
+                https://repo1.dso.mil/big-bang/product/packages/keycloak/-/raw/0a1e5fc45abc7782a10afa2a9a927050fc0f15ca/docs/test-data/realm.json \
                 | jq '
                 .authenticationFlows |= map(
                   if .id == "cdf1be21-4140-4652-9d68-3b60742cc8ad" then
