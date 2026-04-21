@@ -12,7 +12,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/bbctl/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: bbctl
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "bbctl" "package" .Values.bbctl "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "bbctl" "package" .Values.bbctl "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsbbctl | nindent 2 }}
 

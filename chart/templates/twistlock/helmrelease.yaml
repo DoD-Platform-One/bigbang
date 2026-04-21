@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/twistlock/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: twistlock
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "twistlock" "package" .Values.twistlock "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "twistlock" "package" .Values.twistlock "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsTwistlock | nindent 2 }}
   

@@ -13,7 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/kyverno/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: kyverno
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kyverno" "package" .Values.kyverno "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "kyverno" "package" .Values.kyverno "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingskyverno | nindent 2 }}
 

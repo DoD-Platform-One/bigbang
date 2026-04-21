@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/authservice/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: authservice
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "authservice" "package" .Values.addons.authservice "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "authservice" "package" .Values.addons.authservice "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsAuthservice | nindent 2 }}
 

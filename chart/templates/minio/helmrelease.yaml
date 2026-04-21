@@ -9,7 +9,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: minio
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "minio" "package" .Values.addons.minio "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "minio" "package" .Values.addons.minio "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMinio | nindent 2 }}
   

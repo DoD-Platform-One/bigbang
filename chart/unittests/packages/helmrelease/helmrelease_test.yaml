@@ -164,6 +164,52 @@ tests:
       value: 45.0.0
 
 ###############################################################################
+# ReleaseName framework (phase 1)
+###############################################################################
+
+- it: should not render spec.releaseName by default for framework-enabled monitoring
+  set:
+    monitoring:
+      enabled: true
+  template: monitoring/helmrelease.yaml
+  asserts:
+  - notExists:
+      path: spec.releaseName
+
+- it: should render spec.releaseName when monitoring.releaseName is set
+  set:
+    monitoring:
+      enabled: true
+      releaseName: monitoring-custom
+  template: monitoring/helmrelease.yaml
+  asserts:
+  - equal:
+      path: spec.releaseName
+      value: monitoring-custom
+
+- it: should render spec.releaseName when argocd.releaseName is set
+  set:
+    addons:
+      argocd:
+        enabled: true
+        releaseName: argocd-custom
+  template: argocd/helmrelease.yaml
+  asserts:
+  - equal:
+      path: spec.releaseName
+      value: argocd-custom
+
+- it: should keep explicit releaseName behavior for templates that already define it (alloy)
+  set:
+    alloy:
+      enabled: true
+  template: alloy/helmrelease.yaml
+  asserts:
+  - equal:
+      path: spec.releaseName
+      value: alloy
+
+###############################################################################
 # ValuesFrom helper
 ###############################################################################
 

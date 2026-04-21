@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/external-secrets/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: external-secrets
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "external-secrets" "package" .Values.addons.externalSecrets "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "external-secrets" "package" .Values.addons.externalSecrets "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettings | nindent 2 }}
 

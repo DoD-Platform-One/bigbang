@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/neuvector/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: neuvector
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "neuvector" "package" .Values.neuvector "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "neuvector" "package" .Values.neuvector "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsNeuvector | nindent 2 }}
 

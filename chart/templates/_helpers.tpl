@@ -656,6 +656,9 @@ Args (dict):
   - root: root context ($ or .)
 */}}
 {{- define "bigbang.helmRelease.chartSpec" -}}
+{{- if and .emitReleaseName (dig "releaseName" "" .package) }}
+releaseName: {{ .package.releaseName }}
+{{- end }}
 chart:
   spec:
     {{- if eq .package.sourceType "git" }}

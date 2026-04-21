@@ -13,7 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/headlamp/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: headlamp
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "headlamp" "package" .Values.addons.headlamp "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "headlamp" "package" .Values.addons.headlamp "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettings | nindent 2 }}
 

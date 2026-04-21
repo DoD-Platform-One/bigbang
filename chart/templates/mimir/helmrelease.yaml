@@ -16,7 +16,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/mimir/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: mimir
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mimir" "package" .Values.addons.mimir "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "mimir" "package" .Values.addons.mimir "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsMimir | nindent 2 }}
   {{- if or .Values.addons.mimir.postRenderers $istioEnabled }}

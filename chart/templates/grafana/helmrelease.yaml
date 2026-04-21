@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/grafana/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: monitoring
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "grafana" "package" .Values.grafana "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "grafana" "package" .Values.grafana "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsGrafana | nindent 2 }}
 
@@ -49,4 +49,3 @@ spec:
   {{- end }}
   {{- end }}
 {{- end }}
-

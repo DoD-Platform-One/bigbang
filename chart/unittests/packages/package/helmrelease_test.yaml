@@ -19,6 +19,21 @@ set:
         path: chart
         tag: 1.0.0
 tests:
+  - it: should keep package template releaseName tied to package name
+    set:
+      packages:
+        sample:
+          enabled: true
+          releaseName: sample-custom
+          git:
+            repo: https://example.com/sample.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - equal:
+          path: spec.releaseName
+          value: sample
+
   - it: should include default dependsOn by default
     asserts:
       - contains:

@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/eck-operator/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: eck-operator
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "eck-operator" "package" .Values.eckOperator "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "eck-operator" "package" .Values.eckOperator "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsEckOperator | nindent 2 }}
 

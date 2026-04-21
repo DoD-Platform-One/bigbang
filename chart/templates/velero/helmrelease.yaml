@@ -14,7 +14,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/velero/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: velero
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "velero" "package" .Values.addons.velero "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "velero" "package" .Values.addons.velero "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsVelero | nindent 2 }}
   

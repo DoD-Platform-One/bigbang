@@ -13,7 +13,7 @@ metadata:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/elasticsearch-kibana/values.yaml") . | sha256sum }}
 spec:
   targetNamespace: logging
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "elasticsearch-kibana" "package" .Values.elasticsearchKibana "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "elasticsearch-kibana" "package" .Values.elasticsearchKibana "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsEk | nindent 2 }}
 

@@ -15,7 +15,7 @@ spec:
   # Use a non-persistent client to allow for Gatekeeper CRD *magic*
   persistentClient: false
   targetNamespace: gatekeeper-system
-  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "gatekeeper" "package" .Values.gatekeeper "root" .) | nindent 2 }}
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "gatekeeper" "package" .Values.gatekeeper "root" . "emitReleaseName" true) | nindent 2 }}
 
   {{- toYaml $fluxSettingsGatekeeper | nindent 2 }}
 
