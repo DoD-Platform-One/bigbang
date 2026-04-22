@@ -1,0 +1,61 @@
+{{- /* Create secret */ -}}
+{{- if .Values.renovate.enabled }}
+{{- /* Create a cleaned copy of renovate config and merge deprecated paths into current paths */ -}}
+{{- $renovatePackage := deepCopy .Values.renovate -}}
+{{- if .Values.renovate.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.renovate.values) | fromYaml -}}
+{{- $renovatePackage = set $renovatePackage "values" $cleanedValues -}}
+{{- end -}}
+{{- include "values-secret" (dict
+  "root" $
+  "package" $renovatePackage
+  "name" "renovate"
+  "defaults" (include "bigbang.defaults.renovate" . | fromYaml | toYaml)
+)}}
+{{- end }}
+
+{{- define "bigbang.defaults.renovate" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.renovate.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+# hostname is deprecated and replaced with domain. But if hostname exists then use it.
+{{- $domainName := default .Values.domain .Values.hostname }}
+hostname: {{ $domainName }}
+domain: {{ $domainName }}
+
+openshift: {{ .Values.openshift }}
+
+istio:
+  enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ $istioHardenedEnabled }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: {{ $istioHardenedEnabled }}
+
+{{- include "secretsImagePullSecretsWithName" . }}
+
+image:
+  pullPolicy: {{ .Values.imagePullPolicy }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      renovate:
+        to:
+          definition:
+            storage-subnets: true
+
+monitoring:
+  enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+
+{{- end -}}

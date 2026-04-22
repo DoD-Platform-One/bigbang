@@ -3,6 +3,8 @@
 #########################
 bbctl:
   enabled: false
+renovate:
+  enabled: false
 monitoring:
   enabled: false
 grafana:

@@ -34,6 +34,7 @@
     "grafana",
     "twistlock",
     "bbctl",
+    "renovate",
     "addons"
   ],
   "additionalProperties": false,
@@ -307,6 +308,7 @@
       "properties": {
         "enabled": true,
         "sourceType": true,
+        "releaseName": true,
         "git": true,
         "helmRepo": true,
         "flux": true,
@@ -995,6 +997,28 @@
               "type": "string"
             }
           }
+        },
+        "disableAutomaticPassthroughValues": true
+      },
+      "additionalProperties": false
+    },
+    "renovate": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "releaseName": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "istio": {
+          "$ref": "#/$defs/istio"
         },
         "disableAutomaticPassthroughValues": true
       },

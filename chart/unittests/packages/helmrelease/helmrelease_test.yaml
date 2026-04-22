@@ -199,6 +199,26 @@ tests:
       path: spec.releaseName
       value: argocd-custom
 
+- it: should not render spec.releaseName by default for framework-enabled renovate
+  set:
+    renovate:
+      enabled: true
+  template: renovate/helmrelease.yaml
+  asserts:
+  - notExists:
+      path: spec.releaseName
+
+- it: should render spec.releaseName when renovate.releaseName is set
+  set:
+    renovate:
+      enabled: true
+      releaseName: renovate-custom
+  template: renovate/helmrelease.yaml
+  asserts:
+  - equal:
+      path: spec.releaseName
+      value: renovate-custom
+
 - it: should keep explicit releaseName behavior for templates that already define it (alloy)
   set:
     alloy:

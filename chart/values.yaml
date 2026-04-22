@@ -1306,6 +1306,31 @@ bbctl:
   values: {}
 
   postRenderers: []
+
+renovate:
+  # -- Toggle deployment of Renovate
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/maintained/renovate.git
+    path: "./chart"
+    tag: "46.31.6-bb.1"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "maintained/renovate"
+    tag: "46.31.6-bb.1"
+
+  # -- Flux reconciliation overrides specifically for the Renovate Package
+  flux: {}
+
+  # -- Values to passthrough to the Renovate chart: https://repo1.dso.mil/big-bang/product/maintained/renovate.git
+  values: {}
+
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
