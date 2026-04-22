@@ -2,7 +2,7 @@
 # =============================================================================
 # BATS Tests for doc-review.sh
 # =============================================================================
-# Source: scripts/doc-review/doc-review.sh
+# Source: scripts/gitlab-triage/doc-review.sh
 # Run with: bats tests/bats/doc-review/
 #
 # These tests verify doc-review.sh argument parsing and pure functions.
@@ -12,7 +12,7 @@
 # Setup runs before each test
 setup() {
     export REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}" && git rev-parse --show-toplevel)"
-    export SCRIPT_PATH="${REPO_ROOT}/scripts/doc-review/doc-review.sh"
+    export SCRIPT_PATH="${REPO_ROOT}/scripts/gitlab-triage/doc-review.sh"
     
     # Create a mock glab command that doesn't hit GitLab
     export PATH="${BATS_TEST_TMPDIR}:${PATH}"
