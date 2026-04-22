@@ -1,0 +1,3 @@
+{{- if and (eq .Values.renovate.sourceType "git") (not .Values.offline) .Values.renovate.enabled }}
+{{- include "bigbang.gitRepository" (dict "name" "renovate" "gitCredsName" "renovate" "git" .Values.renovate.git "component" "core" "root" .) }}
+{{- end }}

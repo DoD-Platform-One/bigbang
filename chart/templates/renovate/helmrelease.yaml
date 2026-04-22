@@ -1,0 +1,49 @@
+{{- $fluxSettingsRenovate := merge .Values.renovate.flux .Values.flux -}}
+{{- if .Values.renovate.enabled }}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: renovate
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: renovate
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/renovate/values.yaml") . | sha256sum }}
+spec:
+  targetNamespace: renovate
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "renovate" "package" .Values.renovate "root" . "emitReleaseName" true) | nindent 2 }}
+  {{- toYaml $fluxSettingsRenovate | nindent 2 }}
+  {{- if .Values.renovate.postRenderers }}
+  postRenderers:
+  {{- with .Values.renovate.postRenderers }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "renovate" "root" .) | nindent 2 }}
+
+  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.gitlab.enabled }}
+  dependsOn:
+  {{- if $istioEnabled }}
+    {{- include "istioHelmReleases" . | nindent 4 }}
+  {{- end }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.monitoring.enabled }}
+    - name: monitoring
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.addons.gitlab.enabled }}
+    - name: gitlab
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- end }}
+{{- end }}

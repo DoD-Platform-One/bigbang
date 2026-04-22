@@ -192,6 +192,14 @@ PLATFORM ONE BBCTL WARNING:
   Please ensure Loki, Alloy, Grafana, and Monitoring are all enabled when using the bbctl package.
 {{- end }}
 
+{{- if and .Values.renovate.enabled (not .Values.addons.gitlab.enabled) }}
+PLATFORM ONE RENOVATE WARNING:
+  Renovate is enabled while the Big Bang GitLab addon is disabled.
+  This can be valid when Renovate is configured for an external SCM platform in renovate.values
+  (for example GitHub, Gitea, or another GitLab instance).
+  If you intended to use the Big Bang GitLab addon, set .Values.addons.gitlab.enabled=true.
+{{- end }}
+
 {{- if $.Values.addons.mattermost.enabled }}
 Mattermost is enabled.
 {{- with .Values.addons.mattermost.database }}
