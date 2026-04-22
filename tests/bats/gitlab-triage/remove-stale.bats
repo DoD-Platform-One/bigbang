@@ -2,7 +2,7 @@
 # =============================================================================
 # BATS Tests for remove-stale.sh
 # =============================================================================
-# Source: scripts/doc-review/remove-stale.sh
+# Source: scripts/gitlab-triage/remove-stale.sh
 # Run with: bats tests/bats/doc-review/
 #
 # These tests verify remove-stale.sh argument parsing and logic.
@@ -12,7 +12,7 @@
 # Setup runs before each test
 setup() {
     export REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}" && git rev-parse --show-toplevel)"
-    export SCRIPT_PATH="${REPO_ROOT}/scripts/doc-review/remove-stale.sh"
+    export SCRIPT_PATH="${REPO_ROOT}/scripts/gitlab-triage/remove-stale.sh"
     
     # Create a mock glab command that doesn't hit GitLab
     export PATH="${BATS_TEST_TMPDIR}:${PATH}"
