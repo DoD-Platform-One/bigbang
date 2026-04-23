@@ -6,6 +6,9 @@ kind: HelmRelease
 metadata:
   name: anchore-enterprise
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: anchore-enterprise
+    {{- include "commonLabels" . | nindent 4}}
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/anchore-enterprise/values.yaml") . | sha256sum }}
 spec:
