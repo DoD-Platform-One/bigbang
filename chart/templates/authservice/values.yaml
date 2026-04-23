@@ -19,6 +19,7 @@
 
 {{- define "bigbang.defaults.authservice" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $ambientEnabled := eq (include "ambientEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioHardenedEnabled := or
@@ -98,6 +99,15 @@ networkPolicies:
         from:
           k8s:
             monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # HBONE ingress from istio-gateway to the authservice waypoint (ambient)
+      authservice-waypoint:15008:
+        podSelector:
+          matchLabels:
+            gateway.networking.k8s.io/gateway-name: authservice-waypoint
+        from:
+          k8s:
+            "istio-gateway/*": {{ and $ambientEnabled .Values.istioGateway.enabled }}
+            kiali-service-account@kiali/kiali: {{ and $ambientEnabled .Values.kiali.enabled }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
@@ -108,6 +118,13 @@ networkPolicies:
           k8s:
             # Tempo trace data
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
+      # Waypoint egress to prometheus/alertmanager when the waypoint fronts them for SSO (ambient)
+      authservice-waypoint:
+        to:
+          k8s:
+            monitoring/prometheus:9090: {{ and $ambientEnabled .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
+            monitoring/alertmanager:9093: {{ and $ambientEnabled .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
+            thanos/thanos:9090: {{ and $ambientEnabled .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled }}
       haproxy:
         to:
           k8s:
