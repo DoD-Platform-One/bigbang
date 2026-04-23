@@ -5,6 +5,9 @@ kind: HelmRelease
 metadata:
   name: gitlab-runner
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: gitlab-runner
+    {{- include "commonLabels" . | nindent 4}}
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/gitlab-runner/values.yaml") . | sha256sum }}
 spec:

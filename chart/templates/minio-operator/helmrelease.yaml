@@ -6,6 +6,9 @@ kind: HelmRelease
 metadata:
   name: minio-operator
   namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: minio-operator
+    {{- include "commonLabels" . | nindent 4}}
   annotations:
     checksum/bigbang-values: {{ include (print $.Template.BasePath "/minio-operator/values.yaml") . | sha256sum }}
 spec:
