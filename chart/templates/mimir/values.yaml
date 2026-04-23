@@ -1,8 +1,14 @@
 {{- /* Create secret */ -}}
 {{- if .Values.addons.mimir.enabled }}
+{{- /* Create a cleaned copy of mimir config and merge deprecated paths into current paths */ -}}
+{{- $mimirPackage := deepCopy .Values.addons.mimir -}}
+{{- if .Values.addons.mimir.values -}}
+{{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.mimir.values) | fromYaml -}}
+{{- $mimirPackage = set $mimirPackage "values" $cleanedValues -}}
+{{- end -}}
 {{- include "values-secret" (dict 
   "root" $ 
-  "package" .Values.addons.mimir 
+  "package" $mimirPackage 
   "name" "mimir" 
   "defaults" ((mergeOverwrite (include "bigbang.defaults.mimir" . | fromYaml) (include "bigbang.mimir.bb-common-migrations" . | fromYaml)) | toYaml)
 )}}
@@ -10,12 +16,12 @@
 
 {{- define "bigbang.defaults.mimir" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.mimir.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 {{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
 {{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
-
 
 upgradeJob:
   image:
@@ -24,95 +30,25 @@ upgradeJob:
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
-  prependReleaseName: false
-  egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
-    from:
-      mimir:
-        to:
-          k8s:
-            monitoring/grafana:3000: {{ .Values.grafana.enabled }} 
-      rollout-operator:
-        to:
-          k8s:
-            monitoring/grafana:3000: {{ .Values.grafana.enabled }} 
-      minio:
-        to:
-          definition:
-            kubeAPI: true
-
-  ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
-    to:
-      mimir:[15020]:
-        from:
-          k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}  
-            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
-      mimir:[8080,9095]:
-        from:
-          k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-            monitoring/grafana: {{ .Values.grafana.enabled }}
-            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
-      rollout-operator:[8080,9095]:
-        from:
-          k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-            monitoring/grafana: {{ .Values.grafana.enabled }}
-            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
-      rollout-operator:[15020]:
-        from:
-          k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-            alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
-      minio:[9000]:
-        from:
-          k8s: 
-            minio-operator/minio-operator: {{ .Values.addons.minioOperator.enabled }}
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-      minio:[15020]:
-        from:
-          k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
-            alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
 istio:
   enabled: {{ $istioEnabled }}
+  hardened:
+    enabled: {{ $istioHardenedEnabled }}
+
+  sidecar:
+    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
+
   ambient:
     enabled: {{ include "ambientEnabled" . }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-      (dig "istio" "hardened" "enabled" false .Values.grafana.values)
-      (dig "istio" "hardened" "enabled" false .Values.loki.values)
-      (dig "istio" "hardened" "enabled" false .Values.eckOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.mimir.values)
-    }}
-    {{- if and (or (dig "values" "istio" "hardened" "enabled" false .Values.addons.mimir) (dig "hardened" "enabled" false .Values.istiod.values)) (contains "s3" .Values.addons.mimir.s3ObjectStorage.endpoint) }}
-    customServiceEntries:
-      - name: egress-object-store
-        enabled: true
-        spec:
-          hosts:
-          - {{(printf "%s.s3.dualstack.%s.amazonaws.com" .Values.addons.mimir.s3ObjectStorage.bucketName .Values.addons.mimir.s3ObjectStorage.region) }}
-          location: MESH_EXTERNAL
-          ports:
-            - number: 443
-              protocol: TLS
-              name: https
-          resolution: DNS
-    {{- end }}
+
+  authorizationPolicies:
+    enabled: {{ $istioHardenedEnabled }}
+    generateFromNetpol: true
 
 routes:
   inbound:
     mimir-gateway:
+      enabled: false
       gateways:
         - {{ include "getGatewayName" (dict "gateway" "public" "root" .)}}
       hosts:
@@ -122,6 +58,78 @@ routes:
       selector:
         app.kubernetes.io/component: gateway
         app.kubernetes.io/name: mimir
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.vault.values }}
+      hosts:
+      - repo1.dso.mil
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    from:
+      mimir:
+        to:
+          k8s:
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }}
+          definition:
+            storage-subnets: {{ not $minioEnabled }}
+      rollout-operator:
+        to:
+          k8s:
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }} 
+      minio:
+        to:
+          definition:
+            kubeAPI: {{ $minioEnabled }}
+
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+    to:
+      mimir:[15020]:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}  
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      mimir:[8080,9095]:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            monitoring-grafana@monitoring/grafana: {{ .Values.grafana.enabled }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      rollout-operator:[8080,9095]:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            monitoring-grafana@monitoring/grafana: {{ .Values.grafana.enabled }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      rollout-operator:[15020]:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ .Values.alloy.alloyMetrics.enabled }}
+      minio:[9000]:
+        from:
+          k8s: 
+            minio-operator@minio-operator/minio-operator: {{ and $minioEnabled .Values.addons.minioOperator.enabled }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and $minioEnabled .Values.monitoring.enabled }}
+      minio:[15020]:
+        from:
+          k8s:
+            minio-operator@monitoring/prometheus: {{ and $minioEnabled .Values.monitoring.enabled }}
+            alloy-alloy-metrics@alloy/alloy-metrics: {{ and $minioEnabled (dig "alloyMetrics" "enabled" false .Values.alloy) }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_grafana_url: {{ printf "https://grafana.%s" .Values.domain | quote }}
+  scripts:
+    envs:
+      MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
 
 {{- if $minioEnabled }}
 minio-tenant:

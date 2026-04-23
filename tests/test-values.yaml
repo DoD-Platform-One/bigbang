@@ -1780,39 +1780,10 @@ addons:
   mimir:
     enabled: false
     values:
-      istio:
-        hardened:
-          customServiceEntries:
-            - name: "cypress-service-entries-mimir"
-              enabled: true
-              spec:
-                hosts:
-                  - 'registry.npmjs.org'
-                  - 'download.cypress.io'
-                  - 'cdn.cypress.io'
-                  - 'repo1.dso.mil'
-                  - 'grafana.dev.bigbang.mil'
-                  - 'optimizationguide-pa.googleapis.com'
-                  - 'clientservices.googleapis.com'
-                  - 'accounts.google.com'
-                  - 'redirector.gvt1.com'
-                  - 'content-autofill.googleapis.com'
-                  - 'safebrowsing.googleapis.com'
-                location: MESH_EXTERNAL
-                ports:
-                  - number: 443
-                    protocol: TLS
-                    name: https
-                resolution: DNS
       bbtests:
         enabled: true
         cypress:
           artifacts: true
-          envs:
-            cypress_grafana_url: 'https://grafana.dev.bigbang.mil'
-        scripts:
-          envs:
-            MIMIR_URL: 'http://mimir-mimir-distributor.mimir.svc:8080'
       upstream:
         mimir:
           structuredConfig:
