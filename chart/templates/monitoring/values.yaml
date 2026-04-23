@@ -169,6 +169,7 @@ networkPolicies:
         from:
           k8s:
             authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
+            authservice-waypoint@authservice/authservice-waypoint: {{ and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             logging/logging-loki: {{ .Values.loki.enabled }}
           definition:
@@ -186,6 +187,7 @@ networkPolicies:
           k8s:
             tempo/tempo: {{ .Values.tempo.enabled }}
             authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
+            authservice-waypoint@authservice/authservice-waypoint: {{ and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
             kiali/kiali: {{ .Values.kiali.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
@@ -253,6 +255,14 @@ sso:
 
 upstream:
   alertmanager:
+    {{- if and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
+    # In ambient mode, route alertmanager traffic through the authservice waypoint so SSO is enforced.
+    service:
+      labels:
+        istio.io/use-waypoint: authservice-waypoint
+        istio.io/use-waypoint-namespace: authservice
+        istio.io/ingress-use-waypoint: "true"
+    {{- end }}
     alertmanagerSpec:
       # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
       # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
@@ -290,6 +300,14 @@ upstream:
     {{- end }}
 
   prometheus:
+    {{- if and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
+    # In ambient mode, route prometheus traffic through the authservice waypoint so SSO is enforced.
+    service:
+      labels:
+        istio.io/use-waypoint: authservice-waypoint
+        istio.io/use-waypoint-namespace: authservice
+        istio.io/ingress-use-waypoint: "true"
+    {{- end }}
     {{- if $thanosEnabled }}
     # Must remain top-level under upstream.prometheus (cannot live inside prometheusSpec.thanos).
     thanosService:
@@ -359,12 +377,14 @@ upstream:
               insecure: false
               trace:
                 enable: true
+              {{- if $monitoringMtlsStrict }}
               http_config:
                 tls_config:
                   key_file: /etc/prom-certs/key.pem
                   ca_file: /etc/prom-certs/root-cert.pem
                   cert_file: /etc/prom-certs/cert-chain.pem
                 insecure_skip_verify: true
+              {{- end }}
         # by default, the object stores only sync every 2 hours
         # increase the frequency so the tests will pass 
         blockSize: 1m

@@ -130,6 +130,15 @@ networkPolicies:
           k8s:
             grafana@monitoring/prometheus: {{ .Values.monitoring.enabled }}
             haproxy@authservice/haproxy: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
+      # Allow authservice waypoint to reach thanos-query-frontend for SSO in ambient mode
+      thanos-query-frontend:9090:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/component: query-frontend
+        from:
+          k8s:
+            authservice-waypoint@authservice/authservice-waypoint: {{ and (eq (include "ambientEnabled" .) "true") .Values.addons.authservice.enabled .Values.addons.thanos.sso.enabled }}
 
 {{- if .Values.monitoring.enabled }}
 metrics:
@@ -179,6 +188,14 @@ query:
     enabled: {{ .Values.networkPolicies.enabled }}
 
 queryFrontend:
+  {{- if and (eq (include "ambientEnabled" .) "true") .Values.addons.authservice.enabled .Values.addons.thanos.sso.enabled }}
+  # In ambient mode, route query-frontend traffic through the authservice waypoint so SSO is enforced.
+  service:
+    labels:
+      istio.io/use-waypoint: authservice-waypoint
+      istio.io/use-waypoint-namespace: authservice
+      istio.io/ingress-use-waypoint: "true"
+  {{- end }}
   networkPolicy:
     enabled: {{ .Values.networkPolicies.enabled }}
 
