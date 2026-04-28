@@ -8,7 +8,7 @@ nav:
   - Develop Package: develop-package.md
   - Development Environment: development-environment.md
   - K3d Keys for Testing: k3d-keys-for-testing.md
-  - Kubernetes Storage: k8s-storage.md
+  - Big Bang Storage Options: bigbang-storage-options.md
   - MDO Partybus Pipelines: mdo-partybus-pipelines.md
   - OSCAL Contributing: oscal-contributing.md
   - Postrenderers: postrenderers.md
