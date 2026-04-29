@@ -22,6 +22,7 @@ domain: {{ $domainName }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
+{{- $consolidatedObjStoreEnabled := dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
 {{- $kasEnabled := dig "global" "kas" "enabled" false .Values.addons.gitlab.values }}
 
@@ -501,7 +502,7 @@ global:
     {{- end }}
   {{- end }}
 
-  {{- if or .Values.addons.gitlab.sso.enabled $extObjStorageIsConfigured }}
+  {{- if or .Values.addons.gitlab.sso.enabled $extObjStorageIsConfigured $consolidatedObjStoreEnabled }}
   appConfig:
     {{- end }}
 
@@ -527,7 +528,7 @@ global:
           key: gitlab-sso.json
     {{- end }}
 
-    {{- if $extObjStorageIsConfigured }}
+    {{- if or $extObjStorageIsConfigured $consolidatedObjStoreEnabled }}
     lfs:
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
       bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-lfs
