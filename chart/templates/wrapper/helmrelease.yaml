@@ -2,7 +2,7 @@
 {{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
-{{- $fluxSettings := merge (dig "flux" dict $vals) $.Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy $.Values.flux) (dig "flux" dict $vals) -}}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
 
 apiVersion: helm.toolkit.fluxcd.io/v2
