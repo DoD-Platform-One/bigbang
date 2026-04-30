@@ -184,10 +184,10 @@ Kubernetes: `>=1.33.0-0`
 | kyvernoPolicies.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | kyvernoPolicies.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git"` |  |
 | kyvernoPolicies.git.path | string | `"./chart"` |  |
-| kyvernoPolicies.git.tag | string | `"3.3.4-bb.24"` |  |
+| kyvernoPolicies.git.tag | string | `"3.3.4-bb.62"` |  |
 | kyvernoPolicies.helmRepo.repoName | string | `"registry1"` |  |
 | kyvernoPolicies.helmRepo.chartName | string | `"kyverno-policies"` |  |
-| kyvernoPolicies.helmRepo.tag | string | `"3.3.4-bb.24"` |  |
+| kyvernoPolicies.helmRepo.tag | string | `"3.3.4-bb.62"` |  |
 | kyvernoPolicies.flux | object | `{"driftDetection":{"ignore":[{"paths":[""],"target":{"kind":"ClusterPolicy"}},{"paths":[""],"target":{"kind":"Job"}},{"paths":[""],"target":{"kind":"StatefulSet"}}]}}` | Flux reconciliation overrides specifically for the Kyverno Package |
 | kyvernoPolicies.values | object | `{}` | Values to passthrough to the kyverno policies chart: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git |
 | kyvernoPolicies.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
