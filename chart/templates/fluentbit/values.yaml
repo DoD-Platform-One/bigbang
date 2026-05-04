@@ -11,7 +11,7 @@
 {{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.fluentbit) "enabled")) }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.fluentbit) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.fluentbit.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $additionalS3 := (and
   (dig "additionalOutputs" "s3" "bucket" false .Values.fluentbit.values)

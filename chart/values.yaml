@@ -636,11 +636,11 @@ kyvernoPolicies:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/kyverno-policies.git
     path: ./chart
-    tag: "3.3.4-bb.62"
+    tag: "3.3.4-bb.64"
   helmRepo:
     repoName: "registry1"
     chartName: "kyverno-policies"
-    tag: "3.3.4-bb.62"
+    tag: "3.3.4-bb.64"
 
   # -- Flux reconciliation overrides specifically for the Kyverno Package
   flux:
@@ -1315,7 +1315,7 @@ renovate:
   sourceType: "git"
 
   git:
-    repo: https://repo1.dso.mil/big-bang/product/maintained/renovate.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/renovate.git
     path: "./chart"
     tag: "46.31.6-bb.1"
   helmRepo:

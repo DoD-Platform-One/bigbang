@@ -18,7 +18,7 @@
   (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)
   (dig "hardened" "enabled" false .Values.istiod.values)
 }}
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -102,7 +102,7 @@ istio:
     enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
   ambient:
     enabled: {{ include "ambientEnabled" . }}
-  injection: {{ dig "istio" "injection" "enabled" .Values.addons.argocd }}
+  injection: {{ ternary "disabled" (dig "istio" "injection" "enabled" .Values.addons.argocd) (eq (include "ambientEnabled" .) "true") }}
   authorizationPolicies:
     enabled: {{ $istioHardened }}
     generateFromNetpol: {{ $istioHardened }}
@@ -112,6 +112,8 @@ monitoring:
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
 
 upstream:
   {{- if .Values.addons.argocd.redis.host }}

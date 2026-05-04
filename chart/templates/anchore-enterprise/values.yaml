@@ -267,7 +267,7 @@ upstream:
   feeds:
     istio:
       enabled: {{ $istioEnabled }}
-      injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
+      injection: {{ ternary "enabled" "disabled" (and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled")) }}
 
   {{- if $externalPostgresEnabled }}
   postgresql:
