@@ -211,8 +211,8 @@ networkPolicies:
           - ipBlock:
               cidr: 10.0.0.0/8
         ports:
-        - port: 5432
-          protocol: TCP
+          - port: 5432
+            protocol: TCP
   ingress:
     # -- Ingress definitions; create definitions here that you want to re-use globally across
     # all packages
@@ -766,7 +766,7 @@ elasticsearchKibana:
 
     # -- Elasticsearch license in json format seen here: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana#enterprise-license
     keyJSON: ""
-    
+
   # -- Values to passthrough to the elasticsearch-kibana chart: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
   values: {}
 
@@ -1315,13 +1315,13 @@ renovate:
   sourceType: "git"
 
   git:
-    repo: https://repo1.dso.mil/big-bang/product/maintained/renovate.git
+    repo: https://repo1.dso.mil/big-bang/product/packages/renovate.git
     path: "./chart"
-    tag: "46.31.6-bb.1"
+    tag: "46.31.6-bb.4"
   helmRepo:
     repoName: "registry1"
-    chartName: "maintained/renovate"
-    tag: "46.31.6-bb.1"
+    chartName: "renovate"
+    tag: "46.31.6-bb.4"
 
   # -- Flux reconciliation overrides specifically for the Renovate Package
   flux: {}
