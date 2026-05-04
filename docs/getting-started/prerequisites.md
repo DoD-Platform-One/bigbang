@@ -332,7 +332,7 @@ allowVolumeExpansion: true
 
 ### Bare Metal/Cloud Agnostic Store Class Notes
 
-* The Big Bang Product team put together a [Comparison Matrix of a few Cloud Agnostic Storage Class offerings](../community/development/k8s-storage.md#kubernetes-storage-options)
+* The Big Bang Product team put together a [Comparison Matrix of a few Cloud Agnostic Storage Class offerings](../community/development/bigbang-storage-options.md#1-kubernetes-csi-options-persistentvolumes)
 
   **NOTE:** No storage class specific container images exist in IronBank at this time.
   * Approved IronBank Images will show up in <https://registry1.dso.mil>.

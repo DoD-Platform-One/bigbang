@@ -23,6 +23,8 @@ ignorePatterns:
   - pattern: "https://confluence.il4.dso.mil/*"
   # ignore links that are known to be unreliable due to rate limiting (will be fixed by https://repo1.dso.mil/big-bang/pipeline-templates/pipeline-templates/-/issues/806)
   - pattern: "https://www.opentext.com/products/cybersecurity-cloud"
+  # ignore Big Bang Slack invite links that return 403 in CI without auth
+  - pattern: "https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/.*"
   # Ignore retired promtail links
   - pattern: "https://grafana.com/docs/loki/latest/send-data/promtail/"
   # Ignore mailto links
@@ -51,4 +53,3 @@ ignorePatterns:
 #   - 200
 #   - 206
 #   - 429
-
