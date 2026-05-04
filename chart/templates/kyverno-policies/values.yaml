@@ -448,7 +448,7 @@ policies:
       excludeContainers:
         - istio-init
     {{- end }}
-    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.neuvector.enabled .Values.alloy.enabled }}
+    {{- if or $deployNodeAgent .Values.twistlock.enabled .Values.fluentbit.enabled .Values.neuvector.enabled .Values.alloy.enabled .Values.addons.mattermost.enabled }}
     exclude:
       any:
       - resources:
@@ -505,7 +505,7 @@ policies:
           - neuvector-cert-upgrader-job-*
       {{- end }}
       {{- if .Values.addons.mattermost.enabled }}
-        # Mattermost fails when policy was implemented
+      # Mattermost fails when policy was implemented
       - resources:
           namespaces:
           - mattermost

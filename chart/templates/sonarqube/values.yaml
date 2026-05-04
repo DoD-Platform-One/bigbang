@@ -23,7 +23,7 @@
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") }}
 {{- $localSSOEnabled := and .Values.addons.keycloak.enabled .Values.addons.sonarqube.sso.enabled }}
 
 OpenShift:

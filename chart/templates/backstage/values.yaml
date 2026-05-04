@@ -15,7 +15,7 @@
 {{- define "bigbang.defaults.backstage" -}}
 
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.backstage) "enabled") $istioEnabled }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.backstage) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.backstage.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.backstage.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.

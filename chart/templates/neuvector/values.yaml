@@ -1,6 +1,6 @@
 {{- define "bigbang.defaults.neuvector" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled") -}}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled") -}}
 
 # Check for existing NeuVector exporter secret, otherwise generate new random password
 {{- $existingSecret := lookup "v1" "Secret" "neuvector" "neuvector-prometheus-exporter-pod-secret" }}
