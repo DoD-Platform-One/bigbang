@@ -1326,7 +1326,7 @@ renovate:
   # -- Flux reconciliation overrides specifically for the Renovate Package
   flux: {}
 
-  # -- Values to passthrough to the Renovate chart: https://repo1.dso.mil/big-bang/product/maintained/renovate.git
+  # -- Values to passthrough to the Renovate chart: https://repo1.dso.mil/big-bang/product/packages/renovate.git
   values: {}
 
   # -- Post Renderers.  See docs/postrenders.md
