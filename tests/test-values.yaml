@@ -325,6 +325,9 @@ kyvernoPolicies:
   values:
     bbtests:
       enabled: true
+      chainsawEnabled: false
+      kyvernoCliEnabled: false
+      legacyEnabled: true
     excludeContainers:
     - not-me
     - or-me
