@@ -305,11 +305,6 @@ kyverno:
             requests:
               cpu: 1
               memory: 768Mi
-      features:
-        policyExceptions:
-          enabled: true
-          # -- Restrict policy exceptions to a single namespace
-          namespace: 'kyverno'
     bbtests:
       enabled: true
 
