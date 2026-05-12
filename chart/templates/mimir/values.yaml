@@ -21,7 +21,7 @@
 {{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
-{{- $istioInjection := (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
+{{- $istioInjection := (and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
 
 upgradeJob:
   image:

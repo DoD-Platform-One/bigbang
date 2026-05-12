@@ -337,7 +337,7 @@ upstream:
       {{- end }}
       {{- if and .Values.addons.mimir.enabled (not (dig "alloyMetrics" "enabled" false .Values.alloy)) }}
       remoteWrite:
-        {{- if $istioEnabled }}
+        {{- if and $istioEnabled (not $ambientEnabled) }}
         # I promise it's not a typo; the port is 80 even though it's TLS
         - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
           writeRelabelConfigs:
