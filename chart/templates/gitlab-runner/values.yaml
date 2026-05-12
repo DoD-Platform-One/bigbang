@@ -12,7 +12,7 @@
 
 {{- define "bigbang.defaults.gitlab-runner" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled") $istioEnabled }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 istio:

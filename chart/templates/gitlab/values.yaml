@@ -20,7 +20,7 @@ domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $consolidatedObjStoreEnabled := dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
@@ -108,7 +108,7 @@ routes:
 
 {{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
-  enabled: {{ $istioInjection }}
+  enabled: {{ $istioEnabled }}
   sidecar:
     enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
   ambient:

@@ -10,7 +10,7 @@
 
 {{- define "bigbang.defaults.twistlock" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.twistlock.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.

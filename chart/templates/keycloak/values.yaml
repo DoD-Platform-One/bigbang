@@ -16,7 +16,7 @@
 {{- define "bigbang.defaults.keycloak" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.keycloak) "enabled") }}
 {{- $monitoringEnabled := eq (include "metricScrapingEnabled" .) "true" }}
 {{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
 {{- $externalPostgresEnabled := or (ne .Values.addons.keycloak.database.host "") (ne (dig "upstream" "database" "hostname" "" .Values.addons.keycloak.values) "") -}}
