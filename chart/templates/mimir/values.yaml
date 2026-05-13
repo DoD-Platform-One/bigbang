@@ -22,6 +22,13 @@
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
 {{- $istioInjection := (and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
+{{- $kafkaEnabled := (.Values.addons.mimir.kafkaIngestStorage.enabled) }}
+{{- $kafkaBrokerHost := (.Values.addons.mimir.kafkaIngestStorage.brokerHost) }}
+{{- $kafkaBrokerPort := (.Values.addons.mimir.kafkaIngestStorage.brokerPort) }}
+{{- $kafkaBrokerNetworkCIDR := (.Values.addons.mimir.kafkaIngestStorage.brokerNetworkCIDR) }}
+{{- $kafkaBrokerClusterDomain := (.Values.addons.mimir.kafkaIngestStorage.brokerClusterDomain) }}
+{{- $kafkaBrokerRouteEnabled := and $kafkaEnabled $istioEnabled (ne $kafkaBrokerHost "") }}
+{{- $kafkaBrokerWildcardRouteEnabled := and $kafkaEnabled $istioEnabled (ne $kafkaBrokerClusterDomain "") }}
 
 upgradeJob:
   image:
@@ -60,16 +67,47 @@ routes:
         app.kubernetes.io/name: mimir
   outbound:
     bb-tests:
-      enabled: {{ dig "bbtests" "enabled" false .Values.addons.vault.values }}
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.mimir.values }}
       hosts:
       - repo1.dso.mil
+    kafka-broker:
+      {{- /* Disable single-host entry when wildcard covers it to avoid redundant ServiceEntries */}}
+      enabled: {{ and $kafkaBrokerRouteEnabled (not $kafkaBrokerWildcardRouteEnabled) }}
+      {{- if ne $kafkaBrokerHost "" }}
+      hosts:
+        - {{ $kafkaBrokerHost | quote }}
+      {{- end }}
+      ports:
+        - number: {{ $kafkaBrokerPort }}
+          name: kafka
+          protocol: TCP
+    kafka-broker-wildcard:
+      enabled: {{ $kafkaBrokerWildcardRouteEnabled }}
+      {{- /* resolution: NONE required — Istio rejects wildcard hosts with DNS resolution */}}
+      resolution: NONE
+      {{- if ne $kafkaBrokerClusterDomain "" }}
+      hosts:
+        - {{ printf "*.%s" $kafkaBrokerClusterDomain | quote }}
+      {{- end }}
+      ports:
+        - number: {{ $kafkaBrokerPort }}
+          name: kafka
+          protocol: TCP
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
+  controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    definitions:
+      {{- $egressDefs := .Values.networkPolicies.egress.definitions | deepCopy }}
+      {{- if and $kafkaEnabled $kafkaBrokerNetworkCIDR }}
+      {{- /* Override kafka-subnets with the specific broker CIDR and only the configured port */}}
+      {{- $kafkaDef := dict "to" (list (dict "ipBlock" (dict "cidr" $kafkaBrokerNetworkCIDR))) "ports" (list (dict "port" $kafkaBrokerPort "protocol" "TCP")) }}
+      {{- $_ := set $egressDefs "kafka-subnets" $kafkaDef }}
+      {{- end }}
+      {{ $egressDefs | toYaml | nindent 6 }}
     from:
       mimir:
         to:
@@ -77,6 +115,28 @@ networkPolicies:
             monitoring/grafana:3000: {{ .Values.grafana.enabled }}
           definition:
             storage-subnets: {{ not $minioEnabled }}
+      {{- if and $kafkaEnabled $kafkaBrokerNetworkCIDR }}
+      # Kafka egress is only rendered when brokerNetworkCIDR is explicitly set.
+      # Leaving brokerNetworkCIDR empty intentionally suppresses the egress rule —
+      # operators must provide their broker subnet CIDR to enable network access.
+      # Scoped to distributor (producer) and ingester (consumer) only.
+      mimir-distributor:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: mimir
+            app.kubernetes.io/component: distributor
+        to:
+          definition:
+            kafka-subnets: true
+      mimir-ingester:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: mimir
+            app.kubernetes.io/component: ingester
+        to:
+          definition:
+            kafka-subnets: true
+      {{- end }}
       rollout-operator:
         to:
           k8s:
@@ -134,9 +194,13 @@ bbtests:
 {{- if $minioEnabled }}
 minio-tenant:
   enabled: true
+  bucketInit:
+    enabled: true
   upstream:
     tenant:
       name: mimir-mimir-minio-tenant
+      buckets:
+        - name: {{ .Values.addons.mimir.minioObjectStorage.bucketName }}
       {{- include "secretsImagePullSecretWithName" . | nindent 6 }}
       configSecret:
         accessKey: {{ .Values.addons.mimir.minioObjectStorage.configSecret.accessKey }}
@@ -149,32 +213,30 @@ minio-tenant:
 upstream:
   image:
     {{- include "secretsPullSecrets" . | nindent 4 }}
-    
+
   rollout_operator:
     {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
 
-  query_scheduler:
-    enabled: {{ not $istioEnabled }}
-  {{- if or $minioEnabled $s3Enabled }}
-  {{- if and $s3Enabled .Values.addons.mimir.s3ObjectStorage.accessSecret .Values.addons.mimir.s3ObjectStorage.accessKey }}
+{{- if or $istioEnabled (and $s3Enabled .Values.addons.mimir.s3ObjectStorage.accessSecret .Values.addons.mimir.s3ObjectStorage.accessKey) }}
   global:
+    {{- if $istioEnabled }}
+    podAnnotations:
+      proxy.istio.io/config: '{"holdApplicationUntilProxyStarts": true}'
+    {{- end }}
+    {{- if and $s3Enabled .Values.addons.mimir.s3ObjectStorage.accessSecret .Values.addons.mimir.s3ObjectStorage.accessKey }}
     extraEnvFrom:
     - secretRef:
         name: mimir-objstore-secret
-  {{- end }}
-  {{- if .Values.addons.mimir.serviceAccountAnnotations }}
-  serviceAccount:
-    annotations:
-      {{- range $key, $value :=  .Values.addons.mimir.serviceAccountAnnotations }}
-      {{ $key }}: {{ $value | quote }}
-      {{- end }}
-  {{- end }}
+    {{- end }}
+{{- end }}
+{{- if or $minioEnabled $s3Enabled $kafkaEnabled }}
   mimir:
     structuredConfig:
-    {{- if $mimirEnterpriseEnabled }}
+      {{- if or $minioEnabled $s3Enabled }}
+      {{- if $mimirEnterpriseEnabled }}
       admin_client:
       backend: s3
-    {{- end }}
+      {{- end }}
       alertmanager_storage:
         backend: s3
       blocks_storage:
@@ -190,7 +252,7 @@ upstream:
             endpoint: minio.mimir.svc.cluster.local
             insecure: true
             secret_access_key: {{ .Values.addons.mimir.minioObjectStorage.configSecret.secretKey }}
-            bucket_name: mimir
+            bucket_name: {{ .Values.addons.mimir.minioObjectStorage.bucketName }}
             {{- else }}
             {{- if $s3Enabled }}
             {{- if and .Values.addons.mimir.s3ObjectStorage.accessSecret .Values.addons.mimir.s3ObjectStorage.accessKey }}
@@ -201,9 +263,26 @@ upstream:
             insecure: {{ .Values.addons.mimir.s3ObjectStorage.insecure }}
             region: {{ .Values.addons.mimir.s3ObjectStorage.region }}
             bucket_name: {{ .Values.addons.mimir.s3ObjectStorage.bucketName }}
-          {{- end }}
-          {{- end }}
-    {{- end }}
+            {{- end }}
+            {{- end }}
+      {{- end }}
+      {{- if $kafkaEnabled }}
+      ingest_storage:
+        enabled: true
+        kafka:
+          address: "{{ $kafkaBrokerHost }}:{{ $kafkaBrokerPort }}"
+          topic: {{ .Values.addons.mimir.kafkaIngestStorage.topic | quote }}
+      ingester:
+        push_grpc_method_enabled: false
+      {{- end }}
+{{- end }}
+  {{- if and (or $minioEnabled $s3Enabled $kafkaEnabled) .Values.addons.mimir.serviceAccountAnnotations }}
+  serviceAccount:
+    annotations:
+      {{- range $key, $value :=  .Values.addons.mimir.serviceAccountAnnotations }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
+  {{- end }}
   metaMonitoring:
     serviceMonitor:
       enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
@@ -217,4 +296,4 @@ upstream:
       {{- end }}
     dashboards:
       enabled: {{ .Values.grafana.enabled }}
-{{- end }}
+{{- end -}}
