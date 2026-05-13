@@ -32,4 +32,20 @@
         target:
           kind: Deployment
           name: ^.+-query-frontend$
+      # Set failurePolicy: Ignore on the rollout-operator admission webhook so that
+      # the minio-tenant StatefulSet can be created on first install before the
+      # rollout-operator pod has endpoints. With failurePolicy: Fail (upstream default),
+      # the minio-operator's StatefulSet creation is rejected until rollout-operator is
+      # ready, delaying bucket provisioning and causing Mimir sanity-check failures.
+      # In a GitOps environment, uncoordinated downscales are not a practical risk as
+      # all StatefulSet mutations flow through Flux. Remove this patch when upstream
+      # mimir-distributed resolves the ordering issue.
+      - patch: |
+          - op: replace
+            path: /webhooks/0/failurePolicy
+            value: Ignore
+        target:
+          group: admissionregistration.k8s.io
+          kind: MutatingWebhookConfiguration
+          name: ^prepare-downscale-.*$
 {{- end }}

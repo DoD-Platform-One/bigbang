@@ -1785,6 +1785,9 @@ addons:
         cypress:
           artifacts: true
       upstream:
+        global:
+          podLabels:
+            kyverno-policies-bbtest/required: "true"
         mimir:
           structuredConfig:
             limits:

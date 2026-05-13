@@ -202,6 +202,16 @@ networkPolicies:
         ports:
           - port: 443
             protocol: TCP
+      # -- Egress definition for Kafka broker subnets (i.e. Amazon MSK, Confluent Cloud, Azure Event Hubs, etc.)
+      kafka-subnets:
+        to:
+          - ipBlock:
+              cidr: "0.0.0.0/0"
+        ports:
+          - port: 9092
+            protocol: TCP
+          - port: 9093
+            protocol: TCP
       database-subnets:
         to:
           - ipBlock:
@@ -2324,12 +2334,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/mimir.git
-      tag: "5.8.0-bb.6"
+      tag: "6.0.6-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "mimir"
-      tag: "5.8.0-bb.6"
+      tag: "6.0.6-bb.0"
 
     # -- Enable Mimir Enterprise
     enterprise:
@@ -2346,6 +2356,8 @@ addons:
       defaultUserCredentials:
         username: "mimir-user"
         password: "supersecret"
+      # -- Bucket name for the Mimir MinIO tenant bucket
+      bucketName: "mimir"
 
     # -- Configure Mimir to use S3 bucket
     s3ObjectStorage:
@@ -2369,6 +2381,33 @@ addons:
 
       # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
       insecure: false
+
+    # -- Configure Mimir to use external Kafka for ingest storage (Mimir 6.x+)
+    # When enabled, disables the classic gRPC push path and enables the Kafka-backed ingest storage path.
+    # For production, use a cloud-managed Kafka service (Amazon MSK, Confluent Cloud, Azure Event Hubs).
+    # The bundled kafka-native image in the mimir chart is for testing only and is not used here.
+    kafkaIngestStorage:
+      enabled: false
+      # -- Kafka broker hostname (bootstrap broker).
+      # Examples: "b-1.cluster.kafka.us-east-1.amazonaws.com" (Amazon MSK),
+      #           "pkc-xxxxx.us-east-1.aws.confluent.cloud" (Confluent Cloud)
+      brokerHost: ""
+      # -- Kafka broker port. Use 9092 for plaintext, 9093 for TLS.
+      # For auth (SASL, IAM) or TLS client config, use values.upstream.mimir.structuredConfig.ingest_storage.kafka directly.
+      brokerPort: 9092
+      # -- Kafka topic name for Mimir ingest storage.
+      topic: "mimir-ingest"
+      # -- CIDR block of the network where Kafka brokers reside.
+      # When empty (default), no Kafka egress NetworkPolicy is rendered.
+      # When set, renders a scoped NetworkPolicy egress rule for distributor and ingester pods.
+      # Examples: "172.31.0.0/16" (MSK in a specific VPC), "10.0.0.0/8" (private cloud)
+      brokerNetworkCIDR: ""
+      # -- Cluster domain covering all Kafka brokers (builds a wildcard Istio ServiceEntry).
+      # Required when Istio REGISTRY_ONLY is enabled: MSK/Kafka redirects clients to
+      # multiple broker addresses after bootstrap, all of which must be registered.
+      # Strip the "b-N." prefix from any broker FQDN to get this value.
+      # Example: "mimir-kafka-test.<cluster-id>.kafka.us-gov-west-1.amazonaws.com"
+      brokerClusterDomain: ""
 
     # -- Mimir Service Account Annotations
     serviceAccountAnnotations: {}
