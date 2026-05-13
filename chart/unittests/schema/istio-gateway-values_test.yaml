@@ -26,12 +26,45 @@ tests:
                     mode: SIMPLE
     asserts:
       - notFailedTemplate: {}
-  - it: should fail validation with invalid istioGateway values
+  - it: should pass validation with waitJob values
     set:
       istioGateway:
         values:
           waitJob:
-            image: foo
+            enabled: false
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with networkPolicies values
+    set:
+      istioGateway:
+        values:
+          networkPolicies:
+            enabled: true
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with mtls values
+    set:
+      istioGateway:
+        values:
+          mtls:
+            mode: STRICT
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with upstream values
+    set:
+      istioGateway:
+        values:
+          upstream:
+            image:
+              registry: registry1.dso.mil
+    asserts:
+      - notFailedTemplate: {}
+  - it: should fail validation with invalid istioGateway values
+    set:
+      istioGateway:
+        values:
+          invalidProperty:
+            foo: bar
     asserts:
       - failedTemplate:
           errorPattern: ".*"

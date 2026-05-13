@@ -353,6 +353,23 @@
           "properties": {
             "gateways": {
               "type": "object"
+            },
+            "waitJob": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "networkPolicies": {
+              "type": "object"
+            },
+            "mtls": {
+              "type": "object"
+            },
+            "upstream": {
+              "type": "object"
             }
           },
           "additionalProperties": false
