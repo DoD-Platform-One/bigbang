@@ -1,0 +1,38 @@
+twistlock:
+  enabled: true
+renovate:
+  enabled: true
+
+gatekeeper:
+  enabled: true
+  flux:
+    install:
+      strategy:
+        name: RetryOnFailure
+        retryInterval: 1m
+    upgrade:
+      strategy:
+        name: RetryOnFailure
+        retryInterval: 1m
+kyvernoPolicies:
+  enabled: false
+kyverno:
+  enabled: false
+kyvernoReporter:
+  enabled: false
+
+addons:
+  minioOperator:
+    enabled: true
+  authservice:
+    enabled: true
+  externalSecrets:
+    enabled: true
+  thanos:
+    enabled: true
+  mimir:
+    enabled: true
+  harbor:
+    enabled: true
+  metricsServer:
+    enabled: true
