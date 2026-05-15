@@ -50,7 +50,6 @@ routes:
       service: minio
       port: 80
       containerPort: 9000
-
     console:
       enabled: true
       gateways:
@@ -59,6 +58,20 @@ routes:
       - minio.{{ .Values.domain }}
       service: minio-minio-minio-instance-console
       port: 9090
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.minio.values }}
+      hosts:
+      - repo1.dso.mil
+
+bbtests:
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://minio.%s/login" $domainName | quote }}
+  scripts:
+    envs:
+      MINIO_PORT: ''
+      MINIO_HOST: {{ printf "https://minio-api.%s" $domainName | quote }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

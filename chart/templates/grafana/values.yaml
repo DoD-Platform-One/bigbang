@@ -83,6 +83,18 @@ networkPolicies:
           k8s:
             authservice/authservice:10003: {{ $authserviceRedisEnabled }}
 
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.grafana.values }}
+      hosts:
+      - repo1.dso.mil
+
+bbtests:
+  cypress:
+    envs:
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+
 upstream:
   {{- if eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:

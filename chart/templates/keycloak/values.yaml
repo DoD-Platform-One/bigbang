@@ -86,6 +86,13 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
+bbtests:
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://keycloak.%s" $domainName | quote }}
+      cypress_tnr_username: "cypress"
+      cypress_tnr_password: "tnr_w!G33ZyAt@C8"
+
 upstream:
   replicas: 1
   image:

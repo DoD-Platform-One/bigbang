@@ -50,6 +50,18 @@ routes:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
 
+waitJob:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://kiali.%s" $domainName | quote }}
+      cypress_check_data: {{ .Values.grafana.enabled | quote }}
+      cypress_ambient_enabled: {{ include "ambientEnabled" . | quote }}
+      cypress_pod_monitor_name: "monitoring-monitoring-istio-envoy"
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.kiali "values" .Values) | nindent 6 }}
+
 {{- if and .Values.kiali.enabled .Values.kiali.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso))  }}
 oidcCaCert: {{ default (dig "certificateAuthority" "cert" "" .Values.sso) .Values.sso.certificate_authority | quote }}
 {{- end }}

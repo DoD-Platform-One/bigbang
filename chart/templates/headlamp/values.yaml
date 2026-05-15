@@ -13,6 +13,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.headlamp" -}}
+{{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioHardenedEnabled := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
   enabled: {{ .Values.istiod.enabled }}
@@ -88,7 +89,11 @@ routes:
         - {{ $ssoHost }}
       {{- end }}
 
-{{- $domainName := default .Values.domain .Values.hostname }}
+bbtests:
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://headlamp.%s" $domainName | quote }}
+
 domain: {{ $domainName }}
 
 {{- if (eq (include "istioEnabled" .) "true") }}

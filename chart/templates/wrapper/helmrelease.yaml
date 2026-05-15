@@ -9,11 +9,11 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}-wrapper
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
                 {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
-              {{ else }}
+             {{ else }}
                 {{ default (dig "namespace" "name" $pkg $vals) "" }}
-              {{ end }}
+             {{ end }}
   labels:
     app.kubernetes.io/name: {{ $pkg }}-wrapper
     {{- include "commonLabels" $ | nindent 4 }}

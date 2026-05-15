@@ -126,6 +126,12 @@ networkPolicies:
           definition:
             kubeAPI: true
 
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_vault_url: {{ printf "https://vault.%s" $domainName | quote }}
+
 upstream:
   global:
     {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}

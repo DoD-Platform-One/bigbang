@@ -15,6 +15,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.alloy" -}}
+{{- $domainName := .Values.domain }}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
 {{- $alloyMetricsEnabled := (dig "alloyMetrics" "enabled" false .Values.alloy) }}
 {{- $alloyClusterEventsEnabled := or
@@ -140,6 +141,14 @@ istio:
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
     generateFromNetpol: {{ $istioHardenedEnabled }}
+
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.alloy.values }}
+      hosts:
+      - repo1.dso.mil
+      - loki.{{ $domainName }}
 
 upstream:
   {{- if .Values.kiali.enabled }}

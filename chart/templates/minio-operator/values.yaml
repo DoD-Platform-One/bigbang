@@ -67,6 +67,13 @@ istio:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
 
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.minioOperator.values }}
+      hosts:
+      - repo1.dso.mil
+
 {{- if $istioEnabled }}
 annotations:
   {{ include "istioAnnotation" . }}

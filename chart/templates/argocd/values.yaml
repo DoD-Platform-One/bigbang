@@ -110,10 +110,73 @@ istio:
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
+routes:
+  inbound:
+    argocd:
+      enabled: true
+      gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.argocd.ingress.gateway "root" .)}}
+      hosts:
+      - argocd.{{ $domainName }}
+      service: argocd-argocd-server
+      containerPort: 8080
+      port: 80
+      selector:
+        app.kubernetes.io/name: argocd-server
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.argocd.values }}
+      hosts:
+      - 'repo1.dso.mil'
+
 networkPolicies:
+  # -- Toggle BigBang networkPolicies integration
   enabled: {{ .Values.networkPolicies.enabled }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
+  ingress:
+    to:
+      # -- Ingress to argocd-server for metrics from prometheus
+      argocd-server:8083:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to argocd-repo-server for metrics from prometheus
+      argocd-repo-server:8084:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to argocd-application-controller for metrics from prometheus
+      argocd-application-controller:8082:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to redis from grafana for dashboards
+      redis-bb:6379:
+        from:
+          k8s:
+            monitoring/grafana: {{ and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port .Values.grafana.enabled }}
+      # -- Ingress to redis-exporter for metrics from prometheus
+      redis-bb:9121:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port .Values.monitoring.enabled }}
+  egress:
+    from:
+      # -- Egress to tempo for tracing from all pods
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ and .Values.tempo.enabled (ne (include "ambientEnabled" .) "true") }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://argocd.%s" $domainName | quote }}
+  scripts:
+    envs:
+      ARGOCD_SERVER: {{ printf "https://argocd.%s" $domainName | quote }}
 
 upstream:
   {{- if .Values.addons.argocd.redis.host }}

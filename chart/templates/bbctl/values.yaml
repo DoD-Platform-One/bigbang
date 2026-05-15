@@ -9,6 +9,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.bbctl" -}}
+{{- $domainName := .Values.domain }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.bbctl.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
@@ -125,5 +126,13 @@ routes:
     bbctl-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.bbctl.values }}
       hosts:
-      - grafana.{{ .Values.domain }}
+      - grafana.{{ $domainName }}
+      - repo1.dso.mil
+
+bbtests:
+  cypress:
+    envs:
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+      cypress_grafana_username: 'admin'
+      cypress_grafana_password: 'prom-operator'
 {{- end -}}
