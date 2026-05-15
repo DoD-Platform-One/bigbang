@@ -76,6 +76,12 @@ networkPolicies:
             # Allow Prometheus to scrape metrics
             monitoring/prometheus: {{ .Values.monitoring.enabled  }}
 
+bbtests:
+  cypress:
+    envs:
+      cypress_kibana_url: {{ printf "https://kibana.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.elasticsearchKibana "values" .Values) | nindent 6 }}
+      
 {{- with .Values.elasticsearchKibana.sso }}
 {{- if .enabled }}
 sso:

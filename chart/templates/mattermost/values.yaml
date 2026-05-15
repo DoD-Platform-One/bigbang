@@ -125,6 +125,27 @@ routes:
       hosts:
         - {{ $ssoHost }}
       {{- end }}
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.mattermost.values }}
+      hosts:
+      - 'repo1.dso.mil'
+
+waitJob:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://chat.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.mattermost "values" .Values) | nindent 6 }}
+    # This should be removed once https://repo1.dso.mil/big-bang/product/packages/mattermost/-/work_items/271 is complete
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
 
 global:
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}

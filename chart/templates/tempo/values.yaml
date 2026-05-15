@@ -93,6 +93,13 @@ routes:
         - tempo.{{ .Values.domain }}
       service: tempo-tempo.tempo.svc.cluster.local
       port: 3200
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.tempo.values }}
+      hosts:
+      - repo1.dso.mil
+      - grafana.{{ $domainName }}
+      - grafana.com
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -138,6 +145,16 @@ istio:
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
     generateFromNetpol: {{ $istioHardenedEnabled }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://tempo.%s" $domainName | quote }}
+      cypress_tempo_datasource: 'http://tempo-tempo.tempo.svc:3200'
+      cypress_check_datasource: {{ .Values.grafana.enabled | quote }}
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.tempo "values" .Values) | nindent 6 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

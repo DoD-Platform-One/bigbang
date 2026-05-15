@@ -62,6 +62,12 @@ routes:
         {{- if ne .Values.loki.strategy "monolith" }}
         app.kubernetes.io/component: gateway
         {{- end }}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.loki.values }}
+      hosts:
+      - repo1.dso.mil
+      - grafana.{{ $domainName }}
 
 {{- include "secretsImagePullSecretsWithName" . }}
 
@@ -113,6 +119,15 @@ networkPolicies:
           definition:
             storage-subnets: {{ $minioEnabled }}
             kubeAPI: {{ $minioEnabled }}
+
+bbtests:
+  cypress:
+    envs:
+      cypress_check_datasource: {{ .Values.grafana.enabled | quote }}
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+  scripts:
+    envs:
+      LOKI_URL: 'http://logging-loki.logging.svc:3100'
 
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}

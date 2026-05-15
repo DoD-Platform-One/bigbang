@@ -843,6 +843,18 @@ networkPolicies:
   {{- $newGateways | toYaml }}
 {{- end }}
 
+{{- /* 
+  This helper is used for packages that perform testing against keycloak when enabled
+*/}}
+{{- define "bigbang.cypressKeycloakValues" }}
+{{- $pkg := .package -}}
+{{- $values := .values -}}
+cypress_keycloak_test_enable: {{ and $values.addons.keycloak.enabled $pkg.sso.enabled | quote }}
+cypress_keycloak_url: {{ printf "https://keycloak.%s/" $values.domain | quote }}
+cypress_tnr_username: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_username" "cypress" $values.addons.keycloak.values | quote }}
+cypress_tnr_password: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_password" "tnr_w!G33ZyAt@C8" $values.addons.keycloak.values | quote }}
+{{- end }}
+
 #######################################################################################################################################
 # convert the bool to string if found
 #######################################################################################################################################

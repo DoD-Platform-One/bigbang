@@ -7,7 +7,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: metrics-server
-  namespace:  {{ .Release.Namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: metrics-server
     app.kubernetes.io/component: "cluster-utilities"

@@ -182,7 +182,7 @@ networkPolicies:
       "*":
         to:
           k8s:
-            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+            tempo/tempo:9411: {{ and .Values.tempo.enabled (ne (include "ambientEnabled" .) "true") }}
           definition:
             database-subnets: {{ $externalPostgresEnabled }}
       api:
@@ -213,6 +213,15 @@ networkPolicies:
           definition:
             redis-subnets: {{ $externalRedisEnabled }}
   additionalPolicies: []
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  scripts:
+    envs:
+      ANCHORE_CLI_URL: {{ printf "https://anchore-api.%s/v1" $domainName | quote }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://anchore.%s" $domainName | quote }}
 
 sso:
   enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
@@ -249,6 +258,7 @@ postgresql:
   {{- end }}
 
 upstream:
+  setServiceAppProtocol: {{ $istioEnabled }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}
   # imagePullSecretName used for main enterprise charts and some bignbang templates
   {{- if ( include "imagePullSecret" . ) }}

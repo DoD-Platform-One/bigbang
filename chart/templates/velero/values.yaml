@@ -14,10 +14,11 @@
 {{- end }}
 
 {{- define "bigbang.defaults.velero" -}}
+{{- $domainName := .Values.domain }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.velero.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.velero.values) }}
 
-domain: {{ .Values.domain }}
+domain: {{ $domainName }}
 
 {{- if $istioEnabled }}
 podAnnotations:
@@ -79,6 +80,11 @@ networkPolicies:
                   helm.sh/hook: pre-upgrade
                   helm.sh/hook-weight: "-10"
                   helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
+
+bbtests:
+  scripts:
+    envs:
+      MINIO_HOST: {{ printf "https://minio-api.%s" $domainName | quote }}
 
 openshift: {{ .Values.openshift }}
 

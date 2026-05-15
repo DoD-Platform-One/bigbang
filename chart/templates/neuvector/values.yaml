@@ -36,6 +36,11 @@ routes:
     neuvector:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.neuvector.ingress.gateway "root" .)}}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.neuvector.values }}
+      hosts:
+      - repo1.dso.mil
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
@@ -56,6 +61,13 @@ networkPolicies:
         to:
           definition:
             sso: {{ .Values.neuvector.sso.enabled }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://neuvector.%s" .Values.domain | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.neuvector "values" .Values) | nindent 6 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

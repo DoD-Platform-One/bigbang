@@ -81,6 +81,15 @@ networkPolicies:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   additionalPolicies: []
 
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+      cypress_prometheus_url: {{ printf "https://prometheus.%s" $domainName | quote }}
+      cypress_check_datasource: {{ .Values.grafana.enabled | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.kyvernoReporter "values" .Values) | nindent 6 }}
+
 openshift: {{ .Values.openshift }}
 
 upstream:

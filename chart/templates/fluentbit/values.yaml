@@ -8,6 +8,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.fluentbit" -}}
+{{- $domainName := .Values.domain }}
 {{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
@@ -85,6 +86,17 @@ istio:
   authorizationPolicies:
     enabled: {{ $istioHardenedEnabled }}
     generateFromNetpol: true
+
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.fluentbit.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - grafana.{{ $domainName }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
 
 openshift: {{ .Values.openshift }}
 

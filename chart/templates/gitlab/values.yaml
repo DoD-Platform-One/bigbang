@@ -105,6 +105,16 @@ routes:
       port: 8090
       selector:
         app: gitlab-pages
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.gitlab.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - 'registry1.dso.mil'
+      - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+      - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
+      - registry.{{ $domainName }}
+      - keycloak.{{ $domainName }}
 
 {{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
@@ -216,6 +226,15 @@ networkPolicies:
         to:
           definition:
             database-subnets: true
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://gitlab.%s" $domainName | quote }}
+  scripts:
+    envs:
+      GITLAB_REGISTRY: registry.{{ $domainName }}
 
 upstream:
   {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}

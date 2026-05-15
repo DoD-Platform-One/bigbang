@@ -13,6 +13,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.fortify" -}}
+{{- $domainName := .Values.domain }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardened := or (dig "istio" "hardened" "enabled" false .Values.addons.fortify.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $externalMySQLHost := dig "externalDatabase" "host" "" .Values.addons.fortify }}
@@ -28,7 +29,7 @@ mysql:
   global:
     {{- include "secretsImagePullSecretsWithName" . | nindent 4 }}
 
-domain: {{ .Values.domain }}
+domain: {{ $domainName }}
 
 openshift: {{ .Values.openshift }}
 
@@ -50,7 +51,7 @@ routes:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.addons.fortify.ingress.gateway "root" .) }}
       hosts:
-        - fortify.{{ .Values.domain }}
+        - fortify.{{ $domainName }}
       service: fortify-ssc-service
       port: 80
       selector:
@@ -84,5 +85,11 @@ networkPolicies:
         to:
           definition:
             external-mysql: {{ $externalMySQLEnabled }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://fortify.%s" $domainName | quote }}
 
 {{- end }}

@@ -122,6 +122,13 @@ networkPolicies:
                   helm.sh/hook-weight: "-10"
                   helm.sh/hook-delete-policy: hook-succeeded,hook-failed,before-hook-creation
 
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://sonarqube.%s" $domainName | quote }}
+      cypress_url_setup: {{ printf "https://sonarqube.%s/setup" $domainName | quote }}
+
 {{- if $istioInjection }}
 annotations:
   {{ include "istioAnnotation" . }}

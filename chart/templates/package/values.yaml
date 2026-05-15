@@ -10,11 +10,11 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $pkg }}-values
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
-              {{ else }}
-                {{ default (dig "namespace" "name" $pkg $vals) "" }}
-              {{ end }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+               {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+             {{ else }}
+               {{ default (dig "namespace" "name" $pkg $vals) "" }}
+             {{ end }}
   labels:
     {{- include "commonLabels" $ | nindent 4 }}
 type: Opaque
