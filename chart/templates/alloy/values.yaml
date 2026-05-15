@@ -17,7 +17,10 @@
 {{- define "bigbang.defaults.alloy" -}}
 {{- $alloyLogsEnabled := (dig "alloyLogs" "enabled" false .Values.alloy) }}
 {{- $alloyMetricsEnabled := (dig "alloyMetrics" "enabled" false .Values.alloy) }}
-{{- $alloyClusterEventsEnabled := (dig "alloyClusterEvents" "enabled" false .Values.alloy) }}
+{{- $alloyClusterEventsEnabled := or
+      (dig "alloyClusterEvents" "enabled" false .Values.alloy)
+      (dig "values" "upstream" "clusterEvents" "enabled" false .Values.alloy)
+}}
 {{- $tempoEnabled := .Values.tempo.enabled }}
 {{- $mimirEnabled := .Values.addons.mimir.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
@@ -97,8 +100,8 @@ networkPolicies:
       alloy-logs:
         to:
           k8s:
-            # Loki egress: namespace with app.kubernetes.io/name=logging, pod with app.kubernetes.io/name=logging-loki, port 3100
-            logging/logging-loki:3100: {{ .Values.loki.enabled }}
+            # Loki egress follows the active Loki write path for the selected deployment strategy.
+            logging/{{ $lokiServiceName }}:3100: {{ .Values.loki.enabled }}
       alloy:
         to:
           tempo/tempo:4317: {{ .Values.tempo.enabled }}
@@ -106,7 +109,7 @@ networkPolicies:
       alloy-singleton:
         to:
           k8s:
-            logging/logging-loki:3100: {{ .Values.loki.enabled }}
+            logging/{{ $lokiServiceName }}:3100: {{ .Values.loki.enabled }}
       {{- end }}
       {{- if $tempoEnabled }}
       # Allow alloy-receiver to forward traces to Tempo backend
@@ -146,12 +149,12 @@ upstream:
   {{- end }}
   destinations:
     {{- if and (or $alloyLogsEnabled $alloyClusterEventsEnabled) .Values.loki.enabled }}
-    - name: loki
+    loki:
       type: loki
       url: {{ $lokiWriteDestUrl }}
     {{- end }}
     {{- if $tempoEnabled }}
-    - name: tempo
+    tempo:
       type: otlp
       url: http://tempo-tempo.tempo.svc.cluster.local:4317
       metrics:
@@ -162,7 +165,7 @@ upstream:
         insecure: true
     {{- end }}
     {{- if and $alloyMetricsEnabled .Values.monitoring.enabled }}
-    - name: prometheus
+    prometheus:
       type: prometheus
       {{- if $sidecarInjectionEnabled }}
       url: https://monitoring-monitoring-kube-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
@@ -176,7 +179,7 @@ upstream:
       {{- end }}
     {{- end }}
     {{- if and $alloyMetricsEnabled $mimirEnabled }}
-    - name: mimir
+    mimir:
       type: prometheus
       {{- if $sidecarInjectionEnabled }}
       url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
@@ -190,12 +193,98 @@ upstream:
       {{- end }}
     {{- end }}
   {{- if .Values.alloy.additionalDestinations }}
-  {{- toYaml .Values.alloy.additionalDestinations | nindent 4 }}
+    {{- range $dest := .Values.alloy.additionalDestinations }}
+    {{ $dest.name }}:
+{{ toYaml $dest | nindent 6 }}
+    {{- end }}
+  {{- end }}
+  collectors:
+  {{- if $alloyLogsEnabled }}
+    alloy-logs:
+      enabled: true
+      presets:
+        - daemonset
+        - filesystem-log-reader
+      global:
+        podSecurityContext:
+          fsGroup: 0
+  {{- end }}
+  {{- if $alloyClusterEventsEnabled }}
+    alloy-singleton:
+      enabled: true
+      presets:
+        - singleton
+      {{- if and $alloyMetricsEnabled $istioEnabled }}
+      alloy:
+        # Mount Istio certs so alloy-singleton can use prometheus destination with mTLS
+        mounts:
+          extra:
+            - name: istio-certs
+              mountPath: /etc/prom-certs/
+      controller:
+        podAnnotations:
+          proxy.istio.io/config: |
+            proxyMetadata:
+              OUTPUT_CERTS: /etc/istio-output-certs
+          sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+          traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+        volumes:
+          extra:
+            - name: istio-certs
+              emptyDir:
+                medium: Memory
+      {{- end }}
+  {{- end }}
+  {{- if $tempoEnabled }}
+    alloy-receiver:
+      enabled: true
+      presets:
+        - deployment
+      alloy:
+        extraPorts:
+        - name: otlp-grpc
+          port: 4317
+          targetPort: 4317
+          protocol: TCP
+          appProtocol: grpc
+        - name: zipkin
+          port: 9411
+          targetPort: 9411
+          protocol: TCP
+  {{- end }}
+  {{- if $alloyMetricsEnabled }}
+    alloy-metrics:
+      enabled: true
+      presets:
+        - deployment
+      alloy:
+        {{- if and $istioEnabled $istioHardenedEnabled }}
+        extraAnnotations:
+          {{ include "istioAnnotation" . }}
+        {{- end }}
+        # Mount Istio certs so alloy-metrics can scrape ServiceMonitors with mTLS tlsConfig
+        mounts:
+          extra:
+            - name: istio-certs
+              mountPath: /etc/prom-certs/
+      controller:
+        {{- if $istioEnabled }}
+        # Istio sidecar annotations to output certs to the shared istio-certs volume
+        podAnnotations:
+          proxy.istio.io/config: |
+            proxyMetadata:
+              OUTPUT_CERTS: /etc/istio-output-certs
+          sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+          traffic.sidecar.istio.io/includeOutboundIPRanges: ""
+        {{- end }}
+        volumes:
+          extra:
+            - name: istio-certs
+              emptyDir:
+                medium: Memory
   {{- end }}
   {{- if $alloyLogsEnabled }}
-  alloy-logs:
-    enabled: true
-  podLogs:
+  podLogsViaLoki:
     enabled: true
     destinations:
       {{- if .Values.loki.enabled }}
@@ -209,29 +298,10 @@ upstream:
       {{- end }}
       {{- end }}
     collector: alloy-logs
-    labelsToKeep:
-      - app.kubernetes.io/name
-      - container
-      - instance
-      - job
-      - level
-      - namespace
-      - service.name
-      - service.namespace
-      - deployment.environment
-      - deployment.environment.name
-      - k8s.namespace.name
-      - k8s.deployment.name
-      - k8s.statefulset.name
-      - k8s.daemonset.name
-      - k8s.cronjob.name
-      - k8s.job.name
-      - k8s.node.name
-      - k8s.pod.name
-      - pod
     structuredMetadata:
-      k8s.pod.name: null
-      pod: null
+      k8s.pod.name: k8s.pod.name
+      pod: ""
+      service.instance.id: service.instance.id
   {{- end }}
   {{- if $alloyClusterEventsEnabled }}
   alloy-singleton:
@@ -258,6 +328,7 @@ upstream:
     {{- end }}
   clusterEvents:
     enabled: true
+    collector: alloy-singleton
     destinations:
       {{- if .Values.loki.enabled }}
       - loki
@@ -271,22 +342,9 @@ upstream:
       {{- end }}
   {{- end }}
   {{- if $tempoEnabled }}
-  # Enable alloy-receiver to collect traces and forward to Tempo
-  alloy-receiver:
-    enabled: true
-    alloy:
-      extraPorts:
-      - name: otlp-grpc
-        port: 4317
-        targetPort: 4317
-        protocol: TCP
-        appProtocol: grpc
-      - name: zipkin
-        port: 9411
-        targetPort: 9411
-        protocol: TCP
   applicationObservability:
     enabled: true
+    collector: alloy-receiver
     receivers:
       otlp:
         grpc:
