@@ -411,12 +411,7 @@ upstream:
             key: objstore.yml
             name: monitoring-objstore-secret
         {{- end }}
-        {{- if $monitoringMtlsStrict }}    
-        # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
-        volumes:
-          - emptyDir:
-              medium: Memory
-            name: istio-certs
+        {{- if $monitoringMtlsStrict }}
         volumeMounts:
           - mountPath: /etc/prom-certs/
             name: istio-certs
@@ -586,7 +581,7 @@ upstream:
             action: replace
             target_label: kubernetes_pod_name
       {{- end }}
-      {{- if $monitoringMtlsStrict }}    
+      {{- if $monitoringMtlsStrict }}
       # Add volume/mount for Istio certs for mTLS scraping
       volumes:
         - emptyDir:
