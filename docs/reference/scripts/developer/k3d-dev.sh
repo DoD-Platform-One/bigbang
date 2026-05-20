@@ -17,7 +17,6 @@ PRIVATE_IP=false
 PROJECTTAG=default
 RESET_K3D=false
 USE_WEAVE=false
-ENABLE_TWISTLOCK_NODE_MOUNTS=${ENABLE_TWISTLOCK_NODE_MOUNTS:-false}
 TERMINATE_INSTANCE=true
 QUIET=false
 K3D_TIMEOUT=300
@@ -216,9 +215,6 @@ function process_arguments {
       echo "                                  (for managing multiple instances)"
       echo " -w|--use-weave-cni               install the weave CNI instead of the"
       echo "                                  default flannel CNI"
-      echo " --enable-twistlock-node-mounts   mount host /etc, /dev/log, and"
-      echo "                                  /run/systemd/private into k3d nodes"
-      echo "                                  for Twistlock defender testing"
       echo " -O|--enable-oidc                 configure kube-apiserver with OIDC"
       echo "                                  for group-based RBAC with Keycloak"
       echo "                                  (uses dev.bigbang.mil defaults)"
@@ -290,10 +286,6 @@ function process_arguments {
 
     -w|--use-weave-cni)
       USE_WEAVE=true
-      ;;
-
-    --enable-twistlock-node-mounts)
-      ENABLE_TWISTLOCK_NODE_MOUNTS=true
       ;;
 
     -O|--enable-oidc)
@@ -708,10 +700,6 @@ function install_k3d {
   # Shared k3d settings across all options
   # 1 server, 3 agents
   k3d_command="k3d cluster create --trace --servers 1 --agents 3 -v /cypress:/cypress@server:* -v /cypress:/cypress@agent:* --verbose"
-  if [[ "$ENABLE_TWISTLOCK_NODE_MOUNTS" == true ]]; then
-    # Volumes to support Twistlock defenders
-    k3d_command+=" -v /etc/passwd:/etc/passwd@server:*\;agent:* -v /dev/log:/dev/log@server:*\;agent:* -v /run/systemd/private:/run/systemd/private@server:*\;agent:* -v /var/lib/twistlock:/var/lib/twistlock@server:*\;agent:*"
-  fi
   # Disable traefik and metrics-server
   k3d_command+=" --k3s-arg \"--disable=traefik@server:0\" --k3s-arg \"--disable=metrics-server@server:0\""
 
