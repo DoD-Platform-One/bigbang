@@ -21,7 +21,7 @@ openshift: {{ .Values.openshift }}
 
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-  {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
+  {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") (eq (include "ambientEnabled" .) "false") }}
   {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
   serviceMonitor:
     scheme: "https"
@@ -290,6 +290,28 @@ upstream:
       service:
         ports:
           postgresql: {{ .Values.addons.anchoreEnterprise.database.port }}
+    {{- end }}
+
+  # This entire section can be removed once istio sidecar is no longer supported
+  # Temporary workaround for https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/work_items/283
+  reports:
+    annotations:
+    {{- with dig "upstream" "reports" "annotations" dict .Values.addons.anchoreEnterprise.values }}
+      {{ toYaml . | nindent 6}}
+    {{- end }}
+    {{- if eq (include "ambientEnabled" .) "false" }}
+      traffic.sidecar.istio.io/excludeInboundPorts: "8558"
+    {{- end }}
+
+  # This entire section can be removed once istio sidecar is no longer supported
+  # Temporary workaround for https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/work_items/283
+  api:
+    annotations:
+    {{- with dig "upstream" "api" "annotations" dict .Values.addons.anchoreEnterprise.values }}
+      {{ toYaml . | nindent 6}}
+    {{- end }}
+    {{- if eq (include "ambientEnabled" .) "false" }}
+      traffic.sidecar.istio.io/excludeOutboundPorts: "8558"
     {{- end }}
 
   ui:
