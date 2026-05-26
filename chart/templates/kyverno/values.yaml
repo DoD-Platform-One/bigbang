@@ -8,12 +8,11 @@
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-
 istio:
-  enabled: {{ $istioEnabled }}
+  # Kyverno installs before Istio and is intentionally not part of the mesh.
+  enabled: false
   ambient:
-    enabled: {{ include "ambientEnabled" . }}
+    enabled: false
 
 networkPolicies:
   enabled: {{ .Values.networkPolicies.enabled }}
