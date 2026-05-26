@@ -132,7 +132,7 @@ gatekeeper:
       replicas: 1
       controllerManager:
         resources:
-          limits: {}
+          limits: null
           requests:
             cpu: 100m
             memory: 256Mi
