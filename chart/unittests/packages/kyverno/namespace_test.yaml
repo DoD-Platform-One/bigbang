@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Kyverno - Namespace Tests
+templates:
+  - templates/kyverno/namespace.yaml
+tests:
+  - it: should explicitly keep Kyverno outside sidecar and ambient dataplanes
+    set:
+      kyverno.enabled: true
+      istiod.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: metadata.labels["istio-injection"]
+          value: disabled
+      - equal:
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none

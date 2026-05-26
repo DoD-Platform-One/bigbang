@@ -3,6 +3,28 @@ suite: Package - Kyverno - Values Tests
 templates:
   - templates/kyverno/values.yaml
 tests:
+  - it: should keep Kyverno outside Istio when ambient is globally enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      kyverno.enabled: true
+      istiod.enabled: true
+      istio.ambient.enabled: true
+      networkPolicies.enabled: true
+    asserts:
+      - equal:
+          path: istio.enabled
+          value: false
+      - equal:
+          path: istio.ambient.enabled
+          value: false
+      - equal:
+          path: networkPolicies.hbonePortInjection.enabled
+          value: false
+
   - it: should include default kubeAPI ingress definition
     postRenderer:
       cmd: "sh"
