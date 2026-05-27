@@ -1,6 +1,9 @@
 # Big Bang Maintainers
 * @jeffv @chris.oconnell @andrewshoell @chris1
 
+[PackageUpdates] @jeffv @chris.oconnell @andrewshoell
+chart/values.yaml
+
 [Documentation] @chris.oconnell @andrewshoell @jeffv @chris1
 docs/
 *.md
