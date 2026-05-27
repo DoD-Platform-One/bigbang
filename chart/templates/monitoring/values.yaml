@@ -106,7 +106,7 @@ routes:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
   outbound:
-    bb-tests:
+    monitoring-bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.monitoring.values }}
       hosts:
       - 'repo1.dso.mil'
