@@ -6,6 +6,7 @@ spec:
   targetNamespace: bigbang
   releaseName: bigbang
   interval: 10m
+  waitStrategy: legacy # default is `poller`, this restores the previous behavior, see https://repo1.dso.mil/big-bang/bigbang/-/work_items/3282 for more info
   chart:
     spec:
       chart: chart
