@@ -155,12 +155,12 @@ networkPolicies:
       redis-bb:6379:
         from:
           k8s:
-            monitoring/grafana: {{ and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port .Values.grafana.enabled }}
+            monitoring/grafana: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.grafana.enabled }}
       # -- Ingress to redis-exporter for metrics from prometheus
       redis-bb:9121:
         from:
           k8s:
-            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port .Values.monitoring.enabled }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.monitoring.enabled }}
   egress:
     from:
       # -- Egress to tempo for tracing from all pods
