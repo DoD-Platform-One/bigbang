@@ -36,6 +36,8 @@ serviceMonitor:
 
 Big Bang needs to set the placeholders above to the appropriate values. In addition, upstream charts may already have values related to monitoring that need to be set.
 
+Big Bang supports Grafana as its own package through `grafana.enabled`. The Monitoring package also retains a legacy compatibility path for deploying Grafana from `monitoring.values.upstream.grafana.enabled`, but new integrations should assume dashboards are consumed by the standalone Grafana package unless they are intentionally supporting that legacy Monitoring-owned Grafana deployment.
+
 In `bigbang/templates/podinfo/values.yaml`, add the following to pass down the values from Big Bang to PodInfo.
 
 ```yaml
