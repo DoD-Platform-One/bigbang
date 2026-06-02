@@ -23,14 +23,13 @@ monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.twistlock.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.twistlock .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
     {{- end }}
 
 {{- if ( include "imagePullSecret" . ) }}

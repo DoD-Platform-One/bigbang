@@ -21,8 +21,7 @@ openshift: {{ .Values.openshift }}
 
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-  {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") (eq (include "ambientEnabled" .) "false") }}
-  {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+  {{- if eq (include "metricsSidecarMtls" (list .Values.addons.anchoreEnterprise .)) "true" }}
   serviceMonitor:
     scheme: "https"
     tlsConfig:
@@ -30,7 +29,6 @@ monitoring:
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true
-  {{- end }}
   {{- end }}
 
 routes:
@@ -352,15 +350,13 @@ ui-redis:
         selector:
           app.kubernetes.io/name: ui-redis
           app.kubernetes.io/instance: anchore-enterprise
-        {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
-        {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.anchoreEnterprise .)) "true" }}
         scheme: "https"
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem
           keyFile: /etc/prom-certs/key.pem
           insecureSkipVerify: true
-        {{- end }}
         {{- end }}
       prometheusRule:
         enabled: true
