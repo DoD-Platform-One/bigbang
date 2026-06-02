@@ -1812,13 +1812,6 @@ addons:
                 capabilities:
                   drop:
                     - ALL
-      storegateway:
-        enabled: true
-      compactor:
-        enabled: true
-        retentionResolutionRaw: 30d
-        retentionResolution5m: 30d
-        retentionResolution1h: 30d
       bbtests:
         enabled: true
         cypress:
@@ -1830,16 +1823,24 @@ addons:
           image: "registry1.dso.mil/bigbang-ci/gitlab-tester:0.0.4"
           envs:
             THANOS_REGISTRY: "thanos.dev.bigbang.mil"
-      objstoreConfig: |-
-        type: s3
-        config:
-          bucket: "thanos"
-          endpoint: minio.thanos.svc.cluster.local:80
-          access_key: "minio"
-          secret_key: "minio123"
-          insecure: true
-          trace:
-            enable: true
+      upstream:
+        storegateway:
+          enabled: true
+        compactor:
+          enabled: true
+          retentionResolutionRaw: 30d
+          retentionResolution5m: 30d
+          retentionResolution1h: 30d
+        objstoreConfig: |-
+          type: s3
+          config:
+            bucket: "thanos"
+            endpoint: minio.thanos.svc.cluster.local:80
+            access_key: "minio"
+            secret_key: "minio123"
+            insecure: true
+            trace:
+              enable: true
 
   # ----------------------------------------------------------------------------------------------------------------------
   # External Secrets
