@@ -118,13 +118,13 @@ upstream:
     scrapeTimeout: 10s
     selector:
       prometheus: monitoring-monitoring-kube-prometheus
-    {{- if $istioInjection }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.fluentbit .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
     {{- end }}
 
   dashboards:

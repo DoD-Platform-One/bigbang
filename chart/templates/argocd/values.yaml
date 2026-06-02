@@ -50,8 +50,7 @@ redis-bb:
         selector:
           app.kubernetes.io/name: redis-bb
           app.kubernetes.io/instance: argocd-argocd
-        # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-        {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
@@ -214,8 +213,7 @@ upstream:
   controller:
     image:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https
@@ -238,8 +236,7 @@ upstream:
     config:
       # Must be enabled for plugins included in PlatformOne image.
       kustomize.buildOptions: "--enable-alpha-plugins"
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https
@@ -263,8 +260,7 @@ upstream:
     - secretRef:
         name: argocd-iam-secret
     {{- end }}     
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https

@@ -155,13 +155,13 @@ redis-bb:
         selector: 
           app.kubernetes.io/name: redis-bb
           app.kubernetes.io/instance: authservice-authservice
-        {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.authservice .)) "true" }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem
           keyFile: /etc/prom-certs/key.pem
-          insecureSkipVerify: true  
+          insecureSkipVerify: true
         {{- end }}
       prometheusRule:
         enabled: true 

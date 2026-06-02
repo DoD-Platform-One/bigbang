@@ -735,6 +735,28 @@ valuesFrom:
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
 {{- end -}}
 
+{{- /*
+Returns "true" if ServiceMonitor should use mTLS for scraping Istio-injected pods.
+Checks: global istio enabled, package istio enabled, injection enabled, not ambient mode, and mTLS STRICT mode.
+This typically gates the creation of a ServiceMonitor tlsConfig with istio-provided certs for scraping metrics from Istio-injected pods.
+insecureSkipVerify will be set to true in the tlsConfig because Prometheus does not support Istio security naming, thus skipping verifying the target pod certificate
+If any of the conditions are not met, the ServiceMonitor will be created without the tlsConfig
+Args (list):
+  - [0] pkg: the package config (e.g. .Values.loki)
+  - [1] root: root context ($)
+Usage: {{- if eq (include "metricsSidecarMtls" (list .Values.loki .)) "true" }}
+*/ -}}
+{{- define "metricsSidecarMtls" -}}
+{{- $pkg := index . 0 -}}
+{{- $root := index . 1 -}}
+{{- $globalIstioEnabled := eq (include "istioEnabled" $root) "true" -}}
+{{- $pkgIstioEnabled := dig "values" "istio" "enabled" true $pkg -}}
+{{- $injectionEnabled := ne (dig "istio" "injection" "enabled" $pkg) "disabled" -}}
+{{- $ambientEnabled := eq (include "ambientEnabled" $root) "true" -}}
+{{- $mtlsStrict := eq (dig "values" "istio" "mtls" "mode" "STRICT" $pkg) "STRICT" -}}
+{{- and $globalIstioEnabled $pkgIstioEnabled $injectionEnabled (not $ambientEnabled) $mtlsStrict -}}
+{{- end -}}
+
 {{- /* Returns dependsOn entries for Istio HelmReleases. */ -}}
 {{- define "istioHelmReleases" -}}
 - name: istiod
