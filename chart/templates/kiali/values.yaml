@@ -16,6 +16,7 @@
 {{- define "bigbang.defaults.kiali" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.kiali.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.kiali.values) }}
+{{- $grafanaUrl := first (dig "routes" "inbound" "grafana" "hosts" list .Values.grafana.values) }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 domain: {{ $domainName }}
@@ -49,6 +50,44 @@ routes:
     kiali:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.kiali.ingress.gateway "root" .)}}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.kiali.values }}
+      hosts:
+      - repo1.dso.mil
+    grafana:
+      enabled: {{ .Values.grafana.enabled }}
+      hosts:
+      - {{ $grafanaUrl | default (printf "%s.%s" "grafana" $domainName) }}
+    sso:
+      enabled: {{ .Values.kiali.sso.enabled }}
+      hosts:
+      - {{ include "sso.host" . }}
+
+networkPolicies:
+  enabled: {{ .Values.networkPolicies.enabled }}
+  hbonePortInjection:
+    enabled: {{ include "ambientEnabled" . }}
+  ingress:
+    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6}}
+    defaults:
+      allowPrometheusToIstioSidecar:
+        enabled: {{ and .Values.monitoring.enabled .Values.istiod.enabled }}
+  egress:
+    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6}}
+    defaults:
+      allowIstiod:
+        enabled: {{ .Values.istiod.enabled }}
+    from:
+      kiali:
+        to:
+          k8s:
+            monitoring/prometheus:9090: {{ .Values.monitoring.enabled }}
+            monitoring/grafana:3000: {{ .Values.grafana.enabled }}
+            tempo/tempo:3200: {{ .Values.tempo.enabled }}
+            istio-system/istiod:15014: {{ .Values.istiod.enabled }}
+          definition:
+            sso: {{ .Values.kiali.sso.enabled }}
 
 waitJob:
   enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
@@ -118,7 +157,6 @@ upstream:
       external_services:
         grafana:
           enabled: {{ .Values.grafana.enabled }}
-          {{- $grafanaUrl := first (dig "istio" "grafana" "hosts" list .Values.grafana.values) }}
           external_url: https://{{ tpl ($grafanaUrl | default (printf "%s.%s" "grafana" $domainName)) . }}
           {{- if .Values.grafana.enabled }}
           auth:
@@ -159,28 +197,4 @@ upstream:
           {{- if .Values.istiod.enabled }}
           egress_gateway_namespace: istio-gateway
           {{- end }}
-networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
-  ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6}}
-    defaults:
-      allowPrometheusToIstioSidecar:
-        enabled: {{ and .Values.monitoring.enabled .Values.istiod.enabled }}
-  egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6}}
-    defaults:
-      allowIstiod:
-        enabled: {{ .Values.istiod.enabled }}
-    from:
-      kiali:
-        to:
-          k8s:
-            monitoring/prometheus:9090: {{ .Values.monitoring.enabled }}
-            monitoring/grafana:3000: {{ .Values.grafana.enabled }}
-            tempo/tempo:3200: {{ .Values.tempo.enabled }}
-            istio-system/istiod:15014: {{ .Values.istiod.enabled }}
-          definition:
-            sso: {{ .Values.kiali.sso.enabled }}
 {{- end -}}
