@@ -122,7 +122,7 @@ sso:
     token: "{{ .Values.sso.url }}/protocol/openid-connect/token"
     # -- OIDC user information path
     userinfo: "{{ .Values.sso.url }}/protocol/openid-connect/userinfo"
-    # -- Literal OIDC JWKS data retrieved from JWKS Uri.  Only needed if `jwsksUri` is not defined.
+    # -- Literal OIDC JWKS data retrieved from JWKS Uri.  Only needed if `jwksUri` is not defined.
     jwks: ""
     # -- Identity provider claim names that store metadata about the authenticated user.
     claims:
@@ -249,7 +249,7 @@ networkPolicies:
               cidr: 10.0.0.0/8
 
 # -- Global ImagePullPolicy value for all packages
-# Permitted values are: None, Always, IfNotPresent
+# Permitted values are: Never, Always, IfNotPresent
 imagePullPolicy: IfNotPresent
 
 # -- Flag for temporary workaround for passthrough chart migrations
@@ -277,7 +277,7 @@ istioCNI:
     tag: 1.29.2-bb.0
   # -- Values to passthrough to the Istio CNI chart
   values: {}
-  # -- Flux reconciliation overrides specifically for the Istio CRDs Package
+  # -- Flux reconciliation overrides specifically for the Istio CNI Package
   flux: {}
   # -- Post Renderers.  See docs/postrenders.md
   postRenderers: []
@@ -540,7 +540,7 @@ kiali:
           target:
             kind: Kiali
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -654,7 +654,7 @@ kyvernoPolicies:
     chartName: "kyverno-policies"
     tag: "3.3.4-bb.65"
 
-  # -- Flux reconciliation overrides specifically for the Kyverno Package
+  # -- Flux reconciliation overrides specifically for the Kyverno Policies Package
   flux:
     driftDetection:
       ignore:
@@ -703,7 +703,7 @@ kyvernoReporter:
   # -- Flux reconciliation overrides specifically for the Kyverno Reporter Package
   flux: {}
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -752,7 +752,7 @@ elasticsearchKibana:
           target:
             kind: StatefulSet
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -858,7 +858,7 @@ alloy:
   alloyLogs:
     enabled: true
 
-    # -- Toggle Alloy to scrape metrics
+  # -- Toggle Alloy to scrape metrics
   alloyMetrics:
     enabled: false
 
@@ -909,7 +909,7 @@ loki:
           target:
             kind: StatefulSet
 
-  # -- Loki architecture.  Options are monolith and scalable
+  # -- Loki architecture. Options are monolith, scalable, and distributed (unsupported).
   strategy: monolith
 
   # -- Loki clusterName identifier
@@ -962,7 +962,7 @@ neuvector:
     chartName: "neuvector"
     tag: "2.8.13-bb.1"
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -979,10 +979,10 @@ neuvector:
     # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
     default_role: ""
 
-    # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
+    # -- OIDC claim used to identify Neuvector groups.
     group_claim: ""
 
-    # -- Default role to use for Neuvector OIDC users. Supports admin, reader, or no default
+    # -- Mapping of OIDC groups to Neuvector global roles.
     group_mapped_roles: []
 
   # -- Flux reconciliation overrides specifically for the Neuvector Package
@@ -1152,7 +1152,7 @@ monitoring:
           target:
             kind: StatefulSet
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -1200,10 +1200,10 @@ grafana:
     chartName: "grafana"
     tag: "10.5.15-bb.3"
 
-  # -- Flux reconciliation overrides specifically for the Monitoring Package
+  # -- Flux reconciliation overrides specifically for the Grafana Package
   flux: {}
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -1254,7 +1254,7 @@ twistlock:
   # -- Flux reconciliation overrides specifically for the Twistlock Package
   flux: {}
 
-  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+  # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
     gateway: ""
 
@@ -1366,7 +1366,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1417,7 +1417,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Backstage Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1440,8 +1440,8 @@ addons:
   authservice:
     # -- Toggle deployment of Authservice.
     # if enabling authservice, a filter needs to be provided by either enabling
-    # sso for monitoring or istio, or manually adding a filter chain in the values here:
-    # `.Values.addons.authservice.values.chain.minimal.callback_uri="htts://somecallback"`
+    # sso for monitoring or tempo, or manually adding a filter chain in the values here:
+    # `.Values.addons.authservice.chains.minimal.callback_uri="https://somecallback"`
     enabled: false
 
     # -- Choose source type of "git" or "helmRepo"
@@ -1490,7 +1490,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Minio Operator Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1519,14 +1519,14 @@ addons:
     # -- Flux reconciliation overrides specifically for the Minio Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
     # -- Default access key to use for minio.
     accesskey: ""
 
-    # -- Default secret key to intstantiate with minio, you should change/delete this after installation.
+    # -- Default secret key to instantiate with minio, you should change/delete this after installation.
     secretkey: ""
 
     # -- Values to passthrough to the minio instance chart: https://repo1.dso.mil/big-bang/product/packages/minio.git
@@ -1559,7 +1559,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Gitlab Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1706,7 +1706,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1771,7 +1771,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Fortify Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1830,7 +1830,7 @@ addons:
       licenseYaml: |
         FULL LICENSE
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -1905,7 +1905,7 @@ addons:
     # -- Flux reconciliation overrides specifically for the Mattermost Operator Package
     flux: {}
 
-    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
+    # -- Values to passthrough to the mattermost operator chart: https://repo1.dso.mil/big-bang/product/packages/mattermost-operator.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -1952,7 +1952,7 @@ addons:
       # -- Pre existing secret created outside of Helm values with license for Mattermost.
       existingSecret: ""
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -2006,12 +2006,12 @@ addons:
 
     # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
     # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
-    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/big-bang/product/packages/values.yaml
+    # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/big-bang/product/packages/mattermost.git
     elasticsearch:
       # -- Toggle interaction with Elastic for optimized search indexing
       enabled: false
 
-    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
+    # -- Values to passthrough to the Mattermost chart: https://repo1.dso.mil/big-bang/product/packages/mattermost.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -2040,7 +2040,7 @@ addons:
     plugins: []
     # - aws
 
-    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/values.yaml
+    # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/velero.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -2087,10 +2087,10 @@ addons:
       # -- Database password for the username used to connect to the existing database.
       password: ""
 
-    # -- Flux reconciliation overrides specifically for the OPA Gatekeeper Package
+    # -- Flux reconciliation overrides specifically for the Keycloak Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       # the istio gateway for keycloak must have tls.mode: PASSTHROUGH
       gateway: ""
@@ -2146,7 +2146,7 @@ addons:
             target:
               kind: StatefulSet
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
       # -- Certificate/Key pair to use as the certificate for exposing Vault
@@ -2215,11 +2215,11 @@ addons:
     # -- Flux reconciliation overrides specifically for the Harbor Package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
-    # -- Values to pass through to Habor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
+    # -- Values to pass through to Harbor chart: https://repo1.dso.mil/big-bang/product/packages/harbor.git
     values: {}
 
     # -- Post Renderers.  See docs/postrenders.md
@@ -2292,7 +2292,7 @@ addons:
             target:
               kind: StatefulSet
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -2319,7 +2319,7 @@ addons:
     # -- Override flux settings for this package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -2378,7 +2378,7 @@ addons:
       # Unencoded string data. This should be placed in the secret values and then encrypted
       accessSecret: ""
 
-      # -- Bucket name for the Mimir bucket as YAML
+      # -- Bucket name for the Mimir bucket.
       bucketName: ""
 
       # -- Whether or not objectStorage connection should require HTTPS, if connecting to in-cluster object
@@ -2420,7 +2420,7 @@ addons:
 
     postRenderers: []
 
-    # -- Flux reconciliation overrides specifically for the alloy package
+    # -- Flux reconciliation overrides specifically for the Mimir Package
     flux: {}
 
   # ----------------------------------------------------------------------------------------------------------------------
@@ -2445,7 +2445,7 @@ addons:
     # -- Override flux settings for this package
     flux: {}
 
-    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istio.gateways`).  The default is "public".
+    # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
     ingress:
       gateway: ""
 
@@ -2564,7 +2564,7 @@ packages:
     # -- After deployment, patch package resources.  [More info](https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers)
     postRenderers: []
 
-    # -- Specify dependencies for the package. Only used for HelmRelease, does not effect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
+    # -- Specify dependencies for the package. Only used for HelmRelease, does not affect Kustomization. See [here](https://fluxcd.io/flux/components/helm/helmreleases/#helmrelease-dependencies) for a reference.
     dependsOn: []
 
     # -- Include default Big Bang package HelmRelease dependencies (gatekeeper, kyverno-policies, istio where applicable).
