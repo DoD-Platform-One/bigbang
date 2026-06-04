@@ -33,6 +33,7 @@ _reset_globals() {
     export action=create_instances
     export ATTACH_SECONDARY_IP=false
     export BIG_INSTANCE=false
+    export INSTANCE_MARKET="spot"
     export METAL_LB=true
     export PRIVATE_IP=false
     export PROJECTTAG=default
@@ -114,6 +115,18 @@ _reset_globals() {
     _reset_globals
     process_arguments -b
     [ "$BIG_INSTANCE" = "true" ]
+}
+
+@test "INSTANCE_MARKET defaults to spot" {
+    _source_k3d_dev
+    [ "$INSTANCE_MARKET" = "spot" ]
+}
+
+@test "process_arguments --on-demand sets INSTANCE_MARKET=on-demand" {
+    _source_k3d_dev
+    _reset_globals
+    process_arguments --on-demand
+    [ "$INSTANCE_MARKET" = "on-demand" ]
 }
 
 @test "process_arguments -M sets METAL_LB=false" {

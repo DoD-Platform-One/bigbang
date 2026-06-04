@@ -12,6 +12,7 @@ SSHUSER=ubuntu
 action=create_instances
 ATTACH_SECONDARY_IP=${ATTACH_SECONDARY_IP:=false}
 BIG_INSTANCE=false
+INSTANCE_MARKET="spot"
 METAL_LB=true
 PRIVATE_IP=false
 PROJECTTAG=default
@@ -114,6 +115,10 @@ function process_arguments {
       BIG_INSTANCE=true
       ;;
 
+    --on-demand)
+      INSTANCE_MARKET="on-demand"
+      ;;
+
     -p|--use-private-ip)
       if [[ "${ATTACH_SECONDARY_IP}" = false ]]; then
         PRIVATE_IP=true
@@ -189,6 +194,8 @@ function process_arguments {
       echo
       echo " -b|--big-instance                use BIG M5 instance. Default is "
       echo "                                  m5a.4xlarge"
+      echo " --on-demand                      use an on-demand EC2 instance instead"
+      echo "                                  of the default spot instance"
       echo " -a|--attach-secondary-public-ip  attach secondary Public IP"
       echo "                                  (overrides -p and -m flags)"
       echo " -d|--destroy-cloud-instance      destroy related cloud resources"
@@ -1282,8 +1289,10 @@ function cloud_aws_request_spot_instance
 ]
 EOF
 
-  echo "Creating spot_options.json ..."
-  cat <<EOF >${TMPDIR}/spot_options.json
+  instance_market_options=()
+  if [[ "${INSTANCE_MARKET}" == "spot" ]]; then
+    echo "Creating spot_options.json ..."
+    cat <<EOF >${TMPDIR}/spot_options.json
 {
   "MarketType": "spot",
   "SpotOptions": {
@@ -1292,12 +1301,14 @@ EOF
   }
 }
 EOF
+    instance_market_options=(--instance-market-options "file://${TMPDIR}/spot_options.json")
+  fi
 
   #### Request a Spot Instance
 
   # Run a spot instance with our launch spec for the max. of 6 hours
   # NOTE: t3.2xlarge spot price is 0.0996 m5a.4xlarge is 0.69
-  echo "Running spot instance ..."
+  echo "Running ${INSTANCE_MARKET} instance ..."
 
   if [[ "${ATTACH_SECONDARY_IP}" == true ]]; then
     # If we are using a secondary IP, we don't want to assign public IPs at launch time. Instead, the script will attach both public IPs after the instance is launched.
@@ -1315,7 +1326,7 @@ EOF
     --security-group-ids "${SecurityGroupId}" \
     --instance-initiated-shutdown-behavior "terminate" \
     --block-device-mappings file://${TMPDIR}/device_mappings.json \
-    --instance-market-options file://${TMPDIR}/spot_options.json \
+    "${instance_market_options[@]}" \
     ${additional_create_instance_options} |
     jq -r '.Instances[0].InstanceId')
 
@@ -1452,11 +1463,11 @@ function cloud_aws_create_instances {
 
   if [[ "${RESET_K3D}" == false ]] ; then
     if [[ "$BIG_INSTANCE" == true ]]; then
-      echo "Will use large m5a.4xlarge spot instance"
+      echo "Will use large m5a.4xlarge ${INSTANCE_MARKET} instance"
       InstSize="m5a.4xlarge"
       SpotPrice="0.69"
     else
-      echo "Will use standard t3.2xlarge spot instance"
+      echo "Will use standard t3.2xlarge ${INSTANCE_MARKET} instance"
       InstSize="t3.2xlarge"
       SpotPrice="0.2"
     fi
