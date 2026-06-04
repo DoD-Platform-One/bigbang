@@ -268,7 +268,7 @@ istioCNI:
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"
   git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/istio-cni
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-cni.git
     path: "./chart"
     tag: 1.29.2-bb.0
   helmRepo:

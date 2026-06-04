@@ -18,6 +18,8 @@
 {{- /* Default values for Thanos */ -}}
 {{- define "bigbang.defaults.thanos" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $authserviceEnabled := eq (include "authserviceEnabled" .) "true" }}
+{{- $thanosUsesAuthservice := or .Values.addons.authservice.enabled (and .Values.addons.thanos.sso.enabled $authserviceEnabled) }}
 {{- $istioHardened := or
   (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
   (dig "hardened" "enabled" false .Values.istiod.values)
@@ -105,7 +107,7 @@ networkPolicies:
         to:
           k8s:
             monitoring/prometheus:10901: {{ .Values.monitoring.enabled }}
-            authservice/authservice:10003: {{ .Values.addons.authservice.enabled }}
+            authservice/authservice:10003: {{ $thanosUsesAuthservice }}
       thanos-storegateway:
         podSelector:
           matchLabels:
@@ -133,7 +135,7 @@ networkPolicies:
             gateway: {{ .Values.istioGateway.enabled }}
           k8s:
             authservice/authservice:10003: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
-            authservice-waypoint@authservice/authservice-waypoint: {{ and (eq (include "ambientEnabled" .) "true") .Values.addons.authservice.enabled .Values.addons.thanos.sso.enabled }}
+            authservice-waypoint@authservice/authservice-waypoint: {{ and (eq (include "ambientEnabled" .) "true") $thanosUsesAuthservice .Values.addons.thanos.sso.enabled }}
       thanos-query:10902:
         podSelector:
           matchLabels:
@@ -186,7 +188,7 @@ upstream:
       {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
       {{- end }}
     {{- end }}
-    {{- if and (eq (include "ambientEnabled" .) "true") .Values.addons.authservice.enabled .Values.addons.thanos.sso.enabled }}
+    {{- if and (eq (include "ambientEnabled" .) "true") $thanosUsesAuthservice .Values.addons.thanos.sso.enabled }}
       # In ambient mode, route query-frontend traffic through the authservice waypoint so SSO is enforced.
     service:
       labels:

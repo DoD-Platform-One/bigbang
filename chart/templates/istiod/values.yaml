@@ -12,7 +12,7 @@
 
 {{- define "bigbang.defaults.istiod" -}}
 {{- $istioHardenedEnabled := dig "hardened" "enabled" false .Values.istiod.values }}
-{{- $authserviceEnabled := (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
+{{- $authserviceEnabled := eq (include "authserviceEnabled" .) "true" }}
 
 istio:
   sidecar:
@@ -105,4 +105,3 @@ upstream:
   jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert  | quote }}
 {{- end }}
 {{- end }}
-

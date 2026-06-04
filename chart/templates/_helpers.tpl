@@ -730,6 +730,19 @@ valuesFrom:
 {{ .Values.istiod.enabled }}
 {{- end -}}
 
+{{- /* Returns true when authservice should be deployed or referenced by integrations. */ -}}
+{{- define "authserviceEnabled" -}}
+{{- and
+  (eq (include "istioEnabled" .) "true")
+  (or
+    .Values.addons.authservice.enabled
+    (and .Values.monitoring.enabled .Values.monitoring.sso.enabled)
+    (and .Values.tempo.enabled .Values.tempo.sso.enabled)
+    (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)
+  )
+-}}
+{{- end -}}
+
 {{- /* Returns true if ambient mode is enabled (via ztunnel or global ambient flag) */ -}}
 {{- define "ambientEnabled" -}}
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
