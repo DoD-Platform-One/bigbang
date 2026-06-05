@@ -1,4 +1,3 @@
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- if and $istioEnabled (eq .Values.addons.authservice.sourceType "git") (not .Values.offline) (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{- if and (eq (include "authserviceEnabled" .) "true") (eq .Values.addons.authservice.sourceType "git") (not .Values.offline) }}
 {{- include "bigbang.gitRepository" (dict "name" "authservice" "gitCredsName" "authservice" "git" .Values.addons.authservice.git "component" "core" "root" .) }}
 {{- end }}

@@ -1,5 +1,4 @@
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- if and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
+{{- if eq (include "authserviceEnabled" .) "true" }}
 
 {{- /* Create a cleaned copy of package config and merge deprecated paths into current paths */ -}}
 {{- $authservicePackage := deepCopy .Values.addons.authservice -}}
