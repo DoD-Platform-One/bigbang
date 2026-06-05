@@ -20,7 +20,7 @@ metadata:
 type: Opaque
 stringData:
 {{- if (not $vals.kustomize) }}
-{{- if dig "bbCommonValues" false $vals }}
+{{- if dig "bbCommonValues" true $vals }}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
 {{- $istioHardened := dig "hardened" "enabled" false $.Values.istiod.values }}
   common.yaml: |
@@ -44,9 +44,9 @@ stringData:
 {{- pick $.Values.networkPolicies "enabled" "hbonePortInjection" "prependReleaseName" "defaultsAsHooks" "egress" "ingress" "additionalPolicies" "additional" | toYaml | nindent 8 }}
   {{- end }}
 
-  {{- if or ($vals.values) (dig "passBigBangValues" true $vals) }}
+  {{- if or ($vals.values) (dig "passBigBangValues" false $vals) }}
   values.yaml: |-
-    {{ if (dig "passBigBangValues" true $vals) -}}
+    {{ if (dig "passBigBangValues" false $vals) -}}
     bigbang:
       {{- include "values-bigbang" $.Values | nindent 6 }}
     {{- end }}
@@ -58,8 +58,8 @@ stringData:
   {{- end }}
 
   {{- else }}
-  {{- if or ($vals.values) (dig "passBigBangValues" true $vals) }}
-  {{- if (dig "passBigBangValues" true $vals) }}
+  {{- if or ($vals.values) (dig "passBigBangValues" false $vals) }}
+  {{- if (dig "passBigBangValues" false $vals) }}
   bigbang: |-
     {{- include "values-bigbang" $.Values | nindent 6 }}
   {{- end }}

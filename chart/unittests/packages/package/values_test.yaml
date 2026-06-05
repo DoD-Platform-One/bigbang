@@ -31,6 +31,7 @@ tests:
       packages:
         sample:
           passBigBangValues: false
+          bbCommonValues: false
     documentSelector:
       path: metadata.name
       value: sample-values
@@ -40,6 +41,10 @@ tests:
           value:
             values.yaml: "{}"
   - it: must create values.yaml with at least the domain when passBigBangValues is set
+    set:
+      packages:
+        sample:
+          passBigBangValues: true
     documentSelector:
       path: metadata.name
       value: sample-values
@@ -70,6 +75,7 @@ tests:
     set:
       packages:
         sample:
+          passBigBangValues: true
           values:
             customKey: customValue
             nested:
@@ -105,6 +111,7 @@ tests:
       packages:
         sample:
           kustomize: true
+          passBigBangValues: true
     documentSelector:
       path: metadata.name
       value: sample-values
@@ -139,6 +146,7 @@ tests:
       packages:
         sample:
           kustomize: true
+          passBigBangValues: true
           values:
             customKey: customValue
             nested:

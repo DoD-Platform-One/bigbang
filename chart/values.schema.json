@@ -1519,11 +1519,11 @@
           },
           "passBigBangValues": {
             "type": "boolean",
-            "default": true
+            "default": false
           },
           "bbCommonValues": {
             "type": "boolean",
-            "default": false
+            "default": true
           },
           "includeDefaultDependsOn": {
             "type": "boolean",
