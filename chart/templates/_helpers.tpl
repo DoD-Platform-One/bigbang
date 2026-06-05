@@ -364,6 +364,17 @@ stringData:
       {{- $gwRecord = set $gwRecord "type" $gwType -}}
       
       {{- $gwDefaults := get $defaults.gateways $name | default dict -}}
+      {{- /*
+        Give every gateway the same upstream.serviceAccount default that
+        `public` and `passthrough` get out of the box. bb-common assumes a
+        principal of '<gatewayName>-ingressgateway-service-account'
+        so making this the umbrella default for ALL gateways means
+        user-defined gateways behave the same as the built-in ones.
+        User overlays still win because they are applied
+        after `defaults` in the HelmRelease valuesFrom chain.
+      */ -}}
+      {{- $defaultSA := printf "%s-ingressgateway-service-account" $gwRecord.serviceName -}}
+      {{- $gwDefaults = merge $gwDefaults (dict "upstream" (dict "serviceAccount" (dict "create" true "name" $defaultSA))) -}}
       {{- if $gwDefaults }}
         {{- $gwRecord = set $gwRecord "defaults" $gwDefaults -}}
       {{ end -}}

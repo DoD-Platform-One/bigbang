@@ -22,10 +22,6 @@ gateways:
           mode: SIMPLE
 
     upstream:
-      serviceAccount:
-        create: true
-        name: public-ingressgateway-ingressgateway-service-account
-
       imagePullPolicy: {{ .Values.imagePullPolicy }}
 
       {{- include "secretsImagePullSecretsWithName" . | nindent 6 }}
@@ -54,10 +50,6 @@ gateways:
           mode: PASSTHROUGH
 
     upstream:
-      serviceAccount:
-        create: true
-        name: passthrough-ingressgateway-ingressgateway-service-account
-
       imagePullPolicy: {{ .Values.imagePullPolicy }}
 
       {{- include "secretsImagePullSecretsWithName" . | nindent 6 }}
