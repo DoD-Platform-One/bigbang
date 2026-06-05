@@ -489,7 +489,7 @@ After completing step 5, if you are unable to connect to external DNS providers 
 
 * Kubectl - https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands 
 * k3d - https://k3d.io/v5.5.1/usage/k3s/
-* Docker - https://docs.docker.com/desktop/linux/troubleshoot/#diagnosing-from-the-terminal
+* Docker - https://docs.docker.com/desktop/troubleshoot-and-support/troubleshoot/#diagnose-from-the-terminal
 * Helm - https://helm.sh/docs/helm/helm/
 
 ### NeuVector "Failed to Get Container"
