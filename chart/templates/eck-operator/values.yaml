@@ -48,12 +48,12 @@ monitoring:
 
 serviceMonitor:
   enabled: {{ eq (include "metricScrapingEnabled" $) "true" }}
-  {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" $.Values.eckOperator.values) "STRICT") }}
+  {{- if eq (include "metricsSidecarMtls" (list $.Values.eckOperator $)) "true" }}
   tlsConfig:
     caFile: /etc/prom-certs/root-cert.pem
     certFile: /etc/prom-certs/cert-chain.pem
     keyFile: /etc/prom-certs/key.pem
-    insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+    insecureSkipVerify: true
   {{- end }}
 
 networkPolicies:

@@ -132,7 +132,7 @@ monitoring:
 
 metrics:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-  {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.elasticsearchKibana.values) "STRICT") $istioInjection }}
+  {{- if eq (include "metricsSidecarMtls" (list .Values.elasticsearchKibana .)) "true" }}
   serviceMonitor:
     scheme: https
     tlsConfig:
