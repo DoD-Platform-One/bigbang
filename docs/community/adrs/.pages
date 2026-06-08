@@ -8,3 +8,5 @@ nav:
   - 0006 Drift Detection: 0006-drift-detection.md
   - 0007 Dev Defaults: 0007-dev-defaults.md
   - 0008 Generate Images Metadata from Explicit Container Image References: 0008-generate-images-metadata-from-explicit-container-image-references.md
+  - 0009 Confidential: 0009-confidential.md
+  - 0010 Upstream Values README Documentation: 0010-upstream-values-readme-documentation.md
