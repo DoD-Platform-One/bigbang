@@ -1,10 +1,7 @@
 # Useful Background Contextual Information
 
-Start with the [Getting Started Overview](../getting-started/index.md), which includes the following sections:
+Start with the [Getting Started Overview](../getting-started.md)
 
-* [What is Big Bang?](../getting-started/index.md#what-is-big-bang)
-* [What *isn't* Big Bang?](../getting-started/index.md#what-isnt-big-bang)
-* [Benefits of Big Bang](../getting-started/index.md#what-are-the-benefits-of-using-big-bang)
 ## Acronyms
 
 * **CSP**: Cloud Service Provider
@@ -21,7 +18,7 @@ Start with the [Getting Started Overview](../getting-started/index.md), which in
 
 ## Prerequisites
 
-* Prerequisites vary depending on deployment scenario. [Prerequisites can be found here.](../getting-started/prerequisites.md)
+* Prerequisites vary depending on deployment scenario. [Prerequisites can be found here.](../getting-started.md)
 
 ## Additional Useful Background Contextual Information
 
