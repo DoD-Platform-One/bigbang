@@ -621,6 +621,7 @@ global:
       {{- end }}
 
     dependencyProxy:
+      enabled: true
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
       bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-dependency-proxy
       {{- else }}
