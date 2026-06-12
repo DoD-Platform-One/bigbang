@@ -13,7 +13,7 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.elasticsearchKibana) "enabled") }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.elasticsearchKibana.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.elasticsearchKibana.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $disableDefaultFLB := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 hostname: {{ $domainName }}
 domain: {{ $domainName }}
@@ -32,11 +32,11 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.elasticsearchKibana.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.elasticsearchKibana.values .) }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
 
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}

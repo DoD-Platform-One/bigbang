@@ -54,11 +54,11 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   prependReleaseName: true
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}

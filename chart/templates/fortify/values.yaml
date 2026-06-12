@@ -42,7 +42,7 @@ istio:
   ambient:
     enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $istioHardened }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.fortify.values .) }}
 
 routes:
   inbound:
@@ -74,7 +74,7 @@ routes:
           protocol: TCP
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   egress:
     from:
       fortify-webapp:

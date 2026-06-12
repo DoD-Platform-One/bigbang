@@ -12,7 +12,7 @@
   {{- $neuvectorMetricsPass = join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2)) }}
 {{- end }}
 
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.neuvector.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.neuvector.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.neuvector.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
@@ -28,8 +28,8 @@ istio:
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.neuvector.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.neuvector.values .) }}
 
 routes:
   inbound:
@@ -43,7 +43,7 @@ routes:
       - repo1.dso.mil
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
 
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}

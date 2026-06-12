@@ -18,18 +18,6 @@ tests:
       - equal:
           path: istio.enabled
           value: true
-  - it: should enable istio sidecar when kiali hardened is enabled
-    postRenderer:
-      cmd: "sh"
-      args:
-        - "-c"
-        - "yq eval '.stringData.defaults' - | yq eval '.'"
-    set:
-      kiali.values.hardened.enabled: true
-    asserts:
-      - equal:
-          path: istio.sidecar.enabled
-          value: true
   - it: should map customServiceEntries to istio.serviceEntries.custom
     postRenderer:
       cmd: "sh"

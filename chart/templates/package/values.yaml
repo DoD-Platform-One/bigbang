@@ -22,7 +22,7 @@ stringData:
 {{- if (not $vals.kustomize) }}
 {{- if dig "bbCommonValues" true $vals }}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
-{{- $istioHardened := dig "hardened" "enabled" false $.Values.istiod.values }}
+{{- $istioHardened := or (dig "istio" "hardened" "enabled" false (default (dict) $vals.values)) (dig "hardened" "enabled" false $.Values.istiod.values) }}
   common.yaml: |
     global:
       domain: {{ $.Values.domain }}
@@ -34,14 +34,15 @@ stringData:
         ambient:
           enabled: {{ include "ambientEnabled" $ }}
         sidecar:
-          enabled: {{ $istioHardened }}
+          enabled: {{ and $istioHardened (ne (include "ambientEnabled" $) "true") }}
         authorizationPolicies:
-          enabled: {{ $istioHardened }}
-          generateFromNetpol: {{ $istioHardened }}
+          enabled: {{ include "authorizationPoliciesEnabled" (list (default (dict) $vals.values) $) }}
+          generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list (default (dict) $vals.values) $) }}
       networkPolicies:
+        enabled: {{ include "networkPoliciesEnabled" $ }}
         hbonePortInjection:
           enabled: {{ include "ambientEnabled" $ }}
-{{- pick $.Values.networkPolicies "enabled" "hbonePortInjection" "prependReleaseName" "defaultsAsHooks" "egress" "ingress" "additionalPolicies" "additional" | toYaml | nindent 8 }}
+{{- pick $.Values.networkPolicies "hbonePortInjection" "prependReleaseName" "defaultsAsHooks" "egress" "ingress" "additionalPolicies" "additional" | toYaml | nindent 8 }}
   {{- end }}
 
   {{- if or ($vals.values) (dig "passBigBangValues" false $vals) }}
