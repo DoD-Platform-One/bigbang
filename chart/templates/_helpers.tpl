@@ -759,6 +759,31 @@ valuesFrom:
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
 {{- end -}}
 
+{{- /* Returns "true" if networkPolicies should be enabled for a package.
+       True when .Values.networkPolicies.enabled is true OR ambient mode is enabled.
+       Ambient mode requires bb-common's network-policies render to run because the
+       AuthorizationPolicies that grant cross-namespace traffic on ambient workloads
+       are generated alongside the NetworkPolicies (via generateFromNetpol).
+    */ -}}
+{{- define "networkPoliciesEnabled" -}}
+{{ or .Values.networkPolicies.enabled (eq (include "ambientEnabled" .) "true") }}
+{{- end -}}
+
+{{- /* Returns "true" if authorization policies should be generated.
+       True when istio.hardened is enabled at the package or global istiod level,
+       OR when ambient mode is globally enabled.
+       Args (positional list):
+         0 - pkg:  the package's values dict (e.g. .Values.loki.values, .Values.addons.argocd.values)
+         1 - root: the root context (.)
+    */ -}}
+{{- define "authorizationPoliciesEnabled" -}}
+{{- $pkg  := index . 0 -}}
+{{- $root := index . 1 -}}
+{{- $hardened := or (dig "istio" "hardened" "enabled" false $pkg) (dig "hardened" "enabled" false $root.Values.istiod.values) -}}
+{{- $ambient  := eq (include "ambientEnabled" $root) "true" -}}
+{{ or $hardened $ambient }}
+{{- end -}}
+
 {{- /*
 Returns "true" if ServiceMonitor should use mTLS for scraping Istio-injected pods.
 Checks: global istio enabled, package istio enabled, injection enabled, not ambient mode, and mTLS STRICT mode.

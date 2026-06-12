@@ -15,7 +15,7 @@ istio:
     enabled: false
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   # Setting to false as Kyverno is not in the mesh
   hbonePortInjection:
     enabled: false

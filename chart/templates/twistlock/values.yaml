@@ -11,7 +11,7 @@
 {{- define "bigbang.defaults.twistlock" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.twistlock.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -39,7 +39,7 @@ imagePullSecretName: ""
 {{- end }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
 
@@ -77,8 +77,8 @@ istio:
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
 
 routes:
   inbound:

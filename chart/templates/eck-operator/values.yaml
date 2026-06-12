@@ -40,8 +40,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.eckOperator.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.eckOperator.values .) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -57,7 +57,7 @@ serviceMonitor:
   {{- end }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress:

@@ -20,13 +20,6 @@ tests:
       - equal:
           path: istio.enabled
           value: true
-  - it: should enable istio sidecar when elasticsearch-kibana hardened is enabled
-    set:
-      elasticsearchKibana.values.hardened.enabled: true
-    asserts:
-      - equal:
-          path: istio.sidecar.enabled
-          value: true
   - it: should map istio.kibana.hosts to routes.inbound.kibana.hosts
     set:
       elasticsearchKibana.values.istio.kibana.hosts:

@@ -95,8 +95,8 @@ istio:
     custom: []
   {{- end }}
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
 routes:
   inbound:
     monitoring-prometheus:
@@ -115,7 +115,7 @@ routes:
       - alertmanager.{{ $domainName }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   defaultsAsHooks:
@@ -453,7 +453,7 @@ upstream:
           {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
           {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
           {{- end }}
-          {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
+          {{- if and (eq (include "networkPoliciesEnabled" .) "true") .Values.addons.vault.enabled }}
           vault-ingress: "true"
           {{- end }}
         {{- if or $sidecarInjectionEnabled .Values.addons.vault.enabled }}

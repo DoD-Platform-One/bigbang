@@ -45,7 +45,7 @@ baseConfig:
     image: {{ .Values.bbctl.preflightCheck.image }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
@@ -112,8 +112,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.bbctl.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.bbctl.values .) }}
 
 routes:
   outbound:

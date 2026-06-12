@@ -10,7 +10,7 @@
 
 {{- define "bigbang.defaults.tempo" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.tempo.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.tempo.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.tempo.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $storageMode := dig "upstream" "tempo" "storage" "trace" "backend" "local" .Values.tempo.values }}
 
 upstream:
@@ -102,7 +102,7 @@ routes:
       - grafana.com
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress:
@@ -143,8 +143,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.tempo.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.tempo.values .) }}
 
 bbtests:
   enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}

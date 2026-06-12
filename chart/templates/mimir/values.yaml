@@ -49,8 +49,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mimir.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mimir.values .) }}
 
 routes:
   inbound:
@@ -95,7 +95,7 @@ routes:
           protocol: TCP
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
