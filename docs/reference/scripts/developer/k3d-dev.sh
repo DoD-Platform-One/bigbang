@@ -707,6 +707,8 @@ function install_k3d {
   # Shared k3d settings across all options
   # 1 server, 3 agents
   k3d_command="k3d cluster create --trace --servers 1 --agents 3 -v /cypress:/cypress@server:* -v /cypress:/cypress@agent:* --verbose"
+  # Required for fluentbit
+  k3d_command+=" -v /etc/machine-id:/etc/machine-id"
   # Disable traefik and metrics-server
   k3d_command+=" --k3s-arg \"--disable=traefik@server:0\" --k3s-arg \"--disable=metrics-server@server:0\""
 
