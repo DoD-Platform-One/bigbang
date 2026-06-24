@@ -742,11 +742,11 @@ Kubernetes: `>=1.33.0-0`
 | addons.mimir.enabled | bool | `false` | Toggle deployment of Mimir |
 | addons.mimir.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.mimir.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/mimir.git"` |  |
-| addons.mimir.git.tag | string | `"6.0.6-bb.1"` |  |
+| addons.mimir.git.tag | string | `"6.0.6-bb.2"` |  |
 | addons.mimir.git.path | string | `"./chart"` |  |
 | addons.mimir.helmRepo.repoName | string | `"registry1"` |  |
 | addons.mimir.helmRepo.chartName | string | `"mimir"` |  |
-| addons.mimir.helmRepo.tag | string | `"6.0.6-bb.1"` |  |
+| addons.mimir.helmRepo.tag | string | `"6.0.6-bb.2"` |  |
 | addons.mimir.enterprise | object | `{"enabled":false}` | Enable Mimir Enterprise |
 | addons.mimir.minioObjectStorage | object | `{"bucketName":"mimir","configSecret":{"accessKey":"minio","secretKey":"minio123"},"defaultUserCredentials":{"password":"supersecret","username":"mimir-user"},"enabled":false}` | Enable Big Bang MinIO dependency chart for Mimir |
 | addons.mimir.minioObjectStorage.configSecret | object | `{"accessKey":"minio","secretKey":"minio123"}` | MinIO root credentials |
