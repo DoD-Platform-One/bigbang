@@ -15,6 +15,7 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $autoRegisterEnabled := and .Values.kyverno.enabled .Values.addons.gitlab.enabled (dig "autoRegister" "enabled" true .Values.addons.gitlabRunner) }}
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -98,6 +99,11 @@ upstream:
 
   service:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+
+  {{- if $autoRegisterEnabled }}
+  runners:
+    secret: gitlab-gitlab-runner-secret
+  {{- end }}
 
   # When istio injected, add an annotation with the istio version to the manager pods only
   {{- if $istioInjection }}
