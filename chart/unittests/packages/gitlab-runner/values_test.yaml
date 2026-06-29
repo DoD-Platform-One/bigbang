@@ -19,3 +19,39 @@ tests:
       - equal:
           path: networkPolicies.ingress.to["gitlab-runner:9252"].podSelector.matchLabels.app
           value: gitlab-runner
+
+  - it: should set runner secret when auto registration is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlabRunner.enabled: true
+      kyverno.enabled: true
+    asserts:
+      - equal:
+          path: autoRegister.enabled
+          value: true
+      - equal:
+          path: upstream.runners.secret
+          value: gitlab-gitlab-runner-secret
+
+  - it: should not set runner secret when auto registration is disabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlabRunner.enabled: true
+      addons.gitlabRunner.autoRegister.enabled: false
+      kyverno.enabled: true
+    asserts:
+      - equal:
+          path: autoRegister.enabled
+          value: false
+      - notExists:
+          path: upstream.runners.secret
