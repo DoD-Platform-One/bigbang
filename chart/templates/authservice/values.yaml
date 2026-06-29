@@ -215,7 +215,7 @@ chains:
   {{ .Values.addons.authservice.chains | toYaml | nindent 2 }}
   {{- end }}
 
-  {{- if and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled }}
+  {{- if and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled (not (hasKey (.Values.addons.authservice.chains | default dict) "thanos")) }}
   thanos:
     match:
       header: ":authority"
@@ -237,6 +237,7 @@ chains:
   {{- end }}
 
   {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
+  {{- if not (hasKey (.Values.addons.authservice.chains | default dict) "prometheus") }}
   prometheus:
     match:
       header: ":authority"
@@ -255,7 +256,9 @@ chains:
     token_uri: {{ include "sso.oidc.token" . }}
     logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
     {{- end }}
+  {{- end }}
 
+  {{- if not (hasKey (.Values.addons.authservice.chains | default dict) "alertmanager") }}
   alertmanager:
     match:
       header: ":authority"
@@ -274,5 +277,6 @@ chains:
     token_uri: {{ include "sso.oidc.token" . }}
     logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
     {{- end }}
+  {{- end }}
   {{- end }}
 {{- end -}}
