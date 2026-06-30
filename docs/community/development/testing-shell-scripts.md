@@ -4,7 +4,7 @@
 
 ## Overview
 
-Big Bang uses [BATS (Bash Automated Testing System)](https://bats-core.readthedocs.io/) to unit-test shell scripts in the repository. The primary test suite covers `k3d-dev.sh`, the script that automates remote k3d development environments on AWS.
+Big Bang uses [BATS (Bash Automated Testing System)](https://bats-core.readthedocs.io/) to unit-test shell scripts in the repository. The primary test suites cover `k3d-dev.sh`, the script that automates remote k3d development environments on AWS, and `quickstart.sh`, the script that orchestrates quickstart provisioning, deployment, and wait flows.
 
 These tests verify pure functions and argument parsing -- no real AWS API calls, SSH connections, or network requests are made. Each test sources the script, calls a function, and checks a variable.
 
@@ -42,6 +42,12 @@ brew install lefthook
 bats tests/bats/k3d-dev/k3d-dev.bats
 ```
 
+To run the quickstart suite directly:
+
+```bash
+bats tests/bats/quickstart/quickstart.bats
+```
+
 To run all BATS test suites recursively (useful as more suites are added):
 
 ```bash
@@ -50,7 +56,7 @@ bats --recursive tests/bats/
 
 ### Run tests in parallel
 
-BATS supports parallel execution with the `--jobs` flag:
+BATS supports parallel execution with the `--jobs` flag when the local BATS installation has the required parallel runner available:
 
 ```bash
 bats --jobs 4 --recursive tests/bats/
@@ -98,10 +104,10 @@ This writes git hooks into `.git/hooks/` that delegate to `lefthook.yaml` in the
 
 | Hook         | Trigger      | Runs when                                               |
 | ------------ | ------------ | ------------------------------------------------------- |
-| `pre-commit` | `git commit` | `k3d-dev.sh` or a `tests/bats/**/*.bats` file is staged |
+| `pre-commit` | `git commit` | A covered script or its matching `tests/bats/...` suite is staged |
 | `pre-push`   | `git push`   | Any `*.sh` or `*.bats` file changed vs. the remote      |
 
-Both hooks run `bats --jobs 4 --recursive tests/bats/`. The glob filters mean they only fire when shell or test files are involved -- a commit that only touches YAML or Markdown skips them entirely.
+The pre-commit hook runs the focused suite for the staged script, such as `bats tests/bats/quickstart/quickstart.bats` for `quickstart.sh` changes. The pre-push hook runs `bats --jobs 4 --recursive tests/bats/`. The glob filters mean they only fire when shell or test files are involved -- a commit that only touches YAML or Markdown skips them entirely.
 
 ### Running hooks manually
 
@@ -121,18 +127,27 @@ Test files live under `tests/bats/`, organized by the script they cover:
 
 ```
 tests/bats/
-└── k3d-dev/
-    └── k3d-dev.bats    # Tests for docs/reference/scripts/developer/k3d-dev.sh
+├── k3d-dev/
+│   └── k3d-dev.bats       # Tests for docs/reference/scripts/developer/k3d-dev.sh
+└── quickstart/
+    └── quickstart.bats    # Tests for docs/reference/scripts/quickstart.sh
 ```
 
-Each `.bats` file is a valid Bash script annotated with `@test` blocks. A helper function `_source_k3d_dev()` loads the script under test, and `_reset_globals()` restores default variable state between tests so they stay independent.
+Each `.bats` file is a valid Bash script annotated with `@test` blocks. Helper functions load the script under test and restore default variable state between tests so they stay independent.
 
-The test suite covers four areas:
+The `k3d-dev.sh` test suite covers four areas:
 
 - **Pure functions** -- `k3dsshcmd`, `set_kubeconfig`
 - **Argument parsing** -- common flags accepted by `process_arguments`
 - **Domain configuration** -- `set_domains` building FQDN lists from subdomains
 - **Error guards** -- batch-file operations fail cleanly when misused
+
+The `quickstart.sh` test suite covers:
+
+- **Argument parsing** -- quickstart flags, implied flags, unknown options, and Helm passthrough arguments
+- **Pure helpers** -- k3d-dev argument generation and dependency checks
+- **Command construction** -- mocked `k3d-dev.sh` and `helm` invocations
+- **Workflow orchestration** -- mocked destroy and deploy/wait flows without real Git, AWS, Helm, Flux, or Kubernetes calls
 
 ## Additional Resources
 

@@ -61,6 +61,7 @@ function checkout_pipeline_templates {
 }
 
 function build_k3d_arguments {
+    local args=""
     if [[ "${arg_privateip}" != "" ]]; then
         args="${args} -P ${arg_privateip}"
     fi
@@ -101,7 +102,7 @@ function build_k3d_cluster {
         -T \
         -q \
         $(build_k3d_arguments) \
-        $@
+        "$@"
 }
 
 function deploy_flux {
@@ -119,7 +120,7 @@ function deploy_bigbang {
             --create-namespace \
             --set registryCredentials.username=${REGISTRY1_USERNAME} \
             --set registryCredentials.password=${REGISTRY1_TOKEN} \
-            $@ \
+            "$@" \
             -f ${BIG_BANG_REPO}/chart/ingress-certs.yaml \
             -f ${BIG_BANG_REPO}/docs/reference/configs/example/dev-sso-values.yaml \
             -f ${BIG_BANG_REPO}/docs/reference/configs/example/policy-overrides-k3d.yaml
@@ -272,7 +273,7 @@ function parse_arguments {
 
 function main {
     set -e
-    parse_arguments $@
+    parse_arguments "$@"
 
     if [[ ! -z "${arg_keyfile}" ]] && [[ ! -e ${arg_keyfile} ]] ; then
         echo "SSH key file ${arg_keyfile} does not exist" >&2
@@ -343,7 +344,7 @@ function main {
     if [[ "${actions}" =~ "deploy" ]]; then
         deploy_flux
 
-        deploy_bigbang ${arg_argv[@]}
+        deploy_bigbang "${arg_argv[@]}"
     fi
 
     if [[ "${actions}" =~ "wait" ]]; then
@@ -363,6 +364,7 @@ function main {
     set +e
 }
 
-check_for_tools
-
-main $@
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    check_for_tools
+    main "$@"
+fi

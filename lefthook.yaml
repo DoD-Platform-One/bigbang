@@ -15,14 +15,19 @@ pre-commit:
   parallel: true
   commands:
     bats-k3d-dev:
-      # Only fire when the script or its tests are staged
-      glob: "{docs/reference/scripts/developer/k3d-dev.sh,tests/bats/**/*.bats}"
-      run: bats --jobs 4 --recursive tests/bats/
+      glob: "{docs/reference/scripts/developer/k3d-dev.sh,tests/bats/k3d-dev/**/*.bats}"
+      run: bats tests/bats/k3d-dev/k3d-dev.bats
+    bats-quickstart:
+      glob: "{docs/reference/scripts/quickstart.sh,tests/bats/quickstart/**/*.bats}"
+      run: bats tests/bats/quickstart/quickstart.bats
+    bats-gitlab-triage:
+      glob: "{scripts/gitlab-triage/*.sh,tests/bats/gitlab-triage/**/*.bats}"
+      run: bats tests/bats/gitlab-triage/
 
 # Runs when you `git push` — only if any .sh or .bats files changed.
 pre-push:
   parallel: true
   commands:
-    bats-k3d-dev:
+    bats-shell-scripts:
       glob: "**/*.{sh,bats}"
       run: bats --jobs 4 --recursive tests/bats/
