@@ -88,6 +88,17 @@ packages:
 
 This deploys the istio-cni package with tag of `1.27.0-bb.0` to the kube-system namespace which already exists within the cluster.
 
+Package namespaces can be assigned custom labels with `<package>.namespace.labels`. These labels are merged with labels rendered by Big Bang and can be used to set package-specific namespace metadata or override generated labels when needed:
+
+```yaml
+packages:
+  example-package:
+    enabled: true
+    namespace:
+      labels:
+        custom-label: custom-value
+```
+
 It is also possible to disable the creation of the `imagePullSecret` by setting the `<package>.namespace.createRegistrySecret` to false:
 
 ```yaml

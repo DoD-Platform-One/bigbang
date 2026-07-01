@@ -2494,6 +2494,9 @@ packages:
     # @default -- true
     enabled: false
 
+    # -- Namespace settings for this package. Use `namespace.labels` to add custom labels or override labels rendered by Big Bang for this package namespace.
+    namespace: {}
+
     # -- Choose source type of "git" or "helmRepo"
     sourceType: "git"
 

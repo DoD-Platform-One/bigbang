@@ -4,23 +4,24 @@
 {{- range $pkg, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (dig "namespace" "create" true $vals) -}}
 {{- $pkg = include "resourceName" $pkg -}}
+{{- $labels := include "commonLabels" $ | fromYaml -}}
+{{- $labels = set $labels "app.kubernetes.io/name" $pkg -}}
+{{- if $istioEnabled }}
+{{- if eq (include "ambientEnabled" $) "true" }}
+{{- $labels = set $labels "istio.io/dataplane-mode" "ambient" -}}
+{{- else }}
+{{- $labels = set $labels "istio-injection" (tpl ((dig "istio" "injection" "enabled" $vals)) $) -}}
+{{- end }}
+{{- end }}
+{{- if (dig "namespace" "labels" nil $vals) -}}
+{{- $labels = mustMergeOverwrite $labels $vals.namespace.labels -}}
+{{- end -}}
 apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ dig "namespace" "name" $pkg $vals }}
   labels:
-    app.kubernetes.io/name: {{ $pkg }}
-    {{- include "commonLabels" $ | nindent 4 }}
-    {{- if $istioEnabled }}
-    {{- if eq (include "ambientEnabled" $) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ tpl ((dig "istio" "injection" "enabled" $vals)) $ }}
-    {{- end }}
-    {{- end }}
-    {{- if (dig "namespace" "labels" nil $vals) -}}
-    {{- toYaml $vals.namespace.labels | nindent 4 -}}
-    {{- end -}}
+    {{- toYaml $labels | nindent 4 }}
   {{- if (dig "namespace" "annotations" nil $vals) }}
   annotations:
     {{- toYaml $vals.namespace.annotations | nindent 4 -}}
