@@ -9,7 +9,5 @@ addons:
     enabled: true
   velero:
     enabled: true
-  backstage:
-    enabled: true
   headlamp:
     enabled: true

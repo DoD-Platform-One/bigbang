@@ -430,21 +430,6 @@ Kubernetes: `>=1.33.0-0`
 | addons.argocd.sso.groups | string | `"g, Impact Level 2 Authorized, role:admin\n"` | ArgoCD SSO group roles, see docs for more details: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/ |
 | addons.argocd.values | object | `{}` | Values to passthrough to the argocd chart: https://repo1.dso.mil/big-bang/product/packages/argocd.git |
 | addons.argocd.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
-| addons.backstage.enabled | bool | `false` | Toggle deployment of Backstage. |
-| addons.backstage.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
-| addons.backstage.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/backstage.git"` |  |
-| addons.backstage.git.path | string | `"./chart"` |  |
-| addons.backstage.git.tag | string | `"2.8.1-bb.0"` |  |
-| addons.backstage.helmRepo.repoName | string | `"registry1"` |  |
-| addons.backstage.helmRepo.chartName | string | `"backstage"` |  |
-| addons.backstage.helmRepo.tag | string | `"2.8.1-bb.0"` |  |
-| addons.backstage.flux | object | `{}` | Flux reconciliation overrides specifically for the Backstage Package |
-| addons.backstage.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public". |
-| addons.backstage.sso.enabled | bool | `false` | Toggle SSO for Backstage on and off |
-| addons.backstage.sso.client_id | string | `""` | Backstage OIDC client ID |
-| addons.backstage.sso.client_secret | string | `""` | Backstage OIDC client secret |
-| addons.backstage.values | object | `{}` | Values to passthrough to the Backstage chart: https://repo1.dso.mil/big-bang/product/packages/backstage.git |
-| addons.backstage.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.authservice.enabled | bool | `false` | Toggle deployment of Authservice. if enabling authservice, a filter needs to be provided by either enabling sso for monitoring or tempo, or manually adding a filter chain in the values here: `.Values.addons.authservice.chains.minimal.callback_uri="https://somecallback"` |
 | addons.authservice.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.authservice.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/authservice.git"` |  |

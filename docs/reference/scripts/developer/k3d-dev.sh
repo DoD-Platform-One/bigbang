@@ -28,7 +28,6 @@ PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
   "anchore-api"
   "anchore"
   "argocd"
-  "backstage"
   "chat"
   "fortify"
   "gitlab"

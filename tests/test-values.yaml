@@ -443,7 +443,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - backstage
               - bbctl
               - gitlab
               - gitlab-runner
@@ -485,7 +484,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - backstage
               - bbctl
               - gitlab
               - gitlab-runner
@@ -534,7 +532,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - backstage
               - bbctl
               - gitlab
               - gitlab-runner
@@ -980,29 +977,6 @@ addons:
               memory:
                 requests: 512Mi
                 limits: 2048Mi
-
-  backstage:
-    enabled: false
-    values:
-      bbtests:
-        enabled: true
-      backstage:
-        backstage:
-          appConfig:
-            organization:
-              name: "P1"
-            auth:
-              environment: development
-              providers:
-                guest:
-                  # because we use NODE_ENV: production, we must set this to allow guest development login
-                  dangerouslyAllowOutsideDevelopment: true
-            proxy:
-              '/grafana/api':
-                # May be a public or an internal DNS
-                target: "https://example.com"
-                headers:
-                  Authorization: "Bearer abc-123"
 
   authservice:
     enabled: false

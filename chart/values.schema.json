@@ -1228,18 +1228,6 @@
             }
           }
         },
-        "backstage": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ],
-          "properties": {
-            "istio": {
-              "$ref": "#/$defs/istio"
-            }
-          }
-        },
         "minioOperator": {
           "allOf": [
             {

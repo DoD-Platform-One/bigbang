@@ -69,7 +69,6 @@ networkPolicies:
         from:
           k8s:
             kiali/kiali: {{ .Values.kiali.enabled }}
-            backstage/backstage: {{ .Values.addons.backstage.enabled }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:

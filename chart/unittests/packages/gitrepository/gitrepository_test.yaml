@@ -341,21 +341,6 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: should not create backstage GitRepository when offline
-    template: backstage/gitrepository.yaml
-    set:
-      offline: true
-      addons:
-        backstage:
-          enabled: true
-          sourceType: git
-          git:
-            repo: https://repo1.dso.mil/big-bang/product/packages/backstage
-            tag: 1.0.0
-    asserts:
-      - hasDocuments:
-          count: 0
-
   - it: should not create anchore-enterprise GitRepository when offline
     template: anchore-enterprise/gitrepository.yaml
     set:
