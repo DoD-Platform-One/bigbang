@@ -431,63 +431,6 @@ tests:
       value: 30m
 
 ###############################################################################
-# Bug fix: backstage kyverno dependency should be conditional
-###############################################################################
-
-- it: backstage should not depend on kyverno when kyverno is disabled
-  set:
-    addons:
-      backstage:
-        enabled: true
-    grafana:
-      enabled: true
-    kyverno:
-      enabled: false
-  template: backstage/helmrelease.yaml
-  asserts:
-  - isKind:
-      of: HelmRelease
-  - notContains:
-      path: spec.dependsOn
-      content:
-        name: kyverno
-      any: true
-
-- it: backstage should depend on kyverno when kyverno is enabled
-  set:
-    addons:
-      backstage:
-        enabled: true
-    grafana:
-      enabled: false
-    kyverno:
-      enabled: true
-  template: backstage/helmrelease.yaml
-  asserts:
-  - contains:
-      path: spec.dependsOn
-      content:
-        name: kyverno
-      any: true
-
-- it: backstage should depend on grafana when grafana is enabled
-  set:
-    addons:
-      backstage:
-        enabled: true
-    grafana:
-      enabled: true
-    kyverno:
-      enabled: false
-  template: backstage/helmrelease.yaml
-  asserts:
-  - contains:
-      path: spec.dependsOn
-      content:
-        name: grafana
-      any: true
-
-###############################################################################
 # Bug fix: fluentbit loki dependency should be in outer condition
 ###############################################################################
 

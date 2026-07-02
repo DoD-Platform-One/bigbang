@@ -3,7 +3,6 @@ suite: Package - Global - Values Tests
 templates:
   - templates/neuvector/values.yaml
   - templates/twistlock/values.yaml
-  - templates/backstage/values.yaml
   - templates/elasticsearch-kibana/values.yaml
   - templates/alloy/values.yaml
   - templates/anchore-enterprise/values.yaml

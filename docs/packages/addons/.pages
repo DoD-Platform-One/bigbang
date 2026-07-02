@@ -3,7 +3,6 @@ nav:
   - Anchore: anchore.md
   - Argo CD: argocd.md
   - AuthService: authservice.md
-  - Backstage: backstage.md
   - External Secrets Operator(ESO): external-secrets-operator.md
   - Fortify: fortify.md
   - GitLab: gitlab.md
