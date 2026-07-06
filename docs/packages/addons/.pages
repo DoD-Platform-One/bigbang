@@ -12,6 +12,7 @@ nav:
   - Metrics Server: metricserver.md
   - Mimir: mimir.md
   - MinIO: minio.md
+  - Renovate: renovate.md
   - SonarQube: sonarqube.md
   - Vault: vault.md
   - Velero: velero.md
