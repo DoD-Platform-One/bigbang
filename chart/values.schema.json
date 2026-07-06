@@ -1410,8 +1410,45 @@
                 "auto"
               ]
             },
+            "sourceType": {
+              "$ref": "#/$defs/sourceType"
+            },
             "git": {
               "$ref": "#/$defs/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/helmRepo"
+            },
+            "automountServiceAccountToken": {
+              "type": "boolean"
+            },
+            "namespace": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "kube-system"
+                },
+                "create": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                },
+                "annotations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                }
+              },
+              "additionalProperties": false
             },
             "flux": {
               "ref": "#/$defs/flux"
@@ -1421,6 +1458,9 @@
             },
             "istio": {
               "$ref": "#/$defs/istio"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/postRenderers"
             }
           }
         },
