@@ -2145,6 +2145,17 @@ addons:
     # -- Enabled automount Service Account Token so that metrics-server fetches resource metrics from the kubelets
     automountServiceAccountToken: true
 
+    # -- Namespace settings for metrics-server. The default target namespace is `kube-system`; set `namespace.name` and `namespace.create=true` to deploy to and create a custom namespace.
+    namespace:
+      # -- Namespace to deploy metrics-server resources to.
+      name: kube-system
+      # -- Create the target namespace. Keep false when using an existing namespace such as `kube-system`.
+      create: false
+      # -- Labels to add to or override on the created namespace when `namespace.create=true`.
+      labels: {}
+      # -- Annotations to add to the created namespace when `namespace.create=true`.
+      annotations: {}
+
     # -- Flux reconciliation overrides specifically for the metrics server Package
     flux: {}
 
