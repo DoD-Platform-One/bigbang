@@ -1200,6 +1200,9 @@ addons:
             autoscaling:
               enabled: false
       upstream:
+        # Anchore sets this lower to 2 by default, for our purposes we need it as the kubernetes default https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-config especially when the runners are ambient.
+        dnsConfig:
+            ndots: 5
         analyzer:
           replicaCount: 1
           resources:
