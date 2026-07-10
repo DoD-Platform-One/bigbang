@@ -18,9 +18,14 @@ spec:
 
   {{- toYaml $fluxSettings | nindent 2 }}
 
-  {{- if .Values.addons.externalSecrets.postRenderers }}
+  {{- if or .Values.addons.externalSecrets.postRenderers $istioEnabled (and dig "upstream" "webhook" "create" false .Values.addons.externalSecrets.values) }}
   postRenderers:
-  {{- toYaml .Values.addons.externalSecrets.postRenderers | nindent 2 }}
+  {{- if $istioEnabled }}
+  {{- include "externalSecrets.istioPostRenderers" . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.addons.externalSecrets.postRenderers }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "external-secrets" "root" .) | nindent 2 }}
 
