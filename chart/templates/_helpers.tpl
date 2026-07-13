@@ -343,6 +343,7 @@ stringData:
 {{- define "enabledGateways" -}}
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
+  {{- $istioPodAnnotations := (include "istioAnnotation" $ | fromYaml) | default dict -}}
 
   {{- $defaultImagePullConfig := dict
     "imagePullPolicy" .Values.imagePullPolicy
@@ -374,13 +375,21 @@ stringData:
         after `defaults` in the HelmRelease valuesFrom chain.
       */ -}}
       {{- $defaultSA := printf "%s-ingressgateway-service-account" $gwRecord.serviceName -}}
-      {{- $gwDefaults = merge $gwDefaults (dict "upstream" (dict "serviceAccount" (dict "create" true "name" $defaultSA))) -}}
+      {{- $defaultUpstreamValues := dict "serviceAccount" (dict "create" true "name" $defaultSA) -}}
+      {{- if $istioPodAnnotations }}
+        {{- $defaultUpstreamValues = set $defaultUpstreamValues "podAnnotations" $istioPodAnnotations -}}
+      {{- end }}
+      {{- $gwDefaults = mergeOverwrite $gwDefaults (dict "upstream" $defaultUpstreamValues) -}}
       {{- if $gwDefaults }}
         {{- $gwRecord = set $gwRecord "defaults" $gwDefaults -}}
       {{ end -}}
       
       {{- $gwOverlays := dig "gateways" $name dict $.Values.istioGateway.values -}}
       {{- if $gwOverlays }}
+        {{- $gwOverlays = deepCopy $gwOverlays -}}
+        {{- if $istioPodAnnotations }}
+          {{- $gwOverlays = mergeOverwrite $gwOverlays (dict "upstream" (dict "podAnnotations" $istioPodAnnotations)) -}}
+        {{- end }}
         {{- $gwRecord = set $gwRecord "overlays" (merge $gwOverlays (dict "upstream" $defaultImagePullConfig)) -}}
       {{ end -}}
       
@@ -448,16 +457,21 @@ bigbang.addValueIfSet can be used to nil check parameters before adding them to 
 Annotation for Istio version
 */}}
 {{- define "istioAnnotation" -}}
-{{- if (eq .Values.istiod.sourceType "git") -}}
-{{- if .Values.istiod.git.semver -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.semver | trimSuffix (regexFind "-bb.*" .Values.istiod.git.semver) }}
-{{- else if .Values.istiod.git.tag -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.tag | trimSuffix (regexFind "-bb.*" .Values.istiod.git.tag) }}
-{{- else if .Values.istiod.git.branch -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.branch }}
+{{- $istiod := .Values.istiod | default dict -}}
+{{- if (eq ($istiod.sourceType | default "git") "git") -}}
+{{- $git := $istiod.git | default dict -}}
+{{- if $git.semver -}}
+bigbang.dev/istioVersion: {{ $git.semver | trimSuffix (regexFind "-bb.*" $git.semver) }}
+{{- else if $git.tag -}}
+bigbang.dev/istioVersion: {{ $git.tag | trimSuffix (regexFind "-bb.*" $git.tag) }}
+{{- else if $git.branch -}}
+bigbang.dev/istioVersion: {{ $git.branch }}
 {{- end -}}
 {{- else -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.helmRepo.tag }}
+{{- $helmRepo := $istiod.helmRepo | default dict -}}
+{{- if $helmRepo.tag -}}
+bigbang.dev/istioVersion: {{ $helmRepo.tag }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
