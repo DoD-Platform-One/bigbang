@@ -52,6 +52,24 @@ tests:
       - matchRegex:
           path: stringData["values.yaml"]
           pattern: '.*domain: dev.bigbang.mil.*'
+  - it: must pass distinct authservice selector key and value through Big Bang values
+    set:
+      packages:
+        sample:
+          passBigBangValues: true
+      addons:
+        authservice:
+          values:
+            selector:
+              key: route-key
+              value: route-value
+    documentSelector:
+      path: metadata.name
+      value: sample-values
+    asserts:
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: 'selector:\n\s+key: route-key\n\s+value: route-value'
   - it: must create values.yaml with custom values when values are set and passBigBangValues is false
     set:
       packages:

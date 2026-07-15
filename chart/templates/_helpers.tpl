@@ -30,7 +30,7 @@
         key: {{ $addvals.values.selector.key }}
               {{- end -}}
               {{- if (dig "values" "selector" "value" false $addvals) }}
-        value: {{ $addvals.values.selector.key }}
+        value: {{ $addvals.values.selector.value }}
               {{- end -}}
           {{- end -}}
         {{- end -}}
