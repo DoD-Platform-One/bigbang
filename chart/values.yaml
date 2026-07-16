@@ -10,8 +10,9 @@ istio:
     # NOTE: Ambient mode is currently in an alpha state.
     enabled: false
 
-# -- (experimental) Toggle sourcing from external repos.
-# All this does right now is toggle GitRepositories, it is _not_ fully functional
+# -- Prevent Big Bang from creating GitRepository resources. HelmReleases configured with Git sources
+# will continue to reference those resources, so they must already exist in the expected namespaces.
+# This applies to integrated packages, additional packages, and the package wrapper.
 offline: false
 
 # -- List of Helm repositories/credentials to pull helm charts from.
@@ -2460,7 +2461,6 @@ wrapper:
 # @default - '{}'
 packages:
   # -- Package name.  Each package will be independently wrapped for Big Bang integration.
-  # @default -- Uses `defaults/<package name>.yaml` for defaults.  See `package` Helm chart for additional values that can be set.
   sample:
     # -- Toggle deployment of this package
     # @default -- true

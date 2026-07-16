@@ -2,10 +2,6 @@
 {{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
-{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
-{{- if $defaults -}}
-{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
-{{- end -}}
 
 {{- $fluxSettings := mergeOverwrite (deepCopy $.Values.flux) (default (dict) $vals.flux) -}}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}

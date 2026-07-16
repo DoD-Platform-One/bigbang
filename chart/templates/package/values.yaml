@@ -2,10 +2,6 @@
 {{- range $pkgKey, $vals := .Values.packages -}}
 {{- if (dig "enabled" true $vals) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
-{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
-{{- if $defaults -}}
-{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
-{{- end -}}
 apiVersion: v1
 kind: Secret
 metadata:

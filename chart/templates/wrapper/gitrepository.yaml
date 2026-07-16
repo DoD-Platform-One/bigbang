@@ -1,5 +1,5 @@
 {{- /* Used for GitOps of the BigBang package wrapper Helm chart.  Shared by all packages */ -}}
-{{- if and .Values.wrapper (eq .Values.wrapper.sourceType "git") (omit (default dict .Values.packages) "sample") -}}
+{{- if and (not .Values.offline) .Values.wrapper (eq .Values.wrapper.sourceType "git") (omit (default dict .Values.packages) "sample") -}}
 {{- $pkg := print .Release.Name "-wrapper" -}}
 {{- $gitCredsDict := dict
   "name" $pkg
