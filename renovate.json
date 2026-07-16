@@ -60,6 +60,18 @@
                 "s*(?<depName>.+):(?<currentValue>.+)"
             ],
             "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^tests/extended/test-values-packages-key\\.yaml$/"
+            ],
+            "matchStrings": [
+                "tag:\\s+[\\\"']?(?<currentValue>\\d+\\.\\d+\\.\\d+-bb\\.\\d+)[\\\"']?"
+            ],
+            "depNameTemplate": "https://repo1.dso.mil/big-bang/product/maintained/podinfo.git",
+            "datasourceTemplate": "git-tags",
+            "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-bb\\.(?<build>\\d+)$"
         }
     ],
     "separateMajorMinor": false
