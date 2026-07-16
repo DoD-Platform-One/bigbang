@@ -10,8 +10,8 @@
 
 {{- define "bigbang.defaults.twistlock" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.twistlock.values) }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -23,14 +23,13 @@ monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.twistlock.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.twistlock .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
     {{- end }}
 
 {{- if ( include "imagePullSecret" . ) }}
@@ -40,7 +39,7 @@ imagePullSecretName: ""
 {{- end }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
 
@@ -78,14 +77,24 @@ istio:
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
 
 routes:
   inbound:
     console:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.twistlock.ingress.gateway "root" .)}}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.twistlock.values }}
+      hosts:
+      - repo1.dso.mil
+
+bbtests:
+  scripts:
+    envs:
+      twistlock_host: {{ printf "https://twistlock.%s" $domainName | quote }}
 
 {{- if $istioEnabled }}
 annotations:

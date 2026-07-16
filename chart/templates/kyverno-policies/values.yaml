@@ -26,12 +26,14 @@ additionalPolicyExceptions:
       - policyName: disallow-privilege-escalation
         ruleNames:
         - disallow-privilege-escalation
+        - autogen-disallow-privilege-escalation
       - policyName: require-non-root-user
         ruleNames:
         - non-root-user
       - policyName: restrict-capabilities
         ruleNames:
         - capabilities
+        - autogen-capabilities
       - policyName: restrict-host-path-mount
         ruleNames:
         - restrict-hostpath-dirs
@@ -46,10 +48,12 @@ additionalPolicyExceptions:
         - resources:
             kinds:
             - Pod
+            - DaemonSet
             namespaces:
             - istio-system
             names:
             - "ztunnel-*"
+            - "ztunnel"
 {{- end }}
 
 waitforready:
@@ -300,19 +304,6 @@ policies:
           - headlamp
           names:
           - headlamp*
-      {{- end }}
-      {{- if .Values.addons.backstage.enabled }}
-      - resources:
-          namespaces:
-          - backstage
-          kinds:
-          - Pod
-          - Deployment
-          - ReplicaSet
-          - ServiceAccount
-          names:
-          - backstage
-          - backstage*
       {{- end }}
       {{- if .Values.gatekeeper.enabled }}
       - resources:

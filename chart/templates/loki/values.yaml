@@ -15,7 +15,7 @@
 
 {{- define "bigbang.defaults.loki" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.loki.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $minioEnabled := dig "minio" "enabled" false .Values.loki.values }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -37,8 +37,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.loki.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.loki.values .) }}
 
 routes:
   inbound:
@@ -62,6 +62,12 @@ routes:
         {{- if ne .Values.loki.strategy "monolith" }}
         app.kubernetes.io/component: gateway
         {{- end }}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.loki.values }}
+      hosts:
+      - repo1.dso.mil
+      - grafana.{{ $domainName }}
 
 {{- include "secretsImagePullSecretsWithName" . }}
 
@@ -69,7 +75,7 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress:
@@ -114,12 +120,20 @@ networkPolicies:
             storage-subnets: {{ $minioEnabled }}
             kubeAPI: {{ $minioEnabled }}
 
+bbtests:
+  cypress:
+    envs:
+      cypress_check_datasource: {{ .Values.grafana.enabled | quote }}
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+  scripts:
+    envs:
+      LOKI_URL: 'http://logging-loki.logging.svc:3100'
+
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
   serviceMonitor:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.loki.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.loki .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem

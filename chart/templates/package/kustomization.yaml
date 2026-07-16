@@ -2,10 +2,6 @@
 {{- range $pkg, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) $vals.kustomize -}}
 {{- $pkg := include "resourceName" $pkg -}}
-{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
-{{- if $defaults -}}
-{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
-{{- end -}}
 {{- $fluxSettings := merge (default $vals.flux (dict)) $.Values.flux -}}
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

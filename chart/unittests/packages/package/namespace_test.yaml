@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - Package - Namespace Tests
+templates:
+  - templates/package/namespace.yaml
+release:
+  name: test
+set:
+  istiod:
+    enabled: true
+  istio:
+    ambient:
+      enabled: true
+tests:
+  - it: should allow package namespace labels to override ambient namespace enrollment
+    set:
+      packages:
+        sample:
+          enabled: true
+          namespace:
+            labels:
+              istio.io/dataplane-mode: none
+              custom-label: custom-value
+    documentSelector:
+      path: metadata.name
+      value: sample
+    asserts:
+      - equal:
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none
+      - equal:
+          path: metadata.labels["custom-label"]
+          value: custom-value
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: sample
+
+  - it: should render cert-manager ecosystem namespaces as ambient opt-out when configured
+    set:
+      packages:
+        cert-manager:
+          enabled: true
+          namespace:
+            labels:
+              istio.io/dataplane-mode: none
+        cert-manager-trust-manager:
+          enabled: true
+          namespace:
+            create: false
+            name: cert-manager
+            labels:
+              istio.io/dataplane-mode: none
+        cert-manager-approver-policy:
+          enabled: true
+          namespace:
+            create: false
+            name: cert-manager
+            labels:
+              istio.io/dataplane-mode: none
+    documentSelector:
+      path: metadata.name
+      value: cert-manager
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none
+
+  - it: should render each cert-manager ecosystem namespace as ambient opt-out when separately created
+    set:
+      packages:
+        cert-manager:
+          enabled: true
+          namespace:
+            labels:
+              istio.io/dataplane-mode: none
+        cert-manager-trust-manager:
+          enabled: true
+          namespace:
+            labels:
+              istio.io/dataplane-mode: none
+        cert-manager-approver-policy:
+          enabled: true
+          namespace:
+            labels:
+              istio.io/dataplane-mode: none
+    asserts:
+      - hasDocuments:
+          count: 3
+      - equal:
+          documentIndex: 0
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none
+      - equal:
+          documentIndex: 1
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none
+      - equal:
+          documentIndex: 2
+          path: metadata.labels["istio.io/dataplane-mode"]
+          value: none

@@ -27,8 +27,6 @@ tests:
                 enabled: false
               externalSecrets:
                 enabled: false
-              backstage:
-                enabled: false
             twistlock:
               enabled: false
             istiod:

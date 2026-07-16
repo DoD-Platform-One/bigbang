@@ -30,7 +30,7 @@ upstream:
         {{- include "secretsPullSecretsWithName" . | nindent 8 }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   # Setting to false as Gatekeeper is not in the mesh
   hbonePortInjection:
     enabled: false

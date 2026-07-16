@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Metrics Server - Namespace
+tests:
+  - it: should not render a Namespace by default
+    set:
+      addons:
+        metricsServer:
+          enabled: true
+    template: metrics-server/namespace.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should target kube-system by default
+    set:
+      addons:
+        metricsServer:
+          enabled: true
+    template: metrics-server/helmrelease.yaml
+    asserts:
+      - equal:
+          path: spec.targetNamespace
+          value: kube-system
+
+  - it: should target a custom namespace
+    set:
+      addons:
+        metricsServer:
+          enabled: true
+          namespace:
+            name: custom-metrics
+    template: metrics-server/helmrelease.yaml
+    asserts:
+      - equal:
+          path: spec.targetNamespace
+          value: custom-metrics
+
+  - it: should render the custom namespace when create is enabled
+    set:
+      addons:
+        metricsServer:
+          enabled: true
+          namespace:
+            name: custom-metrics
+            create: true
+            labels:
+              istio-injection: disabled
+              custom-label: custom-value
+            annotations:
+              custom-annotation: custom-value
+    template: metrics-server/namespace.yaml
+    asserts:
+      - isKind:
+          of: Namespace
+      - equal:
+          path: metadata.name
+          value: custom-metrics
+      - equal:
+          path: metadata.labels["app.kubernetes.io/name"]
+          value: metrics-server
+      - equal:
+          path: metadata.labels["istio-injection"]
+          value: disabled
+      - equal:
+          path: metadata.labels["custom-label"]
+          value: custom-value
+      - equal:
+          path: metadata.annotations["custom-annotation"]
+          value: custom-value
+
+  - it: should render the registry secret in the custom namespace
+    set:
+      registryCredentials:
+        registry: registry1.dso.mil
+        username: test
+        password: test
+      addons:
+        metricsServer:
+          enabled: true
+          namespace:
+            name: custom-metrics
+    template: metrics-server/imagepullsecret.yaml
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.namespace
+          value: custom-metrics

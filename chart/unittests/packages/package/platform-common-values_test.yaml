@@ -109,6 +109,30 @@ tests:
           path: bb-common.networkPolicies.enabled
           value: false
 
+  - it: should enable networkPolicies when ambient is enabled even if networkPolicies.enabled is false
+    set:
+      networkPolicies.enabled: false
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.enabled
+          value: true
+      - equal:
+          path: bb-common.istio.authorizationPolicies.enabled
+          value: true
+      - equal:
+          path: bb-common.istio.authorizationPolicies.generateFromNetpol
+          value: true
+
+  - it: should enable networkPolicies when ambient is enabled via ztunnel
+    set:
+      networkPolicies.enabled: false
+      ztunnel.enabled: true
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.enabled
+          value: true
+
   - it: should pass through networkPolicies egress settings
     set:
       networkPolicies.egress.enabled: true

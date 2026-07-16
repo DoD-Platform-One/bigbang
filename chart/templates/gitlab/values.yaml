@@ -20,7 +20,7 @@ domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") $istioEnabled }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $consolidatedObjStoreEnabled := dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
@@ -105,20 +105,30 @@ routes:
       port: 8090
       selector:
         app: gitlab-pages
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.gitlab.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - 'registry1.dso.mil'
+      - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+      - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
+      - registry.{{ $domainName }}
+      - keycloak.{{ $domainName }}
 
 {{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
-  enabled: {{ $istioInjection }}
+  enabled: {{ $istioEnabled }}
   sidecar:
     enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
   ambient:
     enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $istioHardened }}
-    generateFromNetpol: {{ $istioHardened }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlab.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlab.values .) }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress:
@@ -217,6 +227,15 @@ networkPolicies:
           definition:
             database-subnets: true
 
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://gitlab.%s" $domainName | quote }}
+  scripts:
+    envs:
+      GITLAB_REGISTRY: registry.{{ $domainName }}
+
 upstream:
   {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
   redis:
@@ -267,7 +286,7 @@ upstream:
       {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
-    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
     metrics:
       serviceMonitor:
         endpointConfig:
@@ -307,7 +326,7 @@ upstream:
         annotations:
           {{ include "istioAnnotation" . }}
       {{- end }}
-      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -321,7 +340,7 @@ upstream:
 
     {{- if or $iamProfile $istioInjection }}
     webservice:
-    {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -367,7 +386,7 @@ upstream:
     gitaly:
       annotations:
         {{ include "istioAnnotation" . }}
-      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -381,7 +400,7 @@ upstream:
     gitlab-shell:
       annotations:
         {{ include "istioAnnotation" . }}
-      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -396,7 +415,7 @@ upstream:
     kas:
       annotations:
         {{ include "istioAnnotation" . }}
-      {{- if and (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlab.values) "STRICT") $istioInjection }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
         serviceMonitor:
           endpointConfig:
@@ -602,6 +621,7 @@ global:
       {{- end }}
 
     dependencyProxy:
+      enabled: true
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
       bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-dependency-proxy
       {{- else }}

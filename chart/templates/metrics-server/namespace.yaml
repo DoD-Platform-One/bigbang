@@ -1,19 +1,28 @@
 {{- $enableFlag := .Values.addons.metricsServer.enabled | toString }}
 {{- $existingMetricsApi := (.Capabilities.APIVersions.Has "metrics.k8s.io/v1beta1") }}
 {{- $existingMetricsHelmRelease := (lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" "bigbang" "metrics-server") }}
-{{- if or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease)) }}
+{{- $metricsServerNamespace := dig "namespace" "name" "kube-system" .Values.addons.metricsServer }}
+{{- if and (dig "namespace" "create" false .Values.addons.metricsServer) (or ( eq $enableFlag "true") (and (eq $enableFlag "auto") (or (not $existingMetricsApi) $existingMetricsHelmRelease))) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $labels := include "commonLabels" . | fromYaml -}}
+{{- $labels = set $labels "app.kubernetes.io/name" "metrics-server" -}}
+{{- $labels = set $labels "app.kubernetes.io/component" "cluster-utilities" -}}
+{{- if eq (include "ambientEnabled" .) "true" }}
+{{- $labels = set $labels "istio.io/dataplane-mode" "ambient" -}}
+{{- else }}
+{{- $labels = set $labels "istio-injection" (ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.metricsServer) "enabled"))) -}}
+{{- end }}
+{{- if (dig "namespace" "labels" nil .Values.addons.metricsServer) -}}
+{{- $labels = mustMergeOverwrite $labels .Values.addons.metricsServer.namespace.labels -}}
+{{- end }}
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: {{ $metricsServerNamespace }}
   labels:
-    app.kubernetes.io/name: metrics-server
-    app.kubernetes.io/component: "cluster-utilities"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.metricsServer) "enabled")) }}
-    {{- end }}
-  name: metrics-server
+    {{- toYaml $labels | nindent 4 }}
+  {{- if (dig "namespace" "annotations" nil .Values.addons.metricsServer) }}
+  annotations:
+    {{- toYaml .Values.addons.metricsServer.namespace.annotations | nindent 4 }}
+  {{- end }}
 {{- end }}

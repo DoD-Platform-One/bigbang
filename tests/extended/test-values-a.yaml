@@ -1,0 +1,32 @@
+fluentbit:
+  enabled: true
+elasticsearchKibana:
+  enabled: true
+eckOperator:
+  enabled: true
+
+# Disable alloy/loki in favor of fluentbit/elasticsearch-kibana/eck-operator for logging/observability in this bucket
+alloy:
+  enabled: false
+loki:
+  enabled: false
+
+addons:
+  minioOperator:
+    enabled: true
+  argocd:
+    enabled: true
+  fortify:
+    enabled: true
+  anchoreEnterprise:
+    enabled: true
+  vault:
+    enabled: true
+  keycloak:
+    enabled: true
+  sonarqube:
+    enabled: true
+  mattermostOperator:
+    enabled: true
+  mattermost:
+    enabled: true

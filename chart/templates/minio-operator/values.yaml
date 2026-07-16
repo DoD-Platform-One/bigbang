@@ -43,7 +43,7 @@ upstream:
     {{- end }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
@@ -57,15 +57,20 @@ istio:
   enabled: {{ $istioEnabled }}
   ambient:
     enabled: {{ include "ambientEnabled" . }}
-  hardened:
-    enabled: {{ or
-      (dig "istio" "hardened" "enabled" false .Values.addons.minioOperator.values)
-      (dig "istio" "hardened" "enabled" false .Values.addons.minio.values)
-      (dig "hardened" "enabled" false .Values.istiod.values)
-    }}
   console:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
+
+  authorizationPolicies:
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.minioOperator.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.minioOperator.values .) }}
+
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.minioOperator.values }}
+      hosts:
+      - repo1.dso.mil
 
 {{- if $istioEnabled }}
 annotations:

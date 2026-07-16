@@ -1245,18 +1245,6 @@
             }
           }
         },
-        "backstage": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/basePackage"
-            }
-          ],
-          "properties": {
-            "istio": {
-              "$ref": "#/$defs/istio"
-            }
-          }
-        },
         "minioOperator": {
           "allOf": [
             {
@@ -1439,8 +1427,45 @@
                 "auto"
               ]
             },
+            "sourceType": {
+              "$ref": "#/$defs/sourceType"
+            },
             "git": {
               "$ref": "#/$defs/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/helmRepo"
+            },
+            "automountServiceAccountToken": {
+              "type": "boolean"
+            },
+            "namespace": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "kube-system"
+                },
+                "create": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                },
+                "annotations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                }
+              },
+              "additionalProperties": false
             },
             "flux": {
               "ref": "#/$defs/flux"
@@ -1450,6 +1475,9 @@
             },
             "istio": {
               "$ref": "#/$defs/istio"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/postRenderers"
             }
           }
         },
@@ -1536,11 +1564,11 @@
           },
           "passBigBangValues": {
             "type": "boolean",
-            "default": true
+            "default": false
           },
           "bbCommonValues": {
             "type": "boolean",
-            "default": false
+            "default": true
           },
           "includeDefaultDependsOn": {
             "type": "boolean",

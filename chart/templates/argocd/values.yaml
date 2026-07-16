@@ -50,8 +50,7 @@ redis-bb:
         selector:
           app.kubernetes.io/name: redis-bb
           app.kubernetes.io/instance: argocd-argocd
-        # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-        {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
@@ -104,16 +103,79 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
   injection: {{ ternary "disabled" (dig "istio" "injection" "enabled" .Values.addons.argocd) (eq (include "ambientEnabled" .) "true") }}
   authorizationPolicies:
-    enabled: {{ $istioHardened }}
-    generateFromNetpol: {{ $istioHardened }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.argocd.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.argocd.values .) }}
 
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
+routes:
+  inbound:
+    argocd:
+      enabled: true
+      gateways:
+      - {{ include "getGatewayName" (dict "gateway" .Values.addons.argocd.ingress.gateway "root" .)}}
+      hosts:
+      - argocd.{{ $domainName }}
+      service: argocd-argocd-server
+      containerPort: 8080
+      port: 80
+      selector:
+        app.kubernetes.io/name: argocd-server
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.argocd.values }}
+      hosts:
+      - 'repo1.dso.mil'
+
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  # -- Toggle BigBang networkPolicies integration
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
+  ingress:
+    to:
+      # -- Ingress to argocd-server for metrics from prometheus
+      argocd-server:8083:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to argocd-repo-server for metrics from prometheus
+      argocd-repo-server:8084:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to argocd-application-controller for metrics from prometheus
+      argocd-application-controller:8082:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+      # -- Ingress to redis from grafana for dashboards
+      redis-bb:6379:
+        from:
+          k8s:
+            monitoring/grafana: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.grafana.enabled }}
+      # -- Ingress to redis-exporter for metrics from prometheus
+      redis-bb:9121:
+        from:
+          k8s:
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.monitoring.enabled }}
+  egress:
+    from:
+      # -- Egress to tempo for tracing from all pods
+      "*":
+        to:
+          k8s:
+            tempo/tempo:9411: {{ and .Values.tempo.enabled (ne (include "ambientEnabled" .) "true") }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://argocd.%s" $domainName | quote }}
+  scripts:
+    envs:
+      ARGOCD_SERVER: {{ printf "https://argocd.%s" $domainName | quote }}
 
 upstream:
   {{- if .Values.addons.argocd.redis.host }}
@@ -151,8 +213,7 @@ upstream:
   controller:
     image:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https
@@ -175,8 +236,7 @@ upstream:
     config:
       # Must be enabled for plugins included in PlatformOne image.
       kustomize.buildOptions: "--enable-alpha-plugins"
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https
@@ -200,8 +260,7 @@ upstream:
     - secretRef:
         name: argocd-iam-secret
     {{- end }}     
-    # conditional passes only for default istio: enabled, mTLS: SCRICT, istio injection: enabled
-    {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.argocd.values) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.argocd .)) "true" }}
     metrics:
       serviceMonitor:
         scheme: https

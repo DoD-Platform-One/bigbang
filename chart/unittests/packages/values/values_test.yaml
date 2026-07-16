@@ -1,0 +1,95 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Global - Values Tests
+templates:
+  - templates/neuvector/values.yaml
+  - templates/twistlock/values.yaml
+  - templates/elasticsearch-kibana/values.yaml
+  - templates/alloy/values.yaml
+  - templates/anchore-enterprise/values.yaml
+  - templates/argocd/values.yaml
+  - templates/authservice/values.yaml
+  - templates/bbctl/values.yaml
+  - templates/eck-operator/values.yaml
+  - templates/fluentbit/values.yaml
+  - templates/fortify/values.yaml
+  - templates/gitlab/values.yaml
+  - templates/gitlab-runner/values.yaml
+  - templates/grafana/values.yaml
+  - templates/harbor/values.yaml
+  - templates/headlamp/values.yaml
+  - templates/istiod/values.yaml
+  - templates/keycloak/values.yaml
+  - templates/kiali/values.yaml
+  - templates/kyverno-reporter/values.yaml
+  - templates/loki/values.yaml
+  - templates/mattermost/values.yaml
+  - templates/mattermost-operator/values.yaml
+  - templates/mimir/values.yaml
+  - templates/minio/values.yaml
+  - templates/monitoring/values.yaml
+  - templates/renovate/values.yaml
+  - templates/sonarqube/values.yaml
+  - templates/tempo/values.yaml
+  - templates/thanos/values.yaml
+  - templates/vault/values.yaml
+  - templates/velero/values.yaml
+  - templates/minio-operator/values.yaml
+tests:
+  - it: enables authorization policies if ambient is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      istio:
+        ambient:
+          enabled: true
+    asserts:
+      - equal:
+          path: istio.authorizationPolicies.enabled
+          value: true
+  - it: enables networkPolicies if ambient is enabled even when networkPolicies.enabled is false
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      networkPolicies:
+        enabled: false
+      istio:
+        ambient:
+          enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.enabled
+          value: true
+  - it: enables networkPolicies if ztunnel is enabled even when networkPolicies.enabled is false
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      networkPolicies:
+        enabled: false
+      ztunnel:
+        enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.enabled
+          value: true
+  - it: disables networkPolicies when both networkPolicies.enabled and ambient are false
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      networkPolicies:
+        enabled: false
+    asserts:
+      - equal:
+          path: networkPolicies.enabled
+          value: false

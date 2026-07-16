@@ -21,8 +21,7 @@ openshift: {{ .Values.openshift }}
 
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-  {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
-  {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+  {{- if eq (include "metricsSidecarMtls" (list .Values.addons.anchoreEnterprise .)) "true" }}
   serviceMonitor:
     scheme: "https"
     tlsConfig:
@@ -30,7 +29,6 @@ monitoring:
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
       insecureSkipVerify: true
-  {{- end }}
   {{- end }}
 
 routes:
@@ -89,6 +87,8 @@ routes:
       - 'auth.docker.io'
       - 'registry-1.docker.io'
       - 'index.docker.io'
+      - 'production.cloudflare.docker.com'
+      - 'production.cloudfront.docker.com'
       - 'docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com' # https://docs.docker.com/desktop/setup/allow-list/
 
 istio:
@@ -103,11 +103,11 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.anchoreEnterprise.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.anchoreEnterprise.values .) }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress:
@@ -182,7 +182,7 @@ networkPolicies:
       "*":
         to:
           k8s:
-            tempo/tempo:9411: {{ .Values.tempo.enabled }}
+            tempo/tempo:9411: {{ and .Values.tempo.enabled (ne (include "ambientEnabled" .) "true") }}
           definition:
             database-subnets: {{ $externalPostgresEnabled }}
       api:
@@ -213,6 +213,15 @@ networkPolicies:
           definition:
             redis-subnets: {{ $externalRedisEnabled }}
   additionalPolicies: []
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  scripts:
+    envs:
+      ANCHORE_CLI_URL: {{ printf "https://anchore-api.%s/v1" $domainName | quote }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://anchore.%s" $domainName | quote }}
 
 sso:
   enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
@@ -249,6 +258,7 @@ postgresql:
   {{- end }}
 
 upstream:
+  setServiceAppProtocol: {{ $istioEnabled }}
   imagePullPolicy: {{ .Values.imagePullPolicy }}
   # imagePullSecretName used for main enterprise charts and some bignbang templates
   {{- if ( include "imagePullSecret" . ) }}
@@ -280,6 +290,28 @@ upstream:
       service:
         ports:
           postgresql: {{ .Values.addons.anchoreEnterprise.database.port }}
+    {{- end }}
+
+  # This entire section can be removed once istio sidecar is no longer supported
+  # Temporary workaround for https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/work_items/283
+  reports:
+    annotations:
+    {{- with dig "upstream" "reports" "annotations" dict .Values.addons.anchoreEnterprise.values }}
+      {{ toYaml . | nindent 6}}
+    {{- end }}
+    {{- if eq (include "ambientEnabled" .) "false" }}
+      traffic.sidecar.istio.io/excludeInboundPorts: "8558"
+    {{- end }}
+
+  # This entire section can be removed once istio sidecar is no longer supported
+  # Temporary workaround for https://repo1.dso.mil/big-bang/product/packages/anchore-enterprise/-/work_items/283
+  api:
+    annotations:
+    {{- with dig "upstream" "api" "annotations" dict .Values.addons.anchoreEnterprise.values }}
+      {{ toYaml . | nindent 6}}
+    {{- end }}
+    {{- if eq (include "ambientEnabled" .) "false" }}
+      traffic.sidecar.istio.io/excludeOutboundPorts: "8558"
     {{- end }}
 
   ui:
@@ -320,15 +352,13 @@ ui-redis:
         selector:
           app.kubernetes.io/name: ui-redis
           app.kubernetes.io/instance: anchore-enterprise
-        {{- if and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.anchoreEnterprise) "enabled") }}
-        {{- if (eq (dig "values" "istio" "mtls" "mode" "STRICT" .Values.addons.anchoreEnterprise) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.anchoreEnterprise .)) "true" }}
         scheme: "https"
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem
           keyFile: /etc/prom-certs/key.pem
           insecureSkipVerify: true
-        {{- end }}
         {{- end }}
       prometheusRule:
         enabled: true

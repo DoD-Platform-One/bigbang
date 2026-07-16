@@ -136,16 +136,9 @@ flowchart BT
             Sonarqube
           end
 
-          subgraph DT-2[ ]
-          style DT-2 fill:transparent,stroke:transparent
+          subgraph Repo[Repositories]
           direction BT
-            subgraph Repo[Repositories]
-            direction BT
-              Harbor
-            end
-            subgraph UI[Dashboards and UIs]
-              Backstage
-            end
+            Harbor
           end
 
         end
@@ -349,7 +342,6 @@ DevSecOps tools include packages that programmers and security teams use to plan
 |Fortify|[Fortify](./addons/fortify.md)|Security scanning tool|[fortify](https://repo1.dso.mil/big-bang/product/packages/fortify)|
 |Sonarqube|[Sonarqube](./addons/sonarqube.md)|Static code analysis|[sonarqube](https://repo1.dso.mil/big-bang/product/packages/sonarqube)|
 |Harbor|[Harbor](./addons/harbor.md)|Container registry|[harbor](https://repo1.dso.mil/big-bang/product/packages/harbor)|
-|Backstage|[Backstage](./addons/backstage.md)|Developer portal platform|[backstage](https://repo1.dso.mil/big-bang/product/packages/backstage)|
 
 ## Further Information
 

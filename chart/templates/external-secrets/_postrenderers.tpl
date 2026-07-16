@@ -1,11 +1,11 @@
-{{- define "anchore-enterprise.addAppProtocol" }}
+{{- define "externalSecrets.istioPostRenderers" }}
 - kustomize:
     patches:
       - patch: |
           - op: add
             path: /spec/ports/0/appProtocol
-            value: "http"
+            value: https
         target:
           kind: Service
-          name: "anchore-enterprise-anchore-enterprise-.*"
+          name: external-secrets-webhook
 {{- end }}

@@ -18,7 +18,7 @@
 
 {{- define "bigbang.defaults.harbor" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.addons.harbor.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.harbor.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $postgresEnabled := dig "postgresql" "enabled" true .Values.addons.harbor.values }}
 
 externalURL: https://harbor.{{ .Values.domain }}
@@ -35,17 +35,28 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.harbor.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.harbor.values .) }}
 
 routes:
   inbound:
     harbor:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.addons.harbor.ingress.gateway "root" .)}}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.harbor.values }}
+      hosts:
+      - repo1.dso.mil
+      - 'registry1.dso.mil'
+      - 'index.docker.io'
+      - 'auth.docker.io'
+      - 'production.cloudflare.docker.com'
+      - 'ib-prod-harbor-storage.s3.us-gov-west-1.amazonaws.com'
+      - 'ib-prod-harbor-storage.s3.us-gov-east-1.amazonaws.com'
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
 
@@ -66,6 +77,14 @@ networkPolicies:
           k8s:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
+
+bbtests:
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://harbor.%s" .Values.domain | quote }}
+  scripts:
+    envs:
+      HARBOR_REGISTRY: {{ printf "harbor.%s" .Values.domain | quote }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}

@@ -54,11 +54,11 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   prependReleaseName: true
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
@@ -69,7 +69,6 @@ networkPolicies:
         from:
           k8s:
             kiali/kiali: {{ .Values.kiali.enabled }}
-            backstage/backstage: {{ .Values.addons.backstage.enabled }}
   egress:
     definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
@@ -82,6 +81,18 @@ networkPolicies:
         to:
           k8s:
             authservice/authservice:10003: {{ $authserviceRedisEnabled }}
+
+routes:
+  outbound:
+    grafana-bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.grafana.values }}
+      hosts:
+      - repo1.dso.mil
+
+bbtests:
+  cypress:
+    envs:
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
 
 upstream:
   {{- if eq (include "metricScrapingEnabled" .) "true" }}

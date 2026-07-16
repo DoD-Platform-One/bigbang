@@ -1,0 +1,210 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Authservice - Thanos SSO
+tests:
+- it: should render authservice HelmRelease when only Thanos SSO requires authservice
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: authservice/helmrelease.yaml
+  asserts:
+  - hasDocuments:
+      count: 1
+  - isKind:
+      of: HelmRelease
+  - equal:
+      path: metadata.name
+      value: authservice
+
+- it: should render authservice GitRepository when only Thanos SSO requires authservice
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: authservice/gitrepository.yaml
+  asserts:
+  - hasDocuments:
+      count: 1
+  - isKind:
+      of: GitRepository
+  - equal:
+      path: metadata.name
+      value: authservice
+
+- it: should render authservice Namespace when only Thanos SSO requires authservice
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: authservice/namespace.yaml
+  asserts:
+  - hasDocuments:
+      count: 1
+  - isKind:
+      of: Namespace
+  - equal:
+      path: metadata.name
+      value: authservice
+
+- it: should render authservice image pull Secret when Thanos SSO requires authservice and registry credentials are set
+  set:
+    istiod:
+      enabled: true
+    registryCredentials:
+      username: test
+      password: test
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: authservice/imagepullsecret.yaml
+  asserts:
+  - hasDocuments:
+      count: 1
+  - isKind:
+      of: Secret
+  - equal:
+      path: metadata.namespace
+      value: authservice
+
+- it: should not render authservice HelmRelease when no authservice integration is enabled
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: false
+  template: authservice/helmrelease.yaml
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: should enable istiod authservice defaults when only Thanos SSO requires authservice
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: istiod/values.yaml
+  asserts:
+  - matchRegex:
+      path: stringData.defaults
+      pattern: "authservice:\n  enabled: true"
+
+- it: should allow Thanos egress to authservice when only Thanos SSO requires authservice
+  set:
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: thanos/values.yaml
+  asserts:
+  - matchRegex:
+      path: stringData.defaults
+      pattern: "authservice/authservice:10003: true"
+
+- it: should route Thanos through the authservice waypoint in ambient mode when only Thanos SSO requires authservice
+  set:
+    istio:
+      ambient:
+        enabled: true
+    istiod:
+      enabled: true
+    monitoring:
+      sso:
+        enabled: false
+    tempo:
+      sso:
+        enabled: false
+    addons:
+      authservice:
+        enabled: false
+      thanos:
+        enabled: true
+        sso:
+          enabled: true
+  template: thanos/values.yaml
+  asserts:
+  - matchRegex:
+      path: stringData.defaults
+      pattern: "authservice-waypoint@authservice/authservice-waypoint: true"
+  - matchRegex:
+      path: stringData.defaults
+      pattern: "istio.io/use-waypoint: authservice-waypoint"

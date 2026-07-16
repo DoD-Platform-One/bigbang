@@ -68,6 +68,18 @@ istio:
 
 These values get passed into the metric server chart [here](https://repo1.dso.mil/big-bang/product/packages/metrics-server/-/blob/main/chart/values.yaml).
 
+### Namespace
+
+Big Bang deploys Metrics Server to the `kube-system` namespace by default. To deploy to a custom namespace and have Big Bang create that namespace, set:
+
+```yaml
+addons:
+  metricsServer:
+    namespace:
+      name: custom-metrics
+      create: true
+```
+
 ### High Availability
 
 Metrics Server is simply installed in high availability mode by setting the `replicas` chart value greater than `1`. The default configuration within BigBang is a 2 replica deployment.

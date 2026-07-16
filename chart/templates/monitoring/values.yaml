@@ -95,8 +95,8 @@ istio:
     custom: []
   {{- end }}
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
 routes:
   inbound:
     monitoring-prometheus:
@@ -105,9 +105,17 @@ routes:
     monitoring-alertmanager:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
+  outbound:
+    monitoring-bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.monitoring.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - prometheus.{{ $domainName }}
+      - grafana.{{ $domainName }}
+      - alertmanager.{{ $domainName }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   defaultsAsHooks:
@@ -192,6 +200,15 @@ networkPolicies:
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             logging/logging-loki: {{ .Values.loki.enabled }}
+
+bbtests:
+  cypress:
+    envs:
+      cypress_bigbang_integration: 'true'
+      cypress_prometheus_url: {{ printf "https://prometheus.%s" $domainName | quote }}
+      cypress_grafana_url: {{ printf "https://grafana.%s" $domainName | quote }}
+      cypress_alertmanager_url: {{ printf "https://alertmanager.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.monitoring "values" .Values) | nindent 6 }}
 
 openshift: {{ .Values.openshift }}
 
@@ -337,7 +354,7 @@ upstream:
       {{- end }}
       {{- if and .Values.addons.mimir.enabled (not (dig "alloyMetrics" "enabled" false .Values.alloy)) }}
       remoteWrite:
-        {{- if $istioEnabled }}
+        {{- if and $istioEnabled (not $ambientEnabled) }}
         # I promise it's not a typo; the port is 80 even though it's TLS
         - url: https://mimir-mimir-gateway.mimir.svc.cluster.local:80/api/v1/push
           writeRelabelConfigs:
@@ -396,14 +413,16 @@ upstream:
         {{- end }}
         {{- if $monitoringMtlsStrict }}    
         # Add volume/mount on thanos sidecar for Istio certs for mTLS scraping
-        volumes:
-          - emptyDir:
-              medium: Memory
-            name: istio-certs
         volumeMounts:
           - mountPath: /etc/prom-certs/
             name: istio-certs
         {{- end }}
+      {{- end }}
+      {{- if $monitoringMtlsStrict }}
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: istio-certs
       {{- end }}
       # The operator performs a strategic merge to add our imagePullPolicy definition to the default containers
       # NOTE: This functionality is not actively maintained upstream and may not work in a future monitoring upgrade
@@ -434,7 +453,7 @@ upstream:
           {{- $prometheusAuthserviceValue := (dig "selector" "value" "keycloak" .Values.addons.authservice.values) }}
           {{ $prometheusAuthserviceKey }}: {{ $prometheusAuthserviceValue }}
           {{- end }}
-          {{- if and .Values.networkPolicies.enabled .Values.addons.vault.enabled }}
+          {{- if and (eq (include "networkPoliciesEnabled" .) "true") .Values.addons.vault.enabled }}
           vault-ingress: "true"
           {{- end }}
         {{- if or $sidecarInjectionEnabled .Values.addons.vault.enabled }}
@@ -569,7 +588,7 @@ upstream:
             action: replace
             target_label: kubernetes_pod_name
       {{- end }}
-      {{- if $monitoringMtlsStrict }}    
+      {{- if $monitoringMtlsStrict }}
       # Add volume/mount for Istio certs for mTLS scraping
       volumes:
         - emptyDir:

@@ -90,6 +90,9 @@ tests:
     kiali.enabled: true
     kiali.values.istio.enabled: true
     kiali.values.routes.inbound.kiali.enabled: false # The route creates a service entry too if it's enabled; disable it for this test
+    kiali.values.routes.outbound.bb-tests.enabled: false # Manually disable templated route for test
+    kiali.values.routes.outbound.grafana.enabled: false # Manually disable templated route for test
+    kiali.values.routes.outbound.sso.enabled: false # Manually disable templated route for test
     kiali.values.istio.hardened.customServiceEntries:
       - name: "hardened-entry-1"
         spec:

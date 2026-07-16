@@ -39,8 +39,8 @@ istio:
   ambient:
     enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
 
 {{- if $istioInjection }}
 podAnnotations:
@@ -54,14 +54,13 @@ monitoring:
 
   serviceMonitor:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-    # conditional passes only for default istio: enabled, mTLS: STRICT
-    {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.mattermost) "STRICT") }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.addons.mattermost .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
     {{- end }}
 
 {{- with .Values.addons.mattermost.sso }}
@@ -78,7 +77,7 @@ sso:
 {{- end }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
@@ -125,6 +124,27 @@ routes:
       hosts:
         - {{ $ssoHost }}
       {{- end }}
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.mattermost.values }}
+      hosts:
+      - 'repo1.dso.mil'
+
+waitJob:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://chat.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.mattermost "values" .Values) | nindent 6 }}
+    # This should be removed once https://repo1.dso.mil/big-bang/product/packages/mattermost/-/work_items/271 is complete
+    resources:
+      requests:
+        cpu: "2"
+        memory: "4Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
 
 global:
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}

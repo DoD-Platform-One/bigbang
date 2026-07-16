@@ -46,6 +46,15 @@ tests:
               ports:
                 - port: 443
                   protocol: TCP
+            kafka-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 9092
+                  protocol: TCP
+                - port: 9093
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -125,6 +134,15 @@ tests:
               ports:
                 - port: 443
                   protocol: TCP
+            kafka-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 9092
+                  protocol: TCP
+                - port: 9093
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -158,7 +176,7 @@ tests:
         args:
         - helm:context
         - custom:
-            defaults: 
+            defaults:
               networkPolicies:
                 egress:
                   from:
@@ -200,6 +218,15 @@ tests:
               ports:
                 - port: 443
                   protocol: TCP
+            kafka-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 9092
+                  protocol: TCP
+                - port: 9093
+                  protocol: TCP
           from:
             custom-ingressgateway:
               to:
@@ -239,7 +266,7 @@ tests:
         args:
         - helm:context
         - custom:
-            defaults: 
+            defaults:
               networkPolicies:
                 egress:
                   from:
@@ -286,6 +313,15 @@ tests:
                     cidr: 0.0.0.0/0
               ports:
                 - port: 443
+                  protocol: TCP
+            kafka-subnets:
+              to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+              ports:
+                - port: 9092
+                  protocol: TCP
+                - port: 9093
                   protocol: TCP
           from:
             custom-ingressgateway:

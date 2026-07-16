@@ -11,9 +11,11 @@
 {{- end }}
 
 {{- define "bigbang.defaults.gitlab-runner" -}}
+{{- $domainName := .Values.domain }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled") $istioEnabled }}
+{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.gitlabRunner.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $autoRegisterEnabled := and .Values.kyverno.enabled .Values.addons.gitlab.enabled (dig "autoRegister" "enabled" true .Values.addons.gitlabRunner) }}
 
 istio:
   enabled: {{ $istioEnabled }}
@@ -22,12 +24,19 @@ istio:
   ambient:
     enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: {{ $istioHardenedEnabled }}
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlabRunner.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlabRunner.values .) }}
 
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.gitlabRunner.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - gitlab.{{ $domainName }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   egress:
@@ -53,8 +62,13 @@ networkPolicies:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   additionalPolicies: []
 
-openshift: {{ .Values.openshift }}
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://gitlab.%s" $domainName | quote }}
 
+openshift: {{ .Values.openshift }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -72,7 +86,7 @@ upstream:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
     serviceMonitor:
       enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.gitlabRunner.values) "STRICT") (eq (include "metricScrapingEnabled" .) "true") }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlabRunner .)) "true" }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
@@ -85,6 +99,11 @@ upstream:
 
   service:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
+
+  {{- if $autoRegisterEnabled }}
+  runners:
+    secret: gitlab-gitlab-runner-secret
+  {{- end }}
 
   # When istio injected, add an annotation with the istio version to the manager pods only
   {{- if $istioInjection }}

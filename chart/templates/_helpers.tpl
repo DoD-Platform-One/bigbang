@@ -30,7 +30,7 @@
         key: {{ $addvals.values.selector.key }}
               {{- end -}}
               {{- if (dig "values" "selector" "value" false $addvals) }}
-        value: {{ $addvals.values.selector.key }}
+        value: {{ $addvals.values.selector.value }}
               {{- end -}}
           {{- end -}}
         {{- end -}}
@@ -344,6 +344,7 @@ stringData:
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
   {{- $commonGatewayValues := omit ($.Values.istioGateway.values | default dict) "gateways" -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
+  {{- $istioPodAnnotations := (include "istioAnnotation" $ | fromYaml) | default dict -}}
 
   {{- $defaultImagePullConfig := dict
     "imagePullPolicy" .Values.imagePullPolicy
@@ -365,12 +366,30 @@ stringData:
       {{- $gwRecord = set $gwRecord "type" $gwType -}}
       
       {{- $gwDefaults := get $defaults.gateways $name | default dict -}}
+      {{- /*
+        Give every gateway the same upstream.serviceAccount default that
+        `public` and `passthrough` get out of the box. bb-common assumes a
+        principal of '<gatewayName>-ingressgateway-service-account'
+        so making this the umbrella default for ALL gateways means
+        user-defined gateways behave the same as the built-in ones.
+        User overlays still win because they are applied
+        after `defaults` in the HelmRelease valuesFrom chain.
+      */ -}}
+      {{- $defaultSA := printf "%s-ingressgateway-service-account" $gwRecord.serviceName -}}
+      {{- $defaultUpstreamValues := dict "serviceAccount" (dict "create" true "name" $defaultSA) -}}
+      {{- if $istioPodAnnotations }}
+        {{- $defaultUpstreamValues = set $defaultUpstreamValues "podAnnotations" $istioPodAnnotations -}}
+      {{- end }}
+      {{- $gwDefaults = mergeOverwrite $gwDefaults (dict "upstream" $defaultUpstreamValues) -}}
       {{- if $gwDefaults }}
         {{- $gwRecord = set $gwRecord "defaults" $gwDefaults -}}
       {{ end -}}
       
       {{- $gwOverlays := mustMergeOverwrite (dict "upstream" $defaultImagePullConfig) (deepCopy $commonGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
       {{- if $gwOverlays }}
+        {{- if $istioPodAnnotations }}
+          {{- $gwOverlays = mergeOverwrite $gwOverlays (dict "upstream" (dict "podAnnotations" $istioPodAnnotations)) -}}
+        {{- end }}
         {{- $gwRecord = set $gwRecord "overlays" $gwOverlays -}}
       {{ end -}}
       
@@ -438,16 +457,21 @@ bigbang.addValueIfSet can be used to nil check parameters before adding them to 
 Annotation for Istio version
 */}}
 {{- define "istioAnnotation" -}}
-{{- if (eq .Values.istiod.sourceType "git") -}}
-{{- if .Values.istiod.git.semver -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.semver | trimSuffix (regexFind "-bb.*" .Values.istiod.git.semver) }}
-{{- else if .Values.istiod.git.tag -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.tag | trimSuffix (regexFind "-bb.*" .Values.istiod.git.tag) }}
-{{- else if .Values.istiod.git.branch -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.git.branch }}
+{{- $istiod := .Values.istiod | default dict -}}
+{{- if (eq ($istiod.sourceType | default "git") "git") -}}
+{{- $git := $istiod.git | default dict -}}
+{{- if $git.semver -}}
+bigbang.dev/istioVersion: {{ $git.semver | trimSuffix (regexFind "-bb.*" $git.semver) }}
+{{- else if $git.tag -}}
+bigbang.dev/istioVersion: {{ $git.tag | trimSuffix (regexFind "-bb.*" $git.tag) }}
+{{- else if $git.branch -}}
+bigbang.dev/istioVersion: {{ $git.branch }}
 {{- end -}}
 {{- else -}}
-bigbang.dev/istioVersion: {{ .Values.istiod.helmRepo.tag }}
+{{- $helmRepo := $istiod.helmRepo | default dict -}}
+{{- if $helmRepo.tag -}}
+bigbang.dev/istioVersion: {{ $helmRepo.tag }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -731,9 +755,69 @@ valuesFrom:
 {{ .Values.istiod.enabled }}
 {{- end -}}
 
+{{- /* Returns true when authservice should be deployed or referenced by integrations. */ -}}
+{{- define "authserviceEnabled" -}}
+{{- and
+  (eq (include "istioEnabled" .) "true")
+  (or
+    .Values.addons.authservice.enabled
+    (and .Values.monitoring.enabled .Values.monitoring.sso.enabled)
+    (and .Values.tempo.enabled .Values.tempo.sso.enabled)
+    (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)
+  )
+-}}
+{{- end -}}
+
 {{- /* Returns true if ambient mode is enabled (via ztunnel or global ambient flag) */ -}}
 {{- define "ambientEnabled" -}}
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
+{{- end -}}
+
+{{- /* Returns "true" if networkPolicies should be enabled for a package.
+       True when .Values.networkPolicies.enabled is true OR ambient mode is enabled.
+       Ambient mode requires bb-common's network-policies render to run because the
+       AuthorizationPolicies that grant cross-namespace traffic on ambient workloads
+       are generated alongside the NetworkPolicies (via generateFromNetpol).
+    */ -}}
+{{- define "networkPoliciesEnabled" -}}
+{{ or .Values.networkPolicies.enabled (eq (include "ambientEnabled" .) "true") }}
+{{- end -}}
+
+{{- /* Returns "true" if authorization policies should be generated.
+       True when istio.hardened is enabled at the package or global istiod level,
+       OR when ambient mode is globally enabled.
+       Args (positional list):
+         0 - pkg:  the package's values dict (e.g. .Values.loki.values, .Values.addons.argocd.values)
+         1 - root: the root context (.)
+    */ -}}
+{{- define "authorizationPoliciesEnabled" -}}
+{{- $pkg  := index . 0 -}}
+{{- $root := index . 1 -}}
+{{- $hardened := or (dig "istio" "hardened" "enabled" false $pkg) (dig "hardened" "enabled" false $root.Values.istiod.values) -}}
+{{- $ambient  := eq (include "ambientEnabled" $root) "true" -}}
+{{ or $hardened $ambient }}
+{{- end -}}
+
+{{- /*
+Returns "true" if ServiceMonitor should use mTLS for scraping Istio-injected pods.
+Checks: global istio enabled, package istio enabled, injection enabled, not ambient mode, and mTLS STRICT mode.
+This typically gates the creation of a ServiceMonitor tlsConfig with istio-provided certs for scraping metrics from Istio-injected pods.
+insecureSkipVerify will be set to true in the tlsConfig because Prometheus does not support Istio security naming, thus skipping verifying the target pod certificate
+If any of the conditions are not met, the ServiceMonitor will be created without the tlsConfig
+Args (list):
+  - [0] pkg: the package config (e.g. .Values.loki)
+  - [1] root: root context ($)
+Usage: {{- if eq (include "metricsSidecarMtls" (list .Values.loki .)) "true" }}
+*/ -}}
+{{- define "metricsSidecarMtls" -}}
+{{- $pkg := index . 0 -}}
+{{- $root := index . 1 -}}
+{{- $globalIstioEnabled := eq (include "istioEnabled" $root) "true" -}}
+{{- $pkgIstioEnabled := dig "values" "istio" "enabled" true $pkg -}}
+{{- $injectionEnabled := ne (dig "istio" "injection" "enabled" $pkg) "disabled" -}}
+{{- $ambientEnabled := eq (include "ambientEnabled" $root) "true" -}}
+{{- $mtlsStrict := eq (dig "values" "istio" "mtls" "mode" "STRICT" $pkg) "STRICT" -}}
+{{- and $globalIstioEnabled $pkgIstioEnabled $injectionEnabled (not $ambientEnabled) $mtlsStrict -}}
 {{- end -}}
 
 {{- /* Returns dependsOn entries for Istio HelmReleases. */ -}}
@@ -842,6 +926,18 @@ networkPolicies:
   {{- end }}
 
   {{- $newGateways | toYaml }}
+{{- end }}
+
+{{- /* 
+  This helper is used for packages that perform testing against keycloak when enabled
+*/}}
+{{- define "bigbang.cypressKeycloakValues" }}
+{{- $pkg := .package -}}
+{{- $values := .values -}}
+cypress_keycloak_test_enable: {{ and $values.addons.keycloak.enabled $pkg.sso.enabled | quote }}
+cypress_keycloak_url: {{ printf "https://keycloak.%s/" $values.domain | quote }}
+cypress_tnr_username: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_username" "cypress" $values.addons.keycloak.values | quote }}
+cypress_tnr_password: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_password" "tnr_w!G33ZyAt@C8" $values.addons.keycloak.values | quote }}
 {{- end }}
 
 #######################################################################################################################################

@@ -18,9 +18,8 @@ spec:
 
   {{- toYaml $fluxSettingsAnchore | nindent 2 }}
 
-  postRenderers:
-  {{ include "anchore-enterprise.addAppProtocol" . | nindent 4 }}
   {{- if .Values.addons.anchoreEnterprise.postRenderers }}
+  postRenderers:
   {{ toYaml .Values.addons.anchoreEnterprise.postRenderers | nindent 4 }}
   {{- end }}
 

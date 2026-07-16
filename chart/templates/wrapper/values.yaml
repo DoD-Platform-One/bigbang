@@ -6,17 +6,15 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $pkg }}-wrapper-values
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
-              {{ else }}
-                {{ default (dig "namespace" "name" $pkg $vals) "" }}
-              {{ end }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+               {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+             {{ else }}
+               {{ default (dig "namespace" "name" $pkg $vals) "" }}
+             {{ end }}
 type: Opaque
 stringData:
   values.yaml: |
-    {{- $defaults := ($.Files.Get (printf "defaults/%s.yaml" $pkg) | fromYaml) -}}
-    {{- $overlays := dict "bigbang" $.Values "package" $vals -}}
-    {{- $merged := mergeOverwrite $overlays $defaults }}
+    {{- $merged := dict "bigbang" $.Values "package" $vals }}
     package:
       name: {{ $pkg }}
       {{- if (omit $merged.package "git" "helmRepo" "flux" "postRenderers" "dependsOn") }}

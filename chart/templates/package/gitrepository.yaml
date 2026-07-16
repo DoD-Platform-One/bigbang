@@ -1,11 +1,7 @@
 {{- /* Used for GitOps on a package's Helm chart */ -}}
 {{- range $pkgKey, $vals := .Values.packages -}}
-{{- if and (dig "enabled" true $vals) ($vals.git) -}}
+{{- if and (not $.Values.offline) (dig "enabled" true $vals) ($vals.git) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
-{{- $defaults := $.Files.Get (printf "defaults/%s.yaml" $pkg) -}}
-{{- if $defaults -}}
-{{- $vals := mergeOverwrite $vals ($defaults | fromYaml).package -}}
-{{- end -}}
 
 {{- $gitCredsDict := dict
   "name" $pkg
@@ -17,11 +13,11 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: {{ $pkg }}
-  namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
-              {{ else }}
-                {{ default (dig "namespace" "name" $pkg $vals) "" }}
-              {{ end }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
+               {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+             {{ else }}
+               {{ default (dig "namespace" "name" $pkg $vals) "" }}
+             {{ end }}
   labels:
     app.kubernetes.io/name: {{ $pkg }}
     {{- include "commonLabels" $ | nindent 4 }}

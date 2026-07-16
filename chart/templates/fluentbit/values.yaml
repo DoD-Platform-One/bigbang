@@ -8,6 +8,7 @@
 {{- end }}
 
 {{- define "bigbang.defaults.fluentbit" -}}
+{{- $domainName := .Values.domain }}
 {{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
@@ -33,7 +34,7 @@
 {{- $lokiWriteDestUrl := printf "%s.logging" $lokiServiceName }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   istioNamespaceSelector:
@@ -83,8 +84,19 @@ istio:
   ambient:
     enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.fluentbit.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.fluentbit.values .) }}
+
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.fluentbit.values }}
+      hosts:
+      - 'repo1.dso.mil'
+      - grafana.{{ $domainName }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
 
 openshift: {{ .Values.openshift }}
 
@@ -106,13 +118,13 @@ upstream:
     scrapeTimeout: 10s
     selector:
       prometheus: monitoring-monitoring-kube-prometheus
-    {{- if $istioInjection }}
+    {{- if eq (include "metricsSidecarMtls" (list .Values.fluentbit .)) "true" }}
     scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
       keyFile: /etc/prom-certs/key.pem
-      insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+      insecureSkipVerify: true
     {{- end }}
 
   dashboards:

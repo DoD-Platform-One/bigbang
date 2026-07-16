@@ -12,7 +12,7 @@
   {{- $neuvectorMetricsPass = join "" (list (randAlphaNum 12) (randAlpha 2 | upper) (randAlpha 2 | lower) (randNumeric 2)) }}
 {{- end }}
 
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.neuvector.values) (dig "hardened" "enabled" false .Values.istiod.values) (dig "hardened" "enabled" false .Values.neuvector.values) }}
+{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.neuvector.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 domain: {{ default .Values.domain .Values.hostname }}
@@ -28,17 +28,22 @@ istio:
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.neuvector.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.neuvector.values .) }}
 
 routes:
   inbound:
     neuvector:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.neuvector.ingress.gateway "root" .)}}
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.neuvector.values }}
+      hosts:
+      - repo1.dso.mil
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
 
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
@@ -56,6 +61,13 @@ networkPolicies:
         to:
           definition:
             sso: {{ .Values.neuvector.sso.enabled }}
+
+bbtests:
+  enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
+  cypress:
+    envs:
+      cypress_url: {{ printf "https://neuvector.%s" .Values.domain | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.neuvector "values" .Values) | nindent 6 }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -126,13 +138,13 @@ monitor:
     {{- end }}
     serviceMonitor:
       enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-      {{- if and $istioInjection (eq (dig "istio" "mtls" "mode" "STRICT" .Values.neuvector.values) "STRICT") (eq (include "metricScrapingEnabled" .) "true") }}
+      {{- if eq (include "metricsSidecarMtls" (list .Values.neuvector .)) "true" }}
       scheme: https
       tlsConfig:
         caFile: /etc/prom-certs/root-cert.pem
         certFile: /etc/prom-certs/cert-chain.pem
         keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
+        insecureSkipVerify: true
       {{- end }}
 
     svc:

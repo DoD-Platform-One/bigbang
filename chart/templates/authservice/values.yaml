@@ -1,5 +1,4 @@
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- if and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled) (and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled)) }}
+{{- if eq (include "authserviceEnabled" .) "true" }}
 
 {{- /* Create a cleaned copy of package config and merge deprecated paths into current paths */ -}}
 {{- $authservicePackage := deepCopy .Values.addons.authservice -}}
@@ -45,8 +44,8 @@ istio:
     enabled: {{ include "ambientEnabled" . }}
 
   authorizationPolicies:
-    enabled: {{ $istioHardenedEnabled }}
-    generateFromNetpol: true
+    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.authservice.values .) }}
+    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.authservice.values .) }}
 
   clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
 
@@ -69,7 +68,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled | default false }}
 
 networkPolicies:
-  enabled: {{ .Values.networkPolicies.enabled | default false }}
+  enabled: {{ include "networkPoliciesEnabled" . }}
   hbonePortInjection:
     enabled: {{ include "ambientEnabled" . }}
   ingress: 
@@ -155,13 +154,13 @@ redis-bb:
         selector: 
           app.kubernetes.io/name: redis-bb
           app.kubernetes.io/instance: authservice-authservice
-        {{- if and $istioEnabled (eq (dig "istio" "mtls" "mode" "STRICT" .Values.addons.authservice.values) "STRICT") }}
+        {{- if eq (include "metricsSidecarMtls" (list .Values.addons.authservice .)) "true" }}
         scheme: https
         tlsConfig:
           caFile: /etc/prom-certs/root-cert.pem
           certFile: /etc/prom-certs/cert-chain.pem
           keyFile: /etc/prom-certs/key.pem
-          insecureSkipVerify: true  
+          insecureSkipVerify: true
         {{- end }}
       prometheusRule:
         enabled: true 
@@ -216,7 +215,7 @@ chains:
   {{ .Values.addons.authservice.chains | toYaml | nindent 2 }}
   {{- end }}
 
-  {{- if and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled }}
+  {{- if and .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled (not (hasKey (.Values.addons.authservice.chains | default dict) "thanos")) }}
   thanos:
     match:
       header: ":authority"
@@ -238,6 +237,7 @@ chains:
   {{- end }}
 
   {{- if and .Values.monitoring.enabled .Values.monitoring.sso.enabled }}
+  {{- if not (hasKey (.Values.addons.authservice.chains | default dict) "prometheus") }}
   prometheus:
     match:
       header: ":authority"
@@ -256,7 +256,9 @@ chains:
     token_uri: {{ include "sso.oidc.token" . }}
     logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
     {{- end }}
+  {{- end }}
 
+  {{- if not (hasKey (.Values.addons.authservice.chains | default dict) "alertmanager") }}
   alertmanager:
     match:
       header: ":authority"
@@ -275,5 +277,6 @@ chains:
     token_uri: {{ include "sso.oidc.token" . }}
     logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
     {{- end }}
+  {{- end }}
   {{- end }}
 {{- end -}}
