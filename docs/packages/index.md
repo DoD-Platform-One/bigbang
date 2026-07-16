@@ -15,12 +15,16 @@
 
 ## Core
 
+Core packages are included in the Big Bang umbrella chart and configured outside the `addons` key in `values.yaml`.
+
 | Package | Status | Monitoring | Tracing | Network Policies | mTLS |
 |----|----|----|----|----|----|
 | [Istio CRDs](https://repo1.dso.mil/big-bang/product/packages/istio-crds) |  ![Istio CRDs Build](https://repo1.dso.mil/big-bang/product/packages/istio-crds/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Daemon](https://repo1.dso.mil/big-bang/product/packages/istiod) |  ![Istio Core Build](https://repo1.dso.mil/big-bang/product/packages/istiod/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio Gateway](https://repo1.dso.mil/big-bang/product/packages/istio-gateway) |  ![Istio Gateway Build](https://repo1.dso.mil/big-bang/product/packages/istio-gateway/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/4906) | Yes |
 | [Istio CNI](https://repo1.dso.mil/big-bang/product/packages/istio-cni) | ![Istio CNI Build](https://repo1.dso.mil/big-bang/product/packages/istio-cni/badges/main/pipeline.svg) | N/A | N/A | N/A | N/A |
+| [Gateway API](https://repo1.dso.mil/big-bang/product/packages/gateway-api) | ![Gateway API Build](https://repo1.dso.mil/big-bang/product/packages/gateway-api/badges/main/pipeline.svg) | N/A | N/A | N/A | N/A |
+| [ztunnel](https://repo1.dso.mil/big-bang/product/packages/ztunnel) | ![ztunnel Build](https://repo1.dso.mil/big-bang/product/packages/ztunnel/badges/main/pipeline.svg) | N/A | N/A | Yes | N/A |
 | [Kiali](https://repo1.dso.mil/big-bang/product/packages/kiali) |  ![Kiali Build](https://repo1.dso.mil/big-bang/product/packages/kiali/badges/main/pipeline.svg) | No | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/589) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1296) |
 | [Prometheus Operator CRDs](https://repo1.dso.mil/big-bang/product/packages/prometheus-operator-crds) | ![Prometheus Operator CRDs Build](https://repo1.dso.mil/big-bang/product/packages/prometheus-operator-crds/badges/main/pipeline.svg) | N/A | N/A | N/A | N/A |
 | [Monitoring](https://repo1.dso.mil/big-bang/product/packages/monitoring) |  ![Monitoring Build](https://repo1.dso.mil/big-bang/product/packages/monitoring/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/509) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1900) |
@@ -34,9 +38,11 @@
 | [Kyverno](https://repo1.dso.mil/big-bang/product/packages/kyverno) |  ![Kyverno Build](https://repo1.dso.mil/big-bang/product/packages/kyverno/badges/main/pipeline.svg) | Yes | N/A | [Yes](https://repo1.dso.mil/big-bang/product/packages/kyverno/-/merge_requests/2) | N/A |
 | [Kyverno Policies](https://repo1.dso.mil/big-bang/product/packages/kyverno-policies) |  ![Kyverno Build](https://repo1.dso.mil/big-bang/product/packages/kyverno-policies/badges/main/pipeline.svg) | N/A | N/A | Yes \* | N/A |
 | [Kyverno Reporter](https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter) |  ![Kyverno Build](https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter/-/merge_requests/1) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/kyverno-reporter/-/merge_requests/1) |
-| [Alloy](https://repo1.dso.mil/big-bang/product/packages/alloy) | ![Alloy Build](https://repo1.dso.mil/big-bang/product/packages/alloy/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/product/packages/alloy/-/merge_requests/38) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/alloy/-/merge_requests/30)
+| [Alloy](https://repo1.dso.mil/big-bang/product/packages/alloy) | ![Alloy Build](https://repo1.dso.mil/big-bang/product/packages/alloy/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/product/packages/alloy/-/merge_requests/38) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/alloy/-/merge_requests/30) |
 | [Loki](https://repo1.dso.mil/big-bang/product/packages/loki) |  ![Loki Build](https://repo1.dso.mil/big-bang/product/packages/loki/badges/main/pipeline.svg) | [Yes](https://repo1.dso.mil/big-bang/product/packages/loki/-/merge_requests/8) | [Yes](https://repo1.dso.mil/big-bang/product/packages/loki/-/merge_requests/15) | [Yes](https://repo1.dso.mil/big-bang/product/packages/loki/-/merge_requests/1) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1516) |
 | [Tempo](https://repo1.dso.mil/big-bang/product/packages/tempo) |  ![Tempo Build](https://repo1.dso.mil/big-bang/product/packages/tempo/badges/main/pipeline.svg) | [Yes](https://repo1.dso.mil/big-bang/product/packages/tempo/-/merge_requests/2) | [Yes](https://repo1.dso.mil/big-bang/product/packages/tempo/-/merge_requests/3) | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1253) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1762) |
+| [Renovate](https://repo1.dso.mil/big-bang/product/packages/renovate) |  ![Renovate Build](https://repo1.dso.mil/big-bang/product/packages/renovate/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/packages/renovate/-/blob/main/chart/values.yaml?ref_type=heads#L305) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/renovate/-/blob/main/chart/values.yaml?ref_type=heads#L295) |
+| [bbctl](https://repo1.dso.mil/big-bang/product/packages/bbctl) | ![bbctl Build](https://repo1.dso.mil/big-bang/product/packages/bbctl/badges/main/pipeline.svg) | No | No | No | N/A |
 
 > `*` inherited from Kyverno when installed in the same namespace.
 
@@ -79,9 +85,6 @@
 |----|----|----|----|----|----|
 | [MinIO](https://repo1.dso.mil/big-bang/product/packages/minio) |  ![MinIO Build](https://repo1.dso.mil/big-bang/product/packages/minio/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/550) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1566) |
 | [MinIO Operator](https://repo1.dso.mil/big-bang/product/packages/minio-operator) |  ![MinIO Operator Build](https://repo1.dso.mil/big-bang/product/packages/minio-operator/badges/main/pipeline.svg) | [N/A](https://repo1.dso.mil/big-bang/product/packages/minio-operator/-/blob/main/docs/prometheus.md) | Yes | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/685) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1554) |
-| [Redis](https://repo1.dso.mil/big-bang/product/packages/redis) |  ![Redis Build](https://repo1.dso.mil/big-bang/product/packages/redis/badges/main/pipeline.svg) | [Yes](https://repo1.dso.mil/big-bang/product/packages/minio-operator/-/blob/main/docs/prometheus.md) | Yes | [Yes](https://repo1.dso.mil/big-bang/product/packages/redis/-/blob/main/chart/values.yaml?ref_type=heads#L57) | Yes |
-| [Renovate](https://repo1.dso.mil/big-bang/product/packages/renovate) |  ![Renovate Build](https://repo1.dso.mil/big-bang/product/packages/renovate/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/packages/renovate/-/blob/main/chart/values.yaml?ref_type=heads#L305) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/renovate/-/blob/main/chart/values.yaml?ref_type=heads#L295) |
-| [wrapper](https://repo1.dso.mil/big-bang/product/packages/wrapper) |  ![Renovate Build](https://repo1.dso.mil/big-bang/product/packages/wrapper/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml?ref_type=heads#L5) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/blob/main/chart/values.yaml?ref_type=heads#L52) |
 
 ## Cluster Utilities
 
@@ -92,19 +95,49 @@
 | [Metrics Server](https://repo1.dso.mil/big-bang/product/packages/metrics-server) |  ![Metrics Server Build](https://repo1.dso.mil/big-bang/product/packages/metrics-server/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1738) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/1968) |
 | [Thanos](https://repo1.dso.mil/big-bang/product/packages/thanos) |  ![Thanos Build](https://repo1.dso.mil/big-bang/product/packages/thanos/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/3113) |
 | [Mimir](https://repo1.dso.mil/big-bang/product/packages/mimir) |  ![Mimir Build](https://repo1.dso.mil/big-bang/product/packages/mimir/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/bigbang/-/merge_requests/5378) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/packages/mimir/-/blob/main/chart/values.yaml?ref_type=heads#L213) |
-| [bbctl](https://repo1.dso.mil/big-bang/product/packages/bbctl) |  ![bbctl Build](https://repo1.dso.mil/big-bang/product/packages/bbctl/badges/main/pipeline.svg) | No | No | No | N/A |
+| [Headlamp](https://repo1.dso.mil/big-bang/product/packages/headlamp) | ![Headlamp Build](https://repo1.dso.mil/big-bang/product/packages/headlamp/badges/main/pipeline.svg) | Yes | Yes | Yes | Yes (STRICT) |
 
-## Community
+# Supporting Repositories
+
+The following active repositories are hosted in the [`product/packages`](https://repo1.dso.mil/groups/big-bang/product/packages) subgroup but provide shared package libraries and tooling rather than standalone deployable packages.
+
+| Repository | Status | Purpose |
+|----|----|----|
+| [bb-common](https://repo1.dso.mil/big-bang/product/packages/bb-common) | ![bb-common Build](https://repo1.dso.mil/big-bang/product/packages/bb-common/badges/main/pipeline.svg) | Common Helm library chart for Big Bang packages |
+| [Gluon](https://repo1.dso.mil/big-bang/product/packages/gluon) | ![Gluon Build](https://repo1.dso.mil/big-bang/product/packages/gluon/badges/master/pipeline.svg) | Shared automation and tooling for Big Bang packages |
+| [wrapper](https://repo1.dso.mil/big-bang/product/packages/wrapper) | ![wrapper Build](https://repo1.dso.mil/big-bang/product/packages/wrapper/badges/main/pipeline.svg) | Wrapper chart for deploying arbitrary big bang packages with big bang capabilities |
+
+# Maintained Packages
+
+[Maintained packages](https://repo1.dso.mil/groups/big-bang/product/maintained) are owned and updated by the Big Bang team and tested in their package pipelines, but are not included in the Big Bang umbrella chart. They can be deployed alongside umbrella packages with the [`packages` key](../installation/environments/extra-package-deployment.md) in `values.yaml`. Support is limited to the package running in isolation and does not cover its interactions with other packages, networking issues, or other emergent integration issues.
 
 | Package | Status | Monitoring | Tracing | Network Policies | mTLS |
 |----|----|----|----|----|----|
-| [coder-v2](https://repo1.dso.mil/big-bang/product/community/coder-v2) |  ![Coder Build](https://repo1.dso.mil/big-bang/product/community/coder-v2/badges/main/pipeline.svg) | No | No | No | No |
-| [Confluence](https://repo1.dso.mil/big-bang/product/community/confluence) |  ![Confluence Build](https://repo1.dso.mil/big-bang/product/community/confluence/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/product/community/confluence/-/blob/main/chart/values.yaml?ref_type=heads#L1778) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/community/confluence/-/blob/main/chart/values.yaml?ref_type=heads#L1726) |
-| [Crossplane](https://repo1.dso.mil/big-bang/product/community/crossplane) |  ![Crossplane Build](https://repo1.dso.mil/big-bang/product/community/crossplane/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/community/crossplane/-/blob/main/chart/values.yaml?ref_type=heads#L202) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/community/crossplane/-/blob/main/chart/values.yaml?ref_type=heads#L200) |
-| [Jenkins](https://repo1.dso.mil/big-bang/product/community/jenkins) |  ![Jenkins Build](https://repo1.dso.mil/big-bang/product/community/jenkins/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/product/community/jenkins/-/blob/main/chart/values.yaml?ref_type=heads#L851) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/community/jenkins/-/blob/main/chart/values.yaml?ref_type=heads#L992) |
-| [Jira](https://repo1.dso.mil/big-bang/product/community/jira) |  ![Jira Build](https://repo1.dso.mil/big-bang/product/community/jira/badges/main/pipeline.svg) | Yes | No | [Yes](https://repo1.dso.mil/big-bang/product/community/jira/-/blob/main/chart/values.yaml?ref_type=heads#L1292) | No |
-| [JupyterHub](https://repo1.dso.mil/big-bang/product/community/jupyterhub) |  ![JupyterHub Build](https://repo1.dso.mil/big-bang/product/community/jupyterhub/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/community/jupyterhub/-/blob/main/chart/values.yaml?ref_type=heads#L94) | No |
-| [Kubecost](https://repo1.dso.mil/big-bang/product/community/kubecost) |  ![Kubecost Build](https://repo1.dso.mil/big-bang/product/community/kubecost/badges/main/pipeline.svg) | Yes | Yes | [Yes](https://repo1.dso.mil/big-bang/product/community/kubecost/-/blob/main/chart/values.yaml?ref_type=heads#L729) | No |
-| [Parabol](https://repo1.dso.mil/big-bang/product/community/parabol) |  ![Parabol Build](https://repo1.dso.mil/big-bang/product/community/parabol/badges/main/pipeline.svg) | Yes | Yes | No | No |
-| [Rapidfort](https://repo1.dso.mil/big-bang/product/community/rapidfort) |  ![Rapidfort Build](https://repo1.dso.mil/big-bang/product/community/rapidfort/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/community/rapidfort/-/blob/main/chart/values.yaml?ref_type=heads#L972) | [Yes (STRICT)](https://repo1.dso.mil/big-bang/product/community/rapidfort/-/blob/main/chart/values.yaml?ref_type=heads#L960) |
-| [sdelements](https://repo1.dso.mil/big-bang/product/community/sdelements) |  ![sdelements Build](https://repo1.dso.mil/big-bang/product/community/sdelements/badges/main/pipeline.svg) | No | No | [Yes](https://repo1.dso.mil/big-bang/product/community/sdelements/-/blob/main/chart/values.yaml?ref_type=heads#L1265) | No |
+| [cert-manager](https://repo1.dso.mil/big-bang/product/maintained/cert-manager) | ![cert-manager Build](https://repo1.dso.mil/big-bang/product/maintained/cert-manager/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [cert-manager-approver-policy](https://repo1.dso.mil/big-bang/product/maintained/cert-manager-approver-policy) | ![cert-manager-approver-policy Build](https://repo1.dso.mil/big-bang/product/maintained/cert-manager-approver-policy/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [cert-manager-trust-manager](https://repo1.dso.mil/big-bang/product/maintained/cert-manager-trust-manager) | ![cert-manager-trust-manager Build](https://repo1.dso.mil/big-bang/product/maintained/cert-manager-trust-manager/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [Confluence](https://repo1.dso.mil/big-bang/product/maintained/confluence) | ![Confluence Build](https://repo1.dso.mil/big-bang/product/maintained/confluence/badges/main/pipeline.svg) | Yes | Yes | Yes | Yes (STRICT) |
+| [Fluentd](https://repo1.dso.mil/big-bang/product/maintained/fluentd) | ![Fluentd Build](https://repo1.dso.mil/big-bang/product/maintained/fluentd/badges/main/pipeline.svg) | Yes | Yes | Yes | Yes (STRICT) |
+| [Garage](https://repo1.dso.mil/big-bang/product/maintained/garage) | ![Garage Build](https://repo1.dso.mil/big-bang/product/maintained/garage/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [GitLab CI Pipelines Exporter](https://repo1.dso.mil/big-bang/product/maintained/gitlab-ci-pipelines-exporter) | ![GitLab CI Pipelines Exporter Build](https://repo1.dso.mil/big-bang/product/maintained/gitlab-ci-pipelines-exporter/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [Jira](https://repo1.dso.mil/big-bang/product/maintained/jira) | ![Jira Build](https://repo1.dso.mil/big-bang/product/maintained/jira/badges/main/pipeline.svg) | Yes | No | Yes | No |
+| [Karpenter](https://repo1.dso.mil/big-bang/product/maintained/karpenter) | ![Karpenter Build](https://repo1.dso.mil/big-bang/product/maintained/karpenter/badges/main/pipeline.svg) | Yes | No | No | No |
+| [Nexus Repository High Availability](https://repo1.dso.mil/big-bang/product/maintained/nxrm-ha) | ![Nexus Repository High Availability Build](https://repo1.dso.mil/big-bang/product/maintained/nxrm-ha/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [Podinfo](https://repo1.dso.mil/big-bang/product/maintained/podinfo) | ![Podinfo Build](https://repo1.dso.mil/big-bang/product/maintained/podinfo/badges/main/pipeline.svg) | Yes | No | Yes | Yes (STRICT) |
+| [Redis](https://repo1.dso.mil/big-bang/product/maintained/redis) | ![Redis Build](https://repo1.dso.mil/big-bang/product/maintained/redis/badges/main/pipeline.svg) | Yes | Yes | Yes | Yes (STRICT) |
+
+# Community Packages
+
+[Community packages](https://repo1.dso.mil/groups/big-bang/product/community) are not maintained by Platform One engineering teams. They are owned and maintained by members of the community, and Platform One does not provide updates or support for them. Community repositories that do not receive commits or updates for one year will be archived.
+
+| Package | Status | Monitoring | Tracing | Network Policies | mTLS |
+|----|----|----|----|----|----|
+| [coder-provisioner](https://repo1.dso.mil/big-bang/product/community/coder-provisioner) | ![coder-provisioner Build](https://repo1.dso.mil/big-bang/product/community/coder-provisioner/badges/main/pipeline.svg) | Yes | No | No | No |
+| [coder-v2](https://repo1.dso.mil/big-bang/product/community/coder-v2) | ![coder-v2 Build](https://repo1.dso.mil/big-bang/product/community/coder-v2/badges/main/pipeline.svg) | No | No | No | No |
+| [Crossplane](https://repo1.dso.mil/big-bang/product/community/crossplane) | ![Crossplane Build](https://repo1.dso.mil/big-bang/product/community/crossplane/badges/main/pipeline.svg) | No | No | Yes | Yes (STRICT) |
+| [Jaeger](https://repo1.dso.mil/big-bang/product/community/jaeger) | ![Jaeger Build](https://repo1.dso.mil/big-bang/product/community/jaeger/badges/main/pipeline.svg) | Yes | Yes | Yes | Yes (STRICT) |
+| [JFrog Platform](https://repo1.dso.mil/big-bang/product/community/jfrog-platform) | ![JFrog Platform Build](https://repo1.dso.mil/big-bang/product/community/jfrog-platform/badges/main/pipeline.svg) | No | No | No | No |
+| [Nexus IQ](https://repo1.dso.mil/big-bang/product/community/nexus-iq) | ![Nexus IQ Build](https://repo1.dso.mil/big-bang/product/community/nexus-iq/badges/main/pipeline.svg) | No | No | No | No |
+| [Parabol](https://repo1.dso.mil/big-bang/product/community/parabol) | ![Parabol Build](https://repo1.dso.mil/big-bang/product/community/parabol/badges/main/pipeline.svg) | Yes | Yes | No | No |
+| [RapidFort](https://repo1.dso.mil/big-bang/product/community/rapidfort) | ![RapidFort Build](https://repo1.dso.mil/big-bang/product/community/rapidfort/badges/main/pipeline.svg) | No | No | Yes | Yes (STRICT) |
+| [SD Elements](https://repo1.dso.mil/big-bang/product/community/sdelements) | ![SD Elements Build](https://repo1.dso.mil/big-bang/product/community/sdelements/badges/main/pipeline.svg) | No | No | Yes | No |
