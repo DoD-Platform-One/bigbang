@@ -1,0 +1,72 @@
+# Validate Big Bang's generic `packages` integration with a maintained package
+# that is intentionally not part of the umbrella chart.
+packages:
+  podinfo:
+    enabled: true
+    namespace:
+      name: podinfo
+    helmRelease:
+      namespace: bigbang
+    sourceType: git
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
+      path: chart
+      tag: 6.14.0-bb.0
+    bbCommonValues: true
+    values:
+      bb-common:
+        istio:
+          serviceEntries:
+            custom:
+              - name: repo1
+                spec:
+                  hosts:
+                    - repo1.dso.mil
+                  location: MESH_EXTERNAL
+                  ports:
+                    - number: 443
+                      protocol: TLS
+                      name: https
+                  resolution: DNS
+      bbtests:
+        enabled: true
+
+kyvernoPolicies:
+  values:
+    policies:
+      restrict-host-path-mount:
+        exclude:
+          any:
+            - resources: &podinfo-resources
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      restrict-host-path-write:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      restrict-volume-types:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      require-non-root-group:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      require-non-root-user:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      disallow-image-tags:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      require-drop-all-capabilities:
+        exclude:
+          any:
+            - resources: *podinfo-resources
+      restrict-image-registries:
+        exclude:
+          any:
+            - resources: *podinfo-resources
