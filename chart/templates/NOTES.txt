@@ -1,5 +1,14 @@
 Thank you for supporting Platform One!
 
+{{ if .Values.offline }}
+
+BIG BANG OFFLINE SOURCE NOTICE:
+  offline=true prevents Big Bang from creating GitRepository resources for integrated packages,
+  additional packages, and the package wrapper. HelmReleases configured with Git sources still
+  reference those resources. Ensure each required GitRepository already exists in the namespace
+  referenced by its HelmRelease before reconciliation.
+{{ end }}
+
 {{ if $.Values.addons.gitlab.enabled }}
 Gitlab is enabled.
 Please follow the Gitlab online documentation for proper configuration.

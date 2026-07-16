@@ -357,6 +357,77 @@ tests:
           count: 0
 
   ##
+  ## Additional package and wrapper offline behavior
+  ##
+  - it: should create an additional package GitRepository when online
+    template: package/gitrepository.yaml
+    set:
+      packages:
+        sample:
+          enabled: true
+          git:
+            repo: https://example.com/sample.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: GitRepository
+      - equal:
+          path: metadata.name
+          value: sample
+
+  - it: should not create an additional package GitRepository when offline
+    template: package/gitrepository.yaml
+    set:
+      offline: true
+      packages:
+        sample:
+          enabled: true
+          git:
+            repo: https://example.com/sample.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should create the package wrapper GitRepository when online
+    template: wrapper/gitrepository.yaml
+    set:
+      packages:
+        mission-app:
+          enabled: true
+          git:
+            repo: https://example.com/mission-app.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: GitRepository
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-wrapper
+
+  - it: should not create the package wrapper GitRepository when offline
+    template: wrapper/gitrepository.yaml
+    set:
+      offline: true
+      packages:
+        mission-app:
+          enabled: true
+          git:
+            repo: https://example.com/mission-app.git
+            path: chart
+            tag: 1.0.0
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  ##
   ## Twistlock extra gitIgnore
   ##
   - it: should include extra gitIgnore for twistlock

@@ -232,7 +232,6 @@ We will implement a simple additional utility as a proof of concept, starting wi
 cat << EOF > ~/podinfo_wrapper.yaml
 packages:
   # -- Package name.  Each package will be independently wrapped for Big Bang integration.
-  # @default -- Uses `defaults/<package name>.yaml` for defaults.  See `package` Helm chart for additional values that can be set.
   podinfo:
     # -- Toggle deployment of this package
     # @default -- true
