@@ -1123,11 +1123,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "87.10.1-bb.0"
+    tag: "87.10.1-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "87.10.1-bb.0"
+    tag: "87.10.1-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
