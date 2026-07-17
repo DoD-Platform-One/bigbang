@@ -1451,7 +1451,7 @@
               "additionalProperties": false
             },
             "flux": {
-              "ref": "#/$defs/flux"
+              "$ref": "#/$defs/flux"
             },
             "values": {
               "$ref": "#/$defs/values"
@@ -1541,6 +1541,63 @@
             "type": "boolean",
             "default": true
           },
+          "namespace": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "create": {
+                "type": "boolean",
+                "default": true
+              },
+              "createRegistrySecret": {
+                "type": "boolean",
+                "default": true
+              },
+              "labels": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "annotations": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "helmRelease": {
+            "type": "object",
+            "properties": {
+              "namespace": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sourceType": {
+            "$ref": "#/$defs/sourceType"
+          },
+          "releaseName": {
+            "type": "string"
+          },
+          "wrapper": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false
+              },
+              "postRenderers": {
+                "$ref": "#/$defs/postRenderers"
+              }
+            },
+            "additionalProperties": false
+          },
           "kustomize": {
             "type": "boolean",
             "default": false
@@ -1556,8 +1613,72 @@
           "includeDefaultDependsOn": {
             "type": "boolean",
             "default": true
+          },
+          "helmRepo": {
+            "$ref": "#/$defs/additionalPackageHelmRepo"
+          },
+          "git": {
+            "$ref": "#/$defs/additionalPackageGit"
+          },
+          "flux": {
+            "$ref": "#/$defs/flux"
+          },
+          "postRenderers": {
+            "$ref": "#/$defs/postRenderers"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "istio": {
+            "$ref": "#/$defs/istio"
+          },
+          "sso": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "monitor": {
+            "type": "object"
+          },
+          "network": {
+            "type": "object"
+          },
+          "secrets": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "configMaps": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "values": {
+            "$ref": "#/$defs/values"
           }
-        }
+        },
+        "additionalProperties": false
       }
     }
   },
@@ -1620,8 +1741,11 @@
           "email": {
             "type": "string"
           },
-          "cosignPublicKey": {
-            "type": "string"
+          "cosignPublicKeys": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
         },
         "anyOf": [
@@ -1652,7 +1776,8 @@
         "required": [
           "name",
           "repository"
-        ]
+        ],
+        "additionalProperties": false
       }
     },
     "basePackage": {
@@ -2183,10 +2308,16 @@
           ]
         },
         "commit": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "semver": {
-          "type": "string"
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "existingSecret": {
           "type": "string"
@@ -2238,6 +2369,68 @@
           "repo": "https://repo1.dso.mil/big-bang/product/packages/loki.git",
           "path": "./chart",
           "tag": "4.8.0-bb.0"
+        }
+      ]
+    },
+    "additionalPackageGit": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/git"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "repo": {
+              "type": "null"
+            },
+            "path": {
+              "type": "null"
+            },
+            "commit": {
+              "type": "null"
+            },
+            "semver": {
+              "type": "null"
+            },
+            "tag": {
+              "type": "null"
+            },
+            "branch": {
+              "type": "null"
+            },
+            "existingSecret": {
+              "type": "string"
+            },
+            "credentials": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "additionalPackageHelmRepo": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/helmRepo"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "repoName": {
+              "type": "null"
+            },
+            "chartName": {
+              "type": "null"
+            },
+            "tag": {
+              "type": "null"
+            },
+            "cosignVerify": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },

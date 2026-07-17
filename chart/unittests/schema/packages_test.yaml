@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema - Additional Packages
+tests:
+  - it: should pass validation with a Git Helm package
+    set:
+      packages:
+        sample:
+          enabled: true
+          namespace:
+            name: podinfo
+            create: true
+            createRegistrySecret: false
+            labels:
+              owner: platform
+            annotations:
+              example.com/managed: "true"
+          helmRelease:
+            namespace: bigbang
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+          flux:
+            timeout: 5m
+          dependsOn:
+            - name: monitoring
+              namespace: bigbang
+          values:
+            replicaCount: 2
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with a HelmRepository package
+    set:
+      packages:
+        sample:
+          enabled: true
+          git: null
+          sourceType: helmRepo
+          helmRepo:
+            repoName: registry1
+            chartName: podinfo
+            tag: "6.3.4"
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should pass validation with a Git Kustomization
+    set:
+      packages:
+        sample:
+          enabled: true
+          kustomize: true
+          git:
+            repo: https://github.com/example/manifests.git
+            path: ./production
+            branch: main
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should allow incomplete source stubs for disabled packages
+    set:
+      packages:
+        sample:
+          enabled: false
+          git:
+            repo: null
+            path: null
+            tag: null
+          helmRepo:
+            repoName: null
+            chartName: null
+            tag: null
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation when a Git source is incomplete
+    set:
+      packages:
+        sample:
+          enabled: true
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: null
+            tag: "6.3.4"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation when a HelmRepository source is incomplete
+    set:
+      packages:
+        sample:
+          enabled: true
+          git: null
+          helmRepo:
+            repoName: registry1
+            chartName: null
+            tag: "6.3.4"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with an unknown package key
+    set:
+      packages:
+        sample:
+          enabled: false
+          unknown: value
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation with a malformed dependency
+    set:
+      packages:
+        sample:
+          enabled: false
+          dependsOn:
+            - namespace: bigbang
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
