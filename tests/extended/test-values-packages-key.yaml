@@ -11,7 +11,7 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
       path: chart
-      tag: 6.14.0-bb.0
+      tag: 6.14.0-bb.1
     bbCommonValues: true
     values:
       bb-common:
@@ -22,6 +22,7 @@ packages:
                 spec:
                   hosts:
                     - repo1.dso.mil
+                    - cdn.jsdelivr.net
                   location: MESH_EXTERNAL
                   ports:
                     - number: 443
@@ -33,40 +34,67 @@ packages:
 
 kyvernoPolicies:
   values:
-    policies:
-      restrict-host-path-mount:
-        exclude:
-          any:
-            - resources: &podinfo-resources
-                namespaces:
-                  - podinfo
-                names:
-                  - podinfo*
-      restrict-host-path-write:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      restrict-volume-types:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      require-non-root-group:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      require-non-root-user:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      disallow-image-tags:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      require-drop-all-capabilities:
-        exclude:
-          any:
-            - resources: *podinfo-resources
-      restrict-image-registries:
-        exclude:
-          any:
-            - resources: *podinfo-resources
+    additionalPolicyExceptions:
+      podinfo:
+        enabled: true
+        namespace: kyverno
+        metadata:
+          annotations:
+            policies.kyverno.io/title: Podinfo Test Exception
+            policies.kyverno.io/category: Test
+            policies.kyverno.io/subject: Pod
+            policies.kyverno.io/description: >-
+              Allows resources created by the Podinfo packages-key validation test.
+        spec:
+          exceptions:
+            - policyName: restrict-host-path-mount
+              ruleNames:
+                - restrict-hostpath-dirs
+                - autogen-restrict-hostpath-dirs
+            - policyName: restrict-host-path-write
+              ruleNames:
+                - require-readonly-hostpath
+                - autogen-require-readonly-hostpath
+            - policyName: restrict-volume-types
+              ruleNames:
+                - restrict-volume-types
+                - autogen-restrict-volume-types
+            - policyName: require-non-root-group
+              ruleNames:
+                - run-as-group
+                - autogen-run-as-group
+                - fs-group
+                - autogen-fs-group
+                - supplemental-groups
+                - autogen-supplemental-groups
+            - policyName: require-non-root-user
+              ruleNames:
+                - non-root-user
+                - autogen-non-root-user
+            - policyName: disallow-image-tags
+              ruleNames:
+                - require-image-tag
+                - autogen-require-image-tag
+                - validate-image-tag
+                - autogen-validate-image-tag
+            - policyName: require-drop-all-capabilities
+              ruleNames:
+                - drop-all-capabilities
+                - autogen-drop-all-capabilities
+            - policyName: restrict-image-registries
+              ruleNames:
+                - validate-registries
+                - autogen-validate-registries
+          match:
+            any:
+              - resources:
+                  kinds:
+                    - Pod
+                    - Deployment
+                    - ReplicaSet
+                    - DaemonSet
+                    - StatefulSet
+                  namespaces:
+                    - podinfo
+                  names:
+                    - podinfo*
