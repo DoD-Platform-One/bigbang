@@ -34,6 +34,38 @@ tests:
             enabled: false
     asserts:
       - notFailedTemplate: {}
+  - it: should pass validation with classificationBanner values
+    set:
+      istioGateway:
+        values:
+          classificationBanner:
+            enabled: true
+            classificationLevel: cui
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with gateway values
+    set:
+      istioGateway:
+        values:
+          gateway:
+            servers:
+              - hosts:
+                  - '*.dev.bigbang.mil'
+                port:
+                  name: http
+                  number: 8080
+                  protocol: HTTP
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with gluon values
+    set:
+      istioGateway:
+        values:
+          gluon:
+            wait:
+              enabled: true
+    asserts:
+      - notFailedTemplate: {}
   - it: should pass validation with networkPolicies values
     set:
       istioGateway:
@@ -48,6 +80,14 @@ tests:
         values:
           mtls:
             mode: STRICT
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with tracing values
+    set:
+      istioGateway:
+        values:
+          tracing:
+            enabled: true
     asserts:
       - notFailedTemplate: {}
   - it: should pass validation with upstream values

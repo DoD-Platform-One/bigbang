@@ -354,6 +354,15 @@
             "gateways": {
               "type": "object"
             },
+            "classificationBanner": {
+              "type": "object"
+            },
+            "gateway": {
+              "type": "object"
+            },
+            "gluon": {
+              "type": "object"
+            },
             "waitJob": {
               "type": "object",
               "properties": {
@@ -366,6 +375,9 @@
               "type": "object"
             },
             "mtls": {
+              "type": "object"
+            },
+            "tracing": {
               "type": "object"
             },
             "upstream": {
