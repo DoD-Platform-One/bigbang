@@ -82,6 +82,10 @@ routes:
               number: {{ $port }}
       {{- end }}
   outbound:
+    headlamp-bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.headlamp.values }}
+      hosts:
+        - repo1.dso.mil
     sso:
       enabled: {{ .Values.addons.headlamp.sso.enabled }}
       {{- if $ssoHost }}
