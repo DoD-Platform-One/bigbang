@@ -1,6 +1,6 @@
 # Configuring Istio Ambient Mode in Big Bang
 
-> **WARNING:** Ambient mode is currently in an **alpha state** within Big Bang. It is not fully integrated and is **not recommended for production use**. Expect potential breaking changes in future releases.
+> **WARNING:** Ambient mode is currently in an **beta state** within Big Bang. It is not fully integrated and is **not recommended for production use**. Expect potential breaking changes in future releases.
 >
 > **NOTE:** When `istio.ambient.enabled` is set to `true`, Big Bang deploys the required ambient infrastructure (ztunnel, istio-cni, gateway-api) and automatically opts all packages into ambient mode by applying the `istio.io/dataplane-mode: ambient` label to their namespaces.
 
