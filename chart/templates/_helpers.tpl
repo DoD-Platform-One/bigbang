@@ -355,7 +355,8 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
+      {{- $effectiveGW := mustMergeOverwrite (deepCopy (get $defaults.gateways $name | default dict)) (deepCopy $commonGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
       
       {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
         {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
