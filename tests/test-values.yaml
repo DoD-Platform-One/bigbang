@@ -1200,6 +1200,25 @@ addons:
             autoscaling:
               enabled: false
       upstream:
+        dataSyncer:
+          initContainers:
+            - name: wait-for-catalog
+              image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:5.27.1
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  until curl --fail --silent \
+                    http://anchore-enterprise-anchore-enterprise-catalog:8082/health;
+                  do
+                    sleep 1
+                  done
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
         # Anchore sets this lower to 2 by default, for our purposes we need it as the kubernetes default https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-config especially when the runners are ambient.
         dnsConfig:
             ndots: 5
