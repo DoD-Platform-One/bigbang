@@ -105,6 +105,7 @@ packages:
   loki:
     # -- Toggle deployment of Loki.
     enabled: true
+    sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/loki.git
       path: "./chart"
@@ -114,6 +115,7 @@ packages:
   argocd:
     # -- Toggle deployment of ArgoCD.
     enabled: false
+    sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"

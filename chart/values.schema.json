@@ -1536,6 +1536,76 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            },
+            "then": {
+              "required": [
+                "sourceType"
+              ],
+              "if": {
+                "properties": {
+                  "sourceType": {
+                    "const": "git"
+                  }
+                },
+                "required": [
+                  "sourceType"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "git": {
+                    "$ref": "#/$defs/git"
+                  }
+                },
+                "required": [
+                  "git"
+                ]
+              },
+              "else": {
+                "properties": {
+                  "helmRepo": {
+                    "$ref": "#/$defs/helmRepo"
+                  }
+                },
+                "required": [
+                  "helmRepo"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kustomize": {
+                  "const": true
+                }
+              },
+              "required": [
+                "kustomize"
+              ]
+            },
+            "then": {
+              "properties": {
+                "sourceType": {
+                  "const": "git"
+                }
+              }
+            }
+          }
+        ],
         "properties": {
           "enabled": {
             "type": "boolean",

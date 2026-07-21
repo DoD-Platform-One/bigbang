@@ -2490,7 +2490,7 @@ packages:
     # @default -- true
     bbCommonValues: true
 
-    # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    # -- HelmRepo source is supported as an option for Helm deployments and is selected with `sourceType: helmRepo`.
     helmRepo:
       # -- Name of the HelmRepo specified in `helmRepositories`
       # @default -- Uses `registry1` Helm Repository if not specified
@@ -2503,7 +2503,7 @@ packages:
       # -- If the HelmRelease should verify the cosign signature of the HelmRepo (only relevant if Repo is OCI). Set to 'false' to disable verification
       #cosignVerify:
 
-    # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    # -- Git source is supported for both Helm and Kustomize deployments and is selected with `sourceType: git`.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
       repo:

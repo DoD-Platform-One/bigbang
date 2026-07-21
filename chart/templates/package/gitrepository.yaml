@@ -1,6 +1,6 @@
 {{- /* Used for GitOps on a package's Helm chart */ -}}
 {{- range $pkgKey, $vals := .Values.packages -}}
-{{- if and (not $.Values.offline) (dig "enabled" true $vals) ($vals.git) -}}
+{{- if and (not $.Values.offline) (dig "enabled" true $vals) (eq (dig "sourceType" "git" $vals) "git") ($vals.git) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
 
 {{- $gitCredsDict := dict
