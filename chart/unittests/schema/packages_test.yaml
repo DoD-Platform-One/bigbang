@@ -6,6 +6,7 @@ tests:
       packages:
         sample:
           enabled: true
+          sourceType: git
           namespace:
             name: podinfo
             create: true
@@ -49,6 +50,7 @@ tests:
       packages:
         sample:
           enabled: true
+          sourceType: git
           kustomize: true
           git:
             repo: https://github.com/example/manifests.git
@@ -78,6 +80,7 @@ tests:
       packages:
         sample:
           enabled: true
+          sourceType: git
           git:
             repo: https://github.com/stefanprodan/podinfo.git
             path: null
@@ -91,10 +94,58 @@ tests:
       packages:
         sample:
           enabled: true
+          sourceType: helmRepo
           git: null
           helmRepo:
             repoName: registry1
             chartName: null
+            tag: "6.3.4"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation when an enabled package omits sourceType
+    set:
+      packages:
+        podinfo:
+          enabled: true
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation when sourceType does not match the configured source
+    set:
+      packages:
+        sample:
+          enabled: true
+          sourceType: helmRepo
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+          helmRepo:
+            repoName: null
+            chartName: null
+            tag: null
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
+  - it: should fail validation when Kustomize uses a HelmRepository source
+    set:
+      packages:
+        sample:
+          enabled: true
+          sourceType: helmRepo
+          kustomize: true
+          git: null
+          helmRepo:
+            repoName: registry1
+            chartName: podinfo
             tag: "6.3.4"
     asserts:
       - failedTemplate:

@@ -149,6 +149,7 @@ package, set its target namespace under `packages`:
 packages:
   podinfo:
     enabled: true
+    sourceType: git
     namespace:
       name: custom-podinfo-namespace
       create: true
@@ -168,6 +169,7 @@ Control an additional Helm package's installation order with dependencies:
 packages:
   podinfo:
     enabled: true
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: "6.3.4"

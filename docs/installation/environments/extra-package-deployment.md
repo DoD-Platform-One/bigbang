@@ -29,6 +29,7 @@ There are some basic override values provided to modify your Helm chart installa
 ```yaml
 packages:
   podinfo:
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
@@ -152,6 +153,7 @@ packages:
   podinfo:
     sso:
       enabled: true
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
@@ -186,6 +188,7 @@ These pieces can typically be complicated to get set up correctly and connected 
 packages:
   podinfo:
     enabled: true
+    sourceType: git
     wrapper:
       enabled: true
     git:
@@ -207,6 +210,7 @@ The wrapper chart provides a number of different ways to provide Istio configura
 ```yaml
 packages:
   podinfo:
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
@@ -234,6 +238,7 @@ The wrapper chart also provides ways to integrate with the monitoring stack (e.g
 ```yaml
 packages:
   podinfo:
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
@@ -258,6 +263,7 @@ The wrapper chart provides ways to configure network policies as needed for your
 ```yaml
 packages:
   podinfo:
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
@@ -291,6 +297,7 @@ Often when deploying a Helm chart, you may be expected to point to an existing s
 ```yaml
 packages:
   podinfo:
+    sourceType: git
     git:
       repo: https://github.com/stefanprodan/podinfo.git
       tag: 6.3.4
