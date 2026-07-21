@@ -26,8 +26,8 @@ helmRepositories: []
   #   username: ""
   #   password: ""
   #   email: ""
-  #   # This is an array/list of public keys to be used. Template will append `.pub` to the key as required by Flux
-  #   cosignPublicKeys: []
+  #   # This is a map of named public keys. The template appends `.pub` to each key name as required by Flux.
+  #   cosignPublicKeys:
   #     key1: |
   #       -----BEGIN PUBLIC KEY-----
   #       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIE7v9J6ttQus6itUoyfMCqMjaIqm
