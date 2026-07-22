@@ -272,8 +272,8 @@ packages:
       # -- Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference).
       # @default -- When no other reference is specified, `master` branch is used
       branch:
-      # -- Path inside of the git repo to find the helm chart or kustomize
-      # @default -- For Helm charts `chart`.  For Kustomize `/`.
+      # -- Path inside the Git repository to the Helm chart or Kustomization. Required for Kustomize packages.
+      # @default -- For Helm packages, `chart`. No default is applied to Kustomize packages.
       path: "chart"
 
     # -- Override flux settings for this package

@@ -1601,6 +1601,12 @@
               "properties": {
                 "sourceType": {
                   "const": "git"
+                },
+                "git": {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ]
                 }
               }
             }
@@ -2294,8 +2300,7 @@
     "git": {
       "type": "object",
       "required": [
-        "repo",
-        "path"
+        "repo"
       ],
       "anyOf": [
         {
