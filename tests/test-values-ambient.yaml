@@ -782,6 +782,27 @@ fluentbit:
     upstream:
       securityContext:
         privileged: true
+      # k3d nodes do not run kubelet as a systemd service. Override the production
+      # defaults so CI collects container logs without requiring /etc/machine-id.
+      config:
+        inputs: |
+          [INPUT]
+              Name tail
+              Path /var/log/containers/*.log
+              Exclude_Path /var/log/containers/*fluent*.log
+              Parser containerd
+              Tag kube.*
+              Mem_Buf_Limit 50MB
+              Skip_Long_Lines On
+              storage.type filesystem
+      daemonSetVolumes:
+        - name: varlog
+          hostPath:
+            path: /var/log
+      daemonSetVolumeMounts:
+        - name: varlog
+          mountPath: /var/log
+          readOnly: true
 
 
 loki:
