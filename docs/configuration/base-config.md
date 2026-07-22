@@ -800,7 +800,7 @@ Kubernetes: `>=1.34.0-0`
 | packages.sample.git.semver | string | `nil` | Git semVer tag expression to check out.  Takes precedence over tag. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference) |
 | packages.sample.git.tag | string | `nil` | Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference) |
 | packages.sample.git.branch | string | `nil` | Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference). |
-| packages.sample.git.path | string | `nil` | Path inside of the git repo to find the helm chart or kustomize |
+| packages.sample.git.path | string | `nil` | Path inside the Git repository to the Helm chart or Kustomization. Required for Kustomize packages. |
 | packages.sample.git.existingSecret | string | `""` | Optional, alternative existing secret to use for git credentials, must be in the appropriate format: https://toolkit.fluxcd.io/components/source/gitrepositories/#https-authentication |
 | packages.sample.git.credentials | object | `{"caFile":"","knownHosts":"","password":"","privateKey":"","publicKey":"","username":""}` | Optional, alternative Chart created secrets with user defined values |
 | packages.sample.git.credentials.username | string | `""` | HTTP git credentials, both username and password must be provided |
