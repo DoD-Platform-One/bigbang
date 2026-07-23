@@ -38,6 +38,14 @@ tests:
       - failedTemplate:
           errorPattern: ".*"
 
+  - it: should reject the removed package automatic passthrough compatibility setting
+    set:
+      kiali:
+        disableAutomaticPassthroughValues: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+
   - it: should fail validation with invalid neuvector istio injection value
     set:
       neuvector:

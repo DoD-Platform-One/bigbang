@@ -10,3 +10,9 @@ tests:
       foo: bar
     asserts:
       - failedTemplate: {}
+
+  - it: should reject the removed automatic passthrough compatibility setting
+    set:
+      disableAutomaticPassthroughValues: false
+    asserts:
+      - failedTemplate: {}
