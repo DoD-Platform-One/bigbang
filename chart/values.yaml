@@ -381,8 +381,16 @@ istioGateway:
     repoName: "registry1"
     chartName: "gateway"
     tag: 1.30.2-bb.2
-  # -- Values to passthrough to the gateway chart(s)
+  # -- Values to pass to every gateway chart. Values under gateways.<name> override these shared values.
   values: {}
+  # EXAMPLE: Disable the wait job for every gateway except public
+  #   waitJob:
+  #     enabled: false
+  #   gateways:
+  #     public:
+  #       waitJob:
+  #         enabled: true
+  #
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
   #     public:

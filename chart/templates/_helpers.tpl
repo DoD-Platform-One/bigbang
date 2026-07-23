@@ -327,6 +327,7 @@ stringData:
 
 {{- define "enabledGateways" -}}
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
+  {{- $commonGatewayValues := omit ($.Values.istioGateway.values | default dict) "gateways" -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
   {{- $istioPodAnnotations := (include "istioAnnotation" $ | fromYaml) | default dict -}}
 
@@ -339,7 +340,8 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
+      {{- $effectiveGW := mustMergeOverwrite (deepCopy (get $defaults.gateways $name | default dict)) (deepCopy $commonGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
       
       {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
         {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
@@ -369,13 +371,12 @@ stringData:
         {{- $gwRecord = set $gwRecord "defaults" $gwDefaults -}}
       {{ end -}}
       
-      {{- $gwOverlays := dig "gateways" $name dict $.Values.istioGateway.values -}}
+      {{- $gwOverlays := mustMergeOverwrite (dict "upstream" $defaultImagePullConfig) (deepCopy $commonGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
       {{- if $gwOverlays }}
-        {{- $gwOverlays = deepCopy $gwOverlays -}}
         {{- if $istioPodAnnotations }}
           {{- $gwOverlays = mergeOverwrite $gwOverlays (dict "upstream" (dict "podAnnotations" $istioPodAnnotations)) -}}
         {{- end }}
-        {{- $gwRecord = set $gwRecord "overlays" (merge $gwOverlays (dict "upstream" $defaultImagePullConfig)) -}}
+        {{- $gwRecord = set $gwRecord "overlays" $gwOverlays -}}
       {{ end -}}
       
       {{- $enabledGateways = set $enabledGateways $name $gwRecord -}}
@@ -838,7 +839,7 @@ Args:
 {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
 {{- $gw := get $gateways $gateway }}
 {{- if $gw }}
-  {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
+  {{- toYaml (dict "app" $gw.serviceName "istio" $gw.type) }}
 {{- end }}
 {{- end -}}
 

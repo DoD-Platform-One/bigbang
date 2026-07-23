@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Istio Gateway - Gateway Type Tests
+templates:
+  - templates/istio-gateway/helmrelease.yaml
+  - templates/istio-gateway/values.yaml
+release:
+  name: bb
+set:
+  istiod.enabled: true
+  istioGateway.enabled: true
+tests:
+  - it: should use the shared gateway type for built-in gateways
+    template: templates/istio-gateway/helmrelease.yaml
+    set:
+      istioGateway.values.upstream.labels.istio: egressgateway
+    documentSelector:
+      path: metadata.labels["app.kubernetes.io/name"]
+      value: istio-gateway-public
+    asserts:
+      - equal:
+          path: metadata.name
+          value: public-egressgateway
+
+  - it: should use the shared gateway type for custom gateways
+    template: templates/istio-gateway/helmrelease.yaml
+    set:
+      istioGateway.values:
+        upstream:
+          labels:
+            istio: ingressgateway
+        gateways:
+          internal:
+            gateway:
+              servers: []
+            waitJob:
+              enabled: false
+    documentSelector:
+      path: metadata.labels["app.kubernetes.io/name"]
+      value: istio-gateway-internal
+    asserts:
+      - equal:
+          path: metadata.name
+          value: internal-ingressgateway

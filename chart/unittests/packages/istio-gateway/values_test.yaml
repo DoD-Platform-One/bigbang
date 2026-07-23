@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Istio Gateway - Values Tests
+templates:
+  - templates/istio-gateway/values.yaml
+release:
+  name: bb
+tests:
+  - it: should apply root common values to the public gateway overlays
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.overlays' - | yq eval '.'"
+    set:
+      istioGateway.values:
+        waitJob:
+          enabled: false
+        networkPolicies:
+          enabled: false
+        mtls:
+          mode: PERMISSIVE
+        upstream:
+          service:
+            type: ClusterIP
+    asserts:
+      - equal:
+          path: waitJob.enabled
+          value: false
+      - equal:
+          path: networkPolicies.enabled
+          value: false
+      - equal:
+          path: mtls.mode
+          value: PERMISSIVE
+      - equal:
+          path: upstream.service.type
+          value: ClusterIP
+
+  - it: should apply root common values to the passthrough gateway overlays
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-passthrough-gateway-values\") | .stringData.overlays' - | yq eval '.'"
+    set:
+      istioGateway.values:
+        waitJob:
+          enabled: false
+        mtls:
+          mode: PERMISSIVE
+    asserts:
+      - equal:
+          path: waitJob.enabled
+          value: false
+      - equal:
+          path: mtls.mode
+          value: PERMISSIVE
+
+  - it: should let gateway-specific values override root common values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.overlays' - | yq eval '.'"
+    set:
+      istioGateway.values:
+        waitJob:
+          enabled: false
+        gateways:
+          public:
+            waitJob:
+              enabled: true
+    asserts:
+      - equal:
+          path: waitJob.enabled
+          value: true
