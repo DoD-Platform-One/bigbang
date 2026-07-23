@@ -842,12 +842,12 @@ alloy:
 
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
-    tag: "4.2.2-bb.0"
+    tag: "4.2.2-bb.1"
     path: "./chart"
   helmRepo:
     repoName: "registry1"
     chartName: "k8s-monitoring"
-    tag: "4.2.2-bb.0"
+    tag: "4.2.2-bb.1"
 
   # -- Toggle Alloy to collect logs
   alloyLogs:
