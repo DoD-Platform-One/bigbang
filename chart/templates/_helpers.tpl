@@ -876,7 +876,7 @@ Args:
 
 {{- define "bigbang.istio-gateway.ingress-netpol-spec" }}
   {{- $ctx := index . 0 }}
-  {{- $name := index . 1 }}
+  {{- $serviceName := index . 1 }}
   {{- $ports := index . 2 }}
 networkPolicies:
   enabled: {{ $ctx.Values.networkPolicies.enabled }}
@@ -886,7 +886,7 @@ networkPolicies:
       {{- $ctx.Values.networkPolicies.ingress.definitions | toYaml | nindent 8 }}
     {{- end }}
     to:
-      "{{ $name }}-ingressgateway:{{ $ports | toJson }}":
+      "{{ $serviceName }}:{{ $ports | toJson }}":
         from:
           definition:
             load-balancer-subnets: true
@@ -896,7 +896,7 @@ networkPolicies:
       {{- $ctx.Values.networkPolicies.egress.definitions | toYaml | nindent 8 }}
     {{- end }}
     from:
-      "{{ $name }}-ingressgateway":
+      "{{ $serviceName }}":
         to:
           k8s:
             '*': true
@@ -921,7 +921,7 @@ networkPolicies:
       {{- $ports = append $ports $server.port.number }}
     {{- end }}
 
-    {{- $newGateway = merge (dict "defaults" (include "bigbang.istio-gateway.ingress-netpol-spec" (list $ctx $name $ports) | fromYaml)) $newGateway }}
+    {{- $newGateway = merge (dict "defaults" (include "bigbang.istio-gateway.ingress-netpol-spec" (list $ctx $gateway.serviceName $ports) | fromYaml)) $newGateway }}
 
     {{- $_ := set $newGateways $name $newGateway }}
   {{- end }}
