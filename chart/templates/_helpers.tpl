@@ -308,24 +308,9 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{- end -}}
 
 {{- define "values-secret" -}}
-{{/* This is a workaround for passthrough charts */}}
-{{/* This is temporary and will be removed in a future release */}}
-{{ $origDefaults := default (dict) (fromYaml .defaults) }}
-{{- $defaults := deepCopy $origDefaults }}
-{{- if and (not .root.Values.disableAutomaticPassthroughValues) (not .package.disableAutomaticPassthroughValues) }}
-{{- $origUpstream := dig "upstream" (dict) $defaults -}}
-{{- $upstream := deepCopy $origDefaults }}
-{{- if $origUpstream }}
-{{- $upstream = mustMergeOverwrite (deepCopy $origDefaults) (deepCopy $origUpstream) }}
-{{- end -}}
-{{- $newDefaults := dict "upstream" $upstream }}
-{{- $defaults = mustMergeOverwrite (deepCopy $origDefaults) $newDefaults | toYaml }}
-{{- else }}
-{{ $defaults = $origDefaults | toYaml }}
-{{- end -}}
-{{/* This is the end of the workaround */}}
+{{- $defaults := default (dict) (fromYaml .defaults) | toYaml }}
 {{- $packageValues := default dict .package.values -}}
-{{- $commonValues := mustMergeOverwrite (deepCopy $packageValues) (deepCopy ($defaults | fromYaml)) -}}
+{{- $commonValues := mustMergeOverwrite (deepCopy $packageValues) (deepCopy ($defaults | fromYaml)) }}
 apiVersion: v1
 kind: Secret
 metadata:
