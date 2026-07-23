@@ -854,7 +854,7 @@ Args:
 {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
 {{- $gw := get $gateways $gateway }}
 {{- if $gw }}
-  {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
+  {{- toYaml (dict "app" $gw.serviceName "istio" $gw.type) }}
 {{- end }}
 {{- end -}}
 
