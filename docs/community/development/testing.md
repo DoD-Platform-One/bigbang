@@ -79,6 +79,10 @@ Also note that the "helm.sh/hook-weight" can be used to order the creation and e
 
 The end consumable is the Umbrella Application. As new versions of Big Bang Applications become available, those changes need to be integrated into the Umbrella and tested. Each Merge Request into the Umbrella Repo requires passing of an [Upgrade Tests](#upgrade-tests) and the [End to End Tests](#end-to-end-tests) for all mock environments.
 
+### Test Values Profiles
+
+Umbrella CI deployments use a complete base configuration plus focused variant overlays. The file roles, precedence, and local rendering example are documented in the [`tests` directory](../../../tests/README.md). Variant files should contain only values that differ from the base configuration so they do not replace pipeline-provided values with duplicate or stale settings.
+
 ### Environments
 
 The Umbrella application will be tested for functionality with customer focused kubernetes environments.  As the Integration team works with customers to adopt Big Bang, the team will provide feedback to Umbrella Test Environments to provide representative environments to perform full End to End regression tests. A representative environment for the e2e tests is Mock Fences, which attempts to mirror the Fences environment owned by GBSD.
