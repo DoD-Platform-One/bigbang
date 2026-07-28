@@ -1189,11 +1189,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "10.5.15-bb.4"
+    tag: "10.5.15-bb.6"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "10.5.15-bb.4"
+    tag: "10.5.15-bb.6"
 
   # -- Flux reconciliation overrides specifically for the Grafana Package
   flux: {}
