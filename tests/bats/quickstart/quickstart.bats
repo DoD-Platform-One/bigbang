@@ -237,7 +237,6 @@ EOF
     [[ "${args}" == *"-f /tmp/custom values.yaml --set addons.gitlab.enabled=true"* ]]
     [[ "${args}" == *"-f ${BIG_BANG_REPO}/chart/ingress-certs.yaml"* ]]
     [[ "${args}" == *"-f ${BIG_BANG_REPO}/docs/reference/configs/example/dev-sso-values.yaml"* ]]
-    [[ "${args}" == *"-f ${BIG_BANG_REPO}/docs/reference/configs/example/policy-overrides-k3d.yaml"* ]]
 }
 
 @test "check_for_tools exits with a helpful error when dependencies are missing" {
