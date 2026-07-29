@@ -38,10 +38,15 @@ elasticsearchKibana:
   repoName: "elasticsearch-kibana"
   hrName: "ek"
   filePath: "elasticsearch-kibana"
+  dependencies:
+    - "fluentbit"
 eckOperator:
   repoName: "eck-operator"
   hrName: "eck-operator"
   filePath: "eck-operator"
+  dependencies:
+    - "elasticsearchKibana"
+    - "fluentbit"
 fluentbit:
   hrName: "fluentbit"
   filePath: "fluentbit"

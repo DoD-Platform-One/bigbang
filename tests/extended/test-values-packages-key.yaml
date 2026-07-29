@@ -32,6 +32,15 @@ packages:
       bbtests:
         enabled: true
 
+gatekeeper:
+  values:
+    violations:
+      allowedDockerRegistries:
+        parameters:
+          excludedResources:
+            # The Podinfo upstream cache Helm test uses the curl container from curlimages/curl.
+            - podinfo/curl
+
 kyvernoPolicies:
   values:
     additionalPolicyExceptions:
