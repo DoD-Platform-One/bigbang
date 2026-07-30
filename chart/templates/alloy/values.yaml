@@ -126,7 +126,16 @@ networkPolicies:
           definition:
             kubeAPI: true
           k8s:
+            {{- if eq (include "monitoring.authservice.waypointEnabled" .) "true" }}
+            # Prometheus is enrolled on the monitoring package's own waypoint for authservice;
+            # in-mesh remote-write egress targets the waypoint pod over HBONE (15008).
+            monitoring/waypoint:15008:
+              podSelector:
+                matchLabels:
+                  gateway.networking.k8s.io/gateway-name: monitoring-monitoring-waypoint
+            {{- else }}
             monitoring/monitoring-monitoring-kube-prometheus:9090: {{ .Values.monitoring.enabled }}
+            {{- end }}
             mimir/mimir-mimir-gateway:8080: {{ $mimirEnabled }}
       {{- end }}
 istio:

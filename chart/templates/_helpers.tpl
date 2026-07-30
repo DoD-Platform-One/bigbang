@@ -758,6 +758,22 @@ valuesFrom:
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
 {{- end -}}
 
+{{- /*
+Returns "true" when Monitoring's prometheus/alertmanager should be protected by
+authservice via the monitoring package's own ambient waypoint (the bb-common
+per-route authservice model). This replaces the legacy model that enrolled the
+Services onto the shared authservice-namespace waypoint. Only applies in ambient
+mode; sidecar-mode SSO keeps the legacy pod-label ext_authz path.
+*/ -}}
+{{- define "monitoring.authservice.waypointEnabled" -}}
+{{- and
+  (eq (include "ambientEnabled" .) "true")
+  (eq (include "authserviceEnabled" .) "true")
+  .Values.monitoring.enabled
+  .Values.monitoring.sso.enabled
+-}}
+{{- end -}}
+
 {{- /* Returns "true" if networkPolicies should be enabled for a package.
        True when .Values.networkPolicies.enabled is true OR ambient mode is enabled.
        Ambient mode requires bb-common's network-policies render to run because the

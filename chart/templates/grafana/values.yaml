@@ -332,7 +332,11 @@ upstream:
       defaultMode: 0440
       readOnly: true
     {{- end }}
-    {{- if and (or .Values.grafana.sso.enabled .Values.monitoring.sso.enabled) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+    {{- /* Mount the SSO CA only when grafana/secret-ca.yaml actually creates tls-ca-sso-grafana.
+           The secret requires grafana OIDC to be configured (grafana.sso.enabled, or
+           monitoring.sso.enabled WITH monitoring.sso.grafana.client_id); mounting on
+           monitoring.sso.enabled alone left grafana stuck on a missing secret. */}}
+    {{- if and (or (and .Values.grafana.enabled .Values.grafana.sso.enabled) (and .Values.monitoring.sso.enabled (dig "grafana" "client_id" false .Values.monitoring.sso))) (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
     - name: "oidc-ca-certificate"
       mountPath: "/etc/oidc/ca.pem"
       secretName: "tls-ca-sso-grafana"
