@@ -265,11 +265,11 @@ istioCNI:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-cni.git
     path: "./chart"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-cni"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   # -- Values to passthrough to the Istio CNI chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CNI Package
@@ -285,11 +285,11 @@ istioCRDs:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-crds.git
     path: "./chart"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-crds"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   # -- Values to passthrough to the Istio CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CRDs Package
@@ -338,11 +338,11 @@ istiod:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istiod.git
     path: "./chart"
-    tag: 1.30.2-bb.1
+    tag: 1.30.3-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istiod"
-    tag: 1.30.2-bb.1
+    tag: 1.30.3-bb.0
   # -- Values to passthrough to the istiod chart
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
@@ -376,11 +376,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.30.2-bb.2
+    tag: 1.30.3-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "gateway"
-    tag: 1.30.2-bb.2
+    tag: 1.30.3-bb.0
   # -- Values to passthrough to the gateway chart(s)
   values: {}
   # EXAMPLE: Set the tls key/cert for the existing public gateway
@@ -499,11 +499,11 @@ ztunnel:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/ztunnel.git
     path: "./chart"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "ztunnel"
-    tag: 1.30.2-bb.0
+    tag: 1.30.3-bb.0
   # -- Values to passthrough to the ztunnel chart
   values: {}
   # -- Flux reconciliation overrides specifically for the ztunnel Package
