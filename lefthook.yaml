@@ -20,6 +20,9 @@ pre-commit:
     bats-quickstart:
       glob: "{docs/reference/scripts/quickstart.sh,tests/bats/quickstart/**/*.bats}"
       run: bats tests/bats/quickstart/quickstart.bats
+    bats-values-overlays:
+      glob: "{tests/test-values.yaml,tests/test-values-ambient.yaml,chart/ingress-certs.yaml,tests/bats/values-overlays/**/*.bats}"
+      run: bats tests/bats/values-overlays/values-overlays.bats
     bats-gitlab-triage:
       glob: "{scripts/gitlab-triage/*.sh,tests/bats/gitlab-triage/**/*.bats}"
       run: bats tests/bats/gitlab-triage/

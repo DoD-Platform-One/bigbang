@@ -11,6 +11,7 @@
 {{- define "bigbang.defaults.mattermost" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.mattermost.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
+{{- $sentryEnabled := dig "mattermostEnvs" "MM_LOGSETTINGS_ENABLESENTRY" true .Values.addons.mattermost.values }}
 {{- /* External postgres is enabled when all database connection fields are provided */ -}}
 {{- $externalPostgresEnabled := and
     (ne .Values.addons.mattermost.database.username "")
@@ -94,6 +95,7 @@ networkPolicies:
             kubeAPI: true
             database-subnets: {{ $externalPostgresEnabled }}
             sso: {{ .Values.addons.mattermost.sso.enabled }}
+            sentry-subnets: {{ $sentryEnabled }}
       {{- if dig "waitJob" "enabled" true .Values.addons.mattermost.values }}
       wait-job:
         to:
@@ -118,6 +120,8 @@ routes:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.addons.mattermost.ingress.gateway "root" .) }}
   outbound:
+    mattermost-sentry:
+      enabled: {{ $sentryEnabled }}
     sso:
       enabled: {{ .Values.addons.mattermost.sso.enabled }}
       {{- if $ssoHost }}

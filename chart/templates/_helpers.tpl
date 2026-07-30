@@ -308,24 +308,9 @@ helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
 {{- end -}}
 
 {{- define "values-secret" -}}
-{{/* This is a workaround for passthrough charts */}}
-{{/* This is temporary and will be removed in a future release */}}
-{{ $origDefaults := default (dict) (fromYaml .defaults) }}
-{{- $defaults := deepCopy $origDefaults }}
-{{- if and (not .root.Values.disableAutomaticPassthroughValues) (not .package.disableAutomaticPassthroughValues) }}
-{{- $origUpstream := dig "upstream" (dict) $defaults -}}
-{{- $upstream := deepCopy $origDefaults }}
-{{- if $origUpstream }}
-{{- $upstream = mustMergeOverwrite (deepCopy $origDefaults) (deepCopy $origUpstream) }}
-{{- end -}}
-{{- $newDefaults := dict "upstream" $upstream }}
-{{- $defaults = mustMergeOverwrite (deepCopy $origDefaults) $newDefaults | toYaml }}
-{{- else }}
-{{ $defaults = $origDefaults | toYaml }}
-{{- end -}}
-{{/* This is the end of the workaround */}}
+{{- $defaults := default (dict) (fromYaml .defaults) | toYaml }}
 {{- $packageValues := default dict .package.values -}}
-{{- $commonValues := mustMergeOverwrite (deepCopy $packageValues) (deepCopy ($defaults | fromYaml)) -}}
+{{- $commonValues := mustMergeOverwrite (deepCopy $packageValues) (deepCopy ($defaults | fromYaml)) }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -772,6 +757,22 @@ valuesFrom:
 {{- /* Returns true if ambient mode is enabled (via ztunnel or global ambient flag) */ -}}
 {{- define "ambientEnabled" -}}
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
+{{- end -}}
+
+{{- /*
+Returns "true" when Monitoring's prometheus/alertmanager should be protected by
+authservice via the monitoring package's own ambient waypoint (the bb-common
+per-route authservice model). This replaces the legacy model that enrolled the
+Services onto the shared authservice-namespace waypoint. Only applies in ambient
+mode; sidecar-mode SSO keeps the legacy pod-label ext_authz path.
+*/ -}}
+{{- define "monitoring.authservice.waypointEnabled" -}}
+{{- and
+  (eq (include "ambientEnabled" .) "true")
+  (eq (include "authserviceEnabled" .) "true")
+  .Values.monitoring.enabled
+  .Values.monitoring.sso.enabled
+-}}
 {{- end -}}
 
 {{- /* Returns "true" if networkPolicies should be enabled for a package.

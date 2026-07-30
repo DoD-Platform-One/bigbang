@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema - Helm Repositories
+tests:
+  - it: should pass validation with named Cosign public keys
+    set:
+      helmRepositories:
+        - name: registry1
+          repository: oci://registry1.dso.mil/bigbang
+          type: oci
+          existingSecret: private-registry
+          cosignPublicKeys:
+            key1: public-key-data
+            backup: backup-public-key-data
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should fail validation with the obsolete singular Cosign key
+    set:
+      helmRepositories:
+        - name: registry1
+          repository: oci://registry1.dso.mil/bigbang
+          type: oci
+          existingSecret: private-registry
+          cosignPublicKey: public-key-data
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

@@ -11,7 +11,7 @@
   "root" $root 
   "name" (printf "istio-%s-gateway" $name)
   "defaults" ($gw.defaults | toYaml)
-  "package" (dict "values" $gw.overlays "disableAutomaticPassthroughValues" true)
+  "package" (dict "values" $gw.overlays)
 ) }}
 {{- end }}
 {{- end }}

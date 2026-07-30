@@ -1,6 +1,6 @@
 {{- /* Used for deploying a package using Kustomize */ -}}
 {{- range $pkg, $vals := .Values.packages -}}
-{{- if and (dig "enabled" true $vals) $vals.kustomize -}}
+{{- if and (dig "enabled" true $vals) $vals.kustomize (eq (dig "sourceType" "git" $vals) "git") ($vals.git) -}}
 {{- $pkg := include "resourceName" $pkg -}}
 {{- $fluxSettings := merge (default $vals.flux (dict)) $.Values.flux -}}
 apiVersion: kustomize.toolkit.fluxcd.io/v1

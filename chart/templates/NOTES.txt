@@ -22,11 +22,10 @@ addons:
   gitlab:
     enabled: true
     hostnames:
-      gitlab: gitlab.example.mil
-      registry: registry.example.mil
+      gitlab: gitlab
+      registry: registry
     sso:
       enabled: true
-      label: "Platform One SSO"
       client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-gitlab"
       client_secret: ""
     database:
@@ -35,7 +34,7 @@ addons:
       username: gitlab
       database: gitlab
       password: mysecretpassword
-    objectstorage:
+    objectStorage:
       type: s3
       endpoint: https://s3.us-gov-west-1.amazonaws.com
       region: us-gov-west-1

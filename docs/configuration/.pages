@@ -1,5 +1,7 @@
 nav:
   - Overview: index.md
+  - Ambient Mode: ambient.md
+  - Running Mission Applications in Ambient: ambient-mission-apps.md
   - Base Configuration: base-config.md
   - Default Credentials: default-credentials.md
   - Gateways: gateways.md

@@ -10,6 +10,34 @@ set:
   istio:
     ambient:
       enabled: true
+  packages:
+    sample:
+      sourceType: git
+      git:
+        repo: https://example.com/sample.git
+        path: chart
+        tag: 1.0.0
+    cert-manager:
+      enabled: false
+      sourceType: git
+      git:
+        repo: https://example.com/cert-manager.git
+        path: chart
+        tag: 1.0.0
+    cert-manager-trust-manager:
+      enabled: false
+      sourceType: git
+      git:
+        repo: https://example.com/cert-manager-trust-manager.git
+        path: chart
+        tag: 1.0.0
+    cert-manager-approver-policy:
+      enabled: false
+      sourceType: git
+      git:
+        repo: https://example.com/cert-manager-approver-policy.git
+        path: chart
+        tag: 1.0.0
 tests:
   - it: should allow package namespace labels to override ambient namespace enrollment
     set:

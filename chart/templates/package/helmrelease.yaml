@@ -2,6 +2,7 @@
 {{- range $pkgKey, $vals := .Values.packages -}}
 {{- if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
+{{- $sourceType := dig "sourceType" "git" $vals -}}
 
 {{- $fluxSettings := mergeOverwrite (deepCopy $.Values.flux) (default (dict) $vals.flux) -}}
 {{- $istioEnabled := eq (include "istioEnabled" $) "true" -}}
@@ -25,7 +26,7 @@ spec:
   targetNamespace: {{ dig "namespace" "name" $pkg $vals }}
   chart:
     spec:
-      {{- if $vals.git }}
+      {{- if and (eq $sourceType "git") $vals.git }}
       chart: {{ dig "git" "path" "chart" $vals }}
       sourceRef:
         kind: GitRepository
@@ -35,7 +36,7 @@ spec:
                     {{ else }}
                       {{ default (dig "namespace" "name" $pkg $vals) "" }}
                     {{ end }}
-      {{- else if $vals.helmRepo }}
+      {{- else if and (eq $sourceType "helmRepo") $vals.helmRepo }}
       chart: {{ dig "helmRepo" "chartName" $pkg $vals }}
       version: {{ dig "helmRepo" "tag" nil $vals }}
       sourceRef:
@@ -50,7 +51,7 @@ spec:
           name: {{ printf "%s-cosign-pub" $vals.helmRepo.repoName }}
       {{- end }}
       {{- else }}
-      {{- fail (printf "Values for source (git or helmRepo) are required for package %s" $pkg) }}
+      {{- fail (printf "Valid values for selected sourceType %q are required for package %s" $sourceType $pkg) }}
       {{- end }}
       interval: {{ default "5m" $fluxSettings.interval }}
       reconcileStrategy: Revision

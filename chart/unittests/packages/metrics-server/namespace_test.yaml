@@ -86,3 +86,19 @@ tests:
       - equal:
           path: metadata.namespace
           value: custom-metrics
+
+  - it: should not duplicate the registry secret when istio-cni owns it
+    set:
+      istioCNI:
+        enabled: true
+      registryCredentials:
+        registry: registry1.dso.mil
+        username: test
+        password: test
+      addons:
+        metricsServer:
+          enabled: true
+    template: metrics-server/imagepullsecret.yaml
+    asserts:
+      - hasDocuments:
+          count: 0

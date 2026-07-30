@@ -3,6 +3,12 @@ suite: Package - Neuvector - Values Tests
 templates:
   - templates/neuvector/values.yaml
 tests:
+  - it: renders the values Secret with an API version
+    asserts:
+      - equal:
+          path: apiVersion
+          value: v1
+
   - it: uses the top-level definitions if they're set
     postRenderer:
       cmd: "sh"

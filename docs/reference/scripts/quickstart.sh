@@ -122,8 +122,7 @@ function deploy_bigbang {
             --set registryCredentials.password=${REGISTRY1_TOKEN} \
             "$@" \
             -f ${BIG_BANG_REPO}/chart/ingress-certs.yaml \
-            -f ${BIG_BANG_REPO}/docs/reference/configs/example/dev-sso-values.yaml \
-            -f ${BIG_BANG_REPO}/docs/reference/configs/example/policy-overrides-k3d.yaml
+            -f ${BIG_BANG_REPO}/docs/reference/configs/example/dev-sso-values.yaml
 }
 
 function check_for_tools {

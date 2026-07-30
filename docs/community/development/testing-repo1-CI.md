@@ -72,7 +72,7 @@ addons:
 1. Deploy BigBang with the above override file
 
 ```bash
-helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ./docs/assets/configs/example/policy-overrides-k3d.yaml -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml -f ../overrides/gitlabrunner-test.yaml
+helm upgrade -i bigbang ./chart -n bigbang --create-namespace -f ../overrides/registry-values.yaml -f ./chart/ingress-certs.yaml -f ../overrides/gitlabrunner-test.yaml
 ```
 
 1. Create a secret with the token for the runner

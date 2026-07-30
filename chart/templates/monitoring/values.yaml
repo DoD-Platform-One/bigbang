@@ -50,6 +50,13 @@ mTLS strict mode with sidecar certs is only applicable when sidecars are used (n
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 
 {{- $authserviceEnabled := and $istioEnabled (or .Values.addons.authservice.enabled (and .Values.monitoring.enabled .Values.monitoring.sso.enabled) (and .Values.tempo.enabled .Values.tempo.sso.enabled)) }}
+{{/*
+When true, prometheus/alertmanager are protected by authservice via the monitoring
+package's own ambient waypoint (bb-common per-route authservice model). This drives
+the per-route authservice config, the self-waypoint Service enrollment, and
+prependReleaseName (so the waypoint is named monitoring-monitoring-waypoint).
+*/}}
+{{- $monitoringAuthserviceWaypoint := eq (include "monitoring.authservice.waypointEnabled" .) "true" }}
 {{- $redisDatasource := (or $gitlabRedis .Values.addons.argocd.enabled $authserviceRedisEnabled) }}
 {{- $headlampEnabled := (.Values.addons.headlamp.enabled) }}
 {{- $thanosEnabled := (.Values.addons.thanos.enabled) }}
@@ -71,6 +78,12 @@ flux:
 {{/* bb-common Istio defaults for monitoring follow hardened posture. */}}
 istio:
   enabled: {{ $istioEnabled }}
+  {{- if $monitoringAuthserviceWaypoint }}
+  # Prefix bb-common Istio resources with the release name so the auto-created
+  # waypoint Gateway is named monitoring-monitoring-waypoint (referenced by the
+  # Service enrollment labels below and by in-mesh client egress policies).
+  prependReleaseName: true
+  {{- end }}
   sidecar:
     enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
     outboundTrafficPolicyMode: REGISTRY_ONLY
@@ -102,9 +115,25 @@ routes:
     monitoring-prometheus:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
+      {{- if $monitoringAuthserviceWaypoint }}
+      # bb-common generates the OIDC ext_authz policies (RequestAuthentication +
+      # CUSTOM/DENY AuthorizationPolicy) for this route, enforced at the waypoint.
+      authservice:
+        enabled: true
+        ingressOnly: true
+        issuer: {{ include "sso.url" . | quote }}
+        clientId: {{ .Values.monitoring.sso.prometheus.client_id | quote }}
+      {{- end }}
     monitoring-alertmanager:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.monitoring.ingress.gateway "root" .)}}
+      {{- if $monitoringAuthserviceWaypoint }}
+      authservice:
+        enabled: true
+        ingressOnly: true
+        issuer: {{ include "sso.url" . | quote }}
+        clientId: {{ .Values.monitoring.sso.alertmanager.client_id | quote }}
+      {{- end }}
   outbound:
     monitoring-bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.monitoring.values }}
@@ -177,7 +206,6 @@ networkPolicies:
         from:
           k8s:
             authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
-            authservice-waypoint@authservice/authservice-waypoint: {{ and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             logging/logging-loki: {{ .Values.loki.enabled }}
           definition:
@@ -195,7 +223,6 @@ networkPolicies:
           k8s:
             tempo/tempo: {{ .Values.tempo.enabled }}
             authservice/haproxy: {{ ((.Values.packages).haproxy).enabled }}
-            authservice-waypoint@authservice/authservice-waypoint: {{ and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
             kiali/kiali: {{ .Values.kiali.enabled }}
             alloy/alloy-logs: {{ .Values.alloy.enabled }}
             alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
@@ -272,12 +299,13 @@ sso:
 
 upstream:
   alertmanager:
-    {{- if and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
+    {{- if $monitoringAuthserviceWaypoint }}
+    # In ambient mode, enroll alertmanager onto the monitoring package's own waypoint
+    # so bb-common's per-route authservice ext_authz is enforced for ingress traffic.
     # In ambient mode, route alertmanager traffic through the authservice waypoint so SSO is enforced.
     service:
       labels:
-        istio.io/use-waypoint: authservice-waypoint
-        istio.io/use-waypoint-namespace: authservice
+        istio.io/use-waypoint: monitoring-monitoring-waypoint
         istio.io/ingress-use-waypoint: "true"
     {{- end }}
     alertmanagerSpec:
@@ -317,12 +345,12 @@ upstream:
     {{- end }}
 
   prometheus:
-    {{- if and $ambientEnabled $authserviceEnabled .Values.monitoring.sso.enabled }}
-    # In ambient mode, route prometheus traffic through the authservice waypoint so SSO is enforced.
+    {{- if $monitoringAuthserviceWaypoint }}
+    # In ambient mode, enroll prometheus onto the monitoring package's own waypoint
+    # so bb-common's per-route authservice ext_authz is enforced for ingress traffic.
     service:
       labels:
-        istio.io/use-waypoint: authservice-waypoint
-        istio.io/use-waypoint-namespace: authservice
+        istio.io/use-waypoint: monitoring-monitoring-waypoint
         istio.io/ingress-use-waypoint: "true"
     {{- end }}
     {{- if $thanosEnabled }}

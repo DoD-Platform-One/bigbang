@@ -62,3 +62,13 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: ".*"
+
+  - it: should fail validation with invalid Metrics Server flux configuration
+    set:
+      addons:
+        metricsServer:
+          flux:
+            install: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

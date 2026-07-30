@@ -6,7 +6,7 @@ Big Bang uses a declarative approach to package management, allowing you to enab
 
 Big Bang organizes packages into three main categories:
 
-- **Core Packages**: Essential infrastructure components (Istio, Fluentd, Monitoring, etc.)
+- **Core Packages**: Integrated infrastructure components (Istiod, Fluent Bit, Monitoring, etc.)
 - **Add-on Packages**: Optional but commonly used applications (ArgoCD, GitLab, etc.)
 - **Custom Packages**: User-defined applications following Big Bang patterns
 
@@ -21,12 +21,12 @@ Core packages are enabled by default but can be disabled:
 monitoring:
   enabled: false
 
-# Disable log aggregation
-fluentd:
+# Disable the Fluent Bit log collector
+fluentbit:
   enabled: false
 
-# Disable service mesh
-istio:
+# Disable the Istio control plane
+istiod:
   enabled: false
 ```
 
@@ -57,24 +57,33 @@ Most packages use Git repositories by default:
 addons:
   gitlab:
     enabled: true
+    sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/gitlab.git
-      tag: "7.7.0-bb.4"
+      tag: "9.11.7-bb.0"
       path: "./chart"
 ```
 
 ### OCI Sources
 
-For packages available as OCI artifacts:
+Define the OCI repository at the top level, then select it from the package with
+`sourceType: helmRepo`:
 
 ```yaml
+helmRepositories:
+  - name: registry1
+    repository: oci://registry1.dso.mil/bigbang
+    type: oci
+    existingSecret: private-registry
+
 addons:
   gitlab:
     enabled: true
-    oci:
-      registry: registry1.dso.mil
-      repository: bigbang/gitlab
-      tag: "7.7.0-bb.4"
+    sourceType: helmRepo
+    helmRepo:
+      repoName: registry1
+      chartName: gitlab
+      tag: "9.11.7-bb.0"
 ```
 
 ## Passing Values to Packages
@@ -88,13 +97,8 @@ addons:
   gitlab:
     enabled: true
     values:
-      global:
-        hosts:
-          domain: bigbang.dev
-        ingress:
-          enabled: true
       upstream:
- .      gitlab:
+        gitlab:
           webservice:
             replicas: 2
 ```
@@ -104,8 +108,8 @@ addons:
 Use YAML anchors and references for complex configurations:
 
 ```yaml
-# Define common values
-commonDomain: &domain "example.com"
+# Anchors can be attached to schema-supported values.
+domain: &domain "example.com"
 
 addons:
   gitlab:
@@ -129,37 +133,52 @@ addons:
     flux:
       timeout: 10m
       interval: 2m
-      retries: 3
+      upgrade:
+        remediation:
+          retries: 3
     values:
       # package values here
 ```
 
 ### Namespace Configuration
 
-Specify custom namespaces for packages:
+Integrated packages use namespaces selected by Big Bang. For an additional
+package, set its target namespace under `packages`:
 
 ```yaml
-addons:
-  gitlab:
+packages:
+  podinfo:
     enabled: true
-    namespace: custom-gitlab-namespace
+    sourceType: git
+    namespace:
+      name: custom-podinfo-namespace
+      create: true
+    git:
+      repo: https://github.com/stefanprodan/podinfo.git
+      tag: "6.3.4"
+      path: charts/podinfo
     values:
-      # package values here
+      replicaCount: 2
 ```
 
 ### Dependency Management
 
-Control package installation order with dependencies:
+Control an additional Helm package's installation order with dependencies:
 
 ```yaml
-addons:
-  gitlab:
+packages:
+  podinfo:
     enabled: true
+    sourceType: git
+    git:
+      repo: https://github.com/stefanprodan/podinfo.git
+      tag: "6.3.4"
+      path: charts/podinfo
     dependsOn:
-      - name: istio
-        namespace: istio-system
+      - name: monitoring
+        namespace: bigbang
     values:
-      # package values here
+      replicaCount: 2
 ```
 
 ## Best Practices

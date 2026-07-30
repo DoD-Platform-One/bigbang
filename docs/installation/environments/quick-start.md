@@ -237,6 +237,9 @@ packages:
     # @default -- true
     enabled: true
 
+    # -- Choose source type of "git" or "helmRepo"
+    sourceType: git
+
     # -- Toggle wrapper functionality. See https://docs-bigbang.dso.mil/latest/docs/installation/environments/extra-package-deployment/#Wrapper-Deployment for more details.
     # @default -- false
     wrapper:
@@ -245,7 +248,7 @@ packages:
     # -- Use a kustomize deployment rather than Helm
     kustomize: false
 
-    # -- HelmRepo source is supported as an option for Helm deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    # -- HelmRepo source is supported as an option for Helm deployments and is selected with `sourceType: helmRepo`.
     helmRepo:
       # -- Name of the HelmRepo specified in `helmRepositories`
       # @default -- Uses `registry1` Helm Repository if not specified
@@ -256,7 +259,7 @@ packages:
       # -- Tag of the chart in the Helm repo, required
       tag:
 
-    # -- Git source is supported for both Helm and Kustomize deployments. If both `git` and `helmRepo` are provided `git` will take precedence.
+    # -- Git source is supported for both Helm and Kustomize deployments and is selected with `sourceType: git`.
     git:
       # -- Git repo URL holding the helm chart for this package, required if using git
       repo: "https://repo1.dso.mil/big-bang/product/packages/podinfo.git"
@@ -269,8 +272,8 @@ packages:
       # -- Git branch to check out.  [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference).
       # @default -- When no other reference is specified, `master` branch is used
       branch:
-      # -- Path inside of the git repo to find the helm chart or kustomize
-      # @default -- For Helm charts `chart`.  For Kustomize `/`.
+      # -- Path inside the Git repository to the Helm chart or Kustomization. Required for Kustomize packages.
+      # @default -- For Helm packages, `chart`. No default is applied to Kustomize packages.
       path: "chart"
 
     # -- Override flux settings for this package

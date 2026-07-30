@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Headlamp - Values Tests
+templates:
+  - templates/headlamp/values.yaml
+tests:
+  - it: should enable Repo1 outbound route when bbtests are enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.headlamp.enabled: true
+      addons.headlamp.values.bbtests.enabled: true
+    asserts:
+      - equal:
+          path: routes.outbound["headlamp-bb-tests"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["headlamp-bb-tests"].hosts[0]
+          value: repo1.dso.mil
+
+  - it: should disable Repo1 outbound route when bbtests are not enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.headlamp.enabled: true
+    asserts:
+      - equal:
+          path: routes.outbound["headlamp-bb-tests"].enabled
+          value: false
