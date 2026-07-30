@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Gateway API - Ambient Enablement
+tests:
+  - it: should render the GitRepository when ambient is enabled via ztunnel
+    template: gateway-api/gitrepository.yaml
+    set:
+      ztunnel.enabled: true
+      gatewayAPI.sourceType: git
+      offline: false
+    asserts:
+      - isKind:
+          of: GitRepository
+      - equal:
+          path: metadata.name
+          value: gateway-api
+
+  - it: should render the values secret when ambient is enabled via ztunnel
+    template: gateway-api/values.yaml
+    set:
+      ztunnel.enabled: true
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-gateway-api-values

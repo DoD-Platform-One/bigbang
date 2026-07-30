@@ -44,3 +44,24 @@ tests:
       - equal:
           path: networkPolicies.ingress.definitions.kubeAPI.from[0].ipBlock.cidr
           value: "10.10.0.0/16"
+
+  - it: should include ztunnel policy exclusions when ambient is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      gatekeeper.enabled: true
+      monitoring.enabled: false
+      istio.ambient.enabled: true
+    asserts:
+      - contains:
+          path: violations.allowedHostFilesystem.parameters.excludedResources
+          content: istio-system/ztunnel-.*
+      - contains:
+          path: violations.restrictedTaint.parameters.excludedResources
+          content: istio-system/ztunnel-.*
+      - contains:
+          path: violations.volumeTypes.parameters.excludedResources
+          content: istio-system/ztunnel-.*

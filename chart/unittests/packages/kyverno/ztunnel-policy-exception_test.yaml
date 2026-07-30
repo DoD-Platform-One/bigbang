@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Kyverno Policies - Ztunnel Exception
+templates:
+  - templates/kyverno-policies/values.yaml
+postRenderer:
+  cmd: "sh"
+  args:
+    - "-c"
+    - "yq eval '.stringData.defaults' - | yq eval '.'"
+tests:
+  - it: should include the ztunnel policy exception when ambient is enabled globally
+    set:
+      kyvernoPolicies.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: additionalPolicyExceptions.ztunnel.enabled
+          value: true
+
+  - it: should include the ztunnel policy exception when ztunnel is enabled
+    set:
+      kyvernoPolicies.enabled: true
+      ztunnel.enabled: true
+    asserts:
+      - equal:
+          path: additionalPolicyExceptions.ztunnel.enabled
+          value: true
+
+  - it: should not include the ztunnel policy exception when ambient is disabled
+    set:
+      kyvernoPolicies.enabled: true
+      istio.ambient.enabled: false
+      ztunnel.enabled: false
+    asserts:
+      - notExists:
+          path: additionalPolicyExceptions.ztunnel
