@@ -340,8 +340,7 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $effectiveGW := mustMergeOverwrite (deepCopy (get $defaults.gateways $name | default dict)) (deepCopy $commonGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
-      {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
       
       {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
         {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
@@ -855,7 +854,7 @@ Args:
 {{- $gateways := (include "enabledGateways" .root) | fromYaml }}
 {{- $gw := get $gateways $gateway }}
 {{- if $gw }}
-  {{- toYaml (dict "app" $gw.serviceName "istio" $gw.type) }}
+  {{- toYaml (dict "app" $gw.serviceName "istio" "ingressgateway") }}
 {{- end }}
 {{- end -}}
 
@@ -877,7 +876,7 @@ Args:
 
 {{- define "bigbang.istio-gateway.ingress-netpol-spec" }}
   {{- $ctx := index . 0 }}
-  {{- $serviceName := index . 1 }}
+  {{- $name := index . 1 }}
   {{- $ports := index . 2 }}
 networkPolicies:
   enabled: {{ $ctx.Values.networkPolicies.enabled }}
@@ -887,7 +886,7 @@ networkPolicies:
       {{- $ctx.Values.networkPolicies.ingress.definitions | toYaml | nindent 8 }}
     {{- end }}
     to:
-      "{{ $serviceName }}:{{ $ports | toJson }}":
+      "{{ $name }}-ingressgateway:{{ $ports | toJson }}":
         from:
           definition:
             load-balancer-subnets: true
@@ -897,7 +896,7 @@ networkPolicies:
       {{- $ctx.Values.networkPolicies.egress.definitions | toYaml | nindent 8 }}
     {{- end }}
     from:
-      "{{ $serviceName }}":
+      "{{ $name }}-ingressgateway":
         to:
           k8s:
             '*': true
@@ -922,7 +921,7 @@ networkPolicies:
       {{- $ports = append $ports $server.port.number }}
     {{- end }}
 
-    {{- $newGateway = merge (dict "defaults" (include "bigbang.istio-gateway.ingress-netpol-spec" (list $ctx $gateway.serviceName $ports) | fromYaml)) $newGateway }}
+    {{- $newGateway = merge (dict "defaults" (include "bigbang.istio-gateway.ingress-netpol-spec" (list $ctx $name $ports) | fromYaml)) $newGateway }}
 
     {{- $_ := set $newGateways $name $newGateway }}
   {{- end }}

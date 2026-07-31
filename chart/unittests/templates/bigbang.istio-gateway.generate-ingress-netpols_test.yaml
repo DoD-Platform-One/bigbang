@@ -11,7 +11,6 @@ tests:
         args:
         - helm:context
         - custom:
-            serviceName: custom-ingressgateway
             defaults: {}
             overlays:
               gateway:
@@ -100,7 +99,6 @@ tests:
         args:
         - helm:context
         - custom:
-            serviceName: custom-ingressgateway
             defaults: {}
             overlays:
               gateway:
@@ -178,7 +176,6 @@ tests:
         args:
         - helm:context
         - custom:
-            serviceName: custom-ingressgateway
             defaults:
               networkPolicies:
                 egress:
@@ -269,7 +266,6 @@ tests:
         args:
         - helm:context
         - custom:
-            serviceName: custom-ingressgateway
             defaults:
               networkPolicies:
                 egress:
