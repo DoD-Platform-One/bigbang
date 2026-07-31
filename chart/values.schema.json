@@ -348,34 +348,40 @@
             "gateways": {
               "type": "object"
             },
-            "classificationBanner": {
-              "type": "object"
-            },
-            "gateway": {
-              "type": "object"
-            },
-            "gluon": {
-              "type": "object"
-            },
-            "waitJob": {
+            "shared": {
               "type": "object",
               "properties": {
-                "enabled": {
-                  "type": "boolean"
+                "classificationBanner": {
+                  "type": "object"
+                },
+                "gateway": {
+                  "type": "object"
+                },
+                "gluon": {
+                  "type": "object"
+                },
+                "waitJob": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "networkPolicies": {
+                  "type": "object"
+                },
+                "mtls": {
+                  "type": "object"
+                },
+                "tracing": {
+                  "type": "object"
+                },
+                "upstream": {
+                  "type": "object"
                 }
-              }
-            },
-            "networkPolicies": {
-              "type": "object"
-            },
-            "mtls": {
-              "type": "object"
-            },
-            "tracing": {
-              "type": "object"
-            },
-            "upstream": {
-              "type": "object"
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false

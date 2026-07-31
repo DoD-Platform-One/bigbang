@@ -5,7 +5,17 @@ templates:
 release:
   name: bb
 tests:
-  - it: should apply root common values to the public gateway overlays
+  - it: should not add overlays when no shared or gateway-specific values are configured
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.overlays' - | yq eval '.'"
+    asserts:
+      - notExists:
+          path: upstream
+
+  - it: should apply shared values to the public gateway overlays
     postRenderer:
       cmd: "sh"
       args:
@@ -13,15 +23,16 @@ tests:
         - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.overlays' - | yq eval '.'"
     set:
       istioGateway.values:
-        waitJob:
-          enabled: false
-        networkPolicies:
-          enabled: false
-        mtls:
-          mode: PERMISSIVE
-        upstream:
-          service:
-            type: ClusterIP
+        shared:
+          waitJob:
+            enabled: false
+          networkPolicies:
+            enabled: false
+          mtls:
+            mode: PERMISSIVE
+          upstream:
+            service:
+              type: ClusterIP
     asserts:
       - equal:
           path: waitJob.enabled
@@ -36,7 +47,7 @@ tests:
           path: upstream.service.type
           value: ClusterIP
 
-  - it: should apply root common values to the passthrough gateway overlays
+  - it: should apply shared values to the passthrough gateway overlays
     postRenderer:
       cmd: "sh"
       args:
@@ -44,10 +55,11 @@ tests:
         - "yq eval 'select(.metadata.name == \"bb-istio-passthrough-gateway-values\") | .stringData.overlays' - | yq eval '.'"
     set:
       istioGateway.values:
-        waitJob:
-          enabled: false
-        mtls:
-          mode: PERMISSIVE
+        shared:
+          waitJob:
+            enabled: false
+          mtls:
+            mode: PERMISSIVE
     asserts:
       - equal:
           path: waitJob.enabled
@@ -56,7 +68,7 @@ tests:
           path: mtls.mode
           value: PERMISSIVE
 
-  - it: should let gateway-specific values override root common values
+  - it: should let gateway-specific values override shared values
     postRenderer:
       cmd: "sh"
       args:
@@ -64,8 +76,9 @@ tests:
         - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.overlays' - | yq eval '.'"
     set:
       istioGateway.values:
-        waitJob:
-          enabled: false
+        shared:
+          waitJob:
+            enabled: false
         gateways:
           public:
             waitJob:
