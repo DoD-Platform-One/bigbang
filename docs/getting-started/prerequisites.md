@@ -20,7 +20,6 @@ It is also recommended to have a minimum of 3 nodes in the cluster to ensure hig
 1. Identify configured swap devices and files with cat /proc/swaps.
 2. Turn off all swap devices and files with swapoff -a.
 3. Remove any matching reference found in /etc/fstab.
-(Credit: Above copy pasted from Aaron Copley of [Serverfault.com](https://serverfault.com/questions/684771/best-way-to-disable-swap-in-linux))
 
 ### ECK Specific Configuration (ECK Is a Core BB App)
 
