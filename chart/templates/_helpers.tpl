@@ -57,6 +57,40 @@
   {{- end }}
 {{- end }}
 
+{{/*
+Render the standard private registry Secret used by integrated packages.
+The caller is responsible for package-specific enablement and ownership checks.
+
+Args (dict):
+  - root: root chart context ($ or .)
+  - namespace: namespace that receives the Secret
+  - appName: app.kubernetes.io/name label value (optional)
+  - component: app.kubernetes.io/component label value (optional)
+  - commonLabels: include common labels when no appName/component is supplied (optional)
+*/}}
+{{- define "bigbang.imagePullSecret" -}}
+{{- if (include "imagePullSecret" .root) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: {{ .namespace }}
+  {{- if or .appName .component .commonLabels }}
+  labels:
+    {{- with .appName }}
+    app.kubernetes.io/name: {{ . }}
+    {{- end }}
+    {{- with .component }}
+    app.kubernetes.io/component: {{ . | quote }}
+    {{- end }}
+    {{- include "commonLabels" .root | nindent 4 }}
+  {{- end }}
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ include "imagePullSecret" .root }}
+{{- end }}
+{{- end }}
+
 {{- define "multipleCreds" -}}
 {
   "auths": {
