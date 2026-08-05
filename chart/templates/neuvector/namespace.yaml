@@ -1,16 +1,3 @@
 {{- if .Values.neuvector.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: neuvector
-  labels:
-    app.kubernetes.io/name: neuvector
-    app.kubernetes.io/component: "sandbox"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.neuvector) "enabled")) }}
-    {{- end }}
+{{- include "bigbang.namespace" (dict "root" . "name" "neuvector" "appName" "neuvector" "component" "sandbox" "package" .Values.neuvector) }}
 {{- end }}

@@ -1,16 +1,3 @@
 {{- if .Values.addons.minio.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: minio
-  labels:
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.minio) "enabled")) }}
-    {{- end }}
-    app.kubernetes.io/name: minio
-    app.kubernetes.io/component: "application-utilities"
-    {{- include "commonLabels" . | nindent 4}}
+{{- include "bigbang.namespace" (dict "root" . "name" "minio" "appName" "minio" "component" "application-utilities" "package" .Values.addons.minio) }}
 {{- end }}

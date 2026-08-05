@@ -1,15 +1,3 @@
 {{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: bbctl
-  labels:
-    app.kubernetes.io/name: bbctl
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled")) }}
-    {{- end }}
+{{- include "bigbang.namespace" (dict "root" . "name" "bbctl" "appName" "bbctl" "package" .Values.addons.gitlab) }}
 {{- end }}

@@ -1,16 +1,3 @@
 {{- if .Values.addons.sonarqube.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: sonarqube
-  labels:
-    app.kubernetes.io/name: sonarqube
-    app.kubernetes.io/component: "developer-tools"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled")) }}
-    {{- end }}
+{{- include "bigbang.namespace" (dict "root" . "name" "sonarqube" "appName" "sonarqube" "component" "developer-tools" "package" .Values.addons.sonarqube) }}
 {{- end }}

@@ -1,18 +1,3 @@
 {{- if .Values.addons.externalSecrets.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    meta.helm.sh/release-namespace: bigbang
-    meta.helm.sh/release-name: bigbang
-    app.kubernetes.io/name: external-secrets
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.externalSecrets) "enabled")) }}
-    {{- end }}
-  name: external-secrets
+{{- include "bigbang.namespace" (dict "root" . "name" "external-secrets" "appName" "external-secrets" "component" "core" "package" .Values.addons.externalSecrets "extraLabels" (dict "meta.helm.sh/release-namespace" "bigbang" "meta.helm.sh/release-name" "bigbang")) }}
 {{- end }}
