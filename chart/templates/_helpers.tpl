@@ -223,7 +223,7 @@ secretRef:
 {{- else if and (.packageGitScope.credentials) (coalesce .packageGitScope.credentials.username .packageGitScope.credentials.password .packageGitScope.credentials.caFile .packageGitScope.credentials.privateKey .packageGitScope.credentials.publicKey .packageGitScope.credentials.knownHosts "") -}}
 {{- /* Input validation happens in git-credentials.yaml template */ -}}
 secretRef:
-  name: {{ .releaseName }}-{{ .name }}-git-credentials
+  name: {{ .releaseName }}-{{ include "resourceName" .name }}-git-credentials
 {{- else -}}
 {{/* If no credentials are specified, use the global credentials in the rootScope */}}
 {{- include "gitCredsGlobal" .rootScope }}
@@ -641,11 +641,15 @@ bigbang.dev/istioVersion: {{ $helmRepo.tag }}
 Returns the git credentails secret for the given scope and name
 */ -}}
 {{- define "gitCredsSecret" -}}
-{{- $name := .name }}
+{{- $name := include "resourceName" .name }}
 {{- $releaseName := .releaseName }}
 {{- $releaseNamespace := .releaseNamespace }}
+{{- $enabled := .targetScope.enabled }}
+{{- if hasKey . "enabled" }}
+{{- $enabled = .enabled }}
+{{- end }}
 {{- with .targetScope -}}
-{{- if and (eq .sourceType "git") .enabled }}
+{{- if and (eq .sourceType "git") $enabled }}
 {{- if .git }}
 {{- with .git -}}
 {{- if not .existingSecret }}

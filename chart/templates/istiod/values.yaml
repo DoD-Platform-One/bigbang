@@ -62,7 +62,7 @@ authservice:
 
 upstream:
   cni:
-    enabled: {{ or .Values.istioCNI.enabled .Values.istio.ambient.enabled }}
+    enabled: {{ or .Values.istioCNI.enabled (eq (include "ambientEnabled" .) "true") }}
   global:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}
