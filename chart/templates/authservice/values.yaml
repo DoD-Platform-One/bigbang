@@ -49,6 +49,13 @@ istio:
 
   clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
 
+routes:
+  outbound:
+    bb-tests:
+      enabled: {{ dig "bbtests" "enabled" false .Values.addons.authservice.values }}
+      hosts:
+      - repo1.dso.mil
+
 image: 
   pullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
   
