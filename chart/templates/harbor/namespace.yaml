@@ -1,17 +1,4 @@
 {{- $pkg := "harbor" }}
 {{- if (get .Values.addons $pkg).enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ $pkg }}
-  labels:
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" (get .Values.addons $pkg)) "enabled")) }}
-    {{- end }}
-    app.kubernetes.io/name: {{ $pkg }}
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
+{{- include "bigbang.namespace" (dict "root" . "name" $pkg "appName" $pkg "component" "core" "package" (get .Values.addons $pkg)) }}
 {{- end }}

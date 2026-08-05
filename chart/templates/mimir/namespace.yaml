@@ -1,16 +1,3 @@
 {{- if .Values.addons.mimir.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mimir
-  labels:
-    app.kubernetes.io/name: mimir
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled")) }}
-    {{- end }}
+{{- include "bigbang.namespace" (dict "root" . "name" "mimir" "appName" "mimir" "component" "core" "package" .Values.addons.mimir) }}
 {{- end }}

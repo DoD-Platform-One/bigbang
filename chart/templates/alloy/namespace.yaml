@@ -1,16 +1,3 @@
 {{- if .Values.alloy.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: alloy
-  labels:
-    app.kubernetes.io/name: alloy
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.alloy) "enabled")) }}
-    {{- end }}
+{{- include "bigbang.namespace" (dict "root" . "name" "alloy" "appName" "alloy" "component" "core" "package" .Values.alloy) }}
 {{- end }}
