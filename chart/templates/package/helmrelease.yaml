@@ -74,8 +74,12 @@ spec:
   {{- $includeDefaultDependsOn := dig "includeDefaultDependsOn" true $vals -}}
   {{- $gatekeeperDep := $.Values.gatekeeper.enabled -}}
   {{- $kyvernoDep := $.Values.kyvernoPolicies.enabled -}}
-  {{- /* Wait on istio if sidecar is enabled */ -}}
-  {{- $istioDep := (and $istioEnabled (eq "enabled" (dig "istio" "injection" "enabled" $vals))) -}}
+  {{- /* Wait on Istio whenever Big Bang injects bb-common Istio values or sidecar injection is enabled.
+         bb-common renders Istio resources in ambient mode and when sidecar injection is disabled, and
+         those resources require istiod's validation webhook to be ready. */ -}}
+  {{- $bbCommonIstioDep := and $istioEnabled (dig "bbCommonValues" true $vals) -}}
+  {{- $sidecarIstioDep := and $istioEnabled (eq "enabled" (dig "istio" "injection" "enabled" $vals)) -}}
+  {{- $istioDep := or $bbCommonIstioDep $sidecarIstioDep -}}
   {{- $defaultDependsOn := and $includeDefaultDependsOn (or $gatekeeperDep $kyvernoDep $istioDep) -}}
   {{- if or $defaultDependsOn $vals.dependsOn }}
   dependsOn:

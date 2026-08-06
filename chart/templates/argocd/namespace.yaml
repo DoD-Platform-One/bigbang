@@ -1,16 +1,3 @@
 {{- if .Values.addons.argocd.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    app.kubernetes.io/name: argocd
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled")) }}
-    {{- end }}
-  name: argocd
+{{- include "bigbang.namespace" (dict "root" . "name" "argocd" "appName" "argocd" "component" "core" "package" .Values.addons.argocd) }}
 {{- end }}

@@ -57,6 +57,95 @@
   {{- end }}
 {{- end }}
 
+{{/*
+Render a Namespace for an integrated package.
+The caller resolves package-specific enablement and passes the package values used
+to determine sidecar injection. Special namespaces with user-provided metadata or
+multiple resources remain in their package templates.
+
+Args (dict):
+  - root: root chart context ($ or .)
+  - name: Namespace metadata.name
+  - appName: app.kubernetes.io/name label value
+  - component: app.kubernetes.io/component label value (optional)
+  - package: package values containing istio.injection (string; defaults to "enabled")
+  - extraLabels: additional labels to render (optional)
+  - meshMode: "auto" (default) or "none"
+*/}}
+{{- define "bigbang.namespace" -}}
+{{- $name := required "bigbang.namespace: name is required" .name -}}
+{{- $appName := required "bigbang.namespace: appName is required" .appName -}}
+{{- $meshMode := "auto" -}}
+{{- if hasKey . "meshMode" -}}
+{{- $candidate := get . "meshMode" -}}
+{{- if not (kindIs "string" $candidate) -}}
+{{- fail (printf "bigbang.namespace: meshMode for namespace %q must be a string, got %s" $name (kindOf $candidate)) -}}
+{{- end -}}
+{{- $meshMode = $candidate -}}
+{{- end -}}
+{{- $validMeshModes := list "auto" "none" -}}
+{{- if not (has $meshMode $validMeshModes) -}}
+{{- fail (printf "bigbang.namespace: unsupported meshMode %q for namespace %q; expected one of: %s" $meshMode $name (join ", " $validMeshModes)) -}}
+{{- end -}}
+{{- $istioEnabled := eq (include "istioEnabled" .root) "true" -}}
+{{- $labels := include "commonLabels" .root | fromYaml -}}
+{{- with .extraLabels -}}
+{{- $labels = mustMergeOverwrite $labels . -}}
+{{- end -}}
+{{- $labels = set $labels "app.kubernetes.io/name" $appName -}}
+{{- with .component -}}
+{{- $labels = set $labels "app.kubernetes.io/component" . -}}
+{{- end -}}
+{{- if eq $meshMode "none" -}}
+{{- $labels = set $labels "istio-injection" "disabled" -}}
+{{- $labels = set $labels "istio.io/dataplane-mode" "none" -}}
+{{- else if eq (include "ambientEnabled" .root) "true" -}}
+{{- $labels = set $labels "istio.io/dataplane-mode" "ambient" -}}
+{{- else -}}
+{{- $labels = set $labels "istio-injection" (ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" (default dict .package)) "enabled"))) -}}
+{{- end -}}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- toYaml $labels | nindent 4 }}
+{{- end }}
+
+{{/*
+Render the standard private registry Secret used by integrated packages.
+The caller is responsible for package-specific enablement and ownership checks.
+
+Args (dict):
+  - root: root chart context ($ or .)
+  - namespace: namespace that receives the Secret
+  - appName: app.kubernetes.io/name label value (optional)
+  - component: app.kubernetes.io/component label value (optional)
+  - commonLabels: include common labels when no appName/component is supplied (optional)
+*/}}
+{{- define "bigbang.imagePullSecret" -}}
+{{- if (include "imagePullSecret" .root) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-registry
+  namespace: {{ .namespace }}
+  {{- if or .appName .component .commonLabels }}
+  labels:
+    {{- with .appName }}
+    app.kubernetes.io/name: {{ . }}
+    {{- end }}
+    {{- with .component }}
+    app.kubernetes.io/component: {{ . | quote }}
+    {{- end }}
+    {{- include "commonLabels" .root | nindent 4 }}
+  {{- end }}
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ include "imagePullSecret" .root }}
+{{- end }}
+{{- end }}
+
 {{- define "multipleCreds" -}}
 {
   "auths": {
@@ -189,7 +278,7 @@ secretRef:
 {{- else if and (.packageGitScope.credentials) (coalesce .packageGitScope.credentials.username .packageGitScope.credentials.password .packageGitScope.credentials.caFile .packageGitScope.credentials.privateKey .packageGitScope.credentials.publicKey .packageGitScope.credentials.knownHosts "") -}}
 {{- /* Input validation happens in git-credentials.yaml template */ -}}
 secretRef:
-  name: {{ .releaseName }}-{{ .name }}-git-credentials
+  name: {{ .releaseName }}-{{ include "resourceName" .name }}-git-credentials
 {{- else -}}
 {{/* If no credentials are specified, use the global credentials in the rootScope */}}
 {{- include "gitCredsGlobal" .rootScope }}
@@ -613,11 +702,15 @@ bigbang.dev/istioVersion: {{ $helmRepo.tag }}
 Returns the git credentails secret for the given scope and name
 */ -}}
 {{- define "gitCredsSecret" -}}
-{{- $name := .name }}
+{{- $name := include "resourceName" .name }}
 {{- $releaseName := .releaseName }}
 {{- $releaseNamespace := .releaseNamespace }}
+{{- $enabled := .targetScope.enabled }}
+{{- if hasKey . "enabled" }}
+{{- $enabled = .enabled }}
+{{- end }}
 {{- with .targetScope -}}
-{{- if and (eq .sourceType "git") .enabled }}
+{{- if and (eq .sourceType "git") $enabled }}
 {{- if .git }}
 {{- with .git -}}
 {{- if not .existingSecret }}

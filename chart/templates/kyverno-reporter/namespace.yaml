@@ -1,17 +1,4 @@
 {{- $pkg := "kyvernoReporter" }}
 {{- if (get .Values $pkg).enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    app.kubernetes.io/name: {{ $pkg | kebabcase }}
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" (get .Values $pkg)) "enabled")) }}
-    {{- end }}
-  name: kyverno-reporter
+{{- include "bigbang.namespace" (dict "root" . "name" "kyverno-reporter" "appName" ($pkg | kebabcase) "component" "core" "package" (get .Values $pkg)) }}
 {{- end }}

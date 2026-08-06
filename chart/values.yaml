@@ -713,11 +713,11 @@ elasticsearchKibana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana.git
     path: "./chart"
-    tag: "1.40.0-bb.1"
+    tag: "1.40.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "elasticsearch-kibana"
-    tag: "1.40.0-bb.1"
+    tag: "1.40.0-bb.2"
 
   # -- Flux reconciliation overrides specifically for the Logging (EFK) Package
   flux:
@@ -805,11 +805,11 @@ fluentbit:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/fluentbit.git
     path: "./chart"
-    tag: "0.57.3-bb.1"
+    tag: "0.57.9-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "fluentbit"
-    tag: "0.57.3-bb.1"
+    tag: "0.57.9-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Fluent-Bit Package
   flux: {}
@@ -832,12 +832,12 @@ alloy:
 
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/alloy.git
-    tag: "4.3.1-bb.0"
+    tag: "4.3.1-bb.1"
     path: "./chart"
   helmRepo:
     repoName: "registry1"
     chartName: "k8s-monitoring"
-    tag: "4.3.1-bb.0"
+    tag: "4.3.1-bb.1"
 
   # -- Toggle Alloy to collect logs
   alloyLogs:
@@ -941,11 +941,11 @@ neuvector:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/neuvector.git
     path: "./chart"
-    tag: "2.11.0-bb.1"
+    tag: "2.11.0-bb.2"
   helmRepo:
     repoName: "registry1"
     chartName: "neuvector"
-    tag: "2.11.0-bb.1"
+    tag: "2.11.0-bb.2"
 
   # -- Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public".
   ingress:
@@ -1107,11 +1107,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "87.10.1-bb.2"
+    tag: "87.10.1-bb.3"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "87.10.1-bb.2"
+    tag: "87.10.1-bb.3"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -1343,11 +1343,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/argocd.git
       path: "./chart"
-      tag: "10.1.4-bb.1"
+      tag: "10.2.1-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "argocd"
-      tag: "10.1.4-bb.1"
+      tag: "10.2.1-bb.0"
     # -- Flux reconciliation overrides specifically for the ArgoCD Package
     flux: {}
 
@@ -1643,11 +1643,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/sonarqube.git
       path: "./chart"
-      tag: "2026.3.1-bb.2"
+      tag: "2026.4.0-bb.0"
     helmRepo:
       repoName: "registry1"
       chartName: "sonarqube"
-      tag: "2026.3.1-bb.2"
+      tag: "2026.4.0-bb.0"
 
     # -- Flux reconciliation overrides specifically for the Sonarqube Package
     flux: {}
@@ -1973,11 +1973,11 @@ addons:
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/velero.git
       path: "./chart"
-      tag: "12.1.0-bb.1"
+      tag: "12.1.0-bb.2"
     helmRepo:
       repoName: "registry1"
       chartName: "velero"
-      tag: "12.1.0-bb.1"
+      tag: "12.1.0-bb.2"
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
@@ -2266,12 +2266,12 @@ addons:
 
     git:
       repo: https://repo1.dso.mil/big-bang/product/packages/external-secrets.git
-      tag: "2.7.0-bb.2"
+      tag: "2.8.0-bb.0"
       path: "./chart"
     helmRepo:
       repoName: "registry1"
       chartName: "external-secrets"
-      tag: "2.7.0-bb.2"
+      tag: "2.8.0-bb.0"
 
     # -- Override flux settings for this package
     flux: {}

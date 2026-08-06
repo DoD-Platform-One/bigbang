@@ -1,16 +1,3 @@
 {{- if .Values.addons.gitlabRunner.enabled }}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    app.kubernetes.io/name: gitlab-runner
-    app.kubernetes.io/component: "developer-tools"
-    {{- include "commonLabels" . | nindent 4}}
-    {{- if eq (include "ambientEnabled" .) "true" }}
-    istio.io/dataplane-mode: ambient
-    {{- else }}
-    istio-injection: {{ ternary "enabled" "disabled" (and $istioEnabled (eq (dig "istio" "injection" "enabled" .Values.addons.gitlabRunner) "enabled")) }}
-    {{- end }}
-  name: gitlab-runner
+{{- include "bigbang.namespace" (dict "root" . "name" "gitlab-runner" "appName" "gitlab-runner" "component" "developer-tools" "package" .Values.addons.gitlabRunner) }}
 {{- end }}

@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Ambient Mode Regressions
+tests:
+  - it: should render gateway API git credentials with a valid name when ambient mode enables the package
+    template: gateway-api/git-credentials.yaml
+    set:
+      istio.ambient.enabled: true
+      gatewayAPI.enabled: false
+      gatewayAPI.sourceType: git
+      gatewayAPI.git.credentials.username: user
+      gatewayAPI.git.credentials.password: password
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-gateway-api-git-credentials
+
+  - it: should reference the normalized gateway API git credentials secret
+    template: gateway-api/gitrepository.yaml
+    set:
+      istio.ambient.enabled: true
+      gatewayAPI.enabled: false
+      gatewayAPI.sourceType: git
+      gatewayAPI.git.credentials.username: user
+      gatewayAPI.git.credentials.password: password
+    asserts:
+      - equal:
+          path: spec.secretRef.name
+          value: RELEASE-NAME-gateway-api-git-credentials
+
+  - it: should render istio CNI git credentials when ztunnel enables ambient mode
+    template: istio-cni/git-credentials.yaml
+    set:
+      ztunnel.enabled: true
+      istioCNI.enabled: false
+      istioCNI.sourceType: git
+      istioCNI.git.credentials.username: user
+      istioCNI.git.credentials.password: password
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-istio-cni-git-credentials
+
+  - it: should render ztunnel git credentials when global ambient mode enables the package
+    template: ztunnel/git-credentials.yaml
+    set:
+      istio.ambient.enabled: true
+      ztunnel.enabled: false
+      ztunnel.sourceType: git
+      ztunnel.git.credentials.username: user
+      ztunnel.git.credentials.password: password
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-ztunnel-git-credentials
+
+  - it: should enable the Istiod CNI configuration when ztunnel enables ambient mode
+    template: istiod/values.yaml
+    set:
+      istiod.enabled: true
+      istio.ambient.enabled: false
+      istioCNI.enabled: false
+      ztunnel.enabled: true
+    asserts:
+      - matchRegex:
+          path: stringData.defaults
+          pattern: "cni:\\n    enabled: true"

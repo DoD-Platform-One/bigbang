@@ -661,8 +661,6 @@ curl https://$PRIVATEIP:5443/v2/_catalog -k # Show return list of images
 curl https://$PRIVATEIP:5443/v2/repositories/rancher/library-busybox/tags
 ```
 
-​To permanently save the iptable rules across reboot, check out [link](https://unix.stackexchange.com/questions/52376/why-do-iptables-rules-disappear-when-restarting-my-debian-system)
-
 - Test that mirroring is working.
 
 ```shell

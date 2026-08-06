@@ -127,7 +127,7 @@ upstream:
         {{- else }}
         image_pull_secrets: []
         {{- end }}
-        {{- if include "istioEnabled" . }}
+        {{- if eq (include "istioEnabled" .) "true" }}
         pod_annotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
