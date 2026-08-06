@@ -4,6 +4,7 @@ templates:
   - templates/package/helmrelease.yaml
 release:
   name: test
+  namespace: bigbang
 set:
   gatekeeper:
     enabled: true
@@ -59,6 +60,49 @@ tests:
           content:
             name: gatekeeper
             namespace: bigbang
+
+  - it: should depend on istiod when bb-common Istio values are injected
+    set:
+      gatekeeper.enabled: false
+      istiod.enabled: true
+    asserts:
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: istiod
+            namespace: bigbang
+
+  - it: should depend on the complete ambient mesh when bb-common Istio values are injected
+    set:
+      gatekeeper.enabled: false
+      istiod.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: istiod
+            namespace: bigbang
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: istio-cni
+            namespace: bigbang
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: ztunnel
+            namespace: bigbang
+
+  - it: should not depend on istio when bb-common values and sidecar injection are disabled
+    set:
+      gatekeeper.enabled: false
+      istiod.enabled: true
+      packages.sample.bbCommonValues: false
+      packages.sample.istio.injection: disabled
+    asserts:
+      - notExists:
+          path: spec.dependsOn
 
   - it: should select HelmRepository according to sourceType even when git is configured
     set:
