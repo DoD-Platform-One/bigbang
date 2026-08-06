@@ -436,8 +436,8 @@ stringData:
       {{- $effectiveGW = mergeOverwrite $effectiveGW $userGW -}}
       {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
       
-      {{- if ne $gwType "ingressgateway" }}
-        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be 'ingressgateway'" $name) -}}
+      {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
+        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
       {{ end -}}
       
       {{- $gwRecord := dict -}}

@@ -437,6 +437,25 @@ istioGateway:
   #   gateways:
   #     passthrough: {}
   #
+  # EXAMPLE: Create an egress gateway
+  #   gateways:
+  #     # https://istio.io/latest/docs/tasks/traffic-management/egress/egress-gateway/
+  #     # https://istio.io/latest/blog/2023/egress-sni/
+  #     outbound: # name of the gateway; will be templated to outbound-egressgateway
+  #       upstream:
+  #         labels:
+  #           istio: egressgateway
+  #       gateway:
+  #         servers:
+  #         - port:
+  #             number: 443
+  #             name: tls
+  #             protocol: TLS
+  #           hosts:
+  #           - '*'
+  #           tls:
+  #             mode: ISTIO_MUTUAL
+  #
   # -- Flux reconciliation overrides specifically for the Istio Gateway Package
   flux:
     driftDetection:
