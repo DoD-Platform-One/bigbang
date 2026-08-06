@@ -72,21 +72,25 @@ upstream:
       PILOT_ENABLE_AMBIENT: "true"
   {{- end }}
 
-  {{- if or $authserviceEnabled .Values.tempo.enabled }}
   meshConfig:
+    defaultConfig:
+      proxyMetadata:
+        ISTIO_META_ENABLE_HBONE: "true"
+      {{- if .Values.tempo.enabled }}
+      tracing:
+        sampling: 10
+      {{- end }}
     {{- if .Values.tempo.enabled }}
     accessLogFormat: |
       [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%" %RESPONSE_CODE% %RESPONSE_FLAGS% %RESPONSE_CODE_DETAILS% %CONNECTION_TERMINATION_DETAILS% "%UPSTREAM_TRANSPORT_FAILURE_REASON%" %BYTES_RECEIVED% %BYTES_SENT% %DURATION% %RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)% "%REQ(X-FORWARDED-FOR)%" "%REQ(USER-AGENT)%" "%REQ(X-REQUEST-ID)%" "%REQ(:AUTHORITY)%" "%UPSTREAM_HOST%" %UPSTREAM_CLUSTER% %UPSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_LOCAL_ADDRESS% %DOWNSTREAM_REMOTE_ADDRESS% %REQUESTED_SERVER_NAME% %ROUTE_NAME% traceID=%REQ(x-b3-traceid)%
     enableTracing: true
-    defaultConfig:
-      tracing:
-        sampling: 10
     defaultProviders:
       tracing:
         - otel-tracing
       metrics:
         - prometheus
     {{- end }}
+    {{- if or $authserviceEnabled .Values.tempo.enabled }}
     extensionProviders:
     {{- if $authserviceEnabled }}
       - name: "authservice"
@@ -100,7 +104,7 @@ upstream:
           service: "alloy-alloy-receiver.alloy.svc.cluster.local"
           port: 4317
     {{- end }}
-  {{- end }}
+    {{- end }}
 {{ if and $authserviceEnabled .Values.sso.certificateAuthority.cert }}
   jwksResolverExtraRootCA: {{ .Values.sso.certificateAuthority.cert  | quote }}
 {{- end }}
