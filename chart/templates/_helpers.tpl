@@ -328,6 +328,7 @@ stringData:
 {{- define "enabledGateways" -}}
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
   {{- $sharedGatewayValues := deepCopy ($.Values.istioGateway.values.shared | default dict) -}}
+  {{- $userGatewayOverrides := deepCopy $userGateways -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
   {{- $istioPodAnnotations := (include "istioAnnotation" $ | fromYaml) | default dict -}}
 
@@ -340,17 +341,21 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
+      {{- $defaultGW := deepCopy (get $defaults.gateways $name | default dict) -}}
+      {{- $userGW := deepCopy (get $userGatewayOverrides $name | default dict) -}}
+      {{- $effectiveGW := mergeOverwrite $defaultGW (deepCopy $sharedGatewayValues) -}}
+      {{- $effectiveGW = mergeOverwrite $effectiveGW $userGW -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
       
-      {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
-        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
+      {{- if ne $gwType "ingressgateway" }}
+        {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be 'ingressgateway'" $name) -}}
       {{ end -}}
       
       {{- $gwRecord := dict -}}
       {{- $gwRecord = set $gwRecord "serviceName" (printf "%s-%s" $name $gwType) -}}
       {{- $gwRecord = set $gwRecord "type" $gwType -}}
       
-      {{- $gwDefaults := get $defaults.gateways $name | default dict -}}
+      {{- $gwDefaults := deepCopy (get $defaults.gateways $name | default dict) -}}
       {{- /*
         Give every gateway the same upstream.serviceAccount default that
         `public` and `passthrough` get out of the box. bb-common assumes a
