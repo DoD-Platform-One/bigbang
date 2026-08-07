@@ -11,7 +11,7 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
       path: chart
-      tag: 6.14.0-bb.1
+      tag: 6.14.1-bb.0
     bbCommonValues: true
     values:
       bb-common:
