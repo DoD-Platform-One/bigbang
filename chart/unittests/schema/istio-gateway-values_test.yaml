@@ -26,12 +26,102 @@ tests:
                     mode: SIMPLE
     asserts:
       - notFailedTemplate: {}
+  - it: should pass validation with waitJob values
+    set:
+      istioGateway:
+        values:
+          shared:
+            waitJob:
+              enabled: false
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with classificationBanner values
+    set:
+      istioGateway:
+        values:
+          shared:
+            classificationBanner:
+              enabled: true
+              classificationLevel: cui
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with gateway values
+    set:
+      istioGateway:
+        values:
+          shared:
+            gateway:
+              servers:
+                - hosts:
+                    - '*.dev.bigbang.mil'
+                  port:
+                    name: http
+                    number: 8080
+                    protocol: HTTP
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with gluon values
+    set:
+      istioGateway:
+        values:
+          shared:
+            gluon:
+              wait:
+                enabled: true
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with networkPolicies values
+    set:
+      istioGateway:
+        values:
+          shared:
+            networkPolicies:
+              enabled: true
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with mtls values
+    set:
+      istioGateway:
+        values:
+          shared:
+            mtls:
+              mode: STRICT
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with tracing values
+    set:
+      istioGateway:
+        values:
+          shared:
+            tracing:
+              enabled: true
+    asserts:
+      - notFailedTemplate: {}
+  - it: should pass validation with upstream values
+    set:
+      istioGateway:
+        values:
+          shared:
+            upstream:
+              image:
+                registry: registry1.dso.mil
+    asserts:
+      - notFailedTemplate: {}
   - it: should fail validation with invalid istioGateway values
     set:
       istioGateway:
         values:
+          invalidProperty:
+            foo: bar
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
+  - it: should fail validation with package values outside shared or gateways
+    set:
+      istioGateway:
+        values:
           waitJob:
-            image: foo
+            enabled: false
     asserts:
       - failedTemplate:
           errorPattern: ".*"

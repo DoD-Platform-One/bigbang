@@ -416,6 +416,8 @@ stringData:
 
 {{- define "enabledGateways" -}}
   {{- $userGateways := deepCopy ($.Values.istioGateway.values.gateways | default dict) -}}
+  {{- $sharedGatewayValues := deepCopy ($.Values.istioGateway.values.shared | default dict) -}}
+  {{- $userGatewayOverrides := deepCopy $userGateways -}}
   {{- $defaults := include "bigbang.defaults.istio-gateway" $ | fromYaml -}}
   {{- $istioPodAnnotations := (include "istioAnnotation" $ | fromYaml) | default dict -}}
 
@@ -428,7 +430,11 @@ stringData:
   
   {{- range $name, $mergedGW := merge $userGateways $defaults.gateways }}
     {{- if and $name $mergedGW }}
-      {{- $gwType := dig "upstream" "labels" "istio" "" $mergedGW -}}
+      {{- $defaultGW := deepCopy (get $defaults.gateways $name | default dict) -}}
+      {{- $userGW := deepCopy (get $userGatewayOverrides $name | default dict) -}}
+      {{- $effectiveGW := mergeOverwrite $defaultGW (deepCopy $sharedGatewayValues) -}}
+      {{- $effectiveGW = mergeOverwrite $effectiveGW $userGW -}}
+      {{- $gwType := dig "upstream" "labels" "istio" "" $effectiveGW -}}
       
       {{- if not (has $gwType (list "ingressgateway" "egressgateway")) }}
         {{- fail (printf "istio-gateway: Gateway '%s' does not have a valid type; upstream.labels.istio must be one of 'ingressgateway' or 'egressgateway'" $name) -}}
@@ -438,7 +444,7 @@ stringData:
       {{- $gwRecord = set $gwRecord "serviceName" (printf "%s-%s" $name $gwType) -}}
       {{- $gwRecord = set $gwRecord "type" $gwType -}}
       
-      {{- $gwDefaults := get $defaults.gateways $name | default dict -}}
+      {{- $gwDefaults := deepCopy (get $defaults.gateways $name | default dict) -}}
       {{- /*
         Give every gateway the same upstream.serviceAccount default that
         `public` and `passthrough` get out of the box. bb-common assumes a
@@ -458,13 +464,13 @@ stringData:
         {{- $gwRecord = set $gwRecord "defaults" $gwDefaults -}}
       {{ end -}}
       
-      {{- $gwOverlays := dig "gateways" $name dict $.Values.istioGateway.values -}}
+      {{- $gwOverlays := mustMergeOverwrite (deepCopy $sharedGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
       {{- if $gwOverlays }}
-        {{- $gwOverlays = deepCopy $gwOverlays -}}
+        {{- $gwOverlays = mustMergeOverwrite (dict "upstream" $defaultImagePullConfig) $gwOverlays -}}
         {{- if $istioPodAnnotations }}
           {{- $gwOverlays = mergeOverwrite $gwOverlays (dict "upstream" (dict "podAnnotations" $istioPodAnnotations)) -}}
         {{- end }}
-        {{- $gwRecord = set $gwRecord "overlays" (merge $gwOverlays (dict "upstream" $defaultImagePullConfig)) -}}
+        {{- $gwRecord = set $gwRecord "overlays" $gwOverlays -}}
       {{ end -}}
       
       {{- $enabledGateways = set $enabledGateways $name $gwRecord -}}

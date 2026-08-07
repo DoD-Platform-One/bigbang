@@ -381,8 +381,17 @@ istioGateway:
     repoName: "registry1"
     chartName: "gateway"
     tag: 1.30.3-bb.0
-  # -- Values to passthrough to the gateway chart(s)
+  # -- Gateway chart values. Values under shared apply to every gateway; values under gateways.<name> override them.
   values: {}
+  # EXAMPLE: Disable the wait job for every gateway except public
+  #   shared:
+  #     waitJob:
+  #       enabled: false
+  #   gateways:
+  #     public:
+  #       waitJob:
+  #         enabled: true
+  #
   # EXAMPLE: Set the tls key/cert for the existing public gateway
   #   gateways:
   #     public:
@@ -442,11 +451,11 @@ istioGateway:
   #             number: 443
   #             name: tls
   #             protocol: TLS
-  #         hosts:
-  #         - '*'
-  #         tls:
-  #           mode: ISTIO_MUTUAL
-
+  #           hosts:
+  #           - '*'
+  #           tls:
+  #             mode: ISTIO_MUTUAL
+  #
   # -- Flux reconciliation overrides specifically for the Istio Gateway Package
   flux:
     driftDetection:
