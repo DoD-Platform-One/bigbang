@@ -466,7 +466,7 @@ stringData:
       
       {{- $gwOverlays := mustMergeOverwrite (deepCopy $sharedGatewayValues) (deepCopy (dig "gateways" $name dict $.Values.istioGateway.values)) -}}
       {{- if $gwOverlays }}
-        {{- $gwOverlays = mustMergeOverwrite (dict "upstream" $defaultImagePullConfig) $gwOverlays -}}
+        {{- $gwOverlays = mustMergeOverwrite (dict "upstream" (deepCopy $defaultImagePullConfig)) $gwOverlays -}}
         {{- if $istioPodAnnotations }}
           {{- $gwOverlays = mergeOverwrite $gwOverlays (dict "upstream" (dict "podAnnotations" $istioPodAnnotations)) -}}
         {{- end }}
