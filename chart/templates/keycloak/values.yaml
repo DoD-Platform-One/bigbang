@@ -158,8 +158,8 @@ upstream:
 
   serviceMonitor:
     enabled: {{ $monitoringEnabled }}
-    scheme: https
     {{- if eq (include "metricsSidecarMtls" (list .Values.addons.keycloak .)) "true" }}
+    scheme: https
     tlsConfig:
       caFile: /etc/prom-certs/root-cert.pem
       certFile: /etc/prom-certs/cert-chain.pem
