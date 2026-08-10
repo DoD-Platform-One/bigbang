@@ -22,6 +22,9 @@
           - op: replace
             path: /spec/endpoints/0/port
             value: tcp-http
+          - op: add
+            path: /spec/endpoints/0/enableHttp2
+            value: false
         target:
           kind: ServiceMonitor
           name: fluentbit-fluent-bit

@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Fluentbit - HelmRelease
+templates:
+  - templates/fluentbit/helmrelease.yaml
+  - templates/fluentbit/values.yaml
+tests:
+  - it: should add ServiceMonitor patch when metric scraping is enabled
+    template: templates/fluentbit/helmrelease.yaml
+    set:
+      fluentbit.enabled: true
+      monitoring.enabled: true
+    asserts:
+      - lengthEqual:
+          path: spec.postRenderers[0].kustomize.patches
+          count: 3
+      - equal:
+          path: spec.postRenderers[0].kustomize.patches[2].target.kind
+          value: ServiceMonitor
+      - matchRegex:
+          path: spec.postRenderers[0].kustomize.patches[2].patch
+          pattern: "tcp-http"
+
+  - it: should not add ServiceMonitor patch when metric scraping is disabled
+    template: templates/fluentbit/helmrelease.yaml
+    set:
+      fluentbit.enabled: true
+      monitoring.enabled: false
+      alloy.enabled: false
+    asserts:
+      - lengthEqual:
+          path: spec.postRenderers[0].kustomize.patches
+          count: 2
+      - equal:
+          path: spec.postRenderers[0].kustomize.patches[0].target.kind
+          value: DaemonSet
+      - equal:
+          path: spec.postRenderers[0].kustomize.patches[1].target.kind
+          value: Service
