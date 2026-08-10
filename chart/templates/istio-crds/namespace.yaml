@@ -1,25 +1,7 @@
 {{- if .Values.istioCRDs.enabled }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: istio-system
-  labels:
-    istio-base-managed: Reconcile
-    istio-injection: disabled
-    app.kubernetes.io/name: istio-system
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
+{{- include "bigbang.namespace" (dict "root" . "name" "istio-system" "appName" "istio-system" "component" "core" "meshMode" "none" "extraLabels" (dict "istio-base-managed" "Reconcile")) }}
 {{- if .Values.istioGateway.enabled }}
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: istio-gateway
-  labels:
-    istio-gateway-managed: Reconcile
-    istio-injection: enabled
-    app.kubernetes.io/name: istio-gateway
-    app.kubernetes.io/component: "core"
-    {{- include "commonLabels" . | nindent 4}}
+{{ include "bigbang.namespace" (dict "root" . "name" "istio-gateway" "appName" "istio-gateway" "component" "core" "package" .Values.istioGateway "extraLabels" (dict "istio-gateway-managed" "Reconcile")) }}
 {{- end }}
 {{- end }}
