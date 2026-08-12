@@ -3,7 +3,7 @@
 ## Setting the stage
 
 Big Bang has always aimed to deliver a secure, ready-to-use Kubernetes platform
-for the Department of Defense. But as the ecosystem has grown and new packages
+for the Department of War. But as the ecosystem has grown and new packages
 have been added, one area has become a constant source of friction: **network
 policies**.
 

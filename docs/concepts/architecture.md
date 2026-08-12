@@ -84,10 +84,10 @@
 
 ##### 1. CNAP (Cloud Native Access Point) or Equivalent
 
-* CNAP is a P1 service offering separate from Big Bang, that bundles several technologies together: Palo Alto Firewall, AppGate Software Defined Perimeter, and P1's Keycloak Implementation which has a plugin baked in that allows SSO using Common Access Cards, by leveraging the x509 certs/PKI associated with the cards and DoD CAs as an federated identity provider.
+* CNAP is a P1 service offering separate from Big Bang, that bundles several technologies together: Palo Alto Firewall, AppGate Software Defined Perimeter, and P1's Keycloak Implementation which has a plugin baked in that allows SSO using Common Access Cards, by leveraging the x509 certs/PKI associated with the cards and DoW CAs as an federated identity provider.
 * CNAP is basically an advanced edge firewall that can do many things. In terms of Network Encryption it can act as a trusted MITM (Terminating HTTPS, inspecting the decrypted traffic for WAF (Web Application Firewall) protection purposes, and then re-encrypting traffic before forwarding to it's intended destination (usually a private IP Address of an Ingress LB of a Big Bang Cluster.)
 * More details on CNAP can be found on the [CNAP Transition to Cloud One](https://repo1.dso.mil/platform-one/bullhorn-delivery-static-assets/-/raw/master/p1/Cloud%20Native%20Access%20Point%20(CNAP)%20Transition%20to%20Cloud%20One%20-%2006_03_2025.pdf).
-* If your DoD command is interested in leveraging CNAP to protect a Big Bang Cluster [this page has instructions on how to ask for more details.](https://p1.dso.mil/#/services)
+* If your DoW command is interested in leveraging CNAP to protect a Big Bang Cluster [this page has instructions on how to ask for more details.](https://p1.dso.mil/#/services)
 * `There is no hard requirement that consumers of Big Bang must leverage CNAP`.
   * P1 uses CNAP to add defense in depth security for many of it's public internet facing services.
   * A consumer of Big Bang can decide not to use CNAP if their AO allows; which could be due to: risk acceptance, alternatives, other compensating controls / circumstances like: users only connecting through trusted networks like NIPRNet, airgap, etc. that are accessed via bastion, VPN, VDI, etc.

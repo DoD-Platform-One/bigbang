@@ -27,7 +27,7 @@ Big Bang is an umbrella Helm chart that packages together a collection of open-s
 - **Self-Service**: GitOps-driven deployments with minimal operational overhead
 
 ### For Organizations
-- **Compliance**: Built-in support for NIST, FedRAMP, and DoD security standards
+- **Compliance**: Built-in support for NIST, FedRAMP, and DoW security standards
 - **Cost Efficiency**: Reduced time-to-market and operational overhead
 - **Risk Reduction**: Proven, tested platform components
 - **Vendor Independence**: Open-source foundation with commercial support options

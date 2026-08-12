@@ -164,7 +164,7 @@ Big Bang implements controls aligned with NIST 800-53 and the Cybersecurity Fram
 
 ### DoD DevSecOps Reference Architecture
 
-Big Bang aligns with DoD DevSecOps principles:
+Big Bang aligns with DoW DevSecOps principles:
 
 **WIP: Continuous Authority to Operate (cATO)**
 - WIP: Automated security assessment
