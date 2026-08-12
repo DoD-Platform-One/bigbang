@@ -237,7 +237,7 @@ bbtests:
       GITLAB_REGISTRY: registry.{{ $domainName }}
 
 upstream:
-  {{- if and (or $istioInjection .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
+  {{- if and (or $istioEnabled .Values.monitoring.enabled) (dig "redis" "install" true .Values.addons.gitlab.values) }}
   redis:
     {{- if eq (include "metricScrapingEnabled" .) "true" }}
     metrics:
@@ -245,7 +245,7 @@ upstream:
         enabled: true
         namespace: gitlab
     {{- end }}
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     master:
       podAnnotations:
         {{ include "istioAnnotation" . }}
@@ -255,12 +255,12 @@ upstream:
     {{- end }}
   {{- end }}
 
-  {{- if or .Values.addons.gitlab.database.host $istioInjection }}
+  {{- if or .Values.addons.gitlab.database.host $istioEnabled }}
   postgresql:
     {{- if .Values.addons.gitlab.database.host }}
     install: false
     {{- end }}
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     primary:
       podAnnotations:
         {{ include "istioAnnotation" . }}
@@ -270,19 +270,19 @@ upstream:
     {{- end }}
   {{- end }}
 
-  {{- if or $extObjStorageIsConfigured $istioInjection }}
+  {{- if or $extObjStorageIsConfigured $istioEnabled }}
   registry:
     {{- if $extObjStorageIsConfigured }}
     storage:
       secret: gitlab-object-storage
       key: registry
     {{- end }}
-    {{- if or $iamProfile $istioInjection }}
+    {{- if or $iamProfile $istioEnabled }}
     annotations: 
       {{- if $iamProfile }}
       iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
       {{- end }}
-      {{- if $istioInjection }}
+      {{- if $istioEnabled }}
       {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
@@ -300,7 +300,7 @@ upstream:
   {{- end }}
 
   gitlab:
-    {{- if or $extObjStorageIsConfigured $istioInjection }}
+    {{- if or $extObjStorageIsConfigured $istioEnabled }}
     toolbox:
       {{- if $extObjStorageIsConfigured }}
       backups:
@@ -309,19 +309,19 @@ upstream:
             secret: gitlab-object-storage
             key: backups
       {{- end }}
-      {{- if or $iamProfile $istioInjection }}
+      {{- if or $iamProfile $istioEnabled }}
       annotations:
         {{- if $iamProfile }}
         iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
         {{- end }}
-        {{- if $istioInjection }}
+        {{- if $istioEnabled }}
         {{ include "istioAnnotation" . }}
         {{- end }}
       {{- end }}
     {{- end }}
     gitlab-exporter:
       enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-      {{- if $istioInjection }}
+      {{- if $istioEnabled }}
       metrics:
         annotations:
           {{ include "istioAnnotation" . }}
@@ -338,7 +338,7 @@ upstream:
               insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
       {{- end }}
 
-    {{- if or $iamProfile $istioInjection }}
+    {{- if or $iamProfile $istioEnabled }}
     webservice:
     {{- if eq (include "metricsSidecarMtls" (list .Values.addons.gitlab .)) "true" }}
       metrics:
@@ -361,12 +361,12 @@ upstream:
                 keyFile: /etc/prom-certs/key.pem
                 insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
     {{- end }}
-    {{- if or $iamProfile $istioInjection }}
+    {{- if or $iamProfile $istioEnabled }}
       annotations: 
         {{- if $iamProfile }}
         iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
         {{- end }}
-        {{- if $istioInjection }}
+        {{- if $istioEnabled }}
         {{ include "istioAnnotation" . }}
         {{- end }}
     sidekiq:
@@ -374,12 +374,12 @@ upstream:
         {{- if $iamProfile }}
         iam.amazonaws.com/role: {{ .Values.addons.gitlab.objectStorage.iamProfile }}
         {{- end }}
-        {{- if $istioInjection }}
+        {{- if $istioEnabled }}
         {{ include "istioAnnotation" . }}
         {{- end }}
     {{- end }}
     {{- end }}
-  {{- if $istioInjection }}
+  {{- if $istioEnabled }}
     migrations:
       annotations:
         {{ include "istioAnnotation" . }}

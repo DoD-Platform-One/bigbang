@@ -110,7 +110,7 @@ upstream:
     password: {{ coalesce .password "keycloak" | quote }}
   {{- end }}
 
-  {{- if $istioInjection }}
+  {{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
   {{- end }}
@@ -226,14 +226,14 @@ postgresql:
         database: keycloak
   {{- end }}
 
-  {{- if $istioInjection }}
+  {{- if $istioEnabled }}
   primary:
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     annotations:
       {{- include "istioAnnotation" . | nindent 6 }}
     {{- end }}
   readReplicas:
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     annotations:
       {{- include "istioAnnotation" . | nindent 6 }}
     {{- end }}

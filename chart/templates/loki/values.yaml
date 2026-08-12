@@ -241,6 +241,10 @@ backend:
           fieldPath: status.podIP
 gateway:
   enabled: true
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   extraArgs:
     - -config.expand-env=true
   extraEnv:
@@ -264,6 +268,10 @@ backend:
 
 gateway:
   enabled: true
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   extraArgs:
     - -config.expand-env=true
   extraEnv:

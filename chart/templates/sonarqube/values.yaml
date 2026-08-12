@@ -129,7 +129,7 @@ bbtests:
       cypress_url: {{ printf "https://sonarqube.%s" $domainName | quote }}
       cypress_url_setup: {{ printf "https://sonarqube.%s/setup" $domainName | quote }}
 
-{{- if $istioInjection }}
+{{- if $istioEnabled }}
 annotations:
   {{ include "istioAnnotation" . }}
 {{- end }}

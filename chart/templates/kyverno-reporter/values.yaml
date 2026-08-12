@@ -96,6 +96,10 @@ upstream:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   ui:
     enabled: true
     image:
