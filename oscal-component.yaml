@@ -843,7 +843,7 @@ component-definition:
             g. Keycloak web UI has a queryable audit logging feature and backend logs can be monitored.
             h. Handled by Day 2 operations of keycloak.
             i. Handled by Day 2 operations of keycloak.
-            j. Mostly, handled by Day 2 operations of keycloak. However, built in registration flow validates and verifies DoD level authorization.
+            j. Mostly, handled by Day 2 operations of keycloak. However, built in registration flow validates and verifies DoW level authorization.
             k.  Handled by Day 2 operations of keycloak.
             l.  Handled by Day 2 operations of keycloak.
       - uuid: 477fbb45-8837-4755-a1f2-6d1843b7bedb
@@ -954,7 +954,7 @@ component-definition:
           are detected)'
       - uuid: 35992922-7375-45fc-bac1-1a6b551a76b9
         control-id: ac-8
-        description: Keycloak has a standard DOD login banner see https://login.dso.mil
+        description: Keycloak has a standard DOW login banner see https://login.dso.mil
       - uuid: 2a99e48f-6631-4ff7-b955-b73caafdedac
         control-id: ac-10
         description: Keycloak does not suffice this control natively; however, you

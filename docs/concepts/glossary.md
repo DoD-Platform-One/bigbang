@@ -8,7 +8,7 @@
 
 ### Big Bang
 
-Big Bang is a declarative, continuous delivery tool for core DoD hardened and approved [packages](#packages) into a Kubernetes cluster. Big Bang follows a [GitOps](#gitops) approach to configuration management, using [Flux v2](#flux-v2) to reconcile Git with the cluster. Environments (e.g., dev and/or prod) and packages (e.g., istio) can be fully configured to suit the deployment needs.
+Big Bang is a declarative, continuous delivery tool for core DoW hardened and approved [packages](#packages) into a Kubernetes cluster. Big Bang follows a [GitOps](#gitops) approach to configuration management, using [Flux v2](#flux-v2) to reconcile Git with the cluster. Environments (e.g., dev and/or prod) and packages (e.g., istio) can be fully configured to suit the deployment needs.
 
 ### Big Bang Components
 

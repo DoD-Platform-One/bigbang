@@ -1,6 +1,6 @@
 # Big Bang
 
-Big Bang is a declarative, continuous delivery tool for deploying Department of Defense (DoD) hardened and approved packages into a Kubernetes cluster.
+Big Bang is a declarative, continuous delivery tool for deploying Department of War (DoW) hardened and approved packages into a Kubernetes cluster.
 
 > If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
@@ -20,7 +20,7 @@ In order for an installation of Big Bang to be a valid installation/configuratio
 
 Big Bang also builds tooling around the testing and validation of Big Bang packages. These tools are provided as-is, without support.
 
-Big Bang is intended to be used for deploying and maintaining a DoD hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, and/or monitoring are handled via Big Bang.  Additional packages (e.g., ArgoCD and GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
+Big Bang is intended to be used for deploying and maintaining a DoW hardened and approved set of packages into a Kubernetes cluster.  Deployment and configuration of ingress/egress, load balancing, policy auditing, logging, and/or monitoring are handled via Big Bang.  Additional packages (e.g., ArgoCD and GitLab) can also be enabled and customized to extend Big Bang's baseline.  Once deployed, the Kubernetes cluster can be used to add mission specific applications.
 
 Additional information can be found in the [Big Bang Docs](./docs/index.md).
 

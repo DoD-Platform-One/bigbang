@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Big Bang faces an inherent tension between two competing goals: being secure and production-ready versus being accessible and easy to evaluate. As a DoD-focused platform, security is paramount, but overly restrictive defaults can create significant barriers to adoption and development.
+Big Bang faces an inherent tension between two competing goals: being secure and production-ready versus being accessible and easy to evaluate. As a DoW-focused platform, security is paramount, but overly restrictive defaults can create significant barriers to adoption and development.
 
 Currently, many Kubernetes platforms and security tools default to production-hardened configurations that require extensive setup before achieving a working deployment. This approach, while secure, presents several challenges:
 
