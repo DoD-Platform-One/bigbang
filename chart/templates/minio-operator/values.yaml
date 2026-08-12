@@ -72,11 +72,6 @@ routes:
       hosts:
       - repo1.dso.mil
 
-{{- if $istioEnabled }}
-annotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
-
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 {{- end -}}

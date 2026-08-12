@@ -329,7 +329,7 @@ upstream:
           {{ $alertmanagerAuthserviceKey }}: {{ $alertmanagerAuthserviceValue }}
           {{- end }}
         {{- end }}
-        {{- if $sidecarInjectionEnabled }}
+        {{- if $istioEnabled }}
         annotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
@@ -484,10 +484,12 @@ upstream:
           {{- if and (eq (include "networkPoliciesEnabled" .) "true") .Values.addons.vault.enabled }}
           vault-ingress: "true"
           {{- end }}
-        {{- if or $sidecarInjectionEnabled .Values.addons.vault.enabled }}
+        {{- if or $istioEnabled .Values.addons.vault.enabled }}
         annotations:
-          {{- if $sidecarInjectionEnabled }}
+          {{- if $istioEnabled }}
           {{ include "istioAnnotation" . }}
+          {{- end }}
+          {{- if $sidecarInjectionEnabled }}
           traffic.sidecar.istio.io/includeOutboundIPRanges: ""
           proxy.istio.io/config: |
             proxyMetadata:
@@ -651,7 +653,7 @@ upstream:
           insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
         {{- end }}
     {{- end }}
-    {{- if $sidecarInjectionEnabled }}
+    {{- if $istioEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -693,6 +695,10 @@ upstream:
   kube-state-metrics:
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
+    {{- if $istioEnabled }}
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
     {{- if or $lokiEnabled $monitoringMtlsStrict }}
     prometheus:
       monitor:
@@ -1002,7 +1008,7 @@ upstream:
       patch:
         image:
           pullPolicy: {{ .Values.imagePullPolicy }}
-    {{- if $sidecarInjectionEnabled }}
+    {{- if $istioEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}

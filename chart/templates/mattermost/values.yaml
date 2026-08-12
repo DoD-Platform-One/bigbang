@@ -43,7 +43,7 @@ istio:
     enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
     generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
 
-{{- if $istioInjection }}
+{{- if $istioEnabled }}
 podAnnotations:
   {{ include "istioAnnotation" . }}
 updateJob:
@@ -177,7 +177,7 @@ postgresql:
   {{- end }}
   install: true
   primary:
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" $ }}
     {{- end }}
@@ -199,7 +199,7 @@ postgresql:
         capabilities:
           drop:
             - ALL
-  {{- if $istioInjection }}
+  {{- if $istioEnabled }}
   readReplicas:
     podAnnotations:
       {{ include "istioAnnotation" $ }}
@@ -225,7 +225,7 @@ minio:
       configSecret:
         accessKey: {{ .accessKey | default "minio" }}
         secretKey: {{ .secretKey | default "BigBangDEVONLY" }}
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     annotations:
       {{ include "istioAnnotation" $ }}
   {{- end }}

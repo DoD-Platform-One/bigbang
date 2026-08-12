@@ -65,7 +65,7 @@ redis-bb:
     {{- else }}
       enabled: false
     {{- end }}
-  {{- if $istioInjection }}
+  {{- if $istioEnabled }}
     master:
       podAnnotations:
         {{ include "istioAnnotation" . }}
@@ -86,7 +86,7 @@ global:
   image:
     imagePullPolicy: {{ .Values.imagePullPolicy }}
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
-{{- if $istioInjection }}
+{{- if $istioEnabled }}
   podAnnotations:
     {{ include "istioAnnotation" . }}
 {{- end }}

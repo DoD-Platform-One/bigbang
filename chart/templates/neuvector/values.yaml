@@ -77,9 +77,9 @@ upstream:
   {{- include "secretsImagePullSecretsSingle" . | nindent 2 }}
 
   openshift: {{ .Values.openshift }}
-  {{- if or .Values.monitoring.enabled $istioInjection .Values.neuvector.sso.enabled }}
+  {{- if or .Values.monitoring.enabled $istioEnabled .Values.neuvector.sso.enabled }}
   controller:
-    {{- if $istioInjection }}
+    {{- if $istioEnabled }}
     podAnnotations:
       {{ include "istioAnnotation" . }}
     {{- end }}
@@ -120,6 +120,22 @@ upstream:
     {{- end }}
   {{- end }}
 
+  {{- if $istioEnabled }}
+  enforcer:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  cve:
+    updater:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+    scanner:
+      podAnnotations:
+        {{ include "istioAnnotation" . }}
+  manager:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
+
 monitor:
   install: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
@@ -127,12 +143,12 @@ monitor:
 
   exporter:
     enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
-    {{- if or (eq (include "metricScrapingEnabled" .) "true") $istioInjection }}
+    {{- if or (eq (include "metricScrapingEnabled" .) "true") $istioEnabled }}
     podAnnotations:
       {{- if eq (include "metricScrapingEnabled" .) "true" }}
       checksum/metrics-pass: {{ sha256sum $neuvectorMetricsPass }}
       {{- end }}
-      {{- if $istioInjection }}
+      {{- if $istioEnabled }}
       {{ include "istioAnnotation" . }}
       {{- end }}
     {{- end }}
@@ -152,23 +168,6 @@ monitor:
       type: ClusterIP
     CTRL_USERNAME: metrics
     CTRL_PASSWORD: {{ $neuvectorMetricsPass }}
-
-
-  {{- if $istioInjection }}
-  enforcer:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  cve:
-    updater:
-      podAnnotations:
-        {{ include "istioAnnotation" . }}
-    scanner:
-      podAnnotations:
-        {{ include "istioAnnotation" . }}
-  manager:
-    podAnnotations:
-      {{ include "istioAnnotation" . }}
-  {{- end }}
 
 {{- end }}
 

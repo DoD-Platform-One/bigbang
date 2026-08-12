@@ -160,6 +160,19 @@ routes:
       - loki.{{ $domainName }}
 
 upstream:
+  {{- if $istioEnabled }}
+  # Force every Alloy collector to roll when the Istio dataplane changes (sidecar <-> ambient).
+  # collectorCommon.alloy is merged into every collector, so this annotates all their pod templates.
+  collectorCommon:
+    alloy:
+      controller:
+        podAnnotations:
+          {{ include "istioAnnotation" . }}
+  # The alloy-operator is a separate Deployment (not a collector), so annotate it directly.
+  alloy-operator:
+    podAnnotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
   {{- if .Values.kiali.enabled }}
   alloy:
     extraLabels:
@@ -276,7 +289,7 @@ upstream:
       presets:
         - deployment
       alloy:
-        {{- if and $istioEnabled $istioHardenedEnabled }}
+        {{- if $istioEnabled }}
         extraAnnotations:
           {{ include "istioAnnotation" . }}
         {{- end }}
@@ -381,7 +394,7 @@ upstream:
   alloy-metrics:
     enabled: true
     alloy:
-      {{- if and $istioEnabled $istioHardenedEnabled }}
+      {{- if $istioEnabled }}
       extraAnnotations:
         {{ include "istioAnnotation" . }}
       {{- end }}

@@ -534,9 +534,14 @@ bigbang.addValueIfSet can be used to nil check parameters before adding them to 
 {{- end -}}
 
 {{/*
-Annotation for Istio version
+Annotation to force pods to restart on Istio dataplane changes.
+In ambient mode emits the dataplane annotation so pods roll when ambient is
+toggled; otherwise emits the Istio version so sidecar pods roll on upgrade.
 */}}
 {{- define "istioAnnotation" -}}
+{{- if eq (include "ambientEnabled" .) "true" -}}
+bigbang.dev/istioDataplane: ambient
+{{- else -}}
 {{- $istiod := .Values.istiod | default dict -}}
 {{- if (eq ($istiod.sourceType | default "git") "git") -}}
 {{- $git := $istiod.git | default dict -}}
@@ -551,6 +556,7 @@ bigbang.dev/istioVersion: {{ $git.branch }}
 {{- $helmRepo := $istiod.helmRepo | default dict -}}
 {{- if $helmRepo.tag -}}
 bigbang.dev/istioVersion: {{ $helmRepo.tag }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
