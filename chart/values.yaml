@@ -1740,16 +1740,6 @@ addons:
     ingress:
       gateway: ""
 
-    sso:
-      # -- Toggle SSO for Fortify on and off
-      enabled: false
-
-      # -- SAML Client ID to use for Fortify
-      client_id: ""
-
-      # -- SAML Client Secret to use for Fortify
-      client_secret: ""
-
     externalDatabase:
       # -- External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when `values.mysql.enabled=false`.
       # This should match the hostname used in `values.fortify_autoconfig` .
@@ -2000,10 +1990,6 @@ addons:
 
     # -- Flux reconciliation overrides specifically for the Velero Package
     flux: {}
-
-    # -- Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi
-    plugins: []
-    # - aws
 
     # -- Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/velero.git
     values: {}
