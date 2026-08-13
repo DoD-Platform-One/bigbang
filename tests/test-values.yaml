@@ -291,8 +291,8 @@ kyverno:
               cpu: 1
               memory: 768Mi
             requests:
-              cpu: 1
-              memory: 768Mi
+              cpu: 500m
+              memory: 384Mi
     bbtests:
       enabled: true
 
@@ -756,7 +756,7 @@ elasticsearchKibana:
           min: 1g
           max: 1g
       data:
-        count: 2
+        count: 1
         persistence:
           size: 256Mi
         resources:
@@ -822,6 +822,7 @@ loki:
     write:
       replicas: 3
     backend:
+      # Loki requires at least two backend replicas outside SingleBinary mode.
       replicas: 3
 
 tempo:
@@ -964,7 +965,7 @@ addons:
         controller:
           resources:
             requests:
-              memory: 2Gi
+              memory: 1Gi
         redis:
           resources:
             requests:
@@ -982,9 +983,12 @@ addons:
       bbtests:
         enabled: true
         cypress:
-          resources:
-            limits:
-              memory: 12Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2
+            memory: 2Gi
         istio:
           sidecar:
             resources:
@@ -1321,13 +1325,13 @@ addons:
             - name: velero
           pools:
           - name: pool-0
-            servers: 3
+            servers: 1
             volumesPerServer: 4
             size: 256Mi
             resources:
               requests:
                 cpu: 250m
-                memory: 2Gi
+                memory: 1Gi
               limits:
                 cpu: 250m
                 memory: 2Gi
@@ -1402,7 +1406,7 @@ addons:
               resources:
                 requests:
                   cpu: 250m
-                  memory: 2Gi
+                  memory: 1Gi
                 limits:
                   cpu: 250m
                   memory: 2Gi
@@ -1713,11 +1717,11 @@ addons:
           enabled: false
         externalURL: https://harbor.dev.bigbang.mil
         nginx:
-          replicas: 2
+          replicas: 1
         portal:
-          replicas: 2
+          replicas: 1
         core:
-          replicas: 2
+          replicas: 1
           secretName: "ci-only"
         #jobservice:
         #registry:
@@ -1798,7 +1802,7 @@ addons:
               resources:
                 requests:
                   cpu: 250m
-                  memory: 2Gi
+                  memory: 1Gi
                 limits:
                   cpu: 250m
                   memory: 2Gi

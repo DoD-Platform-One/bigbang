@@ -107,3 +107,30 @@ kyvernoPolicies:
                     - podinfo
                   names:
                     - podinfo*
+
+#########################
+# Disable Core Packages #
+#########################
+bbctl:
+  enabled: false
+renovate:
+  enabled: false
+monitoring:
+  enabled: false
+grafana:
+  enabled: false
+neuvector:
+  enabled: false
+loki:
+  enabled: false
+tempo:
+  enabled: false
+kyvernoReporter:
+  enabled: false
+kiali:
+  enabled: false
+alloy:
+  enabled: false
+addons:
+  minioOperator:
+    enabled: false
