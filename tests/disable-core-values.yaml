@@ -3,8 +3,6 @@
 #########################
 bbctl:
   enabled: false
-renovate:
-  enabled: false
 monitoring:
   enabled: false
 grafana:
@@ -19,11 +17,7 @@ kyvernoReporter:
   enabled: false
 kiali:
   enabled: false
-gatekeeper:
-  enabled: false
 alloy:
-  enabled: false
-istioCNI:
   enabled: false
 addons:
   minioOperator:
