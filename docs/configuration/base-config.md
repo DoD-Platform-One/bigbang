@@ -546,9 +546,6 @@ Kubernetes: `>=1.34.0-0`
 | addons.fortify.helmRepo.tag | string | `"26.2.0-bb.1"` |  |
 | addons.fortify.flux | object | `{}` | Flux reconciliation overrides specifically for the Fortify Package |
 | addons.fortify.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public". |
-| addons.fortify.sso.enabled | bool | `false` | Toggle SSO for Fortify on and off |
-| addons.fortify.sso.client_id | string | `""` | SAML Client ID to use for Fortify |
-| addons.fortify.sso.client_secret | string | `""` | SAML Client Secret to use for Fortify |
 | addons.fortify.externalDatabase.host | string | `""` | External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when `values.mysql.enabled=false`. This should match the hostname used in `values.fortify_autoconfig` . |
 | addons.fortify.externalDatabase.port | int | `3306` | External MySQL port used to generate Fortify's outbound bb-common route/ServiceEntry when `values.mysql.enabled=false`. This should match the port used in `values.fortify_autoconfig`. |
 | addons.fortify.values | object | `{}` | Values to passthrough to the fortify chart: https://repo1.dso.mil/big-bang/product/packages/fortify.git |
@@ -631,7 +628,6 @@ Kubernetes: `>=1.34.0-0`
 | addons.velero.helmRepo.chartName | string | `"velero"` |  |
 | addons.velero.helmRepo.tag | string | `"12.1.0-bb.2"` |  |
 | addons.velero.flux | object | `{}` | Flux reconciliation overrides specifically for the Velero Package |
-| addons.velero.plugins | list | `[]` | Plugin provider for Velero - requires at least one plugin installed. Current supported values: aws, azure, csi |
 | addons.velero.values | object | `{}` | Values to passthrough to the Velero chart: https://repo1.dso.mil/big-bang/product/packages/velero.git |
 | addons.velero.postRenderers | list | `[]` | Post Renderers.  See docs/postrenders.md |
 | addons.keycloak.enabled | bool | `false` | Toggle deployment of Keycloak. |

@@ -1024,8 +1024,6 @@ addons:
       timeout: 15m
     ingress:
       gateway: ""
-    sso:
-      enabled: false
     values:
       storage:
         volume: 5Gi
@@ -1367,12 +1365,6 @@ addons:
 
     minioObjectStorage:
       enabled: true
-    imagePullSecrets:
-      - name: private-registry
-    console:
-      persistence:
-        size: 5Gi
-      localVolumeUpgrade: true
 
   mattermostOperator:
     enabled: false
@@ -1432,8 +1424,6 @@ addons:
 
   velero:
     enabled: false
-    plugins:
-    - aws
     values:
       # Minio is only enabled for velero in our test-values so including the netpol required for it here as well
       networkPolicies:
@@ -1653,9 +1643,6 @@ addons:
       gateway: "passthrough"
       key: "" # Gets added via chart/ingress-certs.yaml
       cert: "" # Gets added via chart/ingress-certs.yaml
-    sso:
-      enabled: false
-      client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_vault
     kms_key_id: mrk-ff723da024254ea2b7f490c68fbc9b9b
     kms_access_key: "" # gets added via CI VAULT_KMS_ACCESS_KEY and 01_deploy_bigbang.sh
     kms_secret_key: "" # gets added via CI VAULT_KMS_SECRET_KEY and 01_deploy_bigbang.sh
