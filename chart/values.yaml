@@ -1333,11 +1333,11 @@ renovate:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/renovate.git
     path: "./chart"
-    tag: "46.31.6-bb.5"
+    tag: "46.251.0-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "renovate"
-    tag: "46.31.6-bb.5"
+    tag: "46.251.0-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Renovate Package
   flux: {}
