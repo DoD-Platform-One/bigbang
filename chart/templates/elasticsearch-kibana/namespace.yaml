@@ -1,4 +1,3 @@
 {{- if .Values.elasticsearchKibana.enabled }}
----
 {{- include "bigbang.namespace" (dict "root" . "name" "logging" "appName" "logging" "component" "core" "package" .Values.elasticsearchKibana) }}
 {{- end }}
