@@ -51,5 +51,3 @@ Please note:
 ## Reference
 
 1. [Fluxcd drift detection technical document](https://fluxcd.io/flux/components/helm/helmreleases/#drift-detection)
-
-2. [Fluxcd cluster-state drift detection blog](https://github.com/fluxcd/helm-controller/issues/643)
