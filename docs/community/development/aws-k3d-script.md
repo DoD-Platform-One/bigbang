@@ -6,17 +6,8 @@ The instance will automatically terminate eight hours after creation.
 
 ## Install and Configure Dependencies
 
-1. Install aws cli.
-
-   ```shell
-   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-   # sudo apt install unzip -y
-   unzip awscliv2.zip
-   sudo ./aws/install
-   rm -rf aws
-   rm awscliv2.zip
-   aws --version
-   ```
+1. Install aws cli via this link <https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html>
+   It is recommended to follow the command line installer steps.
 
 1. Configure aws cli.
 
@@ -35,15 +26,17 @@ The instance will automatically terminate eight hours after creation.
     Follow jq installation instructions for your workstation operating system.  
     <https://stedolan.github.io/jq/download/>
 
-1. Mac users will need to install the GNU version of the sed command.  
-   <https://medium.com/@bramblexu/install-gnu-sed-on-mac-os-and-set-it-as-default-7c17ef1b8f64>
+1. Mac users will need to install the GNU version of the sed command. You can use the Homebrew
+   '''shell
+   brew install gnu-sed
+
 
 ## Usage
 
 The default with no options specified is to use the EC2 public IP for the k3d cluster and the security group.
 
 ```shell
-./docs/assets/scripts/developer/k3d-dev.sh -h
+./docs/reference/scripts/developer/k3d-dev.sh -h
 AWS User Name: your.name
 Usage:
 k3d-dev.sh -b -p -m -a -d -h
@@ -100,7 +93,7 @@ The Big Bang product is tightly coupled with the GitOps tool FluxCD. Before you 
 
 From the bigbang directory, deploy BigBang via helm.
 ```shell
-helm upgrade -i bigbang chart/ -n bigbang --create-namespace --set registryCredentials.username=XXXXX --set registryCredentials.password='XXXXX' -f chart/ingress-certs.yaml -f chart/values.yaml
+helm upgrade -i bigbang chart/ -n bigbang --create-namespace --set 'registryCredentials.username=XXXXX' --set 'registryCredentials.password=XXXXX' -f chart/ingress-certs.yaml
 ```
 
 Overrides can be supplemented by adding references to the specific yaml file, the right-most values file will take highest precedence: 
