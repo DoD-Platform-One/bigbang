@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsArgo := merge .Values.addons.argocd.flux .Values.flux -}}
 {{- if .Values.addons.argocd.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

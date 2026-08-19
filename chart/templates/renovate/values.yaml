@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Create secret */ -}}
 {{- if .Values.renovate.enabled }}
 {{- /* Create a cleaned copy of renovate config and merge deprecated paths into current paths */ -}}

@@ -2463,8 +2463,19 @@ wrapper:
     # -- Git tag to check out.  Takes precedence over branch. [More info](https://fluxcd.io/flux/components/source/gitrepositories/#reference), example: 0.0.2
     tag: "0.4.15"
 
-# -- Packages to deploy with Big Bang
+# -- Packages to deploy with Big Bang.
+# Built-in packages can be configured here using their existing package name,
+# for example `packages.monitoring` or `packages.gitlab`. These overrides take
+# precedence over the corresponding legacy top-level or `addons.<name>` values.
+# Unrecognized names continue to deploy custom packages using the contract below.
+# Legacy built-in paths remain supported until Big Bang 4.x.
 # @default - '{}'
+# -- Select the package configuration contract. Leave `version` unset to retain
+# the Big Bang 3.x custom-package behavior for every entry under `packages`.
+# Set `version: v1` to opt into canonical built-in package names in 3.x. The v1
+# discriminator remains part of the public contract and becomes the default in 4.x.
+packageConfiguration: {}
+
 packages:
   # -- Package name.  Each package will be independently wrapped for Big Bang integration.
   sample:

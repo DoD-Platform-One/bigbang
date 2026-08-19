@@ -1,0 +1,222 @@
+apiVersion: bigbang.dev/v1alpha1
+packages:
+  istioCNI:
+    displayName: Istio CNI
+    category: core
+    legacyPath: istioCNI
+    templateDirectory: istio-cni
+  istioCRDs:
+    displayName: Istio CRDs
+    category: core
+    legacyPath: istioCRDs
+    templateDirectory: istio-crds
+  gatewayAPI:
+    displayName: Gateway API
+    category: core
+    legacyPath: gatewayAPI
+    templateDirectory: gateway-api
+  istiod:
+    displayName: Istiod
+    category: core
+    legacyPath: istiod
+    templateDirectory: istiod
+  istioGateway:
+    displayName: Istio Gateway
+    category: core
+    legacyPath: istioGateway
+    templateDirectory: istio-gateway
+  ztunnel:
+    displayName: Ztunnel
+    category: core
+    legacyPath: ztunnel
+    templateDirectory: ztunnel
+  kiali:
+    displayName: Kiali
+    category: core
+    legacyPath: kiali
+    templateDirectory: kiali
+  gatekeeper:
+    displayName: Gatekeeper
+    category: core
+    legacyPath: gatekeeper
+    templateDirectory: gatekeeper
+  kyverno:
+    displayName: Kyverno
+    category: core
+    legacyPath: kyverno
+    templateDirectory: kyverno
+  kyvernoPolicies:
+    displayName: Kyverno Policies
+    category: core
+    legacyPath: kyvernoPolicies
+    templateDirectory: kyverno-policies
+  kyvernoReporter:
+    displayName: Kyverno Reporter
+    category: core
+    legacyPath: kyvernoReporter
+    templateDirectory: kyverno-reporter
+  elasticsearchKibana:
+    displayName: Elasticsearch Kibana
+    category: core
+    legacyPath: elasticsearchKibana
+    templateDirectory: elasticsearch-kibana
+  eckOperator:
+    displayName: ECK Operator
+    category: core
+    legacyPath: eckOperator
+    templateDirectory: eck-operator
+  fluentbit:
+    displayName: Fluent Bit
+    category: core
+    legacyPath: fluentbit
+    templateDirectory: fluentbit
+  alloy:
+    displayName: Alloy
+    category: core
+    legacyPath: alloy
+    templateDirectory: alloy
+  loki:
+    displayName: Loki
+    category: core
+    legacyPath: loki
+    templateDirectory: loki
+  neuvector:
+    displayName: NeuVector
+    category: core
+    legacyPath: neuvector
+    templateDirectory: neuvector
+  tempo:
+    displayName: Tempo
+    category: core
+    legacyPath: tempo
+    templateDirectory: tempo
+  prometheusOperatorCRDs:
+    displayName: Prometheus Operator CRDs
+    category: core
+    legacyPath: prometheusOperatorCRDs
+    templateDirectory: prometheus-operator-crds
+  monitoring:
+    displayName: Monitoring
+    category: core
+    legacyPath: monitoring
+    templateDirectory: monitoring
+  grafana:
+    displayName: Grafana
+    category: core
+    legacyPath: grafana
+    templateDirectory: grafana
+  twistlock:
+    displayName: Twistlock
+    category: core
+    legacyPath: twistlock
+    templateDirectory: twistlock
+  bbctl:
+    displayName: BBCTL
+    category: core
+    legacyPath: bbctl
+    templateDirectory: bbctl
+  renovate:
+    displayName: Renovate
+    category: core
+    legacyPath: renovate
+    templateDirectory: renovate
+  argocd:
+    displayName: Argo CD
+    category: addon
+    legacyPath: addons.argocd
+    templateDirectory: argocd
+  authservice:
+    displayName: Authservice
+    category: addon
+    legacyPath: addons.authservice
+    templateDirectory: authservice
+  minioOperator:
+    displayName: MinIO Operator
+    category: addon
+    legacyPath: addons.minioOperator
+    templateDirectory: minio-operator
+  minio:
+    displayName: MinIO
+    category: addon
+    legacyPath: addons.minio
+    templateDirectory: minio
+  gitlab:
+    displayName: GitLab
+    category: addon
+    legacyPath: addons.gitlab
+    templateDirectory: gitlab
+  gitlabRunner:
+    displayName: GitLab Runner
+    category: addon
+    legacyPath: addons.gitlabRunner
+    templateDirectory: gitlab-runner
+  sonarqube:
+    displayName: SonarQube
+    category: addon
+    legacyPath: addons.sonarqube
+    templateDirectory: sonarqube
+  fortify:
+    displayName: Fortify
+    category: addon
+    legacyPath: addons.fortify
+    templateDirectory: fortify
+  anchoreEnterprise:
+    displayName: Anchore Enterprise
+    category: addon
+    legacyPath: addons.anchoreEnterprise
+    templateDirectory: anchore-enterprise
+  mattermostOperator:
+    displayName: Mattermost Operator
+    category: addon
+    legacyPath: addons.mattermostOperator
+    templateDirectory: mattermost-operator
+  mattermost:
+    displayName: Mattermost
+    category: addon
+    legacyPath: addons.mattermost
+    templateDirectory: mattermost
+  velero:
+    displayName: Velero
+    category: addon
+    legacyPath: addons.velero
+    templateDirectory: velero
+  keycloak:
+    displayName: Keycloak
+    category: addon
+    legacyPath: addons.keycloak
+    templateDirectory: keycloak
+  vault:
+    displayName: Vault
+    category: addon
+    legacyPath: addons.vault
+    templateDirectory: vault
+  metricsServer:
+    displayName: Metrics Server
+    category: addon
+    legacyPath: addons.metricsServer
+    templateDirectory: metrics-server
+  harbor:
+    displayName: Harbor
+    category: addon
+    legacyPath: addons.harbor
+    templateDirectory: harbor
+  headlamp:
+    displayName: Headlamp
+    category: addon
+    legacyPath: addons.headlamp
+    templateDirectory: headlamp
+  thanos:
+    displayName: Thanos
+    category: addon
+    legacyPath: addons.thanos
+    templateDirectory: thanos
+  externalSecrets:
+    displayName: External Secrets
+    category: addon
+    legacyPath: addons.externalSecrets
+    templateDirectory: external-secrets
+  mimir:
+    displayName: Mimir
+    category: addon
+    legacyPath: addons.mimir
+    templateDirectory: mimir

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.alloy.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "alloy" "appName" "alloy" "component" "core" "package" .Values.alloy) }}
 {{- end }}

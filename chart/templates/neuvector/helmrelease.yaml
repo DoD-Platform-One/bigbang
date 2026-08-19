@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsNeuvector := merge .Values.neuvector.flux .Values.flux -}}
 {{- if .Values.neuvector.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

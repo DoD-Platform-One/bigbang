@@ -1,13 +1,15 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Used for creating values to use for Helm wrapper and package Helm charts. */ -}}
-{{- range $pkgKey, $vals := .Values.packages -}}
+{{- $customPackages := .Values._customPackages | default dict -}}
+{{- range $pkgKey, $vals := $customPackages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ $pkg }}-wrapper-values
-  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-               {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $customPackages $pkgKey) }}
+               {{ dig "helmRelease" "namespace" "" (index $customPackages $pkgKey) }}
              {{ else }}
                {{ default (dig "namespace" "name" $pkg $vals) "" }}
              {{ end }}

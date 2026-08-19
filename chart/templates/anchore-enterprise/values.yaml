@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.anchoreEnterprise.enabled }}
 {{- /* Create a cleaned copy of anchore config and merge deprecated paths into current paths */ -}}
 {{- $anchorePackage := deepCopy .Values.addons.anchoreEnterprise -}}

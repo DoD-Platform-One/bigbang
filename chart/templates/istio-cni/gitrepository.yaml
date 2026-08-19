@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.istioCNI.sourceType "git") (not .Values.offline) (or .Values.istioCNI.enabled (eq (include "ambientEnabled" .) "true")) }}
 {{- include "bigbang.gitRepository" (dict "name" "istio-cni" "gitCredsName" "istioCNI" "git" .Values.istioCNI.git "component" "core" "root" .) }}
 {{- end }}

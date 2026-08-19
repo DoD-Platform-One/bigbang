@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "gitlab-runner" }}
 
 {{- if .Values.addons.gitlabRunner.enabled }}

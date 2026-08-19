@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "kyvernoReporter" }}
 {{- if (get .Values $pkg).enabled }}
 {{- /* Create a cleaned copy of kyvernoReporter config and merge deprecated paths into current paths */ -}}

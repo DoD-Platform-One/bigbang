@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.eckOperator.sourceType "git") (not .Values.offline) (or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled) }}
 {{- include "bigbang.gitRepository" (dict "name" "eck-operator" "gitCredsName" "eckOperator" "git" .Values.eckOperator.git "component" "core" "root" .) }}
 {{- end }}

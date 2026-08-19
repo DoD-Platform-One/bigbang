@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.sonarqube.sourceType "git") (not .Values.offline) .Values.addons.sonarqube.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "sonarqube" "gitCredsName" "sonarqube" "git" .Values.addons.sonarqube.git "root" .) }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and .Values.monitoring.enabled (dig "grafana" "enabled" true .Values.monitoring.values) }}
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert

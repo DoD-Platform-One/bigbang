@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if eq (include "authserviceEnabled" .) "true" }}
 {{- include "bigbang.namespace" (dict "root" . "name" "authservice" "appName" "authservice" "component" "core" "package" .Values.addons.authservice) }}
 {{- end }}

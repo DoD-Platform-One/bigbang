@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.twistlock.enabled }}
 {{- /* Create a cleaned copy of twistlock config and merge deprecated paths into current paths */ -}}
 {{- $twistlockPackage := deepCopy .Values.twistlock -}}

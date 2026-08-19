@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.vault.enabled }}
 {{- /* Create a cleaned copy of vault config and merge deprecated paths into current paths */ -}}
 {{- $vaultPackage := deepCopy .Values.addons.vault -}}

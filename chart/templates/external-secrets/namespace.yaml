@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.externalSecrets.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "external-secrets" "appName" "external-secrets" "component" "core" "package" .Values.addons.externalSecrets "extraLabels" (dict "meta.helm.sh/release-namespace" "bigbang" "meta.helm.sh/release-name" "bigbang")) }}
 {{- end }}

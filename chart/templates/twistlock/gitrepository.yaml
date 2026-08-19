@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.twistlock.sourceType "git") (not .Values.offline) .Values.twistlock.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "twistlock" "gitCredsName" "twistlock" "git" .Values.twistlock.git "component" "security" "extraIgnore" "!/chart/scripts/*.sh" "root" .) }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.istioCRDs.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "istio-system" "appName" "istio-system" "component" "core" "meshMode" "none" "extraLabels" (dict "istio-base-managed" "Reconcile")) }}
 {{- if .Values.istioGateway.enabled }}

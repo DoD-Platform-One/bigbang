@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.fortify.sourceType "git") (not .Values.offline) .Values.addons.fortify.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "fortify" "gitCredsName" "fortify" "git" .Values.addons.fortify.git "root" .) }}
 {{- end }}

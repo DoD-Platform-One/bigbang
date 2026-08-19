@@ -26,6 +26,9 @@ pre-commit:
     bats-gitlab-triage:
       glob: "{scripts/gitlab-triage/*.sh,tests/bats/gitlab-triage/**/*.bats}"
       run: bats tests/bats/gitlab-triage/
+    generated-package-schemas:
+      glob: "{chart/package-metadata.yaml,chart/values.schema.json,scripts/generate-package-schemas.jq,scripts/generate-package-schemas.sh,scripts/migrate-values-3-to-4.sh}"
+      run: scripts/generate-package-schemas.sh --check
 
 # Runs when you `git push` — only if any .sh or .bats files changed.
 pre-push:
@@ -34,3 +37,6 @@ pre-push:
     bats-shell-scripts:
       glob: "**/*.{sh,bats}"
       run: bats --jobs 4 --recursive tests/bats/
+    generated-package-schemas:
+      glob: "{chart/package-metadata.yaml,chart/values.schema.json,scripts/generate-package-schemas.jq,scripts/generate-package-schemas.sh,scripts/migrate-values-3-to-4.sh}"
+      run: scripts/generate-package-schemas.sh --check

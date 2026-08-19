@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.tempo.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "tempo" "appName" "tempo" "component" "core" "package" .Values.tempo) }}
 {{- end }}

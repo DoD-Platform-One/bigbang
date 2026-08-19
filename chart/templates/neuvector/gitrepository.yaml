@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (not .Values.offline) (eq .Values.neuvector.sourceType "git") .Values.neuvector.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "neuvector" "gitCredsName" "neuvector" "git" .Values.neuvector.git "component" "core" "root" .) }}
 {{- end }}

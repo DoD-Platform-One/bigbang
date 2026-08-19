@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.minio.sourceType "git") (not .Values.offline) (or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled) }}
 {{- include "bigbang.gitRepository" (dict "name" "minio" "gitCredsName" "minio" "git" .Values.addons.minio.git "root" .) }}
 {{- end }}

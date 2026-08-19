@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsGitlabRunner := merge .Values.addons.gitlabRunner.flux .Values.flux -}}
 {{- if .Values.addons.gitlabRunner.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2

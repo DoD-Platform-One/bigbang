@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsMimir := merge .Values.addons.mimir.flux .Values.flux -}}
 {{- if .Values.addons.mimir.enabled }}
 {{- if and (dig "minio-tenant" "enabled" false .Values.addons.mimir.values) (not .Values.addons.minioOperator.enabled) }}

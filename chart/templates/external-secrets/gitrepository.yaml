@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.externalSecrets.sourceType "git") (not .Values.offline) .Values.addons.externalSecrets.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "external-secrets" "gitCredsName" "externalSecrets" "git" .Values.addons.externalSecrets.git "component" "core" "root" .) }}
 {{- end }}

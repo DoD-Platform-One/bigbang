@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.kiali.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "kiali" "appName" "kiali" "component" "core" "package" .Values.kiali) }}
 {{- end }}

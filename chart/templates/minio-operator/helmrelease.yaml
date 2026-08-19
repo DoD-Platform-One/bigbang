@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsMinioOperator := merge .Values.addons.minioOperator.flux .Values.flux -}}
 {{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

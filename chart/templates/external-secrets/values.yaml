@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.externalSecrets.enabled }}
 {{- include "values-secret" (dict "root" $ "package" .Values.addons.externalSecrets "name" "external-secrets" "defaults" (include "bigbang.defaults.external-secrets" .)) }}
 {{- end }}

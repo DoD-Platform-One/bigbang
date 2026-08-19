@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (not .Values.prometheusOperatorCRDs.enabled) .Values.grafana.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "monitoring" "appName" "monitoring" "component" "core" "package" .Values.grafana) }}
 {{- end }}

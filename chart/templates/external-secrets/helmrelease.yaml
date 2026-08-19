@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettings := merge .Values.addons.externalSecrets.flux .Values.flux -}}
 {{- if .Values.addons.externalSecrets.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

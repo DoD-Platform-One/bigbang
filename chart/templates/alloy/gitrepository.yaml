@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.alloy.sourceType "git") (not .Values.offline) .Values.alloy.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "alloy" "gitCredsName" "alloy" "git" .Values.alloy.git "component" "core" "root" .) }}
 {{- end }}

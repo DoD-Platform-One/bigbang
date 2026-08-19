@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.gatewayAPI.sourceType "git") (not .Values.offline) (or .Values.gatewayAPI.enabled (eq (include "ambientEnabled" .) "true")) }}
 {{- include "bigbang.gitRepository" (dict "name" "gateway-api" "gitCredsName" "gatewayAPI" "git" .Values.gatewayAPI.git "component" "core" "root" .) }}
 {{- end }}

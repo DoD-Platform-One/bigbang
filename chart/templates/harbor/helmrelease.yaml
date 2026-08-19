@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "harbor" }}
 {{- $fluxSettingsHarbor := merge .Values.addons.harbor.flux .Values.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.sonarqube.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "sonarqube" "appName" "sonarqube" "component" "developer-tools" "package" .Values.addons.sonarqube) }}
 {{- end }}

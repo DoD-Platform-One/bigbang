@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.elasticsearchKibana.sourceType "git") (not .Values.offline) .Values.elasticsearchKibana.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "elasticsearch-kibana" "gitCredsName" "elasticsearchKibana" "git" .Values.elasticsearchKibana.git "component" "core" "root" .) }}
 {{- end }}

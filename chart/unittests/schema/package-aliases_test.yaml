@@ -1,0 +1,304 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Schema - Unified Built-in Package Paths
+templates:
+  - templates/_self-test/render.yaml
+  - templates/kiali/helmrelease.yaml
+  - templates/kiali/values.yaml
+  - templates/gitlab/helmrelease.yaml
+  - templates/gitlab/values.yaml
+  - templates/metrics-server/helmrelease.yaml
+  - templates/metrics-server/values.yaml
+  - templates/package/helmrelease.yaml
+  - templates/wrapper/helmrelease.yaml
+release:
+  name: test
+set:
+  packageConfiguration:
+    version: v1
+tests:
+  - it: should disable a top-level built-in package through packages
+    set:
+      packages:
+        kiali:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: templates/kiali/helmrelease.yaml
+
+  - it: should enable an add-on through packages and apply Flux overrides
+    set:
+      packages:
+        gitlab:
+          enabled: true
+          flux:
+            timeout: 22m
+    asserts:
+      - equal:
+          path: metadata.name
+          value: gitlab
+        template: templates/gitlab/helmrelease.yaml
+      - equal:
+          path: spec.timeout
+          value: 22m
+        template: templates/gitlab/helmrelease.yaml
+
+  - it: should prefer the unified package path over the legacy path
+    set:
+      kiali:
+        enabled: true
+      packages:
+        kiali:
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: templates/kiali/helmrelease.yaml
+
+  - it: should continue rendering unknown entries as custom packages
+    set:
+      packages:
+        podinfo:
+          enabled: true
+          sourceType: git
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+    asserts:
+      - equal:
+          path: metadata.name
+          value: podinfo
+        template: templates/package/helmrelease.yaml
+
+  - it: should not render a built-in alias as a custom package
+    set:
+      packages:
+        gitlab:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: templates/package/helmrelease.yaml
+
+  - it: should preserve explicitly supplied built-ins as resolved canonical values
+    set:
+      kiali:
+        enabled: false
+      packages:
+        kiali:
+          enabled: true
+          git:
+            tag: canonical-tag
+      _selfTest:
+        bigbang.self-test.package-alias-state:
+          args: helm:context
+          resultIsYaml: true
+    asserts:
+      - equal:
+          path: result.packages.kiali.enabled
+          value: true
+        template: templates/_self-test/render.yaml
+      - equal:
+          path: result.packages.kiali.git.tag
+          value: canonical-tag
+        template: templates/_self-test/render.yaml
+      - equal:
+          path: result.packages.kiali.git.repo
+          value: https://repo1.dso.mil/big-bang/product/packages/kiali.git
+        template: templates/_self-test/render.yaml
+      - notExists:
+          path: result.customPackages.kiali
+        template: templates/_self-test/render.yaml
+
+  - it: should make preserved canonical built-ins available to tpl expressions
+    set:
+      packages:
+        kiali:
+          git:
+            tag: canonical-tag
+      _selfTest:
+        resourceName:
+          args: '{{ .Values.packages.kiali.git.repo }}@{{ .Values.packages.kiali.git.tag }}'
+    asserts:
+      - equal:
+          path: args
+          value: https://repo1.dso.mil/big-bang/product/packages/kiali.git@canonical-tag
+        template: templates/_self-test/render.yaml
+
+  - it: should keep built-ins out of generic rendering while retaining custom packages
+    set:
+      packages:
+        kiali:
+          enabled: true
+        podinfo:
+          enabled: true
+          sourceType: git
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: templates/package/helmrelease.yaml
+      - equal:
+          path: metadata.name
+          value: podinfo
+        template: templates/package/helmrelease.yaml
+
+  - it: should keep built-ins out of generic wrapper rendering
+    set:
+      packages:
+        kiali:
+          enabled: true
+        podinfo:
+          enabled: true
+          wrapper:
+            enabled: true
+          sourceType: git
+          git:
+            repo: https://github.com/stefanprodan/podinfo.git
+            path: charts/podinfo
+            tag: "6.3.4"
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: templates/wrapper/helmrelease.yaml
+      - equal:
+          path: metadata.name
+          value: podinfo-wrapper
+        template: templates/wrapper/helmrelease.yaml
+
+  - it: should not populate canonical packages from legacy-only built-ins
+    set:
+      kiali:
+        enabled: true
+      _selfTest:
+        bigbang.self-test.package-alias-state:
+          args: helm:context
+          resultIsYaml: true
+    asserts:
+      - notExists:
+          path: result.packages.kiali
+        template: templates/_self-test/render.yaml
+      - notExists:
+          path: result.customPackages.kiali
+        template: templates/_self-test/render.yaml
+
+  - it: should reject string booleans for built-in packages
+    set:
+      packages:
+        kiali:
+          enabled: "false"
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*got string, want boolean.*"
+
+  - it: should preserve the metrics server auto enablement mode
+    set:
+      packages:
+        metricsServer:
+          enabled: auto
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should reject unsupported metrics server enablement strings
+    set:
+      packages:
+        metricsServer:
+          enabled: sometimes
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*value must be one of true, false, 'auto'.*"
+
+  - it: should accept partial package-specific and source overrides
+    set:
+      packages:
+        kiali:
+          git:
+            tag: test-tag
+          sso:
+            client_id: canonical-client
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should allow arbitrary child chart values
+    set:
+      packages:
+        kiali:
+          values:
+            upstream:
+              featureAddedByChildChart:
+                enabled: true
+    asserts:
+      - notFailedTemplate: {}
+
+  - it: should reject unknown fields on a built-in package
+    set:
+      packages:
+        kiali:
+          enabeld: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*additional properties 'enabeld' not allowed.*"
+
+  - it: should reject unknown nested source fields
+    set:
+      packages:
+        kiali:
+          git:
+            repository: https://example.com/kiali.git
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*additional properties 'repository' not allowed.*"
+
+  - it: should reject unknown package-specific fields
+    set:
+      packages:
+        kiali:
+          sso:
+            clientID: canonical-client
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*additional properties 'clientID' not allowed.*"
+
+  - it: should reject a custom package name that collides with a built-in package
+    set:
+      packages:
+        istio-cni:
+          enabled: true
+          sourceType: git
+          git:
+            repo: https://example.com/istio-cni.git
+            tag: test
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*packages.istio-cni conflicts with built-in package packages.istioCNI.*"
+        template: templates/wrapper/helmrelease.yaml
+
+  - it: should reject custom package names that normalize to the same identity
+    set:
+      packages:
+        examplePackage:
+          enabled: true
+          sourceType: git
+          git:
+            repo: https://example.com/example-package.git
+            tag: test
+        example-package:
+          enabled: false
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*normalize to the same package identity.*"
+        template: templates/wrapper/helmrelease.yaml
+
+  - it: should allow custom names whose rendered resource identities are distinct
+    set:
+      packages:
+        examplePackage:
+          enabled: false
+        examplepackage:
+          enabled: false
+    asserts:
+      - notFailedTemplate: {}

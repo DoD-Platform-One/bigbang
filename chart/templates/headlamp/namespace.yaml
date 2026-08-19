@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.headlamp.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "headlamp" "appName" "headlamp" "component" "core" "package" .Values.addons.headlamp "extraLabels" (dict "meta.helm.sh/release-namespace" "bigbang" "meta.helm.sh/release-name" "bigbang")) }}
 {{- end }}

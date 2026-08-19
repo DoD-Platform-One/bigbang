@@ -1,5 +1,7 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Used for Helm chart deployment of Big Bang wrapper.  One per package. */ -}}
-{{- range $pkgKey, $vals := .Values.packages -}}
+{{- $customPackages := .Values._customPackages | default dict -}}
+{{- range $pkgKey, $vals := $customPackages -}}
 {{- if and (dig "enabled" true $vals) (dig "wrapper" "enabled" false $vals) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
 {{- $fluxSettings := mergeOverwrite (deepCopy $.Values.flux) (dig "flux" dict $vals) -}}
@@ -9,8 +11,8 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}-wrapper
-  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-                {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $customPackages $pkgKey) }}
+                {{ dig "helmRelease" "namespace" "" (index $customPackages $pkgKey) }}
              {{ else }}
                 {{ default (dig "namespace" "name" $pkg $vals) "" }}
              {{ end }}

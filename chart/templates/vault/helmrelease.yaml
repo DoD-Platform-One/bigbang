@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsVault := merge .Values.addons.vault.flux .Values.flux -}}
 
 {{- if .Values.addons.vault.enabled }}

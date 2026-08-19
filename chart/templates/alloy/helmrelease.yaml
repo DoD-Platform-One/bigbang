@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsAlloy := merge .Values.alloy.flux .Values.flux -}}
 {{- if .Values.alloy.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

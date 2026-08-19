@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.loki.sourceType "git") (not .Values.offline) .Values.loki.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "loki" "gitCredsName" "loki" "git" .Values.loki.git "component" "core" "root" .) }}
 {{- end }}

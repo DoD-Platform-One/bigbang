@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "kyvernoReporter" }}
 {{- $fluxSettings := merge .Values.kyvernoReporter.flux .Values.flux -}}
 {{- if (get .Values $pkg).enabled }}

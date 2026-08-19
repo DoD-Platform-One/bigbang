@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.fortify.enabled }}
 {{- $fortifyPackage := deepCopy .Values.addons.fortify -}}
 {{- if .Values.addons.fortify.values -}}

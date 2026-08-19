@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.bbctl.sourceType "git") (not .Values.offline) .Values.bbctl.enabled .Values.monitoring.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "bbctl" "gitCredsName" "bbctl" "git" .Values.bbctl.git "root" .) }}
 {{- end }}

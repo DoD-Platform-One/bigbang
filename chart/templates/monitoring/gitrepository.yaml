@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.monitoring.sourceType "git") (not .Values.offline) .Values.monitoring.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "monitoring" "gitCredsName" "monitoring" "git" .Values.monitoring.git "component" "core" "root" .) }}
 {{- end }}

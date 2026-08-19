@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.mattermost.sourceType "git") (not .Values.offline) .Values.addons.mattermost.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "mattermost" "gitCredsName" "mattermost" "git" .Values.addons.mattermost.git "component" "collaboration-tools" "root" .) }}
 {{- end }}

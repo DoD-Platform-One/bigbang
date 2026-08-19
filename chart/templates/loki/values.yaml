@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.loki.enabled }}
 {{- /* Create a cleaned copy of loki config and merge deprecated paths into current paths */ -}}
 {{- $lokiPackage := deepCopy .Values.loki -}}
