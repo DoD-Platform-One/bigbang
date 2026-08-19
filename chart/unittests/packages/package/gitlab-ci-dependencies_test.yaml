@@ -20,6 +20,12 @@ release:
   namespace: bigbang
 values:
   - ../../../../tests/test-values.yaml
+set:
+  addons.gitlab.enabled: true
+  packages.cloudnative-pg.enabled: true
+  packages.postgresql.enabled: true
+  packages.redis.enabled: true
+  packages.garage.enabled: true
 tests:
   - it: points GitLab at the released package tag
     template: gitlab/gitrepository.yaml

@@ -12,6 +12,12 @@ release:
 values:
   - ../../../../tests/test-values.yaml
   - ../../../../tests/test-values-ambient.yaml
+set:
+  addons.gitlab.enabled: true
+  packages.cloudnative-pg.enabled: true
+  packages.postgresql.enabled: true
+  packages.redis.enabled: true
+  packages.garage.enabled: true
 tests:
   - it: waits for the complete ambient mesh before installing Garage
     template: package/helmrelease.yaml
