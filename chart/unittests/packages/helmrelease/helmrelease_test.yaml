@@ -487,6 +487,67 @@ tests:
         name: kyverno
       any: true
 
+- it: gitlab should append custom HelmRelease dependencies
+  set:
+    addons:
+      gitlab:
+        enabled: true
+        dependsOn:
+          - name: cloudnative-pg
+            namespace: bigbang
+    gatekeeper:
+      enabled: false
+    istiod:
+      enabled: false
+    kyvernoPolicies:
+      enabled: false
+    monitoring:
+      enabled: false
+  template: gitlab/helmrelease.yaml
+  asserts:
+  - lengthEqual:
+      path: spec.dependsOn
+      count: 1
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: cloudnative-pg
+        namespace: bigbang
+
+- it: gitlab should preserve default dependencies when appending custom dependencies
+  set:
+    addons:
+      gitlab:
+        enabled: true
+        dependsOn:
+          - name: cloudnative-pg
+            namespace: bigbang
+    gatekeeper:
+      enabled: false
+    istiod:
+      enabled: true
+    kyvernoPolicies:
+      enabled: true
+    monitoring:
+      enabled: false
+  template: gitlab/helmrelease.yaml
+  asserts:
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: cloudnative-pg
+        namespace: bigbang
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: kyverno-policies
+        namespace: NAMESPACE
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: istiod
+        namespace: NAMESPACE
+
 ###############################################################################
 # DependsOn correctness
 ###############################################################################

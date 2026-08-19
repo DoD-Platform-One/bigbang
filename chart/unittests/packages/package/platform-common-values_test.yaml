@@ -186,6 +186,22 @@ tests:
               - port: 5432
                 protocol: TCP
 
+  - it: should have default redis-subnets egress definition
+    asserts:
+      - equal:
+          path: bb-common.networkPolicies.egress.definitions.redis-subnets
+          value:
+            to:
+              - ipBlock:
+                  cidr: "192.168.0.0/16"
+              - ipBlock:
+                  cidr: "172.16.0.0/12"
+              - ipBlock:
+                  cidr: "10.0.0.0/8"
+            ports:
+              - port: 6379
+                protocol: TCP
+
   - it: should allow custom sso egress CIDR
     set:
       networkPolicies.egress.definitions.sso.to:

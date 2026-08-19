@@ -1,0 +1,356 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - GitLab CI External Dependencies
+templates:
+  - templates/helm-repository/helmrepo.yaml
+  - templates/package/gitrepository.yaml
+  - templates/package/helmrelease.yaml
+  - templates/package/namespace.yaml
+  - templates/package/values.yaml
+  - templates/wrapper/helmrelease.yaml
+  - templates/wrapper/values.yaml
+  - templates/gitlab/gitrepository.yaml
+  - templates/gitlab/helmrelease.yaml
+  - templates/gitlab/secret-database.yaml
+  - templates/gitlab/secret-objectstore.yaml
+  - templates/gitlab/secret-redis-bb.yaml
+  - templates/gitlab/values.yaml
+  - templates/kyverno-policies/values.yaml
+release:
+  name: test
+  namespace: bigbang
+values:
+  - ../../../../tests/test-values.yaml
+tests:
+  - it: points GitLab at the released package tag
+    template: gitlab/gitrepository.yaml
+    documentSelector:
+      path: metadata.name
+      value: gitlab
+    asserts:
+      - equal:
+          path: spec.ref.tag
+          value: 10.1.3-bb.0
+
+  - it: sources the operator from the Big Bang maintained CloudNativePG package
+    template: package/gitrepository.yaml
+    documentSelector:
+      path: metadata.name
+      value: cloudnative-pg
+    asserts:
+      - equal:
+          path: spec.url
+          value: https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git
+      - equal:
+          path: spec.ref.tag
+          value: 0.29.0-bb.0
+
+  - it: sources Garage from the updated Big Bang maintained package
+    template: package/gitrepository.yaml
+    documentSelector:
+      path: metadata.name
+      value: garage
+    asserts:
+      - equal:
+          path: spec.url
+          value: https://repo1.dso.mil/big-bang/product/maintained/garage.git
+      - equal:
+          path: spec.ref.tag
+          value: 0.9.3-bb.2
+
+  - it: uses only the Registry1 HelmRepository
+    template: helm-repository/helmrepo.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: registry1
+      - equal:
+          path: spec.url
+          value: oci://registry1.dso.mil/bigbang
+      - equal:
+          path: spec.secretRef.name
+          value: private-registry
+
+  - it: deploys the single PostgreSQL operand through the Big Bang wrapper
+    template: package/helmrelease.yaml
+    documentSelector:
+      path: metadata.name
+      value: postgresql
+    asserts:
+      - isKind:
+          of: HelmRelease
+      - equal:
+          path: metadata.namespace
+          value: bigbang
+      - equal:
+          path: spec.targetNamespace
+          value: postgresql
+      - equal:
+          path: spec.releaseName
+          value: postgresql
+      - equal:
+          path: spec.timeout
+          value: 30m
+      - equal:
+          path: spec.chart.spec.chart
+          value: wrapper
+      - equal:
+          path: spec.chart.spec.version
+          value: 0.4.15
+      - equal:
+          path: spec.chart.spec.sourceRef
+          value:
+            kind: HelmRepository
+            name: registry1
+            namespace: bigbang
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: cloudnative-pg
+            namespace: bigbang
+      - equal:
+          path: spec.waitStrategy.name
+          value: poller
+      - equal:
+          path: spec.healthCheckExprs[0]
+          value:
+            apiVersion: postgresql.cnpg.io/v1
+            kind: Cluster
+            current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+      - equal:
+          path: spec.postRenderers[0].kustomize.patches[0].target
+          value:
+            group: ""
+            version: v1
+            kind: ConfigMap
+            name: ^postgresql$
+      - matchRegex:
+          path: spec.postRenderers[0].kustomize.patches[0].patch
+          pattern: '(?s)op: replace.*path: "".*apiVersion: postgresql.cnpg.io/v1.*kind: Cluster.*name: postgresql.*namespace: postgresql.*imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.10.*database: gitlabhq_production.*owner: gitlab'
+
+  - it: deploys Redis with its normal identity and namespace
+    template: package/helmrelease.yaml
+    documentSelector:
+      path: metadata.name
+      value: redis
+    asserts:
+      - equal:
+          path: spec.targetNamespace
+          value: redis
+      - equal:
+          path: spec.releaseName
+          value: redis
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: redis-wrapper
+            namespace: bigbang
+
+  - it: deploys Garage with its normal identity and namespace
+    template: package/helmrelease.yaml
+    documentSelector:
+      path: metadata.name
+      value: garage
+    asserts:
+      - equal:
+          path: spec.targetNamespace
+          value: garage
+      - equal:
+          path: spec.releaseName
+          value: garage
+      - notExists:
+          path: spec.postRenderers
+
+  - it: creates distinct dependency namespaces
+    template: package/namespace.yaml
+    documentSelector:
+      path: metadata.name
+      value: postgresql
+    asserts:
+      - equal:
+          path: metadata.labels.istio-injection
+          value: disabled
+
+  - it: keeps the CloudNativePG operator namespace unmeshed in sidecar CI
+    template: package/namespace.yaml
+    documentSelector:
+      path: metadata.name
+      value: cloudnative-pg
+    asserts:
+      - equal:
+          path: metadata.labels.istio-injection
+          value: disabled
+
+  - it: retains Garage NetworkPolicies in its own namespace
+    template: package/values.yaml
+    documentSelector:
+      path: metadata.name
+      value: garage-values
+    asserts:
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)networkPolicies:.*enabled: true.*garage-s3:3900"
+      - notMatchRegex:
+          path: stringData["values.yaml"]
+          pattern: "postgresql:5432|redis:6379"
+
+  - it: renders PostgreSQL operand and policies as wrapper chart values
+    template: package/values.yaml
+    documentSelector:
+      path: metadata.name
+      value: postgresql-values
+    asserts:
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)configMaps:.*placeholder: replaced-by-flux-post-renderer.*name: postgresql"
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)allow-gitlab-postgresql.*kubernetes.io/metadata.name: gitlab.*port: 5432"
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)allow-cloudnative-pg-status.*kubernetes.io/metadata.name: cloudnative-pg.*port: 8000"
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)allow-cnpg-kube-api.*cidr: ['\"]?172.16.0.0/12['\"]?.*cnpg.io/cluster: postgresql"
+      - notMatchRegex:
+          path: stringData["values.yaml"]
+          pattern: "allowControlPlaneEgress: true"
+
+  - it: renders Redis wrapper ingress only from GitLab
+    template: wrapper/values.yaml
+    documentSelector:
+      path: metadata.name
+      value: redis-wrapper-values
+    asserts:
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)allow-gitlab-redis.*kubernetes.io/metadata.name: gitlab.*port: 6379"
+      - matchRegex:
+          path: stringData["values.yaml"]
+          pattern: "(?s)allow-redis-upgrade-kube-api.*app.kubernetes.io/name: bigbang-redis-upgrade-job.*cidr: 172.16.0.0/12"
+      - notMatchRegex:
+          path: stringData["values.yaml"]
+          pattern: "allowControlPlaneEgress: true"
+
+  - it: renders namespace-scoped GitLab egress to every external dependency
+    template: gitlab/values.yaml
+    asserts:
+      - matchRegex:
+          path: stringData.common
+          pattern: "(?s)name: allow-external-dependencies.*port: 3900.*kubernetes.io/metadata.name: garage"
+      - matchRegex:
+          path: stringData.common
+          pattern: "(?s)port: 5432.*kubernetes.io/metadata.name: postgresql"
+      - matchRegex:
+          path: stringData.common
+          pattern: "(?s)port: 6379.*kubernetes.io/metadata.name: redis"
+
+  - it: preserves API tokens for CNPG operands
+    template: kyverno-policies/values.yaml
+    asserts:
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)namespace: postgresql.*allow:.*postgresql-\\*"
+      - notMatchRegex:
+          path: stringData.overlays
+          pattern: "postgresql-readiness"
+
+  - it: leaves dependency credential ownership with Redis PostgreSQL and Garage
+    template: gitlab/secret-objectstore.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not render duplicate database credentials
+    template: gitlab/secret-database.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: does not render duplicate Redis credentials
+    template: gitlab/secret-redis-bb.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: synchronizes dependency-owned credentials into GitLab through Kyverno
+    template: kyverno-policies/values.yaml
+    asserts:
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: sync-redis-credentials"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)clone:.*name: redis.*namespace: redis"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: gitlab-redis-secret-bb"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: sync-postgresql-credentials"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)clone:.*name: postgresql-app.*namespace: postgresql"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: gitlab-database"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: sync-garage-gitlab-credentials"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)names:.*garage-gitlab-credentials.*namespaces:.*garage"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "name: gitlab-object-storage"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "backups:.*base64_encode"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "rails:.*base64_encode"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "registry:.*base64_encode"
+
+  - it: points GitLab at the synchronized dependency Secrets
+    template: gitlab/values.yaml
+    asserts:
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)redis:.*auth:.*key: redis-password.*secret: gitlab-redis-secret-bb"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)psql:.*password:.*key: password.*secret: gitlab-database"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)object_store:.*connection:.*key: rails.*secret: gitlab-object-storage"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)objectStorage:.*config:.*key: backups.*secret: gitlab-object-storage"
+      - matchRegex:
+          path: stringData.overlays
+          pattern: "(?s)storage:.*key: registry.*secret: gitlab-object-storage"
+
+  - it: gates GitLab on every external CI dependency release
+    template: gitlab/helmrelease.yaml
+    documentSelector:
+      path: metadata.name
+      value: gitlab
+    asserts:
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: postgresql
+            namespace: bigbang
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: redis
+            namespace: bigbang
+      - contains:
+          path: spec.dependsOn
+          content:
+            name: garage
+            namespace: bigbang

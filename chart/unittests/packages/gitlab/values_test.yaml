@@ -3,6 +3,31 @@ suite: Package - Gitlab - Values Tests
 templates:
   - templates/gitlab/values.yaml
 tests:
+  - it: rejects an object storage endpoint without an HTTP URI scheme
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.objectStorage.endpoint: garage.garage.svc.cluster.local:3900
+    asserts:
+      - failedTemplate:
+          errorMessage: "addons.gitlab.objectStorage.endpoint must begin with http:// or https:// when set"
+
+  - it: rejects a registry object storage endpoint without an HTTP URI scheme
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.objectStorage.endpoint: http://garage.garage.svc.cluster.local:3900
+      addons.gitlab.objectStorage.regionendpoint: garage.garage.svc.cluster.local:3900
+    asserts:
+      - failedTemplate:
+          errorMessage: "addons.gitlab.objectStorage.regionendpoint must begin with http:// or https:// when set"
+
+  - it: does not validate dormant object storage values when GitLab is disabled
+    set:
+      addons.gitlab.enabled: false
+      addons.gitlab.objectStorage.endpoint: garage.garage.svc.cluster.local:3900
+    asserts:
+      - hasDocuments:
+          count: 0
+
   - it: sets the registry host from addons.gitlab.hostnames.registry
     postRenderer:
       cmd: "sh"
@@ -30,3 +55,361 @@ tests:
       - equal:
           path: global.hosts.registry.name
           value: "custom-registry.example.com"
+
+  - it: configures the Big Bang Redis secret with the shared auth values shape
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.redis.password: test-password
+    asserts:
+      - equal:
+          path: global.redis.auth.enabled
+          value: true
+      - equal:
+          path: global.redis.auth.secret
+          value: "gitlab-redis-secret-bb"
+      - equal:
+          path: global.redis.auth.key
+          value: "secret"
+      - notExists:
+          path: global.redis.password
+
+  - it: preserves per-bucket object storage connections by default
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.objectStorage.type: minio
+      addons.gitlab.objectStorage.endpoint: http://garage.garage.svc.cluster.local:3900
+      addons.gitlab.objectStorage.region: garage
+      addons.gitlab.objectStorage.accessKey: test-access-key
+      addons.gitlab.objectStorage.accessSecret: test-secret-key
+    asserts:
+      - notExists:
+          path: global.appConfig.object_store
+      - equal:
+          path: global.appConfig.lfs.connection.secret
+          value: gitlab-object-storage
+      - equal:
+          path: global.appConfig.artifacts.connection.key
+          value: rails
+      - equal:
+          path: networkPolicies.egress.definitions.storage-subnets.ports
+          value:
+            - port: 443
+              protocol: TCP
+
+  - it: uses consolidated object storage only when explicitly enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.objectStorage.type: s3
+      addons.gitlab.objectStorage.endpoint: https://s3.us-gov-west-1.amazonaws.com
+      addons.gitlab.objectStorage.region: us-gov-west-1
+      addons.gitlab.objectStorage.accessKey: test-access-key
+      addons.gitlab.objectStorage.accessSecret: test-secret-key
+      addons.gitlab.values.global.appConfig.object_store.enabled: true
+    asserts:
+      - equal:
+          path: global.appConfig.object_store.enabled
+          value: true
+      - equal:
+          path: global.appConfig.object_store.connection.secret
+          value: gitlab-object-storage
+      - equal:
+          path: global.appConfig.object_store.connection.key
+          value: rails
+      - notExists:
+          path: global.appConfig.lfs.connection
+      - notExists:
+          path: global.appConfig.artifacts.connection
+      - notExists:
+          path: global.appConfig.uploads.connection
+      - notExists:
+          path: global.appConfig.packages.connection
+      - notExists:
+          path: global.appConfig.dependencyProxy.connection
+
+  - it: preserves GitLab 18 network policy defaults when removed service blocks are absent
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
+          value: false
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
+          value: false
+      - notExists:
+          path: networkPolicies.egress.definitions.redis-subnets
+      - notExists:
+          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
+      - notExists:
+          path: networkPolicies.egress.from.sidekiq.to.definition.redis-subnets
+      - notExists:
+          path: networkPolicies.egress.from.migrations.to.definition.redis-subnets
+      - notExists:
+          path: networkPolicies.egress.from.toolbox.to.definition.redis-subnets
+      - notExists:
+          path: networkPolicies.egress.from.gitlab-exporter.to.definition.redis-subnets
+      - equal:
+          path: networkPolicies.egress.from.gitlab-exporter.to.definition.database-subnets
+          value: false
+      - notExists:
+          path: redis-bb
+      - notExists:
+          path: garage
+      - notExists:
+          path: postgresql.enabled
+
+  - it: enables external subnet egress for Big Bang GitLab 19 connection values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.database.host: postgresql-rw.postgresql.svc.cluster.local
+      addons.gitlab.database.port: 6432
+      addons.gitlab.objectStorage.type: minio
+      addons.gitlab.objectStorage.endpoint: http://garage.garage.svc.cluster.local:3900
+      addons.gitlab.objectStorage.region: garage
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.gitlab-exporter.to.definition.database-subnets
+          value: true
+      - contains:
+          path: networkPolicies.egress.definitions.database-subnets.ports
+          content:
+            port: 6432
+            protocol: TCP
+
+  - it: enables external subnet egress for direct upstream GitLab 19 values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.psql.host: postgres.example.internal
+      addons.gitlab.values.global.psql.port: 7432
+      addons.gitlab.values.global.redis.host: redis.example.internal
+      addons.gitlab.values.global.redis.port: 6380
+      addons.gitlab.values.global.appConfig.object_store.enabled: true
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
+          value: true
+      - contains:
+          path: networkPolicies.egress.definitions.database-subnets.ports
+          content:
+            port: 7432
+            protocol: TCP
+      - equal:
+          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.sidekiq.to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.toolbox.to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.gitlab-exporter.to.definition.redis-subnets
+          value: true
+      - contains:
+          path: networkPolicies.egress.definitions.redis-subnets.ports
+          content:
+            port: 6380
+            protocol: TCP
+
+  - it: enables database subnet egress for decomposed upstream PostgreSQL values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.psql.main.host: postgres.example.internal
+      addons.gitlab.values.global.psql.main.port: 8432
+      addons.gitlab.values.global.psql.ci.port: 9432
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
+          value: true
+      - contains:
+          path: networkPolicies.egress.definitions.database-subnets.ports
+          content:
+            port: 8432
+            protocol: TCP
+      - contains:
+          path: networkPolicies.egress.definitions.database-subnets.ports
+          content:
+            port: 9432
+            protocol: TCP
+
+  - it: enables external storage subnet egress for direct per-feature object storage values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.appConfig.artifacts.connection:
+        secret: gitlab-object-storage
+        key: rails
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
+          value: true
+
+  - it: enables external Redis subnet egress for upstream Sentinel values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.redis.host: redis-sentinel.example.internal
+      addons.gitlab.values.global.redis.sentinels:
+        - host: sentinel.example.internal
+          port: 26379
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
+          value: true
+      - exists:
+          path: networkPolicies.egress.definitions.redis-subnets
+      - contains:
+          path: networkPolicies.egress.definitions.redis-subnets.ports
+          content:
+            port: 26379
+            protocol: TCP
+
+  - it: enables external Redis subnet egress for an upstream redis.yml override
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.redis.redisYmlOverride:
+        cache:
+          secret: gitlab-redis-yml
+          key: redis.yml
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
+          value: true
+      - contains:
+          path: networkPolicies.egress.definitions.redis-subnets.ports
+          content:
+            port: 6379
+            protocol: TCP
+
+  - it: enables external Redis subnet egress when password authentication is disabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.redis.host: redis.example.internal
+      addons.gitlab.values.global.redis.auth.enabled: false
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
+          value: true
+      - exists:
+          path: networkPolicies.egress.definitions.redis-subnets
+
+  - it: restores the Redis definition when upgrading with reused pre-existing values
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.redis.host: redis.example.internal
+      networkPolicies.egress.definitions.redis-subnets: null
+    asserts:
+      - equal:
+          path: networkPolicies.egress.definitions.redis-subnets
+          value:
+            to:
+              - ipBlock:
+                  cidr: 192.168.0.0/16
+              - ipBlock:
+                  cidr: 172.16.0.0/12
+              - ipBlock:
+                  cidr: 10.0.0.0/8
+            ports:
+              - port: 6379
+                protocol: TCP
+
+  - it: tolerates null GitLab 19 removed service blocks without enabling replacements
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons:
+        gitlab:
+          enabled: true
+          values:
+            global:
+              minio: null
+            upstream:
+              postgresql: null
+              redis: null
+              minio: null
+    asserts:
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
+          value: true
+      - notExists:
+          path: redis-bb
+      - notExists:
+          path: garage
+      - notExists:
+          path: postgresql.enabled

@@ -35,6 +35,17 @@ tests:
               ports:
               - port: 5432
                 protocol: TCP
+            redis-subnets:
+              to:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+              ports:
+              - port: 6379
+                protocol: TCP
             sso:
               to:
                 - ipBlock:
@@ -123,6 +134,17 @@ tests:
               ports:
               - port: 5432
                 protocol: TCP
+            redis-subnets:
+              to:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+              ports:
+              - port: 6379
+                protocol: TCP
             sso:
               to:
                 - ipBlock:
@@ -206,6 +228,17 @@ tests:
                     cidr: 10.0.0.0/8
               ports:
               - port: 5432
+                protocol: TCP
+            redis-subnets:
+              to:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+              ports:
+              - port: 6379
                 protocol: TCP
             sso:
               to:
@@ -302,6 +335,17 @@ tests:
                     cidr: 10.0.0.0/8
               ports:
               - port: 5432
+                protocol: TCP
+            redis-subnets:
+              to:
+                - ipBlock:
+                    cidr: 192.168.0.0/16
+                - ipBlock:
+                    cidr: 172.16.0.0/12
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+              ports:
+              - port: 6379
                 protocol: TCP
             sso:
               to:

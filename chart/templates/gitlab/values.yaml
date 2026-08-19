@@ -1,4 +1,11 @@
 {{- if .Values.addons.gitlab.enabled }}
+{{- $objectStorageValues := .Values.addons.gitlab.objectStorage -}}
+{{- range $endpointName := list "endpoint" "regionendpoint" -}}
+  {{- $endpointValue := get $objectStorageValues $endpointName -}}
+  {{- if and (not (empty $endpointValue)) (not (regexMatch "^https?://" ($endpointValue | toString))) -}}
+    {{- fail (printf "addons.gitlab.objectStorage.%s must begin with http:// or https:// when set" $endpointName) -}}
+  {{- end -}}
+{{- end -}}
 {{- $gitlabPackage := deepCopy .Values.addons.gitlab -}}
 {{- if .Values.addons.gitlab.values -}}
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.gitlab.values) | fromYaml -}}
@@ -25,6 +32,108 @@ domain: {{ $domainName }}
 {{- $consolidatedObjStoreEnabled := dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
 {{- $kasEnabled := dig "global" "kas" "enabled" false .Values.addons.gitlab.values }}
+{{- $externalRedisConfigured := eq (include "bigbang.gitlab.externalRedisConfigured" .) "true" }}
+{{- $externalPostgresConfigured := eq (include "bigbang.gitlab.externalPostgresConfigured" .) "true" }}
+{{- $gitlabGlobalValues := (get .Values.addons.gitlab.values "global") | default dict }}
+{{- $gitlabRedisValues := dict }}
+{{- $gitlabPsqlValues := dict }}
+{{- if kindIs "map" $gitlabGlobalValues }}
+  {{- $configuredRedisValues := (get $gitlabGlobalValues "redis") | default dict }}
+  {{- if kindIs "map" $configuredRedisValues }}
+    {{- $gitlabRedisValues = $configuredRedisValues }}
+  {{- end }}
+  {{- $configuredPsqlValues := (get $gitlabGlobalValues "psql") | default dict }}
+  {{- if kindIs "map" $configuredPsqlValues }}
+    {{- $gitlabPsqlValues = $configuredPsqlValues }}
+  {{- end }}
+{{- end }}
+{{- $gitlabEgressDefinitions := deepCopy .Values.networkPolicies.egress.definitions }}
+{{- if $externalPostgresConfigured }}
+  {{- $databaseDefinition := (get $gitlabEgressDefinitions "database-subnets") | default dict }}
+  {{- if or (not (kindIs "map" $databaseDefinition)) (empty $databaseDefinition) }}
+    {{- $databaseDefinition = dict
+      "to" (list
+        (dict "ipBlock" (dict "cidr" "192.168.0.0/16"))
+        (dict "ipBlock" (dict "cidr" "172.16.0.0/12"))
+        (dict "ipBlock" (dict "cidr" "10.0.0.0/8")))
+      "ports" (list (dict "port" 5432 "protocol" "TCP")) }}
+  {{- end }}
+  {{- $databasePorts := (get $databaseDefinition "ports") | default list }}
+  {{- if not (kindIs "slice" $databasePorts) }}
+    {{- $databasePorts = list }}
+  {{- end }}
+  {{- $databasePortNumbers := list }}
+  {{- range $entry := $databasePorts }}
+    {{- if kindIs "map" $entry }}
+      {{- if hasKey $entry "port" }}
+        {{- $databasePortNumbers = append $databasePortNumbers ((get $entry "port") | int) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- $configuredDatabasePorts := list }}
+  {{- if not (empty .Values.addons.gitlab.database.host) }}
+    {{- $configuredDatabasePorts = append $configuredDatabasePorts (.Values.addons.gitlab.database.port | default 5432 | int) }}
+  {{- end }}
+  {{- if or (not (empty (get $gitlabPsqlValues "host"))) (not (empty (get $gitlabPsqlValues "port"))) }}
+    {{- $configuredDatabasePorts = append $configuredDatabasePorts ((get $gitlabPsqlValues "port") | default 5432 | int) }}
+  {{- end }}
+  {{- range $databaseName := list "main" "ci" "embedding" "sec" }}
+    {{- $databaseValues := (get $gitlabPsqlValues $databaseName) | default dict }}
+    {{- if kindIs "map" $databaseValues }}
+      {{- $databasePort := get $databaseValues "port" }}
+      {{- if or (not (empty $databasePort)) (and (eq $databaseName "main") (not (empty (get $databaseValues "host")))) }}
+        {{- $configuredDatabasePorts = append $configuredDatabasePorts ($databasePort | default 5432 | int) }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- range $configuredDatabasePort := $configuredDatabasePorts }}
+    {{- if not (has $configuredDatabasePort $databasePortNumbers) }}
+      {{- $databasePorts = append $databasePorts (dict "port" $configuredDatabasePort "protocol" "TCP") }}
+      {{- $databasePortNumbers = append $databasePortNumbers $configuredDatabasePort }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $databaseDefinition "ports" $databasePorts }}
+  {{- $_ := set $gitlabEgressDefinitions "database-subnets" $databaseDefinition }}
+{{- end }}
+{{- if $externalRedisConfigured }}
+  {{- $redisDefinition := (get $gitlabEgressDefinitions "redis-subnets") | default dict }}
+  {{- if or (not (kindIs "map" $redisDefinition)) (empty $redisDefinition) }}
+    {{- $redisDefinition = dict
+      "to" (list
+        (dict "ipBlock" (dict "cidr" "192.168.0.0/16"))
+        (dict "ipBlock" (dict "cidr" "172.16.0.0/12"))
+        (dict "ipBlock" (dict "cidr" "10.0.0.0/8")))
+      "ports" (list (dict "port" 6379 "protocol" "TCP")) }}
+  {{- end }}
+  {{- $redisPorts := (get $redisDefinition "ports") | default list }}
+  {{- $redisPortNumbers := list }}
+  {{- range $entry := $redisPorts }}
+    {{- if kindIs "map" $entry }}
+      {{- $redisPortNumbers = append $redisPortNumbers ((get $entry "port") | int) }}
+    {{- end }}
+  {{- end }}
+  {{- $configuredRedisPort := get $gitlabRedisValues "port" }}
+  {{- if not (empty $configuredRedisPort) }}
+    {{- $configuredRedisPort = int $configuredRedisPort }}
+    {{- if not (has $configuredRedisPort $redisPortNumbers) }}
+      {{- $redisPorts = append $redisPorts (dict "port" $configuredRedisPort "protocol" "TCP") }}
+      {{- $redisPortNumbers = append $redisPortNumbers $configuredRedisPort }}
+    {{- end }}
+  {{- end }}
+  {{- range $sentinel := (get $gitlabRedisValues "sentinels") | default list }}
+    {{- if kindIs "map" $sentinel }}
+      {{- $sentinelPort := (get $sentinel "port") | default 26379 | int }}
+      {{- if not (has $sentinelPort $redisPortNumbers) }}
+        {{- $redisPorts = append $redisPorts (dict "port" $sentinelPort "protocol" "TCP") }}
+        {{- $redisPortNumbers = append $redisPortNumbers $sentinelPort }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- $_ := set $redisDefinition "ports" $redisPorts }}
+  {{- $_ := set $gitlabEgressDefinitions "redis-subnets" $redisDefinition }}
+{{- else }}
+  {{- $_ := unset $gitlabEgressDefinitions "redis-subnets" }}
+{{- end }}
 
 openshift: {{ .Values.openshift }}
 
@@ -205,7 +314,7 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
   egress:
-    definitions: {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
+    definitions: {{ toYaml $gitlabEgressDefinitions | nindent 6 }}
     from:
       "*":
         to:
@@ -217,15 +326,56 @@ networkPolicies:
         to:
           definition:
             storage-subnets: true
+            {{- if $externalRedisConfigured }}
+            redis-subnets: true
+            {{- end }}
       webservice:
         to:
           definition:
             sso: true
             database-subnets: true
+            {{- if $externalRedisConfigured }}
+            redis-subnets: true
+            {{- end }}
       migrations:
         to:
           definition:
             database-subnets: true
+            {{- if $externalRedisConfigured }}
+            redis-subnets: true
+            {{- end }}
+      {{- if $externalRedisConfigured }}
+      toolbox:
+        to:
+          definition:
+            redis-subnets: true
+      {{- end }}
+      {{- if eq (include "metricScrapingEnabled" .) "true" }}
+      gitlab-exporter:
+        podSelector:
+          matchLabels:
+            app: gitlab-exporter
+        to:
+          definition:
+            {{- if $externalRedisConfigured }}
+            redis-subnets: true
+            {{- end }}
+      {{- end }}
+      {{- if and $externalRedisConfigured $kasEnabled }}
+      kas:
+        to:
+          definition:
+            redis-subnets: true
+      {{- end }}
+      {{- if and $externalRedisConfigured (dig "upstream" "gitlab" "mailroom" "enabled" false .Values.addons.gitlab.values) }}
+      mailroom:
+        podSelector:
+          matchLabels:
+            app: mailroom
+        to:
+          definition:
+            redis-subnets: true
+      {{- end }}
 
 bbtests:
   enableImagePullSecrets: {{ ne .Values.registryCredentials nil }}
@@ -548,13 +698,21 @@ global:
     {{- end }}
 
     {{- if or $extObjStorageIsConfigured $consolidatedObjStoreEnabled }}
+    {{- if and $extObjStorageIsConfigured $consolidatedObjStoreEnabled }}
+    object_store:
+      enabled: true
+      connection:
+        secret: gitlab-object-storage
+        key: rails
+    {{- end }}
+
     lfs:
       {{- if .Values.addons.gitlab.objectStorage.bucketPrefix }}
       bucket: {{ .Values.addons.gitlab.objectStorage.bucketPrefix }}-gitlab-lfs
       {{- else }}
       bucket: gitlab-lfs
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -566,7 +724,7 @@ global:
       {{- else }}
       bucket: gitlab-artifacts
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -578,7 +736,7 @@ global:
       {{- else }}
       bucket: gitlab-uploads
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -590,7 +748,7 @@ global:
       {{- else }}
       bucket: gitlab-packages
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -602,7 +760,7 @@ global:
       {{- else }}
       bucket: gitlab-mr-diffs
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -614,7 +772,7 @@ global:
       {{- else }}
       bucket: gitlab-terraform-state
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -627,7 +785,7 @@ global:
       {{- else }}
       bucket: gitlab-dependency-proxy
       {{- end }}
-      {{- if not (dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values)}}
+      {{- if not $consolidatedObjStoreEnabled }}
       connection:
         secret: gitlab-object-storage
         key: rails
@@ -657,9 +815,11 @@ global:
   {{- end }}
 
   {{- if and (ne .Values.addons.gitlab.redis.password "") (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled) }}
-  redis:  
-    password:
+  redis:
+    auth:
+      enabled: true
       secret: "gitlab-redis-secret-bb"
+      key: "secret"
   {{- end }}
 
   {{- if .Values.addons.gitlab.smtp.password }}
