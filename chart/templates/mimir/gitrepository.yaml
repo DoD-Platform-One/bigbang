@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.mimir.sourceType "git") (not .Values.offline) .Values.addons.mimir.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "mimir" "gitCredsName" "mimir" "git" .Values.addons.mimir.git "component" "core" "root" .) }}
 {{- end }}

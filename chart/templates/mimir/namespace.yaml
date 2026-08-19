@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.mimir.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "mimir" "appName" "mimir" "component" "core" "package" .Values.addons.mimir) }}
 {{- end }}

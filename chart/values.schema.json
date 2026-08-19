@@ -46,6 +46,20 @@
     "comments": {
       "type": "string"
     },
+    "packageConfiguration": {
+      "type": "object",
+      "description": "Selects the package configuration contract. In Big Bang 3.x, v1 opts into canonical built-in package paths; Big Bang 4.x retains v1 as its default unified package contract.",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Package configuration contract version.",
+          "enum": [
+            "v1"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "domain": {
       "type": "string"
     },
@@ -1417,6 +1431,30 @@
           "properties": {
             "istio": {
               "$ref": "#/$defs/istio"
+            },
+            "ingress": {
+              "type": "object",
+              "properties": {
+                "gateway": {
+                  "type": "string"
+                },
+                "cert": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "kms_access_key": {
+              "type": "string"
+            },
+            "kms_secret_key": {
+              "type": "string"
+            },
+            "kms_key_id": {
+              "type": "string"
             }
           }
         },
@@ -1433,6 +1471,11 @@
               "type": [
                 "boolean",
                 "string"
+              ],
+              "enum": [
+                true,
+                false,
+                "auto"
               ],
               "examples": [
                 true,
@@ -1561,231 +1604,7 @@
       },
       "additionalProperties": false
     },
-    "packages": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "allOf": [
-          {
-            "if": {
-              "not": {
-                "properties": {
-                  "enabled": {
-                    "const": false
-                  }
-                },
-                "required": [
-                  "enabled"
-                ]
-              }
-            },
-            "then": {
-              "required": [
-                "sourceType"
-              ],
-              "if": {
-                "properties": {
-                  "sourceType": {
-                    "const": "git"
-                  }
-                },
-                "required": [
-                  "sourceType"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "git": {
-                    "$ref": "#/$defs/git"
-                  }
-                },
-                "required": [
-                  "git"
-                ]
-              },
-              "else": {
-                "properties": {
-                  "helmRepo": {
-                    "$ref": "#/$defs/helmRepo"
-                  }
-                },
-                "required": [
-                  "helmRepo"
-                ]
-              }
-            }
-          },
-          {
-            "if": {
-              "properties": {
-                "kustomize": {
-                  "const": true
-                }
-              },
-              "required": [
-                "kustomize"
-              ]
-            },
-            "then": {
-              "properties": {
-                "sourceType": {
-                  "const": "git"
-                },
-                "git": {
-                  "type": "object",
-                  "required": [
-                    "path"
-                  ]
-                }
-              }
-            }
-          }
-        ],
-        "properties": {
-          "enabled": {
-            "type": "boolean",
-            "default": true
-          },
-          "namespace": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string"
-              },
-              "create": {
-                "type": "boolean",
-                "default": true
-              },
-              "createRegistrySecret": {
-                "type": "boolean",
-                "default": true
-              },
-              "labels": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              },
-              "annotations": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              }
-            },
-            "additionalProperties": false
-          },
-          "helmRelease": {
-            "type": "object",
-            "properties": {
-              "namespace": {
-                "type": "string"
-              }
-            },
-            "additionalProperties": false
-          },
-          "sourceType": {
-            "$ref": "#/$defs/sourceType"
-          },
-          "releaseName": {
-            "type": "string"
-          },
-          "wrapper": {
-            "type": "object",
-            "properties": {
-              "enabled": {
-                "type": "boolean",
-                "default": false
-              },
-              "postRenderers": {
-                "$ref": "#/$defs/postRenderers"
-              }
-            },
-            "additionalProperties": false
-          },
-          "kustomize": {
-            "type": "boolean",
-            "default": false
-          },
-          "passBigBangValues": {
-            "type": "boolean",
-            "default": false
-          },
-          "bbCommonValues": {
-            "type": "boolean",
-            "default": true
-          },
-          "includeDefaultDependsOn": {
-            "type": "boolean",
-            "default": true
-          },
-          "helmRepo": {
-            "$ref": "#/$defs/additionalPackageHelmRepo"
-          },
-          "git": {
-            "$ref": "#/$defs/additionalPackageGit"
-          },
-          "flux": {
-            "$ref": "#/$defs/flux"
-          },
-          "postRenderers": {
-            "$ref": "#/$defs/postRenderers"
-          },
-          "dependsOn": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "namespace": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "istio": {
-            "$ref": "#/$defs/istio"
-          },
-          "sso": {
-            "type": "object",
-            "properties": {
-              "enabled": {
-                "type": "boolean"
-              }
-            },
-            "additionalProperties": false
-          },
-          "monitor": {
-            "type": "object"
-          },
-          "network": {
-            "type": "object"
-          },
-          "secrets": {
-            "type": [
-              "object",
-              "array"
-            ]
-          },
-          "configMaps": {
-            "type": [
-              "object",
-              "array"
-            ]
-          },
-          "values": {
-            "$ref": "#/$defs/values"
-          }
-        },
-        "additionalProperties": false
-      }
-    }
+    "packages": {}
   },
   "$defs": {
     "registryCredential": {
@@ -2810,6 +2629,3980 @@
           ]
         }
       }
+    },
+    "packageAliasPartials": {
+      "registryCredential": {
+        "type": "object",
+        "properties": {
+          "registry": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "helmRepositories": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "repository": {
+              "type": "string",
+              "format": "uri"
+            },
+            "existingSecret": {
+              "type": "string"
+            },
+            "provider": {
+              "type": "string",
+              "enum": [
+                "generic",
+                "aws",
+                "azure",
+                "gcp"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "oci",
+                "default"
+              ]
+            },
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "cosignPublicKeys": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          },
+          "anyOf": [
+            {
+              "required": [
+                "existingSecret"
+              ]
+            },
+            {
+              "required": [
+                "username",
+                "password"
+              ]
+            },
+            {
+              "required": [
+                "provider"
+              ],
+              "not": {
+                "properties": {
+                  "provider": {
+                    "const": "generic"
+                  }
+                }
+              }
+            }
+          ],
+          "required": [
+            "name",
+            "repository"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "basePackage": {
+        "type": "object",
+        "if": {
+          "properties": {
+            "sourceType": {
+              "const": "git"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            }
+          }
+        },
+        "properties": {
+          "enabled": {
+            "$ref": "#/$defs/packageAliasPartials/enabled"
+          },
+          "sourceType": {
+            "enum": [
+              "git",
+              "helmRepo"
+            ]
+          },
+          "releaseName": {
+            "type": "string",
+            "description": "Optional Helm releaseName override for this package."
+          },
+          "flux": {
+            "$ref": "#/$defs/packageAliasPartials/flux"
+          },
+          "values": {
+            "$ref": "#/$defs/packageAliasPartials/values"
+          },
+          "postRenderers": {
+            "$ref": "#/$defs/packageAliasPartials/postRenderers"
+          }
+        }
+      },
+      "values": {
+        "type": "object",
+        "default": {},
+        "properties": {}
+      },
+      "flux": {
+        "type": "object",
+        "properties": {
+          "driftDetection": {
+            "description": "DriftDetection holds the configuration for detecting and handling differences between the manifest in the Helm storage and the resources currently existing in the cluster.  Note: this field is provisional to the v2beta2 API, and not actively used by v2beta1 HelmReleases.",
+            "type": "object",
+            "properties": {
+              "ignore": {
+                "description": "Ignore contains a list of rules for specifying which changes to ignore during diffing.",
+                "type": "array",
+                "items": {
+                  "description": "IgnoreRule defines a rule to selectively disregard specific changes during the drift detection process.",
+                  "type": "object",
+                  "required": [
+                    "paths"
+                  ],
+                  "properties": {
+                    "paths": {
+                      "description": "Paths is a list of JSON Pointer (RFC 6901) paths to be excluded from consideration in a Kubernetes object.",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "target": {
+                      "description": "Target is a selector for specifying Kubernetes objects to which this rule applies. If Target is not set, the Paths will be ignored for all Kubernetes objects within the manifest of the Helm release.",
+                      "type": "object",
+                      "properties": {
+                        "annotationSelector": {
+                          "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                          "type": "string"
+                        },
+                        "group": {
+                          "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        },
+                        "labelSelector": {
+                          "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                          "type": "string"
+                        },
+                        "name": {
+                          "description": "Name to match resources with.",
+                          "type": "string"
+                        },
+                        "namespace": {
+                          "description": "Namespace to select resources from.",
+                          "type": "string"
+                        },
+                        "version": {
+                          "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "mode": {
+                "description": "Mode defines how differences should be handled between the Helm manifest and the manifest currently applied to the cluster. If not explicitly set, it defaults to DiffModeDisabled.",
+                "type": "string",
+                "enum": [
+                  "enabled",
+                  "warn",
+                  "disabled"
+                ]
+              }
+            }
+          },
+          "install": {
+            "description": "Install holds the configuration for Helm install actions for this HelmRelease.",
+            "type": "object",
+            "properties": {
+              "crds": {
+                "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Create` and if omitted CRDs are installed but not updated.  Skip: do neither install nor replace (update) any CRDs.  Create: new CRDs are created, existing CRDs are neither updated nor deleted.  CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted.  By default, CRDs are applied (installed) during Helm install action. With this option users can opt-in to CRD replace existing CRDs on Helm install actions, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+                "type": "string",
+                "enum": [
+                  "Skip",
+                  "Create",
+                  "CreateReplace"
+                ]
+              },
+              "createNamespace": {
+                "description": "CreateNamespace tells the Helm install action to create the HelmReleaseSpec.TargetNamespace if it does not exist yet. On uninstall, the namespace will not be garbage collected.",
+                "type": "boolean"
+              },
+              "disableHooks": {
+                "description": "DisableHooks prevents hooks from running during the Helm install action.",
+                "type": "boolean"
+              },
+              "disableOpenAPIValidation": {
+                "description": "DisableOpenAPIValidation prevents the Helm install action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+                "type": "boolean"
+              },
+              "disableWait": {
+                "description": "DisableWait disables the waiting for resources to be ready after a Helm install has been performed.",
+                "type": "boolean"
+              },
+              "disableWaitForJobs": {
+                "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm install has been performed.",
+                "type": "boolean"
+              },
+              "remediation": {
+                "description": "Remediation holds the remediation configuration for when the Helm install action for the HelmRelease fails. The default is to not perform any action.",
+                "type": "object",
+                "properties": {
+                  "ignoreTestFailures": {
+                    "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an install action but fail. Defaults to 'Test.IgnoreFailures'.",
+                    "type": "boolean"
+                  },
+                  "remediateLastFailure": {
+                    "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false'.",
+                    "type": "boolean"
+                  },
+                  "retries": {
+                    "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using an uninstall, is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                    "type": "integer"
+                  }
+                }
+              },
+              "replace": {
+                "description": "Replace tells the Helm install action to re-use the 'ReleaseName', but only if that name is a deleted release which remains in the history.",
+                "type": "boolean"
+              },
+              "skipCRDs": {
+                "description": "SkipCRDs tells the Helm install action to not install any CRDs. By default, CRDs are installed if not already present.  Deprecated use CRD policy (`crds`) attribute with value `Skip` instead.",
+                "type": "boolean"
+              },
+              "timeout": {
+                "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm install action. Defaults to 'HelmReleaseSpec.Timeout'.",
+                "type": "string",
+                "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+              }
+            }
+          },
+          "interval": {
+            "description": "Interval at which to reconcile the Helm release. This interval is approximate and may be subject to jitter to ensure efficient use of resources.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          },
+          "kubeConfig": {
+            "description": "KubeConfig for reconciling the HelmRelease on a remote cluster. When used in combination with HelmReleaseSpec.ServiceAccountName, forces the controller to act on behalf of that Service Account at the target cluster. If the --default-service-account flag is set, its value will be used as a controller level fallback for when HelmReleaseSpec.ServiceAccountName is empty.",
+            "type": "object",
+            "properties": {
+              "secretRef": {
+                "description": "SecretRef holds the name of a secret that contains a key with the kubeconfig file as the value. If no key is set, the key will default to 'value'. It is recommended that the kubeconfig is self-contained, and the secret is regularly updated if credentials such as a cloud-access-token expire. Cloud specific `cmd-path` auth helpers will not function without adding binaries and credentials to the Pod that is responsible for reconciling Kubernetes resources.",
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "description": "Key in the Secret, when not specified an implementation-specific default key is used.",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Name of the Secret.",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "maxHistory": {
+            "description": "MaxHistory is the number of revisions saved by Helm for this HelmRelease. Use '0' for an unlimited number of revisions; defaults to '10'.",
+            "type": "integer"
+          },
+          "persistentClient": {
+            "description": "PersistentClient tells the controller to use a persistent Kubernetes client for this release. When enabled, the client will be reused for the duration of the reconciliation, instead of being created and destroyed for each (step of a) Helm action.  This can improve performance, but may cause issues with some Helm charts that for example do create Custom Resource Definitions during installation outside Helm's CRD lifecycle hooks, which are then not observed to be available by e.g. post-install hooks.  If not set, it defaults to true.",
+            "type": "boolean"
+          },
+          "releaseName": {
+            "description": "ReleaseName used for the Helm release. Defaults to a composition of '[TargetNamespace-]Name'.",
+            "type": "string",
+            "maxLength": 53,
+            "minLength": 1
+          },
+          "rollback": {
+            "description": "Rollback holds the configuration for Helm rollback actions for this HelmRelease.",
+            "type": "object",
+            "properties": {
+              "cleanupOnFail": {
+                "description": "CleanupOnFail allows deletion of new resources created during the Helm rollback action when it fails.",
+                "type": "boolean"
+              },
+              "disableHooks": {
+                "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+                "type": "boolean"
+              },
+              "disableWait": {
+                "description": "DisableWait disables the waiting for resources to be ready after a Helm rollback has been performed.",
+                "type": "boolean"
+              },
+              "disableWaitForJobs": {
+                "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm rollback has been performed.",
+                "type": "boolean"
+              },
+              "force": {
+                "description": "Force forces resource updates through a replacement strategy.",
+                "type": "boolean"
+              },
+              "recreate": {
+                "description": "Recreate performs pod restarts for the resource if applicable.",
+                "type": "boolean"
+              },
+              "timeout": {
+                "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm rollback action. Defaults to 'HelmReleaseSpec.Timeout'.",
+                "type": "string",
+                "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+              }
+            }
+          },
+          "serviceAccountName": {
+            "description": "The name of the Kubernetes service account to impersonate when reconciling this HelmRelease.",
+            "type": "string"
+          },
+          "storageNamespace": {
+            "description": "StorageNamespace used for the Helm storage. Defaults to the namespace of the HelmRelease.",
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 1
+          },
+          "suspend": {
+            "description": "Suspend tells the controller to suspend reconciliation for this HelmRelease, it does not apply to already started reconciliations. Defaults to false.",
+            "type": "boolean"
+          },
+          "test": {
+            "description": "Test holds the configuration for Helm test actions for this HelmRelease.",
+            "type": "object",
+            "properties": {
+              "enable": {
+                "description": "Enable enables Helm test actions for this HelmRelease after an Helm install or upgrade action has been performed.",
+                "type": "boolean"
+              },
+              "ignoreFailures": {
+                "description": "IgnoreFailures tells the controller to skip remediation when the Helm tests are run but fail. Can be overwritten for tests run after install or upgrade actions in 'Install.IgnoreTestFailures' and 'Upgrade.IgnoreTestFailures'.",
+                "type": "boolean"
+              },
+              "timeout": {
+                "description": "Timeout is the time to wait for any individual Kubernetes operation during the performance of a Helm test action. Defaults to 'HelmReleaseSpec.Timeout'.",
+                "type": "string",
+                "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+              }
+            }
+          },
+          "timeout": {
+            "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm action. Defaults to '5m0s'.",
+            "type": "string",
+            "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+          },
+          "uninstall": {
+            "description": "Uninstall holds the configuration for Helm uninstall actions for this HelmRelease.",
+            "type": "object",
+            "properties": {
+              "deletionPropagation": {
+                "description": "DeletionPropagation specifies the deletion propagation policy when a Helm uninstall is performed.",
+                "type": "string",
+                "default": "background",
+                "enum": [
+                  "background",
+                  "foreground",
+                  "orphan"
+                ]
+              },
+              "disableHooks": {
+                "description": "DisableHooks prevents hooks from running during the Helm rollback action.",
+                "type": "boolean"
+              },
+              "disableWait": {
+                "description": "DisableWait disables waiting for all the resources to be deleted after a Helm uninstall is performed.",
+                "type": "boolean"
+              },
+              "keepHistory": {
+                "description": "KeepHistory tells Helm to remove all associated resources and mark the release as deleted, but retain the release history.",
+                "type": "boolean"
+              },
+              "timeout": {
+                "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm uninstall action. Defaults to 'HelmReleaseSpec.Timeout'.",
+                "type": "string",
+                "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+              }
+            }
+          },
+          "upgrade": {
+            "description": "Upgrade holds the configuration for Helm upgrade actions for this HelmRelease.",
+            "type": "object",
+            "properties": {
+              "cleanupOnFail": {
+                "description": "CleanupOnFail allows deletion of new resources created during the Helm upgrade action when it fails.",
+                "type": "boolean"
+              },
+              "crds": {
+                "description": "CRDs upgrade CRDs from the Helm Chart's crds directory according to the CRD upgrade policy provided here. Valid values are `Skip`, `Create` or `CreateReplace`. Default is `Skip` and if omitted CRDs are neither installed nor upgraded.  Skip: do neither install nor replace (update) any CRDs.  Create: new CRDs are created, existing CRDs are neither updated nor deleted.  CreateReplace: new CRDs are created, existing CRDs are updated (replaced) but not deleted.  By default, CRDs are not applied during Helm upgrade action. With this option users can opt-in to CRD upgrade, which is not (yet) natively supported by Helm. https://helm.sh/docs/chart_best_practices/custom_resource_definitions.",
+                "type": "string",
+                "enum": [
+                  "Skip",
+                  "Create",
+                  "CreateReplace"
+                ]
+              },
+              "disableHooks": {
+                "description": "DisableHooks prevents hooks from running during the Helm upgrade action.",
+                "type": "boolean"
+              },
+              "disableOpenAPIValidation": {
+                "description": "DisableOpenAPIValidation prevents the Helm upgrade action from validating rendered templates against the Kubernetes OpenAPI Schema.",
+                "type": "boolean"
+              },
+              "disableWait": {
+                "description": "DisableWait disables the waiting for resources to be ready after a Helm upgrade has been performed.",
+                "type": "boolean"
+              },
+              "disableWaitForJobs": {
+                "description": "DisableWaitForJobs disables waiting for jobs to complete after a Helm upgrade has been performed.",
+                "type": "boolean"
+              },
+              "force": {
+                "description": "Force forces resource updates through a replacement strategy.",
+                "type": "boolean"
+              },
+              "preserveValues": {
+                "description": "PreserveValues will make Helm reuse the last release's values and merge in overrides from 'Values'. Setting this flag makes the HelmRelease non-declarative.",
+                "type": "boolean"
+              },
+              "remediation": {
+                "description": "Remediation holds the remediation configuration for when the Helm upgrade action for the HelmRelease fails. The default is to not perform any action.",
+                "type": "object",
+                "properties": {
+                  "ignoreTestFailures": {
+                    "description": "IgnoreTestFailures tells the controller to skip remediation when the Helm tests are run after an upgrade action but fail. Defaults to 'Test.IgnoreFailures'.",
+                    "type": "boolean"
+                  },
+                  "remediateLastFailure": {
+                    "description": "RemediateLastFailure tells the controller to remediate the last failure, when no retries remain. Defaults to 'false' unless 'Retries' is greater than 0.",
+                    "type": "boolean"
+                  },
+                  "retries": {
+                    "description": "Retries is the number of retries that should be attempted on failures before bailing. Remediation, using 'Strategy', is performed between each attempt. Defaults to '0', a negative integer equals to unlimited retries.",
+                    "type": "integer"
+                  },
+                  "strategy": {
+                    "description": "Strategy to use for failure remediation. Defaults to 'rollback'.",
+                    "type": "string",
+                    "enum": [
+                      "rollback",
+                      "uninstall"
+                    ]
+                  }
+                }
+              },
+              "timeout": {
+                "description": "Timeout is the time to wait for any individual Kubernetes operation (like Jobs for hooks) during the performance of a Helm upgrade action. Defaults to 'HelmReleaseSpec.Timeout'.",
+                "type": "string",
+                "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
+              }
+            }
+          },
+          "values": {
+            "description": "Values holds the values for this Helm release.",
+            "x-kubernetes-preserve-unknown-fields": true
+          }
+        }
+      },
+      "git": {
+        "type": "object",
+        "anyOf": [
+          {
+            "properties": {
+              "branch": {
+                "maxLength": 0
+              },
+              "commit": {
+                "maxLength": 0
+              }
+            }
+          },
+          {
+            "properties": {
+              "tag": {
+                "maxLength": 0
+              }
+            }
+          },
+          {
+            "properties": {
+              "branch": {
+                "maxLength": 0
+              },
+              "commit": {
+                "maxLength": 0
+              },
+              "tag": {
+                "maxLength": 0
+              }
+            }
+          }
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "examples": [
+              "https://repo1.dso.mil/big-bang/product/packages/loki.git"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "examples": [
+              "./chart"
+            ]
+          },
+          "tag": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "nullable": false,
+            "examples": [
+              "4.8.0-bb.0"
+            ]
+          },
+          "branch": {
+            "minLength": 1,
+            "type": [
+              "string",
+              "null"
+            ],
+            "nullable": false,
+            "examples": [
+              "feature-branch"
+            ]
+          },
+          "commit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "semver": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "existingSecret": {
+            "type": "string"
+          },
+          "credentials": {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string"
+              },
+              "password": {
+                "type": "string"
+              },
+              "caFile": {
+                "type": "string"
+              },
+              "privateKey": {
+                "type": "string"
+              },
+              "publicKey": {
+                "type": "string"
+              },
+              "knownHosts": {
+                "type": "string"
+              }
+            },
+            "anyOf": [
+              {},
+              {}
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "examples": [
+          {
+            "repo": "https://repo1.dso.mil/big-bang/product/packages/loki.git",
+            "path": "./chart",
+            "tag": "4.8.0-bb.0"
+          }
+        ]
+      },
+      "additionalPackageGit": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/packageAliasPartials/git"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "repo": {
+                "type": "null"
+              },
+              "path": {
+                "type": "null"
+              },
+              "commit": {
+                "type": "null"
+              },
+              "semver": {
+                "type": "null"
+              },
+              "tag": {
+                "type": "null"
+              },
+              "branch": {
+                "type": "null"
+              },
+              "existingSecret": {
+                "type": "string"
+              },
+              "credentials": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "additionalPackageHelmRepo": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/packageAliasPartials/helmRepo"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "repoName": {
+                "type": "null"
+              },
+              "chartName": {
+                "type": "null"
+              },
+              "tag": {
+                "type": "null"
+              },
+              "cosignVerify": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      },
+      "postRenderers": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/postRenderersArray"
+            }
+          },
+          {
+            "$ref": "#/$defs/packageAliasPartials/postRenderersArray"
+          }
+        ]
+      },
+      "postRenderersArray": {
+        "description": "PostRenderers holds an array of Helm PostRenderers, which will be applied in order of their definition.",
+        "type": "array",
+        "items": {
+          "description": "PostRenderer contains a Helm PostRenderer specification.",
+          "type": "object",
+          "properties": {
+            "kustomize": {
+              "description": "Kustomization to apply as PostRenderer.",
+              "type": "object",
+              "properties": {
+                "images": {
+                  "description": "Images is a list of (image name, new name, new tag or digest) for changing image names, tags or digests. This can also be achieved with a patch, but this operator is simpler to specify.",
+                  "type": "array",
+                  "items": {
+                    "description": "Image contains an image name, a new name, a new tag or digest, which will replace the original name and tag.",
+                    "type": "object",
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "digest": {
+                        "description": "Digest is the value used to replace the original image tag. If digest is present NewTag value is ignored.",
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Name is a tag-less image name.",
+                        "type": "string"
+                      },
+                      "newName": {
+                        "description": "NewName is the value used to replace the original name.",
+                        "type": "string"
+                      },
+                      "newTag": {
+                        "description": "NewTag is the value used to replace the original tag.",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "patches": {
+                  "description": "Strategic merge and JSON patches, defined as inline YAML objects, capable of targeting objects based on kind, label and annotation selectors.",
+                  "type": "array",
+                  "items": {
+                    "description": "Patch contains an inline StrategicMerge or JSON6902 patch, and the target the patch should be applied to.",
+                    "type": "object",
+                    "required": [
+                      "patch"
+                    ],
+                    "properties": {
+                      "patch": {
+                        "description": "Patch contains an inline StrategicMerge patch or an inline JSON6902 patch with an array of operation objects.",
+                        "type": "string"
+                      },
+                      "target": {
+                        "description": "Target points to the resources that the patch document should be applied to.",
+                        "type": "object",
+                        "properties": {
+                          "annotationSelector": {
+                            "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                            "type": "string"
+                          },
+                          "group": {
+                            "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          },
+                          "labelSelector": {
+                            "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "Name to match resources with.",
+                            "type": "string"
+                          },
+                          "namespace": {
+                            "description": "Namespace to select resources from.",
+                            "type": "string"
+                          },
+                          "version": {
+                            "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "patchesJson6902": {
+                  "description": "JSON 6902 patches, defined as inline YAML objects.",
+                  "type": "array",
+                  "items": {
+                    "description": "JSON6902Patch contains a JSON6902 patch and the target the patch should be applied to.",
+                    "type": "object",
+                    "required": [
+                      "patch",
+                      "target"
+                    ],
+                    "properties": {
+                      "patch": {
+                        "description": "Patch contains the JSON6902 patch document with an array of operation objects.",
+                        "type": "array",
+                        "items": {
+                          "description": "JSON6902 is a JSON6902 operation object. https://datatracker.ietf.org/doc/html/rfc6902#section-4",
+                          "type": "object",
+                          "required": [
+                            "op",
+                            "path"
+                          ],
+                          "properties": {
+                            "from": {
+                              "description": "From contains a JSON-pointer value that references a location within the target document where the operation is performed. The meaning of the value depends on the value of Op, and is NOT taken into account by all operations.",
+                              "type": "string"
+                            },
+                            "op": {
+                              "description": "Op indicates the operation to perform. Its value MUST be one of \"add\", \"remove\", \"replace\", \"move\", \"copy\", or \"test\". https://datatracker.ietf.org/doc/html/rfc6902#section-4",
+                              "type": "string",
+                              "enum": [
+                                "test",
+                                "remove",
+                                "add",
+                                "replace",
+                                "move",
+                                "copy"
+                              ]
+                            },
+                            "path": {
+                              "description": "Path contains the JSON-pointer value that references a location within the target document where the operation is performed. The meaning of the value depends on the value of Op.",
+                              "type": "string"
+                            },
+                            "value": {
+                              "description": "Value contains a valid JSON structure. The meaning of the value depends on the value of Op, and is NOT taken into account by all operations.",
+                              "x-kubernetes-preserve-unknown-fields": true
+                            }
+                          }
+                        }
+                      },
+                      "target": {
+                        "description": "Target points to the resources that the patch document should be applied to.",
+                        "type": "object",
+                        "properties": {
+                          "annotationSelector": {
+                            "description": "AnnotationSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource annotations.",
+                            "type": "string"
+                          },
+                          "group": {
+                            "description": "Group is the API group to select resources from. Together with Version and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "Kind of the API Group to select resources from. Together with Group and Version it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          },
+                          "labelSelector": {
+                            "description": "LabelSelector is a string that follows the label selection expression https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api It matches with the resource labels.",
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "Name to match resources with.",
+                            "type": "string"
+                          },
+                          "namespace": {
+                            "description": "Namespace to select resources from.",
+                            "type": "string"
+                          },
+                          "version": {
+                            "description": "Version of the API Group to select resources from. Together with Group and Kind it is capable of unambiguously identifying and/or selecting resources. https://github.com/kubernetes/community/blob/master/contributors/design-proposals/api-machinery/api-group.md",
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "patchesStrategicMerge": {
+                  "description": "Strategic merge patches, defined as inline YAML objects.",
+                  "type": "array",
+                  "items": {
+                    "x-kubernetes-preserve-unknown-fields": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "enabled": {
+        "type": "boolean",
+        "default": false,
+        "examples": [
+          false
+        ]
+      },
+      "sso": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "client_id": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ingress": {
+        "type": "object",
+        "properties": {
+          "gateway": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "helmRepo": {
+        "type": "object",
+        "properties": {
+          "repoName": {
+            "type": "string"
+          },
+          "chartName": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "cosignVerify": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "sourceType": {
+        "enum": [
+          "helmRepo",
+          "git"
+        ]
+      },
+      "istio": {
+        "type": "object",
+        "properties": {
+          "injection": {
+            "enum": [
+              "enabled",
+              "disabled"
+            ]
+          }
+        }
+      },
+      "aliases": {
+        "istioCNI": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "istioCRDs": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gatewayAPI": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "istiod": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "istioGateway": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "type": "object",
+              "properties": {
+                "gateways": {
+                  "type": "object"
+                },
+                "shared": {
+                  "type": "object",
+                  "properties": {
+                    "classificationBanner": {
+                      "type": "object"
+                    },
+                    "gateway": {
+                      "type": "object"
+                    },
+                    "gluon": {
+                      "type": "object"
+                    },
+                    "waitJob": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        }
+                      }
+                    },
+                    "networkPolicies": {
+                      "type": "object"
+                    },
+                    "mtls": {
+                      "type": "object"
+                    },
+                    "tracing": {
+                      "type": "object"
+                    },
+                    "upstream": {
+                      "type": "object"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "ztunnel": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "kiali": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "$ref": "#/$defs/packageAliasPartials/sso"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gatekeeper": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "kyverno": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "kyvernoPolicies": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "kyvernoReporter": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                },
+                "default_role": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "elasticsearchKibana": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "$ref": "#/$defs/packageAliasPartials/sso"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "license": {
+              "properties": {
+                "trial": {
+                  "type": "boolean"
+                },
+                "keyJSON": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "serviceAccountAnnotations": {
+              "properties": {
+                "elasticsearch": true,
+                "kibana": true
+              }
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "eckOperator": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "fluentbit": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "alloy": {
+          "properties": {
+            "enabled": true,
+            "sourceType": true,
+            "releaseName": true,
+            "git": true,
+            "helmRepo": true,
+            "flux": true,
+            "values": true,
+            "postRenderers": true,
+            "additionalDestinations": true,
+            "alloyLogs": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "alloyMetrics": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "alloyClusterEvents": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "loki": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "clusterName": {
+              "type": "string"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "strategy": {
+              "type": "string",
+              "enum": [
+                "monolith",
+                "scalable",
+                "distributed"
+              ]
+            },
+            "objectStorage": {
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "accessKey": {
+                  "type": "string"
+                },
+                "accessSecret": {
+                  "type": "string"
+                },
+                "bucketNames": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "neuvector": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                },
+                "default_role": {
+                  "type": "string"
+                },
+                "issuer": {
+                  "type": "string"
+                },
+                "group_claim": {
+                  "type": "string"
+                },
+                "group_mapped_roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string"
+                      },
+                      "global_role": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "tempo": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "$ref": "#/$defs/packageAliasPartials/sso"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "objectStorage": {
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "accessKey": {
+                  "type": "string"
+                },
+                "accessSecret": {
+                  "type": "string"
+                },
+                "bucket": {
+                  "type": "string"
+                },
+                "insecure": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "metricsGenerator": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "prometheusOperatorCRDs": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "monitoring": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "prometheusMetrics": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "prometheus": {
+                  "type": "object",
+                  "properties": {
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "client_secret": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "alertmanager": {
+                  "type": "object",
+                  "properties": {
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "client_secret": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "grafana": {
+                  "type": "object",
+                  "properties": {
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "client_secret": {
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "type": "string"
+                    },
+                    "allow_sign_up": {
+                      "type": "boolean"
+                    },
+                    "role_attribute_path": {
+                      "type": "string"
+                    },
+                    "token_url": {
+                      "type": "string"
+                    },
+                    "auth_url": {
+                      "type": "string"
+                    },
+                    "api_url": {
+                      "type": "string"
+                    },
+                    "tls_client_ca": {
+                      "type": "string"
+                    },
+                    "tls_skip_verify_insecure": {
+                      "type": "boolean"
+                    },
+                    "tls_client_cert": {
+                      "type": "string"
+                    },
+                    "tls_client_key": {
+                      "type": "string"
+                    },
+                    "allowed_domains": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "grafana": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "enterprise": true,
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "grafana": {
+                  "type": "object",
+                  "properties": {
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "client_secret": {
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "type": "string"
+                    },
+                    "allow_sign_up": {
+                      "type": "boolean"
+                    },
+                    "role_attribute_path": {
+                      "type": "string"
+                    },
+                    "token_url": {
+                      "type": "string"
+                    },
+                    "auth_url": {
+                      "type": "string"
+                    },
+                    "api_url": {
+                      "type": "string"
+                    },
+                    "tls_client_ca": {
+                      "type": "string"
+                    },
+                    "tls_skip_verify_insecure": {
+                      "type": "boolean"
+                    },
+                    "tls_client_cert": {
+                      "type": "string"
+                    },
+                    "tls_client_key": {
+                      "type": "string"
+                    },
+                    "allowed_domains": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "twistlock": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "client_id": {
+                  "type": "string"
+                },
+                "provider_type": {
+                  "type": "string"
+                },
+                "provider_name": {
+                  "type": "string"
+                },
+                "groups": {
+                  "type": "string"
+                },
+                "issuer_uri": {
+                  "type": "string"
+                },
+                "idp_url": {
+                  "type": "string"
+                },
+                "console_url": {
+                  "type": "string"
+                },
+                "cert": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "bbctl": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "registryOverrides": {
+              "description": "List of docker image registry hostnames to use in commands that deploy images.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "preflightCheck": {
+              "description": "Configuration values specific to the preflight-check command.",
+              "type": "object",
+              "properties": {
+                "image": {
+                  "description": "Image name including tag to deploy as the preflight check pod.",
+                  "type": "string"
+                }
+              }
+            },
+            "repoCredentials": {
+              "type": "object",
+              "items": {
+                "repo": {
+                  "description": "Hostname of the source code repository website.",
+                  "type": "string"
+                },
+                "username": {
+                  "description": "Username used to acess the repository. Only required when using a private repository.",
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Password or API token used to acess the repository. Only required when using a private repository.",
+                  "type": "string"
+                },
+                "email": {
+                  "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "renovate": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "argocd": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true,
+            "redis": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "authservice": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "chains": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "minioOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "minio": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "accesskey": true,
+            "ingress": true,
+            "secretkey": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gitlab": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "hostnames": true,
+            "ingress": true,
+            "objectStorage": true,
+            "railsSecret": true,
+            "redis": true,
+            "smtp": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gitlabRunner": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "sonarqube": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "ingress": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "fortify": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "externalDatabase": {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "default": "",
+                  "description": "External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                },
+                "port": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "default": 3306,
+                  "description": "External MySQL port used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                }
+              }
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "anchoreEnterprise": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "adminPassword": true,
+            "database": true,
+            "enterprise": true,
+            "ingress": true,
+            "redis": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "mattermostOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "mattermost": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "elasticsearch": true,
+            "enterprise": true,
+            "ingress": true,
+            "objectStorage": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "velero": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "keycloak": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "ingress": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "vault": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "type": "object",
+              "properties": {
+                "gateway": {
+                  "type": "string"
+                },
+                "cert": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "kms_access_key": {
+              "type": "string"
+            },
+            "kms_secret_key": {
+              "type": "string"
+            },
+            "kms_key_id": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "metricsServer": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": [
+                "boolean",
+                "string"
+              ],
+              "enum": [
+                true,
+                false,
+                "auto"
+              ],
+              "examples": [
+                true,
+                false,
+                "auto"
+              ]
+            },
+            "sourceType": {
+              "$ref": "#/$defs/packageAliasPartials/sourceType"
+            },
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "automountServiceAccountToken": {
+              "type": "boolean"
+            },
+            "namespace": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "kube-system"
+                },
+                "create": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                },
+                "annotations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                }
+              },
+              "additionalProperties": false
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "harbor": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "headlamp": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "thanos": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true,
+            "objectStorage": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "externalSecrets": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "type": "object",
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "ingress": true
+          },
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "mimir": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "type": "object",
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "enterprise": true,
+            "kafkaIngestStorage": true,
+            "minioObjectStorage": true,
+            "s3ObjectStorage": true,
+            "serviceAccountAnnotations": true
+          },
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        }
+      }
+    },
+    "customPackages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            },
+            "then": {
+              "required": [
+                "sourceType"
+              ],
+              "if": {
+                "properties": {
+                  "sourceType": {
+                    "const": "git"
+                  }
+                },
+                "required": [
+                  "sourceType"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "git": {
+                    "$ref": "#/$defs/git"
+                  }
+                },
+                "required": [
+                  "git"
+                ]
+              },
+              "else": {
+                "properties": {
+                  "helmRepo": {
+                    "$ref": "#/$defs/helmRepo"
+                  }
+                },
+                "required": [
+                  "helmRepo"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kustomize": {
+                  "const": true
+                }
+              },
+              "required": [
+                "kustomize"
+              ]
+            },
+            "then": {
+              "properties": {
+                "sourceType": {
+                  "const": "git"
+                },
+                "git": {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "namespace": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "create": {
+                "type": "boolean",
+                "default": true
+              },
+              "createRegistrySecret": {
+                "type": "boolean",
+                "default": true
+              },
+              "labels": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "annotations": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "helmRelease": {
+            "type": "object",
+            "properties": {
+              "namespace": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sourceType": {
+            "$ref": "#/$defs/sourceType"
+          },
+          "releaseName": {
+            "type": "string"
+          },
+          "wrapper": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false
+              },
+              "postRenderers": {
+                "$ref": "#/$defs/postRenderers"
+              }
+            },
+            "additionalProperties": false
+          },
+          "kustomize": {
+            "type": "boolean",
+            "default": false
+          },
+          "passBigBangValues": {
+            "type": "boolean",
+            "default": false
+          },
+          "bbCommonValues": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeDefaultDependsOn": {
+            "type": "boolean",
+            "default": true
+          },
+          "helmRepo": {
+            "$ref": "#/$defs/additionalPackageHelmRepo"
+          },
+          "git": {
+            "$ref": "#/$defs/additionalPackageGit"
+          },
+          "flux": {
+            "$ref": "#/$defs/flux"
+          },
+          "postRenderers": {
+            "$ref": "#/$defs/postRenderers"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "istio": {
+            "$ref": "#/$defs/istio"
+          },
+          "sso": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "monitor": {
+            "type": "object"
+          },
+          "network": {
+            "type": "object"
+          },
+          "secrets": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "configMaps": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "values": {
+            "$ref": "#/$defs/values"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "canonicalPackages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "allOf": [
+          {
+            "if": {
+              "not": {
+                "properties": {
+                  "enabled": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "enabled"
+                ]
+              }
+            },
+            "then": {
+              "required": [
+                "sourceType"
+              ],
+              "if": {
+                "properties": {
+                  "sourceType": {
+                    "const": "git"
+                  }
+                },
+                "required": [
+                  "sourceType"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "git": {
+                    "$ref": "#/$defs/git"
+                  }
+                },
+                "required": [
+                  "git"
+                ]
+              },
+              "else": {
+                "properties": {
+                  "helmRepo": {
+                    "$ref": "#/$defs/helmRepo"
+                  }
+                },
+                "required": [
+                  "helmRepo"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kustomize": {
+                  "const": true
+                }
+              },
+              "required": [
+                "kustomize"
+              ]
+            },
+            "then": {
+              "properties": {
+                "sourceType": {
+                  "const": "git"
+                },
+                "git": {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "namespace": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "create": {
+                "type": "boolean",
+                "default": true
+              },
+              "createRegistrySecret": {
+                "type": "boolean",
+                "default": true
+              },
+              "labels": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "annotations": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "helmRelease": {
+            "type": "object",
+            "properties": {
+              "namespace": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "sourceType": {
+            "$ref": "#/$defs/sourceType"
+          },
+          "releaseName": {
+            "type": "string"
+          },
+          "wrapper": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false
+              },
+              "postRenderers": {
+                "$ref": "#/$defs/postRenderers"
+              }
+            },
+            "additionalProperties": false
+          },
+          "kustomize": {
+            "type": "boolean",
+            "default": false
+          },
+          "passBigBangValues": {
+            "type": "boolean",
+            "default": false
+          },
+          "bbCommonValues": {
+            "type": "boolean",
+            "default": true
+          },
+          "includeDefaultDependsOn": {
+            "type": "boolean",
+            "default": true
+          },
+          "helmRepo": {
+            "$ref": "#/$defs/additionalPackageHelmRepo"
+          },
+          "git": {
+            "$ref": "#/$defs/additionalPackageGit"
+          },
+          "flux": {
+            "$ref": "#/$defs/flux"
+          },
+          "postRenderers": {
+            "$ref": "#/$defs/postRenderers"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "istio": {
+            "$ref": "#/$defs/istio"
+          },
+          "sso": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "monitor": {
+            "type": "object"
+          },
+          "network": {
+            "type": "object"
+          },
+          "secrets": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "configMaps": {
+            "type": [
+              "object",
+              "array"
+            ]
+          },
+          "values": {
+            "$ref": "#/$defs/values"
+          }
+        },
+        "additionalProperties": false
+      },
+      "properties": {
+        "istioCNI": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/istioCNI"
+        },
+        "istioCRDs": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/istioCRDs"
+        },
+        "gatewayAPI": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gatewayAPI"
+        },
+        "istiod": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/istiod"
+        },
+        "istioGateway": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/istioGateway"
+        },
+        "ztunnel": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/ztunnel"
+        },
+        "kiali": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/kiali"
+        },
+        "gatekeeper": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gatekeeper"
+        },
+        "kyverno": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/kyverno"
+        },
+        "kyvernoPolicies": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/kyvernoPolicies"
+        },
+        "kyvernoReporter": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/kyvernoReporter"
+        },
+        "elasticsearchKibana": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/elasticsearchKibana"
+        },
+        "eckOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/eckOperator"
+        },
+        "fluentbit": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/fluentbit"
+        },
+        "alloy": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/alloy"
+        },
+        "loki": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/loki"
+        },
+        "neuvector": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/neuvector"
+        },
+        "tempo": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/tempo"
+        },
+        "prometheusOperatorCRDs": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/prometheusOperatorCRDs"
+        },
+        "monitoring": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/monitoring"
+        },
+        "grafana": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/grafana"
+        },
+        "twistlock": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/twistlock"
+        },
+        "bbctl": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/bbctl"
+        },
+        "renovate": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/renovate"
+        },
+        "argocd": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/argocd"
+        },
+        "authservice": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/authservice"
+        },
+        "minioOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/minioOperator"
+        },
+        "minio": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/minio"
+        },
+        "gitlab": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gitlab"
+        },
+        "gitlabRunner": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gitlabRunner"
+        },
+        "sonarqube": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/sonarqube"
+        },
+        "fortify": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/fortify"
+        },
+        "anchoreEnterprise": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/anchoreEnterprise"
+        },
+        "mattermostOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/mattermostOperator"
+        },
+        "mattermost": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/mattermost"
+        },
+        "velero": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/velero"
+        },
+        "keycloak": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/keycloak"
+        },
+        "vault": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/vault"
+        },
+        "metricsServer": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/metricsServer"
+        },
+        "harbor": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/harbor"
+        },
+        "headlamp": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/headlamp"
+        },
+        "thanos": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/thanos"
+        },
+        "externalSecrets": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/externalSecrets"
+        },
+        "mimir": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/mimir"
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "$comment": "Generated canonical package configuration gate.",
+      "if": {
+        "properties": {
+          "packageConfiguration": {
+            "properties": {
+              "version": {
+                "const": "v1"
+              }
+            },
+            "required": [
+              "version"
+            ]
+          }
+        },
+        "required": [
+          "packageConfiguration"
+        ]
+      },
+      "then": {
+        "properties": {
+          "packages": {
+            "$ref": "#/$defs/canonicalPackages"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "packages": {
+            "$ref": "#/$defs/customPackages"
+          }
+        }
+      }
+    }
+  ]
 }

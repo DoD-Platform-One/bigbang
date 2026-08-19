@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if or .Values.addons.minioOperator.enabled .Values.addons.minio.enabled }}
   {{- $minioOperatorPackage := deepCopy .Values.addons.minioOperator -}}
 

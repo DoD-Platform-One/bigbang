@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.prometheusOperatorCRDs.sourceType "git") (not .Values.offline) .Values.prometheusOperatorCRDs.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "prometheus-operator-crds" "gitCredsName" "prometheusOperatorCRDs" "git" .Values.prometheusOperatorCRDs.git "component" "core" "root" .) }}
 {{- end }}

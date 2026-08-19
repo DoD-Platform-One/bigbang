@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.kiali.enabled }}
 {{- /* Create a cleaned copy of kiali config and merge deprecated paths into current paths */ -}}
 {{- $kialiPackage := deepCopy .Values.kiali -}}

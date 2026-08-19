@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.monitoring.enabled }}
 {{- include "values-secret" (dict 
   "root" $ 

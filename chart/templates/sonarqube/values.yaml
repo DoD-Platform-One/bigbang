@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.sonarqube.enabled }}
 {{- /* Create a cleaned copy of sonarqube config and merge deprecated paths into current paths */ -}}
 {{- $sonarqubePackage := deepCopy .Values.addons.sonarqube -}}

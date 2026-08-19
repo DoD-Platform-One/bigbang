@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Create secret */ -}}
 {{- if .Values.addons.mimir.enabled }}
 {{- /* Create a cleaned copy of mimir config and merge deprecated paths into current paths */ -}}

@@ -10,6 +10,24 @@ Big Bang organizes packages into three main categories:
 - **Add-on Packages**: Optional but commonly used applications (ArgoCD, GitLab, etc.)
 - **Custom Packages**: User-defined applications following Big Bang patterns
 
+All built-in packages can be configured through the unified `packages.<name>`
+path. Existing top-level and `addons.<name>` paths remain supported until Big
+Bang 4.x. In Big Bang 3.x, set `packageConfiguration.version` to `v1` to opt in
+to the unified built-in package paths. The v1 discriminator remains supported
+and becomes the default package contract in Big Bang 4.x. When both paths are
+present, `packages.<name>` takes precedence.
+
+```yaml
+packageConfiguration:
+  version: v1
+
+packages:
+  monitoring:
+    enabled: true
+  gitlab:
+    enabled: false
+```
+
 ## Enabling and Disabling Packages
 
 ### Core Packages
@@ -17,17 +35,21 @@ Big Bang organizes packages into three main categories:
 Core packages are enabled by default but can be disabled:
 
 ```yaml
-# Disable monitoring stack
-monitoring:
-  enabled: false
+packageConfiguration:
+  version: v1
 
-# Disable the Fluent Bit log collector
-fluentbit:
-  enabled: false
+packages:
+  # Disable monitoring stack
+  monitoring:
+    enabled: false
 
-# Disable the Istio control plane
-istiod:
-  enabled: false
+  # Disable the Fluent Bit log collector
+  fluentbit:
+    enabled: false
+
+  # Disable the Istio control plane
+  istiod:
+    enabled: false
 ```
 
 ### Add-on Packages
@@ -35,7 +57,10 @@ istiod:
 Add-on packages are disabled by default and must be explicitly enabled:
 
 ```yaml
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   # Enable GitLab
   gitlab:
     enabled: true
@@ -54,7 +79,10 @@ Big Bang supports both Git and OCI (Open Container Initiative) sources for packa
 Most packages use Git repositories by default:
 
 ```yaml
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   gitlab:
     enabled: true
     sourceType: git
@@ -76,7 +104,10 @@ helmRepositories:
     type: oci
     existingSecret: private-registry
 
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   gitlab:
     enabled: true
     sourceType: helmRepo
@@ -93,7 +124,10 @@ addons:
 Pass values directly to packages using the `values` key:
 
 ```yaml
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   gitlab:
     enabled: true
     values:
@@ -111,7 +145,10 @@ Use YAML anchors and references for complex configurations:
 # Anchors can be attached to schema-supported values.
 domain: &domain "example.com"
 
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   gitlab:
     enabled: true
     values:
@@ -127,7 +164,10 @@ addons:
 Configure Flux-specific behavior for packages:
 
 ```yaml
-addons:
+packageConfiguration:
+  version: v1
+
+packages:
   gitlab:
     enabled: true
     flux:
@@ -142,8 +182,8 @@ addons:
 
 ### Namespace Configuration
 
-Integrated packages use namespaces selected by Big Bang. For an additional
-package, set its target namespace under `packages`:
+Built-in packages use namespaces selected by Big Bang. For a custom package,
+set its target namespace under `packages`:
 
 ```yaml
 packages:
@@ -163,7 +203,7 @@ packages:
 
 ### Dependency Management
 
-Control an additional Helm package's installation order with dependencies:
+Control a custom Helm package's installation order with dependencies:
 
 ```yaml
 packages:

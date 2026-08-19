@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.mattermost.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "mattermost" "appName" "mattermost" "component" "collaboration-tools" "package" .Values.addons.mattermost "extraLabels" (dict "app" (printf "%s-mattermost" .Release.Name))) }}
 {{- end }}

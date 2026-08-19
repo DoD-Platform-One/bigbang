@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq (include "authserviceEnabled" .) "true") (eq .Values.addons.authservice.sourceType "git") (not .Values.offline) }}
 {{- include "bigbang.gitRepository" (dict "name" "authservice" "gitCredsName" "authservice" "git" .Values.addons.authservice.git "component" "core" "root" .) }}
 {{- end }}

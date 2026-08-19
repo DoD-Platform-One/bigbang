@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.velero.sourceType "git") (not .Values.offline) .Values.addons.velero.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "velero" "gitCredsName" "velero" "git" .Values.addons.velero.git "component" "cluster-utilities" "root" .) }}
 {{- end }}

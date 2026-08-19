@@ -1,5 +1,7 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Used for deploying a package using a Helm chart */ -}}
-{{- range $pkgKey, $vals := .Values.packages -}}
+{{- $customPackages := .Values._customPackages | default dict -}}
+{{- range $pkgKey, $vals := $customPackages -}}
 {{- if and (dig "enabled" true $vals) (not $vals.kustomize) -}}
 {{- $pkg := include "resourceName" $pkgKey -}}
 {{- $sourceType := dig "sourceType" "git" $vals -}}
@@ -11,8 +13,8 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ $pkg }}
-  namespace: {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-               {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+  namespace: {{ if dig "helmRelease" "namespace" nil (index $customPackages $pkgKey) }}
+               {{ dig "helmRelease" "namespace" "" (index $customPackages $pkgKey) }}
              {{ else }}
                {{ default (dig "namespace" "name" $pkg $vals) "" }}
              {{ end }}
@@ -31,8 +33,8 @@ spec:
       sourceRef:
         kind: GitRepository
         name: {{ $pkg }}
-        namespace:  {{ if dig "helmRelease" "namespace" nil (index $.Values.packages $pkgKey) }}
-                      {{ dig "helmRelease" "namespace" "" (index $.Values.packages $pkgKey) }}
+        namespace:  {{ if dig "helmRelease" "namespace" nil (index $customPackages $pkgKey) }}
+                      {{ dig "helmRelease" "namespace" "" (index $customPackages $pkgKey) }}
                     {{ else }}
                       {{ default (dig "namespace" "name" $pkg $vals) "" }}
                     {{ end }}

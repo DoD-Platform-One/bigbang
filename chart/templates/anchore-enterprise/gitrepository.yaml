@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.anchoreEnterprise.sourceType "git") (not .Values.offline) .Values.addons.anchoreEnterprise.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "anchore-enterprise" "gitCredsName" "anchore-enterprise" "git" .Values.addons.anchoreEnterprise.git "root" .) }}
 {{- end }}

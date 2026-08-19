@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.keycloak.sourceType "git") (not .Values.offline) .Values.addons.keycloak.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "keycloak" "gitCredsName" "keycloak" "git" .Values.addons.keycloak.git "component" "security-tools" "root" .) }}
 {{- end }}

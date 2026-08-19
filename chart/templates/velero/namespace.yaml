@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.velero.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "velero" "appName" "velero" "component" "cluster-utilities" "package" .Values.addons.velero) }}
 {{- end }}

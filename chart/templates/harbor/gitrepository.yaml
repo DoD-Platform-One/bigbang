@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.harbor.sourceType "git") (not .Values.offline) .Values.addons.harbor.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "harbor" "gitCredsName" "harbor" "git" .Values.addons.harbor.git "root" .) }}
 {{- end }}

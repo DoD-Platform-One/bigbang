@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "harbor" }}
 
 {{- /* Create secret */ -}}

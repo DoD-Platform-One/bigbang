@@ -47,6 +47,101 @@
 {{- end -}}
 {{- end }}
 
+{{/*
+When packageConfiguration.version is v1, normalize the backwards-compatible
+packages.<name> configuration for built-ins onto the legacy values paths
+consumed by the existing templates. Without that explicit opt-in, every entry
+under packages retains the Big Bang 3.x custom-package meaning.
+
+Explicitly supplied built-ins remain under .Values.packages as resolved values
+so templates can use the canonical path. Unknown entries are copied into the
+internal .Values._customPackages map consumed by generic package renderers.
+New-path values take precedence over legacy-path values. Legacy-only built-ins
+are not populated under .Values.packages.
+
+This compatibility layer is temporary. Its package identities and legacy paths
+come from the package metadata catalog and can be removed with the legacy paths
+in Big Bang 4.x.
+*/}}
+{{- define "bigbang.normalizePackageAliases" -}}
+{{- $packages := .Values.packages | default dict -}}
+{{- $metadata := .Files.Get "package-metadata.yaml" | fromYaml -}}
+{{- $catalog := get $metadata "packages" | default dict -}}
+{{- if not $catalog -}}
+  {{- fail "chart/package-metadata.yaml must define built-in packages" -}}
+{{- end -}}
+{{- $migrations := .Values._packageAliasMigrations | default list -}}
+{{- $customPackages := dict -}}
+{{- $canonicalPackagesEnabled := eq (dig "version" "" (.Values.packageConfiguration | default dict)) "v1" -}}
+
+{{- if $canonicalPackagesEnabled -}}
+{{- /* Reserve canonical identities and rendered resource names. */ -}}
+{{- $reservedNames := dict -}}
+{{- range $name, $package := $catalog -}}
+  {{- $identities := uniq (list (lower $name) (include "resourceName" $name) (lower $package.templateDirectory)) -}}
+  {{- range $identity := $identities -}}
+    {{- if and (hasKey $reservedNames $identity) (ne (get $reservedNames $identity) $name) -}}
+      {{- fail (printf "built-in packages %s and %s share reserved identity %s" (get $reservedNames $identity) $name $identity) -}}
+    {{- end -}}
+    {{- $_ := set $reservedNames $identity $name -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Unknown entries remain custom packages, but cannot masquerade as a built-in
+      or normalize to the same resource identity as another custom package. */ -}}
+{{- $customResourceNames := dict -}}
+{{- range $name := keys $packages | sortAlpha -}}
+  {{- if not (hasKey $catalog $name) -}}
+    {{- $identities := uniq (list (lower $name) (include "resourceName" $name)) -}}
+    {{- range $identity := $identities -}}
+      {{- if hasKey $reservedNames $identity -}}
+        {{- $owner := get $reservedNames $identity -}}
+        {{- if hasKey $catalog $owner -}}
+          {{- fail (printf "packages.%s conflicts with built-in package packages.%s; use the canonical name packages.%s" $name $owner $owner) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $resourceName := include "resourceName" $name -}}
+    {{- if hasKey $customResourceNames $resourceName -}}
+      {{- fail (printf "packages.%s and packages.%s normalize to the same package identity" (get $customResourceNames $resourceName) $name) -}}
+    {{- end -}}
+    {{- $_ := set $customResourceNames $resourceName $name -}}
+    {{- $_ := set $customPackages $name (get $packages $name) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- range $name, $package := $catalog -}}
+  {{- if hasKey $packages $name -}}
+    {{- $alias := get $packages $name | default dict -}}
+    {{- $legacyPath := splitList "." $package.legacyPath -}}
+    {{- if eq (len $legacyPath) 1 -}}
+      {{- $legacy := get $.Values $name | default dict -}}
+      {{- $resolved := mustMergeOverwrite (deepCopy $legacy) (deepCopy $alias) -}}
+      {{- $_ := set $.Values $name (deepCopy $resolved) -}}
+      {{- $_ := set $packages $name $resolved -}}
+    {{- else if and (eq (len $legacyPath) 2) (eq (first $legacyPath) "addons") -}}
+      {{- $legacy := get $.Values.addons $name | default dict -}}
+      {{- $resolved := mustMergeOverwrite (deepCopy $legacy) (deepCopy $alias) -}}
+      {{- $_ := set $.Values.addons $name (deepCopy $resolved) -}}
+      {{- $_ := set $packages $name $resolved -}}
+    {{- else -}}
+      {{- fail (printf "unsupported legacyPath %s for package %s" $package.legacyPath $name) -}}
+    {{- end -}}
+    {{- $migrations = append $migrations (printf "packages.%s replaces %s" $name $package.legacyPath) -}}
+  {{- end -}}
+{{- end -}}
+{{- else -}}
+  {{- /* Preserve the pre-existing 3.x contract unless canonical package names
+        have been explicitly enabled. */ -}}
+  {{- range $name, $package := $packages -}}
+    {{- $_ := set $customPackages $name $package -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $_ := set .Values "_packageAliasMigrations" (uniq $migrations) -}}
+{{- $_ := set .Values "_customPackages" $customPackages -}}
+{{- end -}}
+
 {{- define "imagePullSecret" }}
   {{- if .Values.registryCredentials -}}
     {{- $credType := typeOf .Values.registryCredentials -}}
@@ -581,7 +676,7 @@ bigbang.dev/istioVersion: {{ $helmRepo.tag }}
 {{- /* To use: $ns := compact (splitList " " (include "uniqueNamespaces" (merge (dict "constraint" "some.boolean" "default" true) .))) */ -}}
 {{- define "uniqueNamespaces" -}}
   {{- $namespaces := list -}}
-  {{- range $pkg, $vals := .Values.packages -}}
+  {{- range $pkg, $vals := (.Values._customPackages | default dict) -}}
     {{- if (dig "enabled" true $vals) -}}
       {{- $constraint := $vals -}}
       {{- range $key := split "." (default "" $.constraint) -}}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.gitlab.sourceType "git") (not .Values.offline) .Values.addons.gitlab.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "gitlab" "gitCredsName" "gitlab" "git" .Values.addons.gitlab.git "component" "developer-tools" "root" .) }}
 {{- end }}

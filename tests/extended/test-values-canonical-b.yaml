@@ -1,0 +1,22 @@
+packageConfiguration:
+  version: v1
+
+packages:
+  twistlock:
+    enabled: true
+  renovate:
+    enabled: true
+  minioOperator:
+    enabled: true
+  authservice:
+    enabled: true
+  externalSecrets:
+    enabled: true
+  thanos:
+    enabled: true
+  mimir:
+    enabled: true
+  harbor:
+    enabled: true
+  metricsServer:
+    enabled: true

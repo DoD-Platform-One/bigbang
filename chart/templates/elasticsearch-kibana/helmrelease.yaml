@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsEk := merge .Values.elasticsearchKibana.flux .Values.flux -}}
 {{- if .Values.elasticsearchKibana.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2

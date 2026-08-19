@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsRenovate := merge .Values.renovate.flux .Values.flux -}}
 {{- if .Values.renovate.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

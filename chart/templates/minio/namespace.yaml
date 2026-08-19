@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.minio.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "minio" "appName" "minio" "component" "application-utilities" "package" .Values.addons.minio) }}
 {{- end }}

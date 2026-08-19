@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Create a cleaned copy of package config and merge deprecated paths into current paths */ -}}
 {{- $mattermostPackage := deepCopy .Values.addons.mattermost -}}
 {{- if .Values.addons.mattermost.values -}}

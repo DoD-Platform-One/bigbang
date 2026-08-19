@@ -1,4 +1,17 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 Thank you for supporting Platform One!
+
+{{- with .Values._packageAliasMigrations }}
+
+BIG BANG PACKAGE VALUES MIGRATION NOTICE:
+  The unified packages.<name> configuration is active. It takes precedence over
+  the corresponding legacy path. Legacy paths remain supported until Big Bang 4.x.
+  Please visit the 3.x->4.x migration guide for more information.
+  https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/migration/migrating-package-values-for-bb4.0.md
+{{- range . }}
+  - {{ . }}
+{{- end }}
+{{- end }}
 
 {{ if .Values.offline }}
 

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and .Values.loki.enabled (not .Values.elasticsearchKibana.enabled) }}
 {{- include "bigbang.namespace" (dict "root" . "name" "logging" "appName" "logging" "component" "core" "package" .Values.loki) }}
 {{- end }}

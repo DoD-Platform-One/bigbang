@@ -4,7 +4,7 @@ Date: 2025-04-23
 
 ## Status
 
-Accepted
+Accepted (amended by [ADR 11](./0011-unified-package-configuration-and-metadata.md))
 
 ## Context
 

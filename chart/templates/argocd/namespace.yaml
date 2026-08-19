@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.argocd.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "argocd" "appName" "argocd" "component" "core" "package" .Values.addons.argocd) }}
 {{- end }}

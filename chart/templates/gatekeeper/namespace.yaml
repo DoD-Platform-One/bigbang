@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.gatekeeper.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "gatekeeper-system" "appName" "gatekeeper" "component" "core" "meshMode" "none" "extraLabels" (dict "admission.gatekeeper.sh/ignore" "no-self-managing" "gatekeeper.sh/system" "yes")) }}
 {{- end }}

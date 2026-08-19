@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.gitlab.enabled }}
 {{- $objectStorageValues := .Values.addons.gitlab.objectStorage -}}
 {{- range $endpointName := list "endpoint" "regionendpoint" -}}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.grafana.sourceType "git") (not .Values.offline) .Values.grafana.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "grafana" "gitCredsName" "grafana" "git" .Values.grafana.git "component" "core" "root" .) }}
 {{- end }}

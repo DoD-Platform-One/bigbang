@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.fluentbit.enabled }}
 {{- $fluentbitPackage := deepCopy .Values.fluentbit -}}
 {{- if .Values.fluentbit.values -}}

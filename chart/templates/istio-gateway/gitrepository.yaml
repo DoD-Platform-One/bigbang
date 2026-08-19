@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.istioGateway.sourceType "git") (not .Values.offline) .Values.istioGateway.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "istio-gateway" "gitCredsName" "istioGateway" "git" .Values.istioGateway.git "component" "core" "root" .) }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if or .Values.eckOperator.enabled .Values.elasticsearchKibana.enabled }}
 
   {{- /* Create a cleaned copy of the config and merge deprecated paths into current paths */ -}}

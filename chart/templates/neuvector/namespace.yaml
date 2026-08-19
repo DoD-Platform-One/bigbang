@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.neuvector.enabled }}
 {{- include "bigbang.namespace" (dict "root" . "name" "neuvector" "appName" "neuvector" "component" "sandbox" "package" .Values.neuvector) }}
 {{- end }}

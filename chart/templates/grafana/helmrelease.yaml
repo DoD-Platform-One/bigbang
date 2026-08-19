@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsGrafana := merge .Values.grafana.flux .Values.flux -}}
 {{- if .Values.grafana.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

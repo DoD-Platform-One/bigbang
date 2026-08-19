@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
 {{- if .Values.addons.keycloak.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}

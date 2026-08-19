@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.addons.argocd.enabled }}
 # handle legacy istio hardened keys in argocd values
 {{- $argocdPackage := deepCopy .Values.addons.argocd -}}

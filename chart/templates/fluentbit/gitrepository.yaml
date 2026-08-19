@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.fluentbit.sourceType "git") (not .Values.offline) .Values.fluentbit.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "fluentbit" "gitCredsName" "fluentbit" "git" .Values.fluentbit.git "component" "core" "root" .) }}
 {{- end }}

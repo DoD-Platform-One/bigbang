@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and .Values.bbctl.enabled .Values.monitoring.enabled }}
 {{- /* Create a cleaned copy of bbctl config and merge deprecated paths into current paths */ -}}
 {{- $bbctlPackage := deepCopy .Values.bbctl -}}

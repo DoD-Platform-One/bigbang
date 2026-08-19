@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /*
   This template renders self-test results based on the configuration provided in the `_selfTest` section
   of the Helm values. Each entry in `_selfTest` corresponds to a template to be
@@ -74,3 +75,13 @@
 {{- end }}
 
 {{- include "bigbang.self-test.render" $ }}
+
+{{- /* Return the package maps after a second normalization pass. This makes
+      alias idempotency and custom-package filtering observable to unit tests. */ -}}
+{{- define "bigbang.self-test.package-alias-state" -}}
+{{- include "bigbang.normalizePackageAliases" . -}}
+packages:
+  {{- .Values.packages | toYaml | nindent 2 }}
+customPackages:
+  {{- .Values._customPackages | toYaml | nindent 2 }}
+{{- end -}}

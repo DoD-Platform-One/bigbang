@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.kyverno.sourceType "git") (not .Values.offline) (or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled) }}
 {{- include "bigbang.gitRepository" (dict "name" "kyverno" "gitCredsName" "kyverno" "git" .Values.kyverno.git "component" "core" "root" .) }}
 {{- end }}

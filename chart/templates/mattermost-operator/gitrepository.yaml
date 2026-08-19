@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- $mmOpOldValues := default dict .Values.addons.mattermostoperator -}}
 {{- $mmOpValues := mergeOverwrite $mmOpOldValues .Values.addons.mattermostOperator -}}
 {{- if and (eq $mmOpValues.sourceType "git") (not .Values.offline) (or $mmOpValues.enabled .Values.addons.mattermost.enabled) }}

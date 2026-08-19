@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- if and (eq .Values.addons.argocd.sourceType "git") (not .Values.offline) .Values.addons.argocd.enabled }}
 {{- include "bigbang.gitRepository" (dict "name" "argocd" "gitCredsName" "argocd" "git" .Values.addons.argocd.git "component" "core" "root" .) }}
 {{- end }}

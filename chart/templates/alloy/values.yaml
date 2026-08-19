@@ -1,3 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
 {{- /* Create secret */ -}}
 {{- if .Values.alloy.enabled }}
 {{- /* Create a cleaned copy of alloy config and merge deprecated paths into current paths */ -}}
