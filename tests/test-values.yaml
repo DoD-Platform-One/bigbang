@@ -107,7 +107,6 @@ helmRepositories:
 
 packages:
   cloudnative-pg:
-    enabled: true
     sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git
@@ -125,7 +124,6 @@ packages:
     passBigBangValues: true
 
   garage:
-    enabled: true
     sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/garage.git
@@ -211,7 +209,6 @@ packages:
             value: 271f33f02bf4a98f414d6c986ce51fb364eb6f4d249976097b72afee84b6802c
 
   postgresql:
-    enabled: true
     # The Big Bang wrapper is the package chart for this one-resource operand.
     # Flux replaces its placeholder ConfigMap with the CNPG Cluster CR before
     # Helm applies or records the release manifest.
@@ -353,7 +350,6 @@ packages:
               placeholder: replaced-by-flux-post-renderer
 
   redis:
-    enabled: true
     sourceType: git
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/redis.git
@@ -1553,7 +1549,7 @@ addons:
         enabled: true
 
   gitlab:
-    enabled: true
+    enabled: false
     dependsOn:
       - name: postgresql
         namespace: bigbang
