@@ -109,3 +109,18 @@ tests:
       - equal:
           path: istio.authorizationPolicies.custom[1].labels.app
           value: "grafana-custom"
+  - it: should point the GitLab Redis datasource at the configured external service
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.redis.password: test-password
+      addons.gitlab.values.global.redis.host: redis-master.redis.svc.cluster.local
+      addons.gitlab.values.global.redis.port: 6379
+    asserts:
+      - equal:
+          path: upstream.datasources["datasourcesbb.yaml"].datasources[1].url
+          value: redis-master.redis.svc.cluster.local:6379

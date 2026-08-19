@@ -38,6 +38,29 @@
             "matchPackageNames": [
                 "/flux/"
             ]
+        },
+        {
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "registry1.dso.mil/ironbank/opensource/postgres/postgresql"
+            ],
+            "allowedVersions": ">=17 <18"
+        },
+        {
+            "matchManagers": [
+                "custom.regex"
+            ],
+            "matchDatasources": [
+                "git-tags"
+            ],
+            "matchPackageNames": [
+                "https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git",
+                "https://repo1.dso.mil/big-bang/product/maintained/garage.git",
+                "https://repo1.dso.mil/big-bang/product/maintained/redis.git"
+            ],
+            "groupName": "GitLab CI Dependencies"
         }
     ],
     "customManagers": [
@@ -70,6 +93,42 @@
                 "tag:\\s+[\\\"']?(?<currentValue>\\d+\\.\\d+\\.\\d+-bb\\.\\d+)[\\\"']?"
             ],
             "depNameTemplate": "https://repo1.dso.mil/big-bang/product/maintained/podinfo.git",
+            "datasourceTemplate": "git-tags",
+            "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-bb\\.(?<build>\\d+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "Update the PostgreSQL 17 image used by the GitLab CI operand",
+            "managerFilePatterns": [
+                "/^tests/test-values\\.yaml$/"
+            ],
+            "matchStrings": [
+                "imageName:\\s+(?<depName>registry1\\.dso\\.mil/ironbank/opensource/postgres/postgresql):(?<currentValue>[^\\s\"']+)"
+            ],
+            "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "description": "Update the Big Bang wrapper chart used by the GitLab CI PostgreSQL operand",
+            "managerFilePatterns": [
+                "/^tests/test-values\\.yaml$/"
+            ],
+            "matchStrings": [
+                "chartName:\\s+wrapper\\s+tag:\\s+[\"']?(?<currentValue>[^\\s\"']+)"
+            ],
+            "depNameTemplate": "registry1.dso.mil/bigbang/wrapper",
+            "datasourceTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "description": "Update maintained GitLab CI dependencies",
+            "managerFilePatterns": [
+                "/^tests/(?:test-values(?:-ambient)?|oci-values)\\.yaml$/"
+            ],
+            "matchStrings": [
+                "repo:\\s+https://repo1\\.dso\\.mil/big-bang/product/maintained/(?<maintainedPackage>cloudnative-pg|garage|redis)\\.git\\s+path:\\s+chart\\s+tag:\\s+[\"']?(?<currentValue>[^\\s\"']+)[\"']?"
+            ],
+            "depNameTemplate": "https://repo1.dso.mil/big-bang/product/maintained/{{{maintainedPackage}}}.git",
             "datasourceTemplate": "git-tags",
             "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-bb\\.(?<build>\\d+)$"
         }

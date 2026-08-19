@@ -2,3 +2,184 @@
 istio:
   ambient:
     enabled: true
+
+# In ambient CI the dependency namespaces are enrolled through their Namespace
+# labels, so ztunnel can enforce the generated HBONE AuthorizationPolicies.
+packages:
+  garage:
+    # bbCommonValues adds the complete ambient Istio dependency set.
+    values:
+      bb-common:
+        istio:
+          enabled: true
+          mtls:
+            mode: STRICT
+          sidecar:
+            enabled: false
+          authorizationPolicies:
+            enabled: true
+            generateFromNetpol: true
+
+  postgresql:
+    dependsOn:
+      - name: cloudnative-pg
+        namespace: bigbang
+      - name: istiod
+        namespace: bigbang
+      - name: istio-cni
+        namespace: bigbang
+      - name: ztunnel
+        namespace: bigbang
+    # The wrapper is the PostgreSQL package chart. In ambient mode its native
+    # policy values render the selector-scoped AuthorizationPolicy and repeat
+    # the custom NetworkPolicies with HBONE ingress.
+    values:
+      package:
+        istio:
+          injection: enabled
+          hardened:
+            enabled: true
+            customAuthorizationPolicies:
+              - name: allow-gitlab-postgresql
+                enabled: true
+                spec:
+                  selector:
+                    matchLabels:
+                      cnpg.io/cluster: postgresql
+                  action: ALLOW
+                  rules:
+                    - from:
+                        - source:
+                            namespaces:
+                              - postgresql
+                              - gitlab
+                      to:
+                        - operation:
+                            ports:
+                              - "5432"
+                    - from:
+                        - source:
+                            principals:
+                              - cluster.local/ns/cloudnative-pg/sa/cloudnative-pg
+                      to:
+                        - operation:
+                            ports:
+                              - "8000"
+        network:
+          additionalPolicies:
+            - name: allow-gitlab-postgresql
+              spec:
+                podSelector:
+                  matchLabels:
+                    cnpg.io/cluster: postgresql
+                policyTypes:
+                  - Ingress
+                ingress:
+                  - from:
+                      - namespaceSelector:
+                          matchLabels:
+                            kubernetes.io/metadata.name: gitlab
+                    ports:
+                      - protocol: TCP
+                        port: 5432
+                      - protocol: TCP
+                        port: 15008
+            - name: allow-cloudnative-pg-status
+              spec:
+                podSelector:
+                  matchLabels:
+                    cnpg.io/cluster: postgresql
+                policyTypes:
+                  - Ingress
+                ingress:
+                  - from:
+                      - namespaceSelector:
+                          matchLabels:
+                            kubernetes.io/metadata.name: cloudnative-pg
+                    ports:
+                      - protocol: TCP
+                        port: 8000
+                      - protocol: TCP
+                        port: 15008
+            - name: allow-cnpg-kube-api
+              spec:
+                podSelector:
+                  matchLabels:
+                    cnpg.io/cluster: postgresql
+                policyTypes:
+                  - Egress
+                egress:
+                  - to:
+                      - ipBlock:
+                          cidr: '{{ .Values.networkPolicies.controlPlaneCidr }}'
+
+  redis:
+    dependsOn:
+      - name: redis-wrapper
+        namespace: bigbang
+      - name: istiod
+        namespace: bigbang
+      - name: istio-cni
+        namespace: bigbang
+      - name: ztunnel
+        namespace: bigbang
+    # Wrapper 0.4.15 does not inject the ambient HBONE port into custom
+    # NetworkPolicies or create ambient AuthorizationPolicies. Repeat the
+    # network rule and use Redis's native custom destination policy support.
+    values:
+      istio:
+        enabled: true
+        ambient:
+          enabled: true
+        hardened:
+          enabled: true
+          customAuthorizationPolicies:
+            - name: allow-gitlab-redis
+              enabled: true
+              spec:
+                selector:
+                  matchLabels:
+                    app.kubernetes.io/instance: redis
+                    app.kubernetes.io/component: master
+                action: ALLOW
+                rules:
+                  - from:
+                      - source:
+                          namespaces:
+                            - redis
+                            - gitlab
+                    to:
+                      - operation:
+                          ports:
+                            - "6379"
+    network:
+      additionalPolicies:
+        - name: allow-gitlab-redis
+          spec:
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/instance: redis
+                app.kubernetes.io/component: master
+            policyTypes:
+              - Ingress
+            ingress:
+              - from:
+                  - namespaceSelector:
+                      matchLabels:
+                        kubernetes.io/metadata.name: gitlab
+                ports:
+                  - protocol: TCP
+                    port: 6379
+                  - protocol: TCP
+                    port: 15008
+        - name: allow-redis-upgrade-kube-api
+          spec:
+            podSelector:
+              matchLabels:
+                app.kubernetes.io/name: bigbang-redis-upgrade-job
+            policyTypes:
+              - Egress
+            egress:
+              - to:
+                  - ipBlock:
+                      cidr: '{{ .Values.networkPolicies.controlPlaneCidr }}'

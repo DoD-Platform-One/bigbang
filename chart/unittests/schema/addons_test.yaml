@@ -20,3 +20,13 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: ".*"
+
+  - it: should fail validation when a GitLab dependency is missing its name
+    set:
+      addons:
+        gitlab:
+          dependsOn:
+            - namespace: bigbang
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"

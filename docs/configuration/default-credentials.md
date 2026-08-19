@@ -29,3 +29,25 @@ The applications in the table below provide both SSO and built-in authentication
 | Neuvector | `admin` | `admin` | You should change the default password when you log into Neuvector. Can also be changed via the chart at the `controller.secret.data.userinitcfg.yaml` key, see the [upstream docs for more details and examples](https://open-docs.neuvector.com/deploying/production/configmap).|
 | Harbor | `admin` | `Harbor12345` | Default password can be overridden with Helm values `addons.harbor.values.harborAdminPassword` |
 | Fortify | `admin` | `admin` | You will be prompted to change the admin user password when you first attempt to login to Fortify using the default credentials |
+
+## Internal CI-only credentials
+
+The credentials in this section are used only by Big Bang's disposable test
+profiles. They are not enabled by a default installation and are not supported
+for consumer development or production deployments.
+
+The GitLab 19 test profile deploys Garage as an internal S3-compatible service.
+Garage `0.9.3-bb.2` supports externally managed Secrets but does not generate
+random credentials. The test profile therefore supplies fixed, ephemeral
+values. The S3 credentials are stored in the
+`garage/garage-gitlab-credentials` Secret:
+
+| Garage credential | Secret key | Retrieval command |
+| ----------------- | ---------- | ----------------- |
+| S3 access-key ID | `accessKeyId` | `kubectl -n garage get secret garage-gitlab-credentials -o go-template='{{base64decode .data.accessKeyId}}'` |
+| S3 secret key | `secretAccessKey` | `kubectl -n garage get secret garage-gitlab-credentials -o go-template='{{base64decode .data.secretAccessKey}}'` |
+
+The fixed Garage admin API token is configured directly in
+`tests/test-values.yaml` as both `garageInit.adminToken` and
+`upstream.environment.GARAGE_ADMIN_TOKEN`; it is not stored in the consumer
+credential Secret.

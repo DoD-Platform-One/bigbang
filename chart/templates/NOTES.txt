@@ -10,12 +10,15 @@ BIG BANG OFFLINE SOURCE NOTICE:
 {{ end }}
 
 {{ if $.Values.addons.gitlab.enabled }}
+{{- $externalPostgresConfigured := eq (include "bigbang.gitlab.externalPostgresConfigured" .) "true" }}
+{{- $externalRedisConfigured := eq (include "bigbang.gitlab.externalRedisConfigured" .) "true" }}
+{{- $externalObjectStorageConfigured := eq (include "bigbang.gitlab.externalObjectStorageConfigured" .) "true" }}
 Gitlab is enabled.
 Please follow the Gitlab online documentation for proper configuration.
 This BigBang chart provides convenient enhancements to the Gitlab Package helm chart.
 If you enable these features certain settings will be defaulted for you and any required secrets will be automatically created.
-You should point to your cloud provider's RDS and object storage.
-Gitlab will not provision storage for you. You will need to provision the database and the S3 buckets.
+You should point to your cloud provider's RDS, Redis or Valkey, and object storage.
+Gitlab will not provision these services for you. You will need to provision the database, Redis or Valkey service, and S3 buckets.
 Here is an example of how to configure your deployment.
 
 addons:
@@ -34,6 +37,13 @@ addons:
       username: gitlab
       database: gitlab
       password: mysecretpassword
+    redis:
+      password: mysecretpassword
+    values:
+      global:
+        redis:
+          host: redis.example.mil
+          port: 6379
     objectStorage:
       type: s3
       endpoint: https://s3.us-gov-west-1.amazonaws.com
@@ -72,20 +82,22 @@ gitlab-backup-tmp
 {{- end }}
 {{- end }}
 
-{{ if $.Values.addons.gitlab.database.host }}
-{{ else }}
+{{ if not $externalPostgresConfigured }}
 PLATFORM ONE GITLAB WARNING:
-  You have enabled an internal postgres database in the BigBang configuration.
-  Platform One does not support this option for production deployments because your persistent data can be permanently lost.
-  This option should only be used for development or CI pipelines.
-{{- end -}}
+  GitLab PostgreSQL is not configured.
+  GitLab 19 no longer includes bundled PostgreSQL. Configure an independently managed PostgreSQL 17 service before enabling GitLab.
+{{- end }}
 
-{{ if $.Values.addons.gitlab.objectStorage.endpoint }}
-{{ else }}
+{{ if not $externalRedisConfigured }}
 PLATFORM ONE GITLAB WARNING:
-  You have enabled a MinIO internal service in the BigBang configuration.
-  Platform One does not support this option for production deployments because your persistent data can be permanently lost.
-  This option should only be used for development or CI pipelines.
+  GitLab Redis or Valkey is not configured.
+  GitLab 19 no longer includes bundled Redis. Configure an independently managed Redis 7.0 or later, or Valkey 7.2 or later, before enabling GitLab.
+{{- end }}
+
+{{ if not $externalObjectStorageConfigured }}
+PLATFORM ONE GITLAB WARNING:
+  GitLab object storage is not configured.
+  GitLab 19 no longer includes bundled MinIO. Configure independently managed object storage before enabling GitLab.
 {{- end }}
 {{- end }}
 

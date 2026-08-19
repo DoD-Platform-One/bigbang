@@ -22,6 +22,8 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
+{{- $gitlabRedisHost := dig "global" "redis" "host" "gitlab-redis-master.gitlab.svc.cluster.local" .Values.addons.gitlab.values }}
+{{- $gitlabRedisPort := dig "global" "redis" "port" 6379 .Values.addons.gitlab.values }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $enterpriseEnabled := (dig "enterprise" "enabled" false .Values.grafana) }}
 
@@ -216,7 +218,7 @@ upstream:
       - name: GitLab
         type: redis-datasource
         access: proxy
-        url: gitlab-redis-master.gitlab.svc.cluster.local:6379
+        url: {{ printf "%s:%v" $gitlabRedisHost $gitlabRedisPort }}
         jsonData:
           client: standalone
         secureJsonData:
