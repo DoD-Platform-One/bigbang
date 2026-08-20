@@ -120,7 +120,7 @@ Bigbang currently used the community edition. This can be overwritten in the val
   edition: ce
 ```
 
-More information about GitLab licensing can be found [here](https://about.gitlab.com/install/ce-or-ee/) for the information page and [here](https://gitlab.com/gitlab-org/gitlab/blob/master/LICENSE) for the actual license.
+More information about GitLab licensing can be found [here](https://about.gitlab.com/install/ce-or-ee/) for the information page and [here](https://gitlab.com/gitlab-org/gitlab/-/blob/master/LICENSE) for the actual license.
 
 ## Storage
 

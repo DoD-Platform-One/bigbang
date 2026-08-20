@@ -25,6 +25,8 @@ ignorePatterns:
   - pattern: "https://www.opentext.com/products/cybersecurity-cloud"
   # ignore Big Bang Slack invite links that return 403 in CI without auth
   - pattern: "https://join.slack.com/t/bigbanguniver-ft39451/shared_invite/.*"
+  # Ignore GitLab license links that intermittently return 503 in CI
+  - pattern: "https://gitlab.com/gitlab-org/gitlab/.*/LICENSE"
   # Ignore retired promtail links
   - pattern: "https://grafana.com/docs/loki/latest/send-data/promtail/"
   # Ignore mailto links

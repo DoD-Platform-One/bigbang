@@ -21,6 +21,7 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $authserviceEnabled := eq (include "authserviceEnabled" .) "true" }}
 {{- $thanosUsesAuthservice := or .Values.addons.authservice.enabled (and .Values.addons.thanos.sso.enabled $authserviceEnabled) }}
+{{- $thanosAuthserviceWaypoint := eq (include "thanos.authservice.waypointEnabled" .) "true" }}
 {{- $istioHardened := or
   (dig "istio" "hardened" "enabled" false .Values.addons.thanos.values)
   (dig "hardened" "enabled" false .Values.istiod.values)
@@ -62,6 +63,13 @@ routes:
       - istio-gateway/public-ingressgateway
       hosts:
       - thanos.{{ .Values.domain }}
+      {{- if $thanosAuthserviceWaypoint }}
+      authservice:
+        enabled: true
+        ingressOnly: true
+        issuer: {{ include "sso.url" . | quote }}
+        clientId: {{ .Values.addons.thanos.sso.client_id | quote }}
+      {{- end }}
     minio:
       enabled: {{ and $istioEnabled $shouldEnableMinio }}
       gateways:
@@ -71,6 +79,9 @@ routes:
 
 istio:
   enabled: {{ $istioEnabled }}
+  {{- if $thanosAuthserviceWaypoint }}
+  prependReleaseName: true
+  {{- end }}
   sidecar:
     enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
   ambient:
@@ -108,6 +119,13 @@ networkPolicies:
         to:
           k8s:
             monitoring/prometheus:10901: {{ .Values.monitoring.enabled }}
+      thanos-query-frontend:
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: thanos
+            app.kubernetes.io/component: query-frontend
+        to:
+          k8s:
             authservice/authservice:10003: {{ $thanosUsesAuthservice }}
       thanos-storegateway:
         podSelector:
@@ -135,8 +153,7 @@ networkPolicies:
           definition:
             gateway: {{ .Values.istioGateway.enabled }}
           k8s:
-            authservice/authservice:10003: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
-            authservice-waypoint@authservice/authservice-waypoint: {{ and (eq (include "ambientEnabled" .) "true") $thanosUsesAuthservice .Values.addons.thanos.sso.enabled }}
+            authservice/authservice: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       thanos-query:10902:
         podSelector:
@@ -146,7 +163,6 @@ networkPolicies:
         from:
           k8s:
             monitoring-grafana@monitoring/grafana: {{ .Values.grafana.enabled }}
-            authservice/authservice:10003: {{ and .Values.addons.thanos.sso.enabled (not .Values.addons.authservice.enabled) }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
       thanos-storegateway:10902:
         podSelector:
@@ -231,12 +247,10 @@ upstream:
       {{ $thanosAuthserviceKey }}: {{ $thanosAuthserviceValue }}
       {{- end }}
     {{- end }}
-    {{- if and (eq (include "ambientEnabled" .) "true") $thanosUsesAuthservice .Values.addons.thanos.sso.enabled }}
-      # In ambient mode, route query-frontend traffic through the authservice waypoint so SSO is enforced.
+    {{- if $thanosAuthserviceWaypoint }}
     service:
       labels:
-        istio.io/use-waypoint: authservice-waypoint
-        istio.io/use-waypoint-namespace: authservice
+        istio.io/use-waypoint: thanos-waypoint
         istio.io/ingress-use-waypoint: "true"
     {{- end }}
 

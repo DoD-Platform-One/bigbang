@@ -20,7 +20,7 @@ After [graduating your package](https://repo1.dso.mil/platform-one/bbtoc/-/tree/
 
 ## Big Bang Updates
 
-1. Open an issue under `https://repo1.dso.mil/big-bang/bigbang/-/issues` to track your work for the new package.
+1. Open an issue under `https://repo1.dso.mil/big-bang/bigbang/-/work_items` to track your work for the new package.
 
 1. Clone the [Big Bang Git repository](https://repo1.dso.mil/big-bang/bigbang) to your machine using `git clone https://repo1.dso.mil/big-bang/bigbang`
 

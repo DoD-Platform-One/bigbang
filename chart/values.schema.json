@@ -5223,6 +5223,24 @@
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
             },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
             },

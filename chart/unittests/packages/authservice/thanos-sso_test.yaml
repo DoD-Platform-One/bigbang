@@ -204,7 +204,7 @@ tests:
   asserts:
   - matchRegex:
       path: stringData.defaults
-      pattern: "authservice-waypoint@authservice/authservice-waypoint: true"
+      pattern: "istio.io/use-waypoint: thanos-waypoint"
   - matchRegex:
       path: stringData.defaults
-      pattern: "istio.io/use-waypoint: authservice-waypoint"
+      pattern: "istio.io/ingress-use-waypoint: \"true\""
