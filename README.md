@@ -33,7 +33,7 @@ Additional information can be found in the [Big Bang Docs](./docs/index.md).
 
 There are three primary ways to contribute to Big Bang. They are listed in the following:
 
-- [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/big-bang/bigbang/-/issues).
+- [Contribute to the Big Bang Team's Backlog](https://repo1.dso.mil/big-bang/bigbang/-/work_items).
 - [Contribute to open-source projects under the Big Bang Technical Oversight Committee (BBTOC)](https://repo1.dso.mil/big-bang/product/bbtoc/-/blob/master/CONTRIBUTING.md).
 - [Submit new package proposals](https://repo1.dso.mil/big-bang/product/bbtoc/-/issues/new?issue%5Bmilestone_id%5D=).
   - Please review the [package lifecycle onboarding guide](./docs/community/development/package-lifecycle/onboarding.md) and [package lifecycle integration guide](./docs/community/development/package-lifecycle/integration.md) if you are interested in submitting a new package.
