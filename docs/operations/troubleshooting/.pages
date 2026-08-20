@@ -4,3 +4,4 @@ nav:
   - Networking: networking.md
   - Packages: packages.md
   - Performance: performance.md
+  - Upgrades: upgrades.md

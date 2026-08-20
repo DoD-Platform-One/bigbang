@@ -1,24 +1,15 @@
-# Appliance Mode
+# Resource-constrained Configuration Example
 
-<!-- TODO: this will be removed as OBE with the updating of airgap and updated core definition -->
+The [example values file](../../reference/configs/appliance-mode/values.yaml) reduces package resource requests and disables selected capabilities for development or evaluation on a resource-constrained cluster.
 
-Big Bang Core currently provides the ability for all packages to be enabled and running Highly Available while being able to fit within the following footprint:
-* 4 vCPU
-* 16 GB Ram
+This example is not a supported hardware minimum, production sizing recommendation, high-availability profile, or security baseline. Its capacity and package choices are not automatically updated when package requirements change.
 
-There is a values.yaml file in this same directory which provides an example of some overrides for the core packages. Flux is also required and included as part of the resource consumption and allocation.
+Before using it:
 
-| Big Bang Core Package | Comments |
-|-------|---|
-| Flux | source, helm, kustomize & notification controllers |
-| Istio | Possibly too heavy for reduced compute but still able to run on above machine |
-| Tempo | tracing capability integrated with grafana |
-| Kiali | Not enough value to justify running in smaller footprint |
-| Monitoring | Prometheus/Alertmanager/Grafana for monitoring/alerting |
-| ECK | Too heavy for reduced compute |
-| Loki/Alloy | need logging |
-| Gatekeeper/Kyverno | Static environment on edge, compliance will be validated in development/cloud |
-| Kyverno Reporter | Static environment on edge, compliance will be validated in development/cloud |
-| Twistlock/Neuvector | Runtime security at least |
+1. Compare every override with the values and release notes for the selected Big Bang release.
+2. Enable only the packages required for the evaluation.
+3. Render the configuration and confirm that the cluster can schedule all requests.
+4. Test storage, ingress, authentication, policy, and application behavior.
+5. Build a separate capacity and availability plan before production use.
 
-Review and reference [the values file in the configs folder to deploy BigBang in Appliance Mode](../../reference/configs/appliance-mode/values.yaml).
+See [Resource Planning](../../getting-started/prerequisites.md#resource-planning) for production considerations.
