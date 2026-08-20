@@ -1,0 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- if and .Values.certManager.enabled (eq .Values.certManager.sourceType "git") (not .Values.offline) }}
+{{- include "bigbang.gitRepository" (dict "name" "cert-manager" "gitCredsName" "certManager" "git" .Values.certManager.git "component" "core" "root" .) }}
+{{- end }}

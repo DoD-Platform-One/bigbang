@@ -8,6 +8,7 @@ Although the below applications have no built in authentication, Big Bang's helm
 
 - Monitoring (Prometheus)
 - Monitoring (Alertmanager)
+- cert-manager (controller and certificate resources; no user-facing authentication)
 
 ## Packages With Built-in Authentication
 

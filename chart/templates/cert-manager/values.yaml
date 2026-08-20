@@ -1,0 +1,44 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- if .Values.certManager.enabled }}
+{{- include "values-secret" (dict
+  "root" $
+  "package" .Values.certManager
+  "name" "cert-manager"
+  "defaults" (include "bigbang.defaults.cert-manager" .)
+) }}
+{{- end }}
+
+{{- define "bigbang.defaults.cert-manager" -}}
+{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $domainName := default .Values.domain .Values.hostname }}
+global:
+  domain: {{ $domainName }}
+
+bb-common:
+  istio:
+    enabled: {{ $istioEnabled }}
+    ambient:
+      enabled: {{ include "ambientEnabled" . }}
+    sidecar:
+      enabled: false
+    authorizationPolicies:
+      enabled: {{ include "authorizationPoliciesEnabled" (list .Values.certManager.values .) }}
+      generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.certManager.values .) }}
+  networkPolicies:
+    enabled: {{ include "networkPoliciesEnabled" . }}
+    hbonePortInjection:
+      enabled: {{ include "ambientEnabled" . }}
+    ingress:
+      definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 8 }}
+    egress:
+      definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 8 }}
+
+upstream:
+  prometheus:
+    servicemonitor:
+      enabled: {{ .Values.monitoring.enabled }}
+      endpointAdditionalProperties:
+        scheme: http
+        enableHttp2: false
+
+{{- end -}}

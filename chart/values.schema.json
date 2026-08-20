@@ -34,6 +34,7 @@
     "twistlock",
     "bbctl",
     "renovate",
+    "certManager",
     "addons"
   ],
   "additionalProperties": false,
@@ -48,11 +49,9 @@
     },
     "packageConfiguration": {
       "type": "object",
-      "description": "Selects the package configuration contract. In Big Bang 3.x, v1 opts into canonical built-in package paths; Big Bang 4.x retains v1 as its default unified package contract.",
       "properties": {
         "version": {
           "type": "string",
-          "description": "Package configuration contract version.",
           "enum": [
             "v1"
           ]
@@ -1049,6 +1048,42 @@
         "postRenderers": true,
         "istio": {
           "$ref": "#/$defs/istio"
+        }
+      },
+      "additionalProperties": false
+    },
+    "certManager": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/basePackage"
+        }
+      ],
+      "properties": {
+        "enabled": true,
+        "sourceType": true,
+        "releaseName": true,
+        "git": true,
+        "helmRepo": true,
+        "flux": true,
+        "values": true,
+        "postRenderers": true,
+        "namespace": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "create": {
+              "type": "boolean"
+            },
+            "labels": {
+              "type": "object"
+            },
+            "annotations": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -3596,6 +3631,64 @@
         }
       },
       "aliases": {
+        "certManager": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "namespace": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "create": {
+                  "type": "boolean"
+                },
+                "labels": {
+                  "type": "object"
+                },
+                "annotations": {
+                  "type": "object"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
         "istioCNI": {
           "properties": {
             "git": {
@@ -6452,6 +6545,9 @@
         "additionalProperties": false
       },
       "properties": {
+        "certManager": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/certManager"
+        },
         "istioCNI": {
           "$ref": "#/$defs/packageAliasPartials/aliases/istioCNI"
         },

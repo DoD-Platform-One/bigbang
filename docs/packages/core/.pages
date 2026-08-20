@@ -1,6 +1,7 @@
 nav:
   - Overview: index.md
   - Alloy: alloy.md
+  - Cert-manager: cert-manager.md
   - ElasticSearch Kibana: elasticsearch-kibana.md
   - Fluent Bit: fluentbit.md
   - Gateway API: gateway-api.md

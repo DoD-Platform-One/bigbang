@@ -1363,6 +1363,52 @@ renovate:
 # ----------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------
+# cert-manager
+#
+certManager:
+  # -- Toggle deployment of cert-manager
+  enabled: false
+
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+
+  namespace:
+    name: cert-manager
+    create: true
+    # cert-manager webhook admission traffic is handled by the package's
+    # port-level Istio configuration; keep the namespace out of ambient
+    # enrollment by default.
+    labels:
+      istio.io/dataplane-mode: none
+
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/cert-manager.git
+    path: "./chart"
+    tag: "v1.20.3-bb.2"
+  helmRepo:
+    repoName: "registry1"
+    chartName: "cert-manager"
+    tag: "v1.20.3-bb.2"
+
+  # -- Flux reconciliation overrides specifically for cert-manager
+  flux: {}
+
+  # -- Values to pass through to the cert-manager chart
+  values:
+    upstream:
+      crds:
+        enabled: true
+    issuers:
+      selfSigned:
+        enabled: false
+      letsEncrypt:
+        enabled: false
+
+  # -- Post Renderers. See docs/postrenders.md
+  postRenderers: []
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------------------------------------------
 #
 addons:
   argocd:

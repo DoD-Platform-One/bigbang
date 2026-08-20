@@ -1,0 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- if and .Values.certManager.enabled (dig "namespace" "create" true .Values.certManager) }}
+{{- include "bigbang.namespace" (dict "root" . "name" (dig "namespace" "name" "cert-manager" .Values.certManager) "appName" "cert-manager" "component" "core" "package" .Values.certManager "meshMode" "none" "extraLabels" (dig "namespace" "labels" nil .Values.certManager) "annotations" (dig "namespace" "annotations" nil .Values.certManager)) }}
+{{- end }}
