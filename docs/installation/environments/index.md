@@ -1,3 +1,10 @@
-# Environments
+# Deployment Environments
 
-This section provides documentation for different deployment environments and their configurations.
+Choose an environment guide only after reviewing the common [Getting Started](../../getting-started/) path and [prerequisites](../../getting-started/prerequisites.md).
+
+- [Disconnected Environments](airgap.md)
+- [Resource-constrained Configuration Example](appliance-mode.md)
+- [SSO Quickstart](sso-quickstart.md)
+- [Extra Package Deployment](extra-package-deployment.md)
+
+The canonical disposable evaluation guide is [Getting Started: Evaluation Quickstart](../../getting-started/quick-start.md). The former quickstart URL remains as a forwarding page for existing bookmarks.

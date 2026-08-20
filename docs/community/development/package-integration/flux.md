@@ -335,7 +335,7 @@ To validate that the Helm chart is working, perform the following steps to deplo
 
     * A `tests/test-values.yaml` in a package repo can be used as override values for the pipeline. It allows pipeline-specific configurations so that the package's `chart/values.yaml` doesn't have to be changed.
 
-1. Install flux using the [instructions from Big Bang](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/quickstart.md#step-8-install-flux).
+1. Install Flux using the [Big Bang prerequisites](../../../getting-started/prerequisites.md#flux).
 1. Install the package using the bigbang Helm chart.
 
     ```shell

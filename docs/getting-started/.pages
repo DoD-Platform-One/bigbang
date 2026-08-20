@@ -1,6 +1,6 @@
 nav:
   - Overview: index.md
-  - FAQ: faq.md
-  - First Deployment: first-deployment.md
   - Prerequisites: prerequisites.md
-  - Quickstart: quick-start.md
+  - Evaluation Quickstart: quick-start.md
+  - First Customer-managed Deployment: first-deployment.md
+  - FAQ: faq.md

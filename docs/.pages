@@ -1,11 +1,11 @@
 nav:
   - Overview: index.md
-  - Community: community
-  - Concepts: concepts
-  - Configuration: configuration
   - Getting Started: getting-started
+  - Concepts: concepts
   - Installation: installation
+  - Configuration: configuration
   - Migration: migration
   - Operations: operations
   - Packages: packages
   - Tutorials: tutorials
+  - Community: community

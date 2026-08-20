@@ -1,150 +1,44 @@
-# Big Bang
+# Big Bang Documentation
 
-Big Bang is a declarative, continuous delivery tool for Kubernetes that enables secure, compliant, and repeatable deployments of cloud-native applications. Built on GitOps principles and designed for enterprise and government environments, Big Bang provides a comprehensive platform for deploying and managing modern applications at scale.
+Big Bang is an umbrella Helm chart that uses Flux to deploy and reconcile a configurable collection of Kubernetes packages.
 
-## What is Big Bang?
+## Start Here
 
-Big Bang is an umbrella Helm chart that packages together a collection of open-source and commercial software tools into a cohesive platform. It leverages Flux CD for GitOps-based deployments and provides:
+New to Big Bang? Follow the [Getting Started](getting-started/) path:
 
-- **Zero Trust Security**: Built-in security controls with defense-in-depth architecture
-- **Compliance by Design**: Implementation of the DoD DevSecOps Reference Architecture and industry standards
-- **Observability Stack**: Comprehensive monitoring, logging, and tracing capabilities
-- **Service Mesh**: Istio-based secure service-to-service communication
-- **Developer Experience**: Integrated CI/CD pipelines and development tools
+1. Understand [what Big Bang manages](getting-started/#what-is-big-bang) and what remains outside its boundary.
+2. Review the [prerequisites](getting-started/prerequisites.md) for your selected release and configuration.
+3. Choose an installation path:
+   - [Evaluation quickstart](getting-started/quick-start.md) for a disposable development or demonstration cluster.
+   - [First production-oriented deployment](getting-started/first-deployment.md) for a customer-managed GitOps environment.
+   - [Disconnected deployment](installation/environments/airgap.md) when dependencies must be mirrored inside the environment.
+4. Continue with [configuration](configuration/) and [operations](operations/) before promoting a deployment to production.
 
-## Why Big Bang?
+The evaluation quickstart is not a production baseline. Big Bang also does not provision or harden the Kubernetes cluster on which it runs.
 
-### For Platform Teams
-- **Rapid Platform Setup**: Deploy a production-ready Kubernetes platform in hours, not months
-- **Security by Default**: Built-in security controls and compliance frameworks
-- **Operational Excellence**: Integrated monitoring, alerting, and lifecycle management
-- **Standardization**: Consistent platform across environments and teams
+## Find Documentation by Task
 
-### For Development Teams
-- **Focus on Applications**: Platform capabilities provided out-of-the-box
-- **Modern Toolchain**: Access to industry-leading development and deployment tools
-- **Secure by Design**: Security controls integrated into the development workflow
-- **Self-Service**: GitOps-driven deployments with minimal operational overhead
+| Goal | Documentation |
+| --- | --- |
+| Understand the architecture and GitOps model | [Concepts](concepts/) |
+| Configure global and package values | [Configuration](configuration/) |
+| Choose an environment-specific deployment pattern | [Installation](installation/) |
+| Operate, upgrade, and troubleshoot a deployment | [Operations](operations/) |
+| Review integrated and optional packages | [Packages](packages/) |
+| Follow a focused procedure | [Tutorials](tutorials/) |
+| Contribute to Big Bang or package development | [Community and Development](community/) |
 
-### For Organizations
-- **Compliance**: Built-in support for NIST, FedRAMP, and DoW security standards
-- **Cost Efficiency**: Reduced time-to-market and operational overhead
-- **Risk Reduction**: Proven, tested platform components
-- **Vendor Independence**: Open-source foundation with commercial support options
+## Sources of Truth
 
-## Core Capabilities
+Documentation is versioned with the repository. When instructions disagree with generated or executable content for the selected release, use these sources in order:
 
-### Security and Compliance
-- Istio service mesh with mutual TLS
-- Kyverno policy engine for admission control
-- Runtime security with vulnerability scanning
-- Supply chain security with image signing
+1. [`chart/Chart.yaml`](../chart/Chart.yaml) for the chart and Kubernetes version constraints.
+2. [`chart/values.yaml`](../chart/values.yaml) and the generated [configuration reference](configuration/base-config.md) for values and defaults.
+3. [`base/`](../base) and rendered manifests for Flux resources and Kubernetes objects.
+4. The selected release notes for required migrations and known changes.
 
-### Observability
-- Prometheus and Grafana for metrics and dashboards
-- Elasticsearch and Kibana for log aggregation and analysis
-- Tempo for distributed tracing
-- Alertmanager for notification management
+## Get Help
 
-### Developer Tools
-- GitLab for source code management and CI/CD
-- ArgoCD for application deployment and management
-- SonarQube for code quality and security analysis
-
-## Documentation Structure
-
-### Getting Started
-Start here if you're new to Big Bang:
-- **[Overview](getting-started/index.md)**: Introduction to Big Bang concepts
-- **[Prerequisites](getting-started/prerequisites.md)**: Cluster and environment requirements
-- **[Quick Start](getting-started/quick-start.md)**: Deploy Big Bang in minutes
-- **[First Deployment](getting-started/first-deployment.md)**: Detailed deployment walkthrough
-- **[FAQ](getting-started/faq.md)**: Common questions and answers
-
-### Core Concepts
-Understand Big Bang's architecture and design:
-- **[Architecture](concepts/architecture.md)**: System design and component relationships
-- **[Security Model](concepts/security-model.md)**: Zero trust security implementation
-- **[GitOps Workflow](concepts/git-ops-workflow.md)**: Deployment and management patterns
-- **[Package Management](concepts/package-management.md)**: Managing Big Bang components
-
-### Installation and Configuration
-Deploy and customize Big Bang:
-- **[Installation](installation/)**: Environment-specific deployment guides
-- **[Configuration](configuration/)**: Customization options and best practices
-- **[Migration](migration/)**: Upgrade and migration procedures
-
-### Operations
-Day-to-day management and maintenance:
-- **[Operations](operations/)**: Monitoring, backup, and maintenance procedures
-- **[Troubleshooting](operations/troubleshooting/)**: Diagnose and resolve common issues
-- **[Upgrades](operations/upgrades.md)**: Version management and upgrade procedures
-
-### Packages
-Understand and configure Big Bang components:
-- **[Package Index](packages/)**: Complete list of available packages
-- **[Core Packages](packages/core/)**: Essential infrastructure components
-- **[Add-on Packages](packages/addons/)**: Optional application packages
-
-### Community and Development
-Contribute to and extend Big Bang:
-- **[Community](community/)**: Get involved with the Big Bang community
-- **[Development](community/development/)**: Contribute code and documentation
-- **[Architecture Decision Records](community/adrs/)**: Design decisions and rationale
-
-### Reference
-Technical reference materials:
-- **[Tutorials](tutorials/)**: Step-by-step guides for common tasks
-- **[Reference](reference/)**: Configuration examples and technical specifications
-
-## Quick Start
-
-For detailed instructions, see the [Quick Start Guide](getting-started/quick-start.md).
-
-## Support and Community
-
-### Getting Help
-- **Documentation**: Start with the guides in this documentation
-- **Community Support**: [Engage with the community](../README.md#community)
-- **Issues**: Report bugs and request features on [Repo1](https://repo1.dso.mil/big-bang/bigbang/-/work_items)
-
-### Contributing
-Big Bang is an open-source project welcoming contributions:
-- **Code Contributions**: Submit merge requests for bug fixes and features
-- **Documentation**: Help improve and expand the documentation
-- **Community Support**: Help other users in community forums
-
-### Learning Resources
-- **[Architecture Decision Records](community/adrs/)**: Understand design decisions
-- **[Development Guide](community/development/)**: Learn how Big Bang works internally
-- **[Tutorials](tutorials/)**: Hands-on guides for specific use cases
-
-## What's Next?
-
-### New Users
-1. Start with [Getting Started Overview](getting-started/index.md)
-2. Review [Prerequisites](getting-started/prerequisites.md)
-3. Follow the [Quick Start Guide](getting-started/quick-start.md)
-4. Explore [Core Concepts](concepts/)
-
-### Existing Users
-1. Check [Operations](operations/) for maintenance procedures
-2. Review [Troubleshooting](operations/troubleshooting/) for issue resolution
-3. Plan [Upgrades](operations/upgrades.md) for new versions
-4. Explore [Advanced Configuration](configuration/) options
-
-### Platform Teams
-1. Understand [Architecture](concepts/architecture.md) and [Security Model](concepts/security-model.md)
-2. Plan [Installation](installation/) for your environment
-3. Establish [Operations](operations/) procedures
-4. Configure [Monitoring](operations/monitoring.md) and alerting
-
-### Developers
-1. Learn [GitOps Workflow](concepts/git-ops-workflow.md) patterns
-2. Explore [Package Management](concepts/package-management.md)
-3. Review available [Add-on Packages](packages/addons/)
-4. Follow [Development Guidelines](community/development/)
-
----
-
-**Ready to get started?** Begin with the [Getting Started Overview](getting-started/index.md) or jump straight to the [Quick Start Guide](getting-started/quick-start.md) to deploy Big Bang in your environment.
+- Search [troubleshooting](operations/troubleshooting/) for the failing layer or symptom.
+- Review [Repo1 work items](https://repo1.dso.mil/big-bang/bigbang/-/work_items) before reporting a defect.
+- Follow the repository [contributing guide](../CONTRIBUTING.md) when proposing a change.
