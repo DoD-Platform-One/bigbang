@@ -27,4 +27,4 @@ This report summarizes `oscal-component.yaml` files found across the repositorie
 
 ## Comparison with the Big Bang aggregate
 
-The existing [Big Bang `oscal-component.yaml`](./oscal-component.yaml) is an older, machine-readable roll-up. The table above is a current, human-readable inventory derived from package repositories.
+The existing [Big Bang `oscal-component.yaml`](../../oscal-component.yaml) is an older, machine-readable roll-up. The table above is a current, human-readable inventory derived from package repositories.

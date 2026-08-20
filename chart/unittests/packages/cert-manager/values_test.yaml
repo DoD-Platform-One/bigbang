@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - cert-manager - Values Tests
+templates:
+  - templates/cert-manager/values.yaml
+tests:
+  - it: disables sidecars and metrics TLS for the integrated namespace
+    set:
+      certManager.enabled: true
+      monitoring.enabled: false
+      istiod.enabled: true
+      istio.ambient.enabled: false
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    asserts:
+      - equal:
+          path: upstream.prometheus.servicemonitor.enabled
+          value: false
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: false
+      - equal:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
+          value: http
+      - notExists:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
+
+  - it: keeps metrics TLS disabled for the integrated ambient path
+    set:
+      certManager.enabled: true
+      monitoring.enabled: true
+      istiod.enabled: true
+      istio.ambient.enabled: true
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    asserts:
+      - equal:
+          path: upstream.prometheus.servicemonitor.enabled
+          value: true
+      - equal:
+          path: bb-common.istio.ambient.enabled
+          value: true
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: false
+      - equal:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
+          value: http
+      - notExists:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
+
+  - it: keeps metrics TLS disabled when Istio is disabled
+    set:
+      certManager.enabled: true
+      istiod.enabled: false
+      istio.ambient.enabled: false
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    asserts:
+      - equal:
+          path: bb-common.istio.enabled
+          value: false
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: false
+      - equal:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
+          value: http
+      - notExists:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig

@@ -3,6 +3,111 @@ suite: Packages - HelmRelease - Shared Helpers and Bug Fixes
 tests:
 
 ###############################################################################
+# cert-manager integrated package
+###############################################################################
+
+- it: should render cert-manager HelmRelease when enabled
+  set:
+    certManager:
+      enabled: true
+    monitoring:
+      enabled: true
+  template: cert-manager/helmrelease.yaml
+  asserts:
+  - isKind:
+      of: HelmRelease
+  - equal:
+      path: metadata.name
+      value: cert-manager
+  - equal:
+      path: spec.targetNamespace
+      value: cert-manager
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: istiod
+        namespace: NAMESPACE
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: monitoring
+        namespace: NAMESPACE
+  - equal:
+      path: spec.postRenderers[0].kustomize.patches[0].target.kind
+      value: ServiceMonitor
+  - equal:
+      path: spec.postRenderers[0].kustomize.patches[0].target.name
+      value: cert-manager
+  - matchRegex:
+      path: spec.postRenderers[0].kustomize.patches[0].patch
+      pattern: "(?s).*remove.*tlsConfig.*"
+
+- it: should not render cert-manager HelmRelease when disabled
+  set:
+    certManager:
+      enabled: false
+  template: cert-manager/helmrelease.yaml
+  asserts:
+  - hasDocuments:
+      count: 0
+
+- it: should not require Istio or monitoring when both are disabled
+  set:
+    certManager:
+      enabled: true
+    istiod:
+      enabled: false
+    monitoring:
+      enabled: false
+    kyvernoPolicies:
+      enabled: false
+  template: cert-manager/helmrelease.yaml
+  asserts:
+  - notExists:
+      path: spec.dependsOn
+  - notExists:
+      path: spec.postRenderers
+
+- it: should normalize canonical cert-manager configuration onto the integrated package
+  set:
+    certManager:
+      enabled: false
+    monitoring:
+      enabled: false
+    packageConfiguration:
+      version: v1
+    packages:
+      certManager:
+        enabled: true
+        sourceType: git
+        namespace:
+          name: canonical-cert-manager
+        git:
+          repo: https://example.com/cert-manager.git
+          path: integrated-chart
+          tag: v1.20.3
+        postRenderers:
+          - kustomize:
+              patches: []
+  template: cert-manager/helmrelease.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: cert-manager
+  - equal:
+      path: spec.targetNamespace
+      value: canonical-cert-manager
+  - equal:
+      path: spec.chart.spec.chart
+      value: integrated-chart
+  - equal:
+      path: spec.chart.spec.sourceRef.kind
+      value: GitRepository
+  - equal:
+      path: spec.postRenderers[0].kustomize.patches
+      value: []
+
+###############################################################################
 # Enable / Disable - Core packages
 ###############################################################################
 

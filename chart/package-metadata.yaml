@@ -1,5 +1,10 @@
 apiVersion: bigbang.dev/v1alpha1
 packages:
+  certManager:
+    displayName: cert-manager
+    category: core
+    legacyPath: certManager
+    templateDirectory: cert-manager
   istioCNI:
     displayName: Istio CNI
     category: core
