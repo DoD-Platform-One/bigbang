@@ -10,6 +10,7 @@ nav:
   - Licensing: licensing.md
   - Logging: logging.md
   - Package Management: package-management.md
+  - Personas: personas.md
   - Security Model: security-model.md
   - Style: style.md
   - Testing: testing.md

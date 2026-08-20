@@ -1,298 +1,81 @@
 # Security Model
 
-Big Bang implements a comprehensive, defense-in-depth security model aligned with industry standards and the DoD DevSecOps Reference Architecture. This document outlines the security principles, controls, and implementations that protect applications and data throughout the software development lifecycle.
+Big Bang is a GitOps deployment and integration layer for Kubernetes packages. It provides configurable security capabilities, but it does not by itself secure the underlying cluster, make every workload compliant, or grant an authorization to operate. The resulting security posture depends on the selected packages and values, the Kubernetes distribution, infrastructure controls, identities, application design, and operational processes.
 
-## Overview
+## Trust Boundaries
 
-Big Bang's security model is built on zero-trust principles and implements multiple layers of security controls to ensure comprehensive protection. The platform addresses security concerns across the entire application lifecycle, from supply chain integrity through runtime protection. Much of the security functionality works out-of-the-box, while also allowing for customization to meet specific organizational requirements. Since the Big Bang team uses Big Bang, many of the security features are continuously tested and improved in real-world scenarios, and then passed on to users.
+Big Bang manages resources inside a Kubernetes cluster through Flux. The platform owner remains responsible for controls outside or below that boundary, including:
 
-### Core Security Principles
+- Kubernetes control-plane, node, container-runtime, and operating-system hardening.
+- Cloud accounts, networks, load balancers, DNS, storage, backups, and key-management services.
+- Git, registry, and identity-provider administration.
+- Application security, data classification, retention, recovery, and incident response.
+- Physical and administrative controls and the evidence required by an authorizing official.
 
-- **Zero Trust Architecture**: Never trust, always verify
-- **Defense in Depth**: Multiple layered security controls
-- **Principle of Least Privilege (PoLP)**: Minimal necessary access rights
-- **Continuous Monitoring**: Real-time security observability
-- **Supply Chain Security**: End-to-end integrity verification
-- **Compliance by Design**: Built-in regulatory compliance
+See [Architecture](architecture.md) and [GitOps Engine](git-ops-engine.md) for the deployment boundary.
 
-## Security Architecture
+## Security Capabilities
 
-### 1. Service Mesh Security
+The following capabilities are available when their packages are enabled and correctly configured.
 
-Big Bang leverages Istio service mesh to provide comprehensive network security:
+### GitOps Reconciliation
 
-**Mutual TLS (mTLS)**
-- Automatic encryption of all service-to-service communication
-- Certificate-based authentication for service identity
-- Transparent encryption without application changes
-
-**Traffic Policy Enforcement**
-- Declarative security policies for service communication
-- Network segmentation through service mesh controls
-- Traffic routing and load balancing with security considerations
-
-**Service Identity and Authentication**
-- SPIFFE/SPIRE integration for workload identity
-- Service account-based authentication
-- JWT token validation and propagation
+Flux reconciles declared sources and Helm releases into the cluster. Pin immutable release references, restrict repository write access, require review, encrypt secrets, and monitor reconciliation failures. Git history and Flux status contribute useful change evidence, but neither replaces an organizational audit system.
 
-### 2. Policy Enforcement
+See [GitOps Workflow](git-ops-workflow.md) and [Encryption](encryption.md).
 
-**Kyverno Policy Engine**
-- Admission control for Kubernetes resources
-- Validation, mutation, and generation policies
-- Compliance policy enforcement at deployment time
+### Workload and Admission Policy
 
-**Network Policies**
-- Pod-to-pod communication controls
-- Namespace isolation and segmentation
-- Default-deny network posture
+Kyverno, Kyverno Policies, and Gatekeeper can validate Kubernetes resources at admission time. Their effectiveness depends on which policies are installed, whether they audit or enforce, and which exclusions apply. Kubernetes Pod Security Admission may also be configured by the cluster owner.
 
-### 3. Runtime Security
+`PodSecurityPolicy` is not part of this model; Kubernetes removed that API in version 1.25. Review the [prerequisites](../getting-started/prerequisites.md#pod-security-and-admission-control) before choosing admission controls.
 
-**Container Security**
-- Runtime threat detection and response
-- Behavioral analysis and anomaly detection
-- Process and network monitoring
+### Network Isolation and Service Mesh
 
-**Vulnerability Management**
-- Continuous image scanning with Twistlock/Prisma Cloud
-- Runtime vulnerability assessment
-- Automated security patching workflows
+Big Bang packages can render Kubernetes `NetworkPolicy` resources. Enforcement requires a compatible CNI. Istio can provide workload identity, traffic policy, ingress controls, and mutual TLS for workloads enrolled in the mesh. Traffic outside the mesh, excluded namespaces, and infrastructure endpoints require separate controls.
 
-**Security Monitoring**
-- Real-time security event collection
-- Security Information and Event Management (SIEM) integration
-- Threat hunting and incident response capabilities
+Enabling Istio does not prove that every connection is encrypted or authorized. Verify mesh enrollment, peer-authentication mode, authorization policies, gateway exposure, and certificate behavior for the deployed configuration.
 
-**Pod Security Standards**
-- Pod Security Policy enforcement
-- Security context validation
-- Privilege escalation prevention
+### Identity and Secrets
 
-### 4. Supply Chain Integrity
+Supported packages can integrate with configured OIDC or SAML providers. Big Bang does not operate the external identity provider or define the organization's account lifecycle, multifactor authentication, privileged-access, or access-review processes.
 
-**Image Security**
-- Container image signing and verification with Cosign
-- WIP: Software Bill of Materials (SBOM) generation and tracking
-- Base image vulnerability scanning
+Environment secrets can be encrypted with SOPS before being stored in Git. Protect the decryption keys, limit access to plaintext Kubernetes Secrets, and use an external secrets system when required by the threat model. See [Encryption](encryption.md).
 
-**Build Pipeline Security**
-- Secure CI/CD pipeline implementation
-- Code signing and artifact attestation
-- Dependency scanning and management
+### Images and Software Supply Chain
 
-**GitOps Security**
-- Git repository access controls and audit logging
-- Branch protection
-- Review requirements
+Big Bang references package sources and container images through configurable Git, Helm, OCI, and registry locations. Platform owners must verify the provenance and vulnerability posture required by their organization, protect registry credentials, approve version changes, and retain applicable software-bill-of-materials and attestation evidence.
 
-**Artifact Management**
-- Secure container registry with Harbor
-- Image promotion workflows
-- Vulnerability remediation tracking
+The presence of an image in a registry or a package in Big Bang is not a guarantee that it satisfies a particular risk decision. Pin versions and apply the organization's admission and promotion policies.
 
-### 5. Principle of Least Privilege (PoLP)
+### Observability and Runtime Security
 
-**Role-Based Access Control (RBAC)**
-- Granular permissions based on job functions
-- Regular access reviews and certification
-- Automated role provisioning and deprovisioning
+Monitoring, Grafana, logging packages, and optional runtime-security products can collect different parts of the operational and security signal. Coverage depends on package selection, licensing, configuration, retention, alert routing, and response procedures. Big Bang does not automatically provide a SIEM, threat-intelligence feed, incident-response program, or complete audit record.
 
-**Service Account Management**
-- Minimal necessary permissions for workloads
-- Service account token security
-- Automated credential rotation
+See [Logging](logging.md), [Monitoring](../operations/monitoring.md), and the documentation for each enabled runtime-security package.
 
-**Network Segmentation**
-- Micro-segmentation through network policies
-- Application-layer access controls
-- Zero-trust network architecture
+## Compliance
 
-### 6. Security Observability
-
-**Monitoring and Alerting**
-- Comprehensive security metrics collection with Prometheus
-- Real-time security dashboards with Grafana
-- Automated alerting for security events
-
-**Audit Logging**
-- Kubernetes API audit logging
-- Application-level audit trails
-- Centralized log aggregation with Elasticsearch/Fluentd
+Big Bang can help implement and observe technical controls, but compliance is a property of a scoped system and its operation. It cannot automatically confer NIST, FedRAMP, DoD, or continuous-authorization status.
 
-**Compliance Reporting**
-- WIP: Automated compliance reporting
-- Security posture dashboards
-- WIP: Risk reporting
-
-**WIP: Threat Detection**
-- WIP: Behavioral analytics and machine learning
-- WIP: Indicators of Compromise (IoC) detection
-- WIP: Integration with threat intelligence feeds
+For each required control:
 
-## Compliance and Standards Alignment
+1. Identify the responsible system component and owner.
+2. Configure the relevant Big Bang, package, cluster, and infrastructure settings.
+3. Test the control in the deployed environment.
+4. Collect versioned evidence and document exclusions or compensating controls.
+5. Reassess after Big Bang, package, Kubernetes, infrastructure, or policy changes.
 
-### NIST Cybersecurity Framework
+## Secure Deployment Checklist
 
-Big Bang implements controls aligned with NIST 800-53 and the Cybersecurity Framework:
+- Pin the Big Bang release and all package sources to reviewed versions.
+- Confirm the Kubernetes version satisfies the release's chart constraint.
+- Encrypt environment secrets and restrict decryption-key access.
+- Review rendered manifests, admission policies, network policies, and exemptions.
+- Verify CNI enforcement, Istio enrollment, ingress exposure, TLS, and identity flows.
+- Configure backups and test restoration for all persistent data.
+- Route actionable metrics, logs, policy results, and runtime alerts to owned response processes.
+- Test upgrades in a representative environment and retain the resulting evidence.
+- Document controls that remain the responsibility of the cluster, infrastructure, application, or organization.
 
-**Identify (ID)**
-- Asset inventory and classification
-- Risk assessment and management
-- Governance and risk management processes
-
-**Protect (PR)**
-- Access control and identity management
-- Data protection and privacy controls
-- Protective technology implementation
-
-**Detect (DE)**
-- Continuous monitoring and detection
-- Security event logging and analysis
-- Anomaly detection and threat hunting
-
-**Respond (RS)**
-- Incident response procedures
-- Automated response capabilities
-- Communication and coordination protocols
-
-**Recover (RC)**
-- Recovery planning and procedures
-- Backup and restore capabilities
-- Business continuity planning
-
-### DoD DevSecOps Reference Architecture
-
-Big Bang aligns with DoW DevSecOps principles:
-
-**WIP: Continuous Authority to Operate (cATO)**
-- WIP: Automated security assessment
-- WIP: Continuous compliance monitoring
-- WIP: Risk-based security controls
-
-**DevSecOps Pipeline Security**
-- Security testing integration throughout CI/CD
-- Automated vulnerability assessment
-- Security gates and approval workflows
-
-**Container Security**
-- Iron Bank images
-- Container security standards
-- Runtime security monitoring
-
-## Security Control Implementation
-
-### Technical Controls
-
-**Identity and Access Management**
-- Multi-factor authentication (MFA)
-- Single sign-on (SSO) with SAML/OIDC
-- Privileged access management (PAM)
-
-**Data Protection**
-- Encryption at rest and in transit
-- Key management and rotation
-- Data loss prevention (DLP)
-
-**Network Security**
-- Web application firewall (WAF)
-- Intrusion detection and prevention (IDS/IPS)
-- Network segmentation and isolation
-
-### Administrative Controls
-
-**Security Policies and Procedures**
-- Information security policy framework
-- Security awareness training programs
-- Incident response procedures
-
-**Configuration Management**
-- Security configuration baselines
-- Change management processes
-- Configuration drift detection
-
-**Vendor Management**
-- Third-party security assessments
-- Supply chain risk management
-- Vendor security requirements
-
-### Physical Controls
-
-**Facility Security**
-- Physical access controls
-- Environmental monitoring
-- Equipment protection
-
-## Security Best Practices
-
-### Development Security
-
-1. **Secure Coding Practices**
-   - Static application security testing (SAST)
-   - Dynamic application security testing (DAST)
-   - Interactive application security testing (IAST)
-
-2. **Dependency Management**
-   - Software composition analysis (SCA)
-   - License compliance verification
-   - Vulnerability remediation tracking
-
-3. **Secret Management**
-   - External Secrets Operator integration
-   - Secret rotation and lifecycle management
-   - Secret scanning and detection
-
-### Operational Security
-
-1. **Continuous Monitoring**
-   - Real-time security metrics
-   - Automated threat detection
-   - Security event correlation
-
-2. **Incident Response**
-   - Playbook-driven response procedures
-   - Automated containment capabilities
-   - Post-incident analysis and improvement
-
-3. **Regular Assessment**
-   - Penetration testing and red team exercises
-   - Vulnerability assessments
-   - Security control effectiveness reviews
-
-## Implementation Guidelines
-
-### Getting Started
-
-1. **Security Baseline Configuration**
-   - Enable default security policies
-   - Configure service mesh security
-   - Implement network segmentation
-
-2. **Monitoring Setup**
-   - Deploy security monitoring tools
-   - Configure alerting and notifications
-   - Establish security dashboards
-
-3. **Compliance Configuration**
-   - Enable compliance scanning
-   - Configure policy enforcement
-   - Establish reporting procedures
-
-### Advanced Security Features
-
-1. **Custom Policy Development**
-   - Create organization-specific policies
-   - Implement custom security controls
-   - Develop compliance automation
-
-2. **Integration and Orchestration**
-   - Connect with external security tools
-   - Implement security orchestration
-   - Automate response procedures
-
-## Conclusion
-
-Big Bang's security model provides comprehensive protection through defense-in-depth strategies, continuous monitoring, and compliance-by-design principles. By implementing these security controls and following best practices, organizations can achieve robust security posture while maintaining operational efficiency and regulatory compliance.
-
-For implementation guidance and specific security configurations, refer to the detailed documentation for each security component and the operational security procedures in the [Operations section](../operations/).
+Package defaults and capabilities change. Use the documentation and rendered output from the exact Big Bang release under review as the implementation source of truth.

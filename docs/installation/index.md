@@ -34,7 +34,7 @@ For a basic installation:
 
 Before installing Big Bang, ensure your environment meets these requirements:
 
-- **Kubernetes Version**: Compatible Kubernetes cluster (see compatibility matrix)
+- **Kubernetes Version**: A cluster satisfying the selected release's [`kubeVersion` constraint](../../chart/Chart.yaml)
 - **Node Resources**: Sufficient CPU, memory, and storage capacity
 - **Network Access**: Connectivity to required registries and repositories
 - **Storage Classes**: Available persistent storage for applications
@@ -44,11 +44,11 @@ See the [detailed prerequisites guide](../getting-started/prerequisites.md) for 
 
 ## Common Installation Scenarios
 
-Big Bang supports various deployment patterns:
+Big Bang can be configured for multiple deployment patterns when the cluster and package requirements are met:
 
 - **Cloud Deployments**: AWS EKS, Azure AKS, Google GKE
 - **On-Premises**: Self-managed Kubernetes clusters
-- **Edge Deployments**: Resource-constrained environments
+- **Resource-constrained Evaluation**: Reduced package sets for non-production testing
 - **Air-Gapped**: Disconnected environments with registry mirrors
 
 ## When Installation Problems Occur

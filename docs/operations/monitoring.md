@@ -1,59 +1,60 @@
-# Monitoring
+# Scrape Annotated Application Metrics
 
-## Integrating Prometheus Label Scraping for Sample Application
+Big Bang's monitoring package can discover Prometheus metrics from annotated Services or Pods. Prefer a package-owned `ServiceMonitor` or `PodMonitor` when one is available; annotation discovery is useful for applications that do not provide those resources.
 
-### Introduction
+## Prerequisites
 
-Integrating Prometheus metrics scraping with label scraping services is helpful for monitoring monitoring applications that either don't ship with a a ServiceMonitor, for testing in researching to build out a serviceMonitor resource, or in-development applications where creating and managing annotations is simpler than building and managing ServiceMonitors. This guide will explain how to integrate metrics scraping for your annotated service endpoints or specific pods with Big Bang.
+- The Big Bang monitoring package is enabled.
+- The application exposes metrics in Prometheus format.
+- The scrape path, port, and protocol are known.
+- Network policies allow Prometheus to reach the target.
 
-By default, global endpoint monitoring is behind a hidden value in Big Bang. If you wish to enable, it the sections below are for each configuration.
+## Enable Annotation Discovery
 
-The available Global serviceMonitor for annotated endpoints service is defined by the prometheus job name `kubernetes-service-endpoints` with following hidden value `monitoring.globalServiceEndpointMetrics` in `values.yaml`:
-```
+Enable one or both discovery jobs in the Big Bang values supplied by the environment:
+
+```yaml
 monitoring:
   globalServiceEndpointMetrics:
     enabled: true
-```
-
-The available Global serviceMonitor for annotated pods is defined by the prometheus job name `kubernetes-pods` with following hidden value `monitoring.globalPodEndpointMetrics` in `values.yaml`:
-```
-monitoring:
   globalPodEndpointMetrics:
     enabled: true
 ```
 
-### Prerequisites
+These values render the `kubernetes-service-endpoints` and `kubernetes-pods` scrape jobs respectively. They are disabled by default.
 
-Before integrating with Prometheus, ensure the following:
+## Annotate a Service
 
-- Determine if the application supports Prometheus metrics exporting. If not, find a Prometheus exporter to provide this service.
-- Identify the path and port used to scrape metrics on the application or exporter.
-- List the services and/or pods that should be monitored.
+Add annotations to the application's Service. Substitute the actual named or numeric metrics port and path:
 
-### Integration Steps
-
-#### 1. Define Placeholder Values for a Service (Recommended)
-
-Add placeholders in `chart/values.yaml` to configure whether the monitoring stack (Prometheus) is enabled:
-the following is an example of a placeholder for allowing scraping of the `metrics-server` service endpoint:
 ```yaml
-addons:
-  metrics-server:
-    values: 
-      service:
-        annotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "10250"
-          prometheus.io/path: "/metrics"
-      serviceMonitor:
-        enabled: false  # set to true to enable monitoring if the service is not already being scraped. This is an easily re-producible example but ideally the app will not ship with a serviceMonitor.
-
-**NOTE:** The example above is for the metrics-server application, you will need to update the service annotations to match your application. Also note that metrics-server is already being scraped by a local serviceMonitor, so you will need to disable it so label scraping can be enabled.
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-application
+  namespace: my-application
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+spec:
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: metrics
+  selector:
+    app.kubernetes.io/name: my-application
 ```
 
-Applications configured correctly will be scraped by Prometheus under the `target->` `kubernetes-service-endpoints` in the Prometheus User Interface (UI). Refer to the image below. If you do not know the correct port and path for your application, you may use `Service Discovery` in the Prometheus UI to find the correct port and path for your application.
+Do not enable annotation discovery and a `ServiceMonitor` for the same endpoint unless duplicate ingestion is intentional.
 
-![Prometheus GUI](https://repo1.dso.mil/big-bang/product/bb-static/-/raw/main/docs/assets/imgs/developer/metrics-server-scraping.png?ref_type=heads)
+## Verify the Target
 
+After Flux reconciles the configuration:
 
-<!-- TODO: add more monitoring documentation. -->
+1. Open the Prometheus Targets page.
+2. Find the target under `kubernetes-service-endpoints` or `kubernetes-pods`.
+3. If it is absent, inspect Prometheus service discovery and confirm the annotations and selectors.
+4. If it is present but down, verify the port, path, protocol, TLS settings, and applicable network policies.
+
+For package-specific dashboards, alerts, and `ServiceMonitor` settings, use the documentation for that package and the [monitoring package](../packages/core/monitoring.md).

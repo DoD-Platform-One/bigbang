@@ -53,24 +53,15 @@ most pressing needs.
 
 > Is Big Bang secure? What about its plugins?
 
-Big Bang is compliant with the
-[DevSecOps Reference Architecture](https://dodcio.defense.gov/Portals/0/Documents/Library/DoD%20Enterprise%20DevSecOps%20Reference%20Design%20-%20CNCF%20Kubernetes%20w-DD1910_cleared_20211022.pdf), and is used at all impact levels and classifications.
+Big Bang provides configurable GitOps, policy, service-mesh, observability, and runtime-security integrations. Security and compliance apply to the complete deployed system, not to the Big Bang chart alone. Package selection, values, cluster and infrastructure hardening, identity, operations, and control evidence remain the responsibility of the system owner. See the [Security Model](../concepts/security-model.md).
 
-[Iron Bank](https://p1.dso.mil/ironbank) performs automated scans of all image
-components used in Big Bang, and patches vulnerabilities as they are found. Big Bang
-pulls all hardened images from Iron Bank.
-
-<!--
-TODO: link to cATO docs - Cyber is working on a Care Package at IL4 to link here
--->
+Many default package images are sourced from [Iron Bank](https://p1.dso.mil/ironbank), but operators must verify every image rendered by their selected release and configuration. Image availability or scan results do not replace an organization's vulnerability-management and risk-acceptance processes.
 
 ## Deployment
 
 > Can we stand up our own instance of Big Bang in AWS GovCloud?
 
-Yes. Big Bang strives to be vendor-agnostic, and will run on Cloud One,
-AWS GovCloud, Microsoft Azure, on-prem hardware, and in air-gapped
-environments.
+Big Bang is designed for conformant Kubernetes clusters and includes configuration for environments such as OpenShift and disconnected networks. Support for a particular provider or distribution depends on the selected Big Bang release's Kubernetes constraint and on the cluster providing the required CNI, CSI, load-balancer, DNS, and network capabilities. See the [prerequisites](prerequisites.md).
 
 > Do we have to set up a full Kubernetes distribution? Can we just deploy Big Bang to a Virtural Machine?
 
