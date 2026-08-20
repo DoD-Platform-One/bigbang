@@ -981,6 +981,22 @@ mode; sidecar-mode SSO keeps the legacy pod-label ext_authz path.
 -}}
 {{- end -}}
 
+{{- /*
+Returns "true" when Thanos's query-frontend should be protected by authservice via
+the thanos package's own ambient waypoint (the bb-common per-route authservice
+model). This replaces the legacy model that enrolled the Service onto the shared
+authservice-namespace waypoint. Only applies in ambient mode; sidecar-mode SSO
+keeps the legacy pod-label ext_authz path.
+*/ -}}
+{{- define "thanos.authservice.waypointEnabled" -}}
+{{- and
+  (eq (include "ambientEnabled" .) "true")
+  (eq (include "authserviceEnabled" .) "true")
+  .Values.addons.thanos.enabled
+  .Values.addons.thanos.sso.enabled
+-}}
+{{- end -}}
+
 {{- /* Returns "true" if networkPolicies should be enabled for a package.
        True when .Values.networkPolicies.enabled is true OR ambient mode is enabled.
        Ambient mode requires bb-common's network-policies render to run because the

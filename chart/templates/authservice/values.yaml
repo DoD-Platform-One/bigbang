@@ -100,6 +100,12 @@ networkPolicies:
                 matchLabels:
                   gateway.networking.k8s.io/gateway-name: monitoring-monitoring-waypoint
             {{- end }}
+            {{- if eq (include "thanos.authservice.waypointEnabled" .) "true" }}
+            thanos/waypoint:
+              podSelector:
+                matchLabels:
+                  gateway.networking.k8s.io/gateway-name: thanos-waypoint
+            {{- end }}
       # Grafana redis client connection
       redis-bb:6379:
         from:
@@ -133,13 +139,6 @@ networkPolicies:
           k8s:
             # Tempo trace data
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
-      # Waypoint egress to thanos when the shared authservice waypoint fronts it for SSO (ambient).
-      # Monitoring no longer uses this waypoint: prometheus/alertmanager are fronted by the
-      # monitoring package's own waypoint, which makes the ext_authz call back to authservice:10003.
-      authservice-waypoint:
-        to:
-          k8s:
-            thanos/thanos:9090: {{ and $ambientEnabled .Values.addons.thanos.enabled .Values.addons.thanos.sso.enabled }}
       haproxy:
         to:
           k8s:
