@@ -4,7 +4,7 @@ When using Big Bang you often find that you need or want to deploy an additional
 
 In order to ease the burden on end users and increase integration with Big Bang components, we have provided a way to deploy these additional packages with optional extra "wrapping" to provide integration with Big Bang capabilities.
 
-Please open an issue in the [Big Bang repository](https://repo1.dso.mil/big-bang/bigbang/-/issues) or in the [Wrapper repository ](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/issues) for any bugs you discover or for any new features or functionality you would like the package/wrapper to support.
+Please open an issue in the [Big Bang repository](https://repo1.dso.mil/big-bang/bigbang/-/work_items) or in the [Wrapper repository ](https://repo1.dso.mil/big-bang/product/packages/wrapper/-/work_items) for any bugs you discover or for any new features or functionality you would like the package/wrapper to support.
 
 ## What is provided
 

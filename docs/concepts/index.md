@@ -29,7 +29,7 @@ Start with the [Getting Started Overview](../getting-started/index.md), which in
     * All locations use the same source code and will include pointers between them.
 * There are multiple implementations of Helm Charts (Helm repositories, `.tgz`, and files and folders in a git repo), whenever Platform One refers to a helm chart, it always referring to the files and folders in a git repo implementation, which is stored in the `/chart` folder within a git repo.
 * Additional pre-reading materials to develop a better understanding of Big Bang before deploying can be found in this `understanding_bigbang` section.
-* If you see an issue with docs or packages, please [open an issue against the main Big Bang Repo](https://repo1.dso.mil/big-bang/bigbang/-/issues), instead of the individual package repo.
+* If you see an issue with docs or packages, please [open an issue against the main Big Bang Repo](https://repo1.dso.mil/big-bang/bigbang/-/work_items), instead of the individual package repo.
 
 ## Note about Snippets of Architecture Diagrams in this folder
 
