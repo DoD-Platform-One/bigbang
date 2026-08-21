@@ -135,24 +135,6 @@ tests:
           path: spec.postRenderers[0].kustomize.patches[0].patch
           pattern: '(?s)op: replace.*path: "".*apiVersion: postgresql.cnpg.io/v1.*kind: Cluster.*name: postgresql.*namespace: postgresql.*imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.10.*database: gitlabhq_production.*owner: gitlab'
 
-  - it: deploys Redis with its normal identity and namespace
-    template: package/helmrelease.yaml
-    documentSelector:
-      path: metadata.name
-      value: redis
-    asserts:
-      - equal:
-          path: spec.targetNamespace
-          value: redis
-      - equal:
-          path: spec.releaseName
-          value: redis
-      - contains:
-          path: spec.dependsOn
-          content:
-            name: redis-wrapper
-            namespace: bigbang
-
   - it: deploys Garage with its normal identity and namespace
     template: package/helmrelease.yaml
     documentSelector:
@@ -223,22 +205,6 @@ tests:
           path: stringData["values.yaml"]
           pattern: "allowControlPlaneEgress: true"
 
-  - it: renders Redis wrapper ingress only from GitLab
-    template: wrapper/values.yaml
-    documentSelector:
-      path: metadata.name
-      value: redis-wrapper-values
-    asserts:
-      - matchRegex:
-          path: stringData["values.yaml"]
-          pattern: "(?s)allow-gitlab-redis.*kubernetes.io/metadata.name: gitlab.*port: 6379"
-      - matchRegex:
-          path: stringData["values.yaml"]
-          pattern: "(?s)allow-redis-upgrade-kube-api.*app.kubernetes.io/name: bigbang-redis-upgrade-job.*cidr: 172.16.0.0/12"
-      - notMatchRegex:
-          path: stringData["values.yaml"]
-          pattern: "allowControlPlaneEgress: true"
-
   - it: renders namespace-scoped GitLab egress to every external dependency
     template: gitlab/values.yaml
     asserts:
@@ -274,24 +240,9 @@ tests:
       - hasDocuments:
           count: 0
 
-  - it: does not render duplicate Redis credentials
-    template: gitlab/secret-redis-bb.yaml
-    asserts:
-      - hasDocuments:
-          count: 0
-
   - it: synchronizes dependency-owned credentials into GitLab through Kyverno
     template: kyverno-policies/values.yaml
     asserts:
-      - matchRegex:
-          path: stringData.overlays
-          pattern: "name: sync-redis-credentials"
-      - matchRegex:
-          path: stringData.overlays
-          pattern: "(?s)clone:.*name: redis.*namespace: redis"
-      - matchRegex:
-          path: stringData.overlays
-          pattern: "name: gitlab-redis-secret-bb"
       - matchRegex:
           path: stringData.overlays
           pattern: "name: sync-postgresql-credentials"
@@ -323,9 +274,6 @@ tests:
   - it: points GitLab at the synchronized dependency Secrets
     template: gitlab/values.yaml
     asserts:
-      - matchRegex:
-          path: stringData.overlays
-          pattern: "(?s)redis:.*auth:.*key: redis-password.*secret: gitlab-redis-secret-bb"
       - matchRegex:
           path: stringData.overlays
           pattern: "(?s)psql:.*password:.*key: password.*secret: gitlab-database"
