@@ -362,54 +362,12 @@ packages:
     helmRelease:
       namespace: bigbang
     namespace:
-      name: redis
-    istio:
-      injection: disabled
-    wrapper:
-      enabled: true
-    network:
-      policies: true
-      defaultDeny: true
-      allowIntraNamespace: true
-      allowDnsEgress: true
-      additionalPolicies:
-        - name: allow-gitlab-redis
-          spec:
-            podSelector:
-              matchLabels:
-                app.kubernetes.io/instance: redis
-                app.kubernetes.io/component: master
-            policyTypes:
-              - Ingress
-            ingress:
-              - from:
-                  - namespaceSelector:
-                      matchLabels:
-                        kubernetes.io/metadata.name: gitlab
-                ports:
-                  - protocol: TCP
-                    port: 6379
-        - name: allow-redis-upgrade-kube-api
-          spec:
-            podSelector:
-              matchLabels:
-                app.kubernetes.io/name: bigbang-redis-upgrade-job
-            policyTypes:
-              - Egress
-            egress:
-              - to:
-                  - ipBlock:
-                      cidr: '{{ .Values.networkPolicies.controlPlaneCidr }}'
-    dependsOn:
-      - name: redis-wrapper
-        namespace: bigbang
-    bbCommonValues: false
+      create: false
+      createRegistrySecret: false
+      name: gitlab
+    bbCommonValues: true
     values:
-      networkPolicies:
-        enabled: false
       upstream:
-        nameOverride: redis
-        fullnameOverride: redis
         architecture: standalone
         auth:
           enabled: true
@@ -659,29 +617,6 @@ kyvernoPolicies:
         spec:
           background: true
           rules:
-            - name: sync-redis-credentials
-              match:
-                any:
-                  - resources:
-                      kinds:
-                        - Secret
-                      names:
-                        - redis
-                      namespaces:
-                        - redis
-                      operations:
-                        - CREATE
-                        - UPDATE
-              generate:
-                generateExisting: true
-                apiVersion: v1
-                kind: Secret
-                name: gitlab-redis-secret-bb
-                namespace: gitlab
-                synchronize: true
-                clone:
-                  namespace: redis
-                  name: redis
             - name: sync-postgresql-credentials
               match:
                 any:
@@ -1598,11 +1533,11 @@ addons:
                       port: 6379
       global:
         redis:
-          host: redis-master.redis.svc.cluster.local
+          host: redis-bb-master
           port: 6379
           auth:
             enabled: true
-            secret: gitlab-redis-secret-bb
+            secret: redis-bb
             key: redis-password
         psql:
           host: postgresql-rw.postgresql.svc.cluster.local
