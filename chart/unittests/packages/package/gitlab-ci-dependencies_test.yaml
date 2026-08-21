@@ -22,12 +22,13 @@ values:
   - ../../../../tests/test-values.yaml
 set:
   addons.gitlab.enabled: true
+  addons.gitlab.git.tag: test-gitlab-tag
   packages.cloudnative-pg.enabled: true
   packages.postgresql.enabled: true
   packages.redis.enabled: true
   packages.garage.enabled: true
 tests:
-  - it: points GitLab at the released package tag
+  - it: points GitLab at the configured package tag
     template: gitlab/gitrepository.yaml
     documentSelector:
       path: metadata.name
@@ -35,7 +36,7 @@ tests:
     asserts:
       - equal:
           path: spec.ref.tag
-          value: 10.1.3-bb.0
+          value: test-gitlab-tag
 
   - it: sources the operator from the Big Bang maintained CloudNativePG package
     template: package/gitrepository.yaml
