@@ -3,5 +3,4 @@ nav:
   - Airgap: airgap.md
   - Resource-constrained Example: appliance-mode.md
   - Extra Package Deployment: extra-package-deployment.md
-  - Quickstart: quick-start.md
   - SSO Quickstart: sso-quickstart.md

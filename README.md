@@ -4,7 +4,7 @@ Big Bang is a declarative, continuous delivery tool for deploying Department of 
 
 > If viewing this from Github, note that this is a mirror of a government repo hosted on [Repo1](https://repo1.dso.mil/) by [DoD Platform One](http://p1.dso.mil/).  Please direct all code changes, issues and comments to [https://repo1.dso.mil/big-bang/bigbang](https://repo1.dso.mil/big-bang/bigbang)
 
-[Click here to view the Big Bang Quick Start Guide](docs/installation/environments/quick-start.md)
+[Start with the Big Bang documentation](docs/index.md), or use the [evaluation quickstart](docs/getting-started/quick-start.md) for a disposable demonstration environment.
 
 ## Usage & Scope
 
@@ -26,8 +26,9 @@ Additional information can be found in the [Big Bang Docs](./docs/index.md).
 
 ## Getting Started
 
-- You will need to instantiate a Big Bang environment tailored to your needs.  [The Big Bang customer template](https://repo1.dso.mil/big-bang/customers/template) is provided for you to copy into your own Git repository and begin modifications.
-- There is a [Quick Start guide](https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/deployment-scenarios/quickstart.md) to be used as an example deployment scenario.
+- Review [Getting Started](./docs/getting-started/) and the [prerequisites](./docs/getting-started/prerequisites.md).
+- Use the [evaluation quickstart](./docs/getting-started/quick-start.md) for a disposable development or demonstration environment.
+- Use the [customer-managed deployment guide](./docs/getting-started/first-deployment.md) and [customer template](https://repo1.dso.mil/big-bang/customers/template) for a persistent GitOps environment.
 
 ## Contributing to Big Bang
 
@@ -89,4 +90,5 @@ Several useful starting points in the Big Bang documentation are listed in the f
 - [Key Big Bang Concept Overviews](./docs/concepts/index.md)
 - [Tutorials for Big Bang](./docs/tutorials/)
 - [Big Bang Prerequisites](./docs/getting-started/prerequisites.md)
+- [Big Bang Evaluation Quickstart](./docs/getting-started/quick-start.md)
 - [Big Bang Example Configurations](https://repo1.dso.mil/big-bang/bigbang/-/tree/master/docs/reference/configs/example)

@@ -15,7 +15,7 @@ Before an installation or upgrade:
 3. Confirm that affinity, topology-spread, and storage requirements can be satisfied during a node or availability-zone failure.
 4. Validate the result in an environment representative of production.
 
-The local [quickstart](../installation/environments/quick-start.md) provides workstation guidance for evaluation only; it is not a production sizing baseline.
+The [evaluation quickstart](quick-start.md) provides workstation guidance for evaluation only; it is not a production sizing baseline.
 
 ## Kubernetes Version
 
