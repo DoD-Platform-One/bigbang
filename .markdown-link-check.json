@@ -1,5 +1,6 @@
 {
   "ignorePatterns": [
-    {"pattern": "^https://.*\\.slack\\.com"}
+    {"pattern": "^https://.*\\.slack\\.com"},
+    {"pattern": "^https://gitlab\\.com/gitlab-org/gitlab/blob/master/LICENSE$"}
   ]
 }
