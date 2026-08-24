@@ -130,3 +130,19 @@ Big Bang umbrella MRs will not need the version in `chart/Chart.yaml` edited via
 The readme of each Big Bang package chart can be re-generated with the following command: <https://repo1.dso.mil/big-bang/product/packages/gluon/-/blob/master/docs/bb-package-readme.md>.
 
 Big Bang umbrella MRs will not need the main README.md edited via Pull Requests.
+
+### Generate the Big Bang Values Reference
+
+The Big Bang values reference is generated from `chart/Chart.yaml`, `chart/values.yaml`, and `docs/configuration/base-config.md.gotmpl` with helm-docs v1.14.2. Do not edit `docs/configuration/base-config.md` directly.
+
+After changing chart metadata, values, or `# --` value documentation, run:
+
+```shell
+scripts/generate-values-reference.sh --write
+```
+
+To verify that the committed reference is current without modifying it, run:
+
+```shell
+scripts/generate-values-reference.sh --check
+```
