@@ -21,7 +21,7 @@ graph LR
   end
   
   subgraph "App"
-    dataplane --"app.bigbang.dev"<br/>port redirects--> appvs{{"Virtual Service"}} --> appsvc{{"App Service"}}
+    dataplane --"app.dev.bigbang.mil"<br/>port redirects--> appvs{{"Virtual Service"}} --> appsvc{{"App Service"}}
   end
 
   subgraph "Logging"

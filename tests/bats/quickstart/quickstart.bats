@@ -23,7 +23,7 @@ _reset_quickstart_globals() {
     arg_privateip=""
     arg_username=""
     arg_keyfile=""
-    arg_version=""
+    arg_version=latest
     arg_pipeline_templates_version=master
     arg_repolocation="${REPO1_LOCATION:-}"
     arg_registry1_username="${REGISTRY1_USERNAME:-}"
@@ -91,6 +91,7 @@ EOF
     [ "${arg_repolocation}" = "/tmp/repo1" ]
     [ "${arg_registry1_username}" = "env-user" ]
     [ "${arg_registry1_token}" = "env-token" ]
+    [ "${arg_version}" = "latest" ]
     [ "${arg_pipeline_templates_version}" = "master" ]
     [ "${arg_cloud_provider}" = "aws" ]
 }

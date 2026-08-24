@@ -15,7 +15,7 @@ declare -g arg_host
 declare -g arg_privateip
 declare -g arg_username
 declare -g arg_keyfile
-declare -g arg_version
+declare -g arg_version=latest
 declare -g arg_pipeline_templates_version=master
 declare -g arg_repolocation="${REPO1_LOCATION:-}"
 declare -g arg_registry1_username="${REGISTRY1_USERNAME:-}"

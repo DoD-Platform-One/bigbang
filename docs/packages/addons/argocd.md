@@ -103,7 +103,7 @@ ArgoCD includes a UI, which is accessible at a configurable URL. The UI can be u
 ArgoCD is Istio injected and the VirtualService resource is accessible externally from the cluster at "argocd.{{ .Values.domain }}" but can be configured via the following values in the bigbang chart:
 
 ```yaml
-domain: bigbang.dev
+domain: dev.bigbang.mil
 istio:
   enabled: true
   argocd:
@@ -135,7 +135,7 @@ addons:
       # @default -- See [values.yaml]
       config:
         # Argo CD's externally facing base URL (optional). Required when configuring SSO
-        url: https://argocd.bigbang.dev        
+        url: https://argocd.dev.bigbang.mil
 ```
 
 ### Logging

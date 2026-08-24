@@ -8,7 +8,7 @@ metadata:
 
 variables:
   - name: DOMAIN
-    default: "bigbang.dev"
+    default: "dev.bigbang.mil"
     prompt: false
 
 components:

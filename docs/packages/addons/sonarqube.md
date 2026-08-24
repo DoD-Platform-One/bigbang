@@ -61,7 +61,7 @@ addons:
 Istio is disabled in the sonarqube chart by default and can be enabled by setting the following values in the bigbang chart:
 
 ```yaml
-hostname: bigbang.dev
+hostname: dev.bigbang.mil
 istio:
   enabled: true
 ```

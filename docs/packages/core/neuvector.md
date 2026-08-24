@@ -10,7 +10,7 @@
 
 ### UI
 
-The Neuvector UI runs on the manager, a simple pod that provides the primary way of accessing and managing NeuVector. The UI is accessible via a web application on the cluster at the DNS name "neuvector" (e.g. neuvector.bigbang.dev/). UI access is exposed through the Istio Virtual Service. For more information, see [Using the NeuVector UI](https://open-docs.neuvector.com/navigation/navigation).
+The Neuvector UI runs on the manager, a simple pod that provides the primary way of accessing and managing NeuVector. The UI is accessible via a web application on the cluster at the DNS name "neuvector" (e.g. neuvector.dev.bigbang.mil/). UI access is exposed through the Istio Virtual Service. For more information, see [Using the NeuVector UI](https://open-docs.neuvector.com/navigation/navigation).
 
 ### Dependency Packages
 

@@ -128,7 +128,7 @@ addons:
   mattermost:
     enabled: true
     database:
-      host: "mm-postgres.bigbang.dev"
+      host: "mm-postgres.dev.bigbang.mil"
       port: "5432"
       username: "admin"
       password: "Pa55w0rd"
