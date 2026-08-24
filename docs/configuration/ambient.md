@@ -32,6 +32,14 @@ When `istio.ambient.enabled` is set to `true`, Big Bang automatically enables th
 
 You do not need to explicitly enable these packages when using the global ambient flag.
 
+## Mission Applications
+
+When Big Bang creates a namespace for an integrated package or an application declared through the `packages` key, it labels that namespace for ambient enrollment automatically. Applications managed by an external controller, such as Argo CD, must create or label their namespaces explicitly with `istio.io/dataplane-mode: ambient`.
+
+Namespace enrollment only places workloads in the ambient data plane. A chart that is not integrated with `bb-common` can still require application-specific Kubernetes `NetworkPolicy` and Istio `AuthorizationPolicy` resources for HBONE traffic, health probes, ingress, metrics, and other callers.
+
+Use the [Mission Applications with Istio Ambient Mode](../tutorials/ambient-mission-applications/index.md) tutorial series to prepare an application and deploy it through either the Big Bang `packages` key or Argo CD. If an application cannot yet run in ambient mode, use the [sidecar-mode exception](#sidecar-mode-exception-for-mission-applications).
+
 ## Example Configuration
 
 A minimal configuration to enable ambient mode:
@@ -71,10 +79,41 @@ istioCNI:
       cniConfDir: /etc/cni/net.d    # Customize for your platform
 ```
 
+## Sidecar-Mode Exception for Mission Applications
+
+Use sidecar mode only as a compatibility exception for an application that cannot yet run in ambient mode. The namespace must opt out of ambient enrollment and enable sidecar injection.
+
+For a namespace managed outside Big Bang, apply these labels declaratively:
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: <application-namespace>
+  labels:
+    istio.io/dataplane-mode: none
+    istio-injection: enabled
+```
+
+For an application deployed through the Big Bang `packages` key, override the namespace labels:
+
+```yaml
+packages:
+  <package-name>:
+    namespace:
+      labels:
+        istio.io/dataplane-mode: none
+        istio-injection: enabled
+```
+
+Restart or roll the application workloads after changing namespace enrollment and confirm that each new pod contains an `istio-proxy` container. Do not apply both ambient enrollment and sidecar injection to the same namespace.
+
 ## Additional Resources
 
 ### Big Bang Documentation
 
+- [Mission Applications with Istio Ambient Mode](../tutorials/ambient-mission-applications/index.md)
+- [Migrating a Big Bang Environment from Sidecar Mode to Ambient Mode](../migration/migrating-istio-to-ambient.md)
 - [ztunnel Package](../packages/core/ztunnel.md)
 - [Gateway API Package](../packages/core/gateway-api.md)
 

@@ -1,10 +1,9 @@
 nav:
   - Overview: index.md
   - Ambient Mode: ambient.md
-  - Running Mission Applications in Ambient: ambient-mission-apps.md
   - Values Reference (generated): base-config.md
   - Default Credentials: default-credentials.md
   - Gateways: gateways.md
   - Network Policies: network-policies.md
   - Postrenderers: postrenderers.md
-  - Sample Production Configuration: sample-prod-config.md
+  - Production Considerations: production-considerations
