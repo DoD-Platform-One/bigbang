@@ -482,10 +482,10 @@ Kubernetes: `>=1.34.0-0`
 | addons.gitlab.sourceType | string | `"git"` | Choose source type of "git" or "helmRepo" |
 | addons.gitlab.git.repo | string | `"https://repo1.dso.mil/big-bang/product/packages/gitlab.git"` |  |
 | addons.gitlab.git.path | string | `"./chart"` |  |
-| addons.gitlab.git.tag | string | `"10.1.3-bb.0"` |  |
+| addons.gitlab.git.tag | string | `"10.2.4-bb.0"` |  |
 | addons.gitlab.helmRepo.repoName | string | `"registry1"` |  |
 | addons.gitlab.helmRepo.chartName | string | `"gitlab"` |  |
-| addons.gitlab.helmRepo.tag | string | `"10.1.3-bb.0"` |  |
+| addons.gitlab.helmRepo.tag | string | `"10.2.4-bb.0"` |  |
 | addons.gitlab.flux | object | `{}` | Flux reconciliation overrides specifically for the Gitlab Package |
 | addons.gitlab.dependsOn | list | `[]` | Additional HelmRelease dependencies for GitLab. Use this for operators that must be Ready before the GitLab chart creates their custom resources. |
 | addons.gitlab.ingress | object | `{"gateway":""}` | Redirect the package ingress to a specific Istio Gateway (listed in `istioGateway.values.gateways`).  The default is "public". |
