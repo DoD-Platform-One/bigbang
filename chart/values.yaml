@@ -34,7 +34,7 @@ helmRepositories: []
   #       R8XrntaedsdEhPPchOQuFzqTyyAPGifV1SaEu8medVRi6mVICWbVwOteNg==
   #       -----END PUBLIC KEY-----
 
-# -- Registry credentials used to pull all images deployed by BigBang.
+# -- (object, list, or null) Registry credentials used to pull all images deployed by Big Bang.
 # Set to null (or omit) if your environment provides ambient image pull access,
 # e.g. AWS EKS nodes with an IAM role granting ECR access, or GKE Workload Identity for GCR.
 # When null, no private-registry Secret or imagePullSecrets stanzas are created.
@@ -44,14 +44,14 @@ helmRepositories: []
 # registryCredentials.email will default to ""
 registryCredentials: null
 
-# -- Single set of registry credentials:
+# Single set of registry credentials:
 # registryCredentials:
 #   registry: registry1.dso.mil
 #   username: ""
 #   password: ""
 #   email: ""
 
-# -- Multiple sets of registry credentials:
+# Multiple sets of registry credentials:
 # registryCredentials:
 #   - registry: registry1.dso.mil
 #     username: ""
@@ -62,7 +62,7 @@ registryCredentials: null
 #     password: ""
 #     email: ""
 
-# Openshift Container Platform Feature Toggle
+# -- OpenShift Container Platform feature toggle.
 openshift: false
 
 # -- Git credential settings for accessing private repositories
@@ -136,7 +136,7 @@ sso:
       # -- IdP's claim name used for the user's groups or roles
       groups: groups
 
-# -- (Advanced) Flux reconciliation parameters.
+# -- Advanced Flux reconciliation parameters.
 # The default values provided will be sufficient for the majority of workloads.
 flux:
   timeout: 10m
@@ -270,6 +270,7 @@ imagePullPolicy: IfNotPresent
 # Istio
 #
 
+# -- Istio CNI package configuration.
 istioCNI:
   # -- Toggle deployment of Istio CNI
   enabled: false
@@ -580,6 +581,7 @@ kiali:
 # ----------------------------------------------------------------------------------------------------------------------
 # OPA Gatekeeper
 #
+# -- OPA Gatekeeper package configuration.
 gatekeeper:
   # -- Toggle deployment of OPA Gatekeeper.
   enabled: false
@@ -615,6 +617,7 @@ gatekeeper:
 # ----------------------------------------------------------------------------------------------------------------------
 # Kyverno
 #
+# -- Kyverno package configuration.
 kyverno:
   # -- Toggle deployment of Kyverno.
   enabled: true
@@ -735,6 +738,7 @@ kyvernoReporter:
 # ----------------------------------------------------------------------------------------------------------------------
 # Elasticsearch, Kibana, Fluentbit Logging stack
 #
+# -- Elasticsearch and Kibana package configuration.
 elasticsearchKibana:
   # -- Toggle deployment of Logging (EFK).
   enabled: false
@@ -855,6 +859,7 @@ fluentbit:
 # ----------------------------------------------------------------------------------------------------------------------
 # Alloy / Loki Logging stack
 #
+# -- Grafana Alloy package configuration.
 alloy:
   # -- Toggle deployment of grafana alloy
   enabled: true
@@ -963,6 +968,7 @@ loki:
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+# -- NeuVector package configuration.
 neuvector:
   # -- Toggle deployment of Neuvector.
   enabled: true
@@ -1032,6 +1038,7 @@ neuvector:
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+# -- Tempo package configuration.
 tempo:
   # -- Toggle deployment of Tempo.
   enabled: true
@@ -1102,6 +1109,7 @@ tempo:
 
 # Monitoring
 #
+# -- Prometheus Operator CRDs package configuration.
 prometheusOperatorCRDs:
   # -- Toggle deployment of Monitoring/Prometheus Operator CRDs (ServiceMonitor, PodMonitor, AlertManager, ScrapeConfigs etc..)
   enabled: true
@@ -1201,6 +1209,7 @@ monitoring:
 
 # Grafana
 #
+# -- Grafana package configuration.
 grafana:
   # -- Toggle deployment of Grafana
   enabled: true
@@ -1252,6 +1261,7 @@ grafana:
 # ----------------------------------------------------------------------------------------------------------------------
 # Twistlock
 #
+# -- Twistlock package configuration.
 twistlock:
   # -- Toggle deployment of Twistlock.
   enabled: false
@@ -1300,6 +1310,7 @@ twistlock:
 # BBCTL Dashboards
 #
 # Requires monitoring, grafana, alloy, and loki to be deployed
+# -- BBCTL package configuration.
 bbctl:
   # -- Toggle deployment of the bbctl dashboards
   enabled: true
@@ -1365,6 +1376,7 @@ renovate:
 # ----------------------------------------------------------------------------------------------------------------------
 # cert-manager
 #
+# -- cert-manager package configuration.
 certManager:
   # -- Toggle deployment of cert-manager
   enabled: false
@@ -1410,6 +1422,7 @@ certManager:
 
 # ----------------------------------------------------------------------------------------------------------------------
 #
+# -- Optional add-on package configuration.
 addons:
   argocd:
     # -- Toggle deployment of ArgoCD.
@@ -1495,6 +1508,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Minio Operator and Instance
   #
+  # -- MinIO Operator package configuration.
   minioOperator:
     # -- Toggle deployment of minio operator and instance.
     enabled: false
@@ -1904,6 +1918,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Mattermost Operator and Instance
   #
+  # -- Mattermost Operator package configuration.
   mattermostOperator:
     # -- Toggle deployment of Mattermost Operator.
     enabled: false
@@ -2065,6 +2080,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Keycloak
   #
+  # -- Keycloak package configuration.
   keycloak:
     # -- Toggle deployment of Keycloak.
     enabled: false
@@ -2130,6 +2146,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Vault
   #
+  # -- Vault package configuration.
   vault:
     # -- Toggle deployment of Vault.
     enabled: false
@@ -2177,6 +2194,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Metrics Server
   #
+  # -- Metrics Server package configuration.
   metricsServer:
     # -- Toggle deployment of metrics server
     # Acceptable options are enabled: true, enabled: false, enabled: auto
@@ -2221,6 +2239,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Harbor
   #
+  # -- Harbor package configuration.
   harbor:
     # -- Toggle deployment of harbor
     enabled: false
@@ -2253,6 +2272,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # thanos
   #
+  # -- Thanos package configuration.
   thanos:
     # -- Toggle deployment of thanos
     enabled: false
@@ -2451,6 +2471,7 @@ addons:
   # ----------------------------------------------------------------------------------------------------------------------
   # Headlamp
   #
+  # -- Headlamp package configuration.
   headlamp:
     # -- Toggle deployment of headlamp
     enabled: false

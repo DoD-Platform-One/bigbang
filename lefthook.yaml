@@ -29,6 +29,9 @@ pre-commit:
     generated-package-schemas:
       glob: "{chart/package-metadata.yaml,chart/values.schema.json,scripts/generate-package-schemas.jq,scripts/generate-package-schemas.sh,scripts/migrate-values-3-to-4.sh}"
       run: scripts/generate-package-schemas.sh --check
+    generated-values-reference:
+      glob: "{chart/Chart.yaml,chart/values.yaml,docs/configuration/base-config.md.gotmpl,docs/configuration/base-config.md,scripts/generate-values-reference.sh}"
+      run: scripts/generate-values-reference.sh --check
 
 # Runs when you `git push` — only if any .sh or .bats files changed.
 pre-push:
@@ -40,3 +43,6 @@ pre-push:
     generated-package-schemas:
       glob: "{chart/package-metadata.yaml,chart/values.schema.json,scripts/generate-package-schemas.jq,scripts/generate-package-schemas.sh,scripts/migrate-values-3-to-4.sh}"
       run: scripts/generate-package-schemas.sh --check
+    generated-values-reference:
+      glob: "{chart/Chart.yaml,chart/values.yaml,docs/configuration/base-config.md.gotmpl,docs/configuration/base-config.md,scripts/generate-values-reference.sh}"
+      run: scripts/generate-values-reference.sh --check
