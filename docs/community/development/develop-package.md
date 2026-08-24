@@ -52,7 +52,7 @@ Package is the term we use for an application that has been prepared to be deplo
     ```yaml
     registry:
     enabled: true
-    host: "registry.bigbang.dev"
+    host: "registry.dev.bigbang.mil"
     image:
         repository: registry1.dso.mil/ironbank/gitlab/gitlab/gitlab-container-registry
         tag: 13.7.2

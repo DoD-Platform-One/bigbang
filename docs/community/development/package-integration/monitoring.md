@@ -192,15 +192,15 @@ helm upgrade -i -n bigbang --create-namespace -f ~/bigbang/chart/values.yaml -f 
 watch kubectl get gitrepo,hr,po -A
 
 # Test ingress to monitoring stack
-curl -L https://prometheus.bigbang.dev
-curl -L https://grafana.bigbang.dev
+curl -L https://prometheus.dev.bigbang.mil
+curl -L https://grafana.dev.bigbang.mil
 ```
 
-> If your application also has an ingress, test it (e.g. `https://podinfo.bigbang.dev`).
+> If your application also has an ingress, test it (e.g. `https://podinfo.dev.bigbang.mil`).
 
 ### Target
 
-Open `https://prometheus.bigbang.dev` and navigate to `Status > Targets.`  The `State` should show `UP` if metrics are being scraped for your package.
+Open `https://prometheus.dev.bigbang.mil` and navigate to `Status > Targets.`  The `State` should show `UP` if metrics are being scraped for your package.
 
 > There should be one `Endpoint` for every replica pod of your package.
 
@@ -210,4 +210,4 @@ In Prometheus, navigate to `Alerts.` Verify that the `PrometheusRule` alerting r
 
 ### Dashboards
 
-Open `https://grafana.bigbang.dev` and navigate to `Dashboards > Manage.` Make sure your dashboards are listed. Select each one and verify that it is working correctly.
+Open `https://grafana.dev.bigbang.mil` and navigate to `Dashboards > Manage.` Make sure your dashboards are listed. Select each one and verify that it is working correctly.

@@ -28,7 +28,7 @@ You will want to spin up the registry on the same host as your cluster (i.e., yo
 
 <!-- TODO: Make this all happen with a flag in the dev script, this should not be too challenging to automate. -->
 
-1. Grab the `*.bigbang.dev` cert to use for the registry. If you follow the commands below, using `curl` and `yq`, this is a simple process.
+1. Grab the `*.dev.bigbang.mil` cert to use for the registry. If you follow the commands below, using `curl` and `yq`, this is a simple process.
 
     ```console
     mkdir certs
@@ -50,33 +50,33 @@ You will want to spin up the registry on the same host as your cluster (i.e., yo
 
 1. Spin up your development cluster as you normally would. Do not install Flux or Big Bang on top of the cluster yet.
 
-1. Modify CoreDNS for your cluster to resolve your registry address to the private IP of your cluster host. In the example below we are using `oci.bigbang.dev`. Run the commands from your cluster host (i.e., ec2 instance if using it) listed in the following:
+1. Modify CoreDNS for your cluster to resolve your registry address to the private IP of your cluster host. In the example below we are using `oci.dev.bigbang.mil`. Run the commands from your cluster host (i.e., ec2 instance if using it) listed in the following:
 
     ```console
     # Note that these commands assume a Linux host and k3d cluster
     export PRIVATE_IP=$(hostname -I | cut -d " " -f1)
     kubectl get configmap -n kube-system coredns -o jsonpath='{.data.NodeHosts}' > newhosts
-    echo "${PRIVATE_IP} oci.bigbang.dev" >> newhosts
+    echo "${PRIVATE_IP} oci.dev.bigbang.mil" >> newhosts
     hosts=$(cat newhosts) yq e -n '.data.NodeHosts = strenv(hosts)' > patch.yaml
     kubectl patch configmap -n kube-system coredns --patch "$(cat patch.yaml)"
     kubectl rollout restart deployment -n kube-system coredns
     ```
 
-1. If your cluster is not on your local machine, also modify /etc/hosts to resolve your registry address (i.e. `oci.bigbang.dev`) to your cluster/registry host's public IP.
+1. If your cluster is not on your local machine, also modify /etc/hosts to resolve your registry address (i.e. `oci.dev.bigbang.mil`) to your cluster/registry host's public IP.
 
     ```console
     # Run on your registry/cluster host to print public IP
     curl http://checkip.amazonaws.com/ 2> /dev/null
 
     # From developer machine add this IP to /etc/hosts
-    sudo sh -c "echo '<IP from curl above> oci.bigbang.dev' >> /etc/hosts"
+    sudo sh -c "echo '<IP from curl above> oci.dev.bigbang.mil' >> /etc/hosts"
     ```
 
-1. Push OCI artifact to this registry with `helm push <artifact name> oci://oci.bigbang.dev:5000`. Following this example that would look like this:
+1. Push OCI artifact to this registry with `helm push <artifact name> oci://oci.dev.bigbang.mil:5000`. Following this example that would look like this:
 
     ```console
-    ❯ helm push anchore-1.19.7-bb.4.tgz oci://oci.bigbang.dev:5000
-    Pushed: oci.bigbang.dev:5000/anchore:1.19.7-bb.4
+    ❯ helm push anchore-1.19.7-bb.4.tgz oci://oci.dev.bigbang.mil:5000
+    Pushed: oci.dev.bigbang.mil:5000/anchore:1.19.7-bb.4
     Digest: sha256:3cb826ee59fab459aa3cd723ded448fc6d7ef2d025b55142b826b33c480f0a4c
     ```
 
@@ -88,7 +88,7 @@ You will want to spin up the registry on the same host as your cluster (i.e., yo
       repository: "oci://registry1.dso.mil/bigbang"
       existingSecret: "private-registry"
      - name: "k3d"
-       repository: "oci://oci.bigbang.dev:5000"
+       repository: "oci://oci.dev.bigbang.mil:5000"
 
     addons:
       anchore:
@@ -153,9 +153,9 @@ Currently you could leverage any of the following as your OCI registry:
 
 1. Install a minimal Big Bang on your cluster, not including the package you want to test. You should at least install Istio and the registry (i.e., Gitlab and/or Harbor).
 
-1. Modify CoreDNS for your cluster to route traffic to `x.bigbang.dev` (e.g., `harbor.bigbang.dev`) to the IP of the public ingress gateway. 
+1. Modify CoreDNS for your cluster to route traffic to `x.dev.bigbang.mil` (e.g., `harbor.dev.bigbang.mil`) to the IP of the public ingress gateway.
 
-1. Modify `/etc/hosts` to route `x.bigbang.dev` to the Public IP of your instance (if using a remote/ec2 based cluster).
+1. Modify `/etc/hosts` to route `x.dev.bigbang.mil` to the Public IP of your instance (if using a remote/ec2 based cluster).
 
 1. Push Helm tgz to your chosen registry.
 

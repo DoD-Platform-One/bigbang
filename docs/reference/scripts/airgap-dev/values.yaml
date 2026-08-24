@@ -1,5 +1,5 @@
 # -- Domain used for BigBang created exposed services, can be overridden by individual packages.
-hostname: bigbang.dev
+hostname: dev.bigbang.mil
 registryCredentials:
   registry: host.k3d.internal
   username: ""
@@ -71,7 +71,7 @@ addons:
       repo: ssh://git@host.k3d.internal/home/git/repos/authservice
     chains:
       minimal:
-        callback_uri: "https://minimal.bigbang.dev"
+        callback_uri: "https://minimal.dev.bigbang.mil"
   gitlab:
     enabled: false
     git:

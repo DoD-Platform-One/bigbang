@@ -10,7 +10,7 @@ The development environment can be set up in one of three ways:
 
 1. One k3d cluster using MetalLB to have Keycloak, Big Bang, and all other apps in the one cluster (see [this example config](../../../reference/configs/example/dev-sso-values.yaml) for more information).
 
-1. Use a single K3D cluster with two Public IP addresses and the `-a` option on the `k3d-dev.sh` script. This will provision two Elastic IPs, MetalLB, and two specialized `k3d-proxy` containers for connecting the Elastic IPs to the MetalLB IPs. This allows for both a Public and Passthrough Istio Gateway to work simultaneously, specifically to allow for x509 mTLS authentication with Keycloak. Keep in mind that `keycloak.bigbang.dev` will need to point to the Secondary IP in your `/etc/hosts` file. The `k3d-dev.sh` script will inform you of this and return the SecondaryIP.
+1. Use a single K3D cluster with two Public IP addresses and the `-a` option on the `k3d-dev.sh` script. This will provision two Elastic IPs, MetalLB, and two specialized `k3d-proxy` containers for connecting the Elastic IPs to the MetalLB IPs. This allows for both a Public and Passthrough Istio Gateway to work simultaneously, specifically to allow for x509 mTLS authentication with Keycloak. Keep in mind that `keycloak.dev.bigbang.mil` will need to point to the Secondary IP in your `/etc/hosts` file. The `k3d-dev.sh` script will inform you of this and return the SecondaryIP.
 
 ## Integration
 
@@ -84,7 +84,7 @@ For validating package integration with SSO, carry out the following basic steps
 
 1. Enable the package and SSO within Big Bang through the values added in the sections above.
 
-1. Using an internet browser, browse to your application (e.g., sonarqube.bigbang.dev).
+1. Using an internet browser, browse to your application (e.g., sonarqube.dev.bigbang.mil).
 
 1. If using built-in SAML/OIDC, click the login button, confirm a redirect to the Identity Provider happens. If using Authservice, confirm a redirect to the Identity Provider happens, prompting user sign in.
 

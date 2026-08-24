@@ -180,7 +180,7 @@ addons:
 
       injector:
         extraEnvironmentVars:
-          AGENT_INJECT_VAULT_ADDR: "https://vault.bigbang.dev"
+          AGENT_INJECT_VAULT_ADDR: "https://vault.dev.bigbang.mil"
 
       server:
         # Increase default resources
@@ -199,7 +199,7 @@ addons:
         # Extra environment variable to support high availability
         extraEnvironmentVars:
           # the istio gateway domain
-          VAULT_API_ADDR: https://vault.bigbang.dev
+          VAULT_API_ADDR: https://vault.dev.bigbang.mil
           VAULT_SKIP_VERIFY: "true"
           VAULT_LOG_FORMAT: "json"
           VAULT_LICENSE: "your-license-key-goes-here"
@@ -236,21 +236,21 @@ addons:
                   leader_api_addr = "https://vault-vault-0.vault-vault-internal:8200"
                   leader_client_cert_file = "/vault/tls/tls.crt"
                   leader_client_key_file = "/vault/tls/tls.key"
-                  leader_tls_servername = "vault.bigbang.dev"
+                  leader_tls_servername = "vault.dev.bigbang.mil"
                 }
 
                 retry_join {
                   leader_api_addr = "https://vault-vault-1.vault-vault-internal:8200"
                   leader_client_cert_file = "/vault/tls/tls.crt"
                   leader_client_key_file = "/vault/tls/tls.key"
-                  leader_tls_servername = "vault.bigbang.dev"
+                  leader_tls_servername = "vault.dev.bigbang.mil"
                 }
 
                 retry_join {
                   leader_api_addr = "https://vault-vault-2.vault-vault-internal:8200"
                   leader_client_cert_file = "/vault/tls/tls.crt"
                   leader_client_key_file = "/vault/tls/tls.key"
-                  leader_tls_servername = "vault.bigbang.dev"
+                  leader_tls_servername = "vault.dev.bigbang.mil"
                 }
               }
 

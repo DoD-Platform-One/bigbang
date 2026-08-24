@@ -54,7 +54,7 @@ elasticsearchKibana:
 Istio is disabled in the elasticsearch-kibana chart by default and can be enabled with the following values in the bigbang chart:
 
 ```yaml
-hostname: bigbang.dev
+hostname: dev.bigbang.mil
 istio:
   enabled: true
 ```
