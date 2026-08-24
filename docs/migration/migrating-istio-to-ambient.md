@@ -19,7 +19,7 @@ Standing up a **new** ambient environment instead? See
 ### Related documentation
 
 - [Configuring Istio Ambient Mode in Big Bang](../configuration/ambient.md)
-- [Running Mission Applications in Ambient](../configuration/ambient-mission-apps.md)
+- [Running Mission Applications in Ambient](../tutorials/ambient-mission-applications/index.md)
 - [ztunnel Package](../packages/core/ztunnel.md) / [Gateway API Package](../packages/core/gateway-api.md)
 - Upstream: [Migrating to Ambient Mode](https://istio.io/latest/docs/ambient/install/)
 
@@ -91,7 +91,7 @@ helm upgrade --install bigbang <chart> -n bigbang \
 
 > [!IMPORTANT]
 > **Most Big Bang managed pods roll into ambient automatically.** Enabling ambient changes the
-> `bigbang.dev/istioDataplane` annotation Big Bang stamps onto nearly every package. When Flux
+> `dev.bigbang.mil/istioDataplane` annotation Big Bang stamps onto nearly every package. When Flux
 > applies the Helm upgrade, the changed pod template makes Kubernetes roll those pods, and they
 > restart without sidecars. Workloads deployed outside of Big Bang need to be addressed separately.
 >
@@ -124,7 +124,7 @@ Re-run `list` afterwards; it should report no sidecar pods.
 
 ### Step 4: Migrate mission apps and non-integrated charts
 
-See [Running Mission Applications in Ambient](../configuration/ambient-mission-apps.md)
+See [Running Mission Applications in Ambient](../tutorials/ambient-mission-applications/index.md)
 
 ## Handling Special Cases
 
@@ -196,7 +196,7 @@ kubectl logs -n istio-system $ztunnel
 ## References
 
 - [Configuring Istio Ambient Mode in Big Bang](../configuration/ambient.md)
-- [Running Mission Applications in Ambient](../configuration/ambient-mission-apps.md)
+- [Running Mission Applications in Ambient](../tutorials/ambient-mission-applications/index.md)
 - [ztunnel Package](../packages/core/ztunnel.md) / [Gateway API Package](../packages/core/gateway-api.md)
 - [Istio Ambient Overview](https://istio.io/latest/docs/ambient/overview/) /
   [Migrating to Ambient](https://istio.io/latest/docs/ambient/install/) /

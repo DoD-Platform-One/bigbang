@@ -6,7 +6,7 @@
 
 ### Gitlab Helm Chart Configuration
 
-1. Follow the `Backup and rename gitlab-rails-secret` task within the [Production document](../configuration/sample-prod-config.md).
+1. Follow the [Protect the Rails Secret](../configuration/production-considerations/gitlab.md#protect-the-rails-secret) guidance in the GitLab production considerations.
 1. Fill in our externalStorage values, specifically `addons.gitlab.objectStorage.iamProfile` or both `.Values.addons.gitlab.objectStorage.accessKey` & `.Values.addons.gitlab.objectStorage.accessSecret` along with `.Values.addons.gitlab.objectStorage.bucketPrefix` or you can override in the name for your own bucket eg:
 ```yaml
 addons:
@@ -105,4 +105,3 @@ You can read more on the upstream documentation: https://docs.gitlab.com/charts/
      backup-utility --restore -t TIMESTAMP_VALUE
      ```
 You can read more on the upstream documentation: https://docs.gitlab.com/charts/backup-restore/restore.html#restoring-the-backup-file.
-

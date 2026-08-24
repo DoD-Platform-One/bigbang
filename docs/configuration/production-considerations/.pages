@@ -1,0 +1,5 @@
+nav:
+  - Overview: index.md
+  - GitLab: gitlab.md
+  - Vault: vault.md
+  - Keycloak: keycloak.md

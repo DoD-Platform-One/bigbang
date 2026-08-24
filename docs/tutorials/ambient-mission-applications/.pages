@@ -1,0 +1,5 @@
+nav:
+  - Overview and Path Selection: index.md
+  - 1. Prepare an Application: prepare-application.md
+  - 2A. Deploy with the packages Key: deploy-with-packages-key.md
+  - 2B. Deploy with Argo CD: deploy-with-argocd.md
