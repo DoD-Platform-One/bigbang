@@ -1,18 +1,19 @@
 nav:
   - Overview: index.md
-  - Anchore: anchore.md
-  - Argo CD: argocd.md
-  - AuthService: authservice.md
-  - External Secrets Operator(ESO): external-secrets-operator.md
-  - Fortify: fortify.md
-  - GitLab: gitlab.md
-  - Harbor: harbor.md
-  - Keycloak: keycloak.md
-  - Mattermost: mattermost.md
-  - Metrics Server: metricserver.md
-  - Mimir: mimir.md
-  - MinIO: minio.md
-  - Renovate: renovate.md
-  - SonarQube: sonarqube.md
-  - Vault: vault.md
-  - Velero: velero.md
+  - "Anchore": anchore.md
+  - "Argo CD": argocd.md
+  - "Authservice": authservice.md
+  - "External Secrets Operator": external-secrets-operator.md
+  - "Fortify": fortify.md
+  - "GitLab": gitlab.md
+  - "Harbor": harbor.md
+  - "Headlamp": headlamp.md
+  - "Keycloak": keycloak.md
+  - "Mattermost": mattermost.md
+  - "Metrics Server": metricserver.md
+  - "Mimir": mimir.md
+  - "MinIO": minio.md
+  - "SonarQube": sonarqube.md
+  - "Thanos": thanos.md
+  - "Vault": vault.md
+  - "Velero": velero.md

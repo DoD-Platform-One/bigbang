@@ -1,17 +1,19 @@
 nav:
   - Overview: index.md
-  - Alloy: alloy.md
-  - Cert-manager: cert-manager.md
-  - ElasticSearch Kibana: elasticsearch-kibana.md
-  - Fluent Bit: fluentbit.md
-  - Gateway API: gateway-api.md
-  - Istio: istio.md
-  - Kiali: kiali.md
-  - Kyverno: kyverno.md
-  - Loki: loki.md
-  - Monitoring: monitoring.md
-  - Neuvector: neuvector.md
-  - OPA Gatekeeper: opa-gatekeeper.md
-  - Tempo: tempo.md
-  - Twistlock: twistlock.md
-  - ztunnel: ztunnel.md
+  - "BBCTL": bbctl.md
+  - "cert-manager": cert-manager.md
+  - "Elasticsearch-Kibana": elasticsearch-kibana.md
+  - "Fluent Bit": fluentbit.md
+  - "Gateway API": gateway-api.md
+  - "Grafana Alloy": alloy.md
+  - "Istio": istio.md
+  - "Kiali": kiali.md
+  - "Kyverno": kyverno.md
+  - "Loki": loki.md
+  - "Monitoring": monitoring.md
+  - "NeuVector": neuvector.md
+  - "OPA Gatekeeper": opa-gatekeeper.md
+  - "Renovate": renovate.md
+  - "Tempo": tempo.md
+  - "Twistlock": twistlock.md
+  - "Ztunnel": ztunnel.md

@@ -1,4 +1,4 @@
-# Fluentbit
+# Fluent Bit
 
 ## Overview
 
